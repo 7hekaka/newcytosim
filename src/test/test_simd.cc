@@ -307,7 +307,7 @@ void test_stride()
     for ( size_t n = 0; n < 12*CNT; ++n )
         a[n] = 1 + n % 12;
     
-#pragma ivdep
+    #pragma omp simd
     for ( size_t n = 0; n < CNT; ++n )
         destride3x4(a+12*n, b+16*n);
     

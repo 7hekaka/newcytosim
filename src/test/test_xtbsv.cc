@@ -544,7 +544,7 @@ void getrs4(int N, real const* B, int LDB, real* Y)
 /// convert doubles to floats
 void convert_to_floats(size_t cnt, double const* src, float* dst)
 {
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t i = 0; i < cnt; ++i )
         dst[i] = (float)src[i];
 }

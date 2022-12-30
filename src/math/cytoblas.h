@@ -58,8 +58,7 @@ inline void xaxpby(int N, real alpha, const real* X, int incX, real beta, real* 
 /// calculates Y <- X + alpha * Y
 inline void xpay(size_t N, const real* X, real alpha, real* Y)
 {
-    #pragma ivdep
-    #pragma vector always
+    #pragma omp simd
     for ( size_t i = 0; i < N; ++i )
         Y[i] = alpha * Y[i] + X[i];
 }
@@ -69,8 +68,7 @@ inline void xpay(size_t N, const real* X, real alpha, real* Y)
 inline void xadd(size_t N, const real* X, real* Y)
 {
     //xaxpy(N, 1.0, X, 1, Y, 1);
-    #pragma ivdep
-    #pragma vector always
+    #pragma omp simd
     for ( size_t i = 0; i < N; ++i )
         Y[i] = Y[i] + X[i];
 }
@@ -79,8 +77,7 @@ inline void xadd(size_t N, const real* X, real* Y)
 inline void xsub(size_t N, const real* X, real* Y)
 {
     //xaxpy(N, -1.0, X, 1, Y, 1);
-    #pragma ivdep
-    #pragma vector always
+    #pragma omp simd
     for ( size_t i = 0; i < N; ++i )
         Y[i] = Y[i] - X[i];
 }
@@ -112,8 +109,7 @@ inline real nrm8(const int N, const real* X, int inc)
 inline real nrm8seq(const size_t cnt, const real* X)
 {
     real res = abs_real(X[0]);
-#pragma ivdep
-#pragma vector always
+    #pragma omp simd
     for ( size_t i = 1; i < cnt; ++i )
         res = std::max(res, abs_real(X[i]));
     return res;
@@ -195,8 +191,7 @@ inline float nrm8(const size_t siz, const float* ptr)
 inline real nrm8(const size_t N, const real* X)
 {
     real r = 0;
-    #pragma ivdep
-    #pragma vector always
+    #pragma omp simd
     for ( size_t i = 0; i < N; ++i )
         r = std::max(r, abs_real(X[i]));
     return r;

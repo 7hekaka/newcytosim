@@ -805,8 +805,7 @@ static void markMatrix(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT)
         for ( size_t n = 0; n < MAT.column_size(j); ++n )
         {
             size_t i = MAT.column_index(j, n);
-            // swap i,j and flip i to display matrix properly on screen
-            if ( j < sup )
+            if ( i < sup )
                 bmap.set(i, j, 1);
         }
     }

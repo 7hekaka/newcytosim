@@ -153,7 +153,7 @@ inline static void zero_real(size_t cnt, real * ptr)
     // this works because IEEE 754 '+0.0' is represented with all bits at zero
     memset(ptr, 0, cnt*sizeof(real));
 #else
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t u = 0; u < cnt; ++u )
         ptr[u] = 0.0;
 #endif

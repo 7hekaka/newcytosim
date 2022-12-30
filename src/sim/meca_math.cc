@@ -240,7 +240,7 @@ static void compactify_double(size_t siz, double* mat)
 /// convert doubles to floats
 static void convert_to_floats(size_t cnt, double const* src, float* dst)
 {
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t i = 0; i < cnt; ++i )
         dst[i] = (float)src[i];
 }

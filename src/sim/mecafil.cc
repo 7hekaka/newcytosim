@@ -128,7 +128,7 @@ void Mecafil::storeDirections()
      */
     const real val = 1.0 / segmentation();
     const size_t end = DIM * lastPoint();
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t i = 0; i < end; ++i )
         iDir[i] = val * ( pPos[i+DIM] - pPos[i] );
 #else
@@ -246,14 +246,14 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     
     const size_t end = nbt;
     // in the general case all values can be computed independently:
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] += R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * ((X-DIM*2)[i]+(X+DIM*2)[i]) - R6 * X[i];
+        Y[i] = Y[i] + R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * (6*X[i]+(X-DIM*2)[i]+(X+DIM*2)[i]);
 
     // special cases at the edges:
     real      * Z = Y + nbt;
     real const* E = X + nbt + DIM;
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t d = 0; d < DIM; ++d )
     {
         Y[d+DIM] -= R1 * ((X+DIM)[d]+(X+DIM*3)[d]) + R4 * ((X+DIM)[d]-(X+DIM*2)[d]) - R2 * X[d];

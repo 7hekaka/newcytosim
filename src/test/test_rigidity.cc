@@ -348,14 +348,14 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     }
 */
     const size_t end = nbt;
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] += R4 * (X[i-DIM]+X[i+DIM]) - R1 * (X[i-DIM*2]+X[i+DIM*2]) - R6 * X[i];
+        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (6*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
     
     // special cases near the edges:
     real      * Z = Y + nbt;
     real const* E = X + nbt + DIM;
-    #pragma ivdep
+    #pragma omp simd
     for ( int d = 0; d < DIM; ++d )
     {
         Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
@@ -373,7 +373,7 @@ void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
     const real R2 = R1 * 2;
 
     const size_t end = nbt;
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
         Y[i] += R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * ((X-DIM*2)[i]+(X+DIM*2)[i]) - R6 * X[i];
     
@@ -381,7 +381,7 @@ void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
     real      * Z = Y + nbt;
     real const* E = X + nbt + DIM;
 
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t d = 0; d < DIM; ++d )
     {
         Y[d+DIM] -= R1 * ((X+DIM)[d]+(X+DIM*3)[d]) + R4 * ((X+DIM)[d]-(X+DIM*2)[d]) - R2 * X[d];
@@ -399,7 +399,7 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
     const real R2 = R1 * 2;
     
     const size_t end = FOR * nbt / DIM;
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t i = FOR*2; i < end; ++i )
         Y[i] += R4 * ((X-FOR)[i]+(X+FOR)[i]) - R1 * ((X-FOR*2)[i]+(X+FOR*2)[i]) - R6 * X[i];
     
@@ -407,7 +407,7 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
     real      * Z = Y + nbt;
     real const* E = X + nbt + FOR;
     
-    #pragma ivdep
+    #pragma omp simd
     for ( size_t d = 0; d < FOR; ++d )
     {
         Y[d+FOR] -= R1 * ((X+FOR)[d]+(X+FOR*3)[d]) + R4 * ((X+FOR)[d]-(X+FOR*2)[d]) - R2 * X[d];
