@@ -131,7 +131,7 @@ void paintCell(const int x_inf, const int x_sup, const int y, const int z, void 
 #endif
     
     // Since all the lists are independent, they can be updated in parallel
-    # pragma ivdep
+    #pragma ivdep
     for ( ; list <= last; ++list )
         list->push_back(seg);
 }
@@ -150,7 +150,7 @@ void paintCellPeriodic(const int x_inf, const int x_sup, const int y, const int 
     //printf("paint %p in (%i to %i, %i, %i)\n", seg, x_inf, x_sup, y, z);
     //std::clog << " paint " << seg << " over ("<< x_inf << " " << x_sup << "; " << y << "; " << z << ")\n";
 
-    # pragma ivdep
+    #pragma ivdep
     for ( int x = x_inf; x <= x_sup; ++x )
     {
         /*

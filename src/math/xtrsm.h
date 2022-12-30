@@ -946,7 +946,7 @@ void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
             tmp *= A[K]; // DIV
             B[K] = tmp;
         }
-        # pragma ivdep
+        #pragma omp simd
         for ( int I = K + 1; I < M; ++I )
             B[I] -= tmp * A[I];
         A += lda;
@@ -964,7 +964,7 @@ void alsatian_xtrsmLLT1(const int M, const REAL* A, const int lda, REAL* B)
     {
         A -= lda;
         REAL tmp = B[I];
-        # pragma ivdep
+        #pragma omp simd
         for ( int K = I + 1; K < M; ++K )
             tmp -= A[K] * B[K];
         if ( diag == 'N' )
@@ -993,7 +993,7 @@ void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
             tmp *= A[K]; // DIV
             B[K] = tmp;
         }
-        # pragma ivdep
+        #pragma omp simd
         for ( int I = 0; I < K; ++I )
             B[I] -= tmp * A[I];
     }
@@ -1009,7 +1009,7 @@ void alsatian_xtrsmLLN1U(const int M, const float* A, const int lda, real* B)
     for ( int K = 0; K < M; ++K )
     {
         const real tmp = B[K];
-        # pragma ivdep
+        #pragma omp simd
         for ( int I = K + 1; I < M; ++I )
             B[I] -= tmp * A[I];
         A += lda;
@@ -1029,7 +1029,7 @@ void alsatian_xtrsmLUN1I(const int M, const float* A, const int lda, real* B)
         A -= lda;
         const real tmp = B[K] * A[K];
         B[K] = tmp;
-        # pragma ivdep
+        #pragma omp simd
         for ( int I = 0; I < K; ++I )
             B[I] -= tmp * A[I];
     }
@@ -1053,7 +1053,7 @@ void alsatian_xtrsmLLN1U_3D(const int M, const float* A, const int lda, real* B)
         real T2 = B[K+2] - T0 * A[K+2] - T1 * A[lda+K+2];
         B[K+1] = T1;
         B[K+2] = T2;
-        # pragma ivdep
+        #pragma omp simd
         for ( int I = K + 3; I < M; ++I )
             B[I] -= T0 * A[I] + T1 * A[I+lda] + T2 * A[I+lda*2];
         A += 3*lda;
@@ -1077,7 +1077,7 @@ void alsatian_xtrsmLUN1I_3D(const int M, const float* A, const int lda, real* B)
         B[K  ] = T0;
         B[K+1] = T1;
         B[K+2] = T2;
-        # pragma ivdep
+        #pragma omp simd
         for ( int I = 0; I < K; ++I )
             B[I] -= T0 * A[I] + T1 * A[I+lda] + T2 * A[I+lda*2];
     }
@@ -1127,7 +1127,7 @@ void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* A, const int lda, doub
         vec4 tt1 = duplo2f128(cast4(t1));
         vec4 tt2 = duplo2f128(cast4(t2));
         vec4 tt3 = duplo2f128(cast4(t3));
-        # pragma ivdep
+        #pragma ivdep
         while ( pB < end-2 )
         {
             vec4 aa = fnmadd4(tt0, load4d(pA), loadu4(pB));
@@ -1175,14 +1175,13 @@ void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* A, const int lda, doub
     {
         const float * pA = A + K + 1;
         A += lda;
-        double * pB = B + K + 1;
+        double * pB;
         vec2 t = loaddup2(B+K);
-        # pragma ivdep
-        while ( pB < end )
+        #pragma omp simd
+        for ( pB = B + K + 1; pB < end; pB += 2 )
         {
             storeu2(pB, fnmadd2(t, load2d(pA), loadu2(pB)));
             pA += 2;
-            pB += 2;
         }
         if ( pB <= end )
         {
@@ -1233,7 +1232,7 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
         vec4 tt1 = duplo2f128(cast4(t1));
         vec4 tt2 = duplo2f128(cast4(t2));
         vec4 tt3 = duplo2f128(cast4(t3));
-# pragma ivdep
+        #pragma ivdep
         while ( pB > B+3 )
         {
             pA -= 4;
@@ -1245,7 +1244,7 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
             storeu4(pB, aa);
         }
 #endif
-# pragma ivdep
+        #pragma ivdep
         while ( pB > B+1 )
         {
             pA -= 2;
@@ -1286,7 +1285,7 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
         vec2 t = mul1(load1(pB), load1d(pA));
         store1(pB, t);
         t = unpacklo2(t, t); // { T0, T0 }
-        # pragma ivdep
+        #pragma ivdep
         while ( pB > B+1 )
         {
             pA -= 2;
@@ -1319,15 +1318,13 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
     if ( M & 1 )
     {
         vec2f t = loaddupf(B);
-        float * pB = B + 1;
         float const* pA = A + 1;
         // there is an even number of scalars, fitting perfectly:
-        # pragma ivdep
-        while ( pB < end )
+        #pragma omp simd
+        for ( float * pB = B + 1; pB < end; pB += 2 )
         {
             store2f(pB, fnmadd2f(t, load2f(pA), load2f(pB)));
             pA += 2;
-            pB += 2;
         }
         A += lda;
         ++K;
@@ -1336,24 +1333,21 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
     // process columns 2 by 2
     for ( ; K < M; K += 2 )
     {
-        float * pB = B + K;
         float const* pA = A + K;
-        vec2f t0 = load2f(pB);
+        vec2f t0 = load2f(B + K);
         vec2f t1 = load2f(pA); // will use upper value
         t1 = fnmadd2f(unpacklo2f(setzero2f(), t0), t1, t0);
-        store2f(pB, t1);
+        store2f(B + K, t1);
         t0 = unpacklo2f(t0, t0);
         t1 = unpackhi2f(t1, t1);
-        pB += 2;
         pA += 2;
-        # pragma ivdep
-        while ( pB < end )
+        #pragma omp simd
+        for ( float * pB = B + K + 2; pB < end; pB += 2 )
         {
             vec2f x = fnmadd2f(t0, load2f(pA), load2f(pB));
             x = fnmadd2f(t1, load2f(pA+lda), x);
             store2f(pB, x);
             pA += 2;
-            pB += 2;
         }
         A += 2*lda;
     }
@@ -1393,15 +1387,14 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, flo
                 pA += 1;
                 pB += 1;
             }
-            # pragma ivdep
-            while ( pB < end )
+            #pragma ivdep
+            for ( ; pB < end; pB += 2 )
             {
                 vec2f x = fnmadd2f(t0, load2f(pA), load2f(pB));
                 x = fnmadd2f(t1, load2f(pA+lda), x); // column K+1
                 x = fnmadd2f(t2, load2f(pA+lda*2), x); // column K+2
                 store2f(pB, x);
                 pA += 2;
-                pB += 2;
             }
         }
         pA += lda*2;
@@ -1422,18 +1415,16 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
     if ( M & 1 )
     {
         A -= lda;
-        float * pB = B;
         float * end = B + K;
         float const* pA = A;
         vec2f t0 = mul2f(load1f(end), load1f(pA+K));
         t0 = unpacklo2f(t0, t0); // { T0, T0 }
         // there is an even number of scalars remaining, fitting perfectly:
-        # pragma ivdep
-        while ( pB < end )
+        #pragma omp simd
+        for ( float * pB = B ; pB < end; pB += 2 )
         {
             store2f(pB, fnmadd2f(t0, load2f(pA), load2f(pB)));
             pA += 2;
-            pB += 2;
         }
         store1f(end, t0);
         --K;
@@ -1444,7 +1435,7 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
     for ( ; K >= 0; K -= 2 )
     {
         A -= 2*lda;
-        float * pB = B;
+        
         float * end = B + K;
         float const* pA = A;
         vec2f t0 = load2f(end);
@@ -1454,14 +1445,13 @@ void alsatian_xtrsmLUN1I_SSE(const int M, const float* A, const int lda, float* 
         t0 = mul2f(fnmadd2f(t1, z, t0), load2f(pA+K)); // { T0, ? }
         store2f(end, blend11f(t0, t1));
         t0 = unpacklo2f(t0, t0); // { T0, T0 }
-        # pragma ivdep
-        while ( pB < end )
+        #pragma omp simd
+        for ( float * pB = B; pB < end; pB += 2 )
         {
             vec2f x = fnmadd2f(t0, load2f(pA), load2f(pB));
             x = fnmadd2f(t1, load2f(pA+lda), x);
             store2f(pB, x);
             pA += 2;
-            pB += 2;
         }
     }
 }
@@ -1499,7 +1489,7 @@ void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, floa
                 x = fnmadd2f(t2, load1f(pA+lda*2), x); // column K+2
                 store1f(pB, x);
             }
-            # pragma ivdep
+            #pragma ivdep
             while ( pB > B )
             {
                 pA -= 2;

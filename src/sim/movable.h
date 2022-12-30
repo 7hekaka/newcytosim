@@ -40,6 +40,7 @@ class Movable
     static Vector readDirectionPrimitive(std::istream&, Vector const&, Space const*);
 
 public:
+    
     /// read a position in space
     static Vector readPosition(std::istream&, Space const*);
 

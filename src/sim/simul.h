@@ -264,7 +264,7 @@ public:
     /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
     Mecable * pickMecable(const std::string&) const;
     
-    /// find a Mecable from a string specifying name and inventory number (e.g. 'fiber1')
+    /// find a Movable from a string specifying name and inventory number (e.g. 'fiber1')
     Object * pickMovable(const std::string&) const;
 
     /// find a Solid Prop

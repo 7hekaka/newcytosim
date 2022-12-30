@@ -942,7 +942,7 @@ void CoupleSet::uniRelax()
 
 
 //------------------------------------------------------------------------------
-# pragma mark - Equilibrate
+#pragma mark - Equilibrate
 
 
 void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleReserve& can)
