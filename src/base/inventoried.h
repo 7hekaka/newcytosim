@@ -1,11 +1,15 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #ifndef INVENTORIED_H
 #define INVENTORIED_H
 
+#include "random.h"
 
 /// type for the serial number of an Object
-typedef unsigned int ObjectID;
+typedef unsigned ObjectID;
+
+/// type used for signature
+typedef unsigned ObjectSignature;
 
 
 /// Class that can be registered in the Inventory
@@ -24,10 +28,13 @@ protected:
     /// object identifier, unique within each class
     ObjectID ID_;
     
+    /// a random number associated with this object
+    ObjectSignature signature_;
+
 public:
     
     /// set identity to 0
-    Inventoried() : ID_(0) {}
+    Inventoried() : ID_(0), signature_(RNG.pint32()) {}
     
     /// passive destructor
     ~Inventoried() {}
@@ -41,6 +48,12 @@ public:
     
     /// returns modifiable identity
     ObjectID& identity() { return ID_; }
+    
+    /// a random number that is likely to be unique
+    ObjectSignature signature() const { return signature_; }
+    
+    /// set signature
+    void signature(ObjectSignature s) { signature_ = s; }
 
 };
 

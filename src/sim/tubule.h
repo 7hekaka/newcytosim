@@ -34,7 +34,7 @@ private:
     Fiber* fil_[FILM];
     
     /// offset in abscissa
-    real   offset_[FILM];
+    real offset_[FILM];
     
     /// the Property of this object
     TubuleProp const* prop;

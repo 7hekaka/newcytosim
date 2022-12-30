@@ -1,6 +1,6 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
-#include "movable.h"
+#include "primitives.h"
 #include "assert_macro.h"
 #include "stream_func.h"
 #include "exceptions.h"
@@ -9,53 +9,9 @@
 #include "tokenizer.h"
 #include "evaluator.h"
 #include "glossary.h"
-#include "modulo.h"
 #include "random.h"
 #include "space.h"
 
-
-/** The default implementation is invalid */
-void Movable::translate(Vector const&)
-{
-    ABORT_NOW("Movable::translate() called for immobile Object");
-}
-
-/** The default implementation is invalid */
-void Movable::rotate(Rotation const& rot)
-{
-    ABORT_NOW("Movable::rotate() called for immobile Object");
-}
-
-/*
- if possible, the Object is translated by `[ rot * Object::position() - Object::position() ]`
- 
- Note that this has no effect if the Object is at the origin
-*/
-void Movable::rotateT(Rotation const& rot)
-{
-    assert_true( mobile() == 1 );
-    Vector pos = position();
-    translate(rot*pos-pos);
-}
-
-/**
-revolve() implements:
-
-    Vector G = position();
-    translate( -G );
-    rotate( T );
-    translate(  G );
-*/
-void Movable::revolve(Rotation const& T)
-{
-    Vector G = position();
-    translate( -G );
-    rotate( T );
-    translate(  G );
-}
-
-//------------------------------------------------------------------------------
-#pragma mark -
 
 /**
  There are different ways to specify a position:
@@ -91,7 +47,7 @@ void Movable::revolve(Rotation const& T)
  chosen randomly inside this area following a uniform probability.
  */
 
-Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
+Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
 
@@ -502,7 +458,7 @@ Vector Movable::readPositionPrimitive(std::istream& is, Space const* spc)
    position = square 3 align 1 1 0 at 1 1
  
  */ 
-Vector Movable::readPosition(std::istream& is, Space const* spc)
+Vector Cytosim::readPosition(std::istream& is, Space const* spc)
 {
     std::string tok;
     std::streampos isp;
@@ -618,10 +574,10 @@ Vector Movable::readPosition(std::istream& is, Space const* spc)
 
 
 /// convert string to a position
-Vector Movable::readPosition(std::string const& arg, Space const* spc)
+Vector Cytosim::readPosition(std::string const& arg, Space const* spc)
 {
     std::istringstream iss(arg);
-    Vector vec = Movable::readPosition(iss, spc);
+    Vector vec = Cytosim::readPosition(iss, spc);
     if ( StreamFunc::has_trail(iss) )
     {
         std::string str;
@@ -633,13 +589,13 @@ Vector Movable::readPosition(std::string const& arg, Space const* spc)
 
 
 /// convert string to a position
-Vector Movable::readPosition(std::string const& arg)
+Vector Cytosim::readPosition(std::string const& arg)
 {
     long max_trials = 1 << 14;
     while ( --max_trials >= 0 )
     {
         std::istringstream iss(arg);
-        Vector vec = Movable::readPosition(iss, nullptr);
+        Vector vec = Cytosim::readPosition(iss, nullptr);
         if ( vec.valid() )
             return vec;
     }
@@ -682,7 +638,7 @@ Vector Movable::readPosition(std::string const& arg)
  cytosim will pick uniformly among all the possible rotations that fulfill the requirements.
  */
 
-Vector Movable::readDirectionPrimitive(std::istream& is, Vector const& pos, Space const* spc)
+Vector Cytosim::readDirectionPrimitive(std::istream& is, Vector const& pos, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
     
@@ -856,7 +812,7 @@ Vector Movable::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
 }
 
 
-Vector Movable::readDirection(std::istream& is, Vector const& pos, Space const* spc)
+Vector Cytosim::readDirection(std::istream& is, Vector const& pos, Space const* spc)
 {
     size_t ouf = 0, max_trials = 1<<14;
     std::string tok;
@@ -958,7 +914,7 @@ static real get_angle(std::istream& is)
  `quat q0 q1 q2 q3`      | As specified by the Quaternion (q0, q1, q2, q3)
 */
 
-Rotation Movable::readRotation(std::istream& is)
+Rotation Cytosim::readRotation(std::istream& is)
 {
     std::streampos isp = is.tellg();
     std::string tok = Tokenizer::get_symbol(is);
@@ -1049,8 +1005,8 @@ Rotation Movable::readRotation(std::istream& is)
  
  Keyword                 | Rotation / Result
  ------------------------|------------------------------------------------------
- ROTATION                | see @ref Movable::readRotation()
- DIRECTION               | see @ref Movable::readDirection
+ ROTATION                | see @ref Cytosim::readRotation()
+ DIRECTION               | see @ref Cytosim::readDirection
  DIRECTION or DIRECTION  | flip randomly between two specified directions
  
  When a DIRECTION is specified, a rotation will be built that transforms (1, 0, 0)
@@ -1059,7 +1015,7 @@ Rotation Movable::readRotation(std::istream& is)
  probability among all the possible rotation, by rotating around (1, 0, 0) beforehand.
 */
 
-Rotation Movable::readOrientation(std::istream& is, Vector const& pos, Space const* spc)
+Rotation Cytosim::readOrientation(std::istream& is, Vector const& pos, Space const* spc)
 {
     int c = Tokenizer::skip_space(is, false);
 

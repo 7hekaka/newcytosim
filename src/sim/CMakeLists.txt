@@ -1,6 +1,6 @@
 
 set(SOURCES_SIM
-    modulo.cc movable.cc
+    modulo.cc primitives.cc
     mecable.cc meca.cc mecapoint.cc
     interpolation.cc interpolation4.cc
     fiber_segment.cc fiber_site.cc

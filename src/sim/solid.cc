@@ -1,5 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
+
 #include "assert_macro.h"
+#include "primitives.h"
 #include "random_vector.h"
 #include "solid.h"
 #include "solid_prop.h"
@@ -250,7 +252,7 @@ void Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, S
         // add 'nbp' points:
         for ( size_t n = 0; n < nbp; ++n )
         {
-            Vector vec = Movable::readPosition(str);
+            Vector vec = Cytosim::readPosition(str);
             addSphere(vec, rad);
         }
         
@@ -309,7 +311,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
     {
         Vector vec(0,0,0);
         try {
-            vec = Movable::readPosition(str);
+            vec = Cytosim::readPosition(str);
         } catch( Exception& e ) {
             print_magenta(std::cerr, e.brief());
             std::cerr << e.info() << " in `" << str << "'\n";
@@ -337,7 +339,7 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
         throw InvalidParameter("radius of solid:ball must be > 0");
 
     // get position of center:
-    Vector cen = Movable::readPosition(opt.value(var, 0));
+    Vector cen = Cytosim::readPosition(opt.value(var, 0));
     // add a bead with a local coordinate system
     size_t ref = addSphere(cen, rad);
     addTriad(rad);
@@ -422,7 +424,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
         throw InvalidParameter("radius of solid:sphere must be > 0");
 
     // get position of center:
-    Vector cen = Movable::readPosition(opt.value(var, 0));
+    Vector cen = Cytosim::readPosition(opt.value(var, 0));
     // add a bead with a local coordinate system
     size_t ref = addSphere(cen, rad);
     addTriad(rad);

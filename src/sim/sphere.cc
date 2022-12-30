@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 #include "cymdef.h"
+#include "primitives.h"
 #include "assert_macro.h"
 #include "exceptions.h"
 #include "messages.h"
@@ -169,7 +170,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
                     vec = Vector::randU(radius());
                 else
                 {
-                    vec = Movable::readPosition(str);
+                    vec = Cytosim::readPosition(str);
                     if ( 8 * vec.norm() < spRadius )
                         throw InvalidParameter(var+" cannot be brought to the Sphere surface");
                 }

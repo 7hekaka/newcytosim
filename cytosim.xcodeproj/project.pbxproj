@@ -472,7 +472,7 @@
 		BB6921B7233D359F00F528D2 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB6921B8233D359F00F528D2 /* lattice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1749A407D798E600BC7BDC /* lattice.cc */; };
 		BB6921B9233D359F00F528D2 /* point_grid.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB53F5760DCB467000ED38EB /* point_grid.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
-		BB6921BA233D359F00F528D2 /* movable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* movable.cc */; };
+		BB6921BA233D359F00F528D2 /* primitives.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* primitives.cc */; };
 		BB6921BB233D359F00F528D2 /* object_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA8BD730E1FBDE8009C7F93 /* object_set.cc */; };
 		BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402E60E236764007410D7 /* solid_set.cc */; };
 		BB6921BE233D359F00F528D2 /* sphere_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9402EA0E236778007410D7 /* sphere_set.cc */; };
@@ -913,6 +913,8 @@
 		BBCE261A281EAFC1004F6955 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBCE2619281EAFC1004F6955 /* Cocoa.framework */; };
 		BBCE261C281EAFC8004F6955 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBCE261B281EAFC8004F6955 /* IOKit.framework */; };
 		BBCE261D281EB066004F6955 /* frame_reader.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB7662C310E923A200C93DF6 /* frame_reader.cc */; };
+		BBCF549F295F1AF200DB8B16 /* primitives.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCF549C295F1AF200DB8B16 /* primitives.h */; };
+		BBCF54A0295F1AF200DB8B16 /* primitives.h in Headers */ = {isa = PBXBuildFile; fileRef = BBCF549C295F1AF200DB8B16 /* primitives.h */; };
 		BBD025DE1B28DF950002B9FE /* chewer_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DA1B28DF950002B9FE /* chewer_prop.cc */; };
 		BBD025DF1B28DF950002B9FE /* chewer_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DB1B28DF950002B9FE /* chewer_prop.h */; };
 		BBD025E01B28DF950002B9FE /* chewer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DC1B28DF950002B9FE /* chewer.cc */; };
@@ -1033,7 +1035,7 @@
 		BBE82A5E233D15EB00BE44DF /* space_cylinderP.cc in Sources */ = {isa = PBXBuildFile; fileRef = E2F6428715D01466009B7C31 /* space_cylinderP.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A5F233D15EB00BE44DF /* space_force.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBE82A65233D163C00BE44DF /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
-		BBE87E000DD33655002B3A3C /* movable.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* movable.cc */; };
+		BBE87E000DD33655002B3A3C /* primitives.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBE87DFE0DD33655002B3A3C /* primitives.cc */; };
 		BBE87E010DD33655002B3A3C /* movable.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE87DFF0DD33655002B3A3C /* movable.h */; };
 		BBE8E6D110C199F4006527D4 /* libcytosim.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BD1405FA5FAA00D4869F /* libcytosim.a */; };
 		BBE8E70310C19D1B006527D4 /* exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBB750830D15CFCA00B79171 /* exceptions.cc */; };
@@ -2174,6 +2176,7 @@
 		BBCE260C281EAAE1004F6955 /* multiplay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = multiplay; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBCE2619281EAFC1004F6955 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
 		BBCE261B281EAFC8004F6955 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		BBCF549C295F1AF200DB8B16 /* primitives.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = primitives.h; sourceTree = "<group>"; };
 		BBD025DA1B28DF950002B9FE /* chewer_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chewer_prop.cc; path = hands/chewer_prop.cc; sourceTree = "<group>"; };
 		BBD025DB1B28DF950002B9FE /* chewer_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = chewer_prop.h; path = hands/chewer_prop.h; sourceTree = "<group>"; };
 		BBD025DC1B28DF950002B9FE /* chewer.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = chewer.cc; path = hands/chewer.cc; sourceTree = "<group>"; };
@@ -2256,7 +2259,7 @@
 		BBE60B940EE9684000FFAB27 /* field_values.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = field_values.h; path = src/sim/field_values.h; sourceTree = SOURCE_ROOT; };
 		BBE60C250EE979ED00FFAB27 /* simul_step.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simul_step.cc; path = src/sim/simul_step.cc; sourceTree = SOURCE_ROOT; };
 		BBE82A64233D15EB00BE44DF /* libcytospaceG.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospaceG.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		BBE87DFE0DD33655002B3A3C /* movable.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = movable.cc; path = src/sim/movable.cc; sourceTree = SOURCE_ROOT; };
+		BBE87DFE0DD33655002B3A3C /* primitives.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = primitives.cc; path = src/sim/primitives.cc; sourceTree = SOURCE_ROOT; };
 		BBE87DFF0DD33655002B3A3C /* movable.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = movable.h; path = src/sim/movable.h; sourceTree = SOURCE_ROOT; };
 		BBE9D38B158500BA00FF944A /* space_ring.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_ring.cc; path = src/sim/spaces/space_ring.cc; sourceTree = SOURCE_ROOT; };
 		BBE9D38C158500BA00FF944A /* space_ring.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_ring.h; path = src/sim/spaces/space_ring.h; sourceTree = SOURCE_ROOT; };
@@ -3633,8 +3636,9 @@
 		BBA8C0BD0E20CA8A009C7F93 /* Objects */ = {
 			isa = PBXGroup;
 			children = (
+				BBCF549C295F1AF200DB8B16 /* primitives.h */,
+				BBE87DFE0DD33655002B3A3C /* primitives.cc */,
 				BBE87DFF0DD33655002B3A3C /* movable.h */,
-				BBE87DFE0DD33655002B3A3C /* movable.cc */,
 				BBA938620FFEAAB200741444 /* object.h */,
 				BBA938610FFEAAB200741444 /* object.cc */,
 				BB3DA1DD254C8F0300226B81 /* object_pool.h */,
@@ -4047,6 +4051,7 @@
 				BBD5DA7B0FF7956C0010D08D /* organizer_set.h in Headers */,
 				BB50CEF30FFA0AAD00278580 /* sphere_prop.h in Headers */,
 				BBA938640FFEAAB200741444 /* object.h in Headers */,
+				BBCF549F295F1AF200DB8B16 /* primitives.h in Headers */,
 				BB537E3811131B110059D9AA /* field_prop.h in Headers */,
 				BB07F48B11627E2200A15828 /* fiber_prop.h in Headers */,
 				BB07F524116291E800A15828 /* fiber_set.h in Headers */,
@@ -4206,6 +4211,7 @@
 				BB692158233D359F00F528D2 /* organizer.h in Headers */,
 				BB692159233D359F00F528D2 /* organizer_set.h in Headers */,
 				BB69215A233D359F00F528D2 /* sphere_prop.h in Headers */,
+				BBCF54A0295F1AF200DB8B16 /* primitives.h in Headers */,
 				BB69215B233D359F00F528D2 /* object.h in Headers */,
 				BB69215D233D359F00F528D2 /* field_prop.h in Headers */,
 				BB69215E233D359F00F528D2 /* fiber_prop.h in Headers */,
@@ -5344,7 +5350,7 @@
 				BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */,
 				BB0DF4810D93F11F006CB71A /* lattice.cc in Sources */,
 				BB53F5780DCB467000ED38EB /* point_grid.cc in Sources */,
-				BBE87E000DD33655002B3A3C /* movable.cc in Sources */,
+				BBE87E000DD33655002B3A3C /* primitives.cc in Sources */,
 				BBA8BD750E1FBDE8009C7F93 /* object_set.cc in Sources */,
 				BB9402E80E236764007410D7 /* solid_set.cc in Sources */,
 				BB9402EC0E236778007410D7 /* sphere_set.cc in Sources */,
@@ -5522,7 +5528,7 @@
 				BB6921B7233D359F00F528D2 /* meca1d.h in Sources */,
 				BB6921B8233D359F00F528D2 /* lattice.cc in Sources */,
 				BB6921B9233D359F00F528D2 /* point_grid.cc in Sources */,
-				BB6921BA233D359F00F528D2 /* movable.cc in Sources */,
+				BB6921BA233D359F00F528D2 /* primitives.cc in Sources */,
 				BB6921BB233D359F00F528D2 /* object_set.cc in Sources */,
 				BB6921BC233D359F00F528D2 /* solid_set.cc in Sources */,
 				BB6921BE233D359F00F528D2 /* sphere_set.cc in Sources */,

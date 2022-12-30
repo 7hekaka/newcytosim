@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 #ifndef MOVABLE_H
 #define MOVABLE_H
@@ -32,33 +32,6 @@ The actual operations need to be implemented by redefining the virtual functions
  */
 class Movable
 {
-    
-    /// read a position primitives, such as 'circle 5', etc.
-    static Vector readPositionPrimitive(std::istream&, Space const*);
-    
-    /// read a direction primitives, such as 'horizontal', etc.
-    static Vector readDirectionPrimitive(std::istream&, Vector const&, Space const*);
-
-public:
-    
-    /// read a position in space
-    static Vector readPosition(std::istream&, Space const*);
-
-    /// convert string to a position
-    static Vector readPosition(std::string const&, Space const*);
-    
-    /// read a position in space
-    static Vector readPosition(std::string const&);
-
-    /// read an orientation, and return a normalized vector
-    static Vector readDirection(std::istream&, Vector const&, Space const*);
-
-    /// read a rotation specified in stream
-    static Rotation readRotation(std::istream&);
-    
-    /// read a rotation specified in stream, at position `pos`
-    static Rotation readOrientation(std::istream&, Vector const&, Space const*);
-
 public:
     
     /// constructor
@@ -85,29 +58,38 @@ public:
     virtual int mobile() const { return 0; }
     
     /// return the spatial position of the Object
-    virtual Vector position() const { return Vector(0.0,0.0,0.0); }
-    
-    /// move Object ( position += given vector )
-    virtual void translate(Vector const&);
-    
-    /// move Object to specified position
-    virtual void setPosition(Vector const& x) { translate( x - position() ); }
+    virtual Vector position() const { return Vector(0.0,0.0,0.0);; }
 
-    /// translate Object by applying rotation around the Origin
-    void rotateT(Rotation const&);
+    /// move Object to specified position
+    void setPosition(Vector const& X) { translate( X - position() ); }
+
+    /// move Object ( position += given vector )
+    virtual void translate(Vector const&) { ABORT_NOW("Movable::translate() called for immobile Object"); }
     
     /// rotate Object around the Origin
-    virtual void rotate(Rotation const&);
-    
+    virtual void rotate(Rotation const&) { ABORT_NOW("Movable::rotate() called for immobile Object"); }
+
+    /// translate Object by applying rotation around the Origin
+    void rotateT(Rotation const& R)
+    {
+        assert_true( mobile() == 1 );
+        Vector pos = position();
+        translate(R*pos-pos);
+    }
+
     /// rotate Object around its current position, using translate() and rotate()
-    void revolve(Rotation const&);
-    
+    void revolve(Rotation const& R)
+    {
+        Vector G = position();
+        translate(-G);
+        rotate(R);
+        translate(G);
+    }
     
     /// bring object to centered image using periodic boundary conditions
-    virtual void foldPosition(Modulo const*) {}
-    
-};
+    void foldPosition(Modulo const*) {}
 
+};
 
 #endif
 

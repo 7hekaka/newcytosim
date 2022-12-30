@@ -6,6 +6,7 @@
 #include "glossary.h"
 #include "lattice.h"
 #include "simul_part.h"
+#include "hand_monitor.h"
 
 
 Dynein::Dynein(DyneinProp const* p, HandMonitor* h)

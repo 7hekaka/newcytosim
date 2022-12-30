@@ -9,6 +9,7 @@
 #include "array.h"
 
 class Simul;
+class Modulo;
 class Property;
 class Inputter;
 class Outputter;
@@ -19,13 +20,10 @@ class Display;
 typedef unsigned char ObjectTag;
 
 /// Type used to mark objects
-typedef unsigned short ObjectMark;
+typedef unsigned int ObjectMark;
 
 /// Type used to flag objects
-typedef unsigned short ObjectFlag;
-
-/// Type used for signature
-typedef unsigned ObjectSignature;
+typedef unsigned int ObjectFlag;
 
 
 /// used to address the highest bit which is not used by ASCII codes
@@ -49,9 +47,9 @@ constexpr uint8_t LOW_BITS = 127;
  */
 class Object : public Movable, public Inventoried
 {
-    /// this class stores the object
+    /// allow container class to access members
     friend class ObjectPool;
-    
+
 protected:
     
     /// the next Object in the list
@@ -70,10 +68,7 @@ private:
 
     /// integer used for private tasks, not saved to file
     ObjectFlag flag_;
-    
-    /// a random number associated with this object
-    ObjectSignature signature_;
-    
+
 public:
     
     /// Object::NULL_TAG = 'v' is the 'void' pointer
@@ -94,13 +89,13 @@ public:
 public:
     
     /// constructor
-    Object() : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(0), flag_(0), signature_(RNG.pint32()) { }
+    Object() : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(0), flag_(0) { }
 
     /// copy constructor
-    Object(Object const& o) : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(o.mark_), flag_(o.flag_), signature_(o.signature_) {}
+    Object(Object const& o) : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(o.mark_), flag_(o.flag_) {}
     
     /// assignment operator
-    Object& operator =(const Object& o) { nextO=nullptr; prevO=nullptr; set_=nullptr; mark_=o.mark_; flag_=o.flag_; signature_=o.signature_; return *this; }
+    Object& operator =(const Object& o) { nextO=nullptr; prevO=nullptr; set_=nullptr; mark_=o.mark_; flag_=o.flag_; return *this; }
     
     /// destructor
     virtual ~Object();
@@ -166,12 +161,6 @@ public:
     
     /// set flag (this value is not stored in trajectory files)
     void flag(ObjectFlag f) { flag_ = f; }
-    
-    /// a random number that is likely to be unique
-    ObjectSignature signature() const { return signature_; }
-    
-    /// set signature
-    void signature(ObjectSignature s) { signature_ = s; }
 
 };
 

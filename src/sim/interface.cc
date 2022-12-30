@@ -4,6 +4,7 @@
 #include <cstdio>
 
 #include "cymdef.h"
+#include "primitives.h"
 #include "interface.h"
 #include "stream_func.h"
 #include "exceptions.h"
@@ -184,7 +185,7 @@ Isometry Interface::read_placement(Glossary& opt)
     // Position
     Vector vec;
     if ( opt.set(str, "position") )
-        vec = Movable::readPosition(str, spc);
+        vec = Cytosim::readPosition(str, spc);
     else if ( spc )
         vec = spc->place();
     
@@ -195,20 +196,20 @@ Isometry Interface::read_placement(Glossary& opt)
         if ( opt.set(str, "direction") )
         {
             std::istringstream iss(str);
-            vec = Movable::readDirection(iss, iso.mov, spc);
+            vec = Cytosim::readDirection(iss, iso.mov, spc);
             if ( has_trail(iss) ) warn_trail(iss);
             iso.rot = Rotation::randomRotationToVector(vec);
         }
         else if ( opt.set(str, "rotation") )
         {
             std::istringstream iss(str);
-            iso.rot = Movable::readRotation(iss);
+            iso.rot = Cytosim::readRotation(iss);
             if ( has_trail(iss) ) warn_trail(iss);
         }
         else if ( opt.set(str, "orientation") )
         {
             std::istringstream iss(str);
-            iso.rot = Movable::readOrientation(iss, iso.mov, spc);
+            iso.rot = Cytosim::readOrientation(iss, iso.mov, spc);
             if ( has_trail(iss) ) warn_trail(iss);
         }
         else
@@ -218,7 +219,7 @@ Isometry Interface::read_placement(Glossary& opt)
         if ( opt.set(str, "orientation", 1) )
         {
             std::istringstream iss(str);
-            Rotation rot = Movable::readOrientation(iss, iso.mov, spc);
+            Rotation rot = Cytosim::readOrientation(iss, iso.mov, spc);
             if ( has_trail(iss) ) warn_trail(iss);
             iso.rotate(rot);
         }

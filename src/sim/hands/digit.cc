@@ -8,6 +8,7 @@
 #include "glossary.h"
 #include "lattice.h"
 #include "simul_part.h"
+#include "hand_monitor.h"
 
 
 Digit::Digit(DigitProp const* p, HandMonitor* h)

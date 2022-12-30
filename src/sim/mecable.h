@@ -10,6 +10,7 @@
 #include "cymdef.h"
 
 class Meca;
+class Space;
 
 /// include some experimental preconditionner methods
 #define RECYCLED_PRECONDITIONNER 0

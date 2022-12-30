@@ -93,7 +93,6 @@ int main(int argc, char* argv[])
     else if ( x == 1 )
     {
         PRINT(Inventoried);
-        PRINT(Movable);
         PRINT(Buddy);
         PRINT(Object);
         PRINT(Mecable);

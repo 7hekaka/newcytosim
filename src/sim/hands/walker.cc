@@ -6,6 +6,7 @@
 #include "messages.h"
 #include "lattice.h"
 #include "simul_part.h"
+#include "hand_monitor.h"
 
 
 Walker::Walker(WalkerProp const* p, HandMonitor* h)

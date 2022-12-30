@@ -2,6 +2,8 @@
 
 #include "nucleator.h"
 #include "nucleator_prop.h"
+#include "hand_monitor.h"
+#include "primitives.h"
 #include "glossary.h"
 #include "exceptions.h"
 #include "iowrapper.h"
@@ -47,7 +49,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
         {
             // nucleating in the bulk:
             std::istringstream ss(str);
-            dir = Movable::readDirection(ss, pos, fip->confine_space_ptr);
+            dir = Cytosim::readDirection(ss, pos, fip->confine_space_ptr);
         }
         else
         {

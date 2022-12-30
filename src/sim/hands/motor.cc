@@ -5,6 +5,7 @@
 #include "glossary.h"
 #include "exceptions.h"
 #include "iowrapper.h"
+#include "hand_monitor.h"
 
 
 Motor::Motor(MotorProp const* p, HandMonitor* h)
