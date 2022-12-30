@@ -419,7 +419,7 @@ void Mecafil::setProjectionDiff(const real threshold)
     if ( useProjectionDiff )
     {
         const real alpha = 1.0 / segmentation();
-        #pragma vector unaligned
+        #pragma omp simd
         for ( size_t jj = 0; jj < nbs; ++jj )
             iJJtJF[jj] = std::max(threshold, alpha * iLLG[jj]);
         

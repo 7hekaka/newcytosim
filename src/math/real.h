@@ -123,7 +123,7 @@ inline static void copy_real(size_t cnt, real const* src, real * dst)
 #if ( 0 )
     memcpy(dst, src, cnt*sizeof(real));
 #else
-    //#pragma vector unaligned
+    #pragma omp simd
     for ( size_t u = 0; u < cnt; ++u )
         dst[u] = src[u];
 #endif

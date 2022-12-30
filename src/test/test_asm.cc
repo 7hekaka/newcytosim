@@ -29,7 +29,7 @@ void projectForcesU(unsigned nbs, const real* dif, const real* X, real* mul)
 //void projectForcesV(unsigned nbs, const real restrict* dif, const real restrict* vec, real restrict* mul)
 void projectForcesV(size_t nbs, const real* dif, const real* vec, real* mul)
 {
-#pragma vector unaligned
+    #pragma omp simd
     for ( size_t jj = 0; jj < nbs; ++jj )
     {
         const real * X = vec + DIM * jj;

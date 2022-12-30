@@ -82,7 +82,7 @@ void free_reals(real* p, real* x, real* y, real* z)
  */
 void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
 {
-    #pragma vector unaligned
+    #pragma omp simd
     for ( size_t jj = 0; jj < nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
@@ -99,7 +99,7 @@ void add_rigidity2(const size_t nbt, const real* vec, const real rigid, real* Y)
 {
     real fx = 0;
     real fy = 0;
-    #pragma vector unaligned
+    #pragma omp simd
     for ( size_t jj = 0; jj < nbt; jj += 2 )
     {
         real const* X = vec + jj;

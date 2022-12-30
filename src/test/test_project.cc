@@ -97,7 +97,7 @@ void free_reals(real*& x, real*& y, real*& z, real*& t)
 /// reference implementation
 void projectForcesU_(UINT nbs, const real* dir, const real* src, real* mul)
 {
-    #pragma vector unaligned
+    #pragma omp simd
     for ( UINT i = 0; i < nbs; ++i )
     {
         const real * X = src + DIM * i;
