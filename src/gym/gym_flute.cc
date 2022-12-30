@@ -80,9 +80,12 @@ namespace gym
         glVertexPointer(std::min(pts, 3UL), GL_FLOAT, tot*Q, nullptr);
         if ( nor > 1 )
         {
-            assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
             glEnableClientState(GL_NORMAL_ARRAY);
             glNormalPointer(GL_FLOAT, tot*Q, (void*)(pts*Q));
+        }
+        else
+        {
+            assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

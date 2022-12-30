@@ -1788,6 +1788,7 @@ void Display::drawSolid(Solid const& obj)
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), pixscale(disp->size), gle::hedron(obj.radius(i)>0));
+        gym::cleanup(1);
     }
     
     //display outline of spheres in 2D
@@ -1943,6 +1944,7 @@ void Display::drawSolids(SolidSet const& set)
                     if ( obj->radius(i) > 0 )
                         drawSolidT(*obj, i);
             }
+            gym::cleanup(1);
         }
     }
 }
