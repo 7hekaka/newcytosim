@@ -292,7 +292,7 @@ void blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
  This is equivalent to calling the standard lapack::pbtf2()
  and then *** inverting *** the diagonal terms
  
- SUBROUTINE DPBTF2( UPLO, N, KD, AB, LDAB, INFO )
+ SUBROUTINE DPBTF2( UPLO='L', N, KD, AB, LDAB, INFO )
 */
 void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* INFO)
 {
@@ -304,7 +304,7 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
         real dia = AB[0];
         if ( dia <= 0 )
         {
-            *INFO = J;
+            *INFO = J+1;
             return;
         }
         dia = std::sqrt(dia) / dia;
@@ -332,7 +332,7 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
  This calls the standard lapack::pbtf2()
  and then *** inverts *** the diagonal terms
  
- SUBROUTINE DPBTF2( UPLO, N, KD, AB, LDAB, INFO )
+ SUBROUTINE DPBTF2( UPLO='L', N, KD=2, AB, LDAB, INFO )
 */
 template < int KD >
 void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)

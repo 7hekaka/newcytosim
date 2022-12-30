@@ -638,6 +638,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
     {
         getIsoBlock(mec, mec->pblock());
         // calculate Cholesky factorization:
+        //VecPrint::full("block", nbp, nbp, mec->pblock(), nbp, 2);
 #if CHOUCROUTE
         alsatian_xpotf2L(nbp, mec->pblock(), nbp, &info);
 #else
@@ -656,6 +657,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
         mec->blockType(0);
         //std::clog << "failed to compute Band Preconditionner block of size " << nbp << "\n";
         ++bump_;
+        //computePrecondIsoS(mec);
     }
 }
 
