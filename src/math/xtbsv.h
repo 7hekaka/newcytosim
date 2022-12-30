@@ -356,7 +356,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
         real dia = AB[0];
         if ( dia <= 0 )
         {
-            *INFO = J;
+            *INFO = J+1;
             return;
         }
         /* In the Alsatian version of the factorization, we invert
@@ -385,7 +385,7 @@ void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
         real dia = AB[0];
         if ( dia <= 0 )
         {
-            *INFO = J;
+            *INFO = J+1;
             return;
         }
         /* In the Alsatian version of the factorization, we invert

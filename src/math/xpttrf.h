@@ -20,7 +20,7 @@ void lapack_xpttrf_ori(int size, real* D, real* E, int* INFO)
     {
         if ( D[i] < 0 )
         {
-            *INFO = i;
+            *INFO = i+1;
             return;
         }
         real e = E[i];
@@ -38,7 +38,7 @@ void lapack_xpttrf(int size, real* D, real* E, int* INFO)
     {
         if ( D[i] < 0 )
         {
-            *INFO = i;
+            *INFO = i+1;
             return;
         }
         real e = E[i] / d;
