@@ -323,6 +323,9 @@ public:
     /// distance from PLUS_END to a vertex specified as index (or intermediate position)
     real distancePointP(const real n) const { return fnCut * ( lastPoint() - n ); }
 
+    /// distance from CENTER to a vertex specified as index (or intermediate position)
+    real distancePointC(const real n) const { return fnCut * ( n - 0.5 * lastPoint() ); }
+
     /// signed distance from the ORIGIN to the specified FiberEnd
     real abscissaEnd(FiberEnd end) const;
     

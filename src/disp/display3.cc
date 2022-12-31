@@ -479,7 +479,10 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
 void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    const real rad = pixscale(disp->line_width);
+    real rad = pixscale(disp->line_width);
+#if NEW_SHAPED_FIBER
+    if ( fib.prop->steric == 2 ) rad = fib.silhouette(inx);
+#endif
     real iseg = fib.segmentationInv();
 
     Vector A = fib.posP(inx);

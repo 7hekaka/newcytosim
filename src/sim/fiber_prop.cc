@@ -286,24 +286,24 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 //------------------------------------------------------------------------------
 void FiberProp::clear()
 {
-    rigidity            = -1;
-    segmentation        = 1;
-    min_length          = 0.008;   // suitable for actin/microtubules
-    max_length          = INFINITY;
-    total_polymer       = INFINITY;
-    persistent          = false;
+    rigidity      = -1;
+    segmentation  = 1;
+    min_length    = 0.008;   // suitable for actin/microtubules
+    max_length    = INFINITY;
+    total_polymer = INFINITY;
+    persistent    = false;
 
-    viscosity           = -1;
-    drag_radius         = 0.0125;  // radius of a Microtubule
-    drag_length         = 5;
-    drag_model          = false;
-    drag_gap            = 0;
+    viscosity    = -1;
+    drag_radius  = 0.0125;  // radius of a Microtubule
+    drag_length  = 5;
+    drag_model   = false;
+    drag_gap     = 0;
     
-    binding_key         = ~0U;  //all bits at 1
+    binding_key  = ~0U;  //all bits at 1
 
-    lattice             = 0;
-    lattice_unit        = 0;
-    save_lattice        = 0;
+    lattice      = 0;
+    lattice_unit = 0;
+    save_lattice = 0;
     
     mesh                = 0;
     mesh_unit           = 0;
@@ -331,40 +331,40 @@ void FiberProp::clear()
     confine_range[1] = INFINITY;
 #endif
 
-    steric              = 0;
-    steric_radius       = 0;
-    steric_range        = 0;
+    steric = 0;
+    steric_radius = 0;
+    steric_range = 0;
     
-    field               = "none";
-    field_ptr           = nullptr;
+    field     = "none";
+    field_ptr = nullptr;
     
-    glue                = 0;
-    glue_single         = "none";
-    glue_prop           = nullptr;
+    glue = 0;
+    glue_single = "none";
+    glue_prop = nullptr;
     
 #if NEW_COLINEAR_FORCE
-    colinear_force      = 0;
+    colinear_force = 0;
 #endif
 #if NEW_FIBER_CHEW
-    max_chewing_speed   = 0;
+    max_chewing_speed = 0;
 #endif
 #if NEW_FIBER_LOOP
-    loop                = 0;
+    loop = 0;
 #endif
 #if NEW_UNCONSTRAINED_LENGTH
-    constrain_length    = true;
+    constrain_length = true;
 #endif
-    activity            = "none";
-    display             = "";
-    display_fresh       = false;
+    activity      = "none";
+    display       = "";
+    display_fresh = false;
     
-    used_polymer        = 0;
-    free_polymer        = 1;
+    used_polymer = 0;
+    free_polymer = 1;
     
 #if OLD_SQUEEZE_FORCE
-    squeeze             = 0;
-    squeeze_force       = 0;
-    squeeze_range       = 1;
+    squeeze       = 0;
+    squeeze_force = 0;
+    squeeze_range = 1;
 #endif
 #if NEW_END_FORCE
     end_force_mode = NO_END;

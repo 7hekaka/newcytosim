@@ -103,8 +103,7 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
             // include segments, in the cell associated with their center
             for ( size_t i = 0; i < F->nbSegments(); ++i )
             {
-                real amp = 2. + std::tanh(std::abs(i-0.5*F->nbSegments())-3);
-                real rad = amp * F->prop->steric_radius;
+                real rad = F->silhouette(i);
                 real rge = rad + F->prop->steric_range;
                 real sup = rge + 0.5 * F->segmentation();
                 grid.add(F, i, rad, rge, sup);

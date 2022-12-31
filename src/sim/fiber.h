@@ -225,7 +225,15 @@ public:
     /// register a chewing quantity
     void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
 #endif
-
+#if NEW_SHAPED_FIBER
+    real silhouette(size_t i) const
+    {
+        real pos = ( 10.0 * i ) / lastSegment() - 5.0; // in [-5, 5]
+        real amp = 2. + std::tanh(std::abs(pos)-1); // in [1, 3]
+        return amp * prop->steric_radius;
+    }
+#endif
+                
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
     virtual void join(Fiber *);
     
@@ -300,6 +308,7 @@ public:
     size_t nbHandsNearEnd(real len, FiberEnd end) const;
     
     //--------------------------------------------------------------------------
+    
 #if FIBER_HAS_LATTICE
     /// modifiable reference to Fiber's Lattice
     FiberLattice * lattice() { return &fLattice; }
@@ -320,7 +329,6 @@ public:
     /// print Lattice data (for debugging purpose)
     void printLattice(std::ostream&) const;
 
-    
 #if FIBER_HAS_MESH
 
     /// modifiable reference to Fiber's mesh
