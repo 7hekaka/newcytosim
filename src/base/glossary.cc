@@ -362,8 +362,13 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
     {
         delimited = true;
         k = Tokenizer::get_block_text(is, 0, Tokenizer::block_delimiter(c));
+        if ( c != '(' )
+        {
+            k.insert(0, 1, c);
+            k.push_back(Tokenizer::block_delimiter(c));
+        }
         c = Tokenizer::get_character(is);
-    }
+   }
     else
     {
         while ( valid_value(c) )

@@ -392,7 +392,7 @@ void Parser::parse_new(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     size_t cnt = 1;
-    std::string blok = Tokenizer::get_block(is, '(');
+    std::string blok = Tokenizer::get_block(is, '[');
     if ( blok.empty() )
         Tokenizer::get_integer(is, cnt);
     else if ( do_new && sim_->spaces.master() )

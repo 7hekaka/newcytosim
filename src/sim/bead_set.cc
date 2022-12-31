@@ -85,7 +85,8 @@ ObjectList BeadSet::newObjects(const Property* p, Glossary& opt)
         else if ( opt.set(str, "radius") ) // range of radius specified
         {
             float a = 0, b = 0;
-            sscanf(str.c_str(), "%f, %f", &a, &b);
+            if ( 2 != sscanf(str.c_str(), "[%f, %f]", &a, &b) )
+                throw InvalidParameter("expected range ([REAL, REAL]) in Bead's radius");
             rad = RNG.real_uniform(a, b);
         }
         // possibly add some variability in the radius:

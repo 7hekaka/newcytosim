@@ -332,7 +332,8 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
     else if ( opt.set(str, var, 1) ) // range of radius specified
     {
         float a = 0, b = 0;
-        sscanf(str.c_str(), "%f, %f", &a, &b);
+        if ( 2 != sscanf(str.c_str(), "[%f, %f]", &a, &b) )
+            throw InvalidParameter("expected range ([REAL, REAL]) in Solid's radius");
         rad = RNG.real_uniform(a, b);
     }
     if ( rad <= 0 )
@@ -417,7 +418,8 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     else if ( opt.set(str, var, 1) ) // range of radius specified
     {
         float a = 0, b = 0;
-        sscanf(str.c_str(), "%f, %f", &a, &b);
+        if ( 2 != sscanf(str.c_str(), "[%f, %f]", &a, &b) )
+            throw InvalidParameter("expected range ([REAL, REAL]) in Solid's radius");
         rad = RNG.real_uniform(a, b);
     }
     if ( rad <= 0 )
