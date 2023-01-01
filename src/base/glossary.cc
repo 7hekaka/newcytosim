@@ -42,6 +42,31 @@ Glossary::Glossary(const std::string& arg)
 }
 
 
+/** If successful, `var` is set to the content of the block without delimiters */
+int Glossary::set_block(std::string & var, char c_in, key_type const& key, size_t inx) const
+{
+    rec_type const* rec = values(key);
+    
+    if ( rec && inx < rec->size() )
+    {
+        val_type const& val = rec->at(inx);
+        
+        if ( val.defined_ )
+        {
+            std::string const& arg = val.value_;
+            size_t s = arg.size();
+            if ( s == 0 or arg[0] != c_in )
+                return 0;
+            if ( arg[s-1] != Tokenizer::block_delimiter(c_in) )
+                return 0;
+            var = arg.substr(1, s-2);
+            ++val.read_;
+            return 1;
+        }
+    }
+    return 0;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Formating
 

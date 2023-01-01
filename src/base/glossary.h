@@ -352,7 +352,8 @@ public:
     std::string to_string() const;
 
     //-------------------------------------------------------------------------------
-    
+    #pragma mark -
+
     /// try to set `var` from `key[inx]`, without recording that the parameter was read.
     template <typename T>
     int peek(T & var, key_type const& key, size_t inx = 0) const
@@ -428,6 +429,12 @@ public:
         return res;
     }
     
+    
+    /// try to set `var` from `key[inx]`, if this is a block starting by 'c_in'. @return 1 if `var` was set
+    /** If successful, `var` is set to the content of the block without delimiters */
+    int set_block(std::string & var, char c_in, key_type const& key, size_t inx = 0) const;
+
+    
     /// try to set `cnt` values in `ptr[]`, starting at `key[0]`. @return number of values set
     /** The internal counters are incremented to record that the values were read */
     template <typename T>
@@ -495,6 +502,9 @@ public:
         return set(var, key, 0, dict, accept_all);
     }
     
+    //-------------------------------------------------------------------------------
+    #pragma mark -
+
     /// try to set `var` from `key[inx]`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */
     static int least_used_index(rec_type const* rec)

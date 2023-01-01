@@ -635,21 +635,17 @@ std::string Tokenizer::get_block(std::istream& is)
 }
 
 
-std::string Tokenizer::strip_block(std::string const& arg)
+bool Tokenizer::strip_block(std::string& arg, char c_in)
 {
     size_t s = arg.size();
     
-    if ( s < 2 )
-        return arg;
+    char c_out = block_delimiter(c_in);
+
+    if ( s < 2 || arg[0] != c_in || arg[s-1] != c_out )
+        return false;
     
-    char c = block_delimiter(arg[0]);
-    if ( c )
-    {
-        if ( arg[s-1] != c )
-            throw InvalidSyntax("mismatched enclosing symbols");
-        return arg.substr(1, s-2);
-    }
-    return arg;
+    arg = arg.substr(1, s-2);
+    return true;
 }
 
 

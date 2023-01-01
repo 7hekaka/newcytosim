@@ -19,7 +19,7 @@ namespace Tokenizer
     char block_delimiter(char arg);
     
     /// same as block_delimiter()
-    inline char block_delimiter(int c) { return block_delimiter((char)c); }
+    //inline char block_delimiter(int c) { return block_delimiter((char)c); }
     
     /// skip space and new-line if `eat_line`==true, return the next character
     int skip_space(std::istream&, bool eat_line);
@@ -85,14 +85,14 @@ namespace Tokenizer
     /// read a delimited set of characters, return block with delimiters included
     std::string get_block(std::istream&);
     
-    /// remove matching parenthesis or other delimiters from the start and from the end of string
-    std::string strip_block(std::string const&);
+    /// remove `c_in` and matching delimiters from string, return false if not present
+    bool strip_block(std::string&, char c_in);
 
     /// return text read until `what` is found, stoping immediately before
     std::string get_until(std::istream&, std::string what);
 
-    /// remove characters present in `ws` from the beggining and at the end of `str`
-    std::string trim(std::string const&, const std::string& ws = " \t\n");
+    /// remove characters present in `ws` found at both edges of `str`
+    std::string trim(std::string const& str, const std::string& ws = " \t\n");
     
 }
 

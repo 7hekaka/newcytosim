@@ -327,15 +327,16 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
     std::string str;
     // get sphere radius:
     real rad = 0;
-    if ( opt.is_number(var, 1) ) // sphere radius specified directly
-        opt.set(rad, var, 1);
-    else if ( opt.set(str, var, 1) ) // range of radius specified
+    if ( opt.set_block(str, '[', var, 1) ) // some code specified
     {
+        // get a range of radius
         float a = 0, b = 0;
-        if ( 2 != sscanf(str.c_str(), "[%f, %f]", &a, &b) )
+        if ( 2 != sscanf(str.c_str(), "%f, %f", &a, &b) )
             throw InvalidParameter("expected range ([REAL, REAL]) in Solid's radius");
         rad = RNG.real_uniform(a, b);
     }
+    else
+        opt.set(rad, var, 1);
     if ( rad <= 0 )
         throw InvalidParameter("radius of solid:ball must be > 0");
 
@@ -388,7 +389,6 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
         while ( opt.set(str, var, inx++) )
         {
             size_t num = 1;
-            Tokenizer::strip_block(str);
             Tokenizer::split_integer(num, str);
             std::string nam = Tokenizer::split_symbol(str);
             if ( nam.empty() )
@@ -413,15 +413,16 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
 {
     std::string str;
     real rad = 0;
-    if ( opt.is_number(var, 1) ) // sphere radius specified directly
-        opt.set(rad, var, 1);
-    else if ( opt.set(str, var, 1) ) // range of radius specified
+    if ( opt.set_block(str, '[', var, 1) ) // some code specified
     {
+        // get a range of radius
         float a = 0, b = 0;
-        if ( 2 != sscanf(str.c_str(), "[%f, %f]", &a, &b) )
+        if ( 2 != sscanf(str.c_str(), "%f, %f", &a, &b) )
             throw InvalidParameter("expected range ([REAL, REAL]) in Solid's radius");
         rad = RNG.real_uniform(a, b);
     }
+    else
+        opt.set(rad, var, 1);
     if ( rad <= 0 )
         throw InvalidParameter("radius of solid:sphere must be > 0");
 
@@ -491,7 +492,6 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
         size_t inx = 2;
         while ( opt.set(str, var, inx++) )
         {
-            Tokenizer::strip_block(str);
             size_t num = 1;
             Tokenizer::split_integer(num, str);
             std::string nam = Tokenizer::split_symbol(str);
@@ -954,7 +954,7 @@ Vector Solid::orientation() const
 void Solid::fixShape()
 {
     if ( nPoints == 0 )
-        throw InvalidParameter("Solid has no points!");
+        throw InvalidParameter("Cannot fix Solid with no points!");
     
     //std::clog << "Fixing Solid " << reference() << " with " << nPoints << " points\n";
     
@@ -964,10 +964,10 @@ void Solid::fixShape()
     // store momentum of the current shape:
     soVariance = dev.e_sum();
     
-    //we store the current points:
+    // store the current points:
     soAmount = nPoints;
     // set reference to current shape translated to be centered:
-    for ( size_t p = 0; p < soAmount; ++p )
+    for ( size_t p = 0; p < nPoints; ++p )
     {
         ( Vector(pPos+DIM*p) - avg ).store(soShape+DIM*p);
         //for ( size_t d = 0; d < DIM; ++d )
