@@ -1290,7 +1290,7 @@ void alsatian_xtrsmLUN1I_4U_SSE(const int M, const float* A, const int lda, doub
         {
             pA -= 2;
             pB -= 2;
-            store2(pB, fnmadd2(t, load2d(pA), load2(pB)));
+            storeu2(pB, fnmadd2(t, load2d(pA), loadu2(pB)));
         }
         if ( pB > B )
         {
