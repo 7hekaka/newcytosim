@@ -184,7 +184,16 @@ Isometry Interface::read_placement(Glossary& opt)
     
     // Position
     Vector vec;
-    if ( opt.set(str, "position") )
+    if ( opt.set_block(str, '[', "position") )
+    {
+        // can specify another object to copy its position
+        Movable * obj = sim_->pickMovable(str);
+        if ( obj )
+            vec = obj->position();
+        else
+            throw InvalidParameter("Could not find Object `"+str+"'");
+    }
+    else if ( opt.set(str, "position") )
         vec = Cytosim::readPosition(str, spc);
     else if ( spc )
         vec = spc->place();
