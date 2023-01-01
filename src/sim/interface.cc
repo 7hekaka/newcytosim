@@ -202,7 +202,17 @@ Isometry Interface::read_placement(Glossary& opt)
     if ( iso.valid() )
     {
         // Rotation applied before the translation
-        if ( opt.set(str, "direction") )
+        if ( opt.set_block(str, '[', "direction") )
+        {
+            // can specify another object to copy its position
+            Movable * obj = sim_->pickMovable(str);
+            if ( obj )
+                vec = obj->direction();
+            else
+                throw InvalidParameter("Could not find Object `"+str+"'");
+            iso.rot = Rotation::randomRotationToVector(vec);
+        }
+        else if ( opt.set(str, "direction") )
         {
             std::istringstream iss(str);
             vec = Cytosim::readDirection(iss, iso.mov, spc);

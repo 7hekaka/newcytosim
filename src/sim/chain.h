@@ -99,7 +99,6 @@ private:
     real fnBirthTime;
 #endif
 #if CURVATURE_DEPENDENT_SEGMENTATION
-
     /// error due to the cutting at different steps
     real autoCutVal;
     
@@ -108,7 +107,6 @@ private:
     
     /// reset auto variables
     void clearAutoCounters(bool=false);
-    
 #endif
 #if FIBER_HAS_NORMAL
     /// vector orthogonal to backbone at the origin, used for display only
@@ -410,7 +408,7 @@ public:
     real projectedForceEnd(FiberEnd end) const;
     
     /// direction averaged over the entire length
-    Vector avgDirection() const { return normalize(posEndP()-posEndM()); }
+    Vector direction() const { return normalize(posEndP()-posEndM()); }
     
     /// return updated `normal` that is orthogonal to `d` (used for fake 3D display)
     Vector3 adjustedNormal(Vector3 const& d) const;

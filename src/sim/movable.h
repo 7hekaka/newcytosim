@@ -59,6 +59,9 @@ public:
     
     /// return the spatial position of the Object
     virtual Vector position() const { return Vector(0.0,0.0,0.0);; }
+    
+    /// return a vector representing the orientation of the Object
+    virtual Vector direction() const { return Vector(1.0,0.0,0.0);; }
 
     /// move Object to specified position
     void setPosition(Vector const& X) { translate( X - position() ); }

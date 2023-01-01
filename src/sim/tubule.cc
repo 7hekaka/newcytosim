@@ -83,7 +83,7 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
 #if ( DIM >= 3 )
     Vector dir(0,0,0);
     if ( bone_ )
-        dir = bone_->avgDirection();
+        dir = bone_->direction();
     else
     {
         // find average direction
