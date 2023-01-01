@@ -340,7 +340,7 @@ void Simul::solve_separate()
     //std::clog << "Separating " << cnt << " fibers\n";
     for ( ObjectFlag f = 0; f <= sup; ++f )
     {
-        // replacing Meca::pickMecables() here:
+        // replacing Meca::getReady():
         sMeca.mecables.clear();
         for ( Fiber * F=fibers.first(); F; F=F->next() )
             if ( F->flag() == f )

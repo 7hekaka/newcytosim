@@ -71,6 +71,9 @@ void Meca::selectStericEngine(Simul const& sim)
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - PointGrid
+
 /**
  The prop->steric of each object is a bit-field that
  specify one or more 'pane' where the object is present.
@@ -100,7 +103,8 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
 #if NEW_SHAPED_FIBER
         if ( F->prop->steric == 2 )
         {
-            // include segments, in the cell associated with their center
+            /* With this option, the steric radius of the fiber may vary,
+             as specified by Fiber::silhouette() */
             for ( size_t i = 0; i < F->nbSegments(); ++i )
             {
                 real rad = F->silhouette(i);
@@ -173,10 +177,12 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - LocusGrid
 
 
-/// add Mecables with steric enabled to the steric grid
-static void addStericMecables(LocusGrid& grid, Simul const& sim)
+/// distribute Mecables with steric enabled to `grid`
+static void distributeStericMecables(LocusGrid& grid, Simul const& sim)
 {
     // distribute Fiber-points on the grid
     for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
@@ -223,8 +229,8 @@ static void addStericMecables(LocusGrid& grid, Simul const& sim)
 }
 
 #if GRID_HAS_PERIODIC
-/// add Mecables with steric enabled to the steric grid, for periodic boundary conditions
-static void addStericMecablesModulo(LocusGrid& grid, Simul const& sim)
+/// distribute Mecables with steric enabled to `grid`, given periodic boundaries
+static void distributeStericMecablesModulo(LocusGrid& grid, Simul const& sim)
 {
     // distribute Fiber-points on the grid
     for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
@@ -296,10 +302,10 @@ void Meca::addStericInteractions(LocusGrid& grid, Simul const& sim)
 
 #if GRID_HAS_PERIODIC
     if ( modulo )
-        addStericMecablesModulo(grid, sim);
+        distributeStericMecablesModulo(grid, sim);
     else
 #endif
-        addStericMecables(grid, sim);
+        distributeStericMecables(grid, sim);
     
 #if ( MAX_STERIC_PANES == 1 )
     
