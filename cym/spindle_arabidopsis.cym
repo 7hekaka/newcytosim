@@ -187,22 +187,22 @@ new 2 chromatin
 new sglue
 {
     base = kinetochore~1, point1
-    attach = chromatin1, 1.5
+    attach = chromatin~1, 1.5
 }
 new sglue
 {
     base = kinetochore~2, point1
-    attach = chromatin2, 1.5
+    attach = chromatin~2, 1.5
 }
 new cglue
 {
-    attach1 = chromatin1, 0.0
-    attach2 = chromatin2, 0.0
+    attach1 = chromatin~1, 0.0
+    attach2 = chromatin~2, 0.0
 }
 new cglue
 {
-    attach1 = chromatin1, 3.0
-    attach2 = chromatin2, 3.0
+    attach1 = chromatin~1, 3.0
+    attach2 = chromatin~2, 3.0
 }
 
 
@@ -327,22 +327,22 @@ set single bead_minus_motor
 new 0 numa
 {
     separation = 0.020
-    ball1 = center, (0.050, 0.080), 12 bead_minus_motor, 4 bead_plus_motor, 1 cutter
+    ball1 = center, [0.050, 0.080], 12 bead_minus_motor, 4 bead_plus_motor, 1 cutter
     position = ball 0.75 at 2 0 0
 }
 
 new 0 numa
 {
     separation = 0.020
-    ball1 = center, (0.050, 0.080), 12 bead_minus_motor, 4 bead_plus_motor, 1 cutter
+    ball1 = center, [0.050, 0.080], 12 bead_minus_motor, 4 bead_plus_motor, 1 cutter
     position = ball 0.75 at -2 0 0
 }
 
 
 % ---------------------- SYSTEM! ------------------------
 
-new (0.5 * volume) parakin
-new (4.0 * volume) antikin
+new [0.5 * volume] parakin
+new [4.0 * volume] antikin
 new 0 clasp
 new 0 augmin
 new 0 katanin
