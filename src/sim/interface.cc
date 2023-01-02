@@ -483,6 +483,8 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         if ( !set )
             throw InvalidSyntax("could not determine the class of `"+name+"'");
     }
+    else if ( cat.empty() )
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
     else
     {
         set = sim_->findSet(cat);
