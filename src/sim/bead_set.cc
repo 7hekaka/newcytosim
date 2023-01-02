@@ -80,7 +80,7 @@ ObjectList BeadSet::newObjects(const Property* p, Glossary& opt)
         inx = 0;
         var = "attach";
         std::string str;
-        if ( opt.set_block(str, '[', var, 1) ) // some code specified
+        if ( opt.set_block(str, '[', "radius") ) // some code specified
         {
             // get a range of radius
             float a = 0, b = 0;

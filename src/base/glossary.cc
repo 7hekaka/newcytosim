@@ -55,7 +55,7 @@ int Glossary::set_block(std::string & var, char c_in, key_type const& key, size_
         {
             std::string const& arg = val.value_;
             size_t s = arg.size();
-            if ( s == 0 or arg[0] != c_in )
+            if ( s < 2 || arg[0] != c_in )
                 return 0;
             if ( arg[s-1] != Tokenizer::block_delimiter(c_in) )
                 return 0;
