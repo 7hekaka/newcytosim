@@ -399,7 +399,7 @@ public:
     PointGrid(Meca& m) : meca(m) { push = 0; pull = 0; }
     
     /// number of panes
-    int nbPanes() const { return NUM_STERIC_PANES; }
+    static int nbPanes() { return NUM_STERIC_PANES; }
 
     /// set stiffness
     void stiffness(real h, real l) { push = h; pull = l; }

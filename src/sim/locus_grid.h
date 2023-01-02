@@ -420,7 +420,7 @@ public:
     LocusGrid(Meca& m) : meca(m) { push = 0; }
     
     /// number of panes
-    int nbPanes() const { return MAX_STERIC_PANES; }
+    static int nbPanes() { return MAX_STERIC_PANES; }
     
     /// set stiffness
     void stiffness(real s) { push = s; }
