@@ -1813,7 +1813,8 @@ void Display::drawSolid(Solid const& obj)
             gym::enableLighting();
             bodyColor(obj);
             //drawObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
-            gle::stretchTube(obj.posP(0), obj.radius(0), obj.posP(1), gle::cylinder1);
+            gym::stretchAlignZ(obj.posP(0), obj.posP(1), obj.radius(0));
+            gle::cylinder1();
         }
 #endif
     }
@@ -1926,7 +1927,10 @@ void Display::drawSolids(SolidSet const& set)
                     bodyColor(*obj);
                     real rad = 0.5 * pixscale(disp->size);
                     for ( size_t i = inx+1; i <= inx+DIM; ++i )
-                        gle::stretchTube(obj->posPoint(i), rad, tw->posPoint(i), gle::tube2);
+                    {
+                        gym::stretchAlignZ(obj->posPoint(i), tw->posPoint(i), rad);
+                        gle::tube2();
+                    }
                 }
             }
             else

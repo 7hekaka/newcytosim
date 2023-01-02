@@ -123,7 +123,8 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 
                 gym::color(disp->color);
 #if ( DIM >= 3 )
-                gle::stretchTube(pf, pixscale(disp->width), ph, gle::truncatedCone);
+                gym::stretchAlignZ(pf, ph, pixscale(disp->width));
+                gle::truncatedCone();
                 //drawCone(pf, ph-pf, pixscale(disp->width));
 #else
                 gle::drawBand(ph, pixscale(disp->width), ps, pixscale(disp->width));

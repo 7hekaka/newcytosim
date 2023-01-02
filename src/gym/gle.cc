@@ -1646,47 +1646,6 @@ namespace gle
     void barrel() { drawRevolution(barrelRadius, 0, 1, 0.0625); }
 
     void dualPassBarrel() { gym::dualPass(barrel); }
-    
-    //-----------------------------------------------------------------------
-#pragma mark - Tubes
-    
-    void stretchTube(Vector1 const& A, float R, Vector1 const& B, void (*obj)())
-    {
-        gym::stretchAlignZ(A, B, R);
-        obj();
-    }
-    
-    void stretchTube(Vector2 const& A, float R, Vector2 const& B, void (*obj)())
-    {
-        gym::stretchAlignZ(A, B, R);
-        obj();
-    }
-    
-    void stretchTube(Vector3 const& A, float R, Vector3 const& B, void (*obj)())
-    {
-        gym::stretchAlignZ(A, B, R);
-        obj();
-    }
-    
-    //-----------------------------------------------------------------------
-
-    void drawTube(Vector1 const& A, float R, Vector1 const& B, void (*obj)())
-    {
-        gym::transAlignZ(A, R, B-A);
-        obj();
-    }
-    
-    void drawTube(Vector2 const& A, float R, Vector2 const& B, void (*obj)())
-    {
-        gym::transAlignZ(A, R, B-A);
-        obj();
-    }
-    
-    void drawTube(Vector3 const& A, float R, Vector3 const& B, void (*obj)())
-    {
-        gym::transAlignZ(A, R, B-A);
-        obj();
-    }
 
     //-----------------------------------------------------------------------
     

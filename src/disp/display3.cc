@@ -212,7 +212,8 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
         dir = normalize(nxt-old);
         gym::enableClipPlane(4);
         gym::setClipPlane(4, -dir, pos);
-        gle::drawTube(old, rad, pos, gle::capedTube);
+        gym::transAlignZ(old, rad, pos-old);
+        gle::capedTube();
         gym::setClipPlane(4, dir, pos);
         
         // draw inner segments
@@ -225,7 +226,8 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
             dir = normalize(nxt-old);
             gym::color_front(select_color(fib, i));
             gym::setClipPlane(5, -dir, pos);
-            gle::drawTube(old, rad, pos, gle::centralTube);
+            gym::transAlignZ(old, rad, pos-old);
+            gle::centralTube();
             gym::setClipPlane(4,  dir, pos);
         }
         gym::disableClipPlane(5);
@@ -238,12 +240,14 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
         old = 0.5 * ( nxt + pos );
         gym::enableClipPlane(4);
         gym::setClipPlane(4, -dir, old);
-        gle::drawTube(pos, rad, nxt, gle::capedTube);
+        gym::transAlignZ(pos, rad, nxt-pos);
+        gle::capedTube();
         gym::setClipPlane(4, dir, old);
     }
     // draw last segment:
     gym::color_front(select_color(fib, last));
-    gle::drawTube(nxt, rad, pos, gle::endedTube);
+    gym::transAlignZ(nxt, rad, pos-nxt);
+    gle::endedTube();
     gym::disableClipPlane(4);
 }
 
@@ -267,10 +271,11 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
     gym::color_front(select_color(fib, inx++, facM));
     gym::enableClipPlane(4);
     gym::setClipPlane(4, -dir, pos);
+    gym::transAlignZ(old, rad, pos-old);
     if ( abs <= 0 )
-        gle::drawTube(old, rad, pos, gle::capedTube);
+        gle::capedTube();
     else
-        gle::drawTube(old, rad, pos, gle::halfTube2);
+        gle::halfTube2();
     gym::setClipPlane(4, dir, pos);
     
     // keep abs to match to the end of the section already drawn
@@ -287,8 +292,8 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
         dir = normalize(nxt-old);
         gym::color_front(select_color(fib, inx++, fac));
         gym::setClipPlane(5, -dir, pos);
-        // could add a disc to close the tube: gle::endedTube
-        gle::drawTube(old, rad, pos, gle::centralTube);
+        gym::transAlignZ(old, rad, pos-old);
+        gle::centralTube();
         gym::setClipPlane(4, dir, pos);
     }
     gym::disableClipPlane(5);
@@ -302,7 +307,8 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
     }
     else
     {
-        gle::drawTube(nxt, rad, pos, gle::halfTube2);
+        gym::transAlignZ(nxt, rad, pos-nxt);
+        gle::halfTube2();
     }
     gym::disableClipPlane(4);
 }
@@ -533,14 +539,17 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         if ( inx == fib.lastSegment() )
         {
             gym::setClipPlane(5, (A-B)*iseg, (A+B)*0.5);
-            gle::drawTube(A, rad, B, gle::capedTube);
+            gym::transAlignZ(A, rad, B-A);
+            gle::capedTube();
             gym::setClipPlane(5, (B-A)*iseg, (A+B)*0.5);
-            gle::drawTube(B, rad, A, gle::endedTube);
+            gym::transAlignZ(B, rad, A-B);
+            gle::endedTube();
         }
         else
         {
             gym::setClipPlane(5, (A-B)*iseg, B);
-            gle::drawTube(A, rad, B, gle::capedTube);
+            gym::transAlignZ(A, rad, B-A);
+            gle::capedTube();
         }
         gym::disableClipPlane(5);
         return;
@@ -554,7 +563,8 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     {
         gym::enableClipPlane(4);
         gym::setClipPlane(4, (B-A)*iseg, A);
-        gle::drawTube(B, rad, A, gle::endedTube);
+        gym::transAlignZ(B, rad, A-B);
+        gle::endedTube();
         gym::disableClipPlane(4);
         return;
     }
@@ -565,7 +575,8 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     
     gym::enableClipPlane(5);
     gym::enableClipPlane(4);
-    gle::drawTube(A, rad, B, gle::centralTube);
+    gym::transAlignZ(A, rad, B-A);
+    gle::centralTube();
     gym::disableClipPlane(4);
     gym::disableClipPlane(5);
 #else
@@ -824,7 +835,8 @@ void Display3::drawOrganizer(Organizer const& obj) const
         {
             drawPoint(P, disp);
             if ( modulo ) modulo->fold(Q, P);
-            gle::stretchTube(P, wid, Q, gle::tube1);
+            gym::stretchAlignZ(P, Q, wid);
+            gle::tube1();
         }
     }
     /**
@@ -846,7 +858,10 @@ void Display3::drawOrganizer(Organizer const& obj) const
 #else
             const float wid = pixscale(disp->width);
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
-                gle::stretchTube(sol->posPoint(i), wid, sol->posPoint(i+1), gle::hexTube);
+            {
+                gym::stretchAlignZ(sol->posPoint(i), sol->posPoint(i+1), wid);
+                gle::hexTube();
+            }
 #endif
         }
     }
@@ -1053,7 +1068,8 @@ void Display3::drawCoupleBplain(Couple const* cx) const
     Vector p2 = cx->posHand2();
 
     gym::color_both(pd1->color);
-    gle::stretchTube(p1, pixscale(pd1->width), p2, gle::hexTube);
+    gym::stretchAlignZ(p1, p2, pixscale(pd1->width));
+    gle::hexTube();
     if ( pd1->visible ) drawHand(p1, pd1);
     if ( pd2->visible ) drawHand(p2, pd2);
 }
@@ -1076,8 +1092,10 @@ void Display3::drawCoupleBside(Couple const* cx) const
         gym::color_both(pd1->color);
         Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
         drawPoint(mid, pixscale(pd1->width));
-        gle::stretchTube(p2, pixscale(pd2->width), mid, gle::hexTube);
-        gle::stretchTube(p1, pixscale(pd1->width), mid, gle::hexTube);
+        gym::stretchAlignZ(p2, mid, pixscale(pd2->width));
+        gle::hexTube();
+        gym::stretchAlignZ(p1, mid, pixscale(pd1->width));
+        gle::hexTube();
         drawPoint(p1, pd1);
         drawPoint(p2, pd2);
         return;
@@ -1205,7 +1223,8 @@ void Display3::drawCoupleBalt(Couple const* cx) const
     {
         gym::color_both(pd1->color, cx->fiber1()->disp->color.transparency());
         gym::closeDepthMask();
-        gle::stretchTube(p1, pixscale(pd2->width), p2, gle::hexTube);
+        gym::stretchAlignZ(p1, p2, pixscale(pd2->width));
+        gle::hexTube();
         gym::openDepthMask();
         return;
     }
