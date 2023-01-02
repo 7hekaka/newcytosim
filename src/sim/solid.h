@@ -15,8 +15,6 @@ class SingleProp;
 class Wrist;
 
 
-#define NEW_SOLID_HAS_TWIN 0
-
 
 /// Undeformable set of points
 /**

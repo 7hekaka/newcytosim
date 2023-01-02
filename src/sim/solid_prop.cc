@@ -10,10 +10,10 @@
 
 void SolidProp::clear()
 {
-    drag              = -1;
-    viscosity         = -1;
-    steric            = 0;
-    steric_range      = 0;
+    drag         = -1;
+    viscosity    = -1;
+    steric       = 0;
+    steric_range = 0;
     
     confine           = CONFINE_OFF;
     confine_stiffness = 0;
@@ -35,9 +35,11 @@ void SolidProp::clear()
     source_prop = nullptr;
     source_rate_dt = 0;
 #endif
-
-    display           = "";
-    display_fresh     = false;
+#if NEW_SOLID_HAS_TWIN
+    twin_stiffness = 0;
+#endif
+    display = "";
+    display_fresh = false;
 }
 
 
@@ -93,7 +95,10 @@ void SolidProp::read(Glossary& glos)
     glos.set(source_rate, "source");
     glos.set(source_type, "source", 1);
 #endif
-    
+#if NEW_SOLID_HAS_TWIN
+    glos.set(twin_stiffness, "twin_stiffness");
+#endif
+
     if ( glos.set(display, "display") )
         display_fresh = true;
 }
@@ -136,6 +141,10 @@ void SolidProp::complete(Simul const& sim)
         source_prop = sim.findProperty<CoupleProp>("couple", source_type);
     source_rate_dt = 4 * M_PI * source_rate * time_step(sim);
 #endif
+#if NEW_SOLID_HAS_TWIN
+    if ( twin_stiffness < 0 )
+        throw InvalidParameter(name()+":twin_stiffness must be >= 0");
+#endif
 }
 
 
@@ -154,6 +163,9 @@ void SolidProp::write_values(std::ostream& os) const
 #endif
 #if NEW_SOLID_SOURCE
     write_value(os, "source", source_rate, source_type);
+#endif
+#if NEW_SOLID_HAS_TWIN
+    write_value(os, "twin_stiffness", twin_stiffness);
 #endif
     write_value(os, "display",   "("+display+")");
 }

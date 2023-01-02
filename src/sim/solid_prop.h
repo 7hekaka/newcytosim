@@ -19,7 +19,10 @@ class Space;
 #define NEW_SOLID_CLAMP 0
 
 /// new option to create Couple from Solid's spheres
-#define NEW_SOLID_SOURCE 0
+#define NEW_SOLID_SOURCE 1
+
+/// option to create a mirror image of a Solid with 'new'
+#define NEW_SOLID_HAS_TWIN 1
 
 /// Property for Bead and Solid
 /*
@@ -72,49 +75,53 @@ public:
      - `all_inside`
      .
      */
-    Confinement  confine;
+    Confinement confine;
     
     /// confinement stiffness (also known as `confine[1]`)
-    real         confine_stiffness;
+    real        confine_stiffness;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string  confine_space;
+    std::string confine_space;
     
 #if NEW_RADIAL_FLOW
     /// for the additional force
-    real         flow_time[2];
+    real        flow_time[2];
     
     /// for the additional force
-    Vector       flow_center;
+    Vector      flow_center;
 #endif
     
 #if NEW_SOLID_CLAMP
     /// position of clamping that applies to point 0 of Solid (known as `clamp`)
-    Vector       clamp_pos;
+    Vector      clamp_pos;
     
     /// stiffness of clamping force (known as `clamp[1]`)
-    real         clamp_stiff;
+    real        clamp_stiff;
 #endif
     
 #if NEW_SOLID_SOURCE
     /// rate
-    real         source_rate;
+    real        source_rate;
     
     /// type
-    std::string  source_type;
+    std::string source_type;
+#endif
+    
+#if NEW_SOLID_HAS_TWIN
+    real twin_stiffness;
 #endif
     
     /// display string (see @ref PointDispPar)
-    std::string  display;
+    std::string display;
     
     /// @}
     
     
     /// flag to indicate that `display` has a new value
-    bool         display_fresh;
+    bool        display_fresh;
     
     /// parameters derived from string `display`
-    PointDisp *  disp;
+    PointDisp * disp;
     
 #if NEW_SOLID_SOURCE
     /// rate

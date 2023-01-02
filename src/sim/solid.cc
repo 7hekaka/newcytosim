@@ -56,7 +56,7 @@ void Solid::setInteractions(Meca& meca) const
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin )
     {
-        const real stiff = 100;
+        const real stiff = prop->twin_stiffness;
         for ( int i = 1; i <= DIM; ++i )
             meca.addLink(Mecapoint(this,i), Mecapoint(soTwin, i), stiff);
     }
