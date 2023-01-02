@@ -136,6 +136,7 @@ set solid kinetochore
 {
     steric = 0
     confine = inside, 111, plate
+    twin_stiffness = 50
     source = 3, augmin
     display = ( color=0x00FFFFFF; size=2; style=5; )
 }
@@ -156,13 +157,13 @@ set hand holder
 {
 }
 
-set single sglue
+set single kglue
 {
     hand = holder
     stiffness = 1000
 }
 
-set couple cglue
+set couple cohesin
 {
     hand1 = holder
     hand2 = holder
@@ -171,7 +172,7 @@ set couple cglue
 
 % ---------------------- CHROMOSOMES ------------------------
 
-new 1 kinetochore
+new kinetochore
 {
     sphere1 = 0 0 0, 0.150, (2 corona sphere 1 0 if (S>0.97))
     position = cylinder 0.1 0.1
@@ -191,22 +192,32 @@ new chromatin
     length = 3.0
 }
 
-new sglue
+new kglue
 {
     base = kinetochore~1, point1
     attach = chromatin~1, 1.5
 }
-new sglue
+new kglue
 {
     base = kinetochore~2, point1
     attach = chromatin~2, 1.5
 }
-new cglue
+new cohesin
 {
     attach1 = chromatin~1, 0.0
     attach2 = chromatin~2, 0.0
 }
-new cglue
+new cohesin
+{
+    attach1 = chromatin~1, 1.0
+    attach2 = chromatin~2, 1.0
+}
+new cohesin
+{
+    attach1 = chromatin~1, 2.0
+    attach2 = chromatin~2, 2.0
+}
+new cohesin
 {
     attach1 = chromatin~1, 3.0
     attach2 = chromatin~2, 3.0

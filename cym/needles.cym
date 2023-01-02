@@ -1,9 +1,9 @@
-% F. Nedelec, Saarbrucken 26 June 2013
+% F. Nedelec, Saarbrucken 26 June 2013, Strasbourg 2.01.2022
 % This illustrates how to assemble objects
 
 set simul system
 {
-    steric = 1, 100
+    steric = 1, 333
     
     time_step = 0.001
     viscosity = 1
@@ -50,18 +50,18 @@ set hand holder
 set single link
 {
     hand = holder
-    stiffness = 1000
+    stiffness = 100
 }
 
 new event
 {
     rate = 10;
     code = (
-        new stem { length=0.25; plus_end=grow; }
-        new ball { point1=center, 0.25; point2=0.25 0 0; buddy=stem~1 }
-        new link { base=solid~1, point1; attach=fiber~1, 0 }
-        new link { base=solid~1, point2; attach=fiber~1, 0.25 }
-    )
+      new stem { length=0.25; plus_end=grow; }
+      new ball { position=[stem~1]; point1=center, 0.25; point2=0.25 0 0; buddy=stem~1; }
+      new link { base=ball~1, point1; attach=stem~1, 0 }
+      new link { base=ball~1, point2; attach=stem~1, 0.25 }
+   )
 }
 
 run 10000 system
