@@ -13,10 +13,19 @@ class PropertyList;
 
 
 /// holds a list of Couple of the same type
+/**
+ This list is build using 'Object::next()' and thus can only hold
+ objects that are not linked in CoupleSet already (see below).
+ It is a single-linked list and addition/removal is made on the same end.
+ CoupleReserve is used for the 'fast_diffusion' algorithm.
+ */
 class CoupleReserve
 {
+    /// All Couple in the list should be of the same type
     CoupleProp const* property_;
+    /// Pointer to first member in list
     Couple * head_;
+    /// Number of Couples in list
     size_t count_;
     
 public:
@@ -39,7 +48,7 @@ public:
     /// add object
     void push(Couple* arg) { arg->Object::next(head_); head_ = arg; ++count_; }
     
-    /// remove head
+    /// remove first object in list
     void pop() { head_ = head_->next(); --count_; }
     
     /// delete all objects

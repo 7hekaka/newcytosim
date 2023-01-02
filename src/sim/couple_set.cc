@@ -465,6 +465,7 @@ void CoupleSet::reheat()
     {
         Couple* o = static_cast<Couple*>(i);
         i = ice_.pop_front();
+        // we want to skip the 'beforeDetachment' here:
         o->hand1()->detachHand();
         o->hand2()->detachHand();
         o->randomizePosition();
@@ -928,14 +929,14 @@ void CoupleSet::uniRelax()
 {
     for ( CoupleReserve & can : uniReserves )
     {
-        Couple * obj = can.head();
-        while ( obj )
+        Couple * o = can.head();
+        while ( o )
         {
-            assert_true(!obj->attached1() && !obj->attached2());
+            assert_true(!o->attached1() && !o->attached2());
             can.pop();
-            obj->randomizePosition();
-            linkFF(obj);
-            obj = can.head();
+            o->randomizePosition();
+            linkFF(o);
+            o = can.head();
         }
     }
 }

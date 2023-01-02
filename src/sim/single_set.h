@@ -12,10 +12,19 @@ class PropertyList;
 typedef Array<Single *> SingleList;
 
 /// holds a list of Single of the same type
+/**
+ This list is build using 'Object::next()' and thus can only hold
+ objects that are not linked in SingleSet already (see below).
+ It is a single-linked list and addition/removal is made on the same end.
+ SingleReserve is used for the 'fast_diffusion' algorithm.
+ */
 class SingleReserve
 {
+    /// All Single in the list should be of the same type
     SingleProp const* property_;
+    /// Pointer to first member in list
     Single * head_;
+    /// Number of Couples in list
     size_t count_;
     
 public:
@@ -38,7 +47,7 @@ public:
     /// add object
     void push(Single* arg) { arg->Object::next(head_); head_ = arg; ++count_; }
     
-    /// remove head
+    /// remove first object in list
     void pop() { head_ = head_->next(); --count_; }
     
     /// delete all objects

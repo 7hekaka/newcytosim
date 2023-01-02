@@ -476,7 +476,7 @@ void Couple::foldPosition(Modulo const* m)
 
 void Couple::randomizePosition()
 {
-    if ( prop->diffusion > 0 )
+    if ( prop->diffusion > 0 || prop->fast_diffusion )
     {
         if ( prop->confine == CONFINE_ON )
             cPos = prop->confine_space_ptr->placeOnEdge(1.0);

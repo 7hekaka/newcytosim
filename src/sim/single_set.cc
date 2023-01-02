@@ -319,6 +319,7 @@ void SingleSet::reheat()
     {
         Single* o = static_cast<Single*>(i);
         i = ice_.pop_front();
+        // we want to skip the 'beforeDetachment' here:
         o->hand()->detachHand();
         o->randomizePosition();
         linkF(o);
@@ -724,14 +725,14 @@ void SingleSet::uniRelax()
 {
     for ( SingleReserve & can : uniReserves )
     {
-        Single * obj = can.head();
-        while ( obj )
+        Single * o = can.head();
+        while ( o )
         {
-            assert_true(!obj->attached());
+            assert_true(!o->attached());
             can.pop();
-            obj->randomizePosition();
-            linkF(obj);
-            obj = can.head();
+            o->randomizePosition();
+            linkF(o);
+            o = can.head();
         }
     }
 }

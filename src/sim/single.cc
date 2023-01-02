@@ -96,7 +96,7 @@ void Single::foldPosition(Modulo const* m)
 
 void Single::randomizePosition()
 {
-    if ( prop->diffusion > 0 )
+    if ( prop->diffusion > 0 || prop->fast_diffusion )
     {
         if ( prop->confine == CONFINE_ON )
             sPos = prop->confine_space_ptr->placeOnEdge(1.0);
