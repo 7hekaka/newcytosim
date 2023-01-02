@@ -1090,7 +1090,16 @@ void Parser::parse_repeat(std::istream& is)
     for ( size_t c = 0; c < cnt; ++c )
     {
         VLOG("--repeat code " << c+1 << "/" << cnt << "\n");
-        evaluate(code);
+        std::istringstream iss(code);
+        std::streampos ipos(0);
+        try {
+            evaluate(iss, ipos);
+        }
+        catch( Exception & e )
+        {
+            e << "\n" + StreamFunc::extract_lines(iss, ipos, iss.tellg());
+            throw;
+        }
     }
 }
 
@@ -1168,9 +1177,17 @@ void Parser::parse_for(std::istream& is)
     
     for ( long v = start; v < end; v += inc )
     {
-        std::string res = replace_bracketed_code(code, Evaluator{{var, v}});
-        //std::clog << res << "\n";
-        evaluate(res);
+        std::string str = replace_bracketed_code(code, Evaluator{{var, v}});
+        std::istringstream iss(str);
+        std::streampos ipos(0);
+        try {
+            evaluate(iss, ipos);
+        }
+        catch( Exception & e )
+        {
+            e << "\n" + StreamFunc::extract_lines(iss, ipos, iss.tellg());
+            throw;
+        }
     }
 }
 
@@ -1303,6 +1320,7 @@ int Parser::evaluate_one(std::istream& is)
 }
 
 
+/** This will repeateadly call `evaluate_one` while there is no error */
 void Parser::evaluate(std::istream& is, std::streampos& ipos)
 {
     while ( is.good() )
