@@ -136,7 +136,7 @@ void Display::drawDiscT(Vector const& pos, real rad, gym_color const& col) const
 
 
 /// used for drawFilament
-inline void drawMonomer(Vector3 const& pos, real rad)
+inline void drawMonomer(Vector3 const& pos, float rad)
 {
     gym::transScale(pos, rad);
     gle::sphere2();
@@ -1131,7 +1131,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
  This style uses one vertex for each site, positionned at the center of the range
  OpenGL will interpolate the colors, and each site will be covered by a gradient.
  */
-void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     const real uni = lat.unit();
     const auto inf = lat.indexM();
@@ -1197,7 +1197,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, rea
  This style, uses two vertices for each site, positionned at the extremity of the range,
  and each site is entirely covered by the color corresponding to the value.
  */
-void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     const real uni = lat.unit();
     const auto inf = lat.indexM();
@@ -1260,17 +1260,17 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, rea
 }
 
 
-void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     drawFiberLattice2(fib, lat, rad);
-    drawFiberLatticeEdges(fib, lat, rad*0.5);
+    drawFiberLatticeEdges(fib, lat, rad*0.5f);
 }
 
 
 /**
  Indicate the edges between sites with small dots
  */
-void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     const real uni = lat.unit();
     const auto inf = lat.indexM();
@@ -1390,7 +1390,7 @@ void Display::drawFilament(Fiber const& fib,
     // axial translation between two sucessive monomers:
     const real dab = 0.004;
     // enlarge radius of monomers to make them overlap
-    const real rad = 0.65 * dab;
+    const float rad = 0.65 * dab;
     
     real ab = 0;
     
@@ -1453,7 +1453,7 @@ void Display::drawActin(Fiber const& fib,
     // axial translation between two sucessive monomers:
     const real dab = 0.00275;
     // enlarge radius of monomers to make them overlap
-    const real rad = 1.3 * dab;
+    const float rad = 1.3 * dab;
     // distance from central axis to center of monomers
     real off = 0.0045 - dab;
     
@@ -1544,7 +1544,7 @@ void Display::drawMicrotubule(Fiber const& fib,
     // axial translation (one heterodimer)
     const real dab = 0.008;
     // enlarged radius of monomers makes them overlap slighlty
-    const real rad = 0.003;
+    const float rad = 0.003;
     // distance from central axis to center of monomers, such that diameter is 25nm
     real off = 0.025 / 2 - rad;
 
@@ -1635,14 +1635,14 @@ void Display::drawFiber(Fiber const& fib)
     VisibleLattice const* lat = fib.visibleLattice();
     if ( lat )
     {
-        real rad = std::max(disp->line_width * unitValue, real(0.25));
+        float rad = std::max(disp->line_width * unitValue, 0.25f);
         if ( style == 3 )
             rad = pixscale(disp->line_width);
         // if the Lattice is displayed, do not draw backbone:
         switch ( disp->lattice_style )
         {
             case 1:
-                drawFiberLattice1(fib, *lat, rad;
+                drawFiberLattice1(fib, *lat, rad);
                 style = 0;
                 break;
             case 2:

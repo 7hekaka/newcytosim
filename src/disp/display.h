@@ -221,16 +221,16 @@ public:
     virtual void drawFiberSpeckles(Fiber const&) const;
    
     /// display lattice subtance using color
-    virtual void drawFiberLattice1(Fiber const&, VisibleLattice const&, real rad) const;
+    virtual void drawFiberLattice1(Fiber const&, VisibleLattice const&, float rad) const;
     
     /// display lattice subtance using color
-    virtual void drawFiberLattice2(Fiber const&, VisibleLattice const&, real rad) const;
+    virtual void drawFiberLattice2(Fiber const&, VisibleLattice const&, float rad) const;
    
     /// display lattice cell edges
-    virtual void drawFiberLattice3(Fiber const&, VisibleLattice const&, real rad) const;
+    virtual void drawFiberLattice3(Fiber const&, VisibleLattice const&, float rad) const;
 
     /// display lattice cell edges
-    virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real rad) const;
+    virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, float rad) const;
 
     /// display Labels for a Fiber
     void         drawFiberLabels(Fiber const&, int style, gym_color const&) const;

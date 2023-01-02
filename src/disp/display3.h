@@ -35,23 +35,23 @@ private:
     inline void drawHandF(Vector const& pos, PointDisp const* dis) const;
     
     /// draw Fiber model segments
-    void drawFiberSegmentsClip(Fiber const&, real rad,
+    void drawFiberSegmentsClip(Fiber const&, float rad,
                                gym_color (*set_color)(Fiber const&, size_t)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
-    void drawFiberSectionsClip(Fiber const&, real rad, long inx, long last, real abs, real inc,
+    void drawFiberSectionsClip(Fiber const&, float rad, long inx, long last, real abs, real inc,
                                gym_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
     
     /// draw Fiber model segments
-    void drawFiberSegmentsJoin(Fiber const&, real rad,
+    void drawFiberSegmentsJoin(Fiber const&, float rad,
                                gym_color (*set_color)(Fiber const&, size_t)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
-    void drawFiberSectionsJoin(Fiber const&, real rad, long inx, long last, real abs, real inc,
+    void drawFiberSectionsJoin(Fiber const&, float rad, long inx, long last, real abs, real inc,
                                gym_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
 
     /// display lattice subtance using specified color function
-    void drawFiberLattice(Fiber const&, VisibleLattice const&, real width, gym_color (*set_color)(Fiber const&, long, real)) const;
+    void drawFiberLattice(Fiber const&, VisibleLattice const&, float rad, gym_color (*set_color)(Fiber const&, long, real)) const;
 
 public:
         
@@ -77,16 +77,16 @@ public:
     void drawFiberSegmentT(Fiber const&, size_t) const;
 
     /// display lattice subtance using color
-    void drawFiberLattice1(Fiber const&, VisibleLattice const&, real rad) const;
+    void drawFiberLattice1(Fiber const&, VisibleLattice const&, float rad) const;
     
     /// display lattice subtance using color
-    void drawFiberLattice2(Fiber const&, VisibleLattice const&, real rad) const;
+    void drawFiberLattice2(Fiber const&, VisibleLattice const&, float rad) const;
     
     /// display lattice subtance using color
-    void drawFiberLattice3(Fiber const&, VisibleLattice const&, real rad) const;
+    void drawFiberLattice3(Fiber const&, VisibleLattice const&, float rad) const;
 
     /// draw Edges of lattice
-    void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, real rad) const;
+    void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, float rad) const;
 
     /// draw Fiber point-like features
     void drawFiberPoints(Fiber const&) const;

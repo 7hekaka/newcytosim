@@ -197,7 +197,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 /**
 This draws the model-segments, using function `select_color` to set display colors
 */
-void Display3::drawFiberSegmentsClip(Fiber const& fib, real rad,
+void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
                                      gym_color (*select_color)(Fiber const&, size_t)) const
 {
     const size_t last = fib.lastSegment();
@@ -257,7 +257,7 @@ This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is relative to the MINUS_END.
 The function `set_color` is called to set the color of the segments.
 */
-void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
+void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
                                      long inx, const long last,
                                      real abs, const real inc,
                                      gym_color (*select_color)(Fiber const&, long, real),
@@ -320,7 +320,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, real rad,
 /**
 This draws the model-segments, using function `select_color` to set display colors
 */
-void Display3::drawFiberSegmentsJoin(Fiber const& fib, real rad,
+void Display3::drawFiberSegmentsJoin(Fiber const& fib, float rad,
                                      gym_color (*select_color)(Fiber const&, size_t)) const
 {
     const size_t last = fib.lastSegment();
@@ -361,7 +361,7 @@ This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is relative to the MINUS_END.
 The function `set_color` is called to set the color of the segments.
 */
-void Display3::drawFiberSectionsJoin(Fiber const& fib, real rad,
+void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
                                      long inx, const long last,
                                      real abs, const real inc,
                                      gym_color (*select_color)(Fiber const&, long, real),
@@ -595,7 +595,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 #pragma mark - Display Lattice
 
 
-void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, real rad,
+void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, float rad,
                                 gym_color (*select_color)(Fiber const&, long, real)) const
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -635,22 +635,22 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, rea
 }
 
 
-void Display3::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display3::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     drawFiberLattice(fib, lat, rad, color_by_lattice);
 }
 
-void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     drawFiberLattice(fib, lat, rad, color_by_lattice_jet);
 }
 
-void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     drawFiberLattice(fib, lat, rad, color_by_lattice_white);
 }
 
-void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, real rad) const
+void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     drawFiberLattice(fib, lat, rad, color_alternate);
 }
