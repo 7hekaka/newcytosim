@@ -4,7 +4,7 @@ template <typename T>
 static bool has_steric(T const& obj, int sup)
 {
     int S = obj->prop->steric;
-    if ( S < 0 || S >> sup )
+    if ( S < 0 || S >= sup )
         throw InvalidParameter(obj->prop->name()+":steric is out-of-range");
     return S;
 }
