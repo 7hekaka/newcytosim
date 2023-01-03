@@ -19,10 +19,10 @@ class Space;
 #define NEW_SOLID_CLAMP 0
 
 /// new option to create Couple from Solid's spheres
-#define NEW_SOLID_SOURCE 1
+#define NEW_SOLID_SOURCE 0
 
 /// option to create a mirror image of a Solid with 'new'
-#define NEW_SOLID_HAS_TWIN 1
+#define NEW_SOLID_HAS_TWIN 0
 
 /// Property for Bead and Solid
 /*
