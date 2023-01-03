@@ -13,11 +13,13 @@ constexpr size_t ISOB_LDD = 3;
 
 /*
  number of off-diagonals and leading dimension for the non-isotropic banded matrix
- We use a band preconditionner with 2*DIM off-diagonals to include the
- 'diagonal' terms from the blocks that are offset by 2 from the matrix diagonal
+ We use a band preconditionner with 2*DIM off-diagonals to include the near-
+ diagonal terms from the blocks that are offset by 2 from the matrix diagonal
  */
-constexpr size_t BAND_NUD = 2*DIM;
-constexpr size_t BAND_LDD = BAND_NUD+DIM;
+constexpr size_t BAND_NUD = 3*DIM;
+
+// should allocate to also hold the true diagonal
+constexpr size_t BAND_LDD = BAND_NUD+1;
 
 
 //------------------------------------------------------------------------------

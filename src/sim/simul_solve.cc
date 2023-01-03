@@ -256,14 +256,15 @@ void Simul::solve_auto()
         
         if ( autoCounter == N_TESTS*N_METHODS )
         {
-            /*
-             Compare the performance of some methods, and select the fastest.
-             Only adopt a more complicated method if the gain is significant.
-             */
             autoPrecond = 0;
             for ( unsigned m : { 0, 1, 4, 6 } )
             {
-                if ( autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
+                /*
+                 Compare the performance of some methods, and select the fastest.
+                 The number of iterations should be decreased, with some CPU gain.
+                 Only adopt a more complicated method if the gain is significant.
+                 */
+                if ( autoCNT[m] < autoCNT[0] && autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
                     autoPrecond = m;
             }
             if ( 1 )

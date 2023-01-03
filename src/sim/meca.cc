@@ -851,7 +851,7 @@ size_t Meca::solve()
         --doNotify;
         std::stringstream oss;
         if ( bump_ > 0 )
-            oss << "\tfailed to compute " << bump_ << " / " << mecables.size() << " preconditionner blocks\n";
+            oss << "\t\tfailed to compute " << bump_ << " / " << mecables.size() << " preconditionner blocks\n";
         oss << "\tsize " << DIM << "*" << nbVertices() << " kern " << largestMecable();
         //oss << " constraints " << nbConstraints();
 #if USE_ISO_MATRIX
