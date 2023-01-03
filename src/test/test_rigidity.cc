@@ -331,7 +331,7 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
 
 void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    const real R6 = R1 * 6;
+    const real SIX = 6.0;
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
 /*
@@ -350,7 +350,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     const size_t end = nbt;
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (6*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
+        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (SIX*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
     
     // special cases near the edges:
     real      * Z = Y + nbt;
