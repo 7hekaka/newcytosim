@@ -47,10 +47,10 @@ protected:
     /// the abscissa from the origin of the Fiber
     real hAbs;
     
-    /// interpolation coefficient: pos = (1-inter_) * Vertex(segix_) + inter_ * Vertex(segix_+1)
+    /// interpolation coefficient: position = (1-inter_) * Vertex1 + inter_ * Vertex2
     mutable real inter_;
 
-    /// index of segment where site is located
+    /// index of segment where site is located: Vertex1 = hFiber::Vertex(segix_)
     mutable unsigned segix_;
 
 #if FIBER_HAS_LATTICE
