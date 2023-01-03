@@ -80,15 +80,17 @@ void free_reals(real* p, real* x, real* y, real* z)
 /*
  This is the simple implementation
  */
-void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 {
+    const real R2 = 2.0 * R1;
+    const real TWO = 2.0;
     #pragma omp simd
     for ( size_t jj = 0; jj < DIM*nbt; ++jj )
     {
-        real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
-        Y[jj      ] -=   f;
-        Y[jj+DIM  ] += 2*f;
-        Y[jj+DIM*2] -=   f;
+        real f = ( X[jj+DIM*2] + X[jj] ) - TWO * X[jj+DIM];
+        Y[jj      ] -= f * R1;
+        Y[jj+DIM  ] += f * R2;
+        Y[jj+DIM*2] -= f * R1;
     }
 }
 
@@ -368,14 +370,16 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 /// only valid if ( nbt > DIM )
 void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    const real R6 = R1 * 6;
+    const real SIX = 6.0;
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
 
     const size_t end = DIM * nbt;
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] += R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * ((X-DIM*2)[i]+(X+DIM*2)[i]) - R6 * X[i];
+    {
+        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (SIX*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
+    }
     
     // special cases near the edges:
     real      * Z = Y + DIM * nbt;

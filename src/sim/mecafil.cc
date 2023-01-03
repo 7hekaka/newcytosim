@@ -222,15 +222,17 @@ void Mecafil::getForces(const real* ptr)
 /*
  This is the reference implementation
  */
-void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
+void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    assert_true( X != Y );
+    const real R2 = 2.0 * R1;
+    const real TWO = 2.0;
+    #pragma omp simd
     for ( size_t jj = 0; jj < DIM*nbt; ++jj )
     {
-        real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
-        Y[jj      ] -= f;
-        Y[jj+DIM  ] += f*2.0;
-        Y[jj+DIM*2] -= f;
+        real f = ( X[jj+DIM*2] + X[jj] ) - TWO * X[jj+DIM];
+        Y[jj      ] -= f * R1;
+        Y[jj+DIM  ] += f * R2;
+        Y[jj+DIM*2] -= f * R1;
     }
 }
 
