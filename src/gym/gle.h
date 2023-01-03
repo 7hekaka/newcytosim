@@ -72,21 +72,24 @@ namespace gle
     void paint_cross();
     /// 2D cross within -1.5 to 1.5
     void stroke_cross();
-    
-    /// draw 2D disc of radius 1 in XY plane, with +Z as normal
-    void disc();
-    /// draw 2D disc of radius 1 in XY plane, with +Z as normal
+
+    /// draw nice 2D disc of radius 1 in XY plane, with +Z as normal
     void disc1();
-    /// nicer 2D disc of radius 1 in XY plane, with +Z as normal
+    /// draw 2D disc of radius 1 in XY plane, with +Z as normal
     void disc2();
-    /// draw 2D disc of radius 1 at Z=1, with +Z as normal
+    /// draw nice 2D disc of radius 1 at Z=1, with +Z as normal
     void discTop1();
     /// draw 2D disc of radius 1 at Z=1, with +Z as normal
     void discTop2();
-    /// draw 2D disc of radius 1 in XY plane, with -Z as normal
+    /// draw nice 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom1();
-    /// nicer 2D disc of radius 1 in XY plane, with -Z as normal
+    /// draw 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom2();
+    /// draw 2D disc of radius 1 in XY plane, at Z = 0.5
+    void discMid2();
+    
+    /// draw nice 2D disc of radius 1 in XY plane, with +Z as normal
+    inline void disc() { disc1(); }
 
     /// paint a disc in XY plane, covering all points at distance to origin [ R0, R1 ]
     void paint_halo(float R0, float R1);
@@ -176,12 +179,13 @@ namespace gle
     void cone3();
 
     /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
-    void cylinder1();
+    inline void cylinder1() { tube2(); discBottom2(); discTop2(); }
     /// display a cylinder of axis Z, radius 1 in Z=[-0.5, 0.5]
-    void cylinder2();
+    void cylinderT();
 
     /// display a cone of axis Z, radius 1 at Z=0, summit at Z=1
-    void cone();
+    inline void cone() { cone2(); discBottom2(); }
+
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
     void longCone();
     /// display a closed cone directed along Z, of radius 1.5 in Z=[0.7, +1.4]

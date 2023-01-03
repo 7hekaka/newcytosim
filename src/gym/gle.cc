@@ -1281,7 +1281,7 @@ namespace gle
     
     static size_t sizeTubeBuffers()
     {
-        return 25 * pi_twice;  // this is empirical!
+        return 26 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)
@@ -1315,6 +1315,7 @@ namespace gle
         tubes_[20] = i+s; i += setDisc(ptr+i, 2, 1, 1);
         tubes_[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
         tubes_[22] = i+s; i += setDisc(ptr+i, 4, 0, -1);
+        tubes_[23] = i+s; i += setDisc(ptr+i, 4, 0.5, 1);
         assert_true( i <= sizeTubeBuffers() );
         return i;
     }
@@ -1361,7 +1362,8 @@ namespace gle
     void discTop2()      { doTubeStrip(tubes_[20], pi_twice/2); }
     void discBottom1()   { doTubeStrip(tubes_[21], pi_twice); }
     void discBottom2()   { doTubeStrip(tubes_[22], pi_twice/4); }
-    
+    void discMid2()      { doTubeStrip(tubes_[23], pi_twice/4); }
+
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
     void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
     void circle_dotted(float w) { gym::bindBufferV2(buf_[0]); gym::drawLines(w, discs_[0], 1+pi_twice); }
@@ -1371,13 +1373,9 @@ namespace gle
     void paint_capsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
     void stroke_cross(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[4], 12); }
     void paint_cross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[5], 12); }
-
-    void disc() { disc1(); }
-    void cone() { cone2(); discBottom2(); }
-    void cylinder1() { tube2(); discBottom2(); discTop2(); }
     
     // these primitices do not preserve the modelview transformation
-    void cylinder2() { gym::translate(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }
+    void cylinderT() { gym::translate(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }
     void longCone() { gym::translate(0,0,-1); gym::scale(1,1,3); cone2(); discBottom2(); }
     void shortCone() { gym::translate(0,0,-0.333f); gym::scale(1,1,0.5); cone2(); discBottom2(); }
 
@@ -1937,7 +1935,7 @@ namespace gle
     void drawCylinder(Vector3 const& pos, Vector3 const& dir, float rad)
     {
         gym::transAlignZ(pos, rad, dir);
-        cylinder2();
+        cylinderT();
     }
     
     
