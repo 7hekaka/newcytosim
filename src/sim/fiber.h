@@ -226,10 +226,12 @@ public:
     void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
 #endif
 #if NEW_SHAPED_FIBER
+    real chiasma_;
+    
     real silhouette(size_t i) const
     {
-        real pos = ( 10.0 * i ) / lastSegment() - 5.0; // in [-5, 5]
-        real amp = 2. + std::tanh(std::abs(pos)-1); // in [1, 3]
+        real pos = real(i) / lastSegment() - chiasma_;
+        real amp = 2.0 + std::tanh(5.0 * std::abs(pos) - 1.0); // in [1, 3]
         return amp * prop->steric_radius;
     }
 #endif

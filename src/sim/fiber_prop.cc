@@ -278,6 +278,12 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
             fib->mesh().clear(val);
     }
 #endif
+#if NEW_SHAPED_FIBER
+    if ( opt.set(fib->chiasma_, "chiasma") )
+        fib->chiasma_ /= fib->length();
+    if ( fib->chiasma_ < 0 || fib->chiasma_ > 1 )
+        throw InvalidParameter("fiber::chiasma must be in [0, 1]");
+#endif
 
     return fib;
 }
@@ -406,7 +412,7 @@ void FiberProp::read(Glossary& glos)
     glos.set(binding_key,  "binding_key");
     
     glos.set(lattice,      "lattice");
-    glos.set(lattice_unit, "lattice", 1, "lattice_unit", 0);
+    glos.set(lattice_unit, "lattice_unit") || glos.set(lattice_unit, "lattice", 1);
     glos.set(save_lattice, "save_lattice");
     
 #if FIBER_HAS_MESH

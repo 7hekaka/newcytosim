@@ -229,6 +229,9 @@ Fiber::Fiber(FiberProp const* p)
     fChewM = 0;
     fChewP = 0;
 #endif
+#if NEW_SHAPED_FIBER
+    chiasma_ = 0.5;
+#endif
 }
 
 #if FIBER_HAS_FAMILY
