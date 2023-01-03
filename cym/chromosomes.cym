@@ -1,0 +1,277 @@
+% the 5 Arabidopsis taliana chromosomes
+% Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
+% F. Nedelec, Strasbourg 2.01.2023
+% Chromosome arm length are from Figure 1 - Genetics 162: 1415–1422 (November 2002)
+% Variation in Chiasma Frequency Among Eight Accessions of Arabidopsis thaliana
+
+% ---------------------- CHROMOSOME 1 ------------------------
+
+new kinetochore
+{
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    position = sphere 1.0
+    twin = mirror
+}
+new chromatin
+{
+    position = [kinetochore~2]
+    chiasma = 1.0
+    length = 2.0
+}
+new chromatin
+{
+    position = [kinetochore~1]
+    direction = [chromatin~1]
+    chiasma = 1.0
+    length = 2.0
+}
+
+new kglue
+{
+    base = kinetochore~1, point1
+    attach = chromatin~1, 1.0
+}
+new kglue
+{
+    base = kinetochore~2, point1
+    attach = chromatin~2, 1.0
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.0
+    attach2 = chromatin~2, 0.0
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.5
+    attach2 = chromatin~2, 0.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 1.5
+    attach2 = chromatin~2, 1.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 2.0
+    attach2 = chromatin~2, 2.0
+}
+run 100 system
+
+
+
+% ---------------------- CHROMOSOME 2 ------------------------
+
+new kinetochore
+{
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    position = sphere 1.0
+    twin = mirror
+}
+new chromatin
+{
+    position = [kinetochore~2]
+    reference = minus_end
+    chiasma = 1.05
+    length = 1.3
+}
+new chromatin
+{
+    position = [kinetochore~1]
+    reference = minus_end
+    direction = [chromatin~1]
+    chiasma = 1.05
+    length = 1.3
+}
+
+new kglue
+{
+    base = kinetochore~1, point1
+    attach = chromatin~1, 1.05
+}
+new kglue
+{
+    base = kinetochore~2, point1
+    attach = chromatin~2, 1.05
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.0
+    attach2 = chromatin~2, 0.0
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.5
+    attach2 = chromatin~2, 0.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 1.3
+    attach2 = chromatin~2, 1.3
+}
+run 100 system
+
+
+
+% ---------------------- CHROMOSOME 3 ------------------------
+
+new kinetochore
+{
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    position = sphere 1.0
+    twin = mirror
+}
+new chromatin
+{
+    position = [kinetochore~2]
+    reference = minus_end
+    chiasma = 0.95
+    length = 1.55
+}
+new chromatin
+{
+    position = [kinetochore~1]
+    reference = minus_end
+    direction = [chromatin~1]
+    chiasma = 0.95
+    length = 1.55
+}
+
+new kglue
+{
+    base = kinetochore~1, point1
+    attach = chromatin~1, 0.95
+}
+new kglue
+{
+    base = kinetochore~2, point1
+    attach = chromatin~2, 0.95
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.0
+    attach2 = chromatin~2, 0.0
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.5
+    attach2 = chromatin~2, 0.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 1.55
+    attach2 = chromatin~2, 1.55
+}
+run 100 system
+
+
+
+% ---------------------- CHROMOSOME 4 ------------------------
+
+new kinetochore
+{
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    position = sphere 1.0
+    twin = mirror
+}
+new chromatin
+{
+    position = [kinetochore~2]
+    reference = minus_end
+    chiasma = 0.90
+    length = 1.2
+}
+new chromatin
+{
+    position = [kinetochore~1]
+    reference = minus_end
+    direction = [chromatin~1]
+    chiasma = 0.90
+    length = 1.2
+}
+
+new kglue
+{
+    base = kinetochore~1, point1
+    attach = chromatin~1, 0.90
+}
+new kglue
+{
+    base = kinetochore~2, point1
+    attach = chromatin~2, 0.90
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.0
+    attach2 = chromatin~2, 0.0
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.5
+    attach2 = chromatin~2, 0.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 1.2
+    attach2 = chromatin~2, 1.2
+}
+run 100 system
+
+
+% ---------------------- CHROMOSOME 5 ------------------------
+
+new kinetochore
+{
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    position = sphere 1.0
+    twin = mirror
+}
+new chromatin
+{
+    position = [kinetochore~2]
+    chiasma = 0.98
+    length = 1.8
+}
+new chromatin
+{
+    position = [kinetochore~1]
+    direction = [chromatin~1]
+    chiasma = 0.98
+    length = 1.8
+}
+
+new kglue
+{
+    base = kinetochore~1, point1
+    attach = chromatin~1, 0.98
+}
+new kglue
+{
+    base = kinetochore~2, point1
+    attach = chromatin~2, 0.98
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.0
+    attach2 = chromatin~2, 0.0
+}
+new cohesin
+{
+    attach1 = chromatin~1, 0.5
+    attach2 = chromatin~2, 0.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 1.5
+    attach2 = chromatin~2, 1.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 1.8
+    attach2 = chromatin~2, 1.8
+}
+run 100 system
+
+
+
+
