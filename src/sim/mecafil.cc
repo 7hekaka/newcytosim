@@ -242,13 +242,13 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     assert_true(nbt > DIM);
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
-    const real R6 = R1 * 6;
+    const real SIX = 6.0;
     
     const size_t end = nbt;
     // in the general case all values can be computed independently:
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] = Y[i] + R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * (6*X[i]+(X-DIM*2)[i]+(X+DIM*2)[i]);
+        Y[i] = Y[i] + R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * (SIX*X[i] + ((X-DIM*2)[i]+(X+DIM*2)[i]));
 
     // special cases at the edges:
     real      * Z = Y + nbt;
