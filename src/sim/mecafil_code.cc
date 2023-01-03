@@ -21,7 +21,7 @@ void add_rigidity2(const size_t nbt, const real* X, const real rigid, real* Y)
 #endif
     
     real * yv = Y;
-    const real*const end = X + nbt + DIM;
+    const real*const end = X + DIM*(nbt+1);
     
     const real* xv = X+DIM;
     while ( xv < end )
@@ -89,7 +89,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
     xn += DIM;
     
     real * yp = Y;
-    real *const end = Y + nbt;
+    real *const end = Y + DIM*nbt;
     while ( yp < end )
     {
         real e0 = *xn - x0;
@@ -152,7 +152,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 void add_rigidity2D_SSE(const size_t nbt, const double* X, const double rigid, double* Y)
 {
     vec2 R = set2(rigid);
-    double *const end = Y + nbt;
+    double *const end = Y + DIM*nbt;
 
     vec2 nn = load2(X+2);
     vec2 oo = mul2(R, sub2(nn, load2(X)));
@@ -190,7 +190,7 @@ void add_rigidity2D_AVX(const size_t nbt, const double* X, const double rigid, d
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);
     
-    double *const end = Y + nbt - 8;
+    double *const end = Y + DIM*nbt - 8;
     
     vec4 xxx = loadu4(X);
     vec4 eee = setzero4();

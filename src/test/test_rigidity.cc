@@ -83,7 +83,7 @@ void free_reals(real* p, real* x, real* y, real* z)
 void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     #pragma omp simd
-    for ( size_t jj = 0; jj < nbt; ++jj )
+    for ( size_t jj = 0; jj < DIM*nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
         Y[jj      ] -=   f;
@@ -100,7 +100,7 @@ void add_rigidity2(const size_t nbt, const real* vec, const real rigid, real* Y)
     real fx = 0;
     real fy = 0;
     #pragma omp simd
-    for ( size_t jj = 0; jj < nbt; jj += 2 )
+    for ( size_t jj = 0; jj < DIM*nbt; jj += 2 )
     {
         real const* X = vec + jj;
         real gx = rigid * ( X[4] - X[2] - X[2] + X[0] );
@@ -112,10 +112,10 @@ void add_rigidity2(const size_t nbt, const real* vec, const real rigid, real* Y)
         fx = gx;
         fy = gy;
     }
-    Y[nbt  ] += fx;
-    Y[nbt+1] += fy;
-    Y[nbt+2] -= fx;
-    Y[nbt+3] -= fy;
+    Y[DIM*nbt  ] += fx;
+    Y[DIM*nbt+1] += fy;
+    Y[DIM*nbt+2] -= fx;
+    Y[DIM*nbt+3] -= fy;
 }
 
 /*
@@ -147,7 +147,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
     xn += DIM;
     
     real * yp = Y;
-    real *const end = Y + nbt;
+    real *const end = Y + DIM*nbt;
     while ( yp < end )
     {
         real e0 = *xn - x0;
@@ -206,7 +206,7 @@ void add_rigidity3(const size_t nbt, const real* X, const real rigid, real* Y)
 void add_rigidity2D_SSE(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
-    real *const end = Y + nbt;
+    real *const end = Y + DIM*nbt;
 
     vec2 nn = load2(X+2);
     vec2 oo = mul2(R, sub2(nn, load2(X)));
@@ -234,7 +234,7 @@ void add_rigidity2D_SSE(const size_t nbt, const real* X, const real rigid, real*
 void add_rigidity2D_SSO(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     vec2 R = set2(rigid);
-    real *const end = Y + nbt;
+    real *const end = Y + DIM*nbt;
 
     vec2 xx  = load2(X+DIM);
     vec2 d   = sub2(xx, load2(X));
@@ -270,7 +270,7 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
     vec4 R = set4(rigid);
     vec4 two = set4(2.0);
     
-    real *const end = Y + nbt - 8;
+    real *const end = Y + DIM*nbt - 8;
     
     vec4 xxx = load4(X);
     vec4 eee = setzero4();
@@ -335,7 +335,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
 /*
-    if ( nbt == DIM )
+    if ( nbt == 1 )
     {
         for ( size_t d = 0; d < DIM; ++d )
         {
@@ -347,14 +347,14 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
         return;
     }
 */
-    const size_t end = nbt;
+    const size_t end = DIM * nbt;
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
         Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (SIX*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
     
     // special cases near the edges:
-    real      * Z = Y + nbt;
-    real const* E = X + nbt + DIM;
+    real      * Z = Y + DIM * nbt;
+    real const* E = X + DIM * nbt + DIM;
     #pragma omp simd
     for ( int d = 0; d < DIM; ++d )
     {
@@ -372,14 +372,14 @@ void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
 
-    const size_t end = nbt;
+    const size_t end = DIM * nbt;
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
         Y[i] += R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * ((X-DIM*2)[i]+(X+DIM*2)[i]) - R6 * X[i];
     
     // special cases near the edges:
-    real      * Z = Y + nbt;
-    real const* E = X + nbt + DIM;
+    real      * Z = Y + DIM * nbt;
+    real const* E = X + DIM * (nbt + 1);
 
     #pragma omp simd
     for ( size_t d = 0; d < DIM; ++d )
@@ -398,14 +398,14 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
     
-    const size_t end = FOR * nbt / DIM;
+    const size_t end = FOR * nbt;
     #pragma omp simd
     for ( size_t i = FOR*2; i < end; ++i )
         Y[i] += R4 * ((X-FOR)[i]+(X+FOR)[i]) - R1 * ((X-FOR*2)[i]+(X+FOR*2)[i]) - R6 * X[i];
     
     // special cases near the edges:
-    real      * Z = Y + nbt;
-    real const* E = X + nbt + FOR;
+    real      * Z = Y + DIM * nbt;
+    real const* E = X + DIM * nbt + FOR;
     
     #pragma omp simd
     for ( size_t d = 0; d < FOR; ++d )
@@ -423,7 +423,7 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
 template < void (*FUNC)(const size_t, const real*, real, real*) >
 void testRigidity(size_t cnt, char const* str)
 {
-    const size_t nbt = DIM * ( NSEG - 1 );
+    const size_t nbt = NSEG - 1;
     const real alpha = 64.0;
     
     zero_real(ALOC, vX);
@@ -431,11 +431,11 @@ void testRigidity(size_t cnt, char const* str)
     zero_real(ALOC, vZ);
     
     FUNC(nbt, vP, alpha, vX);
-    VecPrint::head(nbt, vX);
+    VecPrint::head(DIM*nbt, vX);
     std::cout << " |";
     VecPrint::print(DIM, vX+NVAL);
     add_rigidity0(nbt, vP, alpha, vY);
-    real err = blas::difference(nbt+2*DIM, vX, vY);
+    real err = blas::difference(DIM*(nbt+2), vX, vY);
 
     tick();
     for ( size_t i=0; i<cnt; ++i )

@@ -225,7 +225,7 @@ void Mecafil::getForces(const real* ptr)
 void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
 {
     assert_true( X != Y );
-    for ( size_t jj = 0; jj < nbt; ++jj )
+    for ( size_t jj = 0; jj < DIM*nbt; ++jj )
     {
         real f = rigid * (( X[jj+DIM*2] - X[jj+DIM] ) - ( X[jj+DIM] - X[jj] ));
         Y[jj      ] -= f;
@@ -239,20 +239,20 @@ void add_rigidity0(const size_t nbt, const real* X, const real rigid, real* Y)
  */
 void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    assert_true(nbt > DIM);
+    assert_true(nbt > 1);
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
     const real SIX = 6.0;
     
-    const size_t end = nbt;
+    const size_t end = DIM*nbt;
     // in the general case all values can be computed independently:
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
         Y[i] = Y[i] + R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * (SIX*X[i] + ((X-DIM*2)[i]+(X+DIM*2)[i]));
 
     // special cases at the edges:
-    real      * Z = Y + nbt;
-    real const* E = X + nbt + DIM;
+    real      * Z = Y + DIM*nbt;
+    real const* E = X + DIM*(nbt+1);
     #pragma omp simd
     for ( size_t d = 0; d < DIM; ++d )
     {
@@ -312,7 +312,7 @@ void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, re
 void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, real const* dir)
 {
     assert_true( X != Y );
-    for ( size_t jj = 0; jj < nbt; jj+=DIM )
+    for ( size_t jj = 0; jj < DIM*nbt; jj+=DIM )
     {
         // cosine of the angle between two consecutive segments:
         const real C = dot(Vector(dir+jj), Vector(dir+jj+DIM));
@@ -346,7 +346,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #endif
     if ( nPoints > 3 )
     {
-        const size_t nbt = DIM * ( nPoints - 2 );  // number of triplet values
+        const size_t nbt = nPoints - 2;  // number of triplets
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
         add_rigidityF(nbt, X, iRigidity, Y);
