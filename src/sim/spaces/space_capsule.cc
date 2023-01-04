@@ -113,9 +113,9 @@ Vector SpaceCapsule::project(Vector const& pos) const
 Vector SpaceCapsule::place() const
 {
 #if ( DIM >= 3 )
-    // volume elements divided by 4 * M_PI * radius_
-    const real V0 = half_;
-    const real V1 = radius_;  // spherical caps
+    // volume elements divided by 4/3 * M_PI * radius_^2
+    const real V0 = 1.5 * half_; // cylindrical shaft of volume 2*H*PI*R^2
+    const real V1 = radius_;  // spherical caps of volume 4/3*PI*R^3
     const real P = RNG.preal() * ( V0 + V1 );
     if ( P < V0 )
     {
@@ -124,8 +124,8 @@ Vector SpaceCapsule::place() const
     }
 #elif ( DIM >= 2 )
     // surface elements divided by radius_
-    const real V0 = 4 * half_;
-    const real V1 = M_PI * radius_;  // spherical caps
+    const real V0 = 4 * half_; // cylindrical shaft of surface 2*H*2*R
+    const real V1 = M_PI * radius_;  // spherical caps of surface PI*R^2
     const real P = RNG.preal() * ( V0 + V1 );
     if ( P < V0 )
         return Vector(RNG.sreal()*half_, RNG.sreal()*radius_, 0);
