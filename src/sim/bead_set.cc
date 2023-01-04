@@ -61,7 +61,7 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
 
  */
 
-ObjectList BeadSet::newObjects(const Property* p, Glossary& opt)
+ObjectList BeadSet::newObjects(Property const* p, Glossary& opt)
 {
     ObjectList res(4, 4);
     BeadProp const* pp = static_cast<BeadProp const*>(p);

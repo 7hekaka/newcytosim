@@ -35,7 +35,7 @@ Object * SphereSet::newObject(const ObjectTag tag, PropertyID pid)
 /**
  @copydetails Sphere::build
  */
-ObjectList SphereSet::newObjects(const Property* p, Glossary& opt)
+ObjectList SphereSet::newObjects(Property const* p, Glossary& opt)
 {
     SphereProp const* pp = static_cast<SphereProp const*>(p);
     // set radius if provided as argument

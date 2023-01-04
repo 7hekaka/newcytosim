@@ -188,7 +188,7 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
    This defines from which position the abscissa is measured.
  .
  */
-ObjectList SingleSet::newObjects(const Property* p, Glossary& opt)
+ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
 {
     SingleProp const* pp = static_cast<SingleProp const*>(p);
     

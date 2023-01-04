@@ -154,10 +154,10 @@ public:
     static std::string title() { return "couple"; }
     
     /// create a new property of category `cat` for a class `name`
-    Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const;
+    Property * newProperty(std::string const& cat, std::string const& name, Glossary&) const;
     
     /// create objects specified by Property, given options provided in `opt`
-    ObjectList newObjects(const Property*, Glossary& opt);
+    ObjectList newObjects(Property const*, Glossary& opt);
     
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);

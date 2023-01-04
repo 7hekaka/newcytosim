@@ -58,7 +58,7 @@ Object * TubuleSet::newObject(const ObjectTag tag, PropertyID pid)
      {
      }
  */
-ObjectList TubuleSet::newObjects(const Property* p, Glossary& opt)
+ObjectList TubuleSet::newObjects(Property const* p, Glossary& opt)
 {
     TubuleProp const* pp = static_cast<TubuleProp const*>(p);
     Tubule * obj = new Tubule(pp);

@@ -102,7 +102,7 @@ Object * SolidSet::newObject(const ObjectTag tag, PropertyID pid)
 /**
 @ref Solid::build
  */
-ObjectList SolidSet::newObjects(const Property* p, Glossary& opt)
+ObjectList SolidSet::newObjects(Property const* p, Glossary& opt)
 {
     SolidProp const* pp = static_cast<SolidProp const*>(p);
     Solid * obj = new Solid(pp);

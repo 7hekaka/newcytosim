@@ -67,7 +67,7 @@ Object * OrganizerSet::newObject(const ObjectTag tag, PropertyID pid)
 }
 
 
-ObjectList OrganizerSet::newObjects(const Property* p, Glossary& opt)
+ObjectList OrganizerSet::newObjects(Property const* p, Glossary& opt)
 {
     Organizer * obj = nullptr;
     

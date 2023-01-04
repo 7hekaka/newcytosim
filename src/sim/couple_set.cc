@@ -270,7 +270,7 @@ Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
  .
  
  */
-ObjectList CoupleSet::newObjects(const Property* p, Glossary& opt)
+ObjectList CoupleSet::newObjects(Property const* p, Glossary& opt)
 {
     CoupleProp const* pp = static_cast<CoupleProp const*>(p);
     Couple * obj = pp->newCouple(&opt);

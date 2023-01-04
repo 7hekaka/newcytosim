@@ -120,10 +120,10 @@ public:
     //--------------------------
 
     /// create a new property of category `cat` for a class `name`
-    virtual Property * newProperty(const std::string& cat, const std::string& name, Glossary&) const = 0;
+    virtual Property * newProperty(std::string const& cat, std::string const& name, Glossary&) const = 0;
     
     /// create Objects of class `name`, given the options provided in `opt`
-    virtual ObjectList newObjects(const Property*, Glossary& opt) = 0;
+    virtual ObjectList newObjects(Property const*, Glossary& opt) = 0;
     
     /// create Object with given Tag and PropertyID (used for reading trajectory file)
     virtual Object * newObject(ObjectTag, PropertyID) = 0;
