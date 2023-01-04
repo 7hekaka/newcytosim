@@ -414,8 +414,7 @@ void SpaceTee::read(Inputter& in, Simul&, ObjectTag)
 
 
 //------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
-//------------------------------------------------------------------------------
+#pragma mark - OpenGL display
 
 #ifdef DISPLAY
 

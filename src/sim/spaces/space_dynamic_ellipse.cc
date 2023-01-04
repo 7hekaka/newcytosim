@@ -433,8 +433,7 @@ void SpaceDynamicEllipse::report(std::ostream& os) const
 }
 
 //------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
-//------------------------------------------------------------------------------
+#pragma mark - OpenGL display
 
 #ifdef DISPLAY
 

@@ -69,8 +69,7 @@ void SpaceRotate::setConfinement(Vector const& pos, Mecapoint const&, real rad, 
 }
 
 //------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
-//------------------------------------------------------------------------------
+#pragma mark - OpenGL display
 
 #ifdef DISPLAY
 #include "gym_view.h"

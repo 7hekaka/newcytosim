@@ -188,8 +188,7 @@ void SpacePolygonZ::setInteractions(Meca& meca, Simul const&) const
 }
 
 //------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
-//------------------------------------------------------------------------------
+#pragma mark - OpenGL display
 
 #ifdef DISPLAY
 

@@ -116,8 +116,7 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 }
 
 //------------------------------------------------------------------------------
-//                         OPENGL  DISPLAY
-//------------------------------------------------------------------------------
+#pragma mark - OpenGL display
 #pragma mark -
 
 #ifdef DISPLAY
