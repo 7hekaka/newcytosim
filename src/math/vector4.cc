@@ -29,12 +29,30 @@ std::istream& operator >> (std::istream& is, Vector4& v)
 {
     if ( is >> v.XX )
     {
+        if ( is.eof() )
+        {
+            v.YY = 0;
+            v.ZZ = 0;
+            v.TT = 0;
+            return is;
+        }
         std::streampos isp = is.tellg();
         if ( is >> v.YY )
         {
+            if ( is.eof() )
+            {
+                v.ZZ = 0;
+                v.TT = 0;
+                return is;
+            }
             isp = is.tellg();
             if ( is >> v.ZZ )
             {
+                if ( is.eof() )
+                {
+                    v.TT = 0;
+                    return is;
+                }
                 isp = is.tellg();
                 if ( is >> v.TT )
                     ;

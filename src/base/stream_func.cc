@@ -168,6 +168,8 @@ void StreamFunc::mark_line(std::ostream& os, std::istream& is, std::streampos po
 {
     is.clear();
     std::streampos sos = is.tellg(), isp = sos;
+    if ( pos == -1 )
+        pos = sos;
     is.seekg(0);
 
     // get the line containing 'pos'
@@ -195,13 +197,6 @@ void StreamFunc::mark_line(std::ostream& os, std::istream& is, std::streampos po
     //sub.append(" ("+std::string(1, is.peek())+")");
     os << '\n' << prefix << " " << line;
     os << '\n' << prefix << " " << sub;
-}
-
-
-void StreamFunc::mark_line(std::ostream& os, std::istream& is)
-{
-    is.clear();
-    mark_line(os, is, is.tellg(), nullptr);
 }
 
 
@@ -365,13 +360,16 @@ std::string StreamFunc::replace_string(std::string const& src, std::string const
 /// return `true` if stream contains unread non-space character(s)
 bool StreamFunc::has_trail(std::istream& is)
 {
-    int c = is.get();
-    while ( isspace(c) )
-        c = is.get();
-    if ( c != EOF )
+    if ( is.good() )
     {
-        is.unget();
-        return true;
+        int c = is.get();
+        while ( isspace(c) )
+            c = is.get();
+        if ( c != EOF )
+        {
+            is.unget();
+            return true;
+        }
     }
     return false;
 }

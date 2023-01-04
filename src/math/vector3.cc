@@ -22,7 +22,7 @@ Vector3::Vector3(const Vector2& arg) : XX(arg.XX), YY(arg.YY), ZZ(0.0)
 
 /**
  This accepts 'X Y Z' but also 'X' and 'X Y'.
- At least one scalar must be read to be valid
+ If no scalar is read the stream state is set to 'fail'
  */
 std::istream& operator >> (std::istream& is, Vector3& v)
 {
@@ -31,9 +31,20 @@ std::istream& operator >> (std::istream& is, Vector3& v)
 #endif
     if ( is >> v.XX )
     {
+        if ( is.eof() )
+        {
+            v.YY = 0;
+            v.ZZ = 0;
+            return is;
+        }
         std::streampos isp = is.tellg();
         if ( is >> v.YY )
         {
+            if ( is.eof() )
+            {
+                v.ZZ = 0;
+                return is;
+            }
             isp = is.tellg();
             if ( is >> v.ZZ )
                 ;

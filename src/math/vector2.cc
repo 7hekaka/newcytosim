@@ -30,6 +30,11 @@ std::istream& operator >> (std::istream& is, Vector2& v)
 {
     if ( is >> v.XX )
     {
+        if ( is.eof() )
+        {
+            v.YY = 0;
+            return is;
+        }
         std::streampos isp = is.tellg();
         if ( is >> v.YY )
             eatOneZero(is);

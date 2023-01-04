@@ -23,10 +23,7 @@ namespace StreamFunc
     void prefix_lines(std::ostream&, std::istream&, const char prefix[], char verbatim, char skip);
 
     /// print the line of `istream` indicating the position `pos`, with a marker underline
-    void mark_line(std::ostream&, std::istream&, std::streampos pos, const char prefix[]);
-    
-    /// print a line of `istream` indicating the current input position
-    void mark_line(std::ostream&, std::istream&);
+    void mark_line(std::ostream&, std::istream&, std::streampos pos = -1, const char prefix[]="");
 
     /// same as `mark_line()`, but output is returned as a string
     std::string marked_line(std::istream&, std::streampos, const char prefix[]);
