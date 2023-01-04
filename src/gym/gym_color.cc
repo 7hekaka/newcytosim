@@ -311,8 +311,8 @@ gym_color gym_color::jet_color(const COLOF h, const COLOF a)
 }
 
 /**
-set a RGB color as a function of a value h in [0, 4].
-The result vary from black, blue, cyan, yellow, orange to red:
+set a RGB color as a function of a value h in [0, 4] with transparency `a`.
+The result varies from black to white:
 - 0 : black
 - 1 : blue
 - 2 : green

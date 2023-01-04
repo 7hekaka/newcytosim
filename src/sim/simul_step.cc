@@ -131,14 +131,9 @@ void Simul::step()
     solids.step();
     
     //printf("     ::steps    %16llu\n", (timer()-rdt)>>5); rdt = timer();
-    
-#if POOL_UNATTACHED < 1
-    ABORT_NOW(" POOL_UNATTACHED must be >= 1");
-#elif POOL_UNATTACHED > 1
-    doAttachCounter = ( doAttachCounter + 1 ) % POOL_UNATTACHED;
-#endif
 
 #if POOL_UNATTACHED > 1
+    doAttachCounter = ( doAttachCounter + 1 ) % POOL_UNATTACHED;
     if ( doAttachCounter )
     {
         couples.stepSkipUnattached();

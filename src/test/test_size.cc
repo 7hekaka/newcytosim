@@ -104,6 +104,7 @@ int main(int argc, char* argv[])
         PRINT(Bead);
         PRINT(Sphere);
         PRINT(Event);
+        PRINT(SimulProp);
         PRINT(Simul);
     }
     else

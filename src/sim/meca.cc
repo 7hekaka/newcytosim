@@ -611,7 +611,7 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
          X = Y + time_step * P * inverse( 1 - time_step * M * P ) * M * Y
  This adds 2 MAT.vec, but swaps M and P for the iterative solver.
  */
-size_t Meca::solve()
+unsigned Meca::solve()
 {
     assert_true(ready_==0);
 

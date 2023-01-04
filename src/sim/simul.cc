@@ -40,6 +40,8 @@ couples(*this), organizers(*this), tubules(*this), events(*this)
     primed_ = 0;
 #if POOL_UNATTACHED > 1
     doAttachCounter = 0;
+#elif POOL_UNATTACHED < 1
+    ABORT_NOW(" POOL_UNATTACHED must be >= 1");
 #endif
     autoPrecond = 0;
     autoCounter = 0;

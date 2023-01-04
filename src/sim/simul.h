@@ -43,31 +43,34 @@ public:
     /// Meca used to solve the system with option 'solve=horizontal'
     Meca1D * pMeca1D;
     
-#if POOL_UNATTACHED > 1
-    /// counter for occasional Hand's attachment
-    unsigned doAttachCounter;
-#endif
+    /// member used to indicate that 'display' is up-to-date
+    int fresh_;
 
 private:
     
+    /// signals that Simul is ready to perform a Monte-Carlo step
+    int primed_;
+
     /// current parser object
     Parser * parser_;
-
-    /// signals that Simul is ready to perform a Monte-Carlo step
-    int      primed_;
 
     /// preconditionning method used/determined by `solve_auto()`
     unsigned autoPrecond;
     
     /// counter used by `solve_auto()`
-    size_t   autoCounter;
+    unsigned autoCounter;
     
     /// record of CPU time for `solve_auto()`
     float    autoCPU[8];
     
     /// record of iteration count for `solve_auto()`
-    size_t   autoCNT[8];
-    
+    unsigned autoCNT[8];
+
+#if POOL_UNATTACHED > 1
+    /// counter for occasional Hand's attachment
+    unsigned doAttachCounter;
+#endif
+
     /// a copy of the properties as they were stored to file
     mutable std::string properties_saved;
 
@@ -78,7 +81,6 @@ public:
     
     /// list of all Object Property, except SimulProp
     PropertyList properties;
-    
     
     /// list of Space in the Simulation
     SpaceSet spaces;
@@ -112,9 +114,6 @@ public:
     
     /// list of Events in the Simulation
     EventSet events;
-    
-    /// member used to indicate that 'display' is up-to-date
-    int fresh_;
 
     //--------------------------------------------------------------------------
     
