@@ -78,7 +78,7 @@ void timerCallback(const int value)
     else
     {
         // in replay mode, no need to lock the simulation data
-        bool draw = false;
+        bool draw = simul.fresh_;
         if ( worker.read_input() )
             draw = true;
         
@@ -98,7 +98,10 @@ void timerCallback(const int value)
             millisec = 100;
         
         if ( draw )
+        {
+            fprintf(stdout, "draw");
             glApp::displayAll(drawSimul);
+        }
     }
     
     glutTimerFunc(millisec, timerCallback, 2);

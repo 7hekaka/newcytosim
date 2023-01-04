@@ -90,11 +90,8 @@ protected:
     /// direction of view
     Vector3 depthAxis;
 
-    /// flag used to calculate expensive analysis only once
+    /// indicate which analysis should be done, that is used in the display
     size_t prep_flag;
-    
-    /// used to calculate clusterAnalysis only once
-    double prep_time;
     
     /// min and max age used to adjust color range with COLORING_AGE
     double age_scale, age_start;
@@ -152,7 +149,7 @@ public:
     void attributeLineDisp(FiberSet const&);
 
     /// get ready to display
-    void prepareForDisplay(Simul const&, PropertyList&, Vector3 const&);
+    void prepareDrawing(Simul const&, PropertyList&, Vector3 const&);
 
     /// display the whole simulation
     void drawSimul(Simul const&);

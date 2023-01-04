@@ -48,6 +48,7 @@ couples(*this), organizers(*this), tubules(*this), events(*this)
         autoCPU[u] = 0;
         autoCNT[u] = 0;
     }
+    fresh_ = 1;
 }
 
 Simul::~Simul()
@@ -89,6 +90,7 @@ void Simul::eraseObjects()
     prop.time = 0;
     modulo = nullptr;
     primed_ = 0;
+    fresh_ = 1;
 }
 
 void Simul::eraseProperties()

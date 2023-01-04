@@ -218,7 +218,7 @@ void drawBug(Simul const& sim)
 {
     view.openDisplay();
     display.setPixelFactors(view.pixelSize(), 1);
-    display.prepareForDisplay(sim, dispList, view.depthAxis());
+    display.prepareDrawing(sim, dispList, view.depthAxis());
     display.drawSimul(sim);
     view.closeDisplay();
 }

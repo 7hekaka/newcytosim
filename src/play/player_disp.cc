@@ -261,8 +261,12 @@ void Player::prepareDisplay(View& view)
         if ( mDisplay->prop->fold )
             simul.foldPositions();
 
-        mDisplay->prepareForDisplay(simul, dispList, view.depthAxis());
-        //std::clog << " dispList.size() = " << dispList.size() << '\n';
+        if ( simul.fresh_ )
+        {
+            mDisplay->prepareDrawing(simul, dispList, view.depthAxis());
+            //std::clog << " dispList.size() = " << dispList.size() << '\n';
+            simul.fresh_ = 0;
+        }
     }
     catch(Exception & e)
     {

@@ -63,14 +63,13 @@ void Display3::drawObjects(Simul const& sim)
         glEnable(GL_STENCIL_TEST);
         glStencilFunc(GL_EQUAL, 0, ~0);
         
-        // set Stencil to 1 for inner surfaces of fibers:
         gym::enableCullFace(GL_FRONT);
         //drawFibers(sim.fibers);
         FiberSet const& set = sim.fibers;
-        // display the Fiber always in the same order:
-        // set Stencil to 0 for outer surfaces:
+        // set Stencil to 1 for inner surfaces of fibers:
         glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
         GLint val = 0;
+        // display the Fiber always in the same order:
         for( Fiber const* fib = set.firstID(); fib; fib=set.nextID(fib) )
         {
             if ( fib->disp->visible )

@@ -1316,6 +1316,7 @@ int Parser::evaluate_one(std::istream& is)
             tok = Tokenizer::get_token(is);
         throw InvalidSyntax("syntax error: unexpected `"+tok+"'");
     }
+    sim_->fresh_ = 1;
     return 0;
 }
 

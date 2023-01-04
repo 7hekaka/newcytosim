@@ -647,6 +647,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
     int has_frame = 0;
     int tag = 0, c = 0;
     int fat = 0;
+    fresh_ = 1;
 
     while ( in.good() )
     {

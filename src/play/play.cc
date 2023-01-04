@@ -76,7 +76,7 @@ void drawMag(View& view)
 
 
 /**
- call drawSystem() if data can be accessed by current thread
+ calls drawSystem() if data can be accessed by current thread
  */
 void drawSimul(View& view)
 {

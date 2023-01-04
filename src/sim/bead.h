@@ -52,7 +52,7 @@ public:
     /// return the position in space of the object
     Vector pos() const { return Vector(pPos); }
 
-    /// return the position in space of the object
+    /// return the position in space of the object (virtual function)
     Vector position() const { return Vector(pPos); }
     
     /// move the object position ( position += given vector )

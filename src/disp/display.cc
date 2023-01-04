@@ -36,7 +36,6 @@ Display::Display(DisplayProp const* dp)
 : pixelSize(1), unitValue(1), sizeScale(1), depthAxis(0,0,1), prop(dp)
 {
     assert_true(dp);
-    prep_time = -1;
     age_start = 0;
     age_scale = 1.0;
     allLineDisp = nullptr;
@@ -189,9 +188,6 @@ void Display::drawObjects(Simul const& sim)
     if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
     
-    if ( stencil_ )
-        gym::clearStencil(0);
-
     drawOrganizers(sim.organizers);
     gym::disableCullFace();
     drawMisc(sim);
@@ -529,7 +525,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
  - parse display strings
  .
 */
-void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3 const& axis)
+void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp, Vector3 const& axis)
 {
     depthAxis = axis;
     
@@ -546,10 +542,8 @@ void Display::prepareForDisplay(Simul const& sim, PropertyList& alldisp, Vector3
     // create a LineDisp for each Fiber:
     attributeLineDisp(sim.fibers);
 
-    if ( prep_flag && prep_time != sim.time() )
+    if ( prep_flag )
     {
-        // the analysis only needs to be done once per state:
-        prep_time = sim.time();
         // compute clusters:
         if ( prep_flag & 1 )
             sim.flagClusters(1, 1, 0);

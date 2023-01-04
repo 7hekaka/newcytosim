@@ -184,6 +184,7 @@ void Simul::step()
     
     // This will also update all the attached Hands
     fibers.step();
+    fresh_ = 1;
 }
 
 

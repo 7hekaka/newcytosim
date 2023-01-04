@@ -113,6 +113,9 @@ public:
     /// list of Events in the Simulation
     EventSet events;
     
+    /// member used to indicate that 'display' is up-to-date
+    int fresh_;
+
     //--------------------------------------------------------------------------
     
     /// constructor

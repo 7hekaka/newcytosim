@@ -883,10 +883,7 @@ void processKey(unsigned char key, int modifiers = 0)
             else
             {
                 if ( worker.holding() )
-                {
-                    glApp::displayAll(drawSimul);
                     worker.signal();
-                }
                 else if ( worker.alone() )
                     player.nextFrame();
                 player.stop();
