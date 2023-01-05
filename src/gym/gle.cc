@@ -1478,7 +1478,7 @@ namespace gle
         ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
         ico[6].buildHemisphere(finesse/2);
-        ico[7].buildDroplet(finesse/2);
+        ico[7].buildDroplet(finesse);
         
         size_t f = 32; // for setIcoidBuffer
         size_t s = 12;

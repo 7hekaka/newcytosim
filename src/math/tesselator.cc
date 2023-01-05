@@ -731,30 +731,17 @@ void Tesselator::buildCylinder(unsigned div, int make)
         {0,  5,  1},
     };
     int f = 5;
-    for ( unsigned i = 1; i <= 5; ++i )
+    for ( unsigned x : { 0, 5, 10 } )
     {
-        unsigned n = i<5 ? i+1 : 1;
-        unsigned p = i<2 ? 5 : i-1;
-        triangle(fac[f++], n, i, i+5);
-        triangle(fac[f++], i, p+5, i+5);
+        for ( unsigned i = 1; i <= 5; ++i )
+        {
+            unsigned ix = i + x;
+            unsigned nx = (i==5) ? 1+x : i+x+1;
+            unsigned px = (i==1) ? 5+x : i+x-1;
+            triangle(fac[f++], nx, ix, ix+5);
+            triangle(fac[f++], ix, px+5, ix+5);
+        }
     }
-    for ( unsigned i = 1; i <= 5; ++i )
-    {
-        unsigned x = 5;
-        unsigned n = i<5 ? i+1 : 1;
-        unsigned p = i<2 ? 5 : i-1;
-        triangle(fac[f++], n+x, i+x, i+5+x);
-        triangle(fac[f++], i+x, p+5+x, i+5+x);
-    }
-    for ( unsigned i = 1; i <= 5; ++i )
-    {
-        unsigned x = 10;
-        unsigned n = i<5 ? i+1 : 1;
-        unsigned p = i<2 ? 5 : i-1;
-        triangle(fac[f++], n+x, i+x, i+5+x);
-        triangle(fac[f++], i+x, p+5+x, i+5+x);
-    }
-
     allocate();
     setApices(vex, div);
     refineTriangles(f, fac, div);
