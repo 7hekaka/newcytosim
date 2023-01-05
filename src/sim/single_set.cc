@@ -301,7 +301,7 @@ void SingleSet::erase()
 void SingleSet::freeze()
 {
     relax();
-#ifdef ROBUST_READING
+#ifdef MORE_ROBUST_READING
     flag(aList, 7);
     flag(fList, 7);
 #endif
@@ -326,20 +326,6 @@ void SingleSet::reheat()
     }
 }
 
-/** After reading from file, the Hands should not update
- any Fiber, Single or Couple as they will be deleted */
-void SingleSet::prune()
-{
-    Object * i = ice_.pop_front();
-    while ( i )
-    {
-        Single* o = static_cast<Single*>(i);
-        i = ice_.pop_front();
-        inventory_.unassign(o);
-        o->objset(nullptr);
-        delete(o);
-    }
-}
 
 void SingleSet::writeF_skip(Outputter& out) const
 {

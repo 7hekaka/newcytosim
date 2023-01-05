@@ -465,14 +465,14 @@ void ObjectSet::flag(ObjectPool const& list, ObjectFlag f)
 void ObjectSet::freeze()
 {
     assert_true(ice_.empty());
-#ifdef ROBUST_READING
+#ifdef MORE_ROBUST_READING
     flag(pool_, 7);
 #endif
     ice_.append(pool_);
 }
 
 
-void ObjectSet::prune()
+void ObjectSet::defrost()
 {
     Object * i = ice_.pop_front();
     while ( i )
@@ -616,7 +616,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
         }
         else
 #endif
-#ifdef ROBUST_READING
+#ifdef MORE_ROBUST_READING
             if ( obj->flag() )
             {
                 obj->flag(0);

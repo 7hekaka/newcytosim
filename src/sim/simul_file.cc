@@ -374,17 +374,18 @@ public:
     /// erase objects in ice buckets
     void prune_all()
     {
-        //sim->events.prune();
-        sim->organizers.prune();
-        sim->tubules.prune();
-        sim->couples.prune();
-        sim->singles.prune();
-        sim->beads.prune();
-        sim->solids.prune();
-        sim->spheres.prune();
-        sim->fibers.prune();
-        sim->spaces.prune();
-        sim->fields.prune();
+        //sim->events.defrost();
+        sim->organizers.defrost();
+        sim->tubules.defrost();
+        sim->couples.defrost();
+        sim->singles.defrost();
+        sim->beads.defrost();
+        sim->solids.defrost();
+        sim->spheres.defrost();
+        sim->fibers.defrost();
+        sim->spaces.defrost();
+        sim->fields.defrost();
+        sim->fibers.updateFibers();
         sim = nullptr;
     }
     
@@ -409,6 +410,7 @@ public:
         sim->fibers.thaw();
         sim->spaces.thaw();
         sim->fields.thaw();
+        sim->fibers.updateFibers();
         sim = nullptr;
     }
 

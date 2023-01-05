@@ -728,21 +728,6 @@ void FiberSet::updateFibers()
     }
 }
 
-
-void FiberSet::prune()
-{
-    ObjectSet::prune();
-    updateFibers();
-}
-
-
-void FiberSet::thaw()
-{
-    ObjectSet::thaw();
-    updateFibers();
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark -
 

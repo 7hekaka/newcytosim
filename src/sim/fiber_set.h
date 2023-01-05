@@ -116,13 +116,7 @@ public:
     
     /// update object after import
     void updateFibers();
-
-    /// delete objects that were not updated during import
-    void prune();
     
-    /// relink all objects after import
-    void thaw();
-
     //--------------------------------------------------------------------------
     
     /// total length of Fiber 

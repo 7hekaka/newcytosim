@@ -79,13 +79,13 @@ protected:
 
 public:
     
-    /// unlink all objects before import
+    /// unlink all objects and put them on 'ice', called before import
     virtual void freeze();
     
-    /// delete objects that were not updated during import
-    virtual void prune();
+    /// delete objects that are still on 'ice' because they were not imported
+    void defrost();
     
-    /// relink all objects after import
+    /// relink objects that are still on 'ice' because they were not imported
     void thaw();
     
     /// apply translation to all Objects in ObjectList

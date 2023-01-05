@@ -231,9 +231,6 @@ public:
     
     /// unlink all objects before import
     void freeze();
-
-    /// delete objects that were not updated during import
-    void prune();
     
     /// detach objects that were not updated during import
     void reheat();

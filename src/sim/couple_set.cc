@@ -443,7 +443,7 @@ void CoupleSet::erase()
 void CoupleSet::freeze()
 {
     relax();
-#ifdef ROBUST_READING
+#ifdef MORE_ROBUST_READING
     flag(aaList, 7);
     flag(faList, 7);
     flag(afList, 7);
@@ -470,22 +470,6 @@ void CoupleSet::reheat()
         o->hand2()->detachHand();
         o->randomizePosition();
         linkFF(o);
-    }
-}
-
-
-/* After reading from file, the Hands should not
- update any Fiber, Single or Couple as they will be deleted */
-void CoupleSet::prune()
-{
-    Object * i = ice_.pop_front();
-    while ( i )
-    {
-        Couple* o = static_cast<Couple*>(i);
-        i = ice_.pop_front();
-        inventory_.unassign(o);
-        o->objset(nullptr);
-        delete(o);
     }
 }
 
