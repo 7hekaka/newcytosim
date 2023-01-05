@@ -98,10 +98,7 @@ void timerCallback(const int value)
             millisec = 100;
         
         if ( draw )
-        {
-            fprintf(stdout, "draw");
             glApp::displayAll(drawSimul);
-        }
     }
     
     glutTimerFunc(millisec, timerCallback, 2);
