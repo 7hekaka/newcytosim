@@ -2009,7 +2009,7 @@ namespace gle
         gym::stretchAlignZ(A, B, R);
         tube1();
         gym::transAlignZ(B, 2*R, B-A);
-        gym::scale(1.5, 1.5, 2.0);
+        gym::scale(1.0, 1.0, 2.0);
         cone2();
         discBottom2();
     }

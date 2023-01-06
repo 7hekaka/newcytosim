@@ -582,7 +582,7 @@ void View::sliceView(int mode) const
             Vector3 V = depthAxis();
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
             if ( !depth_clamp )
-                setFog(1, 0, fog_color);
+                setFog(3, 2, fog_color);
         } break;
         case 3: {
             gym::ref_view();
@@ -591,7 +591,7 @@ void View::sliceView(int mode) const
             setFog(1, 1, fog_color);
         } break;
         case 4: {
-            real thk = view_scale * 0.05;
+            real thk = view_scale * 0.01;
             gym::ref_view();
             Vector3 V = -depthAxis();
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk-off);
