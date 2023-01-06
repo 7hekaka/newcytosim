@@ -200,7 +200,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
 {
     assert_true(range >= 0);
     
-    fGrid.clear();
+    fGrid.clearCells();
     const Vector offset(fGrid.inf());
     const Vector deltas(fGrid.delta());
     const real width = range + fGrid.cellRadius();

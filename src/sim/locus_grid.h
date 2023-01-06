@@ -340,6 +340,7 @@ private:
     /// check all pairs between the two lists, checking center-to-center distance
     void setStericsX(BigLocusList const&, BigLocusList const&) const;
 
+    /// used for steric with periodic boundary conditions
     inline size_t direct_index(Vector const& w)
     {
 #if ( DIM == 3 )
@@ -441,7 +442,7 @@ public:
     size_t capacity() const;
 
     /// clear the grid
-    void clear() { pGrid.clear(); }
+    void clear() { pGrid.clearCells(); }
     
     /// link in the cell containing the middle of the segment
     void add(Fiber const* fib, size_t inx, real rad, real rge)

@@ -417,7 +417,7 @@ public:
     size_t capacity() const;
 
     /// clear the grid
-    void clear() { pGrid.clear(); }
+    void clear() { pGrid.clearCells(); }
         
     /// place FiberSegment on the grid
     void add(Fiber const* fib, size_t inx, real rad, real rge, real sup) const

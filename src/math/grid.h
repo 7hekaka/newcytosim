@@ -95,7 +95,7 @@ public:
     }
     
     /// call function clear() for all cells
-    void clear()
+    void clearCells()
     {
         if ( !gCell )
             return;
