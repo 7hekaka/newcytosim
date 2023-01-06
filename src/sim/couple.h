@@ -253,6 +253,9 @@ public:
     Couple * prev() const { return static_cast<Couple*>(prevO); }
     
     //------------------------------ read/write --------------------------------
+    
+    /// a unique character identifying the Duo
+    static const ObjectTag TAG_DUO = 'y';
 
     /// a unique character identifying the class
     static const ObjectTag TAG = 'c';

@@ -64,6 +64,9 @@ public:
     /// simulation step for a linking Duo
     void stepAA();
 
+    /// return unique character identifying the class
+    ObjectTag tag() const { return TAG_DUO; }
+
     /// write to file
     void write(Outputter&) const;
     

@@ -235,7 +235,7 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
 
 Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
 {
-    if ( tag == Couple::TAG )
+    if ( tag == Couple::TAG || tag == Couple::TAG_DUO )
     {
         CoupleProp * P = simul_.findProperty<CoupleProp>("couple", pid);
         return P->newCouple();
@@ -372,7 +372,7 @@ void CoupleSet::relinkD2(Couple * obj)
 
 void CoupleSet::link(Object * obj)
 {
-    assert_true( obj->tag() == Couple::TAG );
+    assert_true( obj->tag() == Couple::TAG || obj->tag() == Duo::TAG );
     assert_true( obj->objset() == this );
 
     Couple * c = static_cast<Couple*>(obj);

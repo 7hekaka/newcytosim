@@ -362,6 +362,7 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
     switch( tag )
     {
         case        Couple::TAG: return &couples;
+        case    Couple::TAG_DUO: return &couples;
         case        Single::TAG: return &singles;
         case  Single::TAG_WRIST: return &singles;
         case         Fiber::TAG: return &fibers;
