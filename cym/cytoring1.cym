@@ -45,7 +45,7 @@ set hand nucl
     display = { size=5; color=white; }
     
     activity = nucleate
-    nucleate = 0.8, actin, { length=0.1; direction=tangent; plus_end=grow; }
+    nucleate = 0.8, actin, ( length=0.1; direction=tangent; plus_end=grow; )
 }
 
 
