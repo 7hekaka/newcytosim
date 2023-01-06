@@ -423,14 +423,15 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     }
     else
         opt.set(rad, var, 1);
-    if ( rad <= 0 )
+    if ( std::abs(rad) < REAL_EPSILON )
         throw InvalidParameter("radius of solid:sphere must be > 0");
 
     // get position of center:
     Vector cen = Cytosim::readPosition(opt.value(var, 0));
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, rad);
+    size_t ref = addSphere(cen, std::abs(rad));
     addTriad(rad);
+    rad = std::abs(rad);
     
 #if ( DIM > 2 )
     real sep = 1.0, dev = 0.0;
