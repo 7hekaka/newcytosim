@@ -138,7 +138,10 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
     else
     {
         out.writeChar(' ');
-        out.writeUInt(id, g);
+        if ( g != NULL_TAG )
+            out.writeUInt(id, g);
+        else
+            out.writeChar(g);
     }
 }
 

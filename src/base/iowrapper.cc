@@ -102,7 +102,7 @@ unsigned Inputter::readUInt()
 uint8_t Inputter::readUInt8()
 {
     if ( ! binary_ )
-        return readInt();
+        return readUInt();
     
     return (uint8_t)get_char();
 }
@@ -122,7 +122,7 @@ uint16_t Inputter::readUInt16bin()
 uint16_t Inputter::readUInt16()
 {
     if ( ! binary_ )
-        return readInt();
+        return readUInt();
     
     uint16_t v;
     if ( 1 != fread(&v, 2, 1, mFile) )
@@ -147,7 +147,7 @@ uint32_t Inputter::readUInt32bin()
 uint32_t Inputter::readUInt32()
 {
     if ( ! binary_ )
-        return readInt();
+        return readUInt();
     
     uint32_t v;
     if ( 1 != fread(&v, 4, 1, mFile) )
@@ -161,7 +161,7 @@ uint32_t Inputter::readUInt32()
 uint64_t Inputter::readUInt64()
 {
     if ( ! binary_ )
-        return readInt();
+        return readUInt();
     
     uint64_t v;
     if ( 1 != fread(&v, 8, 1, mFile) )
