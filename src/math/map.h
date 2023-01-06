@@ -571,7 +571,7 @@ public:
         // clamping is necessary for semi-periodic condition
         size_t Y = imagei_clamped(mDim[1], map(1, y));
         size_t Z = imagei_clamped(mDim[2], map(2, z));
-        return map(0, x) + mDim[0]*Y + mDim[1]*Z;
+        return map(0, x) + mDim[0] * ( Y + mDim[1] * Z );
     }
 
     //--------------------------------------------------------------------------
@@ -701,12 +701,10 @@ private:
         //allocate and reset arrays:
         deleteRegions();
         
-        regions = new int*[mNbCells];
-        eRegion = new int[edgeMax*(regMax+1)];
-        for ( size_t e = 0; e < edgeMax*(regMax+1); ++e )
-            eRegion[e] = 0;
+        regions = new int*[mNbCells]{nullptr};
+        eRegion = new int[edgeMax*(regMax+1)]{0};
         
-        int ori[ORD];
+        int ori[ORD]{0};
         for ( size_t indx = 0; indx < mNbCells; ++indx )
         {
             setCoordinatesFromIndex(ori, indx);
