@@ -90,7 +90,7 @@ new 50 minifilament
     single5 = motor, point1, point2, 0.90;
     single6 = motor, point1, point2, 0.95;
     direction = horizontal;
-    placement = inside, cell, ( z > p )
+    placement = inside, cell, ( Z > P )
 }
 
 new 1000 crosslinker
