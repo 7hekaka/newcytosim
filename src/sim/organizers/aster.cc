@@ -258,7 +258,7 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
 size_t Aster::placeAnchor(const Vector A, const Vector B, size_t ref)
 {
     AsterLink & link = asLinks.new_val();
-    //std::clog << "Aster::placeAnchor(" << asLinks.size() << ")\n";
+    //std::clog << asLinks.size() << "  AsterLink(" << A << " " << B << ")\n";
     link.set(A, B, ref);
     link.len_ *= asRadius;
     //link.print(std::clog);
@@ -290,9 +290,6 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
         if ( p )
         {
             sol = new Solid(p);
-            // add a Sphere if no component were specified:
-            if ( !opt.has_key("point1") && !opt.has_key("sphere1") )
-                sol->addSphere(Vector(0,0,0), asRadius);
             ObjectList list = sol->build(opt, sim);
             objs.append(list);
             //std::clog << "Aster::makeSolid() created solid " << sol->reference() << "\n";
@@ -305,6 +302,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
                 //std::clog << "Aster created on solid " << sol->reference() << "\n";
                 // add Solid to return list, so that its position can be adjusted
                 objs.push_back(sol);
+                //std::clog << " aster:solid at " << sol->position() << '\n';
             }
             else
                 throw InvalidParameter("unknown aster:solid `"+spec+"'");
@@ -313,12 +311,25 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
     else
         throw InvalidParameter("aster:solid must be specified");
     
-    // check that there is at least one point:
-    if ( sol->sumRadius() < REAL_EPSILON )
-        throw InvalidParameter("Aster's drag coefficient is null: please specify 'point1=center, RADIUS'");
+    // find local coordinate system:
+    size_t ref = ~0U;
+    for ( size_t i = 0; i < sol->nbPoints(); ++i )
+    {
+        if ( sol->hasTriad(i) > 0 )
+        {
+            ref = i;
+            break;
+        }
+    }
     
-    // add local coordinate system around the last point:
-    size_t ref = sol->addTriad(asRadius);
+    // add coordinate system if needed:
+    if ( ref == ~0U )
+    {
+        if ( sol->sumRadius() < REAL_EPSILON )
+            sol->addSphere(Vector(0,0,0), asRadius);
+        ref = sol->addTriad(asRadius);
+    }
+
     sol->fixShape();
     asSolid = sol;
     //asSolid->write(std::clog);
@@ -381,7 +392,6 @@ void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
         std::clog << "with aster:seed_diameter = " << sep << '\n';
     }
     //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
-    //std::clog << " aster:solid at " << asSolid->position() << '\n';
     for ( size_t i = 0; i < cnt; ++i )
     {
         real x = pts[i].XX;

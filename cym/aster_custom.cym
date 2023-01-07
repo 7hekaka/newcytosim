@@ -54,16 +54,16 @@ new star
     type = disc
     solid = core1
     radius = 0.5, 0.5
-    fibers = 23, microtubule, ( length = 5 )
+    fibers = 6, microtubule, ( length = 5 )
     direction = inward
     position = surface
 }
 
-new 0 star
+new star
 {
     radius = 0.5
     solid = core
-    position = -1 0 0
+    position = -5 0 0
     orientation = off
     point1 = center, 0.5
     fibers = 2, microtubule
