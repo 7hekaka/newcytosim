@@ -407,22 +407,17 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             extract(is, L);
             extract(is, T);
             extract(is, R);
-            real x=0, y=0;
-            
-            // straight
-            if ( B == 0 ) {
-                x = T * RNG.shalf();
-                y = L * RNG.preal();
-            } else {
+            real x = T * RNG.shalf();
+            real y = L * RNG.preal();
+            if ( B > 0 ) {
                 real radius = L / (B * M_PI);
-                real radiusInner = radius -T/2.0;
+                real inner = radius -T/2.0;
                 real theta = abs_real( L / radius );
                 real angle = RNG.preal() * theta;
                 // substract R to have the arc start from 0,0:
-                x = (radiusInner + T * RNG.preal()) * std::cos(angle) - radius;
-                y = (radiusInner + T * RNG.preal()) * std::sin(angle);
+                x = (inner + T * RNG.preal()) * std::cos(angle) - radius;
+                y = (inner + T * RNG.preal()) * std::sin(angle);
             }
-            
             real C = std::cos(R);
             real S = std::sin(R);
             return Vector(C*x + S*y , -S*x + C*y, 0 );

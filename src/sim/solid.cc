@@ -879,10 +879,11 @@ Vector Solid::centroid() const
     Vector res(0,0,0);
     for ( size_t i = 0; i < nPoints; ++i )
     {
-        if ( soRadius[i] > 0 )
+        real R = soRadius[i];
+        if ( R > 0 )
         {
-            res += soRadius[i] * posP(i);
-            sum += soRadius[i];
+            res += R * posP(i);
+            sum += R;
         }
     }
     if ( sum < REAL_EPSILON )
