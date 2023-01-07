@@ -710,12 +710,16 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         var = "single" + std::to_string(++inp);
     }
     /* Attach fibers using two interpolated anchors (24.11.2022) */
-    inp = 1;
-    var = "fiber1";
-    while ( opt.has_key(var) )
+    /* Except that if 'fibers' is specified, this is building an Aster */
+    if ( !opt.has_key("fibers") )
     {
-        makeFiber(objs, opt, var, sim);
-        var = "fiber" + std::to_string(++inp);
+        inp = 1;
+        var = "fiber1";
+        while ( opt.has_key(var) )
+        {
+            makeFiber(objs, opt, var, sim);
+            var = "fiber" + std::to_string(++inp);
+        }
     }
     // verify the number of points:
     inp = 0;
