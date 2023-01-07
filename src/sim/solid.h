@@ -197,6 +197,9 @@ public:
     /// add DIM points separated by `len`, to make a coordinate system around the last point
     size_t addTriad(real len);
 
+    /// check if a coordinate system already exist at given index
+    real hasTriad(size_t) const;
+    
     //--------------------------------------------------------------------------
     
     /// radius of the sphere around point `i`

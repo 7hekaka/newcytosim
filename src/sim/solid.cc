@@ -69,9 +69,8 @@ void Solid::setInteractions(Meca& meca) const
             case CONFINE_INSIDE:
                 for ( size_t i = 0; i < nPoints; ++i )
                 {
-                    const real rad = soRadius[i];
                     // confine all massive points:
-                    if ( rad > 0 )
+                    if ( radius(i) > 0 )
                     {
                         Vector pos = posP(i);
                         if ( ! spc->inside(pos) )
@@ -83,9 +82,8 @@ void Solid::setInteractions(Meca& meca) const
             case CONFINE_OUTSIDE:
                 for ( size_t i = 0; i < nPoints; ++i )
                 {
-                    const real rad = soRadius[i];
                     // confine all massive points:
-                    if ( rad > 0 )
+                    if ( radius(i) > 0 )
                     {
                         Vector pos = posP(i);
                         if ( spc->inside(pos) )
@@ -97,7 +95,7 @@ void Solid::setInteractions(Meca& meca) const
             case CONFINE_ALL_INSIDE:
                 for ( size_t i = 0; i < nPoints; ++i )
                 {
-                    const real rad = soRadius[i];
+                    const real rad = radius(i);
                     // confine all massive points:
                     if ( rad > 0 )
                     {
@@ -112,7 +110,7 @@ void Solid::setInteractions(Meca& meca) const
                 for ( size_t i = 0; i < nPoints; ++i )
                 {
                     // only confine massive points:
-                    if ( soRadius[i] > 0 )
+                    if ( radius(i) > 0 )
                         spc->setConfinement(posP(i), Mecapoint(this, i), meca, prop->confine_stiffness);
                 }
                 break;
@@ -799,6 +797,21 @@ size_t Solid::addTriad(real arm)
 }
 
 
+real Solid::hasTriad(size_t inx) const
+{
+    Vector P = posPoint(inx);
+    real R = posPoint(inx+1).XX - P.XX;
+    for ( int i = 0; i < DIM; ++i )
+    {
+        Vector pos = posPoint(inx+i+1) - P;
+        pos[i] -= R;
+        if ( pos.norm_inf() > REAL_EPSILON )
+            return 0;
+    }
+    return R;
+}
+
+
 void Solid::setRadius(const size_t indx, const real rad)
 {
     assert_true( indx < nPoints );
@@ -813,7 +826,7 @@ real Solid::sumRadius() const
     real res = 0;
     
     for ( size_t i = 0; i < nPoints; ++i )
-        res += soRadius[i];
+        res += radius(i);
     
     return res;
 }
@@ -879,7 +892,7 @@ Vector Solid::centroid() const
     Vector res(0,0,0);
     for ( size_t i = 0; i < nPoints; ++i )
     {
-        real R = soRadius[i];
+        real R = radius(i);
         if ( R > 0 )
         {
             res += R * posP(i);
@@ -905,7 +918,7 @@ Vector Solid::orientation() const
     
     for ( size_t i = 0; i < nPoints; ++i )
     {
-        const real w = soRadius[i];
+        const real w = radius(i);
         Vector p = posP(i);
             
         M[0] += w * ( DIM * p.XX * p.XX - 1 );
@@ -1252,7 +1265,7 @@ void Solid::setDragCoefficient()
     
     for ( size_t i = 0; i < nPoints; ++i )
     {
-        real R = soRadius[i];
+        real R = radius(i);
         if ( R > 0 )
         {
             sumR   += R;
@@ -1362,7 +1375,7 @@ void Solid::makeProjection()
     
     for ( size_t i = 0; i < nPoints; ++i )
     {
-        real R = soRadius[i];
+        real R = radius(i);
         if ( R > 0 )
         {
             sumR  += R;
@@ -1430,7 +1443,7 @@ void Solid::makeProjection()
     
     for ( size_t i = 0; i < nPoints; ++i )
     {
-        const real R = soRadius[i];
+        const real R = radius(i);
         if ( R > 0 )
         {
             ++cnt;
