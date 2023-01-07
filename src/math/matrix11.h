@@ -229,6 +229,12 @@ public:
         return abs_real(val_);
     }
     
+    /// inverse in place
+    void inverse()
+    {
+        val_ = 1.0 / val_;
+    }
+
 #pragma mark -
 
     /// multiplication by a vector: this * V
