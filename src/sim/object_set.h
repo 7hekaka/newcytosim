@@ -95,6 +95,9 @@ public:
     static void rotateObjects(ObjectList const&, Rotation const&);
     
     /// apply Isometry to all Objects in ObjectList
+    static void moveObject(Object*, Isometry const&);
+
+    /// apply Isometry to all Objects in ObjectList
     static void moveObjects(ObjectList const&, Isometry const&);
 
     /// set flag of all Objects to `f`

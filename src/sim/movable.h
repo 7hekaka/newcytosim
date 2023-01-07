@@ -89,6 +89,17 @@ public:
         translate(G);
     }
     
+    /// Apply isometry
+    void move(Isometry const& iso)
+    {
+        switch ( mobile() )
+        {
+            case 1: rotateT(iso); translate(iso); break;
+            case 2: rotate(iso); break;
+            case 3: rotate(iso); translate(iso); break;
+        }
+    }
+
     /// bring object to centered image using periodic boundary conditions
     void foldPosition(Modulo const*) {}
 

@@ -65,14 +65,7 @@ void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso)
 {
     //std::clog << "moving " << objs.size() << " objects" << '\n';
     for ( Object * obj : objs )
-    {
-        switch ( obj->mobile() )
-        {
-            case 1: obj->rotateT(iso); obj->translate(iso); break;
-            case 2: obj->rotate(iso); break;
-            case 3: obj->rotate(iso); obj->translate(iso); break;
-        }
-    }
+        obj->move(iso);
 }
 
 
@@ -124,12 +117,7 @@ void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso, ObjectF
         if ( obj->flag() != f )
         {
             //std::clog << "    moving " << obj->reference() << '\n';
-            switch ( obj->mobile() )
-            {
-                case 1: obj->rotateT(iso); obj->translate(iso); break;
-                case 2: obj->rotate(iso); break;
-                case 3: obj->rotate(iso); obj->translate(iso); break;
-            }
+            obj->move(iso);
             obj->flag(f);
         }
         //else std::clog << "    already moved " << obj->reference() << '\n';
@@ -153,7 +141,8 @@ void ObjectSet::add(Object * obj)
     }
     else
     {
-        std::cerr << "Warning: attempted to re-link "+obj->reference()+" \n";
+        // that is totally fine...
+        //std::cerr << "Warning: attempted to re-link "+obj->reference()+" \n";
     }
 }
 
