@@ -349,6 +349,22 @@ public:
         nbo_ = 0;
     }
     
+    /// Set the number of objects to zero
+    inline void clear(VAL const& zero)
+    {
+        for ( size_t ii=0; ii < nbo_; ++ii )
+            val_[ii] = zero;
+        nbo_ = 0;
+    }
+    
+    /// Set all values to `zero`
+    void zero(VAL const& zero)
+    {
+        assert_true( val_ || alc_==0 );
+        for ( size_t ii=0; ii < alc_; ++ii )
+            val_[ii] = zero;
+    }
+
     /// Delete all values as if they were pointers to Object
     void destroy()
     {
@@ -361,15 +377,6 @@ public:
         }
         nbo_ = 0;
     }
-    
-    /// Set all values to `zero`
-    void zero(VAL const& zero)
-    {
-        assert_true( val_ || alc_==0 );
-        for ( size_t ii=0; ii < alc_; ++ii )
-            val_[ii] = zero;
-    }
-    
     
 #pragma mark -
     
