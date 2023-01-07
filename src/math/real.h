@@ -191,7 +191,7 @@ constexpr inline static real sign_real(const real x)
 }
 
 /// absolute value of `x`
-constexpr inline static real abs_real(const real x) { return std::fabs(x); }
+constexpr inline static real abs_real(const real x) { return std::abs(x); }
 
 /// minimum between `x` and `y`
 constexpr inline static real min_real(const real x, const real y) { return std::min(x, y); }
