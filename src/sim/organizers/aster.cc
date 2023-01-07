@@ -235,7 +235,7 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
         dir.negate();
     
     if ( fos.empty() )
-        throw InvalidParameter("fiber specs must be specified");
+        throw InvalidParameter("aster:fibers must be specified");
     
     ObjectList list;
     Fiber * F = sim.fibers.newFiber(list, fip, fos);
@@ -266,6 +266,7 @@ size_t Aster::placeAnchor(const Vector A, const Vector B, size_t ref)
 }
 
 
+/** Create a new Fiber with minus-end in A and attached in B */
 void Aster::placeFiber(ObjectList& objs, Simul& sim, const Vector A, const Vector B,
                        size_t ref, std::string const& fiber_type, std::string const& fos)
 {
@@ -285,8 +286,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
     std::string spec;
     if ( opt.set(spec, "solid") )
     {
-        SolidProp const* p = static_cast<SolidProp*>(sim.findProperty("solid", spec));
-        
+        SolidProp const* p = sim.findSolidProp(spec);
         if ( p )
         {
             sol = new Solid(p);
@@ -302,9 +302,9 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
             sol = sim.pickSolid(spec);
             if ( sol )
             {
-                // prevent Aster from being moved, so that its position match the Solid
-                opt.define("placement", "off");
                 //std::clog << "Aster created on solid " << sol->reference() << "\n";
+                // add Solid to return list, so that its position can be adjusted
+                objs.push_back(sol);
             }
             else
                 throw InvalidParameter("unknown aster:solid `"+spec+"'");
@@ -381,18 +381,14 @@ void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
         std::clog << "with aster:seed_diameter = " << sep << '\n';
     }
     //std::clog << "toss(" << nbf << ") placed " << cnt << "\n";
+    //std::clog << " aster:solid at " << asSolid->position() << '\n';
     for ( size_t i = 0; i < cnt; ++i )
     {
-        // orient anchors by default along the X-axis:
-        real y = pts[i].y();
-#if ( DIM == 3 )
         real x = pts[i].XX;
-        Vector3 A(-dis, x, y);
-        Vector3 B( dis, x, y);
-#else
-        Vector A(-dis, y, 0);
-        Vector B( dis, y, 0);
-#endif
+        real y = pts[i].YY;
+        // orient anchors by default along the X-axis:
+        Vector A(-dis, x, y);
+        Vector B( dis, x, y);
         placeFiber(objs, sim, A, B, ref, tif, fos);
     }
 }
