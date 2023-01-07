@@ -391,13 +391,12 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
         
         // find possible position & rotation:
         Isometry iso;
-        bool okay = find_placement(iso, opt, placement);
-
-        if ( okay )
+        if ( find_placement(iso, opt, placement) )
         {
             // place object at this position:
             ObjectSet::moveObjects(objs, iso);
             // special case for which we check all vertices:
+            bool okay = true;
             if ( placement == PLACE_ALL_INSIDE )
             {
                 std::string str;
@@ -406,11 +405,27 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
                     spc = sim_->findSpace(str);
                 okay = all_points_inside(objs, spc);
             }
+            if ( okay )
+                break;
         }
-        if ( okay )
-            break;
         else
-            objs.destroy();
+        {
+            for ( Object* i : objs )
+                if ( ! i->linked() )
+                    delete(i);
+            objs.clear();
+            continue;
+        }
+        iso.inverse();
+        // objects that were just created by newObjects() are not yet linked
+        for ( Object* i : objs )
+        {
+            if ( ! i->linked() )
+                delete(i);
+            else
+                i->move(iso);
+        }
+        objs.clear();
     }
     
     if ( objs.empty() )
@@ -430,7 +445,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
             i->mark(mk);
     }
     
-    // optionally link buddies:
+    // optionally enlist buddies:
     std::string str;
     if ( opt.set(str, "buddy") )
     {
@@ -457,6 +472,8 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
     Vector vec;
     if ( opt.set(vec, "translation") )
         ObjectSet::translateObjects(objs, vec);
+    
+    //std::clog << "new_object " << objs.size() << " " << pp->name() << "\n";
     
     /* 
      Because the objects in ObjectList are not necessarily all of the same class,
