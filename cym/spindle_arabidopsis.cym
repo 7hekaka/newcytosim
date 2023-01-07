@@ -10,7 +10,8 @@ set simul system
     steric = 2, 1111, 222
     display = ( size=2560,768; point_value=0.01; point_size=0.5; line_width=1; zoom=2; style=3;)
     skip_free_couple = 1
-    verbose = 0
+    precondition = 1
+    verbose = 7
 }
 
 set space cell
@@ -146,7 +147,7 @@ set fiber chromatin
     rigidity = 5
     viscosity = 5
     segmentation = 0.10
-    steric = 2, 0.125
+    steric = 2, 0.070  % this is multiplied by 3 in the silhouette
     confine = inside, 111, plate
     binding_key = 0
     
@@ -171,36 +172,36 @@ set couple cohesin
 }
 
 % ---------------------- CHROMOSOMES ------------------------
-
+repeat 3 {
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.150, (2 corona sphere 1 0 if (S>0.97))
-    position = cylinder 0.1 0.1
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    position = sphere 1.0
     twin = mirror
 }
-
 new chromatin
 {
     position = [kinetochore~2]
-    length = 3.0
+    chiasma = 1.0
+    length = 2.0
 }
-
 new chromatin
 {
     position = [kinetochore~1]
     direction = [chromatin~1]
-    length = 3.0
+    chiasma = 1.0
+    length = 2.0
 }
 
 new kglue
 {
     base = kinetochore~1, point1
-    attach = chromatin~1, 1.5
+    attach = chromatin~1, 1.0
 }
 new kglue
 {
     base = kinetochore~2, point1
-    attach = chromatin~2, 1.5
+    attach = chromatin~2, 1.0
 }
 new cohesin
 {
@@ -209,22 +210,23 @@ new cohesin
 }
 new cohesin
 {
-    attach1 = chromatin~1, 1.0
-    attach2 = chromatin~2, 1.0
+    attach1 = chromatin~1, 0.5
+    attach2 = chromatin~2, 0.5
+}
+new cohesin
+{
+    attach1 = chromatin~1, 1.5
+    attach2 = chromatin~2, 1.5
 }
 new cohesin
 {
     attach1 = chromatin~1, 2.0
     attach2 = chromatin~2, 2.0
 }
-new cohesin
-{
-    attach1 = chromatin~1, 3.0
-    attach2 = chromatin~2, 3.0
 }
 
-
-run 0 system
+%include chromosomes.cym
+%include chromosomes.cym
 
 % ---------------------- KINESIN-5 ------------------------
 
@@ -349,11 +351,11 @@ new 0 numa
     position = ball 0.75 at 2 0 0
 }
 
-new 0 numa
+new 10 numa
 {
     separation = 0.020
     ball1 = center, [0.050, 0.080], 12 bead_minus_motor, 4 bead_plus_motor, 1 cutter
-    position = ball 0.75 at -2 0 0
+    position = plate %ball 0.75 at -2 0 0
 }
 
 
@@ -371,11 +373,11 @@ new 0 event
     rate = 0.0
 }
 
-repeat 1000
+repeat 100
 {
-  run 20000 system
-  {
-      nb_frames = 20
-  }
+    run 1000 system
+    {
+        nb_frames = 1
+    }
 }
 
