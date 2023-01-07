@@ -68,9 +68,6 @@ private:
     /// array to store the reference shape of the solid, as coordinates
     real * soShape;
     
-    /// the number of points when fixShape() was last called, used for verifications.
-    size_t soAmount;
-    
     /// the reduced total (all points summed) drag coefficient for translation
     real soDrag;
     
@@ -84,7 +81,10 @@ private:
     Solid * soTwin;
 #endif
     /// a counter used in reshape()
-    unsigned int soReshapeTimer;
+    unsigned soReshapeTimer;
+    
+    /// the number of points when fixShape() was last called, used for verifications.
+    unsigned soAmount;
 
     /// reset private variables
     void reset();
