@@ -2,7 +2,7 @@
 // Started FJN on January 2008
 
 #ifndef DIM
-#  define DIM 3
+#  define DIM 2
 #endif
 
 #include "vector.h"
@@ -15,24 +15,24 @@
 #include "gym_flute.h"
 #include "gym_flute_dim.h"
 #include "gym_draw.h"
+#include "gym_cap.h"
 
 #include "grid.h"
 #include "grid_display.h"
 
-//area of the grid
-const int range = 5;
-real     left[] = {  -range,  -range,  0 };
-real    right[] = {   range,   range,  0.5 };
-size_t n_cell[] = { 2*range,   range,  2 };
+// grid definitions:
+const int range = 3;
+real inf[] = {-range,-range, 0 };
+real sup[] = { range, range, 0.5 };
+size_t num[] = { 3*range, 2*range, 3 };
 
 
-typedef Grid<real, DIM> grid_type;
-grid_type myGrid;
+Grid<real, DIM> grid;
 
 size_t cell_indx;
 int coord[4] = { 0 };
-Vector3 pos(0,0,0);
-Vector3 nod(0,0,0);
+Vector3 mouse(0,0,0);
+Vector3 node(0,0,0);
 
 
 #define TEST_REGIONS
@@ -41,14 +41,14 @@ real regionRadius = 1.5;
 //------------------------------------------------------------------------------
 void throwMarbles(int cnt)
 {
-    myGrid.setValues(0);
+    grid.setValues(0);
     real w[3] = { 0, 0, 0 };
     for( int n = 0; n < cnt; ++n )
     {
         w[0] = range * RNG.sreal();
         w[1] = range * RNG.sreal();
         w[2] = range * RNG.sreal();
-        ++myGrid(w);
+        ++grid(w);
     }
 }
 
@@ -59,33 +59,33 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
     {
         case 'p':
             for ( size_t d = 0; d < DIM; ++d )
-                myGrid.setPeriodic(d, !myGrid.isPeriodic(d));
+                grid.setPeriodic(d, !grid.isPeriodic(d));
             break;
             
         case 'i':
             //decrease region-radius
             if ( regionRadius > 1 )
                 regionRadius -= 0.25;
-            myGrid.createRoundRegions(regionRadius);
-            //myGrid.createSquareRegions(regionRadius);
+            grid.createRoundRegions(regionRadius);
+            //grid.createSquareRegions(regionRadius);
             glApp::flashText("radius = %f", regionRadius);
             break;
 
         case 'o':
             // increase region-radius
             regionRadius += 0.25;
-            myGrid.createRoundRegions(regionRadius);
-            //myGrid.createSquareRegions(regionRadius);
+            grid.createRoundRegions(regionRadius);
+            //grid.createSquareRegions(regionRadius);
             glApp::flashText("radius = %f", regionRadius);
             break;
 
         case 'r':
-            myGrid.createRoundRegions(regionRadius);
+            grid.createRoundRegions(regionRadius);
             glApp::flashText("radius = %f", regionRadius);
             break;
 
         case 's':
-            myGrid.createSideRegions(regionRadius);
+            grid.createSideRegions(regionRadius);
             break;
             
         case 'h':
@@ -94,6 +94,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
 
         case ' ': 
             throwMarbles(32);
+            glApp::currentView().reset();
             break;
 
         default:
@@ -109,18 +110,18 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
 ///set callback for shift-click, with unprojected click position
 void processMouseClick(int, int, const Vector3 & a, int)
 {
-    pos = a;
-    cell_indx = myGrid.index(pos);
-    myGrid.setPositionFromIndex(nod, cell_indx, 0);
-    myGrid.setCoordinatesFromIndex(coord, cell_indx);
+    mouse = a;
+    cell_indx = grid.index(mouse);
+    grid.setPositionFromIndex(node, cell_indx, 0);
+    grid.setCoordinatesFromIndex(coord, cell_indx);
     
     char str[32];
 
-    if ( myGrid.hasRegions() )
+    if ( grid.hasRegions() )
     {
-        real num = myGrid.sumValuesInRegion(cell_indx);
+        real val = grid.sumValuesInRegion(cell_indx);
         snprintf(str, sizeof(str), "cell %lu : coord %i %i : %.0f marbles",
-                 cell_indx, coord[0], coord[1], num);
+                 cell_indx, coord[0], coord[1], val);
     } 
     else
     {
@@ -154,37 +155,39 @@ static gym_color field_color(int, const real& val, Vector2 const&)
 int display(View& view)
 {
     view.openDisplay();
+    gym::disableLighting();
 
 #if ( DIM >= 3 )
     Vector3 dir = view.depthAxis();
-    drawValues(myGrid, field_color, 0, dir, 0);
+    drawValues(grid, field_color, 0, dir, 0);
 #elif ( DIM > 1 )
-    drawValues(myGrid, field_color, 0);
+    drawValues(grid, field_color, 0);
 #endif
     
-    float gray[4] = {1,1,1,.5f};
+    float gray[4] = {0.5f,0.5f,0.5f,1.f};
     float white[4] = {1,1,1,1};
-    float yellow[4] = {0,1,1,1};
+    float yellow[4] = {1,1,0,1};
+    float blue[4] = {0,0,1,1};
 
     //--------------draw a grid in gray:
     
     gym::color(gray);
-    drawBoundaries(myGrid, 1);
+    drawBoundaries(grid, 1);
 
     //--------------draw content of cells
     const real gold = 2.0 / ( 1.0 + sqrt(5) );
-    flute4D * flu = gym::mapBufferC4VD(16*myGrid.nbCells()+2);
+    flute4D * flu = gym::mapBufferC4VD(16*grid.nbCells()+2);
     flute4D * ptr = flu;
 
-    for ( size_t c = 0 ; c < myGrid.nbCells(); ++c )
+    for ( size_t c = 0 ; c < grid.nbCells(); ++c )
     {
-        int cnt = myGrid.icell(c);
+        int cnt = grid.icell(c);
         // use Fibonacci's spiral on the sphere:
         if ( cnt > 0 )
         {
             Vector x, y;
-            myGrid.setPositionFromIndex(x, c, 0.3);
-            myGrid.setPositionFromIndex(y, c, 0.7);
+            grid.setPositionFromIndex(x, c, 0.2);
+            grid.setPositionFromIndex(y, c, 0.8);
             for ( int u = 0; u < std::min(16, cnt); ++u )
             {
                 Vector off(fmod(u*gold,1.0), float(u)/cnt, 0.5);
@@ -194,23 +197,22 @@ int display(View& view)
     }
 
     //-------------draw selected-cell
-    gym_color lor(1,1,0);
-    *ptr++ = { lor, Vector2(pos) };
-    *ptr++ = { lor, Vector2(nod) };
+    *ptr++ = { white, mouse };
+    *ptr++ = { blue, node };
     gym::unmapBufferC4VD();
-    gym::drawPoints(12, 0, ptr-flu);
+    gym::drawPoints(10, 0, ptr-flu);
     gym::cleanup();
 
     //-------------draw region
-    if ( myGrid.hasRegions() )
+    if ( grid.hasRegions() )
     {
         char str[16];
         int const* offset = nullptr;
-        size_t nb = myGrid.getRegion(offset, cell_indx);
+        size_t nb = grid.getRegion(offset, cell_indx);
         for ( size_t j = 0; j < nb; ++j )
         {
             Vector x;
-            myGrid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
+            grid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
             snprintf(str, sizeof(str), "%lu", j);
             view.drawText(x, white, str, 0);
         }
@@ -218,7 +220,7 @@ int display(View& view)
     else
     {
         char str[16];
-        real val = myGrid.interpolate(pos);
+        real val = grid.interpolate(mouse);
         snprintf(str, sizeof(str), "cell %lu %f", cell_indx, val);
         glApp::setMessage(str);
     }
@@ -229,7 +231,7 @@ int display(View& view)
 
 void speedTest()
 {
-    printf("Real test...");
+    printf("Speed test...");
 
     real   L[] = { 0, 0, 0};
     real   R[] = { 1, 1, 1};
@@ -240,24 +242,22 @@ void speedTest()
     map.createCells();
     map.setValues(0);
 
-    real w[3];
+    real w[3], A = 0.5;
     for ( int cc=0; cc<10000; ++cc )
     {
         w[0] = RNG.preal();
         w[1] = RNG.preal();
         w[2] = RNG.preal();
-        for ( int x = 0; x < 1000; ++x )
+        for ( int x = 0; x < 1024; ++x )
         {
-            ++map( w );
-            ++map( w );
-            ++map( w );
-            ++map( w );
-            ++map( w );
-            ++map( w );
-            ++map( w );
-            ++map( w );
-            ++map( w );
-            ++map( w );
+            ++map(w);
+            ++map(w+Vector(A,0,0));
+            ++map(w+Vector(0,A,0));
+            ++map(w+Vector(A,A,0));
+            ++map(w+Vector(0,0,A));
+            ++map(w+Vector(A,0,A));
+            ++map(w+Vector(0,A,A));
+            ++map(w+Vector(A,A,A));
         }
     }
 
@@ -323,10 +323,10 @@ int main(int argc, char* argv[])
     }
 
     //initialize the grid:
-    myGrid.setDimensions(left, right, n_cell);
-    myGrid.createCells();
-    //myGrid.setPeriodic(0, true);
-    //myGrid.setPeriodic(1, true);
+    grid.setDimensions(inf, sup, num);
+    grid.createCells();
+    //grid.setPeriodic(0, true);
+    //grid.setPeriodic(1, true);
     throwMarbles(8*(1<<DIM));
 
     glutInit(&argc, argv);

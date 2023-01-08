@@ -26,9 +26,9 @@ void drawBoundaries(Map<1> const& map, float width)
  */
 void drawBoundaries(Map<2> const& map, float width)
 {
-    size_t supX = 1 + map.breadth(0);
-    size_t supY = 1 + map.breadth(1);
-    flute2 * flt = gym::mapBufferV2(2*std::max(supX, supY));
+    const size_t supX = 1 + map.breadth(0);
+    const size_t supY = 1 + map.breadth(1);
+    flute2 * flt = gym::mapBufferV2(2*supY);
 
     float i = map.inf(0);
     float s = map.sup(0);
@@ -40,7 +40,8 @@ void drawBoundaries(Map<2> const& map, float width)
     }
     gym::unmapBufferV2();
     gym::drawLines(width, 0, 2*supY);
-    
+    flt = gym::mapBufferV2(2*supX);
+
     i = map.inf(1);
     s = map.sup(1);
     for ( size_t n = 0; n < supX; ++n )
@@ -59,9 +60,9 @@ void drawBoundaries(Map<2> const& map, float width)
  */
 void drawBoundaries(Map<3> const& map, float width)
 {
-    size_t supX = 1 + map.breadth(0);
-    size_t supY = 1 + map.breadth(1);
-    size_t supZ = 1 + map.breadth(2);
+    const size_t supX = 1 + map.breadth(0);
+    const size_t supY = 1 + map.breadth(1);
+    const size_t supZ = 1 + map.breadth(2);
 
     float i = map.inf(0);
     float s = map.sup(0);
