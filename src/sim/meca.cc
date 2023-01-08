@@ -327,8 +327,8 @@ void Meca::multiply(const real* X, real* Y) const
 /// qsort function comparing number of points of Mecables
 static int compareMecables(const void * A, const void * B)
 {
-    size_t a = (*static_cast<Mecable *const*>(A))->nbPoints();
-    size_t b = (*static_cast<Mecable *const*>(B))->nbPoints();
+    auto a = (*static_cast<Mecable *const*>(A))->nbPoints();
+    auto b = (*static_cast<Mecable *const*>(B))->nbPoints();
     return ( a < b ) - ( a > b );
 }
 
