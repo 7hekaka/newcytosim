@@ -372,7 +372,7 @@ void CoupleSet::relinkD2(Couple * obj)
 
 void CoupleSet::link(Object * obj)
 {
-    assert_true( obj->tag() == Couple::TAG || obj->tag() == Duo::TAG );
+    assert_true( obj->tag() == Couple::TAG || obj->tag() == Couple::TAG_DUO );
     assert_true( obj->objset() == this );
 
     Couple * c = static_cast<Couple*>(obj);

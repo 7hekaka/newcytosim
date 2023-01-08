@@ -157,7 +157,7 @@ void Duo::stepAA()
 
 void Duo::write(Outputter& out) const
 {
-    writeMarker(out, TAG_DUO);
+    writeMarker(out, Couple::TAG_DUO);
     out.writeUInt8(active_);
     cHand1->writeHand(out);
     cHand2->writeHand(out);
@@ -168,7 +168,7 @@ void Duo::write(Outputter& out) const
 
 void Duo::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    if ( tag == Duo::TAG )
+    if ( tag == Couple::TAG_DUO )
         active_ = in.readUInt8();
     else
         active_ = 1;

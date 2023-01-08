@@ -65,7 +65,7 @@ public:
     void stepAA();
 
     /// return unique character identifying the class
-    ObjectTag tag() const { return TAG_DUO; }
+    ObjectTag tag() const { return Couple::TAG_DUO; }
 
     /// write to file
     void write(Outputter&) const;
