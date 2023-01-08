@@ -24,7 +24,7 @@
 const int range = 3;
 real inf[] = {-range,-range, 0 };
 real sup[] = { range, range, 0.5 };
-size_t num[] = { 3*range, 2*range, 3 };
+size_t num[] = { 7*range, 5*range, 3 };
 
 
 Grid<real, DIM> grid;
@@ -35,8 +35,8 @@ Vector3 mouse(0,0,0);
 Vector3 node(0,0,0);
 
 
-#define TEST_REGIONS
-real regionRadius = 1.5;
+bool roundRegions = false;
+real regionRadius = 2.0;
 
 //------------------------------------------------------------------------------
 void throwMarbles(int cnt)
@@ -65,17 +65,21 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
         case 'i':
             //decrease region-radius
             if ( regionRadius > 1 )
-                regionRadius -= 0.25;
-            grid.createRoundRegions(regionRadius);
-            //grid.createSquareRegions(regionRadius);
+                regionRadius /= M_SQRT2;
+            if ( roundRegions )
+                grid.createRoundRegions(regionRadius);
+            else
+                grid.createSquareRegions(regionRadius);
             glApp::flashText("radius = %f", regionRadius);
             break;
 
         case 'o':
             // increase region-radius
-            regionRadius += 0.25;
-            grid.createRoundRegions(regionRadius);
-            //grid.createSquareRegions(regionRadius);
+            regionRadius *= M_SQRT2;
+            if ( roundRegions )
+                grid.createRoundRegions(regionRadius);
+            else
+                grid.createSquareRegions(regionRadius);
             glApp::flashText("radius = %f", regionRadius);
             break;
 
@@ -217,7 +221,7 @@ int display(View& view)
             view.drawText(x, white, str, 0);
         }
     }
-    else
+    if ( 1 )
     {
         char str[16];
         real val = grid.interpolate(mouse);

@@ -616,22 +616,15 @@ private:
     }
     
     /// return array of dimensionality ORD, containing indices with reference to the center cell
-    static int * newRectangularGrid(size_t& cmx, const size_t range[ORD])
+    static size_t initRectangularGrid(int * ccc, const size_t range[ORD])
     {
-        cmx = 1;
-        for ( int d = 0; d < ORD; ++d )
-            cmx *= ( 2 * range[d] + 1 );
-        int * ccc = new int[ORD*cmx];
-        
-        size_t nb = 1;
+        size_t res = 1;
         for ( int d = 0; d < ORD; ++d )
         {
-            size_t h = 0;
-            for ( ; h < nb && h < cmx; ++h )
-                ccc[ORD*h+d] = 0;
+            size_t h = res;
             for ( size_t s = 1; s <= range[d]; ++s )
             {
-                for ( size_t n = 0; n < nb; ++n )
+                for ( size_t n = 0; n < res; ++n )
                 {
                     for ( int e = 0; e < d; ++e )
                         ccc[ORD*h+e] = ccc[ORD*n+e];
@@ -643,17 +636,16 @@ private:
                     ++h;
                 }
             }
-            nb = h;
+            res = h;
         }
-        assert_true(nb==cmx);
-        return ccc;
+        return res;
     }
     
     
     /// calculate cell index offsets between 'ori' and 'ori+shift'
     int calculateOffsets(int offsets[], int shift[], size_t cnt, int ori[], bool positive)
     {
-        int nb = 0;
+        int res = 0;
         int cc[ORD];
         int ori_indx = (int)pack(ori);
         for ( size_t ii = 0; ii < cnt; ++ii )
@@ -666,7 +658,7 @@ private:
             if ( isPeriodic() )
             {
                 //check that cell is not already included:
-                for ( int n = 0; n < nb; ++n )
+                for ( int n = 0; n < res; ++n )
                     if ( offsets[n] == off )
                     {
                         add = false;
@@ -677,9 +669,9 @@ private:
                 add &= inside(cc);
             
             if ( add )
-                offsets[nb++] = off;
+                offsets[res++] = off;
         }
-        return nb;
+        return res;
     }
     
    
@@ -738,8 +730,8 @@ private:
     {
         real dsq = 0;
         for ( int d = 0; d < ORD; ++d ) 
-            dsq += cWidth[d] * c[d] * cWidth[d] * c[d];
-        return ( dsq > radius * radius );
+            dsq += square(cWidth[d] * c[d]);
+        return ( dsq > square(radius) );
     }
     
     /// accept within a certain diameter
@@ -768,39 +760,46 @@ public:
      */
     void createSquareRegions(const real radius)
     {
+        size_t cmx = 1;
         size_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
+        {
+            assert_true( cWidth[d] > REAL_EPSILON );
             range[d] = std::ceil( radius / cWidth[d] );
-        size_t cmx = 0;
-        int * ccc = newRectangularGrid(cmx, range);
+            cmx *= ( 2 * range[d] + 1 );
+        }
+        int * ccc = new int[ORD*cmx]{0};
+        initRectangularGrid(ccc, range);
         
-        for ( size_t s = cmx; s > 0 ; --s )
-            if ( reject_square(ccc+ORD*(s-1), radius) )
-                remove_entry(ccc, s-1, cmx);
+        for ( size_t s = cmx; s-- > 0 ; )
+            if ( reject_square(ccc+ORD*s, radius) )
+                remove_entry(ccc, s, cmx);
         
         createRegions(ccc, cmx, range, false);
         delete[] ccc;
     }
     
-    /// create regions which contains cells at a distance 'range' or less
+    /// create regions which contains cells at a distance 'radius' or less
     /**
      Note: the range is specified in real units.
      The region covers an area of space that is approximately circular.
      */
     void createRoundRegions(const real radius)
     {
+        size_t cmx = 1;
         size_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
-            assert_true( cWidth[d] > 0 );
+            assert_true( cWidth[d] > REAL_EPSILON );
             range[d] = std::ceil( radius / cWidth[d] );
+            cmx *= ( 2 * range[d] + 1 );
         }
-        size_t cmx = 0;
-        int * ccc = newRectangularGrid(cmx, range);
-       
-        for ( size_t s = cmx; s > 0 ; --s )
-            if ( reject_disc(ccc+ORD*(s-1), radius) )
-                remove_entry(ccc, s-1, cmx);
+        int * ccc = new int[ORD*cmx]{0};
+        initRectangularGrid(ccc, range);
+
+        for ( size_t s = cmx; s-- > 0 ; )
+            if ( reject_disc(ccc+ORD*s, radius) )
+                remove_entry(ccc, s, cmx);
         
         createRegions(ccc, cmx, range, false);
         delete[] ccc;
@@ -814,13 +813,17 @@ public:
 
      Note: the radius is taken specified in units of cells: 1 = 1 cell
      */
-    void createSideRegions(const int radius)
+    void createSideRegions(const int num_cells)
     {
+        size_t cmx = 1;
         size_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
-            range[d] = radius;
-        size_t cmx = 0;
-        int * ccc = newRectangularGrid(cmx, range);
+        {
+            range[d] = num_cells;
+            cmx *= ( 2 * range[d] + 1 );
+        }
+        int * ccc = new int[ORD*cmx]{0};
+        initRectangularGrid(ccc, range);
         createRegions(ccc, cmx, range, true);
         delete[] ccc;
     }
