@@ -460,16 +460,20 @@ void CoupleSet::freeze()
 void CoupleSet::reheat()
 {
     //std::clog << "Couple::reheat " << ice_.size() << "\n";
-    Object * i = ice_.pop_front();
+    Object * i = ice_.front();
     while ( i )
     {
         Couple* o = static_cast<Couple*>(i);
-        i = ice_.pop_front();
-        // we want to skip the 'beforeDetachment' here:
-        o->hand1()->detachHand();
-        o->hand2()->detachHand();
-        o->randomizePosition();
-        linkFF(o);
+        i = i->next();
+        if ( o->prop->fast_diffusion )
+        {
+            ice_.pop(o);
+            // we want to skip the 'beforeDetachment' here:
+            o->hand1()->detachHand();
+            o->hand2()->detachHand();
+            o->randomizePosition();
+            linkFF(o);
+        }
     }
 }
 

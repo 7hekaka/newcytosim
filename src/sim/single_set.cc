@@ -314,15 +314,19 @@ void SingleSet::freeze()
 void SingleSet::reheat()
 {
     //std::clog << "Single::reheat " << ice_.size() << "\n";
-    Object * i = ice_.pop_front();
+    Object * i = ice_.front();
     while ( i )
     {
         Single* o = static_cast<Single*>(i);
-        i = ice_.pop_front();
-        // we want to skip the 'beforeDetachment' here:
-        o->hand()->detachHand();
-        o->randomizePosition();
-        linkF(o);
+        i = i->next();
+        if ( o->prop->fast_diffusion )
+        {
+            ice_.pop(o);
+            // we want to skip the 'beforeDetachment' here:
+            o->hand()->detachHand();
+            o->randomizePosition();
+            linkF(o);
+        }
     }
 }
 
