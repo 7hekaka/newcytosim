@@ -231,7 +231,7 @@ public:
     real silhouette(size_t i) const
     {
         real pos = real(i) / lastSegment() - chiasma_;
-        real amp = 2.0 + std::tanh(5.0 * std::abs(pos) - 1.0); // in [1, 3]
+        real amp = 2.0 + std::tanh(10.0 * std::abs(pos) - 1.0); // in [1, 3]
         return amp * prop->steric_radius;
     }
 #endif
