@@ -347,20 +347,6 @@ Object * ObjectSet::pickObject(Property const* p) const
 }
 
 
-size_t ObjectSet::count(const ObjectPool & list,
-                        bool (*func)(Object const*, void const*), void const* arg)
-{
-    size_t res = 0;
-    Object const* n = list.front();
-    while ( n )
-    {
-        res += func(n, arg);
-        n = n->next();
-    }
-    return res;
-}
-
-
 ObjectList ObjectSet::collect(const ObjectPool & list)
 {
     ObjectList res;
@@ -437,7 +423,7 @@ ObjectList ObjectSet::collect(Property const* p) const
 
 size_t ObjectSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    return count(pool_, func, arg);
+    return pool_.count(func, arg);
 }
 
 //------------------------------------------------------------------------------

@@ -79,10 +79,10 @@ void DuoProp::complete(Simul const& sim)
     deactivation_rate_dt = deactivation_rate * time_step(sim) * POOL_UNATTACHED;
     
     /// print predicted decay distance in verbose mode:
-    if ( primed(sim) && sim.prop.verbose )
+    if ( primed(sim) && sim.prop.verbose && sim.couples.count(match_property, this) )
     {
         real L = std::sqrt(diffusion / deactivation_rate);
-        std::clog << name() << ":deactivation_rate " << deactivation_rate;
+        std::clog << std::setw(10) << name() << ":deactivation_rate " << deactivation_rate;
         std::clog << "  length " << L << "\n";
     }
 }

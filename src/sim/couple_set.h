@@ -201,35 +201,35 @@ public:
     void relinkD2(Couple *);
 
     /// first unattached Couple
-    Couple * firstFF() const{ return static_cast<Couple*>(ffList.front()); }
+    Couple * firstFF() const { return static_cast<Couple*>(ffList.front()); }
     /// first Couple attached only by cHand1
-    Couple * firstAF() const{ return static_cast<Couple*>(afList.front()); }
+    Couple * firstAF() const { return static_cast<Couple*>(afList.front()); }
     /// first Couple attached only by cHand2
-    Couple * firstFA() const{ return static_cast<Couple*>(faList.front()); }
+    Couple * firstFA() const { return static_cast<Couple*>(faList.front()); }
     /// first Couple attached by both hands
-    Couple * firstAA() const{ return static_cast<Couple*>(aaList.front()); }
+    Couple * firstAA() const { return static_cast<Couple*>(aaList.front()); }
 
     /// last unattached Couple
-    Couple * lastFF()  const{ return static_cast<Couple*>(ffList.back()); }
+    Couple * lastFF() const { return static_cast<Couple*>(ffList.back()); }
     /// last Couple attached by cHand1
-    Couple * lastAF()  const{ return static_cast<Couple*>(afList.back()); }
+    Couple * lastAF() const { return static_cast<Couple*>(afList.back()); }
     /// last Couple attached by cHand2
-    Couple * lastFA()  const{ return static_cast<Couple*>(faList.back()); }
+    Couple * lastFA() const { return static_cast<Couple*>(faList.back()); }
     /// last Couple attached by both hands
-    Couple * lastAA()  const{ return static_cast<Couple*>(aaList.back()); }
+    Couple * lastAA() const { return static_cast<Couple*>(aaList.back()); }
 
     /// number of free Couples
-    size_t sizeFF()  const{ return ffList.size(); }
+    size_t sizeFF() const { return ffList.size(); }
     /// number of Couples attached by cHand1 only
-    size_t sizeAF()  const{ return afList.size(); }
+    size_t sizeAF() const { return afList.size(); }
     /// number of Couples attached by cHand2 only
-    size_t sizeFA()  const{ return faList.size(); }
+    size_t sizeFA() const { return faList.size(); }
     /// number of Couples attached by one hand
-    size_t sizeA()   const{ return faList.size() + afList.size(); }
+    size_t sizeA()  const { return faList.size() + afList.size(); }
     /// number of Couples attached by both hands
-    size_t sizeAA()  const{ return aaList.size(); }
+    size_t sizeAA() const { return aaList.size(); }
     /// total number of elements
-    size_t size()    const{ return ffList.size() + faList.size() + afList.size() + aaList.size(); }
+    size_t size()   const { return ffList.size() + faList.size() + afList.size() + aaList.size(); }
 
     /// erase all Object and all Property
     void erase();

@@ -132,8 +132,11 @@ public:
     size_t count() const;
     
     /// returns 1 if element appears in the list
-    bool count(Object const* n) const;
+    size_t count(Object const* n) const;
     
+    /// count objects from ObjectPool for which `func(obj, val) == true`
+    size_t count(bool (*func)(Object const*, void const*), void const* val) const;
+
     /// test coherence of list
     int bad() const;
     

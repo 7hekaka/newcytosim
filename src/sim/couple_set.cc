@@ -581,10 +581,10 @@ ObjectList CoupleSet::collect(bool (*func)(Object const*, void const*), void con
 
 size_t CoupleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    size_t ff = ObjectSet::count(ffList, func, arg);
-    size_t af = ObjectSet::count(afList, func, arg);
-    size_t fa = ObjectSet::count(faList, func, arg);
-    size_t aa = ObjectSet::count(aaList, func, arg);
+    size_t ff = ffList.count(func, arg);
+    size_t af = afList.count(func, arg);
+    size_t fa = faList.count(func, arg);
+    size_t aa = aaList.count(func, arg);
     return ff + af + fa + aa;
 }
 

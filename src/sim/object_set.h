@@ -58,9 +58,6 @@ protected:
     
     /// mark all objects from given list with value `f`
     static void flag(ObjectPool const&, ObjectFlag f);
-    
-    /// collect objects from ObjectPool for which func(obj, val) == true
-    static size_t count(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
 
     /// collect all objects
     static ObjectList collect(ObjectPool const&);

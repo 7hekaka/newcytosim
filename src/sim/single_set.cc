@@ -430,8 +430,8 @@ ObjectList SingleSet::collect(bool (*func)(Object const*, void const*), void con
 
 size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* arg) const
 {
-    size_t f = ObjectSet::count(fList, func, arg);
-    size_t a = ObjectSet::count(aList, func, arg);
+    size_t f = fList.count(func, arg);
+    size_t a = aList.count(func, arg);
     return f + a;
 }
 

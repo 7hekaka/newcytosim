@@ -173,15 +173,15 @@ void DynamicFiberProp::complete(Simul const& sim)
         min_length = unit_length;
      
     /// print predicted average length in verbose mode:
-    if ( primed(sim) && sim.prop.verbose )
+    if ( primed(sim) && sim.prop.verbose && sim.fibers.count(match_property, this)  )
     {
         // calculate stall force, from:
         // 0 = growing_speed * std::exp(force/growing_force) + growing_off_speed;
         real f = -growing_force[0] * std::log(-growing_off_speed[0]/growing_speed[0]);
-        std::clog << name() << ":stall_force " << f;
+        std::clog << std::setw(16) << name() << ":stall_force " << f;
 
         if ( 0 == growing_off_speed[0] )
-        splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
+            splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
     }
 }
 

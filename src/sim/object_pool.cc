@@ -189,20 +189,6 @@ void ObjectPool::erase()
     nSize  = 0;
 }
 
-
-
-size_t ObjectPool::count() const
-{
-    size_t cnt = 0;
-    Object * p = frontO;
-    while ( p )
-    {
-        ++cnt;
-        p = p->nextO;
-    }
-    return cnt;
-}
-
 //------------------------------------------------------------------------------
 #pragma mark - Sort
 
@@ -565,20 +551,48 @@ void ObjectPool::shuffle(Object * p)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Check
+#pragma mark - Count
 
-
-bool ObjectPool::count(Object const* n) const
+size_t ObjectPool::count() const
 {
-    Object * p = frontO;
+    size_t cnt = 0;
+    Object * p = front();
     while ( p )
     {
-        if ( p == n )
-            return 1;
-        p = p->nextO;
+        ++cnt;
+        p = p->next();
     }
-    return 0;
+    return cnt;
 }
+
+
+size_t ObjectPool::count(Object const* n) const
+{
+    size_t res = 0;
+    Object * p = front();
+    while ( p )
+    {
+        res += ( p == n );
+        p = p->next();
+    }
+    return res;
+}
+
+
+size_t ObjectPool::count(bool (*func)(Object const*, void const*), void const* arg) const
+{
+    size_t res = 0;
+    Object const* n = front();
+    while ( n )
+    {
+        res += func(n, arg);
+        n = n->next();
+    }
+    return res;
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Check
 
 /**
  This traverses the entire list and checks every link, which is costly
