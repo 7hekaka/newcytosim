@@ -576,12 +576,12 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
 
     if ( obj && update )
     {
-#if ( 1 )
-        // check that property index has not changed:
+        /* check that property index has not changed: this can happen however, if
+         objects are created/destroyed since the identity numbers are recycled */
         if ( obj->property()->number() != pid )
         {
             Property const* P = obj->property();
-            std::clog << "Incident: erasing " << P->category() << P->number() << " `" << P->name();
+            std::clog << "Remark: erasing " << P->category() << P->number() << " `" << P->name();
             std::clog << "' to load object with property #" << pid << '\n';
             // the orphan Object remains on the 'ice_' to be deleted during pruning:
             inventory_.unassign(obj);
@@ -590,7 +590,6 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
             obj = nullptr;
         }
         else
-#endif
 #ifdef MORE_ROBUST_READING
             if ( obj->flag() )
             {
