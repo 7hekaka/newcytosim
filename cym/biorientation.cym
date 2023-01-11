@@ -1,70 +1,80 @@
-% Towards the Arabidopsis taliana spindle
-% Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni Hamburg)
-% F. Nedelec, Strasbourg 22 November 2012
+% Arabidopsis taliana spindle
+% Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
+% F. Nedelec, Cambridge 12.11.2022, Sunny. 25.11.2022, Rainy; Fat Chromosomes: 31.12.2022
+% This relies on: NEW_SOLID_HAS_TWIN, NEW_SOLID_SOURCE, NEW_ANCHOR_NORMAL, NEW_SHAPED_FIBER
 
 set simul system
 {
+    viscosity = 1
     time_step = 0.01
-    viscosity = 10
-    steric = 2, 111, 22
-    display = ( size=1280,256; point_value=0.01; point_size=0.5; line_width=1;)
+    steric = 1, 1111, 222
+    display = ( size=2560,768; point_value=0.01; point_size=0.5; line_width=1; zoom=2; style=3;)
+    skip_free_couple = 1
+    precondition = 1
+    verbose = 7
 }
 
 set space cell
 {
-    shape = cylinder
-    display = ( color=0xFFFFFF04; visible=0 )
-}
-
-set space plate
-{
-    shape = cylinder
-    display = ( color=0x0000FF11; visible=0 )
+    shape = capsule
+    display = ( color=0xFFFFFF04; visible=1 )
 }
 
 new cell
 {
-    length = 16
-    diameter = 2
+    length = 25
+    radius = 2
 }
 
-new plate
+set space origin
 {
-    length = 1
-    diameter = 1
+    shape = sphere
+    display = ( color=0x0000FF11; visible=0 )
 }
+
+new origin
+{
+    radius = 0
+}
+
+
+% ---------------------- MICROTUBULES ------------------------
 
 set fiber microtubule
 {
     rigidity = 20
     segmentation = 0.5
-    steric = 1, 0.025, 0.025
+    steric = 1, 0.025, 0.010
+    confine = inside, 1, cell
 
     activity = dynamic
-    min_length = 0.032
+    min_length = 0.024
     growing_speed = 0.21
     shrinking_speed = -0.42
-    hydrolysis_rate = 0.8
+    hydrolysis_rate = 1.0
     growing_force = 5
 
-    display = ( line_width=2.5; end_size=2, 2; coloring=2; speckles=3; )
+    display = (color=0xFFFFFF44; line_width=2.5; end_size=2, 2; coloring=2; speckles=3; )
 }
 
-set fiber slow_microtubule
+set fiber chromofiber
 {
     rigidity = 20
     segmentation = 0.5
-    steric = 1, 0.025, 0.025
+    steric = 1, 0.025, 0.010
+    confine = inside, 1, cell
 
     activity = dynamic
-    min_length = 0.032
+    min_length = 0.024
     growing_speed = 0.04
     shrinking_speed = -0.20
     hydrolysis_rate = 0.2
     growing_force = 5
 
-    display = ( line_width=2.5; end_size=2, 2; coloring=0; speckles=3; )
+    display = ( line_width=2.5; end_size=2, 2; color=light_gray; speckles=3; )
 }
+
+% ---------------------- NUCLEATORS ------------------------
 
 set hand plus_nucleator
 {
@@ -74,33 +84,76 @@ set hand plus_nucleator
     hold_shrinking_end = 0
     addictive = 1
     activity = nucleate
-    nucleate = 1.0, slow_microtubule, ( length=0.064; end_state = grow, white; )
-    display = ( color=white; size=3; width=3; )
+    nucleate = 1.0, chromofiber, ( length=0.032; end_state = grow, white; )
+    display = ( color=white; size=5; width=3; )
 }
+
+set hand minus_nucleator
+{
+    unbinding = 1, 1
+    activity = nucleate
+    specificity = mostly_parallel
+    hold_growing_end = 0
+    nucleate = 0.1, microtubule, ( length=0.032; end_state = grow, white; )
+    display = ( color=yellow; size=5; width=3; )
+}
+
+set single nucleator
+{
+    hand = minus_nucleator
+    stiffness = 100
+}
+
+% ---------------------- AMPLIFICATION ------------------------
+
+set hand activator
+{
+    binding = 10, 0.080
+    unbinding = 0.02, 4
+    display = ( color=green; size=5; width=1; )
+}
+
+set couple augmin
+{
+    hand1 = activator
+    hand2 = minus_nucleator
+    stiffness = 10
+    activity = duo
+    deactivation = 5, delete
+    trans_activated = 1
+    length = 0.050
+    diffusion = 0.1
+}
+
+%---------------------- KINETOCHORES ------------------------
 
 set single corona
 {
     hand = plus_nucleator
-    stiffness = 333, 100
+    stiffness = 333
+    anchor_stiffness = 167
     diffusion = 10
 }
 
-set solid chromosome
+set solid kinetochore
 {
-    steric = 2
-    confine = inside, 111, plate
-    display = ( color=0xFFFFFFFF; coloring=1; size=2; style=7; )
+    steric = 0
+    confine = on, 1, origin
+    twin_stiffness = 50
+    source = 7, augmin
+    display = ( color=0x00FFFFFF; size=2; style=5; )
 }
 
-new chromosome
+
+new kinetochore
 {
-    sphere1 = +0.1 0 0, 0.100, (5 corona sphere 1 0 if (S > 0.96))
-    position = 0 0 0
-    orientation = 1 0 0
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    position = sphere 1.0
     twin = mirror
+    direction = 1 0 0
 }
 
-run 10 system
+% ---------------------- KINESIN-5 ------------------------
 
 set hand slow_kinesin
 {
@@ -110,12 +163,12 @@ set hand slow_kinesin
     activity = mighty
     unloaded_speed = 0.05
     stall_force = 5
-    display = ( color=orange; size=3.5; )
+    display = ( color=blue; size=3.5; )
 }
 
-set couple kinesin5
+set couple parakin
 {
-    specificity = off
+    specificity = parallel
     hand1 = slow_kinesin
     hand2 = slow_kinesin
     stiffness = 400
@@ -133,10 +186,10 @@ set hand clasp_kinesin
     unloaded_speed = 0.05
     stall_force = 5
     rescue_chance = 1.0
-    display = ( color=blue; size=3.5; )
+    display = ( color=orange; size=3.5; )
 }
 
-set couple kinesin5clasp
+set couple antikin
 {
     specificity = antiparallel
     hand1 = clasp_kinesin
@@ -147,19 +200,25 @@ set couple kinesin5clasp
     fast_diffusion = 1
 }
 
-run 1000 system { solve = on }
+% ---------------------- SYSTEM! ------------------------
 
-new 300 kinesin5
-new 500 kinesin5clasp
+new [0.5 * volume] parakin
+new [4.0 * volume] antikin
+new 0 clasp
+new 0 augmin
+new 0 katanin
 
-new event
+new 0 event
 {
-    code = (new microtubule { position = discYZ 0.2 0.1; direction=X; length=0.256; end_state = grow, white; })
-    rate = 0.5
+    code = (new microtubule { position = discYZ 0.5 0.1; direction=X; length=0.256; end_state=grow, white; })
+    rate = 0.0
 }
 
-run 100000 system
+repeat 100
 {
-  nb_frames = 100
-  solve = on
+    run 5000 system
+    {
+        nb_frames = 10
+    }
 }
+
