@@ -34,7 +34,7 @@ real * makeGaussians_(real dst[], size_t cnt, const uint32_t arg[])
         real x = src[0] * TWO_POWER_MINUS_31;
         real y = src[1] * TWO_POWER_MINUS_31;
 #if 1
-        if ( std::abs(x) + std::abs(y) >= M_SQRT2 )
+        if ( std::fabs(x) + std::fabs(y) >= M_SQRT2 )
         {
             constexpr real S = M_SQRT1_2 + 1;
             // subtract corner and scale to recover a square of size sqrt(1/2)

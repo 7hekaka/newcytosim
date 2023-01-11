@@ -11,7 +11,7 @@
 typedef double real;
 
 /// absolute value
-inline real abs_real(const real x) { return std::abs(x); }
+inline real abs_real(const real x) { return std::fabs(x); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
 inline float sign_select(float const val, float const neg, float const pos)

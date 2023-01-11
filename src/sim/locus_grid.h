@@ -50,7 +50,7 @@ public:
         float x = XX - arg.XX;
 #if ( DIM == 1 )
         float r = RR + arg.RR;
-        return ( std::abs(x) <= r );
+        return ( std::fabs(x) <= r );
 #elif ( DIM == 2 )
         float y = YY - arg.YY;
         float r = RR + arg.RR;

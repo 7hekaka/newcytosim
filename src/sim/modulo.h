@@ -40,7 +40,7 @@ public:
         int q = std::nearbyint(x * inv_period_[i]);
         /*
         real y = std::remainder(x, P);
-        if ( std::abs(y-x+w*P) > 0.001 )
+        if ( std::fabs(y-x+w*P) > 0.001 )
             std::clog << "   " << x-q*P << "   " << y << "\n";
          */
         return x - q * P;

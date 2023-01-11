@@ -248,7 +248,7 @@ real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
         this increases the number of points within the unit circle by a factor 3-2*sqrt(2)
         without changing the property of being equidistributed within the unit circle.
         */
-        if ( std::abs(x) + std::abs(y) >= M_SQRT2 )
+        if ( abs_real(x) + abs_real(y) >= M_SQRT2 )
         {
             constexpr real S = M_SQRT1_2 + 1;
             // subtract corner and scale to recover a square of size sqrt(1/2)
