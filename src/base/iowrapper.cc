@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright Cambridge University 2020
 
+#include <cmath>
 #include "iowrapper.h"
 #include "exceptions.h"
 
@@ -618,7 +619,7 @@ void Outputter::writeEulerAngles(const float a, const float b)
 {
     assert_true( binary_ );
     constexpr float sup = 3.1999f;
-    bool valid = ( std::abs(a) < sup ) & ( 0 <= b ) & ( b < sup );
+    bool valid = ( std::fabs(a) < sup ) & ( 0 <= b ) & ( b < sup );
     uint16_t u[2];
     *((int16_t*)u) = int16_t(a * 1024.f);
     u[1] = uint16_t(b * 2048.f);

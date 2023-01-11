@@ -181,7 +181,7 @@ constexpr inline static real sign_select(real const val, real const neg, real co
 }
 
 /// sign of a 'real': -1 or +1; result is +1 if ( x == 0 ) and -1 if ( x == -0 )
-constexpr inline static real sign_real(const real x)
+inline static real sign_real(const real x)
 {
 #if REAL_IS_DOUBLE
     return std::copysign(1.0, x);
@@ -191,22 +191,22 @@ constexpr inline static real sign_real(const real x)
 }
 
 /// absolute value of `x`
-constexpr inline static real abs_real(const real x) { return std::abs(x); }
+inline static real abs_real(const real x) { return std::fabs(x); }
 
 /// minimum between `x` and `y`
-constexpr inline static real min_real(const real x, const real y) { return std::min(x, y); }
+inline static real min_real(const real x, const real y) { return std::min(x, y); }
 
 /// maximum between `x` and `y`
-constexpr inline static real max_real(const real x, const real y) { return std::max(x, y); }
+inline static real max_real(const real x, const real y) { return std::max(x, y); }
 
 /// clamp value 'x' within [i, s]
-constexpr inline static real clamp_real(const real x, const real i, const real s)
+inline static real clamp_real(const real x, const real i, const real s)
 {
     return std::max(i, std::min(x, s));
 }
 
 /// adjust 'x' to canonical image with period 'p':
-constexpr inline static real fold_real(const real x, const real p)
+inline static real fold_real(const real x, const real p)
 {
     // using remainder() function for branchless code
     return std::remainder(x, p);

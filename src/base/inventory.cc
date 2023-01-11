@@ -3,6 +3,7 @@
 #include "inventory.h"
 #include "assert_macro.h"
 #include "exceptions.h"
+#include <iostream>
 #include <limits>
 
 
@@ -67,7 +68,10 @@ void Inventory::assign(Inventoried * obj)
     ObjectID& n = obj->identity();
     
     if ( n <= 0 )
+    {
         n = ++highest_;
+        //std::clog << "Inventory::assign(" << obj << " <- " << n << ")\n";
+    }
     else
     {
         // already allocated and registered
@@ -84,7 +88,6 @@ void Inventory::assign(Inventoried * obj)
     record_[n] = obj;
     
     lowest_ = std::min(lowest_, n);
-    //std::clog << "Inventory::store() assigned " << n << " to " << obj << "\n";
 }
 
 
