@@ -20,6 +20,9 @@ class FiberSegment;
 class LineDisp;
 
 
+/// record birth time of fibers, used for display mostly
+#define FIBER_HAS_BIRTHTIME 0
+
 /// Flag to add a Lattice of integers to each Fiber {0, 1}
 #define FIBER_HAS_LATTICE 0
 
@@ -112,6 +115,10 @@ private:
 #if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
     Single * fGlue;
+#endif
+#if FIBER_HAS_BIRTHTIME
+    /// simulation time when initialized
+    real fBirthTime;
 #endif
 
 protected:
@@ -221,21 +228,6 @@ public:
     /// perform all the cuts registered by sever()
     void severNow();
 
-#if NEW_FIBER_CHEW
-    /// register a chewing quantity
-    void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
-#endif
-#if NEW_SHAPED_FIBER
-    real chiasma_;
-    
-    real silhouette(size_t i) const
-    {
-        real pos = real(i) / lastSegment() - chiasma_;
-        real amp = 2.0 + std::tanh(10.0 * std::fabs(pos) - 1.0); // in [1, 3]
-        return amp * prop->steric_radius;
-    }
-#endif
-                
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
     virtual void join(Fiber *);
     
@@ -309,6 +301,48 @@ public:
     /// number of Hands attached at a distance less than 'len' from the specified FiberEnd
     size_t nbHandsNearEnd(real len, FiberEnd end) const;
     
+    //--------------------------------------------------------------------------
+
+#if NEW_FIBER_CHEW
+    /// register a chewing quantity
+    void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
+#endif
+#if NEW_SHAPED_FIBER
+    real chiasma_;
+    
+    real silhouette(size_t i) const
+    {
+        real pos = real(i) / lastSegment() - chiasma_;
+        real amp = 2.0 + std::tanh(10.0 * std::fabs(pos) - 1.0); // in [1, 3]
+        return amp * prop->steric_radius;
+    }
+    
+    void chiasma(real c) { chiasma_ = c; }
+    real chiasma() const { return chiasma_; }
+#else
+    void chiasma(real c) { }
+    real chiasma() const { return 0.0; }
+#endif
+#if FIBER_HAS_BIRTHTIME
+    /// returns simulation time at which Fiber was created
+    real birthTime() const { return fBirthTime; }
+
+    /// set birth time
+    void birthTime(double t) { fBirthTime = t; }
+
+    /// returns current age of the fiber
+    double age() const;
+#else
+    /// set birth time
+    void birthTime(double) {}
+
+    /// returns simulation time at which Fiber was created
+    real birthTime() const { return 0; }
+
+    /// returns current age of the fiber
+    double age() const { return 0; }
+#endif
+
     //--------------------------------------------------------------------------
     
 #if FIBER_HAS_LATTICE
@@ -406,14 +440,17 @@ public:
     
     /// identifies angle data format
     static const ObjectTag TAG_COMPACT = 'g';
+    
+    /// identifies Age and Chiasma info (must be upper case as this is meta-data)
+    static const ObjectTag TAG_FIBINFO = 'G';
 
-    /// identifies data for dynamic ends of fibers
+    /// identifies data for dynamic ends of fibers (must be upper case)
     static const ObjectTag TAG_DYNAMIC = 'F';
     
-    /// identifies FiberLattice data (was 'l' before 23/06/2021)
+    /// identifies FiberLattice data (was 'l' before 23/06/2021; must be upper case)
     static const ObjectTag TAG_LATTICE = 'T';
     
-    /// identifies Lattice<real> data (was 'L' before 23/06/2021)
+    /// identifies Lattice<real> data (was 'L' before 23/06/2021; must be upper case)
     static const ObjectTag TAG_FIBMESH = 'M';
 
     /// return unique character identifying the class

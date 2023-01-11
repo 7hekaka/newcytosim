@@ -374,7 +374,7 @@ public:
     static const char TRAJECTORY[];
 
     /// current file format (check history in `simul_file.cc`)
-    static constexpr unsigned currentFormatID = 58;
+    static constexpr unsigned currentFormatID = 59;
     
     /// class for reading trajectory file
     class InputLock;

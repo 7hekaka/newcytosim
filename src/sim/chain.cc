@@ -64,9 +64,6 @@ Chain::Chain()
 #endif
     fnAbscissaM = 0;
     fnAbscissaP = 0;
-#if FIBER_HAS_BIRTHTIME
-    fnBirthTime = 0;
-#endif
 #if FIBER_HAS_NORMAL
     fnNormal.set(0, 0, 1);
 #endif
@@ -272,14 +269,6 @@ Vector3 Chain::adjustedNormal(Vector3 const& d) const
     return d.orthogonal();
 #endif
 }
-
-
-#if FIBER_HAS_BIRTHTIME
-double Chain::age() const
-{
-    return simul().time() - fnBirthTime;
-}
-#endif
 
 //===================================================================
 #pragma mark -
@@ -2152,11 +2141,6 @@ void Chain::write(Outputter& out) const
     out.writeFloat(length());
     out.writeFloat(fnSegmentation);
     out.writeFloat(fnAbscissaM);
-#if FIBER_HAS_BIRTHTIME
-    out.writeFloat(fnBirthTime);
-#else
-    out.writeFloat(0.0);
-#endif
     Mecable::write(out);
 }
 
@@ -2176,10 +2160,13 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     float seg = in.readFloat(); // saved target value for segmentation
     float abs = in.readFloat();
     
-#if BACKWARD_COMPATIBILITY < 50
-    if ( in.formatID() > 49 ) // 12.12.2018 moved birthTime
+#if BACKWARD_COMPATIBILITY < 60
+    if ( in.formatID() > 49 && in.formatID() < 59 ) // birthTime [ 12.12.2018, 11.01.2023 ]
+    {
+        // we are discarding the birthTime information... for old formats only
+        in.readFloat();
+    }
 #endif
-        birthTime(in.readFloat());
 
     Mecable::read(in, sim, tag);
     
@@ -2233,7 +2220,6 @@ void Chain::writeAngles(Outputter& out) const
     out.writeFloatBinary(length());
     //out.writeFloat(fnSegmentation);
     out.writeFloatBinary(fnAbscissaM);
-    //out.writeFloat(fnBirthTime);
     out.writeUInt16Binary(nPoints-1);
     // first point:
     out.writeFloatsBinary(pPos, DIM);

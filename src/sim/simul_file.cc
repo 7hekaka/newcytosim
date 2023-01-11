@@ -20,6 +20,7 @@
  
  History of changes in file format:
 
+ - 59: 11/01/2023 Chain::birth_time moved to Fiber
  - 58: 26/11/2022 References written on 2 or 4 bytes
  - ??: 11/06/2021 References written always on 4 bytes with tag+identity
  - 56: 23/06/2021 Secondary TAG use capital letters, but ID was not changed

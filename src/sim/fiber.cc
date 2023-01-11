@@ -217,6 +217,9 @@ Fiber::Fiber(FiberProp const* p)
 #endif
         }
     }
+#if FIBER_HAS_BIRTHTIME
+    fBirthTime = 0;
+#endif
 #if FIBER_HAS_GLUE
     fGlue = nullptr;
 #endif
@@ -1213,6 +1216,14 @@ void Fiber::updateFiber()
     updateHands();
 }
 
+
+#if FIBER_HAS_BIRTHTIME
+double Fiber::age() const
+{
+    return simul().time() - fBirthTime;
+}
+#endif
+
 //------------------------------------------------------------------------------
 #pragma mark - Lattice
 
@@ -1769,7 +1780,13 @@ void Fiber::write(Outputter& out) const
     writeMarker(out, TAG_COMPACT);
     Chain::writeAngles(out);
 #endif
-    
+#if FIBER_HAS_BIRTHTIME || NEW_SHAPED_FIBER
+    writeMarker(out, TAG_FIBINFO);
+    out.writeFloat(birthTime());
+    out.writeFloat(chiasma());
+    out.writeFloat(0.0);
+    out.writeFloat(0.0);
+#endif
 #if FIBER_HAS_LATTICE
     /*
      We can save the occupancy Lattice here, but this is not necessary
@@ -1883,6 +1900,13 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
     }
 #endif
+    else if ( tag == TAG_FIBINFO )
+    {
+        birthTime(in.readFloat());
+        chiasma(in.readFloat());
+        in.readFloat();
+        in.readFloat();
+    }
     else
         Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'\n";
 }

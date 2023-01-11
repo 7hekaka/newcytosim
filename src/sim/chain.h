@@ -17,9 +17,6 @@ class Glossary;
 /// include a normal used for fancy display of fibers as helices
 #define FIBER_HAS_NORMAL 0
 
-/// record birth time of fibers, used for display mostly
-#define FIBER_HAS_BIRTHTIME 0
-
 // enable compact storage of filaments based on Euler angle (23/06/2021)
 /** This makes the trajectory files smaller, at the expense of precision
  This option is normally not desired, expect to compress old simulations files */
@@ -94,10 +91,6 @@ private:
     /// abscissa of the plus-end (equal to length initially)
     real fnAbscissaP;
     
-#if FIBER_HAS_BIRTHTIME
-    /// simulation time when initialized
-    real fnBirthTime;
-#endif
 #if CURVATURE_DEPENDENT_SEGMENTATION
     /// error due to the cutting at different steps
     real autoCutVal;
@@ -213,31 +206,6 @@ public:
     
     /// Number of distance constraints applied to the movements of vertices
     size_t nbConstraints() const { return nPoints - 1; }
-#endif
-
-    //---------------------
-
-#if FIBER_HAS_BIRTHTIME
-    
-    /// returns simulation time at which Fiber was created
-    real birthTime() const { return fnBirthTime; }
-
-    /// set birth time
-    void birthTime(double t) { fnBirthTime = t; }
-
-    /// returns current age of the fiber
-    double age() const;
-#else
-    
-    /// set birth time
-    void birthTime(double) {}
-
-    /// returns simulation time at which Fiber was created
-    real birthTime() const { return 0; }
-
-    /// returns current age of the fiber
-    double age() const { return 0; }
-
 #endif
     
     //---------------------
