@@ -485,7 +485,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     real rad = pixscale(disp->line_width);
-#if NEW_SHAPED_FIBER
+#if NEW_FIBER_SILHOUETTE
     if ( fib.chiasma() > -1 ) rad = fib.silhouette(inx);
 #endif
     real iseg = fib.segmentationInv();

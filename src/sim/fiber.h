@@ -307,7 +307,7 @@ public:
     /// register a chewing quantity
     void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
 #endif
-#if NEW_SHAPED_FIBER
+#if NEW_FIBER_SILHOUETTE
     real chiasma_;
     
     /// return the radius of i-th segment (`i` in [0, n_points-2])

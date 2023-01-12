@@ -1,7 +1,7 @@
 % Arabidopsis taliana spindle
 % Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
 % F. Nedelec, Cambridge 12.11.2022, Sunny. 25.11.2022, Rainy; Fat Chromosomes: 31.12.2022
-% This relies on: NEW_SOLID_HAS_TWIN, NEW_SOLID_SOURCE, NEW_ANCHOR_NORMAL, NEW_SHAPED_FIBER
+% This relies on: NEW_SOLID_HAS_TWIN, NEW_SOLID_SOURCE, NEW_ANCHOR_NORMAL, NEW_FIBER_SILHOUETTE
 
 set simul system
 {

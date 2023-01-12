@@ -232,7 +232,7 @@ Fiber::Fiber(FiberProp const* p)
     fChewM = 0;
     fChewP = 0;
 #endif
-#if NEW_SHAPED_FIBER
+#if NEW_FIBER_SILHOUETTE
     chiasma_ = -1.0;
 #endif
 }
@@ -1780,7 +1780,7 @@ void Fiber::write(Outputter& out) const
     writeMarker(out, TAG_COMPACT);
     Chain::writeAngles(out);
 #endif
-#if FIBER_HAS_BIRTHTIME || NEW_SHAPED_FIBER
+#if FIBER_HAS_BIRTHTIME || NEW_FIBER_SILHOUETTE
     writeMarker(out, TAG_FIBINFO);
     out.writeFloat(birthTime());
     out.writeFloat(chiasma());

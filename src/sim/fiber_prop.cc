@@ -278,7 +278,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
             fib->mesh().clear(val);
     }
 #endif
-#if NEW_SHAPED_FIBER
+#if NEW_FIBER_SILHOUETTE
     if ( opt.set(fib->chiasma_, "chiasma") )
     {
         fib->chiasma_ /= fib->length();
