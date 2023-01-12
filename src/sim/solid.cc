@@ -1593,28 +1593,46 @@ void Solid::write(Outputter& out) const
         out.writeSoftSpace();
         out.writeFloat(soRadius[p]);
     }
+#if NEW_SOLID_HAS_TWIN
+    writeMarker(out, TAG_SOLINFO);
+    if ( soTwin )
+        out.writeUInt32(soTwin->identity());
+    else
+        out.writeUInt32(0);
+    out.writeFloat(0.0);
+#endif
 }
 
 
-void Solid::read(Inputter& in, Simul&, ObjectTag)
+void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    try
+    if ( tag == TAG )
     {
-        size_t nbp = in.readUInt16();
-        setNbPoints(nbp);
-        for ( size_t i = 0; i < nbp ; ++i )
+        try
         {
-            in.readFloats(pPos+DIM*i, DIM);
-            soRadius[i] = in.readFloat();
+            size_t nbp = in.readUInt16();
+            setNbPoints(nbp);
+            for ( size_t i = 0; i < nbp ; ++i )
+            {
+                in.readFloats(pPos+DIM*i, DIM);
+                soRadius[i] = in.readFloat();
+            }
         }
+        catch( Exception & e )
+        {
+            clearPoints();
+            throw;
+        }
+        fixShape();
     }
-    catch( Exception & e )
+    else if ( tag == TAG_SOLINFO )
     {
-        clearPoints();
-        throw;
+        ObjectID id = in.readUInt32();
+        in.readFloat();
+#if NEW_SOLID_HAS_TWIN
+        soTwin = sim.solids.findID(id);
+#endif
     }
-    
-    fixShape();
 }
 
 

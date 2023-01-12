@@ -250,6 +250,9 @@ public:
     /// a unique character identifying the class
     static const ObjectTag TAG = 'd';
     
+    /// a unique character identifying the class
+    static const ObjectTag TAG_SOLINFO = 'D';
+
     /// return unique character identifying the class
     ObjectTag tag() const { return TAG; }
     
