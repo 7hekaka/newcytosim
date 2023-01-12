@@ -379,18 +379,19 @@ bool valid_value(const int c)
 int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
 {
     // skip spaces, but do not eat lines
-    int c = Tokenizer::get_character(is);
+    char c = Tokenizer::get_character(is);
+    char d = Tokenizer::block_delimiter(c);
     bool delimited = 0;
     
     std::string k;
-    if ( Tokenizer::block_delimiter(c) )
+    if ( d )
     {
         delimited = true;
-        k = Tokenizer::get_block_text(is, 0, Tokenizer::block_delimiter(c));
+        k = Tokenizer::get_block_text(is, 0, d);
         if ( c != '(' )
         {
-            k.insert(k.begin(), (char)c);
-            k.push_back(Tokenizer::block_delimiter(c));
+            k.insert(k.begin(), c);
+            k.push_back(d);
         }
         c = Tokenizer::get_character(is);
    }
