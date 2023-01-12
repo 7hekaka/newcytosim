@@ -69,11 +69,11 @@ public:
     /// the volume of the bead
     real radiusSqr() const { return paRadius * paRadius; }
     
+    /// the volume of the Bead
+    real volume() const { return ((M_PI*4.0/3.0) * paRadius) * (paRadius * paRadius); }
+
     /// set the radius of the Bead
     void resize(real R) { assert_true(R>0); paRadius = R; }
-    
-    /// the volume of the bead
-    real volume() const;
     
     //--------------------------------------------------------------------------
     
