@@ -233,7 +233,7 @@ Fiber::Fiber(FiberProp const* p)
     fChewP = 0;
 #endif
 #if NEW_SHAPED_FIBER
-    chiasma_ = 0.5;
+    chiasma_ = -1.0;
 #endif
 }
 

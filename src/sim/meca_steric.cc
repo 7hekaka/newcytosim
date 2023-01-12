@@ -101,7 +101,7 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
     for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
     {
 #if NEW_SHAPED_FIBER
-        if ( F->prop->steric == 2 )
+        if ( F->chiasma() > -1 )
         {
             /* With this option, the steric radius of the fiber may vary,
              as specified by Fiber::silhouette() */
