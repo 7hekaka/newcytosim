@@ -8,7 +8,7 @@
 /**
  Buddy implements mutual relationship between objects.
  
- The class is used to keep track of a circle of `buddies` using a single-linked list.
+ The class is used to record a circle of `buddies` using a single-linked list.
  Relationship is established with connect().
  When an object is destroyed, it calls goodbye() for all its buddies.
  

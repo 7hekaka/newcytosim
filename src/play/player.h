@@ -137,7 +137,7 @@ public:
 
     
     /// set View::focus and quat to match the center of gravity of the Fibers
-    void autoTrack(FiberSet const&, View&) const;
+    void autoFocus(Simul const&, View&) const;
     
     /// adjust the viewing area
     void autoScale(SpaceSet const&, View&) const;

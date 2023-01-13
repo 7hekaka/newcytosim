@@ -42,7 +42,7 @@ public:
     /// the point that is in the center of the window in real-world coordinates
     Vector3 focus;
     
-    /// additional translation used by autoTrack
+    /// additional translation used by autoFocus()
     Vector3 focus_shift;
     
     /// orientation of display

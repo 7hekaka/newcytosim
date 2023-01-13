@@ -151,22 +151,23 @@ std::string Player::buildMemo(int type) const
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
-void Player::autoTrack(FiberSet const& fibers, View& view) const
+void Player::autoFocus(Simul const& sim, View& view) const
 {
+    unsigned mode = view.track_fibers;
     real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     
-    if ( view.track_fibers & 1 )
+    if ( mode & 1 )
     {
         Vector M, G, P;
-        FiberSet::infoPosition(fibers.collect(), M, G, P);
+        FiberSet::infoPosition(sim.fibers.collect(), M, G, P);
         view.move_shift(Vector3(G));
         //std::clog << "auto center: " << G << '\n';
     }
     
-    if ( view.track_fibers & 2 )
+    if ( mode & 2 )
     {
         // align with mean nematic direction
-        real S = FiberSet::infoNematic(fibers.collect(), vec);
+        real S = FiberSet::infoNematic(sim.fibers.collect(), vec);
         view.align_with(Vector3(vec));
         flashText("Nematic order S = %5.3f", S);
         //view.rotation.setFromMatrix3(vec);
@@ -174,17 +175,31 @@ void Player::autoTrack(FiberSet const& fibers, View& view) const
         //std::clog << "auto rotate: " << Vector3(vec) << '\n';
     }
 
-    if ( view.track_fibers & 4 )
+    if ( mode & 4 )
     {
         real sum = 0;
         real avg[3] = { 0 };
         real mom[9] = { 0 };
-        FiberSet::infoComponents(fibers.collect(), sum, avg, mom, vec);
+        FiberSet::infoComponents(sim.fibers.collect(), sum, avg, mom, vec);
         // get rotation from matrix:
         view.rotation.setFromMatrix3(vec);
         // inverse rotation:
         view.rotation.conjugate();
         //std::clog << "auto quat: " << view.rotation << '\n';
+    }
+
+    if ( mode & 8 )
+    {
+        // track position of Solid (kinetochores)
+        Vector pos(0,0,0);
+        for ( Solid const* B=sim.solids.first(); B; B=B->next() )
+            pos += B->position();
+        size_t cnt = sim.solids.size();
+        if ( cnt )
+        {
+            pos /= cnt;
+            view.move_shift(pos);
+        }
     }
 }
 
@@ -239,7 +254,7 @@ void Player::prepareDisplay(View& view)
     //-------- auto-track:
     
     if ( view.track_fibers )
-        autoTrack(simul.fibers, view);
+        autoFocus(simul, view);
     
     //-------- texts:
     

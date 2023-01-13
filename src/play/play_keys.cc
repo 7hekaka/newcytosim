@@ -979,7 +979,10 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
 
         case 't':
-            view.track_fibers ^= 1;
+            if ( altKeyDown )
+                view.track_fibers ^= 8;
+            else
+                view.track_fibers ^= 1;
             flashText("view.track_fibers = %i (translation)", view.track_fibers);
             break;
             
