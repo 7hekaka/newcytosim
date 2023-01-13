@@ -196,10 +196,7 @@ void Player::autoFocus(Simul const& sim, View& view) const
             pos += B->position();
         size_t cnt = sim.solids.size();
         if ( cnt )
-        {
-            pos /= cnt;
-            view.move_shift(pos);
-        }
+            view.move_shift(Vector3(pos)*(1.0/cnt));
     }
 }
 
