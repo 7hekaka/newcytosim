@@ -167,7 +167,7 @@ public:
     void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)()) const;
     
     /// draw a fine spherical object
-    void drawBallT(Vector const&, real radius, gym_color const&) const;
+    void drawBallT(Vector const&, real radius, gym_color const&, bool mark) const;
     
     /// draw a fine spherical object
     void drawDiscT(Vector const&, real radius, gym_color const&) const;
@@ -266,9 +266,6 @@ public:
     
     /// draw translucent elements of a Solid
     void drawSolidT(Solid const&, size_t) const;
-    
-    /// draw football for one sphere of a Solid
-    void drawFootball(Solid const&, size_t, gym_color, bool flip);
 
     /// draw the Solids
     void drawSolids(SolidSet const&);

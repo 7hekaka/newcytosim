@@ -109,7 +109,7 @@ void gym::rotateInverse(Vector3 const& A, Vector3 const& B, Vector3 const& C)
 }
 
 
-// translate to center T and rotate
+// translate to center T and rotate to align with axes A, B, C
 void gym::transRotate(Vector3 const& T, Vector3 const& A,
                       Vector3 const& B, Vector3 const& C)
 {

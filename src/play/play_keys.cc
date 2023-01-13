@@ -39,6 +39,12 @@ static void changeStyle(PointDisp * p, int)
     flashText("%s:style = %i", p->name_str(), p->style);
 }
 
+static void changeColoring(PointDisp* p)
+{
+    p->coloring = ( p->coloring + 1 ) % 3;
+    flashText("%s:coloring = %i", p->name_str(), p->coloring);
+}
+
 static void setSize(PointDisp * p, float s)
 {
     if ( s >= 0.5 )

@@ -116,12 +116,17 @@ void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*
 }
 
 
-void Display::drawBallT(Vector const& pos, real rad, gym_color const& col) const
+void Display::drawBallT(Vector const& pos, real rad, gym_color const& col, bool mark) const
 {
     gym::transScale(pos, rad);
-    gym::enableLighting();
+    //gym::enableLighting();
     gym::color_both(col);
     gle::dualPassSphere4();
+    if ( mark )
+    {
+        gym::color_front(0,0,0);
+        gle::footballPentagons();
+    }
 }
 
 
@@ -1778,11 +1783,28 @@ void Display::drawSolid(Solid const& obj)
     //display points:
     if (( disp->style & 4 ) && disp->perceptible )
     {
+        real rad = pixscale(disp->size);
         bodyColor(obj);
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), pixscale(disp->size), gle::hedron(obj.radius(i)>0));
+            drawObject(obj.posP(i), rad, gle::hedron(obj.radius(i)>0));
         gym::cleanup(1);
+
+#if NEW_SOLID_HAS_TWIN
+        // draw links between 'obj' and its Twin
+        rad /= 2;
+        const size_t inx = 0;
+        Solid const* twi = obj.twin();
+        if ( twi && obj.radius(inx) > 0 && obj.nbPoints() > inx + 3 )
+        {
+            gym::color(bodyColorF(obj));
+            for ( size_t i = inx+1; i <= inx+DIM; ++i )
+            {
+                gym::stretchAlignZ(obj.posPoint(i), twi->posPoint(i), rad);
+                gle::tube2();
+            }
+        }
+#endif
     }
     
     //display outline of spheres in 2D
@@ -1859,7 +1881,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         gym::enableClipPlane(5-i);
         gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
     }
-    drawBallT(X, obj.radius(inx), bodyColorF(obj));
+    drawBallT(X, obj.radius(inx), bodyColorF(obj), obj.mark());
     for ( size_t i = 0; i < num; ++i )
         gym::disableClipPlane(5-i);
 #else
@@ -1868,28 +1890,24 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
 }
 
 
-void Display::drawFootball(Solid const& obj, size_t inx, gym_color col, bool flip)
+static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color bak, bool flip)
 {
     Vector X = obj.posP(inx);
 #if ( DIM >= 3 )
-    gym::transRotate(X, obj.posP(inx+1)-X, obj.posP(inx+2)-X, obj.posP(inx+3)-X);
+    Vector A = obj.posP(inx+1) - X;
+    Vector B = obj.posP(inx+2) - X;
+    Vector C = obj.posP(inx+3) - X;
+    gym::transRotate(X, A, B, C);
+    //flip = ( dot(cross(A,B), C) < 0 );
 #else
     gym::transScale(X, obj.radius(inx));
 #endif
-    if ( flip )
-    {
-        glFrontFace(GL_CW);
-        gle::sphere1();
-        gym::color_front(col);
-        gle::footballPentagons();
-        glFrontFace(GL_CCW);
-    }
-    else
-    {
-        gle::sphere1();
-        gym::color_front(col);
-        gle::footballPentagons();
-    }
+    if ( flip ) glFrontFace(GL_CW);
+    gym::color_front(col);
+    gle::sphere1();
+    gym::color_front(bak);
+    gle::footballPentagons();
+    if ( flip ) glFrontFace(GL_CCW);
 }
 
 
@@ -1903,29 +1921,17 @@ void Display::drawSolids(SolidSet const& set)
             drawSolid(*obj);
 #if ( DIM >= 3 )
 #if NEW_SOLID_HAS_TWIN
-            size_t inx = 0;
-            Solid const* tw = obj->twin();
-            if ( tw && obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
+            const size_t inx = 0;
+            Solid const* twi = obj->twin();
+            if ( twi && obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
             {
-                real len = std::sqrt(obj->twinTensionSqr());
                 gym::enableLighting();
-                gym_color col = gym_color::dark_jet_color(disp->scale * len);
-                gym::color_back(disp->color2);
-                gym::color_front(disp->color, 1.0);
-                drawFootball(*obj, inx, col, true);
-                gym::color_front(disp->color, 1.0);
-                drawFootball(*obj->twin(), inx, col, 0);
-                if ( disp->style & 4 )
-                {
-                    //draw links between 'obj' and Twin
-                    bodyColor(*obj);
-                    real rad = 0.5 * pixscale(disp->size);
-                    for ( size_t i = inx+1; i <= inx+DIM; ++i )
-                    {
-                        gym::stretchAlignZ(obj->posPoint(i), tw->posPoint(i), rad);
-                        gle::tube2();
-                    }
-                }
+                //real len = std::sqrt(obj->twinTensionSqr());
+                //gym_color col = gym_color::dark_jet_color(disp->scale * len);
+                gym_color col = bodyColorF(*obj);
+                gym_color black(0,0,0,1);
+                drawFootball(*obj, inx, col, black, true);
+                drawFootball(*twi, inx, col, black, false);
             }
             else
 #endif
@@ -1983,10 +1989,11 @@ void Display::drawBeadT(Bead const& obj) const
     
     if ( disp->style & 1 )
     {
+        gym_color col = bodyColorF(obj);
 #if ( DIM > 2 )
-        drawBallT(obj.position(), obj.radius(), bodyColorF(obj));
+        drawBallT(obj.position(), obj.radius(), col, obj.mark());
 #else
-        drawDiscT(obj.position(), obj.radius(), bodyColorF(obj));
+        drawDiscT(obj.position(), obj.radius(), col);
 #endif
     }
 }
@@ -1994,6 +2001,7 @@ void Display::drawBeadT(Bead const& obj) const
 
 void Display::drawBeads(BeadSet const& set)
 {
+    gym::enableLighting();
     for ( Bead * obj = set.first(); obj; obj=obj->next() )
     {
         if ( obj->prop->disp->visible )
@@ -2209,6 +2217,7 @@ void Display::drawTransparentObjects(Array<zObject>& list)
     // depth-sort objects:
     list.sort(compareZObject);
 
+    gym::enableLighting();
     for ( zObject const& i : list )
         i.draw(this);
 }
