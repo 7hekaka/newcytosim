@@ -4,6 +4,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <signal.h>
+#include <fstream>
 
 #include "vector.h"
 #include "single.h"
@@ -505,9 +506,9 @@ void SimThread::exportObjects(bool binary)
     lock();
     try {
         char str[64] = { '\0' };
-        
         snprintf(str, sizeof(str), "properties%04li.cmp", reader_.currentFrame());
-        sim_->writeProperties(str, true);
+        std::ofstream ofs(str);
+        sim_->writeProperties(ofs, true);
         
         snprintf(str, sizeof(str), "objects%04li.cmo", reader_.currentFrame());
         sim_->writeObjects(str, false, binary);

@@ -745,20 +745,9 @@ void Simul::writeProperties(std::ostream& os, const bool prune) const
 {
     //std::clog << "Writing properties" << '\n';
     os << "% Cytosim property file, pid " << getpid() << '\n';
-    os << "% " << TimeDate::date_string() << '\n';
 
     prop.write(os, prune);
     properties.write(os, prune);
-}
-
-
-/**
- Save properties to a file
- */
-void Simul::writeProperties(char const* name, bool prune) const
-{
-    std::ofstream os(name);
-    writeProperties(os, prune);
 }
 
 
@@ -778,10 +767,11 @@ void Simul::writeProperties(bool prune) const
         properties_saved = oss.str();
         // use default property file name
         std::string name = prop.property_file.c_str();
-        std::ofstream os(name);
+        std::ofstream ofs(name);
         //this should be equivalent to: writeProperties(os, prune);
-        os << properties_saved << std::endl;
-        //std::clog << "Saved properties at frame " << currentFrame() << '\n';
+        ofs << "% " << TimeDate::date_string() << '\n';
+        ofs << properties_saved << '\n';
+        //std::clog << "Saved properties at " << time() << "s\n";
     }
 }
 
