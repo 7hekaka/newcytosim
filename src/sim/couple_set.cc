@@ -129,7 +129,7 @@ void CoupleSet::step()
 
 /**
  This version does not simulate the attachment of free Hand, and hence calls
- specialized versions of Couple::step() that do not include Hand::stepUnattached():
+ specialized versions of Couple::step() that do not perform attachment:
  either stepHand1(), stepHand2() or stepAA().
  Couple::stepFF() is never called.
  

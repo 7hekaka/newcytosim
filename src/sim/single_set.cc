@@ -102,7 +102,7 @@ void SingleSet::step()
 
 /**
  This version does not simulate the attachment of free Hand, and hence skips
- Single::stepF() that calls Hand::stepUnattached().
+ Single::stepF() that performs attachment
 
  This is only used if POOL_UNATTACHED > 1
 */
