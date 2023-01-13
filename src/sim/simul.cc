@@ -359,6 +359,7 @@ ObjectSet * Simul::findSet(const std::string& cat)
  */
 ObjectSet * Simul::findSetT(const ObjectTag tag)
 {
+    assert_true(islower(tag));
     switch( tag )
     {
         case        Couple::TAG: return &couples;
@@ -366,11 +367,7 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case        Single::TAG: return &singles;
         case  Single::TAG_WRIST: return &singles;
         case         Fiber::TAG: return &fibers;
-        case Fiber::TAG_FIBINFO: return &fibers;
         case Fiber::TAG_COMPACT: return &fibers;
-        case Fiber::TAG_DYNAMIC: return &fibers;
-        case Fiber::TAG_LATTICE: return &fibers;
-        case Fiber::TAG_FIBMESH: return &fibers;
 #if BACKWARD_COMPATIBILITY < 57
         case 'l': return &fibers; // TAG_LATTICE before 23/06/2021
         case 'L': return &fibers; // TAG_FIBMESH before 23/06/2021

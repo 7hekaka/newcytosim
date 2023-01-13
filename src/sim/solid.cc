@@ -1598,7 +1598,7 @@ void Solid::write(Outputter& out) const
         out.writeFloat(soRadius[p]);
     }
 #if NEW_SOLID_HAS_TWIN
-    writeMarker(out, TAG_SOLINFO);
+    writeMarker(out, TAG_SOLID);
     if ( soTwin )
         out.writeUInt32(soTwin->identity());
     else
@@ -1629,7 +1629,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
         fixShape();
     }
-    else if ( tag == TAG_SOLINFO )
+    else if ( tag == TAG_SOLID )
     {
         ObjectID id = in.readUInt32();
         in.readFloat();

@@ -39,7 +39,7 @@ static void changeStyle(PointDisp * p, int)
     flashText("%s:style = %i", p->name_str(), p->style);
 }
 
-static void changeColoring(PointDisp* p)
+static void changeColoring(PointDisp* p, int)
 {
     p->coloring = ( p->coloring + 1 ) % 3;
     flashText("%s:coloring = %i", p->name_str(), p->coloring);
@@ -1043,7 +1043,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
                 
         case 'C':
-            setFiberDisp(player.allVisibleFiberDisp(), setColoring, 1);
+            setPointDisp(player.allVisibleSphereDisp(), changeColoring, 1);
             break;
 
         case 167:
