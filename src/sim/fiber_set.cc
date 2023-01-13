@@ -1017,11 +1017,11 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
 
 
 /**
- Return the principal component directions of the cloud of vertices.
+ Calculates the principal component directions of the cloud of vertices.
  Each fiber is weighted by its length.
  
- @return G = average center of gravity
- @return `mom`, a 9-elements matrix containing the moments in its lower part:
+ @set avg[] = average center of gravity
+ @set mom[], a 9-elements matrix containing the moments in its lower part:
  - mom[0] = sum( ( X - mean(X) ) * ( X - mean(X) ) ) / S
  - mom[1] = sum( ( X - mean(X) ) * ( Y - mean(Y) ) ) / S
  - mom[2] = sum( ( X - mean(X) ) * ( Z - mean(Z) ) ) / S
@@ -1030,7 +1030,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
  - mom[8] = sum( ( Z - mean(Z) ) * ( Z - mean(Z) ) ) / S
  .
  
- @return `res`, a 9-elements matrix containing the first two principal component vectors
+ @set res[], a 9-elements matrix containing the first two principal component vectors
  
  if DIM == 2:
    Component 1 is { vec[0], vec[1] }
@@ -1038,6 +1038,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
    Component 1 is { vec[0], vec[1], vec[2] }
    Component 2 is { vec[3], vec[4], vec[5] }
  
+ @return 0 if everything proceeded without error
  */
 int FiberSet::infoComponents(ObjectList const& objs,
                              real& sum, real avg[3], real mom[9], real res[9])
@@ -1076,7 +1077,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
     }
     
     if ( sum == 0 )
-        return 0;
+        return 1;
     
     /**
      Remove the mean:
@@ -1113,7 +1114,8 @@ int FiberSet::infoComponents(ObjectList const& objs,
     // calculate two largest eigenvalues in 3D, one in 2D:
     lapack::xsyevx('V','I','L', DIM, M, 3, 0, 0, 2, DIM, REAL_EPSILON,
                    &nbv, val, vec, 3, work, 32, iwork, ifail, &info);
-    
+    //VecPrint::full(3, 3, vec);
+
 #if ( DIM > 2 )
     real u = sign_real(vec[3]);
     real v = sign_real(vec[0]);
@@ -1141,10 +1143,9 @@ int FiberSet::infoComponents(ObjectList const& objs,
     res[7] =  0;
     res[8] =  1;
 #endif
-
-    //VecPrint::full(3, 3, vec);
-    
-    return ( info == 0  &&  nbv == DIM-1 );
+    if ( nbv != DIM-1 )
+        return 2;
+    return info;
 }
 
 
