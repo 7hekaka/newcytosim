@@ -1003,9 +1003,11 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     }
     
     VLOG("+RUN START " << sec);
-    int max = std::max(frames, 1);
+    double tau = sim_->time_step();
+    // limit to one frame per time_step:
+    int max = std::max(std::min(frames, (int)std::round(sec/tau)), 1);
     // subtract half a time_step, to ensure we finish exactly on time!
-    double start = sim_->time() - 0.5 * sim_->time_step();
+    double start = sim_->time() - 0.5 * tau;
     double delta = sec / double(max);
     
     for ( int frm = 1; frm <= max; ++frm )
