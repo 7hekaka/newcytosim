@@ -227,14 +227,14 @@ void Mecable::rotate(Rotation const& T)
 //------------------------------------------------------------------------------
 #pragma mark - Export/Inport
 
-/** Assuming that ptr[] is rightfully allocated! */
+/** Assuming that pts[] is rightfully allocated! */
 void Mecable::putPoints(real * pts) const
 {
     copy_real(DIM*nPoints, pPos, pts);
 }
 
 
-/** Assuming that ptr[] is rightfully allocated! */
+/** Assuming that pts[] is rightfully allocated! */
 void Mecable::getPoints(const real * pts)
 {
     copy_real(DIM*nPoints, pts, pPos);

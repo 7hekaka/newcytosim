@@ -72,12 +72,11 @@ public:
     /// rotate Object around the Origin
     virtual void rotate(Rotation const&) { ABORT_NOW("Movable::rotate() called for immobile Object"); }
 
-    /// translate Object by applying rotation around the Origin
-    void rotateT(Rotation const& R)
+    /// return translation derived from applying rotation around the Origin
+    Vector translation(Rotation const& R) const
     {
-        assert_true( mobile() == 1 );
         Vector pos = position();
-        translate(R*pos-pos);
+        return R * pos - pos;
     }
 
     /// rotate Object around its current position, using translate() and rotate()
@@ -94,7 +93,7 @@ public:
     {
         switch ( mobile() )
         {
-            case 1: rotateT(iso); translate(iso); break;
+            case 1: translate(iso.mov+translation(iso.rot)); break;
             case 2: rotate(iso); break;
             case 3: rotate(iso); translate(iso); break;
         }

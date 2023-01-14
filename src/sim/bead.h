@@ -49,6 +49,9 @@ public:
     
     //--------------------------------------------------------------------------
     
+    /// Bead only accepts translation
+    int mobile() const { return 1; }
+
     /// return the position in space of the object
     Vector pos() const { return Vector(pPos); }
 
