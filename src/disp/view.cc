@@ -569,42 +569,49 @@ void View::loadView() const
  */
 void View::sliceView(int mode) const
 {
-    real off = 0;//view_scale * 0.5;
+    real off = 0.5;
     switch ( mode )
     {
         case 1: {
             gym::ref_view();
             Vector3 V = depthAxis();
-            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, off);
         } break;
         case 2: {
             gym::ref_view();
-            Vector3 V = depthAxis();
-            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
-            if ( !depth_clamp )
-                setFog(3, 2, fog_color);
+            Vector3 V = -depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, off);
+            setFog(1, 1, fog_color);
         } break;
         case 3: {
             gym::ref_view();
-            Vector3 V = -depthAxis();
-            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
-            setFog(1, 1, fog_color);
+            Vector3 V = depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, off);
+            if ( !depth_clamp )
+                setFog(3, 2, fog_color);
         } break;
         case 4: {
-            real thk = view_scale * 0.01;
+            real thk = view_scale * 0.1;
             gym::ref_view();
             Vector3 V = -depthAxis();
-            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk-off);
-            gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk+off);
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk);
+            gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk);
         } break;
-        case 5: {  // this is equivalent to mode 1
+        case 5: {
+            real thk = view_scale * 0.02;
             gym::ref_view();
             Vector3 V = -depthAxis();
-            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk);
+            gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk);
         } break;
-        case 6: {
+        case 6: {  // this is equivalent to mode 1
             gym::ref_view();
             Vector3 V = depthAxis();
+            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
+        } break;
+        case 7: {
+            gym::ref_view();
+            Vector3 V = -depthAxis();
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
         } break;
     }

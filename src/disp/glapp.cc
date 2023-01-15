@@ -441,7 +441,7 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
         case 'v':
             if ( mDIM == 3 )
             {
-                view.slice = ( view.slice + 1 ) % 5;
+                view.slice = ( view.slice + 1 ) % 8;
                 flashText("view:slice = %i", view.slice);
             }
             break;
