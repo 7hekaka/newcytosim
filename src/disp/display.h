@@ -167,7 +167,7 @@ public:
     void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)()) const;
     
     /// draw a fine spherical object
-    void drawBallT(Vector const&, real radius, gym_color const&, bool mark) const;
+    void drawBallT(Vector const&, real radius, gym_color const&, unsigned mark) const;
     
     /// draw a fine spherical object
     void drawDiscT(Vector const&, real radius, gym_color const&) const;

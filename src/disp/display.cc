@@ -116,7 +116,7 @@ void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*
 }
 
 
-void Display::drawBallT(Vector const& pos, real rad, gym_color const& col, bool mark) const
+void Display::drawBallT(Vector const& pos, real rad, gym_color const& col, unsigned mark) const
 {
     gym::transScale(pos, rad);
     //gym::enableLighting();
