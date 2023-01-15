@@ -34,6 +34,12 @@ void Player::clear()
     mDisplay = nullptr;
 }
 
+void Player::refresh()
+{
+    simul.fresh_ = 1;
+    glApp::postRedisplay();
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - I/O
 
@@ -94,7 +100,7 @@ void Player::rewind()
         stop();
         worker.rewindFile();
         worker.loadFrame(0);
-        glApp::postRedisplay();
+        refresh();
     }
 }
 

@@ -59,6 +59,9 @@ public:
     /// cleanup
     void clear();
 
+    /// ask to redraw the scene
+    void refresh();
+
     /// return all Fiber FiberDisp
     PropertyList allFiberDisp() const;
    

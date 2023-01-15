@@ -1178,6 +1178,7 @@ void processKey(unsigned char key, int modifiers = 0)
     }
     
     // if break was called, redraw the scene:
+    simul.fresh_ = 1;
     glApp::displayMain();
 }
 

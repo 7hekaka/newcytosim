@@ -42,7 +42,7 @@ static void processMenuFiber(int item)
                 std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
                 return;
         }
-        glApp::postRedisplay();
+        player.refresh();
     }
 }
 
@@ -100,7 +100,7 @@ static void processMenuCouple(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
-    glApp::postRedisplay();
+    player.refresh();
 }
 
 static int buildMenuCouple()
@@ -138,7 +138,7 @@ static void processMenuDisplay(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
-    glApp::postRedisplay();
+    player.refresh();
 }
 
 
@@ -200,7 +200,7 @@ static void processMenuFiberSelect(int item)
                 std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
                 return;
         }
-        glApp::postRedisplay();
+        player.refresh();
     }
 }
 
@@ -237,7 +237,7 @@ static void processMenuCoupleSelect(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
-    glApp::postRedisplay();
+    player.refresh();
 }
 
 static int buildMenuCoupleSelect()
@@ -269,7 +269,7 @@ static void processMenuSingleSelect(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
-    glApp::postRedisplay();
+    player.refresh();
 }
 
 static int buildMenuSingleSelect()
@@ -361,7 +361,7 @@ static void processMenuReplay(int item)
             std::cerr << "CYTOSIM ERROR: unknown menu code" << item << '\n';
             return;
     }
-    glApp::postRedisplay();
+    player.refresh();
 }
 
 static int buildMenuReplay()
