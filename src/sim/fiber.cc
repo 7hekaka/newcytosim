@@ -113,7 +113,7 @@ void Fiber::step(real addM, real addP, bool split)
     cDeltaM = 0;
     cDeltaP = 0;
     
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     if ( split )
     {
         if ( fChewM > 0 )
@@ -228,7 +228,7 @@ Fiber::Fiber(FiberProp const* p)
     sister_ = nullptr;
     brother_ = nullptr;
 #endif
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     fChewM = 0;
     fChewP = 0;
 #endif

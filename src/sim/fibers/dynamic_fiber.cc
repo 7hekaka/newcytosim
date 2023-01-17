@@ -80,7 +80,7 @@ int DynamicFiber::stepMinusEnd()
 	constexpr size_t M = 1;
 	int res = 0;
     
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     ///@todo implement smooth saturation using logistic function
     // convert chewing rate to stochastic off rate:
     real chewed = std::min(fChewM, prop()->max_chewing_speed_dt) / prop()->unit_length;
@@ -244,7 +244,7 @@ int DynamicFiber::stepPlusEnd()
     constexpr size_t P = 0;
     int res = 0;
     
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     ///@todo implement smooth saturation using logistic function
     // convert chewing rate to stochastic off rate:
     real chewed = std::min(fChewP, prop()->max_chewing_speed_dt) / prop()->unit_length;

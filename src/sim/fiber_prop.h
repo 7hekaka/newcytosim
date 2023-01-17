@@ -20,7 +20,7 @@ class Space;
 #define OLD_DYNAMIC_ZONE     0
 #define OLD_SQUEEZE_FORCE    0
 #define NEW_COLINEAR_FORCE   0
-#define NEW_FIBER_CHEW       0
+#define NEW_FIBER_END_CHEW   0
 #define NEW_FIBER_CONFINE2   0
 #define NEW_CONFINE_RANGE    0
 #define NEW_FIBER_END_FORCE  0
@@ -299,7 +299,7 @@ public:
      */
     real colinear_force;
 #endif
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     /// maximum speed of disassembly due to chewing (speed)
     real max_chewing_speed;
 #endif

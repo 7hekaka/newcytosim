@@ -353,7 +353,7 @@ void FiberProp::clear()
 #if NEW_COLINEAR_FORCE
     colinear_force = 0;
 #endif
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     max_chewing_speed = 0;
 #endif
 #if NEW_FIBER_LOOP
@@ -528,7 +528,7 @@ void FiberProp::read(Glossary& glos)
 #if NEW_COLINEAR_FORCE
     glos.set(colinear_force, "colinear_force");
 #endif
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     glos.set(max_chewing_speed, "max_chewing_speed");
 #endif
 #if NEW_FIBER_LOOP
@@ -675,7 +675,7 @@ void FiberProp::complete(Simul const& sim)
     if ( drag_length <= 0 )
         throw InvalidParameter("fiber:drag_length must be > 0");
 
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     if ( max_chewing_speed < 0 )
         throw InvalidParameter("fiber:max_chewing_speed must be >= 0");
     max_chewing_speed_dt = max_chewing_speed * time_step(sim);
@@ -745,7 +745,7 @@ void FiberProp::write_values(std::ostream& os) const
 #if NEW_COLINEAR_FORCE
     write_value(os, "colinear_force",      colinear_force);
 #endif
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     write_value(os, "max_chewing_speed",   max_chewing_speed);
 #endif
 #if NEW_FIBER_LOOP

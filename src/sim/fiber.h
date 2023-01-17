@@ -123,7 +123,7 @@ private:
 
 protected:
     
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     /// stored chewing at the end
     real fChewM, fChewP;
 #endif
@@ -303,7 +303,7 @@ public:
     
     //--------------------------------------------------------------------------
 
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
     /// register a chewing quantity
     void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
 #endif

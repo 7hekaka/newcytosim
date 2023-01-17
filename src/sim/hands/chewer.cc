@@ -29,7 +29,7 @@ void Chewer::stepUnloaded()
     
     if ( engaged != NO_END )
     {
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
         hFiber->chew(prop->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
@@ -65,7 +65,7 @@ void Chewer::stepLoaded(Vector const& force)
     
     if ( engaged != NO_END )
     {
-#if NEW_FIBER_CHEW
+#if NEW_FIBER_END_CHEW
         hFiber->chew(prop->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
