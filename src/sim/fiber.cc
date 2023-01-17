@@ -997,7 +997,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             if ( spc->inside(pos) )
                 spc->setConfinement(pos, Mecapoint(this, L), meca, stiff);
         } break;
-#if NEW_FIBER_CONFINE_RANGE
+#if NEW_CONFINE_RANGE
         case CONFINE_RANGE:
         {
             // we use here the MINUS_END as a reference... which maybe problematic

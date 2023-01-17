@@ -17,14 +17,14 @@ class Space;
 
 
 /// compile switches to enable specialized features:
-#define OLD_DYNAMIC_ZONE        0
-#define OLD_SQUEEZE_FORCE       0
-#define NEW_COLINEAR_FORCE      0
-#define NEW_FIBER_CHEW          0
-#define NEW_FIBER_CONFINE2      0
-#define NEW_FIBER_CONFINE_RANGE 0
-#define NEW_END_FORCE           0
-#define NEW_FIBER_SILHOUETTE    0
+#define OLD_DYNAMIC_ZONE     0
+#define OLD_SQUEEZE_FORCE    0
+#define NEW_COLINEAR_FORCE   0
+#define NEW_FIBER_CHEW       0
+#define NEW_FIBER_CONFINE2   0
+#define NEW_CONFINE_RANGE    0
+#define NEW_END_FORCE        0
+#define NEW_FIBER_SILHOUETTE 0
 
 /// Property for a Fiber
 /**
@@ -247,7 +247,7 @@ public:
     /// name of space used for confinement (also known as `confine[2]`)
     std::string confine2_space;
 #endif
-#if NEW_FIBER_CONFINE_RANGE
+#if NEW_CONFINE_RANGE
     real confine_range[2];
 #endif
     

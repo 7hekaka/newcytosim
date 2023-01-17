@@ -13,7 +13,7 @@
 #include "fiber.h"
 
 /**
- This is virtualized to return a derived Fiber if appropriate
+ This is virtualized to return a derived Fiber from classes derived from FiberProp
  */
 Fiber* FiberProp::newFiber() const
 {
@@ -304,7 +304,7 @@ void FiberProp::clear()
     viscosity    = -1;
     drag_radius  = 0.0125;  // radius of a Microtubule
     drag_length  = 5;
-    drag_model   = false;
+    drag_model   = 0;
     drag_gap     = 0;
     
     binding_key  = ~0U;  //all bits at 1
@@ -334,7 +334,7 @@ void FiberProp::clear()
     confine2_space     = "first";
     confine2_space_ptr = nullptr;
 #endif
-#if NEW_FIBER_CONFINE_RANGE
+#if NEW_CONFINE_RANGE
     confine_range[0] = 0;
     confine_range[1] = INFINITY;
 #endif
@@ -448,7 +448,7 @@ void FiberProp::read(Glossary& glos)
                                   {"plus_end",  CONFINE_PLUS_END},
                                   {"minus_end", CONFINE_MINUS_END},
                                   {"both_ends", CONFINE_BOTH_ENDS},
-#if NEW_FIBER_CONFINE_RANGE
+#if NEW_CONFINE_RANGE
                                   {"range",     CONFINE_RANGE},
 #endif
                                   {"plus_out",  CONFINE_PLUS_OUT}});
@@ -485,7 +485,7 @@ void FiberProp::read(Glossary& glos)
     glos.set(confine2_stiff, 2, "confine2_stiffness");
     glos.set(confine2_space, "confine2_space");
 #endif
-#if NEW_FIBER_CONFINE_RANGE
+#if NEW_CONFINE_RANGE
     glos.set(confine_range, 2,   "confine_range");
 #endif
 
@@ -736,7 +736,7 @@ void FiberProp::write_values(std::ostream& os) const
 #if NEW_FIBER_CONFINE2
     write_value(os, "confine2", confine2, confine2_stiff[0], confine2_stiff[1], confine2_space);
 #endif
-#if NEW_FIBER_CONFINE_RANGE
+#if NEW_CONFINE_RANGE
     write_value(os, "confine_range",       confine_range, 2);
 #endif
     write_value(os, "steric",              steric, steric_radius, steric_range);
