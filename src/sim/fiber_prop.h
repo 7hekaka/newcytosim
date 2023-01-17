@@ -23,7 +23,7 @@ class Space;
 #define NEW_FIBER_CHEW       0
 #define NEW_FIBER_CONFINE2   0
 #define NEW_CONFINE_RANGE    0
-#define NEW_END_FORCE        0
+#define NEW_FIBER_END_FORCE  0
 #define NEW_FIBER_SILHOUETTE 0
 
 /// Property for a Fiber
@@ -322,7 +322,7 @@ public:
     real squeeze_range;
 #endif
     
-#if NEW_END_FORCE
+#if NEW_FIBER_END_FORCE
     /// the force vector added to an end of the fiber
     Vector end_force;
     /// the fiber end to which a force is added (set as end_force[1])

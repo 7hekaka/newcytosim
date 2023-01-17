@@ -1039,7 +1039,7 @@ void Fiber::setInteractions(Meca& meca) const
         }
     }
 #endif
-#if NEW_END_FORCE
+#if NEW_FIBER_END_FORCE
     switch( prop->end_force_mode )
     {
         case MINUS_END:
