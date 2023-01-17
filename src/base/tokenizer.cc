@@ -127,7 +127,7 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
     
     std::string res = get_stuff(is, valid_symbol);
     
-    VLOG("Tokenizer: SYMBOL |" << res << "|\n");
+    VLOG("Tokenizer:SYMBOL |" << res << "|\n");
     return res;
 }
 
@@ -547,7 +547,7 @@ std::string Tokenizer::get_token(std::istream& is)
 //------------------------------------------------------------------------------
 
 /**
- This will read a block, assuming that opening delimiter has been read already.
+ This will read a block, assuming that the opening delimiter has been read already.
  It will read characters until the given closing delimiter `c_out` is found.
  if `c_in` is not zero, the block is returned with `c_in` and `c_out` at the
  first and last positions.

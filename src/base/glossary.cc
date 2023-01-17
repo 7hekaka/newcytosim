@@ -387,19 +387,20 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
     if ( d )
     {
         delimited = true;
-        k = Tokenizer::get_block_text(is, 0, d);
-        if ( c != '(' )
-        {
-            k.insert(k.begin(), c);
-            k.push_back(d);
-        }
+        if ( c == '(' )
+            k = Tokenizer::get_block_text(is, 0, d); // parentheses are stripped
+        else
+            k = Tokenizer::get_block_text(is, c, d);
         c = Tokenizer::get_character(is);
-   }
+    }
     else
     {
-        while ( valid_value(c) )
+        while ( valid_value(c) || c == '(' )
         {
-            k.push_back(char(c));
+            if ( c == '(' )
+                k.append(Tokenizer::get_block_text(is, c, ')'));
+            else
+                k.push_back(char(c));
             c = is.get();
         }
     }

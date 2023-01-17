@@ -335,7 +335,7 @@ public:
     /// Calculate speeds for given forces: Y <- forces(X)
     /**
      The function calculates the 'legal' forces with constraints applied.
-     It may or may not scale by the object's mobility coefficient, and one may
+     It may or may not scale by the object's mobility coefficient, but one may
      derive the speeds in conjunction with `leftoverMobility()`:
      
          speed = leftoverMobility() * projectForces(forces)
