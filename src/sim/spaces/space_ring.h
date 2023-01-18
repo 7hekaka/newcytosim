@@ -20,9 +20,6 @@
  */
 class SpaceRing : public Space
 {    
-    /// apply a force directed towards the edge of the Space
-    static void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff, real len, real rad);
-
 private:
     
     /// half the length of the cylinder

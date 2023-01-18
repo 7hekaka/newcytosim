@@ -113,22 +113,9 @@ Vector SpaceRing::project(Vector const& W) const
  This applies a force directed to the surface of the cylinder
  */
 void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
-                               Meca& meca, real stiff, const real len, const real rad)
-{
-    if ( abs_real(pos.XX) > len )
-        meca.addPlaneClampX(mp, std::copysign(len, pos.XX), stiff);
-    
-    meca.addCylinderClampX(mp, rad, stiff);
-}
-
-
-/**
- This applies a force directed to the surface of the cylinder
- */
-void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
                                Meca& meca, real stiff) const
 {
-    setConfinement(pos, mp, meca, stiff, half_, radius_);
+    meca.addCylinderClampX(mp, radius_, stiff);
 }
 
 /**
@@ -137,7 +124,12 @@ void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
 void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
                                real rad, Meca& meca, real stiff) const
 {
-    setConfinement(pos, mp, meca, stiff, half_, radius_);
+    if ( radius_ > rad )
+        meca.addCylinderClampX(mp, radius_-rad, stiff);
+    else {
+        meca.addLineClamp(mp, Vector(pos.XX,0,0), Vector(1,0,0), stiff);
+        std::cerr << "object is too big to fit in SpaceRing\n";
+    }
 }
 
 //------------------------------------------------------------------------------
