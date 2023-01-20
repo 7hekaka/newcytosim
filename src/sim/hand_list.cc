@@ -4,6 +4,7 @@
 #include "hand_list.h"
 #include "hand_monitor.h"
 #include "hand.h"
+#include "blinksort.h"
 
 /**
 Link the hand at the front of the list.
@@ -78,11 +79,11 @@ void HandList::detachAll()
 }
 
 /// qsort function comparing Hand::abscissa()
-static int compareAbscissa(const void* A, const void* B)
+static int compareAbscissa(const Hand* A, const Hand* B)
 {
-    real a = (*static_cast<Hand *const*>(A))->abscissa();
-    real b = (*static_cast<Hand *const*>(B))->abscissa();
-    return ( a > b ) - ( b > a );
+    real a = A->abscissa();
+    real b = B->abscissa();
+    return ( a > b ) - ( a < b );
 }
 
 /**
@@ -92,35 +93,7 @@ static int compareAbscissa(const void* A, const void* B)
 void HandList::sort()
 {
     if ( haFront != haBack )
-    {
-        size_t cnt = count();
-        Hand ** tmp = new Hand*[cnt];
-        
-        size_t i = 0;
-        Hand * n = haFront;
-        
-        while ( n )
-        {
-            tmp[i++] = n;
-            n = n->next();
-        }
-        
-        qsort(tmp, cnt, sizeof(Hand*), compareAbscissa);
-        
-        n = tmp[0];
-        haFront = n;
-        n->prev(nullptr);
-        for ( i = 1; i < cnt; ++i )
-        {
-            n->next(tmp[i]);
-            tmp[i]->prev(n);
-            n = tmp[i];
-        }
-        n->next(nullptr);
-        haBack = n;
-        
-        delete[] tmp;
-    }
+        ::blinksort(haFront, haBack, compareAbscissa, haFront, haBack);
 }
 
 
