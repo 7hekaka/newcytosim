@@ -29,7 +29,7 @@ void SolidProp::clear()
     clamp_stiff  = 0;
     clamp_pos.reset();
 #endif
-#if NEW_SOLID_SOURCE
+#if NEW_SOLID_MAKE_COUPLE
     source_rate = 0;
     source_type = "none";
     source_prop = nullptr;
@@ -91,7 +91,7 @@ void SolidProp::read(Glossary& glos)
     if ( clamp_stiff < 0 )
         throw InvalidParameter("clamp[0] (stiffness) should be >= 0");
 #endif
-#if NEW_SOLID_SOURCE
+#if NEW_SOLID_MAKE_COUPLE
     glos.set(source_rate, "source");
     glos.set(source_type, "source", 1);
 #endif
@@ -134,7 +134,7 @@ void SolidProp::complete(Simul const& sim)
     if ( primed(sim) && steric && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
     
-#if NEW_SOLID_SOURCE
+#if NEW_SOLID_MAKE_COUPLE
     if ( source_type == "none" )
         source_prop = nullptr;
     else
@@ -161,7 +161,7 @@ void SolidProp::write_values(std::ostream& os) const
 #if NEW_SOLID_CLAMP
     write_value(os, "clamp", clamp_pos, clamp_stiff);
 #endif
-#if NEW_SOLID_SOURCE
+#if NEW_SOLID_MAKE_COUPLE
     write_value(os, "source", source_rate, source_type);
 #endif
 #if NEW_SOLID_HAS_TWIN

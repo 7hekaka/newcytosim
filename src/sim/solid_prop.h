@@ -19,7 +19,7 @@ class Space;
 #define NEW_SOLID_CLAMP 0
 
 /// new option to create Couple from Solid's spheres
-#define NEW_SOLID_SOURCE 0
+#define NEW_SOLID_MAKE_COUPLE 0
 
 /// option to create a mirror image of a Solid with 'new'
 #define NEW_SOLID_HAS_TWIN 0
@@ -99,7 +99,7 @@ public:
     real        clamp_stiff;
 #endif
     
-#if NEW_SOLID_SOURCE
+#if NEW_SOLID_MAKE_COUPLE
     /// rate
     real        source_rate;
     
@@ -123,7 +123,7 @@ public:
     /// parameters derived from string `display`
     PointDisp * disp;
     
-#if NEW_SOLID_SOURCE
+#if NEW_SOLID_MAKE_COUPLE
     /// rate
     real source_rate_dt;
     

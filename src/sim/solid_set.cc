@@ -12,7 +12,7 @@ void SolidSet::step()
     for ( Solid * S = first(); S; S=S->next() )
         S->step();
 #endif
-#if NEW_SOLID_SOURCE
+#if NEW_SOLID_MAKE_COUPLE
     static real nextCreation = RNG.exponential();
     for ( Solid * S = first(); S; S=S->next() )
     {
