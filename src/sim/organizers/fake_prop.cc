@@ -6,13 +6,13 @@
 
 void FakeProp::clear()
 {
-    stiffness  = -1;
+    stiffness = -1;
 }
 
 
 void FakeProp::read(Glossary& glos)
 {
-    glos.set(stiffness,   "stiffness");
+    glos.set(stiffness, "stiffness");
 }
 
 

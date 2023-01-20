@@ -24,14 +24,14 @@ public:
      */
 
     /// stiffness of links
-    real          stiffness;
+    real stiffness;
     
     /// @}
 
 public:
  
     /// constructor
-    NucleusProp(const std::string& n) : Property(n)  { clear(); }
+    NucleusProp(const std::string& n) : Property(n) { clear(); }
     
     /// destructor
     ~NucleusProp() { }

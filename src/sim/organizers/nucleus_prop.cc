@@ -12,7 +12,7 @@ void NucleusProp::clear()
 
 void NucleusProp::read(Glossary& glos)
 {
-    glos.set(stiffness,       "stiffness");
+    glos.set(stiffness, "stiffness");
 }
 
 
@@ -25,6 +25,6 @@ void NucleusProp::complete(Simul const& sim)
 
 void NucleusProp::write_values(std::ostream& os) const
 {
-    write_value(os, "stiffness",       stiffness);
+    write_value(os, "stiffness", stiffness);
 }
 

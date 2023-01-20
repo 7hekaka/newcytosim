@@ -24,7 +24,7 @@ public:
      */
     
     /// stiffness of assembly links
-    real          stiffness;
+    real stiffness;
     
     /// @}
 
