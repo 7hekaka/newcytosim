@@ -915,8 +915,15 @@ static int compareFibers(Object const* A, Object const* B)
 {
     real a = static_cast<Fiber const*>(A)->length();
     real b = static_cast<Fiber const*>(B)->length();
-    return ( a < b ) - ( a > b );
-    //return ( a > b ) - ( b > a );
+    return ( a < b ) - ( a > b ); //sort in decreasing length
+    //return ( a > b ) - ( a < b );
+}
+static int comp(void const* A, void const* B)
+{
+    real a = static_cast<Fiber const*>(A)->length();
+    real b = static_cast<Fiber const*>(B)->length();
+    return ( a < b ) - ( a > b ); //sort in decreasing length
+    //return ( a > b ) - ( a < b );
 }
 
 
@@ -925,9 +932,9 @@ static int compareFibers(Object const* A, Object const* B)
  */
 void Simul::reportFibersSorted(std::ostream& out, Property const* sel) const
 {
-    // sort fibers in the ObjectPool:
-    const_cast<Simul*>(this)->fibers.pool_.blinksort(compareFibers);
-
+    // sort fibers by decreasing length:
+    const_cast<FiberSet&>(fibers).pool_.blinksort(compareFibers);
+    
     out << COM << "class" << SEP << "identity" << SEP << "length";
     out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
     out << SEP << "cos" << SEP << "sin" << SEP << "organizer";

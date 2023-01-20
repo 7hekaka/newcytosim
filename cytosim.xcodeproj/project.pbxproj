@@ -754,6 +754,7 @@
 		BB97B7D720DE3B7E004D659C /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB98FE920B35F66300796DAE /* meca.h in Headers */ = {isa = PBXBuildFile; fileRef = BB98FE900B35F66300796DAE /* meca.h */; };
 		BB98FE930B35F66300796DAE /* meca.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB98FE910B35F66300796DAE /* meca.cc */; };
+		BB99CAEB2979EC9300172211 /* blinksort.h in Headers */ = {isa = PBXBuildFile; fileRef = BB99CAEA2979EC9300172211 /* blinksort.h */; };
 		BB9B5DE315429BF400C0B9B6 /* field.h in Headers */ = {isa = PBXBuildFile; fileRef = BB9B5DE215429BF400C0B9B6 /* field.h */; };
 		BB9B5E0D15429ED100C0B9B6 /* field.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB9B5E0C15429ED100C0B9B6 /* field.cc */; };
 		BB9D87A81E76BB0000DD0F00 /* test_matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E4E00E8EB4A60009F6D0 /* test_matrix.cc */; };
@@ -2053,6 +2054,7 @@
 		BB9771601F52D98200EB8C92 /* cymart.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = cymart.cc; sourceTree = "<group>"; };
 		BB98FE900B35F66300796DAE /* meca.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = meca.h; path = src/sim/meca.h; sourceTree = SOURCE_ROOT; };
 		BB98FE910B35F66300796DAE /* meca.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = meca.cc; path = src/sim/meca.cc; sourceTree = SOURCE_ROOT; };
+		BB99CAEA2979EC9300172211 /* blinksort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = blinksort.h; sourceTree = "<group>"; };
 		BB9A56010A74E9E40069E362 /* test_tesselator.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_tesselator.cc; path = src/test/test_tesselator.cc; sourceTree = SOURCE_ROOT; };
 		BB9B5DE215429BF400C0B9B6 /* field.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = field.h; sourceTree = "<group>"; };
 		BB9B5E0C15429ED100C0B9B6 /* field.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = field.cc; sourceTree = "<group>"; };
@@ -3070,6 +3072,7 @@
 		BB614DA105BE90330048FA70 /* misc */ = {
 			isa = PBXGroup;
 			children = (
+				BB99CAEA2979EC9300172211 /* blinksort.h */,
 				BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */,
 				BB7358A505B98DA3006956D5 /* smath.h */,
 				BB3205EF220DB5930098C439 /* evaluator.h */,
@@ -4325,6 +4328,7 @@
 				BB158A8628A65244008AFB22 /* simd_sse.h in Headers */,
 				BB9EC394209235CC00EF00E7 /* SFMT-params.h in Headers */,
 				BBDF9AA4228BFBD3005018BD /* xpttrf.h in Headers */,
+				BB99CAEB2979EC9300172211 /* blinksort.h in Headers */,
 				BB71917F0EF1CD9900CED9E2 /* random.h in Headers */,
 				BB7191800EF1CD9900CED9E2 /* sparmat.h in Headers */,
 				BB7191820EF1CD9900CED9E2 /* real.h in Headers */,

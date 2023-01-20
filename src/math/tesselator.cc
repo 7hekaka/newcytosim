@@ -202,11 +202,11 @@ struct VertexIZ
 
 
 /// qsort function comparing the Z component of two points
-static int compareVertexZ(const void * a, const void * b)
+static int compareVertexZ(const void * A, const void * B)
 {
-    float az = ((VertexIZ const*)(a))->val;
-    float bz = ((VertexIZ const*)(b))->val;
-    return ( az > bz ) - ( bz > az );
+    float a = ((VertexIZ const*)(A))->val;
+    float b = ((VertexIZ const*)(B))->val;
+    return ( a > b ) - ( a < b );
 }
 
 

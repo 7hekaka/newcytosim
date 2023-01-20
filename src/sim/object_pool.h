@@ -4,6 +4,7 @@
 #define OBJECT_POOL_H
 
 #include <stddef.h>
+#include "blinksort.h"
 class Object;
 
 /// Doubly linked list of Objects
@@ -80,12 +81,6 @@ public:
     /// import all objects from given list, emptying it
     void append(ObjectPool& list);
     
-    /// link `n` after already linked `p`
-    void push_after(Object * p, Object * n);
-    
-    /// link `n` before already linked `p`
-    void push_before(Object * p, Object * n);
-    
     /// Remove Object `n` from list
     void pop(Object * n);
     
@@ -101,18 +96,20 @@ public:
     /// delete all pool, clearing the list on the way
     void erase();
     
-    /// slowly sort according to given function
-    void bubblesort(int (*comp)(const Object*, const Object*));
+    /// sort according to given function
+    void mergesort(int (*comp)(const Object*, const Object*))
+    {
+        if ( frontO != backO )
+            ::mergesort(frontO, backO, comp);
+    }
     
     /// sort according to given function
-    void mergesort(int (*comp)(const Object*, const Object*));
-    
-    /// quicksort according to given function using std::qsort()
-    void quicksort(int (*comp)(const void*, const void*));
-    
-    /// sort according to given function
-    void blinksort(int (*comp)(const Object*, const Object*));
-    
+    void blinksort(int (*comp)(const Object*, const Object*))
+    {
+        if ( frontO != backO )
+            ::blinksort(frontO, backO, comp, frontO, backO);
+    }
+
     /// Rearrange the list by exchanging the portions before and after `p`
     void permute(Object *);
     
@@ -139,23 +136,6 @@ public:
 
     /// test coherence of list
     int bad() const;
-    
-private:
-    
-    /// move sublist
-    void move_behind(Object*&, Object*&, Object*, Object*);
-    
-    /// sort sublist
-    void blinksort(int (*comp)(const Object*, const Object*), Object*, Object*);
-    
-    /// split linked list roughly in two
-    static Object * split(Object*);
-    
-    /// merge two linked lists
-    static Object * merge(int (*comp)(const Object*, const Object*), Object *first, Object *second);
-    
-    /// sort according to given function
-    static Object * mergesort(int (*comp)(const Object*, const Object*), Object*);
 
 };
 
