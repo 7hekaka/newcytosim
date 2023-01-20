@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 #endif
     
     size_t frame = 0;
-    size_t period = 1;
+    size_t period = ~0UL;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
     if ( arg.use_key("-") ) arg.define("verbose", 0);
@@ -150,8 +150,7 @@ int main(int argc, char* argv[])
         reader.openFile(input);
         
         arg.set(frame, "frame");
-        if ( arg.set(period, "period") )
-            period = std::max(1UL, period);
+        arg.set(period, "period");
 
         if ( arg.set(str, "output") )
         {
@@ -208,7 +207,7 @@ int main(int argc, char* argv[])
             ++s;
         }
     }
-    else if ( period > 0 )
+    else if ( period != ~0UL )
     {
         // process every 'period' record:
         frame += period;
