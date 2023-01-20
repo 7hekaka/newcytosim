@@ -314,7 +314,9 @@ void FiberSet::step()
             fp->free_polymer = 0;
         }
     }
-
+#if NEW_FIBER_MAKE_COUPLE
+    static real nextCreation = RNG.exponential();
+#endif
     /*
      We call step() here exactly once for every Fiber.
      New Fiber may be created, for instance by Fiber::sever(), but they should
@@ -326,6 +328,19 @@ void FiberSet::step()
     {
         Fiber * nxt = obj->next();
         obj->step();
+#if NEW_FIBER_MAKE_COUPLE
+        real len = obj->length();
+        // creation rate is proportional to length:
+        nextCreation -= obj->prop->source_rate_dt * len;
+        while ( nextCreation <= 0 )
+        {
+            nextCreation += RNG.exponential();
+            Couple * C = obj->prop->source_prop->newCouple();
+            C->setPosition(obj->posM(len*RNG.preal()));
+            C->activate();
+            simul_.couples.add(C);
+        }
+#endif
         obj = nxt;
     }
 }

@@ -11,6 +11,7 @@
 class Field;
 class Fiber;
 class FiberDisp;
+class CoupleProp;
 class SingleProp;
 class SingleSet;
 class Space;
@@ -25,6 +26,7 @@ class Space;
 #define NEW_CONFINE_RANGE    0
 #define NEW_FIBER_END_FORCE  0
 #define NEW_FIBER_SILHOUETTE 0
+#define NEW_FIBER_MAKE_COUPLE 0
 
 /// Property for a Fiber
 /**
@@ -303,7 +305,14 @@ public:
     /// maximum speed of disassembly due to chewing (speed)
     real max_chewing_speed;
 #endif
+#if NEW_FIBER_MAKE_COUPLE
+    /// rate of creation
+    real        source_rate;
     
+    /// type of couple being made
+    std::string source_type;
+#endif
+
     /// specialization
     /**
      @copydetails FiberGroup
@@ -354,7 +363,14 @@ public:
     /// pointer to actual confinement Space, derived from `confine_space`
     Space const* confine2_space_ptr;
 #endif
+#if NEW_FIBER_MAKE_COUPLE
+    /// rate
+    real source_rate_dt;
     
+    /// type
+    CoupleProp * source_prop;
+#endif
+
     /// derived variable: pointer to associated Field
     Field * field_ptr;
 
