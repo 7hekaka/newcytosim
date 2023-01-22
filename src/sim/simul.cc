@@ -198,8 +198,13 @@ void Simul::add(ObjectList const& objs)
 {
     //std::clog << " Simul::add("<< objs.size() <<" objects):" << '\n';
     for ( Object * obj : objs )
+    {
         if ( obj )
+        {
+            //std::clog << "   Simul::add " << obj->reference() << " @ " << obj << "\n";
             add(obj);
+        }
+    }
 }
 
 

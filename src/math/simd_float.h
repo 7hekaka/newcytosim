@@ -327,7 +327,7 @@ LOCAL vec8f load8if(vec8i const* a) { return _mm256_cvtepi32_ps(_mm256_load_si25
 #define permute2f128f(a,b,c) _mm256_permute2f128_ps(a,b,c)
 
 /// return `neg` if `val < 0` and `pos` otherwise
-LOCAL vec8f sign_select8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv_ps(pos, neg, val); }
+LOCAL vec8f signselect8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv_ps(pos, neg, val); }
 
 #endif // AVX
 

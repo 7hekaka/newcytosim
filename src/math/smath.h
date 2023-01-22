@@ -367,7 +367,21 @@ namespace sMath
         v = (v + (v >> 4)) & (T)~(T)0/255*15;
         return (T)(v * ((T)~(T)0/255)) >> (sizeof(v) - 1) * 8;
     }
-   
+    
+    
+    /* Find the nullpoint of a monotonously increasing function */
+    static real find_root(real (*func)(real), real a, real b)
+    {
+        if ( func(a) > 0 ) std::swap(a,b);
+        for ( int i = 0; i < 16; ++i )
+        {
+            real m = 0.5 * ( a + b );
+            real v = func(m);
+            if ( v < 0 ) a = m;
+            else b = m;
+        }
+        return 0.5 * ( a + b );
+    }
 }
 
 
