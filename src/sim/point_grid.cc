@@ -100,9 +100,9 @@ void PointGrid::checkPP(FatPoint const& aa, FatPoint const& bb) const
     real ab2 = vab.normSqr();
     if ( below(ab2, ran) )
     {
-        real stiff = sign_select(ab2-len*len, push, pull);
-        meca.addLongLink(aa.pnt_, bb.pnt_, len, stiff);
-        //meca.addLongLink1(aa.pnt_, bb.pnt_, vab, ab2, len, push);
+        real stiff = sign_select(ab2-len*len, push_, pull_);
+        meca_.addLongLink(aa.pnt_, bb.pnt_, len, stiff);
+        //meca_.addLongLink1(aa.pnt_, bb.pnt_, vab, ab2, len, push_);
     }
 }
 
@@ -128,7 +128,7 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
         {
             // the point projects inside the segment
             if ( below(ab2, ran) )
-                meca.addSideSlidingLink(bb.seg_, abs, aa.pnt_, ran, push);
+                meca_.addSideSlidingLink(bb.seg_, abs, aa.pnt_, ran, push_);
         }
         else
         {
@@ -142,7 +142,7 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
 #endif
                 ab2 = vab.normSqr();
                 if ( below(ab2, ran) )
-                    meca.addLongLink1(aa.pnt_, bb.vertex2(), vab, ab2, ran, push);
+                    meca_.addLongLink1(aa.pnt_, bb.vertex2(), vab, ab2, ran, push_);
             }
         }
     }
@@ -161,7 +161,7 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
          or if this is the terminal point of a fiber.
          */
         if ( below(ab2, ran) && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
-            meca.addLongLink1(aa.pnt_, bb.vertex1(), vab, ab2, ran, push);
+            meca_.addLongLink1(aa.pnt_, bb.vertex1(), vab, ab2, ran, push_);
     }
 }
 
@@ -187,8 +187,8 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
          bb.vertex1() projects inside segment 'aa'
          */
         const real len = aa.rad_ + bb.rad_;
-        real stiff = sign_select(dis2-len*len, push, pull);
-        meca.addSideSlidingLink(aa.seg_, abs, bb.vertex1(), len, stiff);
+        real stiff = sign_select(dis2-len*len, push_,pull_);
+        meca_.addSideSlidingLink(aa.seg_, abs, bb.vertex1(), len, stiff);
     }
     else if ( abs < 0 )
     {
@@ -208,7 +208,7 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
                 real ab2 = vab.normSqr();
                 real len = aa.rad_ + bb.rad_;
                 if ( below(ab2, len)  &&  dot(vab, bb.diff()) >= 0 )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, len, push);
+                    meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, len, push_);
             }
         }
         else
@@ -228,8 +228,8 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
                 if ( below(ab2, ran) )
                 {
                     real len = aa.rad_ + bb.rad_;
-                    real stiff = sign_select(ab2-len*len, push, pull);
-                    meca.addLongLink2(aa.vertex1(), bb.vertex1(), vab, ab2, len, stiff);
+                    real stiff = sign_select(ab2-len*len, push_,pull_);
+                    meca_.addLongLink2(aa.vertex1(), bb.vertex1(), vab, ab2, len, stiff);
                 }
             }
         }
@@ -259,8 +259,8 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
         if ( below(dis2, ran) )
         {
             const real len = aa.rad_ + bb.rad_;
-            real stiff = sign_select(dis2-len*len, push, pull);
-            meca.addSideSlidingLink(aa.seg_, abs, bb.vertex2(), len, stiff);
+            real stiff = sign_select(dis2-len*len, push_,pull_);
+            meca_.addSideSlidingLink(aa.seg_, abs, bb.vertex2(), len, stiff);
         }
     }
     else if ( abs < 0 )
@@ -280,7 +280,7 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
             real ab2 = vab.normSqr();
             real len = aa.rad_ + bb.rad_;
             if ( below(ab2, len)  &&  dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, len, push);
+                meca_.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, len, push_);
         }
         else
         {
@@ -290,8 +290,8 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
                 if ( below(ab2, ran) )
                 {
                     real len = aa.rad_ + bb.rad_;
-                    real stiff = sign_select(ab2-len*len, push, pull);
-                    meca.addLongLink2(aa.vertex1(), bb.vertex2(), vab, ab2, len, stiff);
+                    real stiff = sign_select(ab2-len*len, push_,pull_);
+                    meca_.addLongLink2(aa.vertex1(), bb.vertex2(), vab, ab2, len, stiff);
                 }
             }
         }
@@ -313,7 +313,7 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
         real ab2 = vab.normSqr();
         real len = aa.rad_ + bb.rad_;
         if ( below(ab2, len)  &&  dot(vab, bb.diff()) <= 0 )
-            meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, len, push);
+            meca_.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, len, push_);
     }
 }
 
@@ -339,8 +339,8 @@ void PointGrid::checkLL(FatLocus const& aa, FatLocus const& bb) const
         if ( aa.seg_.within(a) & bb.seg_.within(b) )
         {
             const real len = aa.rad_ + bb.rad_;
-            real stiff = sign_select(dis2-len*len, push, pull);
-            meca.addSideSlidingLink(aa.seg_, a, Interpolation(bb.seg_, b), len, stiff);
+            real stiff = sign_select(dis2-len*len, push_,pull_);
+            meca_.addSideSlidingLink(aa.seg_, a, Interpolation(bb.seg_, b), len, stiff);
         }
     }
     else

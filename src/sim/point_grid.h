@@ -278,13 +278,13 @@ private:
     Grid<PointGridCell, DIM> pGrid;
     
     /// Meca
-    Meca& meca;
+    Meca& meca_;
     
     /// stiffness
-    real push;
+    real push_;
     
     ///
-    real pull;
+    real pull_;
 
 private:
     
@@ -396,13 +396,13 @@ private:
 public:
     
     /// creator
-    PointGrid(Meca& m) : meca(m) { push = 0; pull = 0; }
+    PointGrid(Meca& m) : meca_(m) { push_ = 0; pull_ = 0; }
     
     /// number of panes
     static int nbPanes() { return NUM_STERIC_PANES; }
 
     /// set stiffness
-    void stiffness(real h, real l) { push = h; pull = l; }
+    void stiffness(real h, real l) { push_ = h; pull_ = l; }
 
     /// define grid covering specified Space, given a minimal cell size requirement
     size_t setGrid(Space const*, real min_width);
