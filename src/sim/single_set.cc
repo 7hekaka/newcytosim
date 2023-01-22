@@ -194,7 +194,21 @@ ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
     
     Single * obj = nullptr;
     std::string str;
-    if ( opt.set(str, "base") )
+    if ( opt.set(str, "multi_base") )
+    {
+        ObjectList objs;
+        BeadProp * bip = simul_.findProperty<BeadProp>("bead", str);
+        if ( bip )
+        {
+            // create one Single on each Bead in the Simul:
+            for ( Object const* i : simul_.beads.collect(bip) )
+                objs.push_back(pp->newWrist(static_cast<Bead const*>(i), 0));
+        }
+        else
+            throw InvalidParameter("could not find Bead type `"+str+"'");
+        return objs;
+    }
+    else if ( opt.set(str, "base") )
     {
         Mecable * mec = simul_.pickMecable(str);
         if ( !mec )
@@ -460,16 +474,13 @@ size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* ar
 void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, size_t fip, size_t nbp, std::string& arg)
 {
     size_t num = 1;
-
     std::istringstream iss(arg);
     iss >> num;
-    
     if ( iss.fail() )
     {
         num = 1;
         iss.clear();
     }
-    
     if ( num == 0 || nbp == 0 )
         return;
     
@@ -489,9 +500,7 @@ void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, size_t fip, siz
     else
     {
         for ( size_t u = 0; u < num; ++u )
-        {
             objs.push_back(sip->newWrist(mec, fip+RNG.pint32(nbp)));
-        }
     }
 }
 
