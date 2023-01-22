@@ -318,7 +318,6 @@ void Meca::addStericInteractions(LocusGrid& grid, Simul const& sim)
         grid.setSterics(1);
         // add steric interactions between panes 1 and 2:
         grid.setSterics(1, 2);
-        //pointGrid.setSterics(*this, pam, 2, 1);
     }
     else
     {
@@ -363,7 +362,6 @@ void Meca::addSomeStericInteractions(LocusGrid& grid)
     grid.setSterics(1);
     // add steric interactions between panes 1 and 2:
     grid.setSterics(1, 2);
-    //pointGrid.setSterics(*this, pam, 2, 1);
 
 #else
     

@@ -690,7 +690,7 @@ void FiberProp::complete(Simul const& sim)
         source_prop = nullptr;
     else
         source_prop = sim.findProperty<CoupleProp>("couple", source_type);
-    source_rate_dt = 4 * M_PI * source_rate * time_step(sim);
+    source_rate_dt = source_rate * time_step(sim);
 #endif
 #if NEW_FIBER_END_CHEW
     if ( max_chewing_speed < 0 )

@@ -327,7 +327,6 @@ void FiberSet::step()
     while ( obj )
     {
         Fiber * nxt = obj->next();
-        obj->step();
 #if NEW_FIBER_MAKE_COUPLE
         real len = obj->length();
         // creation rate is proportional to length:
@@ -341,6 +340,7 @@ void FiberSet::step()
             simul_.couples.add(C);
         }
 #endif
+        obj->step(); // this may delete 'obj'
         obj = nxt;
     }
 }
