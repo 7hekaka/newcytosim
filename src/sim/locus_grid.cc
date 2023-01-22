@@ -115,7 +115,7 @@ void LocusGrid::checkPP(BigPoint const& aa, BigPoint const& bb) const
     real ab2 = vab.normSqr();
     
     if ( below(ab2, ran) )
-        meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
+        meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push_);
 }
 
 
@@ -144,7 +144,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
         {
             // the point projects inside the segment
             if ( below(ab2, ran) )
-                meca.addSideSlidingLink(bb.segment(), abs, aa.vertex1(), ran, push);
+                meca_.addSideSlidingLink(bb.segment(), abs, aa.vertex1(), ran, push_);
         }
         else
         {
@@ -158,7 +158,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
 #endif
                 ab2 = vab.normSqr();
                 if ( below(ab2, ran) )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
+                    meca_.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push_);
             }
         }
     }
@@ -177,7 +177,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
          or if this is the terminal point of a fiber.
          */
         if ( below(ab2, ran) && ( bb.isFirst() || dot(vab, bb.prevDiff()) <= 0 ))
-            meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
+            meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push_);
     }
 }
 
@@ -202,7 +202,7 @@ void LocusGrid::checkLLP1(BigLocus const& aa, BigLocus const& bb, float ran, rea
         {
             real ab2 = vab.normSqr();
             if ( below(ab2, ran)  &&  dot(vab, bb.diff()) >= 0 )
-                meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
+                meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push_);
         }
     }
     else
@@ -215,7 +215,7 @@ void LocusGrid::checkLLP1(BigLocus const& aa, BigLocus const& bb, float ran, rea
         {
             real ab2 = vab.normSqr();
             if ( below(ab2, ran) )
-                meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
+                meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push_);
         }
     }
 }
@@ -239,7 +239,7 @@ void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, rea
             real ab2 = vab.normSqr();
 
             if ( below(ab2, ran)  && dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
+                meca_.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push_);
         }
         else
         {
@@ -247,7 +247,7 @@ void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, rea
             {
                 real ab2 = vab.normSqr();
                 if ( below(ab2, ran) )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
+                    meca_.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push_);
             }
         }
     }
@@ -268,7 +268,7 @@ void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, rea
         real ab2 = dab.normSqr();
         
         if ( below(ab2, ran)  &&  dot(dab, bb.diff()) <= 0 )
-            meca.addLongLink1(aa.vertex2(), bb.vertex2(), dab, ab2, ran, push);
+            meca_.addLongLink1(aa.vertex2(), bb.vertex2(), dab, ab2, ran, push_);
     }
 }
 
@@ -290,7 +290,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
         /*
          bb.vertex1() projects inside segment 'aa'
          */
-        meca.addSideSlidingLink(aa.segment(), abs, bb.vertex1(), ran, push);
+        meca_.addSideSlidingLink(aa.segment(), abs, bb.vertex1(), ran, push_);
     }
     else if ( abs < 0 )
     {
@@ -309,7 +309,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
             #endif
                 real ab2 = vab.normSqr();
                 if ( below(ab2, ran)  &&  dot(vab, bb.diff()) >= 0 )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
+                    meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push_);
             }
         }
         else
@@ -327,7 +327,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
             {
                 real ab2 = vab.normSqr();
                 if ( below(ab2, ran) )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push);
+                    meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push_);
             }
         }
     }
@@ -356,7 +356,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
          bb.vertex2() projects inside segment 'aa'
          */
         if ( below(dis2, ran) )
-            meca.addSideSlidingLink(seg, abs, bb.vertex2(), ran, push);
+            meca_.addSideSlidingLink(seg, abs, bb.vertex2(), ran, push_);
     }
     else if ( abs < 0 )
     {
@@ -376,7 +376,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
             real ab2 = vab.normSqr();
 
             if ( below(ab2, ran)  && dot(vab, bb.diff()) <= 0 )
-                meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
+                meca_.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push_);
         }
         else
         {
@@ -384,7 +384,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
             {
                 real ab2 = vab.normSqr();
                 if ( below(ab2, ran) )
-                    meca.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push);
+                    meca_.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push_);
             }
         }
     }
@@ -405,7 +405,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
         real ab2 = vab.normSqr();
         
         if ( below(ab2, ran)  &&  dot(vab, bb.diff()) <= 0 )
-            meca.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, ran, push);
+            meca_.addLongLink1(aa.vertex2(), bb.vertex2(), vab, ab2, ran, push_);
     }
 }
 
@@ -481,7 +481,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         {
             // Since axis is orthogonal to daa, we know the norm of the cross-product:
             Vector leg = cross(daa, axis) * ( copysign(ran, D) * aa.lenInv() * sqrt(iS) );
-            meca.addSideSlidingLink3D(aa.interpolation(a), leg, bb.interpolation(b), daa, push);
+            meca_.addSideSlidingLink3D(aa.interpolation(a), leg, bb.interpolation(b), daa, push_);
         }
         
         /* If the shortest distance between the lines is greater than 'ran', then
@@ -492,7 +492,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         if ( below(dis2-m1*m1, ran) && aa.within(m1) )
         {
             Vector leg = cross(daa, off).normalized( ran * aa.lenInv() );
-            meca.addSideSlidingLink3D(aa.interpolation(m1), leg, bb.vertex1(), daa, push);
+            meca_.addSideSlidingLink3D(aa.interpolation(m1), leg, bb.vertex1(), daa, push_);
         }
         else if ( m1 < 0 )
             checkLLP1(aa, bb, ran, m1, off);
@@ -508,7 +508,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
                 if ( below(a1b2.normSqr()-mm*mm, ran) )
                 {
                     Vector leg = cross(daa, a1b2).normalized( ran * aa.lenInv() );
-                    meca.addSideSlidingLink3D(aa.interpolation(mm), leg, bb.vertex2(), daa, push);
+                    meca_.addSideSlidingLink3D(aa.interpolation(mm), leg, bb.vertex2(), daa, push_);
                 }
             }
             else
@@ -519,7 +519,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         if ( below(dis2-m2*m2, ran) && bb.within(m2) )
         {
             Vector leg = cross(dbb, off).normalized( ran * bb.lenInv() ); // two minus sign cancel out
-            meca.addSideSlidingLink3D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push);
+            meca_.addSideSlidingLink3D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push_);
         }
         else if ( m2 < 0 )
             checkLLP1(bb, aa, ran, m2, -off);
@@ -534,7 +534,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
                 if ( below(a2b1.normSqr()-mm*mm, ran) )
                 {
                     Vector leg = cross(dbb, a2b1).normalized( ran * bb.lenInv() ); // two minus sign cancel out
-                    meca.addSideSlidingLink3D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push);
+                    meca_.addSideSlidingLink3D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push_);
                 }
             }
             else
@@ -575,7 +575,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     if ( below(dis2-m1*m1, ran) && aa.within(m1) )
     {
         real leg = std::copysign(ran*aa.lenInv(), cross(daa, off));
-        meca.addSideSlidingLink2D(aa.interpolation(m1), leg, bb.vertex1(), daa, push);
+        meca_.addSideSlidingLink2D(aa.interpolation(m1), leg, bb.vertex1(), daa, push_);
     }
     else if ( m1 < 0 )
         checkLLP1(aa, bb, ran, m1, off);
@@ -591,7 +591,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
             if ( below(a1b2.normSqr()-mm*mm, ran) )
             {
                 real leg = std::copysign(ran*aa.lenInv(), cross(daa, a1b2));
-                meca.addSideSlidingLink2D(aa.interpolation(mm), leg, bb.vertex2(), daa, push);
+                meca_.addSideSlidingLink2D(aa.interpolation(mm), leg, bb.vertex2(), daa, push_);
             }
         }
         else
@@ -602,7 +602,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     if ( below(dis2-m2*m2, ran) && bb.within(m2) )
     {
         real leg = std::copysign(ran*bb.lenInv(), cross(dbb, off)); // two minus sign cancel out
-        meca.addSideSlidingLink2D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push);
+        meca_.addSideSlidingLink2D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push_);
     }
     else if ( m2 < 0 )
         checkLLP1(bb, aa, ran, m2, -off);
@@ -617,7 +617,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
             if ( below(a2b1.normSqr()-mm*mm, ran) )
             {
                 real leg = std::copysign(ran*bb.lenInv(), cross(dbb, a2b1)); // two minus sign cancel out
-                meca.addSideSlidingLink2D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push);
+                meca_.addSideSlidingLink2D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push_);
             }
         }
         else
@@ -663,7 +663,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     if ( dis2 < ran*ran )
     {
         if ( as.within(a) & bs.within(b) )
-            meca.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push);
+            meca_.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push_);
     }
     else
     {

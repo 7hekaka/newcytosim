@@ -293,10 +293,10 @@ private:
 #endif
     
     /// Meca
-    Meca& meca;
+    Meca& meca_;
     
     /// stiffness
-    real push;
+    real push_;
 
 private:
     
@@ -418,13 +418,13 @@ private:
 public:
     
     /// creator
-    LocusGrid(Meca& m) : meca(m) { push = 0; }
+    LocusGrid(Meca& m) : meca_(m), push_(0) {}
     
     /// number of panes
     static int nbPanes() { return MAX_STERIC_PANES; }
     
     /// set stiffness
-    void stiffness(real s) { push = s; }
+    void stiffness(real s) { push_ = s; }
                
     /// define grid covering specified Space, given a minimal cell size requirement
     size_t setGrid(Space const*, real min_width);
