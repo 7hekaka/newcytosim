@@ -614,6 +614,8 @@ static PointDisp * findVisibleFiberDisp(PropertyList const& plist, int& cnt)
 
 static void setFiberDispVisible(PropertyList const& plist, int val)
 {
+    if ( plist.size() < 1 )
+        flashText("no fiber visible!");
     for ( Property * i : plist )
         toFiberDisp(i)->visible = val;
 }
@@ -621,35 +623,29 @@ static void setFiberDispVisible(PropertyList const& plist, int val)
 
 static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 {
-    FiberDisp* one = nullptr;
+    FiberDisp* pick = nullptr;
     cnt = 0;
-    // find first one which is visible:
-    for ( PropertyList::const_iterator i = plist.begin(); i < plist.end(); ++i )
+    for ( Property * i : plist )
     {
-        FiberDisp * dsp = toFiberDisp(*i);
-        if ( dsp->visible )
-        {
-            ++cnt;
-            // choose follower:
-            if ( i+1 < plist.end() )
-                one = toFiberDisp(*(i+1));
-            else
-                one = nullptr;
-        }
+        FiberDisp * dsp = toFiberDisp(i);
+        if ( cnt == 1 )
+            pick = dsp;
+        cnt += ( dsp->visible );
     }
-    return one;
+    return pick;
 }
 
 
-static void shuffleVisible(FiberDisp* p, int)
+static void shuffleVisible(FiberDisp* p, int val)
 {
-    if ( p->visible && p->line_style )
+    if ( !val && p->visible && p->line_style )
     {
         p->visible = 0;
         flashText("%s:visible = %i", p->name_str(), p->visible);
     }
-    else if ( p->visible )
+    else if ( p->speckle_style )
     {
+        p->visible = 1;
         p->line_style = 1;
         p->speckle_style = 0;
         flashText("%s:line_style = %i", p->name_str(), p->line_style);
@@ -666,10 +662,10 @@ static void shuffleVisible(FiberDisp* p, int)
 
 static void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
-    if ( plist.size() == 1 || val == 0 )
+    if ( plist.size() == 1 )
     {
         for ( Property * i : plist )
-            shuffleVisible(toFiberDisp(i), 0);
+            shuffleVisible(toFiberDisp(i), val);
     }
     else
     {
@@ -683,7 +679,7 @@ static void shuffleFiberDispVisible(const PropertyList& plist, int val)
             p->visible = val;
             flashText("Only `%s' is visible", p->name_str());
         }
-        else if ( p != nullptr )
+        else if ( p )
         {
             setFiberDispVisible(plist, 0);
             p->visible = val;
@@ -972,7 +968,8 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case '~':
-            shuffleFiberDispVisible(player.allFiberDisp(), 1);
+            //shuffleFiberDispVisible(player.allFiberDisp(), 1);
+            setFiberDisp(player.allFiberDisp(), shuffleVisible, 1);
             break;
 
         case 't':
