@@ -569,8 +569,6 @@ static void changeEndSize(FiberDisp* p, int inc)
         size[1] = grained(size[1], inc);
         flashText("%s::minus_end %.2f", p->name_str(), size[1]);
     }
-    else
-        changePointSize(p, inc);
 }
 
 
@@ -580,7 +578,6 @@ static void changeSize(FiberDisp* p, int inc)
     if ( p->line_style ) changeLineWidth(p, inc);
     if ( p->point_style ) changePointSize(p, inc);
     if ( p->speckle_style ) changeSpeckleSize(p, inc);
-    changeEndSize(p, inc);
 }
 
 //---------------------------------------------------------------------
