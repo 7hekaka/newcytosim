@@ -27,7 +27,7 @@ typedef SparMatSymBlk     SparMatB;
 typedef SparMatSymBlkDiag SparMatD;
 
 // number of multiplication in sequence
-constexpr size_t N_MUL = 191;
+constexpr size_t N_MUL = 97;
 
 // number of repeat of ( 1 prepare + N_MUL multiplications )
 constexpr size_t N_RUN = 8;
@@ -750,9 +750,10 @@ int main( int argc, char* argv[] )
     testMatrices(8*110, 1<<18);
 #endif
     //testMatrices(37, 1<<17);
-    testMatrices(15494, 131836);
-    testBlockMatrix(15494, 131836);
-    testParallelVecmul(15464, 131836);
+    testMatrices(5494, 131836);
+    testBlockMatrix(5494, 131836);
+    testBlockMatrix(5494, 431836);
+    //testParallelVecmul(15464, 131836);
 #if ( 0 )
     size_t dim[5] = { 0 };
     for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));

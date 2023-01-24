@@ -188,6 +188,12 @@ LOCAL vec4f broadcast1f(float const* a) { return vld1q_dup_f32(a); }
 
 LOCAL void store1f(float* a, vec4f b) { *a = b[0]; }
 LOCAL void store2f(float* a, vec4f b) { vst1_f32(a, vget_low_f32(b)); }
+LOCAL void store3f(float* a, vec4f b) { a[0]=b[0]; a[1]=b[1]; a[2]=b[2]; }
+LOCAL void store4f(float* a, vec4f b) { vst1q_f32(a, b); }
+LOCAL void storeu4f(float* a, vec4f b) { vst1q_f32(a, b); }
+
+/// convert single and store them in double precision
+LOCAL void store2d(double* a, vec2f b) { vst1q_f64(a, vcvt_f64_f32(b)); }
 
 LOCAL vec4f set4f(float a) { return vdupq_n_f32(a); }
 LOCAL vec4i set4i(int a)   { return vdupq_n_u32(a); }
@@ -195,11 +201,6 @@ LOCAL vec4f set4fi(int a) { return vdupq_n_u32(a); }
 
 LOCAL vec4f load4f(float const* a) { return vld1q_f32(a); }
 LOCAL vec4f loadu4f(float const* a) { return vld1q_f32(a); }
-LOCAL void store4f(float* a, vec4f b) { vst1q_f32(a, b); }
-LOCAL void storeu4f(float* a, vec4f b) { vst1q_f32(a, b); }
-
-/// convert single and store them in double precision
-LOCAL void store2d(double* a, vec2f b) { vst1q_f64(a, vcvt_f64_f32(b)); }
 
 //LOCAL vec4f shiftbitsR4(vec4f a, int b) { return vshrq_n_u32((int32x4_t)a, b); }
 //LOCAL vec4f shiftbitsL4(vec4f a, int b) { return vshlq_n_u32((int32x4_t)a, b); }

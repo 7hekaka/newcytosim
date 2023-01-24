@@ -1102,7 +1102,7 @@ void SparMatSym2::vecMulAddColIso3D_AVX(const double* X, double* Y,
 #endif
 
 
-#if defined(__SSE3__) && SPARMAT2_COMPACTED && !REAL_IS_DOUBLE
+#if SPARMAT2_USES_SSE && SPARMAT2_COMPACTED && !REAL_IS_DOUBLE
 void SparMatSym2::vecMulAddColIso3D_SSE(const float* X, float* Y,
                                         size_t start, size_t stop) const
 {

@@ -220,7 +220,7 @@ void Mecable::translate(Vector const& T)
 void Mecable::rotate(Rotation const& T)
 {
     for ( size_t i = 0; i < nPoints; ++i)
-        ( T.vecmul(pPos+DIM*i) ).store(pPos+DIM*i);
+        T.vecmul(pPos+DIM*i).store(pPos+DIM*i);
 }
 
 
