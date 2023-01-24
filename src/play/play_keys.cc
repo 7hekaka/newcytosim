@@ -143,7 +143,7 @@ static PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
     for ( Property * i : plist )
     {
         PointDisp * d = toPointDisp(i);
-        if ( cnt == 1 )
+        if ( cnt == 1 && !pick )
             pick = d;
         cnt += ( d->visible );
     }
@@ -164,29 +164,23 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
     {
         size_t cnt = 0;
         PointDisp * p = nextVisiblePointDisp(plist, cnt);
-
-        if ( cnt > 1 )
+        if ( cnt == 0 )
         {
-            setPointDispVisible(plist, 0);
-            p = toPointDisp(plist.front());
-            p->visible = val;
-            flashText("Only `%s' is visible", p->name_str());
-        }
-        else if ( p != nullptr )
-        {
-            setPointDispVisible(plist, 0);
-            p->visible = val;
-            flashText("Only `%s' is visible", p->name_str());
-        }
-        else if ( cnt == 1 )
-        {
-            setPointDispVisible(plist, 0);
-            flashText("All hidden");
+            setPointDispVisible(plist, 1);
+            flashText("All hands visible");
         }
         else
         {
-            setPointDispVisible(plist, val);
-            flashText("All visible");
+            setPointDispVisible(plist, 0);
+            if ( cnt > 1 )
+                p = toPointDisp(plist.front());
+            if ( p )
+            {
+                p->visible = val;
+                flashText("Only `%s' is visible", p->name_str());
+            }
+            else
+                flashText("No hand visible");
         }
     }
 }
@@ -627,25 +621,10 @@ static void setFiberDispVisible(PropertyList const& plist, int val)
         if ( d )
         {
             d->visible = val;
-            if ( val && !d->line_style && !d->speckle_style )
+            if ( val && !d->speckle_style )
                 d->line_style = 1;
         }
     }
-}
-
-
-static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
-{
-    FiberDisp* pick = nullptr;
-    cnt = 0;
-    for ( Property * i : plist )
-    {
-        FiberDisp * d = toFiberDisp(i);
-        if ( cnt == 1 )
-            pick = d;
-        cnt += ( d->visible );
-    }
-    return pick;
 }
 
 
@@ -674,6 +653,23 @@ static void shuffleVisible(FiberDisp* p, int val)
 }
 
 
+static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
+{
+    FiberDisp* pick = nullptr;
+    cnt = 0;
+    for ( Property * i : plist )
+    {
+        FiberDisp * d = toFiberDisp(i);
+        //std::clog << "     " << d->visible << " " << d->name_str() <<"\n";
+        if ( cnt == 1 && !pick )
+            pick = d;
+        cnt += ( d->visible );
+    }
+    //std::clog << cnt << " " << (pick?pick->name_str():"none") << "\n";
+    return pick;
+}
+
+
 static void shuffleFiberDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.size() == 1 )
@@ -685,29 +681,24 @@ static void shuffleFiberDispVisible(const PropertyList& plist, int val)
     {
         size_t cnt = 0;
         FiberDisp * p = nextVisibleFiberDisp(plist, cnt);
-        
-        if ( cnt > 1 )
+        if ( cnt == 0 )
         {
-            setFiberDispVisible(plist, 0);
-            p = toFiberDisp(plist.front());
-            p->visible = val;
-            flashText("Only `%s' is visible", p->name_str());
-        }
-        else if ( p )
-        {
-            setFiberDispVisible(plist, 0);
-            p->visible = val;
-            flashText("Only `%s' is visible", p->name_str());
-        }
-        else if ( cnt == 1 )
-        {
-            setFiberDispVisible(plist, 0);
-            flashText("All fibers hidden");
+            setFiberDispVisible(plist, 1);
+            flashText("All fibers visible");
         }
         else
         {
-            setFiberDispVisible(plist, val);
-            flashText("All fibers visible");
+            setFiberDispVisible(plist, 0);
+            if ( cnt > 1 )
+                p = toFiberDisp(plist.front());
+            if ( p )
+            {
+                p->visible = val;
+                p->line_style = val;
+                flashText("Only `%s' is visible", p->name_str());
+            }
+            else
+                flashText("No fiber visible");
         }
     }
 }
