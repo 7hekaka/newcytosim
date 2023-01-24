@@ -242,8 +242,91 @@ static void changeCoupleSelect2()
 }
 
 //---------------------------------------------------------------------
-#pragma mark - Fibers
+#pragma mark - Fibers flash
 
+static void flashColoring(FiberDisp const* p)
+{
+    char const* n = p->name_str();
+    switch ( p->coloring )
+    {
+        case FiberDisp::COLORING_OFF:       flashText("%s: no coloring", n);      break;
+        case FiberDisp::COLORING_RANDOM:    flashText("%s: randomly colored", n);     break;
+        case FiberDisp::COLORING_DIRECTION: flashText("%s: colored by direction", n); break;
+        case FiberDisp::COLORING_MARK:      flashText("%s: colored by mark", n);      break;
+        case FiberDisp::COLORING_FLAG:      flashText("%s: colored by flag", n);      break;
+        case FiberDisp::COLORING_FAMILY:    flashText("%s: colored by family", n);    break;
+        case FiberDisp::COLORING_CLUSTER:   flashText("%s: colored by cluster", n);   break;
+        case FiberDisp::COLORING_AGE:       flashText("%s: colored by age", n);       break;
+        case FiberDisp::COLORING_PSTATE:    flashText("%s: colored by +end state", n);break;
+        default: flashText("unknown %s:coloring mode", n); break;
+    }
+}
+
+
+static void flashPointStyle(FiberDisp const* p)
+{
+    char const* n = p->name_str();
+    switch ( p->point_style )
+    {
+        case 0: flashText("%s: no points", n); break;
+        case 1: flashText("%s: vertices", n); break;
+        case 2: flashText("%s: arrowheads", n); break;
+        case 3: flashText("%s: chevrons", n); break;
+        case 4: flashText("%s: center points", n); break;
+        default: flashText("unknown %s:point_style", n); break;
+    }
+}
+
+static void flashLineStyle(FiberDisp const* p)
+{
+    char const* n = p->name_str();
+    switch ( p->line_style )
+    {
+        case 0: flashText("%s: no lines", n); break;
+        case 1: flashText("%s: lines", n); break;
+        case 2: flashText("%s: color by axial tensions", n); break;
+        case 3: flashText("%s: jet color by axial tensions", n); break;
+        case 4: flashText("%s: color by curvature", n); break;
+        case 5: flashText("%s: color by orientation", n); break;
+        case 6: flashText("%s: highlight near minus-end", n); break;
+        case 7: flashText("%s: highlight near plus-end", n); break;
+        case 8: flashText("%s: color by height", n); break;
+        case 9: flashText("%s: color by grid (if style=3)", n); break;
+        default: flashText("unknown %s:line style", n); break;
+    }
+}
+
+static void flashFiberStyle(FiberDisp const* p)
+{
+    char const* n = p->name_str();
+    switch ( p->style )
+    {
+        case 0: flashText("%s: default style", n); break;
+        case 1: flashText("%s: style=filament", n); break;
+        case 2: flashText("%s: style=actin", n); break;
+        case 3: flashText("%s: style=microtubule", n); break;
+        case 4: flashText("%s: style=backbone", n); break;
+        default: flashText("unknown %s:style", n); break;
+    }
+}
+
+static void flashExclude(FiberDisp const* p)
+{
+    char const* n = p->name_str();
+    switch ( p->hide )
+    {
+        case 0: flashText("%s: Right and left pointing", n); break;
+        case 1: flashText("%s: Right-pointing only", n);     break;
+        case 2: flashText("%s: Left-pointing only", n);      break;
+        case 3: flashText("%s: all hidden", n);              break;
+        case 4: flashText("%s: Counter-clockwise only", n);  break;
+        case 8: flashText("%s: Clockwise fibers only", n);   break;
+        case 12: flashText("%s: all hidden", n);             break;
+    }
+}
+
+//---------------------------------------------------------------------
+#pragma mark - Fibers
 
 static void changeExclude(FiberDisp* p, int val)
 {
@@ -252,17 +335,7 @@ static void changeExclude(FiberDisp* p, int val)
     p->hide = ( p->hide + 1 ) & 3;
     if ( val )
         p->hide <<= 2;
-    
-    switch ( p->hide )
-    {
-        case 0: flashText("All fibers");                break;
-        case 1: flashText("Right-pointing fibers");     break;
-        case 2: flashText("Left-pointing fibers");      break;
-        case 3: flashText("No fibers");                 break;
-        case 4: flashText("Counter-clockwise fibers");  break;
-        case 8: flashText("Clockwise fibers");          break;
-        case 12: flashText("No fibers");                break;
-    }
+    flashExclude(p);
 }
 
 
@@ -343,38 +416,17 @@ static void invertScale(FiberDisp* p, int)
     }
 }
 
-
-static void flashColoring(int val)
-{
-    switch ( val )
-    {
-        case FiberDisp::COLORING_OFF:       flashText("Fibers: no coloring");         break;
-        case FiberDisp::COLORING_RANDOM:    flashText("Fibers randomly colored");     break;
-        case FiberDisp::COLORING_DIRECTION: flashText("Fibers colored by direction"); break;
-        case FiberDisp::COLORING_MARK:      flashText("Fibers colored by mark");      break;
-        case FiberDisp::COLORING_FLAG:      flashText("Fibers colored by flag");      break;
-        case FiberDisp::COLORING_FAMILY:    flashText("Fibers colored by family");    break;
-        case FiberDisp::COLORING_CLUSTER:   flashText("Fibers colored by cluster");   break;
-        case FiberDisp::COLORING_AGE:       flashText("Fibers colored by age");       break;
-        case FiberDisp::COLORING_PSTATE:    flashText("Fibers colored by +end state");break;
-        default: flashText("unknown fiber:coloring mode"); break;
-    }
-}
-
-
 static void setColoring(FiberDisp* p, int val)
 {
     p->coloring = ( p->coloring ? 0 : val );
-    flashColoring(p->coloring);
+    flashColoring(p);
 }
-
 
 static void changeColoring(FiberDisp* p, int inc)
 {
     p->coloring = ( p->coloring + inc + 9 ) % 9;
-    flashColoring(p->coloring);
+    flashColoring(p);
 }
-
 
 static void setMask(FiberDisp* p, int val)
 {
@@ -393,47 +445,7 @@ static void changeMask(FiberDisp* p, int val)
 static void changePointStyle(FiberDisp* p, int arg)
 {
     p->point_style = ( p->point_style + 1 ) % arg;
-    switch ( p->point_style )
-    {
-        case 0: flashText("Fibers: no points"); break;
-        case 1: flashText("Fibers: vertices"); break;
-        case 2: flashText("Fibers: arrowheads"); break;
-        case 3: flashText("Fibers: chevrons"); break;
-        case 4: flashText("Fibers: center points"); break;
-        default: flashText("unknown fiber:point_style"); break;
-    }
-}
-
-
-static void flashLineStyle(int val)
-{
-    switch ( val )
-    {
-        case 0: flashText("Fibers: no lines"); break;
-        case 1: flashText("Fibers: lines"); break;
-        case 2: flashText("Fiber color by axial tensions"); break;
-        case 3: flashText("Fiber jet color by axial tensions"); break;
-        case 4: flashText("Fiber color by curvature"); break;
-        case 5: flashText("Fiber color by orientation"); break;
-        case 6: flashText("Fiber highlight near minus-end"); break;
-        case 7: flashText("Fiber highlight near plus-end"); break;
-        case 8: flashText("Fiber color by height"); break;
-        case 9: flashText("Fiber color by grid (if style=3)"); break;
-        default: flashText("unknown fiber:line style"); break;
-    }
-}
-
-static void flashFiberStyle(int val)
-{
-    switch ( val )
-    {
-        case 0: flashText("Fibers: default style"); break;
-        case 1: flashText("Fibers: style=filament"); break;
-        case 2: flashText("Fibers: style=actin"); break;
-        case 3: flashText("Fibers: style=microtubule"); break;
-        case 4: flashText("Fibers: style=backbone"); break;
-        default: flashText("unknown fiber:style"); break;
-    }
+    flashPointStyle(p);
 }
 
 static void toggleLineStyle(FiberDisp* p, int val)
@@ -441,19 +453,19 @@ static void toggleLineStyle(FiberDisp* p, int val)
     p->line_style = ( p->line_style != val ) * val;
     if ( p->style == 4 ) // override the 'backbone' style
         p->style = 0;
-    flashLineStyle(p->line_style);
+    flashLineStyle(p);
 }
 
 static void changeLineStyle(FiberDisp* p, int inc)
 {
     p->line_style = ( p->line_style + inc ) % 9;
-    flashLineStyle(p->line_style);
+    flashLineStyle(p);
 }
 
 static void toggleStyle(FiberDisp* p, int val)
 {
     p->style = ( p->style != val ) * val;
-    flashFiberStyle(p->style);
+    flashFiberStyle(p);
 }
 
 
@@ -462,9 +474,9 @@ static void changeSpeckleStyle(FiberDisp* p, int)
     p->speckle_style = ( p->speckle_style + 1 ) % 3;
     switch ( p->speckle_style )
     {
-        case 0: flashText("Fibers: no speckles");       break;
-        case 1: flashText("Fibers: random speckles");   break;
-        case 2: flashText("Fibers: regular speckles");  break;
+        case 0: flashText("%s: no speckles", p->name_str());       break;
+        case 1: flashText("%s: random speckles", p->name_str());   break;
+        case 2: flashText("%s: regular speckles", p->name_str());  break;
     }
 }
 
@@ -480,7 +492,7 @@ static void changeLatticeStyle(FiberDisp* p, int)
 {
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
     p->lattice_style = ( 1 + p->lattice_style ) % 5;
-    flashText("Fibers: lattice_style=%i", p->lattice_style);
+    flashText("%s: lattice_style=%i", p->name_str(), p->lattice_style);
 #else
     flashText("Warning: cannot display fiber:lattice");
 #endif
@@ -639,24 +651,25 @@ static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 
 static void shuffleVisible(FiberDisp* p, int val)
 {
+    char const* n = p->name_str();
     if ( val && p->visible && p->line_style )
     {
         p->visible = 0;
-        flashText("%s:visible = %i", p->name_str(), p->visible);
+        flashText("%s:visible = %i", n, p->visible);
     }
-    else if ( p->speckle_style )
-    {
-        p->visible = 1;
-        p->line_style = 1;
-        p->speckle_style = 0;
-        flashText("%s:line_style = %i", p->name_str(), p->line_style);
-    }
-    else
+    else if ( p->line_style )
     {
         p->visible = 1;
         p->line_style = 0;
         p->speckle_style = 1;
-        flashText("%s:speckle_style = %i", p->name_str(), p->speckle_style);
+        flashText("%s:speckle_style = %i", n, p->speckle_style);
+    }
+    else
+    {
+        p->visible = 1;
+        p->line_style = 1;
+        p->speckle_style = 0;
+        flashText("%s:line_style = %i", n, p->line_style);
     }
 }
 
@@ -969,7 +982,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case '~':
-            setFiberDisp(player.allFiberDisp(), shuffleVisible, 0);
+            setFiberDisp(player.allVisibleFiberDisp(), shuffleVisible, 0);
             break;
 
         case 't':
