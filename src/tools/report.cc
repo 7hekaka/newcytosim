@@ -137,7 +137,7 @@ int main(int argc, char* argv[])
 #endif
     
     size_t frame = 0;
-    size_t period = ~0UL;
+    size_t period = 1;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
     if ( arg.use_key("-") ) arg.define("verbose", 0);
@@ -149,7 +149,8 @@ int main(int argc, char* argv[])
         simul.loadProperties();
         reader.openFile(input);
         
-        arg.set(frame, "frame");
+        if ( arg.set(frame, "frame") )
+            period = ~0UL;
         arg.set(period, "period");
 
         if ( arg.set(str, "output") )
