@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 
 #include "interpolation4.h"
 #include "interpolation.h"
@@ -11,14 +11,14 @@ void Interpolation4::clear()
 {
     mec_ = nullptr;
     prime_ = 0;
-    set_coef(0.0, 0.0, 0.0);
+    set_coef(0, 0, 0);
 }
 
 
 void Interpolation4::polish()
 {
     // ensures that sum of coefficients is 1
-    coef_[0] = ( 1.0 - coef_[1] ) - ( coef_[2] + coef_[3] );
+    coef_[0] = ( real(1) - coef_[1] ) - ( coef_[2] + coef_[3] );
 
     size_t R = 4;
     while ((R > 0) & (abs_real(coef_[R-1]) < REAL_EPSILON))
@@ -35,7 +35,7 @@ Vector Interpolation4::dir() const
 {
     if ( rank_ < 2 )
         return Vector::randU();
-    real C[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
+    real C[4] = { coef_[0] - real(1), coef_[1], coef_[2], coef_[3] };
     return mec_->interpolatePoints(prime_, C, rank_);
 }
 
@@ -48,7 +48,7 @@ void Interpolation4::set(Mecable const* m, size_t p)
     
     mec_ = m;
     prime_ = p;
-    set_coef(0.0, 0.0, 0.0);
+    set_coef(0, 0, 0);
 }
 
 /**
@@ -65,11 +65,11 @@ void Interpolation4::set(Mecable const* m, size_t p, size_t q, real c)
     mec_ = m;
     prime_ = p;
     if ( q == p + 1 )
-        set_coef(c, 0.0, 0.0);
+        set_coef(c, 0, 0);
     else if ( q == p + 2 )
-        set_coef(0.0, c, 0.0);
+        set_coef(0, c, 0);
     else if ( q == p + 3 )
-        set_coef(0.0, 0.0, c);
+        set_coef(0, 0, c);
     else
         throw InvalidSyntax("out-of-range index in Interpolation");
 }
@@ -93,9 +93,9 @@ void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
     prime_ = p;
 
 #if ( DIM == 1 )
-    set_coef(vec.XX, 0.0, 0.0);
+    set_coef(vec.XX, 0, 0);
 #elif ( DIM == 2 )
-    set_coef(vec.XX, vec.YY, 0.0);
+    set_coef(vec.XX, vec.YY, 0);
 #else
     set_coef(vec.XX, vec.YY, vec.ZZ);
 #endif
@@ -156,7 +156,7 @@ void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& 
     assert_true(mec_);
     size_t off = mec_->matIndex() + prime_;
     // coefficients to extract ( surface_point - center )
-    real alp[4] = { coef_[0]-1.0, coef_[1], coef_[2], coef_[3] };
+    real alp[4] = { coef_[0] - real(1), coef_[1], coef_[2], coef_[3] };
     //printf("offsetLink %9.3f %9.3f %9.3f\n", alp[1], alp[2], alp[3]);
     // extract distance in current configuration:
     real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
@@ -166,7 +166,7 @@ void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& 
     alp[1] *= alpha;
     alp[2] *= alpha;
     alp[3] *= alpha;
-    alp[0] = ( 1.0 - alp[1] ) - ( alp[2] + alp[3] );
+    alp[0] = ( real(1) - alp[1] ) - ( alp[2] + alp[3] );
     switch ( rank_ )
     {
         case 0:
