@@ -26,12 +26,12 @@ new chromatin
     length = 2.0
 }
 
-new kglue
+new kinglue
 {
     base = kinetochore~1, point1
     attach = chromatin~1, 1.0
 }
-new kglue
+new kinglue
 {
     base = kinetochore~2, point1
     attach = chromatin~2, 1.0
@@ -84,12 +84,12 @@ new chromatin
     length = 1.3
 }
 
-new kglue
+new kinglue
 {
     base = kinetochore~1, point1
     attach = chromatin~1, 1.05
 }
-new kglue
+new kinglue
 {
     base = kinetochore~2, point1
     attach = chromatin~2, 1.05
@@ -137,12 +137,12 @@ new chromatin
     length = 1.55
 }
 
-new kglue
+new kinglue
 {
     base = kinetochore~1, point1
     attach = chromatin~1, 0.95
 }
-new kglue
+new kinglue
 {
     base = kinetochore~2, point1
     attach = chromatin~2, 0.95
@@ -190,12 +190,12 @@ new chromatin
     length = 1.2
 }
 
-new kglue
+new kinglue
 {
     base = kinetochore~1, point1
     attach = chromatin~1, 0.90
 }
-new kglue
+new kinglue
 {
     base = kinetochore~2, point1
     attach = chromatin~2, 0.90
@@ -240,12 +240,12 @@ new chromatin
     length = 1.8
 }
 
-new kglue
+new kinglue
 {
     base = kinetochore~1, point1
     attach = chromatin~1, 0.98
 }
-new kglue
+new kinglue
 {
     base = kinetochore~2, point1
     attach = chromatin~2, 0.98
