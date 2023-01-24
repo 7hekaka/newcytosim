@@ -290,11 +290,14 @@ public:
     /// first Field with this Property
     Field * pickField(const Property * p) const;
     
-    //---------------------------- PROPERTIES ----------------------------------
+    //------------------------- CODE EVALUATOR ---------------------------------
 
-    /// set Parser used in' evaluate'
-    void parser(Parser* p) { parser_ = p; }
+    /// set Parser to be used in `evaluate()'
+    void parser(Parser * p) { parser_ = p; }
     
+    /// return current Parser
+    Parser * parser() const { return parser_; }
+
     /// Parse a text containing cytosim commands
     void evaluate(std::string const&);
 

@@ -193,15 +193,16 @@ void SimThread::start()
 void SimThread::prolong_run(double sec)
 {
     assert_true( isWorker() );
+    Parser * back = sim_->parser();
+    sim_->parser(this);
     try {
-        sim_->parser(this);
         Parser::execute_run(sec);
     }
     catch( Exception & e ) {
         std::cerr << e.brief() << e.info() << '\n';
         //flashText("Error: %s", e.what());
     }
-    sim_->parser(nullptr);
+    sim_->parser(back);
 }
 
 

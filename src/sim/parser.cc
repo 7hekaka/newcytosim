@@ -1378,6 +1378,7 @@ void Parser::readConfig(std::istream& is, std::string const& filename)
     VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change);
     VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
 
+    Parser * back = sim_->parser();
     sim_->parser(this);
     std::streampos ipos(0);
     try {
@@ -1389,7 +1390,7 @@ void Parser::readConfig(std::istream& is, std::string const& filename)
         e << "\n" + StreamFunc::extract_lines(is, ipos, is.tellg());
         throw;
     }
-    sim_->parser(nullptr);
+    sim_->parser(back);
 }
 
 
