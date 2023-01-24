@@ -1,0 +1,297 @@
+% Arabidopsis taliana spindle
+% Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
+% F. Nedelec, Cambridge 12.11.2022, Sunny. 25.11.2022, Rainy
+% Fat Chromosomes: 31.12.2022
+
+set simul system
+{
+    viscosity = 1
+    time_step = 0.005
+    steric = 1, 555, 222
+    display = ( size=2560,768; point_value=0.01; point_size=0.5; line_width=1; zoom=2; style=3;)
+    skip_free_couple = 1
+    precondition = 6
+}
+
+set space cell
+{
+    shape = cylinder
+    display = ( color=0xFFFFFF04; visible=1 )
+}
+
+set space ring
+{
+    shape = ring
+    display = ( color=0xFFFFFF04; visible=1 )
+}
+
+new cell
+{
+    length = 10
+    diameter = 4.5
+}
+
+new ring
+{
+    length = 10
+    diameter = 4.5
+}
+
+% ---------------------- MICROTUBULES ------------------------
+
+set fiber microtubule
+{
+    rigidity = 20
+    segmentation = 0.75
+    steric = 1, 0.025, 0.010
+    confine = inside, 77, ring
+    
+    activity = dynamic
+    min_length = 0.024
+    growing_speed = 0.21
+    shrinking_speed = -0.42
+    hydrolysis_rate = 1.0
+    growing_force = 5
+    total_polymer = 20000
+    display = (color=0xFFFFFF88; line_width=2.5; end_size=9, 9; coloring=2; speckles=7; )
+}
+
+set fiber kinetofiber
+{
+    rigidity = 20
+    segmentation = 0.75
+    steric = 1, 0.025, 0.010
+    confine = inside, 77, ring
+
+    activity = dynamic
+    min_length = 0.024
+    growing_speed = 0.04
+    shrinking_speed = -0.20
+    hydrolysis_rate = 0.2
+    growing_force = 5
+
+    display = (color=0xFFFFFF88; line_width=2.5; end_size=9, 9; coloring=2; speckles=7; )
+}
+
+% ---------------------- AMPLIFICATION ------------------------
+
+set hand nucleator
+{
+    unbinding = 0, inf
+    activity = nucleate
+    specificity = mostly_parallel
+    nucleate = 0.1, microtubule, ( length=0.032; end_state = grow, white; )
+    display = ( color=yellow; size=2; width=3; )
+}
+
+set hand activator
+{
+    binding = 10, 0.120
+    unbinding = 0.01, 4
+    display = ( color=green; size=5; width=1; )
+}
+
+set couple augmin
+{
+    hand1 = activator
+    hand2 = nucleator
+    stiffness = 100
+    activity = duo
+    vulnerable = 0
+    deactivation = 2, delete
+    trans_activated = 1
+    length = 0.050
+    diffusion = 1
+}
+
+%---------------------- KINETOCHORES ------------------------
+
+set space plate
+{
+    shape = cylinder
+    display = ( color=0xFFFFFF04; visible=1 )
+}
+
+new plate
+{
+    length = 0.5
+    diameter = 4.5
+}
+
+set hand kinetonuc
+{
+    binding = 0, 0.050
+    unbinding = 0, 5
+    track_end = plus_end
+    hold_shrinking_end = 0
+    addictive = 1
+    activity = nucleate
+    nucleate = 1.0, kinetofiber, ( length=0.032; end_state = grow, white; )
+    display = ( color=white; size=4; width=3; )
+}
+
+set single corona
+{
+    hand = kinetonuc
+    stiffness = 333
+    anchor_stiffness = 167
+    diffusion = 10
+}
+
+set solid kinetochore
+{
+    steric = 0
+    confine = inside, 9, plate
+    twin_stiffness = 200
+    display = ( color=0x00FFFFFF; size=2; style=5; )
+}
+
+set fiber chromatin
+{
+    rigidity = 1
+    viscosity = 2
+    segmentation = 0.1
+    steric = 1, 0.070  % this is multiplied by 3 by silhouette
+    binding_key = 0
+    source = 4, augmin
+    display = ( color=0xFFFFFF33; coloring=1; line=20; )
+}
+
+set hand holder
+{
+}
+
+set single kinglue
+{
+    hand = holder
+    stiffness = 1000
+}
+
+set couple cohesin
+{
+    hand1 = holder
+    hand2 = holder
+    stiffness = 4
+}
+
+% ---------------------- CHROMOSOMES ------------------------
+
+include plant_chromosomes.cym
+include plant_chromosomes.cym
+
+% ---------------------- KINESIN-5 ------------------------
+
+set hand slow_kinesin
+{
+    binding = 10, 0.080
+    unbinding = 0.5, 6
+    
+    activity = mighty
+    unloaded_speed = 0.05
+    stall_force = 5
+    display = ( color=blue; size=3.5; )
+}
+
+set couple parakin
+{
+    specificity = parallel
+    hand1 = slow_kinesin
+    hand2 = slow_kinesin
+    stiffness = 400
+    length = 0.060
+    diffusion = 5
+    fast_diffusion = 1
+}
+
+set hand clasp_kinesin
+{
+    binding = 10, 0.080
+    unbinding = 0.5, 6
+    
+    activity = mighty
+    unloaded_speed = 0.05
+    stall_force = 5
+    rescue_chance = 0.125
+    display = ( color=orange; size=3.5; )
+}
+
+set couple antikin
+{
+    specificity = antiparallel
+    hand1 = clasp_kinesin
+    hand2 = clasp_kinesin
+    stiffness = 400
+    length = 0.060
+    diffusion = 5
+    fast_diffusion = 1
+}
+
+% ---------------------- KATANIN ------------------------
+
+set hand katanin
+{
+    binding = 10, 0.050
+    unbinding = 0.01, 3
+    activity = cut
+    cutting_rate = 0.1
+    new_end_state = red, white
+    display = ( size=7; color=pink; )
+}
+
+set single cutter
+{
+    hand = katanin
+    stiffness = 10
+    diffusion = 10
+}
+
+% ---------------------- CONDENSATE ------------------------
+
+set hand bead_motor
+{
+    binding = 5, 0.080
+    unbinding = 1
+    activity = motor
+    unloaded_speed = -0.25
+    stall_force = 2
+}
+
+set single simplex
+{
+    hand = bead_motor
+    stiffness = 100
+}
+
+set bead condensate
+{
+    steric = 0
+    confine = inside, 3, cell
+    display = ( coloring=2; style=7; color=0xFFFFFF22; )
+}
+
+new 0 condensate
+{
+    attach = simplex
+    radius = 0.068
+    position = ball 1.0 at 3 0
+}
+
+new 0 condensate
+{
+    radius = 0.068
+    position = ball 1.0 at -3 0
+}
+
+% ---------------------- SYSTEM! ------------------------
+
+new 1000 parakin
+new 8000 antikin
+new 0 clasp
+new 0 augmin
+new 0 katanin
+
+run 200000 system
+{
+    nb_frames = 1000
+}
+
