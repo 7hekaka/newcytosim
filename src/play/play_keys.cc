@@ -138,23 +138,16 @@ static void setPointDispVisible(PropertyList const& plist, int val)
 
 static PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
 {
-    PointDisp* one = nullptr;
+    PointDisp* pick = nullptr;
     cnt = 0;
-    // find first one which is visible:
-    for ( PropertyList::const_iterator i = plist.begin(); i < plist.end(); ++i )
+    for ( Property * i : plist )
     {
-        PointDisp * dsp = toPointDisp(*i);
-        if ( dsp->visible )
-        {
-            ++cnt;
-            // choose follower:
-            if ( i+1 < plist.end() )
-                one = toPointDisp(*(i+1));
-            else
-                one = nullptr;
-        }
+        PointDisp * d = toPointDisp(i);
+        if ( cnt == 1 )
+            pick = d;
+        cnt += ( d->visible );
     }
-    return one;
+    return pick;
 }
 
 
@@ -513,11 +506,11 @@ static void changeLineWidth(FiberDisp* p, int inc)
 }
 
 
-static void changeEndStyle(FiberDisp* p, int val)
+static void changeEndStyle(FiberDisp* d, int val)
 {
     const int P = 1+val;
     const int M = 1+val*2;
-    int * style = p->end_style;
+    int * style = d->end_style;
     // showing the plus ends -> the minus ends -> both -> none
     switch( bool(style[1]) + 2*bool(style[0]) )
     {
@@ -542,10 +535,10 @@ static void changeEndStyle(FiberDisp* p, int val)
     
     switch( (style[0]?1:0) + (style[1]?2:0) )
     {
-        case 0: flashText("Fibers: no ends");    break;
-        case 1: flashText("Fibers: plus-ends");  break;
-        case 2: flashText("Fibers: minus-ends"); break;
-        case 3: flashText("Fibers: both ends");  break;
+        case 0: flashText("%s: no ends", d->name_str());    break;
+        case 1: flashText("%s: plus-ends", d->name_str());  break;
+        case 2: flashText("%s: minus-ends", d->name_str()); break;
+        case 3: flashText("%s: both ends", d->name_str());  break;
     }
 }
 
@@ -617,7 +610,15 @@ static void setFiberDispVisible(PropertyList const& plist, int val)
     if ( plist.size() < 1 )
         flashText("no fiber visible!");
     for ( Property * i : plist )
-        toFiberDisp(i)->visible = val;
+    {
+        FiberDisp * d = toFiberDisp(i);
+        if ( d )
+        {
+            d->visible = val;
+            if ( val && !d->line_style && !d->speckle_style )
+                d->line_style = 1;
+        }
+    }
 }
 
 
@@ -627,10 +628,10 @@ static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
     cnt = 0;
     for ( Property * i : plist )
     {
-        FiberDisp * dsp = toFiberDisp(i);
+        FiberDisp * d = toFiberDisp(i);
         if ( cnt == 1 )
-            pick = dsp;
-        cnt += ( dsp->visible );
+            pick = d;
+        cnt += ( d->visible );
     }
     return pick;
 }
@@ -638,7 +639,7 @@ static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 
 static void shuffleVisible(FiberDisp* p, int val)
 {
-    if ( !val && p->visible && p->line_style )
+    if ( val && p->visible && p->line_style )
     {
         p->visible = 0;
         flashText("%s:visible = %i", p->name_str(), p->visible);
@@ -665,7 +666,7 @@ static void shuffleFiberDispVisible(const PropertyList& plist, int val)
     if ( plist.size() == 1 )
     {
         for ( Property * i : plist )
-            shuffleVisible(toFiberDisp(i), val);
+            shuffleVisible(toFiberDisp(i), 1);
     }
     else
     {
@@ -688,12 +689,12 @@ static void shuffleFiberDispVisible(const PropertyList& plist, int val)
         else if ( cnt == 1 )
         {
             setFiberDispVisible(plist, 0);
-            flashText("All hidden");
+            flashText("All fibers hidden");
         }
         else
         {
             setFiberDispVisible(plist, val);
-            flashText("All visible");
+            flashText("All fibers visible");
         }
     }
 }
@@ -964,12 +965,11 @@ void processKey(unsigned char key, int modifiers = 0)
         //------------------------------ Fibers --------------------------------
            
         case '`':
-            shuffleFiberDispVisible(player.allFiberDisp(), 0);
+            shuffleFiberDispVisible(player.allFiberDisp(), 1);
             break;
             
         case '~':
-            //shuffleFiberDispVisible(player.allFiberDisp(), 1);
-            setFiberDisp(player.allFiberDisp(), shuffleVisible, 1);
+            setFiberDisp(player.allFiberDisp(), shuffleVisible, 0);
             break;
 
         case 't':
