@@ -61,8 +61,7 @@ Vector SpaceRing::place() const
 bool SpaceRing::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    const real RT = W.normYZSqr();
-    return ( abs_real(W.XX) <= half_  &&  RT <= square(radius_) );
+    return ( W.normYZSqr() <= square(radius_) );
 #else
     return false;
 #endif
@@ -73,8 +72,7 @@ bool SpaceRing::allInside(Vector const& W, const real rad ) const
     assert_true( rad >= 0 );
 
 #if ( DIM > 2 )
-    const real RT = W.normYZSqr();
-    return ( abs_real(W.XX) + rad <= half_  &&  RT <= square(radius_-rad) );
+    return ( W.normYZSqr() <= square(radius_-rad) );
 #else
     return false;
 #endif
