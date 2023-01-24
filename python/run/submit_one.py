@@ -31,9 +31,9 @@ import sys, os, subprocess, tempfile
 # default parameters for submission:
 submit  = 'sbatch'
 queue   = 'icelake'
-runtime = '12:00:00'  # 12 hour
-memory  = '4096'      # in MB
-ncpu    = 64          # nb of threads per job
+runtime = '12:00:00' # 12 hour
+memory  = '4096'     # in MB
+ncpu    = 1          # nb of threads per job
 
 # where output is sent:
 out = sys.stderr
@@ -94,9 +94,10 @@ def main(args):
     else:
         submit = proc.stdout.readline().strip()
 
-    # first argument is used for go_sim.py:
+    # first argument is the executable:
     cmd = args.pop(0)
-
+    cmd = os.path.abspath(cmd)
+    
     job = []
     cwd = os.getcwd()
     path = cwd
