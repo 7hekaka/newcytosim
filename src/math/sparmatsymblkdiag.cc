@@ -300,7 +300,7 @@ void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd, const size_t sta
         col.dia_.addto_symm(dia, ldd);
         for ( size_t n = 0; n < col.noff_; ++n )
         {
-            size_t ii = col.inx_[n];
+            auto ii = col.inx_[n];
             // assuming lower triangle is stored:
             assert_true( ii > jj );
             if ( ii < end )
@@ -331,7 +331,7 @@ void SparMatSymBlkDiag::addLowerBand(real alpha, real* mat, size_t ldd, const si
         col.dia_.addto_lower(dia, ldd, alpha);
         for ( size_t n = 0; n < col.noff_; ++n )
         {
-            size_t ii = col.inx_[n];
+            auto ii = col.inx_[n];
             // assuming lower triangle is stored:
             assert_true(ii>jj);
             if ((ii <= jj+rank) & (ii < end))
@@ -365,7 +365,7 @@ void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
         mat[j+ldd*j] += alpha * col.dia_.trace();  // diagonal term
         for ( size_t n = 0; n < col.noff_; ++n )
         {
-            size_t ii = col.inx_[n];
+            auto ii = col.inx_[n];
             // assuming lower triangle is stored:
             if (( ii < end ) & ( ii <= jj+rank ))
             {
@@ -586,7 +586,7 @@ void SparMatSymBlkDiag::sortElements()
 #ifndef NDEBUG
         for ( size_t n = 0 ; n < col.noff_ ; ++n )
         {
-            const size_t i = col.inx_[n];
+            const auto i = col.inx_[n];
             assert_true( i < rsize_ );
             assert_true( i != j );
         }
@@ -642,7 +642,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd1D(const real* X, real* Y, size_t jj) co
     for ( size_t n = 0; n < noff_; ++n )
     {
         const real M = blk_[n].value();
-        const size_t ii = inx_[n];
+        const auto ii = inx_[n];
         Y[ii] += M * xx;
         yy += M * X[ii];
     }
@@ -657,7 +657,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle1D(const real* X, real* Y, size_
     for ( size_t n = 0; n < noff_; ++n )
     {
         const real M = blk_[n].value();
-        const size_t ii = inx_[n];
+        const auto ii = inx_[n];
         Y[ii] += M * xx;
         yy += M * X[ii];
     }
@@ -684,7 +684,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D(const real* X, real* Y, size_t jj) co
     Vector2 yy = dia_.vecmul(xx);
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 2 * inx_[n];
+        const auto ii = 2 * inx_[n];
         Block const& M = blk_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
@@ -700,7 +700,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle2D(const real* X, real* Y, size_
     for ( size_t n = 0; n < noff_; ++n )
     {
         Block const& M = blk_[n];
-        const size_t ii = 2 * inx_[n];
+        const auto ii = 2 * inx_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -727,8 +727,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D(const real* X, real* Y, size_t jj) co
     Vector3 yy = dia_.vecmul(xx);
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 3 * inx_[n];
         Block const& M = blk_[n];
+        const auto ii = 3 * inx_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -743,7 +743,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D(const real* X, real* Y, size_
     for ( size_t n = 0; n < noff_; ++n )
     {
         Block const& M = blk_[n];
-        const size_t ii = 3 * inx_[n];
+        const auto ii = 3 * inx_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -771,8 +771,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd4D(const real* X, real* Y, size_t jj) co
     vec4 yyyy = dia_.vecmul4(xxxx);
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 4 * inx_[n];
         Block const& M = blk_[n];
+        const auto ii = 4 * inx_[n];
         store4(Y+ii, add4(load4(Y+ii), M.vecmul4(xxxx)));
         yyyy += M.trans_vecmul(X+ii);
     }
@@ -787,7 +787,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle4D(const real* X, real* Y, size_
     for ( size_t n = 0; n < noff_; ++n )
     {
         Block const& M = blk_[n];
-        const size_t ii = 4 * inx_[n];
+        const auto ii = 4 * inx_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
     }
@@ -913,7 +913,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVX(const double* X, double* Y, size_
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 2 * inx_[n];
+        const auto ii = 2 * inx_[n];
         vec4 mat = blk_[n].data0(); // load 2x2 matrix
         vec4 yy = load2Z(Y+ii);          // yy = { Y0 Y1 0 0 }
         vec4 xx = broadcast2(X+ii);      // xx = { X0 X1 X0 X1 }
@@ -1105,7 +1105,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t 
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n, ++blk, ++inx )
     {
-        const size_t ii = 3 * inx[0];
+        const auto ii = 3 * inx[0];
         const vec4f M012 = blk->data0();
         const vec4f M345 = blk->data1();
         const vec4f M678 = blk->data2();
@@ -1177,8 +1177,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
             {
                 Block const& M = blk[0];
                 Block const& P = blk[1];
-                const size_t ii = 3 * inx[0];
-                const size_t kk = 3 * inx[1];
+                const auto ii = 3 * inx[0];
+                const auto kk = 3 * inx[1];
                 const vec4f M012 = M.data0();
                 const vec4f M345 = M.data1();
                 const vec4f M678 = M.data2();
@@ -1212,7 +1212,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSEU(const float* X, float* Y, size_t
 #pragma nounroll
         for ( ; blk < end; ++inx, ++blk )
         {
-            const size_t ii = 3 * inx[0];
+            const auto ii = 3 * inx[0];
             const vec4f M012 = blk->data0();
             const vec4f M345 = blk->data1();
             const vec4f M678 = blk->data2();
@@ -1288,11 +1288,11 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
         {
             Block const& M = blk[0];
             Block const& P = blk[1];
-            const size_t ii = 3 * inx[0];
+            const auto ii = 3 * inx[0];
             const vec4f M012 = M.data0();
             const vec4f M345 = M.data1();
             const vec4f M678 = M.data2();
-            const size_t kk = 3 * inx[1];
+            const auto kk = 3 * inx[1];
             const vec4f P012 = P.data0();
             const vec4f P345 = P.data1();
             const vec4f P678 = P.data2();
@@ -1323,7 +1323,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
     //assert_true( blk == blk_+noff_-1 );
     for ( ; blk < end; ++blk, ++inx ) //if ( blk < end )
     {
-        const size_t ii = 3 * inx[0];
+        const auto ii = 3 * inx[0];
         const vec4f L012 = blk->data0();
         const vec4f L345 = blk->data1();
         const vec4f L678 = blk->data2();
@@ -1393,7 +1393,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 3 * inx_[n];
+        const auto ii = 3 * inx_[n];
         double const* mat = blk_[n].data();
         // multiply with the full block in vectors { XY, Z0 }:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
@@ -1471,7 +1471,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVX(const double* X, double* Y, size_
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 3 * inx_[n];
+        const auto ii = 3 * inx_[n];
         const vec4 M012 = blk_[n].data0();
         const vec4 M345 = blk_[n].data1();
         const vec4 M678 = blk_[n].data2();
@@ -1553,8 +1553,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVXU(const double* X, double* Y, size
 #pragma nounroll
         for ( ; blk < end; blk += 2, inx += 2 )
         {
-            const size_t ii = 3 * inx[0];
-            const size_t kk = 3 * inx[1];
+            const auto ii = 3 * inx[0];
+            const auto kk = 3 * inx[1];
             assert_true( ii < kk );
             //printf("--- %4i %4i\n", ii, kk);
             vec4 M0 = blk[0].data0();
@@ -1600,7 +1600,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVXU(const double* X, double* Y, size
         #pragma nounroll
         for ( end = blk_ + noff_; blk < end; ++blk, ++inx )
         {
-            const size_t ii = 3 * inx[0];
+            const auto ii = 3 * inx[0];
             //printf("--- %4i\n", ii);
             vec4 m0 = blk[0].data0();
             vec4 z = fmadd4(m0, x0, loadu4(Y+ii));
@@ -1675,8 +1675,8 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_AVX(const double* X, double* 
             vec4 P0 = blk[1].data0();
             vec4 P1 = blk[1].data1();
             vec4 P2 = blk[1].data2();
-            const size_t ii = 3 * inx[0];
-            const size_t kk = 3 * inx[1];
+            const auto ii = 3 * inx[0];
+            const auto kk = 3 * inx[1];
             assert_true( ii < kk );
             //printf("--- %4i %4i\n", ii, kk);
             vec4 z = fmadd4(M0, x0, loadu4(Y+ii));
@@ -1721,7 +1721,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_AVX(const double* X, double* 
             vec4 M1 = blk[0].data1();
             vec4 M2 = blk[0].data2();
             // extract index from the matrix data:
-            const size_t ii = 3 * inx[0];
+            const auto ii = 3 * inx[0];
             //printf("--- %4i\n", ii);
             
             vec4 z = fmadd4(M0, x0, loadu4(Y+ii));
@@ -1775,7 +1775,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd4D_AVX(const double* X, double* Y, size_
     #pragma nounroll
     for ( size_t n = 0; n < noff_; ++n )
     {
-        const size_t ii = 4 * inx_[n];
+        const auto ii = 4 * inx_[n];
         const vec4 yy = load4(Y+ii);
         const vec4 xx = load4(X+ii);  // xx = { X0 X1 X2 X3 }
         const vec4 m0 = blk_[n].data0();
