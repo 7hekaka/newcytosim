@@ -516,8 +516,10 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                 // may skip unattached Singles
                 if ( prop.skip_free_single > 1 )
                     in.skip_until("#section ");
+#if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
                 if ( iss.good() && mod == 1 )
                     singles.reheat();
+#endif
             }
             else if ( tok == "reheat" )
             {
@@ -533,8 +535,10 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                 // may skip unattached Couples
                 if ( prop.skip_free_couple > 1 )
                     in.skip_until("#section ");
+#if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
                 if ( iss.good() && mod == 1 )
                     couples.reheat();
+#endif
             }
             else if ( tok == "reheat" )
             {
