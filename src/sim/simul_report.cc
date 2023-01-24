@@ -3137,7 +3137,7 @@ void Simul::reportProfile(std::ostream& out) const
 {
     out << COM << "position" << SEP << "left-pointing" << SEP << "right-pointing";
     Vector n(1,0,0);
-    real m = 40, dm = 0.5;
+    real m = 10, dm = 0.5;
     int nr, nl;
     for ( real p = -m ; p <= m ; p += dm )
     {
