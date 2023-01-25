@@ -59,6 +59,14 @@ void Solid::setInteractions(Meca& meca) const
         const real stiff = prop->twin_stiffness;
         for ( int i = 1; i <= DIM; ++i )
             meca.addLink(Mecapoint(this,i), Mecapoint(soTwin, i), stiff);
+        const real meta = prop->twin_metastiff;
+        if ( meta > 0 )
+        for ( int i = 1; i <= DIM; ++i )
+        {
+            // this adds an link with the midplane at X = 0
+            meca.addPointClampX(Mecapoint(this,i), 0, meta);
+            meca.addPointClampX(Mecapoint(soTwin, i), 0, meta);
+        }
     }
 #endif
     if ( prop->confine != CONFINE_OFF )
