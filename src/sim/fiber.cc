@@ -374,8 +374,8 @@ void Fiber::cutP(real len)
 /**
  The Fiber is cut at point P
  - A new Fiber is created from the section [ P , PLUS_END ],
- - all FiberSite attached to this section are transferred to the new Fiber,
- - Lattice content is also transferred,
+ - all FiberSite attached to this section are relocated to the new Fiber,
+ - Lattice susbtance is also relocated,
  - a pointer to the new Fiber is returned, which should be added to the Simul
  .
  @return zero, if `pti` is not an internal point
@@ -395,7 +395,7 @@ Fiber* Fiber::severPoint(size_t pti)
     *(static_cast<Chain*>(fib)) = *this;
     *(static_cast<Object*>(fib)) = *this;
 
-    // the signature on both pieces should be conserved:
+    // the signature should be conserved:
     fib->signature(signature());
     fib->birthTime(birthTime());
 
@@ -439,8 +439,8 @@ Fiber* Fiber::severPoint(size_t pti)
 The Fiber is cut at distance `abs` from its MINUS_END:
  - current Fiber is truncated to keep only the section [ MINUS_END , abs ],
  - A new Fiber is created representing the other section [ abs , PLUS_END ],
- - Hands are transferred to the new Fiber if appropriate,
- - Lattice substances are also transferred,
+ - Hands are relocated to the new Fiber if appropriate,
+ - Lattice substances are also relocated,
  .
  A pointer to the new Fiber is returned (containing the PLUS_END), but this
  pointer may be zero, if `abs` was not within the valid range of abscissa.
@@ -452,13 +452,15 @@ Fiber* Fiber::severM(real abs)
     Fiber* fib = prop->newFiber();
     assert_true( fib->prop == prop );
 
+    // the signature should be conserved:
+    fib->signature(signature());
+    fib->birthTime(birthTime());
+
     // copy the Chain part of the object:
     *(static_cast<Chain*>(fib)) = *this;
     *(static_cast<Object*>(fib)) = *this;
 
-    // the signature on both pieces should be conserved:
-    assert_true(fib->signature() == signature());
-    assert_true(fib->birthTime() == birthTime());
+    // check correctness of values:
     assert_small(fib->abscissaM() - abscissaM());
     assert_small(fib->abscissaP() - abscissaP());
 
@@ -505,9 +507,25 @@ Fiber* Fiber::severM(real abs)
 Fiber* Fiber::severNow(const real abs)
 {
     //std::clog << "sever " << reference() << " at " << abs << '\n';
-    if ( abscissaM() < abs && abs < abscissaP() )
-        return severM(abs-abscissaM());
-    return nullptr;
+    if ( abs - REAL_EPSILON < abscissaM() )
+    {
+#if 0
+        // this will remove a tiny fraction of the fiber at the minus-end
+        if ( 0 < abs-abscissaM() && abs < abscissaP() )
+            cutM(abs-abscissaM());
+#endif
+        return nullptr;
+    }
+    if ( abs + REAL_EPSILON > abscissaP() )
+    {
+#if 0
+        // this will remove a tiny fraction of the fiber at the plus-end
+        if ( abscissaM() < abs && 0 < abscissaP()-abs )
+            cutP(abscissaP()-abs);
+#endif
+        return nullptr;
+    }
+    return severM(abs-abscissaM());
 }
 
 
@@ -649,8 +667,8 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
 
 /**
  The given `fib` is added past the PLUS_END of `*this`,
- Hands bound to `fib` are transferred to *this.
- The dynamic state of the PLUS_END is also transferred.
+ Hands bound to `fib` are relocated to *this.
+ The dynamic state of the PLUS_END is also relocated.
  `fib` is enventually deleted
 */
 void Fiber::join(Fiber * fib)

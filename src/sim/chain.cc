@@ -1099,11 +1099,10 @@ void Chain::addSegmentM()
 
 
 /**
+ A portion of size `delta` is removed at the MINUS_END, and vertices are recalculated.
  The Fiber length is reduced by `delta` ( which must be >= 0 ).
- The portion of size `delta` near the MINUS_END is removed,
- the (fewer) vertices are recalculated.
  
- Note: after cutM(), the distance between the points is not exactly
+ Note: after cutM(), the distance between adjacent vertices is not exactly
  equal to segmentation(). This is true only if the fiber is straight.
  */
 void Chain::cutM(const real delta)
@@ -1219,11 +1218,10 @@ void Chain::addSegmentP()
 
 
 /**
+ A portion of size `delta` is removed at the PLUS_END, and vertices are recalculated.
  The Fiber length is reduced by `delta` ( which must be >= 0 ).
- The portion of size `delta` near the PLUS_END is removed,
- and the fewer vertices are recalculated.
 
- Note: after cutP(), the distance between the points is not exactly
+ Note: after cutP(), the distance between adjacent vertices is not exactly
  equal to segmentation(). This is true only if the fiber is straight.
 */
 void Chain::cutP(const real delta)
