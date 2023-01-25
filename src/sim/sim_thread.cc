@@ -116,13 +116,17 @@ void SimThread::run()
     assert_true( isWorker() );
     while ( 1 )
     {
+        std::string filename = simulProp().config_file;
         if ( config_code )
         {
             std::stringstream is(config_code);
-            readConfig(is, simulProp().config_file);
+            readConfig(is, filename);
         }
         else
-            Parser::readConfig();
+        {
+            std::ifstream ifs(filename.c_str(), std::ifstream::in);
+            readConfig(ifs, filename);
+        }
         // the simulation is now terminated, we shall wait for `repeat_`
         //fprintf(stderr, "Completed simulation %i\n", sim_->prop.flag);
         while ( !repeat_ )

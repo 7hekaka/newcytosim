@@ -847,7 +847,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     Filter filter(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
-    VLOG("-CUT PLANE (" << n << ").x = " << -a);
+    VLOG("-CUT " << objs.size() << " fibers PLANE (" << n << ").x = " << -a);
     sim_->fibers.planarCut(objs, n, a, stateP, stateM);
 }
 
