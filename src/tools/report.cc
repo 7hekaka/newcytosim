@@ -10,6 +10,7 @@
 #include "stream_func.h"
 #include "frame_reader.h"
 #include "iowrapper.h"
+#include "filepath.h"
 #include "glossary.h"
 #include "messages.h"
 #include "splash.h"
@@ -130,6 +131,13 @@ int main(int argc, char* argv[])
     what = argv[ax++];
     if ( arg.read_strings(argc-ax, argv+ax) )
         return EXIT_FAILURE;
+
+    // change working directory if specified:
+    if ( arg.has_key("directory") )
+    {
+        FilePath::change_dir(arg.value("directory"));
+        std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
+    }
 
 #if BACKWARD_COMPATIBILITY < 50
     if ( arg.set(str, "prefix") && str=="time" )
