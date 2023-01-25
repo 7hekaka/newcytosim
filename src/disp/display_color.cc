@@ -4,9 +4,14 @@
 namespace {
     
     // colors that vary with the direction of a vector:
-    gym_color radial_color(const Vector3& d) { return gym_color::radial_color((float)d.XX, (float)d.YY, (float)d.ZZ, 1.0f); }
-    gym_color radial_color(const Vector2& d) { return gym_color::radial_colorXY((float)d.XX, (float)d.YY, 1.0f); }
-    gym_color radial_color(const Vector1& d) { if ( d.XX > 0 ) return gym_color(1,1,1); else return gym_color(0,1,0); }
+    gym_color radial_color(const Vector3& d, gym_color::COLOF a = 1.f)
+    { return gym_color::radial_color((gym_color::COLOF)d.XX, (gym_color::COLOF)d.YY, (gym_color::COLOF)d.ZZ, a); }
+    
+    gym_color radial_color(const Vector2& d, gym_color::COLOF a = 1.f)
+    { return gym_color::radial_colorXY((gym_color::COLOF)d.XX, (gym_color::COLOF)d.YY, a); }
+    
+    gym_color radial_color(const Vector1& d, gym_color::COLOF a = 1.f)
+    { if ( d.XX > 0 ) return gym_color(1,1,1,a); else return gym_color(0,1,0,a); }
     
     //------------------------------------------------------------------------------
 #pragma mark - Color schemes to draw Fibers
