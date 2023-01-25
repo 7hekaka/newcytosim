@@ -828,9 +828,20 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     opt.set(n, "plane");
     opt.set(a, "plane", 1);
     
-    state_t stateP = STATE_RED, stateM = STATE_GREEN;
-    opt.set(stateP, "new_end_state");
-    opt.set(stateM, "new_end_state", 1);
+    Glossary::dict_type<state_t> keys{{"white",     STATE_WHITE},
+                                      {"green",     STATE_GREEN},
+                                      {"yellow",    STATE_YELLOW},
+                                      {"orange",    STATE_ORANGE},
+                                      {"red",       STATE_RED},
+                                      {"static",    STATE_WHITE},
+                                      {"grow",      STATE_GREEN},
+                                      {"growing",   STATE_GREEN},
+                                      {"shrink",    STATE_RED},
+                                      {"shrinking", STATE_RED}};
+
+    state_t stateP = STATE_RED, stateM = STATE_WHITE;
+    opt.set(stateP, "new_end_state", 0, keys);
+    opt.set(stateM, "new_end_state", 1, keys);
     
     Property * pp = sim_->properties.find(name);
     ObjectSet * set = nullptr;
