@@ -27,11 +27,11 @@ DynamicFiber::~DynamicFiber()
 //------------------------------------------------------------------------------
 #pragma mark - MINUS END
 
-/** set MINUS_END as shrinking */
+/** set MINUS_END as STATE_WHITE (inactive) by default */
 void DynamicFiber::initM()
 {
     unitM[0] = 0;
-    unitM[1] = 0;
+    unitM[1] = 2;
     mStateM  = calculateStateM();
 
     nextGrowthM = RNG.exponential();
@@ -66,8 +66,8 @@ void DynamicFiber::setEndStateM(state_t s)
         {
             assert_true( 0==unitM[0] || 1==unitM[0] );
             assert_true( 0==unitM[1] || 1==unitM[1] );
-            assert_true( mStateM == calculateStateM() );
         }
+        assert_true( mStateM == calculateStateM() );
     }
 }
 
@@ -183,7 +183,7 @@ int DynamicFiber::stepMinusEnd()
 //------------------------------------------------------------------------------
 #pragma mark - PLUS END
 
-/** set PLUS_END as growing */
+/** set as STATE_GREEN (growing) by default */
 void DynamicFiber::initP()
 {
     unitP[0] = 1;
@@ -228,8 +228,8 @@ void DynamicFiber::setEndStateP(state_t s)
         {
             assert_true( 0==unitP[0] || 1==unitP[0] );
             assert_true( 0==unitP[1] || 1==unitP[1] );
-            assert_true( mStateP == calculateStateP() );
         }
+        assert_true( mStateP == calculateStateP() );
     }
 }
 
