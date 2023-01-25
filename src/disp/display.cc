@@ -2170,6 +2170,7 @@ void Display::drawOrganizers(OrganizerSet const& set)
 /// display sub-part `inx` of object `obj`
 void zObject::draw(Display const* disp) const
 {
+    assert_false( point_.bad() );
     Mecable const * mec = point_.mecable();
     switch( mec->tag() )
     {
@@ -2190,7 +2191,7 @@ void zObject::draw(Display const* disp) const
             break;
             
         default:
-            std::cerr << "Internal error: unknown zObject pointer" << '\n';
+            std::cerr << "Internal error: unknown zObject\n";
     }
 }
 

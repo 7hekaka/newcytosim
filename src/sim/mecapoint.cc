@@ -56,3 +56,16 @@ std::ostream& operator << (std::ostream& os, Mecapoint const& arg)
     arg.print(os);
     return os;
 }
+
+
+int Mecapoint::bad() const
+{
+    if ( !mec_ )
+        return 1;
+
+    if ( point() >= mec_->nbPoints() )
+        return 2;
+    
+    return 0;
+}
+

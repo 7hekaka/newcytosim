@@ -38,7 +38,8 @@ class PointDisp;
 /**
  @brief A display element with a depth coordinate
  
- zObject is used to depth-sort and display transparent objects
+ zObject is used to depth-sort and display transparent elements from back to front
+ An element is a segment of a Fiber, or a sphere component from Solid/Bead/Sphere
  */
 class zObject
 {
@@ -50,11 +51,11 @@ class zObject
 
 public:
     
+    /// constructor
     zObject() : depth_(0) { }
-    
-    zObject(Mecable const* m) : point_(m, 0), depth_(0) { }
 
-    zObject(Mecable const* m, size_t i) : point_(m, i), depth_(0) { }
+    /// constructor
+    zObject(Mecable const* m, size_t i = 0) : point_(m, i), depth_(0) { }
     
     /// position
     Vector position() const { return point_.pos(); }

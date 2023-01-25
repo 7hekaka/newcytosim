@@ -63,6 +63,9 @@ public:
 
     /// Human friendly ouput
     void print(std::ostream&) const;
+
+    /// debug function
+    int bad() const;
 };
 
 /// output operator for debugging purpose
