@@ -57,9 +57,9 @@ static void splash(std::ostream& os, real g, real h, real unit)
     //const real ctime = g / ( 3*h*h );  // that is only true if g >> h
     std::streamsize p = os.precision();
     os.precision(5);
-    os << "  hydrolysis " << h << " growth " << g;
-    os << "  catastrophe_time " << ctime << "  rate " << 1/ctime;
-    os << "  length " << len << "\n";
+    os << "  hydrolysis " << h << "/s growth " << g << "/s";
+    os << "  catastrophe_time " << ctime << "s  rate " << 1/ctime << "/s";
+    os << "  length " << len << "um \n";
     os.precision(p);
 }
 
