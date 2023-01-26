@@ -521,6 +521,14 @@ Vector Cytosim::readPosition(std::istream& is, Space const* spc)
             extract(is, blur);
             pos += Vector::randG(blur);
         }
+        // extend long the X axis
+        else if ( tok == "extend" )
+        {
+            real B = 0, T = 0;
+            extract(is, B);
+            extract(is, T);
+            pos.XX += B + ( T - B ) * RNG.preal();
+        }
 #if ( DIM > 2 )
         // extend long the Z axis
         else if ( tok == "extendZ" )
