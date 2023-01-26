@@ -3,7 +3,7 @@
 # A script to submit analysis jobs to the SLURM queuing system
 #
 # Derived from submit_slurm.py
-# F. Nedelec, 4.11.2020, 28.10.2022
+# F. Nedelec, 4.11.2020, 30.09.2021, 28.10.2022, 26.01.2023
 
 """
     Submit a job to the SLURM system to be called in multiple directories
@@ -22,7 +22,7 @@ Example:
     submit_one.py 'report platelet > platelet.txt' run????
     Submit one job to run command in the directories provided
     
-F. Nedelec, Last updated 30.09.2021
+F. Nedelec, Last updated 26.01.2023
 """
 
 
@@ -34,6 +34,7 @@ queue   = 'icelake'
 runtime = '12:00:00' # 12 hour
 memory  = '4096'     # in MB
 ncpu    = 1          # nb of threads per job
+exclusive = 0        # node exclusivity
 
 # where output is sent:
 out = sys.stderr
@@ -70,6 +71,9 @@ def sub(file):
     cmd += ['--partition='+queue]
     cmd += ['--time='+runtime]
     cmd += ['--mem='+memory]
+    # request exclusivity on node:
+    if exclusive:
+        cmd += ['--exclusive']
     # define signals sent if time is exceeded:
     cmd += ['--signal=15@120']
     cmd += ['--signal=2@60']
@@ -121,6 +125,8 @@ def main(args):
                 runtime = val
             elif key == 'queue':
                 queue = val
+            elif key == 'exclusive':
+                exclusive = val
             else:
                 out.write("Error: I do not understand argument `%s'\n" % arg)
                 sys.exit()
