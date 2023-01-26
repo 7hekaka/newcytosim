@@ -191,12 +191,13 @@ void ObjectPool::permute(Object * p)
 /**
  Rearrange [F--P][X--Y][Q--B] into [X--Y][F--P][Q--B]
  
- Q must be after P
+ Q must be after P: Q > P
  If Q is between Front and P, this will destroy the list,
  but it would be costly to check this condition here.
  */
 void ObjectPool::shuffle_up(Object * p, Object * q)
 {
+    assert_true( p != q );
     assert_true( p  &&  p->nextO );
     assert_true( q  &&  q->prevO );
     
@@ -263,25 +264,25 @@ void ObjectPool::shuffle()
     if ( pp+1 < qq )
     {
         for ( ; n < pp; ++n )
-            p = p->nextO;
+            p = p->next();
         for ( q = p; n < qq; ++n )
-            q = q->nextO;
+            q = q->next();
         
         shuffle_up(p, q);
     }
     else if ( qq+1 < pp )
     {
         for ( ; n < qq; ++n )
-            p = p->nextO;
+            p = p->next();
         for ( q = p; n < pp; ++n )
-            q = q->nextO;
+            q = q->next();
         
         shuffle_down(p, q);
     }
     else
     {
         for ( ; n < qq; ++n )
-            p = p->nextO;
+            p = p->next();
 
         permute(p);
     }
@@ -294,13 +295,13 @@ void ObjectPool::shuffle()
 void ObjectPool::shuffle(Object * p)
 {
     assert_true(p);
-    size_t i = RNG.pint32((uint32_t)nSize>>1);
+    size_t i = RNG.pint32((uint32_t)nSize>>2);
     
-    Object * q;
-    for ( q = p ; q && i > 0; --i )
-        q = q->nextO;
+    Object * q = p;
+    while ( q->next() && --i > 0 )
+        q = q->next();
     
-    if ( q )
+    if ( p != q )
         shuffle_up(p, q);
 }
 
@@ -361,7 +362,7 @@ int ObjectPool::bad() const
     Object * p = frontO, * q;
     while ( p )
     {
-        q = p->nextO;
+        q = p->next();
         if ( !q )
         {
             if ( p != backO )

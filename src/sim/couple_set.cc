@@ -410,17 +410,23 @@ void CoupleSet::foldPositions(Modulo const* m) const
 
 void CoupleSet::shuffle()
 {
-    if ( ffList.size() > 1 ) ffList.shuffle();
-    if ( afList.size() > 1 ) afList.shuffle();
-    if ( faList.size() > 1 ) faList.shuffle();
-    if ( aaList.size() > 1 ) aaList.shuffle();
-    
     ObjectID id = RNG.pint32(inventory_.lowest(), inventory_.highest());
     Couple * c = static_cast<Couple*>(inventory_.get(id));
     if ( c )
     switch( c->state() )
     {
-        case 0: if ( !uniEnabled ) ffList.permute(c);break;
+        case 0: if ( !c->prop->fast_diffusion ) ffList.shuffle(c); break;
+        case 1: afList.shuffle(c); break;
+        case 2: faList.shuffle(c); break;
+        case 3: aaList.shuffle(c); break;
+    }
+    
+    id = RNG.pint32(inventory_.lowest(), inventory_.highest());
+    c = static_cast<Couple*>(inventory_.get(id));
+    if ( c )
+    switch( c->state() )
+    {
+        case 0: if ( !c->prop->fast_diffusion ) ffList.permute(c); break;
         case 1: afList.permute(c); break;
         case 2: faList.permute(c); break;
         case 3: aaList.permute(c); break;
