@@ -44,7 +44,6 @@ void DuoProp::clear()
     activation = "off";
     vulnerable = true;
     activation_space = nullptr;
-    activation_beads = nullptr;
 }
 
 
@@ -64,15 +63,7 @@ void DuoProp::complete(Simul const& sim)
     CoupleProp::complete(sim);
     
     activation_space = sim.findSpace(activation);
-#if ( 0 )
-    if ( !activation_space )
-    {
-        activation_beads = sim.findSolidProp(activation);
-    }
     
-    if ( primed(sim) && !activation_space && !activation_beads )
-        throw InvalidParameter("duo:activation not found!");
-#endif
     if ( deactivation_rate < 0 )
         throw InvalidParameter("deactivation_rate should be >= 0");
     

@@ -5,7 +5,6 @@
 
 #include "couple_prop.h"
 class Space;
-class SolidProp;
 
 
 /// Additional Property for Duo and DuoLong
@@ -45,9 +44,6 @@ public:
     
     // Space inside which the Duo is activated
     Space const* activation_space;
-    
-    // Space inside which the Duo is activated
-    SolidProp const* activation_beads;
 
 public:
     
