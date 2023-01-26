@@ -871,18 +871,21 @@ void Display3::drawOrganizer(Organizer const& obj) const
 
 void Display3::drawSinglesF(SingleSet const& set) const
 {
+    assert_enabled(GL_LIGHTING);
     for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
     {
-        if ( obj->disp()->perceptible )
+        PointDisp const* dis = obj->disp();
+        if ( dis->perceptible )
         {
-            gym::color_both(obj->disp()->color2);
+            //drawHandF(obj->posFoot(), obj->disp());
+            gym::color_both(dis->color2.tweak(obj->signature()));
 #if ( 0 )
-            if ( obj->disp()->style == 2 )
+            if ( dis->style == 2 )
             {
                 Space const* spc = obj->confineSpace();
                 if ( spc )
                 {
-                    const float rad = pixscale(obj->disp()->size);
+                    const float rad = pixscale(dis->size);
                     /// draw a disc tangent to the Space:
                     Vector pos = obj->posFoot();
                     Vector dir = spc->normalToEdge(pos);
@@ -891,7 +894,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
                 }
             }
 #endif
-            drawHandF(obj->posFoot(), obj->disp());
+            drawObject(obj->posFoot(), pixscale(dis->size), gle::blob);
         }
     }
 }
@@ -983,8 +986,17 @@ void Display3::drawCouplesF(CoupleSet const& set) const
  */
 void Display3::drawCouplesF1(CoupleSet const& set) const
 {
-    for ( Couple * cx = set.firstFF(); cx ; cx=cx->next() )
-        drawHandF(cx->posFree(), cx->disp1());
+    assert_enabled(GL_LIGHTING);
+    for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
+    {
+        //drawHandF(cx->posFree(), cx->disp1());
+        PointDisp const* dis = obj->disp1();
+        if ( dis->perceptible )
+        {
+            gym::color_both(dis->color2.tweak(obj->signature()));
+            drawObject(obj->posFree(), pixscale(dis->size), gle::blob);
+        }
+    }
 }
 
 
