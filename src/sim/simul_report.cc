@@ -3121,7 +3121,7 @@ void Simul::reportIndices(std::ostream& out) const
 {
     out << COM << "amount" << SEP << "radial" << SEP << "polar";
     real ixa, ixp;
-    fibers.infoSpindle(ixa, ixp, Vector(1,0,0), 0, 30, 1);
+    fibers.infoSpindle(ixa, ixp, Vector(1,0,0), 0, 10, 0.5);
     out << LIN << fibers.size();
     out << SEP << ixa;
     out << SEP << ixp;
@@ -3135,16 +3135,17 @@ void Simul::reportIndices(std::ostream& out) const
  */
 void Simul::reportProfile(std::ostream& out) const
 {
-    out << COM << "position" << SEP << "left-pointing" << SEP << "right-pointing";
+    out << COM << "position" << SEP << "leftward" << SEP << "rightward" << SEP << "right-left";
     Vector n(1,0,0);
     real m = 10, dm = 0.5;
-    int nr, nl;
-    for ( real p = -m ; p <= m ; p += dm )
+    int R, L;
+    for ( real x = -m ; x <= m ; x += dm )
     {
-        fibers.infoPlane(nr, nl, n, -p);
-        out << LIN << p;
-        out << SEP << nl;
-        out << SEP << nr;
+        fibers.infoPlane(R, L, n, -x);
+        out << LIN << x;
+        out << SEP << L;
+        out << SEP << R;
+        out << SEP << R-L;
     }
 }
 
