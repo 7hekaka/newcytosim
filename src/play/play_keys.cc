@@ -720,7 +720,7 @@ void helpKeys(std::ostream& os)
     os << "   ALT-SPACE   Reset view (i.e. zoom, translation, rotation)\n";
     os << "   f F         Toggle full-screen mode; maximize window size\n";
     os << "   i v b       Invert colors; toggle slice view; toggle scale bar\n";
-    os << "   l k         Read parameter file; Print display parameters\n";
+    os << "   l L         Read parameter file; Print display parameters\n";
     os << "   r R         Report various informations on display window\n";
 #if ENABLE_WRITE
     os << "   y Y         Save current image; Play and save all images\n";
@@ -806,7 +806,7 @@ void processKey(unsigned char key, int modifiers = 0)
 
         //------------------------- Global controls ----------------------------
 
-        case 'k':
+        case 'L':
         {
             if ( altKeyDown )
                 worker.writeProperties(std::cout, true);
@@ -817,7 +817,7 @@ void processKey(unsigned char key, int modifiers = 0)
                 player.writeDisplayParameters(std::cout, true);
             }
         } break;
-            
+        
 #if DRAW_MECA_LINKS
         case 'K':
             disp.draw_links = !disp.draw_links;
