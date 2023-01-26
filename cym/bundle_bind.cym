@@ -1,0 +1,115 @@
+% Arabidopsis taliana spindle
+% Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
+% F. Nedelec, Strasbourg 26.01.2023
+
+set simul system
+{
+    viscosity = 1
+    time_step = 0.001
+    steric = 1, 555, 222
+    display = ( size=2048,2048; point_value=0.01; style=3; rotation=0.7 0 0.7 0;)
+    skip_free_couple = 1
+    precondition = 6
+    verbose = 7
+}
+
+set space cell
+{
+    shape = cylinder
+    display = ( color=0xFFFFFF04; visible=1 )
+}
+
+new cell
+{
+    length = 2
+    diameter = 1.5
+}
+
+% ---------------------- MICROTUBULES ------------------------
+
+set fiber microtubule
+{
+    rigidity = 20
+    segmentation = 0.75
+    steric = 1, 0.030, 0.010
+    
+    activity = dynamic
+    min_length = 0.024
+    growing_speed = 0.21
+    shrinking_speed = -0.42, -0.2
+    hydrolysis_rate = 1.0
+    growing_force = 5
+    total_polymer = 20000
+    display = (color=0xFFFFFF88; line_width=2.5; end_size=9, 9; coloring=2; speckles=7; )
+}
+
+% ---------------------- KINESIN-5 ------------------------
+
+set hand anti_kinesin
+{
+    binding = 16, 0.074
+    unbinding = 2, 6
+    
+    activity = mighty
+    unloaded_speed = 0.06
+    stall_force = 5
+    rescue_chance = 0.125
+    display = ( color=orange; size=1.5; )
+}
+
+set couple antikin
+{
+    specificity = antiparallel
+    hand1 = anti_kinesin
+    hand2 = anti_kinesin
+    stiffness = 400
+    length = 0.060
+    diffusion = 5
+    fast_diffusion = 1
+}
+
+%---------------------- TEST SINGLE ------------------------
+
+set hand binder
+{
+    binding = 1000, 0.020
+    display = ( color=blue; size=3; )
+}
+
+set single blue
+{
+    hand = binder
+    stiffness = 2000
+    diffusion = 0.1
+}
+
+% ---------------------- SYSTEM! ------------------------
+
+new 800 antikin
+
+repeat 20
+{
+    new microtubule
+    {
+        position = cylinder 0 0.12
+        direction = 1 0 0
+        length = 2
+    }
+    run 10 system
+    new microtubule
+    {
+        position = cylinder 0 0.12
+        direction = -1 0 0
+        length = 2
+    }
+    run 10 system
+}
+
+new 1000 blue ( ring 2 0.748 )
+
+
+run 3000 system
+{
+    nb_frames = 30
+}
+
