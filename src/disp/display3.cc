@@ -636,22 +636,22 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, flo
 
 void Display3::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
-    drawFiberLattice(fib, lat, rad, color_by_lattice);
+    drawFiberLattice(fib, lat, pixscale(rad), color_by_lattice);
 }
 
 void Display3::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
-    drawFiberLattice(fib, lat, rad, color_by_lattice_jet);
+    drawFiberLattice(fib, lat, pixscale(rad), color_by_lattice_jet);
 }
 
 void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
-    drawFiberLattice(fib, lat, rad, color_by_lattice_white);
+    drawFiberLattice(fib, lat, pixscale(rad), color_by_lattice_white);
 }
 
 void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
-    drawFiberLattice(fib, lat, rad, color_alternate);
+    drawFiberLattice(fib, lat, pixscale(rad), color_alternate);
 }
 
 //------------------------------------------------------------------------------

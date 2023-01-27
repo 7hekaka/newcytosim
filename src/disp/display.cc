@@ -1131,6 +1131,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
  */
 void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
+    rad = pixwidth(rad);
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1197,6 +1198,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
  */
 void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
+    rad = pixwidth(rad);
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1270,6 +1272,7 @@ void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, flo
  */
 void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
+    rad = pixwidth(rad);
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -1600,6 +1603,28 @@ void Display::drawMicrotubule(Fiber const& fib,
 }
 
 
+int Display::drawFiberLattice(Fiber const& fib, int style, float rad) const
+{
+    VisibleLattice const* lat = fib.visibleLattice();
+    if ( lat ) switch ( style )
+    {
+        case 1:
+            drawFiberLattice1(fib, *lat, rad);
+            return 1;
+        case 2:
+            drawFiberLattice2(fib, *lat, rad);
+            return 1;
+        case 3:
+            drawFiberLattice3(fib, *lat, rad);
+            return 1;
+        case 4:
+            drawFiberLatticeEdges(fib, *lat, rad);
+            return 0;
+    }
+    return 0;
+}
+
+
 void Display::drawFiber(Fiber const& fib)
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -1630,32 +1655,11 @@ void Display::drawFiber(Fiber const& fib)
     }
 
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
-    VisibleLattice const* lat = fib.visibleLattice();
-    if ( lat )
+    if ( disp->lattice_style )
     {
-        float rad = std::max(disp->line_width * unitValue, 0.25f);
-        if ( style == 3 )
-            rad = pixscale(disp->line_width);
         // if the Lattice is displayed, do not draw backbone:
-        switch ( disp->lattice_style )
-        {
-            case 1:
-                drawFiberLattice1(fib, *lat, rad);
-                style = 0;
-                break;
-            case 2:
-                drawFiberLattice2(fib, *lat, rad);
-                style = 0;
-                break;
-            case 3:
-                drawFiberLattice3(fib, *lat, rad);
-                style = 0;
-                break;
-            case 4:
-                drawFiberLatticeEdges(fib, *lat, rad);
-                style = 0;
-                break;
-        }
+        if ( drawFiberLattice(fib, disp->lattice_style, disp->line_width) )
+            style = 0;
     }
 #endif
 #if ( DIM >= 3 )

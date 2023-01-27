@@ -161,6 +161,9 @@ public:
     /// scale from size / line width to natural units
     float pixscale(float w) const { return w * sizeScale; }
     
+    /// scale from size into OpenGL line width (pixel) units
+    float pixwidth(float w) const { return std::max(w * unitValue, 0.25f); }
+    
     /// draw primitive `obj` at given position
     void drawObject(Vector const& pos, float rad, void (*obj)()) const;
     
@@ -190,6 +193,9 @@ public:
 
     /// draw thin lines joining the Fiber vertices
     void drawFiberBackbone(Fiber const&) const;
+    
+    /// draw fiber Lattice
+    int drawFiberLattice(Fiber const& fib, int style, float size) const;
 
     /// draw Fiber MINUS_END
     virtual void drawFiberMinusEnd(Fiber const&, int style, float size) const;

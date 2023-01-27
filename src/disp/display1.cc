@@ -30,8 +30,8 @@ Display1::Display1(DisplayProp const* dp) : Display(dp)
 
 void Display1::drawObjects(Simul const& sim)
 {
-    linkWidth = std::max(prop->link_width * unitValue, 0.25f);
-    pointSize = std::max(prop->point_size * unitValue, 0.25f);
+    linkWidth = pixwidth(prop->link_width);
+    pointSize = pixwidth(prop->point_size);
 
     gym::closeDepthMask();
     gym::disableLighting();
