@@ -807,6 +807,8 @@ size_t Solid::addTriad(real arm)
 /** will return the size of the base vector, negated if triad is indirect */
 real Solid::hasTriad(size_t inx) const
 {
+    if ( inx + DIM >= nbPoints() )
+        return 0;
     Vector P = posPoint(inx);
     real R = posPoint(inx+1).XX - P.XX;
     real res = R;

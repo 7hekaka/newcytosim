@@ -124,7 +124,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Position of vertex number 'p' (indices starting at zero)
-    Vector posPoint(size_t p)  const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
+    Vector posPoint(size_t p) const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
     
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/

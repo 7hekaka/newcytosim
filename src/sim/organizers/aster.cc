@@ -313,7 +313,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
     
     // find local coordinate system:
     size_t ref = ~0U;
-    for ( size_t i = 0; i < sol->nbPoints(); ++i )
+    for ( size_t i = 0; i+DIM < sol->nbPoints(); ++i )
     {
         if ( sol->hasTriad(i) )
         {
