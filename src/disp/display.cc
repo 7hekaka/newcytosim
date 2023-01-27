@@ -987,6 +987,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     gym::disableLighting();
     gym::unmapBufferC4VD();
     gym::drawLineStrip(disp->line_widthX, 0, ptr-flu);
+    gym::restoreLighting();
     gym::cleanup();
 }
 
