@@ -134,7 +134,7 @@ namespace gym
         //glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col_);
         float blk[4] = { 0, 0, 0, 1 };
         glMaterialfv(GL_BACK, GL_AMBIENT, col);
-        glMaterialfv(GL_BACK, GL_DIFFUSE, col);
+        //glMaterialfv(GL_BACK, GL_DIFFUSE, col);
         glMaterialfv(GL_BACK, GL_EMISSION, blk);
     }
     

@@ -34,9 +34,9 @@ public:
     
     /// draw the given simulation state using OpenGL commands
     void drawObjects(Simul const&);
-   
-    /// draw Fibers with offset
-    void drawFiber(Fiber const&);
+    
+    /// draw Fibers
+    void drawFibers(FiberSet const&);
     
     /// draw free Singles
     void drawSinglesF(SingleSet const&) const;

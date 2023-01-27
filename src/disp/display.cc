@@ -274,8 +274,7 @@ void Display::drawTiled(Simul const& sim, int tile)
     gym::get_view(ref);
     for ( int i = 0; i < cnt; ++i )
     {
-        gym::mat_copy(mat, ref);
-        gym::mat_translate(mat, pos[i].XX, pos[i].YY, pos[i].ZZ);
+        gym::mat_translate(mat, ref, pos[i].XX, pos[i].YY, pos[i].ZZ);
         gym::set_view(mat);
         drawSimul(sim);
     }

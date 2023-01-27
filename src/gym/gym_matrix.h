@@ -74,6 +74,9 @@ namespace gym
     /// translate matrix, like glTranslate()
     void mat_translate(float[16], float X, float Y, float Z);
     
+    /// copy and translate matrix
+    void mat_translate(float[16], const float[16], float X, float Y, float Z);
+
     /// translate matrix and then scale, like glTranslate() followed by glScale()
     void mat_transscale(float[16], float X, float Y, float Z, float S);
 

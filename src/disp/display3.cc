@@ -61,7 +61,7 @@ void Display3::drawObjects(Simul const& sim)
         glClearStencil(0);
         glClear(GL_STENCIL_BUFFER_BIT);
         glEnable(GL_STENCIL_TEST);
-        glStencilFunc(GL_EQUAL, 0, ~0);
+        glStencilFunc(GL_ALWAYS, 0, ~0);
         
         gym::enableCullFace(GL_FRONT);
         //drawFibers(sim.fibers);
@@ -75,7 +75,7 @@ void Display3::drawObjects(Simul const& sim)
             if ( fib->disp->visible )
             {
                 glStencilFunc(GL_ALWAYS, ++val, ~0);
-                drawFiber(*fib);
+                drawFiberLines(*fib, fib->prop->disp->line_style);
             }
         }
         // set Stencil to 0 for outer surfaces:
@@ -86,7 +86,7 @@ void Display3::drawObjects(Simul const& sim)
         {
             if ( fib->disp->visible )
             {
-                glStencilFunc(GL_EQUAL, ++val, ~0);
+                glStencilFunc(GL_ALWAYS, ++val, ~0);
                 drawFiber(*fib);
             }
         }

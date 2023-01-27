@@ -237,10 +237,10 @@ public:
     void         drawFiberForces(Fiber const&, real scale, float width) const;
     
     /// draw all features of Fiber
-    virtual void drawFiber(Fiber const&);
+    void drawFiber(Fiber const&);
     
     /// draw Fibers
-    virtual void drawFibers(FiberSet const&);
+    void drawFibers(FiberSet const&);
     
     /// draw the average fiber for the pool defined by func(obj, val) == true
     void drawAverageFiber(ObjectList const&, gym_color) const;

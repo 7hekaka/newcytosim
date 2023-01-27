@@ -227,7 +227,6 @@ void Player::setPixelSize(View& view)
         mag = disp.point_value / pix;
     
     mDisplay->setPixelFactors(pix, mag);
-    
     mDisplay->setStencil(view.stencil);
 
     for ( Property * p : dispList )

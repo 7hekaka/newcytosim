@@ -91,20 +91,25 @@ void Display1::drawObjects(Simul const& sim)
 #pragma mark -
 
 
-void Display1::drawFiber(Fiber const& fib)
+void Display1::drawFibers(FiberSet const& set)
 {
 #if ENABLE_EXPLODED_DISPLAY
     //translate whole display to display the Fiber
-    GLfloat mat[16];
-    gym::get_view(mat);
-    gym::translate(0, fib.disp->explode_shift, 0);
+    GLfloat ref[16], mat[16];
+    gym::get_view(ref);
 #endif
-    
-    Display::drawFiber(fib);
 
+    for ( Fiber const* fib = set.first(); fib ; fib=fib->next() )
+    {
+        if ( fib->disp->visible )
+        {
 #if ENABLE_EXPLODED_DISPLAY
-    gym::set_view(mat);
+            gym::mat_translate(mat, ref, 0, fib->disp->explode_shift, 0);
+            gym::set_view(mat);
 #endif
+            drawFiber(*fib);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
