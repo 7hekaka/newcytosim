@@ -1,0 +1,91 @@
+% Arabidopsis taliana spindle
+% Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
+% F. Nedelec, Cambridge 12.11.2022, Sunny. 25.11.2022, Rainy
+% Fat Chromosomes: 31.12.2022, 28.01.2023
+
+set simul system
+{
+    viscosity = 1
+    time_step = 0.01
+    steric = 1, 555, 222
+    display = ( size=1024,1024; point_value=0.01; style=3; )
+    skip_free_couple = 1
+    precondition = 6
+    verbose = 7
+}
+
+set space cell
+{
+    shape = cylinder
+    display = ( color=0xFFFFFF04; visible=1 )
+}
+
+new cell
+{
+    length = 2
+    diameter = 4.5
+}
+
+%---------------------- KINETOCHORES ------------------------
+
+set hand kinetonuc
+{
+    display = ( color=white; size=4; width=3; )
+}
+
+set single corona
+{
+    hand = kinetonuc
+    stiffness = 333
+    anchor_stiffness = 167
+    diffusion = 10
+}
+
+set solid kinetochore
+{
+    steric = 0
+    twin_stiffness = 500
+    twin_metastiff = 100
+    display = ( color=0x00FFFFFF; size=2; style=5; )
+}
+
+set fiber chromatin
+{
+    rigidity = 1
+    viscosity = 5
+    segmentation = 0.1
+    steric = 1, 0.070  % this is multiplied by 3 by silhouette
+    display = ( color=0xFFFFFF33; coloring=1; line=20; )
+}
+
+set hand holder
+{
+    binding = 2000, 0.020
+    display = ( color=blue; size=3; )
+}
+
+set single kinglue
+{
+    hand = holder
+    stiffness = 2000
+    diffusion = 0.1
+}
+
+set couple cohesin
+{
+    hand1 = holder
+    hand2 = holder
+    stiffness = 4
+}
+
+% ---------------------- CHROMOSOMES ------------------------
+
+include plant_chromosomes.cym
+include plant_chromosomes.cym
+
+
+run 100000 system
+{
+    nb_frames = 1000
+}
+
