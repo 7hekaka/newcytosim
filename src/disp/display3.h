@@ -20,9 +20,6 @@ class Display3 : public Display
 private:
     
     /// draw a point with a small sphere
-    void drawPoint(Vector const&, float) const;
-    
-    /// draw a point with a small sphere
     void drawPoint(Vector const&, PointDisp const*) const;
 
     /// draw primitive `obj` at given position

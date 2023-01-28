@@ -98,21 +98,15 @@ PointDisp const* Couple::disp21() const
 
 void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
 {
-    if ( rad > pixelSize )
-    {
-        gym::transScale(pos, rad);
-        obj();
-    }
+    gym::transScale(pos, rad);
+    obj();
 }
 
 
 void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*obj)()) const
 {
-    if ( rad > pixelSize )
-    {
-        gym::transAlignZ(pos, rad, dir);
-        obj();
-    }
+    gym::transAlignZ(pos, rad, dir);
+    obj();
 }
 
 
@@ -806,7 +800,7 @@ void Display::drawMisc(Simul const& sim)
 void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 {
     const float rad = pixscale(size);
-    if ( rad > 0 ) switch(style)
+    if ( rad > pixelSize ) switch(style)
     {
         default: break;
         case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
@@ -833,7 +827,7 @@ void Display::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
     gym::ref_view();
     const float rad = pixscale(size);
-    if ( rad > 0 ) switch(style)
+    if ( rad > pixelSize ) switch(style)
     {
         default: break;
         case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
@@ -1066,7 +1060,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         gym::disableLighting();
         gym::color(fib.disp->color);
         gym::loadPoints(fib.nbPoints(), fib.addrPoints());
-        gym::drawSquarePoints(disp->point_size, 0, fib.nbPoints());
+        gym::drawSquarePoints(disp->point_sizeX, 0, fib.nbPoints());
     }
     else if ( style == 2 )
     {
@@ -2028,22 +2022,26 @@ void Display::drawBeads(BeadSet const& set)
 void Display::drawSphere(Sphere const& obj)
 {
     const PointDisp * disp = obj.prop->disp;
+    const float rad = pixscale(disp->size);
     
-    // display surface points
-    if ( disp->style & 2 )
+    if ( rad > pixelSize )
     {
-        bodyColor(obj);
-        for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
-            drawObject(obj.posP(i), pixscale(disp->size), gle::sphere1);
-    }
-    
-    // display center and reference points
-    if ( disp->style & 8 )
-    {
-        bodyColor(obj);
-        drawObject(obj.posP(0), pixscale(disp->size), gle::star);
-        for ( size_t i = 0; i < obj.nbRefPoints; ++i )
-            drawObject(obj.posP(i), pixscale(disp->size), gle::cube);
+        // display surface points
+        if ( disp->style & 2 )
+        {
+            bodyColor(obj);
+            for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
+                drawObject(obj.posP(i), rad, gle::sphere1);
+        }
+        
+        // display center and reference points
+        if ( disp->style & 8 )
+        {
+            bodyColor(obj);
+            drawObject(obj.posP(0), rad, gle::star);
+            for ( size_t i = 0; i < obj.nbRefPoints; ++i )
+                drawObject(obj.posP(i), rad, gle::cube);
+        }
     }
 }
 

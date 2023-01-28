@@ -144,13 +144,6 @@ void Display3::drawObjects(Simul const& sim)
 #pragma mark - Drawing primitives
 
 
-inline void Display3::drawPoint(Vector const& pos, float rad) const
-{
-    assert_enabled(GL_LIGHTING);
-    drawObject(pos, rad, gle::sphere1);
-}
-
-
 inline void Display3::drawPoint(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
@@ -677,7 +670,7 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
 void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 {
     const float rad = pixscale(size);
-    if ( rad > 0 ) switch(style)
+    if ( rad > pixelSize ) switch(style)
     {
         default: break;
         case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
@@ -704,7 +697,7 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 void Display3::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
 {
     const float rad = pixscale(size);
-    if ( rad > 0 ) switch(style)
+    if ( rad > pixelSize ) switch(style)
     {
         default: break;
         case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
@@ -792,35 +785,38 @@ void Display3::drawFiberPoints(Fiber const& fib) const
     gym::color_front(fib.disp->color);
     gym::color_back(disp->back_color);
 
-    if ( style == 1 )
+    if ( rad > pixelSize )
     {
-        gym::enableLighting();
-        // display vertices:
-        for ( size_t i = 0; i < fib.nbPoints(); ++i )
-            drawObject(fib.posP(i), rad, gle::cube);
-    }
-    else if ( style == 2 )
-    {
-        gym::enableLighting();
-        // display arrowheads along the fiber:
-        const real gap = disp->point_gap;
-        real ab = std::ceil(fib.abscissaM()/gap) * gap;
-        for ( ; ab <= fib.abscissaP(); ab += gap )
-            gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
-    }
-    else if ( style == 3 )
-    {
-        gym::enableLighting();
-        // display chevrons along the fiber:
-        const real gap = disp->point_gap;
-        real ab = std::ceil(fib.abscissaM()/gap) * gap;
-        for ( ; ab <= fib.abscissaP(); ab += gap )
-            gle::drawCone(fib.pos(ab), -fib.dir(ab), rad);
-    }
-    else if ( style == 4 )
-    {
-        // display middle of fiber:
-        drawPoint(fib.posMiddle(), 2*rad);
+        if ( style == 1 )
+        {
+            gym::enableLighting();
+            // display vertices:
+            for ( size_t i = 0; i < fib.nbPoints(); ++i )
+                drawObject(fib.posP(i), rad, gle::cube);
+        }
+        else if ( style == 2 )
+        {
+            gym::enableLighting();
+            // display arrowheads along the fiber:
+            const real gap = disp->point_gap;
+            real ab = std::ceil(fib.abscissaM()/gap) * gap;
+            for ( ; ab <= fib.abscissaP(); ab += gap )
+                gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
+        }
+        else if ( style == 3 )
+        {
+            gym::enableLighting();
+            // display chevrons along the fiber:
+            const real gap = disp->point_gap;
+            real ab = std::ceil(fib.abscissaM()/gap) * gap;
+            for ( ; ab <= fib.abscissaP(); ab += gap )
+                gle::drawCone(fib.pos(ab), -fib.dir(ab), rad);
+        }
+        else if ( style == 4 )
+        {
+            // display middle of fiber:
+            drawObject(fib.posMiddle(), 2*rad, gle::sphere2);
+        }
     }
 }
 
@@ -883,24 +879,27 @@ void Display3::drawSinglesF(SingleSet const& set) const
         PointDisp const* dis = obj->disp();
         if ( dis->perceptible )
         {
-            //drawHandF(obj->posFoot(), obj->disp());
-            gym::color_both(dis->color2.tweak(obj->signature()));
-#if ( 0 )
-            if ( dis->style == 2 )
+            const float rad = pixscale(dis->size);
+            if ( rad > pixelSize )
             {
-                Space const* spc = obj->confineSpace();
-                if ( spc )
+                //drawHandF(obj->posFoot(), obj->disp());
+                gym::color_both(dis->color2.tweak(obj->signature()));
+#if ( 0 )
+                if ( dis->style == 2 )
                 {
-                    const float rad = pixscale(dis->size);
-                    /// draw a disc tangent to the Space:
-                    Vector pos = obj->posFoot();
-                    Vector dir = spc->normalToEdge(pos);
-                    drawObject(pos, dir, rad, gle::disc);
-                    continue;
+                    Space const* spc = obj->confineSpace();
+                    if ( spc )
+                    {
+                        /// draw a disc tangent to the Space:
+                        Vector pos = obj->posFoot();
+                        Vector dir = spc->normalToEdge(pos);
+                        drawObject(pos, dir, rad, gle::disc);
+                        continue;
+                    }
                 }
-            }
 #endif
-            drawObject(obj->posFoot(), pixscale(dis->size), gle::blob);
+                drawObject(obj->posFoot(), pixscale(dis->size), gle::blob);
+            }
         }
     }
 }
@@ -924,41 +923,44 @@ void Display3::drawSingleB(Single const* obj) const
     const float wid = pixscale(disp->width);
     const float rad = pixscale(disp->size);
 
-    gym::color_both(disp->color2);
+    if ( rad > pixelSize )
+    {
+        gym::color_both(disp->color2);
 #if ( 0 )
-    if ( obj->disp()->style == 2 && obj->confineSpace() )
-    {
-        // draw a disc tangent to the Space:
-        drawObject(pf, obj->confineSpace()->normalToEdge(pf), rad, gle::disc);
-    }
-    else
+        if ( obj->disp()->style == 2 && obj->confineSpace() )
+        {
+            // draw a disc tangent to the Space:
+            drawObject(pf, obj->confineSpace()->normalToEdge(pf), rad, gle::disc);
+        }
+        else
 #endif
-    {
-        gym::transScale(pf, wid);
-        gle::blob(); // the foot
-    }
-    gym::color_both(disp->color);
+        {
+            gym::transScale(pf, wid);
+            gle::blob(); // the foot
+        }
+        gym::color_both(disp->color);
 #if ( DIM > 2 )
-    Vector diff = pf - ph;
-    float L = norm(diff);
-    gym::transAlignZ(ph, rad, diff/L);
-    gle::blob();
-    gym::scale(wid/rad, wid/rad, L/rad);
-    gle::hexTube();
+        Vector diff = pf - ph;
+        float L = norm(diff);
+        gym::transAlignZ(ph, rad, diff/L);
+        gle::blob();
+        gym::scale(wid/rad, wid/rad, L/rad);
+        gle::hexTube();
 #elif ( 0 )
-    Vector dir = normalize( pf - ph );
-    gym::enableClipPlane(5);
-    gym::setClipPlane(5, -dir, pf);
-    gym::transAlignZ(ph, rad, dir);
-    gle::needle();
-    gym::disableClipPlane(5);
+        Vector dir = normalize( pf - ph );
+        gym::enableClipPlane(5);
+        gym::setClipPlane(5, -dir, pf);
+        gym::transAlignZ(ph, rad, dir);
+        gle::needle();
+        gym::disableClipPlane(5);
 #else
-    if ( obj->base() )
-        drawObject(ph, rad, gle::octahedron);
-    else
-        drawHand(ph, disp);
-    gle::drawBand(ph, wid, disp->color, pf, wid, disp->color.alpha_scaled(0.5f));
+        if ( obj->base() )
+            drawObject(ph, rad, gle::octahedron);
+        else
+            drawHand(ph, disp);
+        gle::drawBand(ph, wid, disp->color, pf, wid, disp->color.alpha_scaled(0.5f));
 #endif
+    }
 }
 
 void Display3::drawSinglesA(SingleSet const& set) const
@@ -1040,7 +1042,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
         Hand const* h = cx->hand1();
         PointDisp const* disp = h->prop->disp;
 
-        if ( h->fiber()->disp->visible && disp->visible )
+        if ( h->fiber()->disp->visible && disp->perceptible )
         {
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber1()->disp->color.transparent() )
@@ -1060,7 +1062,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
         Hand const* h = cx->hand2();
         PointDisp const* disp = h->prop->disp;
 
-        if ( cx->fiber2()->disp->visible && cx->disp2()->visible )
+        if ( cx->fiber2()->disp->visible && cx->disp2()->perceptible )
         {
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber2()->disp->color.transparent() )
@@ -1108,7 +1110,7 @@ void Display3::drawCoupleBside(Couple const* cx) const
         // semi-accurate rendering of Couple's side-side link
         gym::color_both(pd1->color);
         Vector mid = 0.5 * ( cx->sidePos1() + cx->sidePos2() );
-        drawPoint(mid, pixscale(pd1->width));
+        drawPoint(mid, pd1);
         gym::stretchAlignZ(p2, mid, pixscale(pd2->width));
         gle::hexTube();
         gym::stretchAlignZ(p1, mid, pixscale(pd1->width));
