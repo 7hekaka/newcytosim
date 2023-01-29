@@ -646,7 +646,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
             return FiberSite(fib, fib->someAbscissa(abs, ref, mod, 1.0));
         }
     }
-    throw InvalidParameter("could not determine specified attachment `"+str+"'");
+    throw InvalidParameter("could not find fiber `"+str+"'");
     return FiberSite();
 }
 
@@ -1232,7 +1232,7 @@ void FiberSet::infoSpindle(real& ixa, real& ixp, Vector const& n, real a, real m
             sum += nio;
         }
     
-        // right side
+        // right side: arguments are swapped!
         infoPlane(no, ni, n, a-p);
         nio = ni + no;
         if ( nio )

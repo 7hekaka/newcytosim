@@ -204,6 +204,9 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
     Vector pos = fib.posPoint(1);
     Vector nxt, dir;
     gym::color_front(select_color(fib, 0));
+#if NEW_FIBER_SILHOUETTE
+    if ( fib.chiasma() > -1 ) rad = fib.silhouette(0);
+#endif
 
     if ( last > 0 )
     {
@@ -225,6 +228,9 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
             dir = normalize(nxt-old);
             gym::color_front(select_color(fib, i));
             gym::setClipPlane(5, -dir, pos);
+#if NEW_FIBER_SILHOUETTE
+            if ( fib.chiasma() > -1 ) rad = fib.silhouette(i);
+#endif
             gym::transAlignZ(old, rad, pos-old);
             gle::centralTube();
             gym::setClipPlane(4,  dir, pos);
