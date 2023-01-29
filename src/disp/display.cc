@@ -1879,7 +1879,7 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         gym::enableClipPlane(5-i);
         gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
     }
-    drawBallT(X, obj.radius(inx), bodyColorF(obj), obj.mark());
+    drawBallT(X, obj.radius(inx), bodyColorF(obj), obj.mark()*(inx==0));
     for ( size_t i = 0; i < num; ++i )
         gym::disableClipPlane(5-i);
 #else
@@ -1928,10 +1928,9 @@ void Display::drawSolids(SolidSet const& set)
                 //gym_color col = gym_color::dark_jet_color(disp->scale * len);
                 gym_color col = bodyColorF(*obj);
                 gym_color black(0,0,0,1);
-                drawFootball(*obj, inx, col, black, true);
-                drawFootball(*twi, inx, col, black, false);
+                drawFootball(*obj, inx, col, black, false);
+                drawFootball(*twi, inx, col, black, true);
             }
-            else
 #endif
             if ( obj->prop->disp->color.transparent() )
             {

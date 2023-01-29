@@ -734,42 +734,57 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         throw InvalidParameter("could not find the number of points specified in solid:nb_points");
     }
 
-    fixShape();
     objs.push_back(this);
 
 #if NEW_SOLID_HAS_TWIN
-    if ( opt.set(str, "twin") && !soTwin )
+    if ( opt.set(str, "twin") )
     {
-        Solid * S = nullptr;
+        real R0 = radius(0);
         if ( str == "mirror" )
         {
-            // create a twin Solid that is the mirror image of *this:
-            S = new Solid(prop);
-            S->soTwin = this;
-            ObjectList list = S->build(opt, sim);
-            real R = 0.5 * radius(0);
-            // using axis going midway between the three references points:
-            Rotation rot = Rotation::randomRotationToVector(Vector(1,1,1)).transposed();
-            // we flip 'S' with a X -> -X to make it mirror image of its twin:
-            ObjectSet::rotateObjects(list, Rotation::flipX()*rot);
-            ObjectSet::translateObjects(list, Vector(+R,0,0));
-            ObjectSet::rotateObjects(objs, rot);
-            ObjectSet::translateObjects(objs, Vector(-R,0,0));
-            objs.append(list);
+            // build rotation that brings (1,1,1) into the X axis:
+            real X = -sqrt((2+M_SQRT3)/6.0), D = 0.5-M_SQRT3/6.0, T = 1.0/M_SQRT3;
+            ObjectSet::rotateObjects(objs, Rotation(-T,X,D,-T,D,X,-T,T,T));
+            ObjectSet::translateObjects(objs, Vector(+0.5*R0,0,0));
+            if ( !soTwin )
+            {
+                // create a twin Solid that is the mirror image of *this:
+                Solid * S = new Solid(prop);
+                S->soTwin = this;
+                objs.append(S->build(opt, sim));
+            }
         }
         else
-            S = sim.pickSolid(str);
-        if ( S )
         {
-            S->soTwin = this;
-            S->fixShape(); // to keep the mirrored shape
+            Solid * S = sim.pickSolid(str);
+            if ( !S )
+                std::cerr << "Warning: could not find twin Solid `" << str << "'\n";
             if ( S->nbPoints() <= DIM )
                 throw InvalidParameter("Solid's twin lacks sufficient points");
         }
-        else
-            std::cerr << "Warning: could not find twin Solid `" << str << "'\n";
+        real len = 2, chi = 0.5;
+        if ( opt.set(len, "chromosome") )
+        {
+            opt.set(chi, "chromosome", 1);
+            for ( int i = 0; i < 16; ++i )
+            {
+                real y = ( i / 15.0 ) * len - chi; // in [-chi, len-chi]
+                if ( abs_real(y) > M_SQRT2*R0 )
+                {
+                    real rad = R0 * ( 2.0 + std::tanh(5.0 * abs_real(y) - M_SQRT2) ); // in [1, 3]
+                    size_t ref = addSphere(Vector(rad, y, 0), rad);
+                    //addTriad(rad);
+                }
+            }
+        }
+        if ( soTwin )
+        {
+            // we flip 'S' with a X -> -X to make it mirror image of its twin:
+            ObjectSet::rotateObjects(objs, Rotation::flipX());
+        }
     }
 #endif
+    fixShape();
     return objs;
 }
 
