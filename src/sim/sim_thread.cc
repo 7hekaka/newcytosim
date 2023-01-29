@@ -334,7 +334,7 @@ int SimThread::loadLastFrame()
 
 SingleProp * SimThread::getHandleProperty() const
 {
-    Property * p = sim_->properties.find("single", "user_single");
+    Property * p = sim_->properties.find("single", "live_single");
     return static_cast<SingleProp*>(p);
 }
 
@@ -342,7 +342,7 @@ SingleProp * SimThread::getHandleProperty() const
 SingleProp * SimThread::makeHandleProperty(real range)
 {
     // Create a Hand that attaches fast and never detach:
-    HandProp * hap = new HandProp("user_hand");
+    HandProp * hap = new HandProp("live_hand");
     hap->binding_range   = range;
     hap->binding_rate    = 1 / time_step(*sim_);
     hap->unbinding_rate  = 0;
@@ -350,8 +350,8 @@ SingleProp * SimThread::makeHandleProperty(real range)
     hap->complete(*sim_);
     sim_->properties.deposit(hap);
 
-    SingleProp * sip = new SingleProp("user_single");
-    sip->hand = "user_hand";
+    SingleProp * sip = new SingleProp("live_single");
+    sip->hand = "live_hand";
     sip->activity = "fixed";
     sip->stiffness = 2000;
     sip->complete(*sim_);
