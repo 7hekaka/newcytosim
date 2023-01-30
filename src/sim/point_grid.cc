@@ -378,7 +378,8 @@ static inline bool not_adjacentPP(FatPoint const* a, FatPoint const* b)
 #if NEW_SOLID_HAS_TWIN
     Solid const* A = Solid::toSolid(a->pnt_.mecable());
     Solid const* B = Solid::toSolid(b->pnt_.mecable());
-    if ( A && B && ( A->twin() == B || B->twin() == A ))
+    if (( A && B ) && (( A->twin() == B || B->twin() == A )
+        && ( a->pnt_.point()==0 && b->pnt_.point()==0 )) )
         return false;
 #endif
     return a->pnt_.mecable() != b->pnt_.mecable();

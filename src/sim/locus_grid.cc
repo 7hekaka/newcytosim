@@ -701,7 +701,8 @@ static inline bool not_adjacentPP(BigPoint const& a, BigPoint const& b)
 #if NEW_SOLID_HAS_TWIN
     Solid const* A = Solid::toSolid(a.obj_);
     Solid const* B = Solid::toSolid(b.obj_);
-    if ( A && B && ( A->twin() == B || B->twin() == A ))
+    if (( A && B ) && (( A->twin() == B || B->twin() == A )
+        && ( a.vix_==0 && b.vix_==0 )) )
         return false;
 #endif
     return a.obj_ != b.obj_;

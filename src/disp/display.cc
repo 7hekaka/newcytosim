@@ -1901,8 +1901,8 @@ static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color 
     gym::transScale(X, obj.radius(inx));
 #endif
     if ( flip ) glFrontFace(GL_CW);
-    gym::color_front(col);
-    gle::sphere1();
+    //gym::color_front(col);
+    //gle::sphere1();
     gym::color_front(bak);
     gle::footballPentagons();
     if ( flip ) glFrontFace(GL_CCW);
