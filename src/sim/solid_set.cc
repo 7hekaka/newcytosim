@@ -16,19 +16,15 @@ void SolidSet::step()
     static real nextCreation = RNG.exponential();
     for ( Solid * S = first(); S; S=S->next() )
     {
-        real rate = S->prop->source_rate_dt;
-        for ( size_t p = 0; p < S->nbPoints(); ++p )
+        nextCreation -= S->prop->source_rate_dt;
+        while ( nextCreation <= 0 )
         {
-            // creation rate is proportional to surface
-            nextCreation -= rate * square(S->radius(p));
-            while ( nextCreation <= 0 )
-            {
-                nextCreation += RNG.exponential();
-                Couple * C = S->prop->source_prop->newCouple();
-                C->setPosition(S->posPoint(p));
-                C->activate();
-                simul_.couples.add(C);
-            }
+            nextCreation += RNG.exponential();
+            Couple * C = S->prop->source_prop->newCouple();
+            size_t p = RNG.pint32(S->nbPoints());
+            C->setPosition(S->posPoint(p));
+            C->activate();
+            simul_.couples.add(C);
         }
     }
 #endif
