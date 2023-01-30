@@ -1000,7 +1000,7 @@ Rotation Cytosim::readRotation(std::istream& is)
     // rewind before token:
     is.clear();
     is.seekg(isp);
-    throw InvalidSyntax("unexpected `"+tok+"' in rotation");
+    throw InvalidSyntax("unexpected `"+tok+"' in rotation specificiation");
     return Rotation::randomRotation();
 }
 
