@@ -745,7 +745,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             // build rotation that brings (1,1,1) into the X axis:
             real X = -sqrt((2+M_SQRT3)/6.0), D = 0.5-M_SQRT3/6.0, T = 1.0/M_SQRT3;
             ObjectSet::rotateObjects(objs, Rotation(-T,X,D,-T,D,X,-T,T,T));
-            ObjectSet::translateObjects(objs, Vector(+0.5*R0,0,0));
+            ObjectSet::translateObjects(objs, Vector(+0.582*R0,0,0));
             if ( !soTwin )
             {
                 // create a twin Solid that is the mirror image of *this:

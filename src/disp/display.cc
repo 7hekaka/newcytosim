@@ -115,7 +115,7 @@ void Display::drawBallT(Vector const& pos, real rad, gym_color const& col, unsig
     gym::transScale(pos, rad);
     //gym::enableLighting();
     gym::color_both(col);
-    gle::dualPassSphere4();
+    gle::dualPassSphere2();
     if ( mark )
     {
         gym::color_front(0,0,0);
@@ -1901,8 +1901,8 @@ static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color 
     gym::transScale(X, obj.radius(inx));
 #endif
     if ( flip ) glFrontFace(GL_CW);
-    //gym::color_front(col);
-    //gle::sphere1();
+    gym::color_front(col, 1.0);
+    gle::sphere1();
     gym::color_front(bak);
     gle::footballPentagons();
     if ( flip ) glFrontFace(GL_CCW);
@@ -1914,36 +1914,39 @@ void Display::drawSolids(SolidSet const& set)
     for ( Solid * obj = set.first(); obj; obj=obj->next() )
     {
         const PointDisp * disp = obj->prop->disp;
-        if ( disp->visible && ( disp->style & 1 ))
+        if ( disp->visible )
         {
             drawSolid(*obj);
+            if ( disp->style & 1 )
+            {
 #if ( DIM >= 3 )
 #if NEW_SOLID_HAS_TWIN
-            const size_t inx = 0;
-            Solid const* twi = obj->twin();
-            if ( twi && obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
-            {
-                gym::enableLighting();
-                //real len = std::sqrt(obj->twinTensionSqr());
-                //gym_color col = gym_color::dark_jet_color(disp->scale * len);
-                gym_color col = bodyColorF(*obj);
-                gym_color black(0,0,0,1);
-                drawFootball(*obj, inx, col, black, false);
-                drawFootball(*twi, inx, col, black, true);
-            }
+                const size_t inx = 0;
+                Solid const* twi = obj->twin();
+                if ( twi && obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
+                {
+                    gym::enableLighting();
+                    //real len = std::sqrt(obj->twinTensionSqr());
+                    //gym_color col = gym_color::dark_jet_color(disp->scale * len);
+                    gym_color col = bodyColorF(*obj);
+                    gym_color black(0,0,0,1);
+                    drawFootball(*obj, inx, col, black, false);
+                    drawFootball(*twi, inx, col, black, true);
+                }
 #endif
-            if ( obj->prop->disp->color.transparent() )
-            {
-                for ( size_t i = 0; i < obj->nbPoints(); ++i )
-                    if ( obj->radius(i) > 0 )
-                        zObjects.push_back(zObject(obj, i));
-            }
-            else
+                if ( obj->prop->disp->color.transparent() )
+                {
+                    for ( size_t i = 0; i < obj->nbPoints(); ++i )
+                        if ( obj->radius(i) > 0 )
+                            zObjects.push_back(zObject(obj, i));
+                }
+                else
 #endif
-            {
-                for ( size_t i = 0; i < obj->nbPoints(); ++i )
-                    if ( obj->radius(i) > 0 )
-                        drawSolidT(*obj, i);
+                {
+                    for ( size_t i = 0; i < obj->nbPoints(); ++i )
+                        if ( obj->radius(i) > 0 )
+                            drawSolidT(*obj, i);
+                }
             }
             gym::cleanup(1);
         }
