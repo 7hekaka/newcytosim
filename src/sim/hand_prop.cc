@@ -294,9 +294,9 @@ void HandProp::complete(Simul const& sim)
  
  @todo the warning may not be relevant for long Links
  */
-void HandProp::checkStiffness(real stiff, real len, real mul, real kT) const
+void HandProp::checkStiffness(real stiff, real len, real, real kT) const
 {
-    real dis = binding_range - len;
+    real dis = std::max(real(0), binding_range - len);
     real en = ( stiff * dis * dis ) / kT;
     
     if ( en > 10.0 && binding_rate > 0 )
