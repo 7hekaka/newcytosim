@@ -271,7 +271,7 @@ static void make_diagonal(size_t siz, real* mat, size_t ldd)
 
 
 /// a test matrix with integer components
-static void test_matrix(size_t siz, real* mat, size_t ldd)
+static void build_test_matrix(size_t siz, real* mat, size_t ldd)
 {
     for ( size_t i = 0; i < siz; ++i )
     for ( size_t j = 0; j < siz; ++j )

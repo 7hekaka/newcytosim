@@ -1865,7 +1865,6 @@ void Display::drawSolid(Solid const& obj)
 void Display::drawSolidT(Solid const& obj, size_t inx) const
 {
     Vector X = obj.posP(inx);
-#if ( DIM > 2 )
     // using clipping planes to cleanup overlapping Spheres
     size_t near[3];
     size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
@@ -1879,12 +1878,13 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         gym::enableClipPlane(5-i);
         gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
     }
+#if ( DIM > 2 )
     drawBallT(X, obj.radius(inx), bodyColorF(obj), obj.mark()*(inx==0));
-    for ( size_t i = 0; i < num; ++i )
-        gym::disableClipPlane(5-i);
 #else
     drawDiscT(X, obj.radius(inx), bodyColorF(obj));
 #endif
+    for ( size_t i = 0; i < num; ++i )
+        gym::disableClipPlane(5-i);
 }
 
 
