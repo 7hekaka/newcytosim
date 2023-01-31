@@ -878,7 +878,7 @@ unsigned Meca::solve()
             oss << "  cycles " << precond_ << "T " << std::setw(8) << cycles_;
             oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
             oss << " S " << std::setw(8) << solve << std::setw(6) << solve/cnt;
-            oss << " R " << std::setw(6) << ( cycles_ - factor - solve ) / cnt;
+            oss << " M " << std::setw(6) << ( cycles_ - factor - solve ) / cnt;
         }
         Cytosim::out << oss.str() << std::endl;
     }

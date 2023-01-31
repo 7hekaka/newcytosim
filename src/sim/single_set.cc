@@ -154,7 +154,6 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
        base = OBJECT, POINT
      }
  
- 
  where:
  - OBJECT is the concatenation of the class name with the serial number of the object:
      - 'bead1' for the first bead
@@ -200,8 +199,15 @@ ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
         BeadProp * bip = simul_.findProperty<BeadProp>("bead", str);
         if ( bip )
         {
-            // create one Single on each Bead in the Simul:
-            for ( Object const* i : simul_.beads.collect(bip) )
+            ObjectList list = simul_.beads.collect(bip);
+            size_t cnt = 0;
+            if ( opt.set(cnt, "requested") )
+            {
+                list.shuffle();
+                list.truncate(cnt);
+            }
+            // create one Single on each of 'cnt' Beads:
+            for ( Object const* i : list )
                 objs.push_back(pp->newWrist(static_cast<Bead const*>(i), 0));
         }
         else

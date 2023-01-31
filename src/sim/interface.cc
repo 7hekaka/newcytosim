@@ -204,7 +204,7 @@ Isometry Interface::read_placement(Glossary& opt)
         // Rotation applied before the translation
         if ( opt.set_block(str, '[', "direction") )
         {
-            // can specify another object to copy its position
+            // can specify another object to copy its orientation
             Movable * obj = sim_->pickMovable(str);
             if ( obj )
                 vec = obj->direction();
@@ -397,7 +397,8 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
         if ( find_placement(iso, opt, placement) )
         {
             // place object at this position:
-            ObjectSet::moveObjects(objs, iso);
+            for ( Object * obj : objs )
+                obj->move(iso);
             // special case for which we check all vertices:
             bool okay = true;
             if ( placement == PLACE_ALL_INSIDE )
@@ -511,8 +512,8 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         if ( !set )
             throw InvalidSyntax("undefined class `"+cat+"'");
     }
-    size_t amount = set->size();
     
+    size_t amount = set->size();
     /// allow to set a desired number of objects:
     size_t target = 0;
     if ( opt.set(target, "nb_objects") )
@@ -555,9 +556,17 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
             opt.define("position",  (A+B)*0.5);
             opt.define("direction", (B-A).normalized());
         }
-
-        for ( size_t n = 0; n < cnt; ++n )
+        
+        if ( opt.has_key("multi_base") )
+        {
+            opt.define("requested", cnt);
             res.append(new_object(set, pp, opt));
+        }
+        else
+        {
+            for ( size_t n = 0; n < cnt; ++n )
+                res.append(new_object(set, pp, opt));
+        }
     }
     //hold();
     
@@ -607,7 +616,6 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt)
 
         if ( spc )
         {
-            // This is a very common case, where we can skip Rotation::randomRotation():
             if ( objs.size() == 1 )
             {
                 Object * obj = objs[0];
@@ -621,7 +629,8 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt)
             else
             {
                 Isometry iso(spc->place(), Rotation::randomRotation());
-                ObjectSet::moveObjects(objs, iso);
+                for ( Object * obj : objs )
+                    obj->move(iso);
             }
         }
         
@@ -629,7 +638,6 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt)
          in ObjectList are not necessarily all of the same class */
         sim_->add(objs);
         res.append(objs);
-        objs.clear();
     }
     
     VLOG("-NEW " << cnt << " `" << name << "'");
