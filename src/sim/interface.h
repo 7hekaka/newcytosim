@@ -27,7 +27,7 @@ private:
     /// perform `cnt` simulation steps also calling Simul::FUNC at each step
     template <SimulFuncPtr FUNC> void step_simul();
     
-    /// create 1 object of type `name`, following options in Glossary
+    /// usually create one object, following options in Glossary
     ObjectList new_object(ObjectSet*, Property const*, Glossary&);
     
     /// change values in given Property as specified in Glossary

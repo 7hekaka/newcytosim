@@ -172,6 +172,8 @@ public:
     /// remove all Wrists anchored on `obj`
     void deleteWrists(Object const*);
     
+    /// create Single attached to the beads
+    ObjectList distributeWrists(SingleProp const*, size_t cnt, Glossary&) const;
     
     ///returns the first free Single
     Single * firstF() const { return static_cast<Single*>(fList.front()); }

@@ -190,31 +190,9 @@ Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
 ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
 {
     SingleProp const* pp = static_cast<SingleProp const*>(p);
-    
     Single * obj = nullptr;
     std::string str;
-    if ( opt.set(str, "multi_base") )
-    {
-        ObjectList objs;
-        BeadProp * bip = simul_.findProperty<BeadProp>("bead", str);
-        if ( bip )
-        {
-            ObjectList list = simul_.beads.collect(bip);
-            size_t cnt = 0;
-            if ( opt.set(cnt, "requested") )
-            {
-                list.shuffle();
-                list.truncate(cnt);
-            }
-            // create one Single on each of 'cnt' Beads:
-            for ( Object const* i : list )
-                objs.push_back(pp->newWrist(static_cast<Bead const*>(i), 0));
-        }
-        else
-            throw InvalidParameter("could not find Bead type `"+str+"'");
-        return objs;
-    }
-    else if ( opt.set(str, "base") )
+    if ( opt.set(str, "base") )
     {
         Mecable * mec = simul_.pickMecable(str);
         if ( !mec )
@@ -240,6 +218,31 @@ ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
     return ObjectList(obj);
 }
 
+
+ObjectList SingleSet::distributeWrists(SingleProp const* sp, size_t cnt, Glossary& opt) const
+{
+    ObjectList objs;
+    std::string str;
+    if ( opt.set(str, "multi_base") )
+    {
+        BeadProp * bip = simul_.findProperty<BeadProp>("bead", str);
+        if ( bip )
+        {
+            ObjectList list = simul_.beads.collect(bip);
+            if ( cnt < list.size() )
+            {
+                list.shuffle();
+                list.truncate(cnt);
+            }
+            // create one Single on each of 'cnt' Beads:
+            for ( Object const* i : list )
+                objs.push_back(sp->newWrist(static_cast<Bead const*>(i), 0));
+        }
+        else
+            throw InvalidParameter("could not find Bead type `"+str+"'");
+    }
+    return objs;
+}
 
 //------------------------------------------------------------------------------
 #pragma mark -

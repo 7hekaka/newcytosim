@@ -352,13 +352,13 @@ bool all_points_inside(ObjectList const& objs, Space const* spc)
 }
 
 /**
- This would usually create ONE object of type 'name', placed according to `opt`
+ This would usually create ONE object of type 'pp', placed according to `opt`
  */
 ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
 {
+    ObjectList objs;
     long nb_trials = 1024;
     opt.set(nb_trials, "nb_trials");
-    ObjectList objs;
     Glossary::dict_type<PlacementType> keys{
         {"off",       PLACE_NOT},
 #if BACKWARD_COMPATIBILITY < 50
@@ -478,12 +478,6 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
         ObjectSet::translateObjects(objs, vec);
     
     //std::clog << "new_object " << objs.size() << " " << pp->name() << "\n";
-    
-    /* 
-     Because the objects in ObjectList are not necessarily all of the same class,
-     we call sim_->add() rather than directly set->add()
-     */
-    sim_->add(objs);
     return objs;
 }
 
@@ -544,6 +538,12 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
             res.append(new_object(set, pp, opt));
         }
     }
+    else if ( set == &sim_->singles && opt.has_key("multi_base") )
+    {
+        // particular case: distribute Single onto beads (31.01.2023):
+        SingleProp const* sp = static_cast<SingleProp const*>(pp);
+        res.append(sim_->singles.distributeWrists(sp, cnt, opt));
+    }
     else
     {
         // syntax sugar, to specify the position of the Fiber ends
@@ -557,19 +557,18 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
             opt.define("direction", (B-A).normalized());
         }
         
-        if ( opt.has_key("multi_base") )
-        {
-            opt.define("requested", cnt);
+        for ( size_t n = 0; n < cnt; ++n )
             res.append(new_object(set, pp, opt));
-        }
-        else
-        {
-            for ( size_t n = 0; n < cnt; ++n )
-                res.append(new_object(set, pp, opt));
-        }
     }
     //hold();
     
+    /*
+     Because the objects in ObjectList are not necessarily all of the same class,
+     for example a Single can be created along with a Fiber in FiberSet::newObjects,
+     we call here sim_->add() rather than directly set->add()
+     */
+    sim_->add(res);
+
     size_t required = 0;
     if ( opt.set(required, "required") )
     {
