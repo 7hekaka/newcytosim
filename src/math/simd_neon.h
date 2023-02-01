@@ -14,6 +14,9 @@ LOCAL vec2 setzero2()                { return vdupq_n_f64(0); }
 
 LOCAL vec2 load1(double const* a) { return vsetq_lane_f64(*a, setzero2(), 0); }
 LOCAL vec2 load1Z(double const* a) { return vsetq_lane_f64(*a, setzero2(), 0); }
+LOCAL vec2 load1upper(double const* b) { return vsetq_lane_f64(*b, setzero2(), 1); }
+LOCAL vec2 load1lower(vec2 a, double const* b) { return vsetq_lane_f64(*b, a, 0); }
+LOCAL vec2 load1upper(vec2 a, double const* b) { return vsetq_lane_f64(*b, a, 1); }
 
 LOCAL vec2 load2(double const* a) { return vld1q_f64(a); }
 LOCAL vec2 loadu2(double const* a) { return vld1q_f64(a); }
@@ -37,6 +40,7 @@ LOCAL vec2 load2d(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
 LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
 LOCAL void store1(double* a, vec2 b)   { vst1_f64(a, vget_low_f64(b)); }
 LOCAL void store2(double* a, vec2 b)   { vst1q_f64(a, b); }
+LOCAL void store1upper(double* a, vec2 b) { vst1_f64(a, vget_high_f64(b)); }
 
 //LOCAL void storedup(double* a, vec2 b) { _mm_store1_pd(a, b); }
 //LOCAL void storelo(double* a, vec2 b)  { _mm_store_sd(a, b); }
@@ -73,7 +77,12 @@ LOCAL vec2 flipsign2(vec2 a)         { return veorq_s64(a, float64x2_t{-0.,-0.})
 LOCAL vec2 unpacklo2(vec2 a, vec2 b) { return vzip1q_f64(a, b); }
 /// return { a[1], b[1] }
 LOCAL vec2 unpackhi2(vec2 a, vec2 b) { return vzip2q_f64(a, b); }
+/// return { a[1], a[0] }
 LOCAL vec2 swap2(vec2 a)             { return vextq_f64(a, a, 1); }
+/// set a = { a[0] b[0] } and b = { b[0] a[0] }
+LOCAL void swap2upper(vec2& a, vec2& b) { a=vzip1q_f64(a, b); b=vzip1q_f64(b, a); }
+/// set a = { b[0] a[0] } and b = { a[0] b[0] }
+LOCAL void swap2lower(vec2& a, vec2& b) { vec2 t=b; b=vzip1q_f64(a, b); a=vzip1q_f64(t, a); }
 
 /// concatenate and shift left, returning { BC } from a={ AB } b={ CD }
 LOCAL vec2 catshift(vec2 a, vec2 b) { return vextq_f64(a, b, 1); }

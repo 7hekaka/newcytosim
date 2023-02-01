@@ -383,8 +383,7 @@ void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t st
 {
     os << "% SparMatBlk size " << rsize_ << ":\n";
     stop = std::min(stop, rsize_);
-    std::streamsize p = os.precision();
-    os.precision(8);
+    std::streamsize p = os.precision(8);
     if ( ! row_ )
         return;
     for ( size_t jj = start; jj < stop; ++jj )

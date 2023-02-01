@@ -1674,8 +1674,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
 
 void Solid::print(std::ostream& os, bool write_shape) const
 {
-    std::streamsize p = os.precision();
-    os.precision(3);
+    std::streamsize p = os.precision(3);
     os << "new solid " << reference() << '\n';
     os << "{\n";
     os << " nb_points = " << nPoints << '\n';

@@ -473,8 +473,7 @@ void SparMatSymBlk::printSparse(std::ostream& os, real inf, size_t start, size_t
 {
     os << "% SparMatSymBlk size " << rsize_ << ":\n";
     stop = std::min(stop, rsize_);
-    std::streamsize p = os.precision();
-    os.precision(8);
+    std::streamsize p = os.precision(8);
     if ( ! column_ )
         return;
     for ( size_t jj = start; jj < stop; ++jj )

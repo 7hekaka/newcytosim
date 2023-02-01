@@ -492,8 +492,7 @@ void SparMatSym1::printSummary(std::ostream& os, size_t start, size_t stop)
 
 void SparMatSym1::printColumn(std::ostream& os, const size_t jj)
 {
-    std::streamsize p = os.precision();
-    os.precision(1);
+    std::streamsize p = os.precision(1);
     Element const* col = column_[jj];
     os << "SMS1 col " << jj << " (" << diagon_[jj] << ") : ";
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
@@ -530,8 +529,7 @@ void SparMatSym1::printSparseArray(std::ostream& os) const
             os << " " << std::setw(4) << ija_[n];
         os << "\n";
         
-        std::streamsize p = os.precision();
-        os.precision(2);
+        std::streamsize p = os.precision(2);
         os << "elm ";
         for ( size_t n = 0; n < end; ++n )
             os << " " << std::setw(4) << elm_[n];

@@ -227,8 +227,7 @@ void FiberSite::print(std::ostream& os) const
         else
 #endif
         {
-            std::streamsize p = os.precision();
-            os.precision(3);
+            std::streamsize p = os.precision(3);
             os << "(" << fiber()->reference() << " " << std::fixed << abscissa() << ")";
             os.precision(p);
         }

@@ -282,27 +282,34 @@ public:
     /// print [ line1; line2; line3 ]
     void print_smart(std::ostream& os) const
     {
+        bool s0 = ( abs_real(value(0,1)-value(1,0)) < REAL_EPSILON );
+        bool s1 = ( abs_real(value(0,2)-value(2,0)) < REAL_EPSILON );
+        bool s2 = ( abs_real(value(1,2)-value(2,1)) < REAL_EPSILON );
+        bool sym = ( s0 && s1 && s2 );
         const int w = (int)os.width();
         os << std::setw(1) << "[";
         os << " " << std::fixed << std::setw(w) << value(0,0);
         os << " " << std::fixed << std::setw(w) << value(1,0);
         os << " " << std::fixed << std::setw(w) << value(2,0);
         os << ";";
-        if ( value(0,1) == value(1,0) )
+        if ( sym )
+        {
             os << " " << std::fixed << std::setw(w) << "sym";
+            os << " " << std::fixed << std::setw(w) << value(1,1);
+            os << " " << std::fixed << std::setw(w) << value(2,1);
+            os << ";";
+            os << " " << std::fixed << std::setw(w) << "sym";
+            os << " " << std::fixed << std::setw(w) << "sym";
+        }
         else
+        {
             os << " " << std::fixed << std::setw(w) << value(0,1);
-        os << " " << std::fixed << std::setw(w) << value(1,1);
-        os << " " << std::fixed << std::setw(w) << value(2,1);
-        os << ";";
-        if ( value(0,2) == value(2,0) )
-            os << " " << std::fixed << std::setw(w) << "sym";
-        else
+            os << " " << std::fixed << std::setw(w) << value(1,1);
+            os << " " << std::fixed << std::setw(w) << value(2,1);
+            os << ";";
             os << " " << std::fixed << std::setw(w) << value(0,2);
-        if ( value(1,2) == value(2,1) )
-            os << " " << std::fixed << std::setw(w) << "sym";
-        else
             os << " " << std::fixed << std::setw(w) << value(1,2);
+        }
         os << " " << std::fixed << std::setw(w) << value(2,2);
         os << " ]";
     }

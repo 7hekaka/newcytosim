@@ -230,7 +230,7 @@ int SparMat::bad() const
 void SparMat::printSparse(std::ostream& os, real, size_t start, size_t stop) const
 {
     stop = std::min(stop, size_);
-    os.precision(8);
+    std::streamsize p = os.precision(8);
     os << "% SparMat size " << size_ << ":\n";
     for ( size_t jj = start; jj < stop; ++jj )
     {
@@ -242,6 +242,7 @@ void SparMat::printSparse(std::ostream& os, real, size_t start, size_t stop) con
             }
     }
     os.flush();
+    os.precision(p);
 }
 
 

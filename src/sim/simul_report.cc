@@ -138,8 +138,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     
     // adjust floating-point notation:
     out.setf(std::ios_base::fixed, std::ios_base::floatfield);
-    std::streamsize op = out.precision();
-    out.precision(p);
+    std::streamsize sp = out.precision(p);
 
     if ( ver & 1 )
     {
@@ -160,7 +159,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     }
     if ( ver & 1 )
         out << "% end\n";
-    out.precision(op);
+    out.precision(sp);
 }
 
 
@@ -618,8 +617,7 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
     {
         out << COM << "bin " << delta << " count " << fibers.size();
         out << LIN << ljust("scale", 2);
-        std::streamsize p = out.precision();
-        out.precision(2);
+        std::streamsize p = out.precision(2);
         for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
         out.precision(p);
@@ -2546,8 +2544,7 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
     
     if ( 1 )
     {
-        std::streamsize p = out.precision();
-        out.precision(3);
+        std::streamsize p = out.precision(3);
         out << COM << "force_distribution" << " (`scale` indicates the center of each bin)";
         out << LIN << ljust("scale", 2);
         for ( size_t u = 0; u <= nbin; ++u )

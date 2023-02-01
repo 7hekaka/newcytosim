@@ -289,8 +289,7 @@ std::string SparMatSym::what() const
 void SparMatSym::printSparse(std::ostream& os, real, size_t start, size_t stop) const
 {
     stop = std::min(stop, size_);
-    std::streamsize p = os.precision();
-    os.precision(8);
+    std::streamsize p = os.precision(8);
     os << "% SparMatSym size " << size_ << ":\n";
     for ( size_t jj = start; jj < stop; ++jj )
     {

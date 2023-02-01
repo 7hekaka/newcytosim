@@ -68,6 +68,7 @@ LOCAL vec2 setzero2()                { return _mm_setzero_pd(); }
 LOCAL vec2 unpacklo2(vec2 a, vec2 b) { return _mm_unpacklo_pd(a,b); }
 /// return { a[1], b[1] }
 LOCAL vec2 unpackhi2(vec2 a, vec2 b) { return _mm_unpackhi_pd(a,b); }
+/// return { a[1], a[0] }
 LOCAL vec2 swap2(vec2 a)             { return _mm_shuffle_pd(a, a, 0b01); }
 
 /// concatenate and shift left, returning { BC } from a={ AB } b={ CD }

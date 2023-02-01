@@ -461,8 +461,7 @@ void SparMatSym2::printSummary(std::ostream& os, size_t start, size_t stop)
 
 void SparMatSym2::printColumn(std::ostream& os, const size_t jj)
 {
-    std::streamsize p = os.precision();
-    os.precision(1);
+    std::streamsize p = os.precision(1);
     Element const* col = column_[jj];
     os << "SparMatSym2 col " << jj << ":";
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
@@ -487,12 +486,11 @@ void SparMatSym2::printSparseArray(std::ostream& os) const
     if ( rowDSS_ )
     {
         std::ios::fmtflags fgs = os.flags();
-        std::streamsize p = os.precision();
+        std::streamsize p = os.precision(2);
         
         size_t cnt = rowDSS_[size_];
         os << "\n% SparMatSym2 size " << size_ << " DSS storage:";
         os << "\nvalues   ";
-        os.precision(2);
         for ( size_t i = 0; i < cnt; ++i )
             os << " " << std::setw(5) << valDSS_[i];
         
@@ -500,7 +498,6 @@ void SparMatSym2::printSparseArray(std::ostream& os) const
         for ( size_t i = 0; i < cnt; ++i )
             os << " " << std::setw(5) << colDSS_[i];
         
-        os.precision(2);
         os << "\nrowIndex ";
         for ( size_t i = 0; i <= size_; ++i )
             os << " " << std::setw(5) << rowDSS_[i];

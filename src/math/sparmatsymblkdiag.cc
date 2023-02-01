@@ -453,8 +453,7 @@ void SparMatSymBlkDiag::printSparse(std::ostream& os, real inf, size_t start, si
 {
     os << "% SparMatSymBlkDiag size " << rsize_ << ":\n";
     stop = std::min(stop, rsize_);
-    std::streamsize p = os.precision();
-    os.precision(8);
+    std::streamsize p = os.precision(8);
     if ( ! pilar_ )
         return;
     for ( size_t j = start; j < stop; ++j )
@@ -623,8 +622,17 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
     }
     
     sortElements();
-
+    
     //printSummary(std::cout, 0, rsize_);
+#if 0
+    std::clog.precision(2);
+    for ( size_t j = 0; j < end; ++j )
+    {
+        Pilar const& pil = pilar_[j];
+        for ( size_t i = 0; i < pil.noff_; ++i )
+            std::clog << std::setw(4) << i << " " << std::setw(8) << pil[i] << "\n";
+    }
+#endif
     return res;
 }
 
@@ -2018,7 +2026,7 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
     for ( size_t j = colix_[0]; j < rsize_; j = colix_[j+1] )
         pilar_[j].vecMulAddTriangle3D_SSE(X, Y, 3*j);
     
-#elif ( SD_BLOCK_SIZE == 3 )
+#elif ( SD_BLOCK_SIZE == 7 )
     
     // process diagonal:
     vecMulDiagonal3D(X, Y);
