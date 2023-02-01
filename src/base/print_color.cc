@@ -108,6 +108,14 @@ void print_cyan(std::ostream& os, std::string const& str)
         os << str;
 }
 
+void print_bold(std::ostream& os, std::string const& str)
+{
+    if ( print_has_colors() )
+        os << KBLD << str << KNRM;
+    else
+        os << str;
+}
+
 #else
 
 bool print_has_colors()
@@ -141,6 +149,11 @@ void print_magenta(std::ostream& os, std::string const& str)
 }
 
 void print_cyan(std::ostream& os, std::string const& str)
+{
+    os << str;
+}
+
+void print_bold(std::ostream& os, std::string const& str)
 {
     os << str;
 }

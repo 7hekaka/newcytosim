@@ -33,3 +33,5 @@ void print_magenta(std::ostream&, std::string const&);
 /// print text in cyan
 void print_cyan(std::ostream&, std::string const&);
 
+/// print text in bold
+void print_bold(std::ostream&, std::string const&);
