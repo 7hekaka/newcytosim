@@ -744,15 +744,13 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         {
             // build rotation that brings (1,1,1) into the X axis:
 #if ( DIM > 2 )
-            real X = -sqrt((2+M_SQRT3)/6.0), D = 0.5-M_SQRT3/6.0, T = 1.0/M_SQRT3;
-            ObjectSet::rotateObjects(objs, Rotation(-T,X,D,-T,D,X,-T,T,T));
-            T = +0.582 * R0;
+            real X = 1.0/M_SQRT3, Y = -sqrt((2+M_SQRT3)/6.0), Z = (3-M_SQRT3)/6.0;
+            ObjectSet::rotateObjects(objs, Rotation(-X,Y,Z,-X,Z,Y,-X,X,X));
 #elif ( DIM > 1 )
             real X = M_SQRT1_2;
             ObjectSet::rotateObjects(objs, Rotation(-X,X,-X,-X));
-            real T = M_SQRT1_2 * R0;
 #endif
-            ObjectSet::translateObjects(objs, Vector(T,0,0));
+            ObjectSet::translateObjects(objs, Vector(X*R0,0,0));
             if ( !soTwin )
             {
                 // create a twin Solid that is the mirror image of *this:
@@ -1674,7 +1672,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
 
 void Solid::print(std::ostream& os, bool write_shape) const
 {
-    std::streamsize p = os.precision(3);
+    std::streamsize p = os.precision(4);
     os << "new solid " << reference() << '\n';
     os << "{\n";
     os << " nb_points = " << nPoints << '\n';
