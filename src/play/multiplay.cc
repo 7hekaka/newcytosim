@@ -267,8 +267,8 @@ inline void selectPanel(int x, int y)
 /* draw System */
 void drawBug(Simul const& sim)
 {
-    display.setPixelFactors(view.pixelSize(), 1);
-    display.prepareDrawing(sim, dispList, view.depthAxis());
+    display.setParameters(view.pixelSize(), 1, view.depthAxis());
+    display.prepareDrawing(sim, dispList);
     gym::clearPixels(view.back_color);
     display.drawSimul(sim);
     //gym::enableLighting(); gym::scale(0.2); gle::star();

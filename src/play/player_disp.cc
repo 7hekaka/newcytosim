@@ -226,7 +226,7 @@ void Player::setPixelSize(View& view)
     if ( disp.point_value > 0 )
         mag = disp.point_value / pix;
     
-    mDisplay->setPixelFactors(pix, mag);
+    mDisplay->setParameters(pix, mag, view.depthAxis());
     mDisplay->setStencil(view.stencil);
 
     for ( Property * p : dispList )
@@ -274,7 +274,7 @@ void Player::prepareDisplay(View& view)
 
         if ( simul.fresh_ )
         {
-            mDisplay->prepareDrawing(simul, dispList, view.depthAxis());
+            mDisplay->prepareDrawing(simul, dispList);
             //std::clog << " dispList.size() = " << dispList.size() << '\n';
             simul.fresh_ = 0;
         }

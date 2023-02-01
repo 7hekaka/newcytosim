@@ -217,8 +217,8 @@ GLFWwindow * initWindow(int W, int H)
 void drawBug(Simul const& sim)
 {
     view.openDisplay();
-    display.setPixelFactors(view.pixelSize(), 1);
-    display.prepareDrawing(sim, dispList, view.depthAxis());
+    display.setParameters(view.pixelSize(), 1, view.depthAxis());
+    display.prepareDrawing(sim, dispList);
     display.drawSimul(sim);
     view.closeDisplay();
 }

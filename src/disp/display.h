@@ -63,8 +63,8 @@ public:
     /// query depth
     real depth() const { return depth_; }
     
-    /// set depth
-    void depth(real z) { depth_ = z; }
+    /// set depth relative to given axis
+    void depth(Vector const& axis) { depth_ = dot(point_.pos(), axis); }
     
     /// display object
     void draw(Display const*) const;
@@ -144,13 +144,13 @@ public:
     void setStencil(bool s) { stencil_ = s; }
 
     /// set current pixel-size and the value of the point in pixels
-    void setPixelFactors(float pixel_size, float unit_value);
+    void setParameters(float pixel_size, float unit_value, Vector3 const& a);
 
     /// attribute a LineDisp, and set individual display values for all fibers
     void attributeLineDisp(FiberSet const&);
 
     /// get ready to display
-    void prepareDrawing(Simul const&, PropertyList&, Vector3 const&);
+    void prepareDrawing(Simul const&, PropertyList&);
 
     /// display the whole simulation
     void drawSimul(Simul const&);

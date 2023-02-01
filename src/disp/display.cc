@@ -42,7 +42,7 @@ Display::Display(DisplayProp const* dp)
     numLineDisp = 0;
 }
 
-void Display::setPixelFactors(float ps, float uv)
+void Display::setParameters(float ps, float uv, Vector3 const& ax)
 {
     pixelSize = ps;
     unitValue = uv;
@@ -52,6 +52,7 @@ void Display::setPixelFactors(float ps, float uv)
      */
     sizeScale = 0.5f * uv * ps;
     //printf(" pixelSize %6.3f unitValue %6.3f : %6.3f\n", ps, uv, sizeScale);
+    depthAxis = ax;
 }
 
 Display::~Display()
@@ -523,10 +524,8 @@ void Display::attributeLineDisp(FiberSet const& fibers)
  - parse display strings
  .
 */
-void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp, Vector3 const& axis)
+void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
 {
-    depthAxis = axis;
-    
     // counter to give different colors to the objects
     size_t idx = 0;
 
@@ -1927,11 +1926,9 @@ void Display::drawSolids(SolidSet const& set)
                 {
                     gym::enableLighting();
                     //real len = std::sqrt(obj->twinTensionSqr());
-                    //gym_color col = gym_color::dark_jet_color(disp->scale * len);
-                    gym_color col = bodyColorF(*obj);
                     gym_color black(0,0,0,1);
-                    drawFootball(*obj, inx, col, black, false);
-                    drawFootball(*twi, inx, col, black, true);
+                    drawFootball(*obj, inx, bodyColorF(*obj), black, false);
+                    drawFootball(*twi, inx, bodyColorF(*twi), black, true);
                 }
 #endif
                 if ( obj->prop->disp->color.transparent() )
@@ -2217,10 +2214,11 @@ static int compareZObject(const void * A, const void * B)
 void Display::drawTransparentObjects(Array<zObject>& list)
 {
     for ( zObject & i : list )
-        i.depth(dot(i.position(), depthAxis));
+        i.depth(depthAxis);
     
     // depth-sort objects:
     list.sort(compareZObject);
+    //std::clog << " depth sorted " << list.size() << " zObjects axis: "<< depthAxis << "\n";
 
     gym::enableLighting();
     for ( zObject const& i : list )
