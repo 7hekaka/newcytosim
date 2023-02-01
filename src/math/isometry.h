@@ -55,20 +55,20 @@ public:
     
     Isometry()
     {
-        mov.reset();
         rot = MatrixD::identity();
+        mov.reset();
     }
 
     Isometry(Vector const& v)
     {
-        mov = v;
         rot = MatrixD::identity();
+        mov = v;
     }
 
-    Isometry(Vector const& v, MatrixD const& r)
+    Isometry(MatrixD const& r, Vector const& v)
     {
-        mov = v;
         rot = r;
+        mov = v;
     }
 
     bool valid()

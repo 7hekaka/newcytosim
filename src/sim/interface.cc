@@ -627,7 +627,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt)
             }
             else
             {
-                Isometry iso(spc->place(), Rotation::randomRotation());
+                Isometry iso(Rotation::randomRotation(), spc->place());
                 for ( Object * obj : objs )
                     obj->move(iso);
             }

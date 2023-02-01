@@ -94,8 +94,8 @@ public:
         switch ( mobile() )
         {
             case 1: translate(iso.mov+translation(iso.rot)); break;
-            case 2: rotate(iso); break;
-            case 3: rotate(iso); translate(iso); break;
+            case 2: rotate(iso.rot); break;
+            case 3: rotate(iso.rot); translate(iso.mov); break;
         }
     }
 

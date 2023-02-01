@@ -101,7 +101,7 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
             objs.append(list);
 
             //position the bundle (initially aligned with X) tangentially:
-            ObjectSet::moveObjects(list, Isometry(pos, rot));
+            ObjectSet::moveObjects(list, Isometry(rot, pos));
             
             nuSphere->addPoint( c + (pos-dir).normalized(rad) );
             grasp(bun->organized(0));
