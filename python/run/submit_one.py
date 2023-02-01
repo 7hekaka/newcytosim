@@ -1,9 +1,9 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # A script to submit analysis jobs to the SLURM queuing system
 #
 # Derived from submit_slurm.py
-# F. Nedelec, 4.11.2020, 30.09.2021, 28.10.2022, 26.01.2023
+# F. Nedelec, 4.11.2020, 30.09.2021, 28.10.2022, 26.01.2023, 1.2.2023
 
 """
     Submit a job to the SLURM system to be called in multiple directories
@@ -22,7 +22,7 @@ Example:
     submit_one.py 'report platelet > platelet.txt' run????
     Submit one job to run command in the directories provided
     
-F. Nedelec, Last updated 26.01.2023
+F. Nedelec, Copyright Cambridge University. Last updated 1.2.2023
 """
 
 
@@ -87,6 +87,9 @@ def sub(file):
 
 #-------------------------------------------------------------------------------
 
+def executable(arg):
+    return os.path.isfile(arg) and os.access(arg, os.X_OK)
+
 def main(args):
     """submit jobs, depending on the arguments provided"""
     global submit, memory, runtime, queue, ncpu
@@ -100,15 +103,14 @@ def main(args):
 
     # first argument is the executable:
     cmd = args.pop(0)
-    cmd = os.path.abspath(cmd)
+    if executable(cmd):
+        cmd = os.path.abspath(cmd)
     
-    job = []
     cwd = os.getcwd()
-    path = cwd
+    paths = []
     for arg in args:
         if os.path.isdir(arg) and os.access(arg, os.X_OK):
-            path = os.path.abspath(arg)
-            job += ['cd '+path+' && '+cmd+';']
+            paths.append(os.path.abspath(arg))
         else:
             [key, equal, val] = arg.partition('=')
             if key == 'mem' or key == 'memory':
@@ -131,7 +133,7 @@ def main(args):
                 out.write("Error: I do not understand argument `%s'\n" % arg)
                 sys.exit()
     
-    if memory < 128:
+    if int(memory) < 128:
         out.write("Error: requested memory (%s MB) seems too low\n" % memory)
         sys.exit()
 
@@ -142,13 +144,13 @@ def main(args):
         out.write("Error: number of cpu/job is excessive?\n")
         sys.exit()
 
-    if job:
-        fd, file = tempfile.mkstemp('', 'j', path, True)
+    for p in paths:
+        fd, file = tempfile.mkstemp('', 'j', p, True)
         out.write("script %s : " % file)
-        write_script(fd, job)
-        os.chmod(file, 0700)
+        write_script(fd, ['cd '+p+' && '+cmd+';'])
+        os.chmod(file, 0o700)
         execute(sub(file))
-    else:
+    if not paths:
         out.write("Error: you need to specify at least one directory\n")
 
 
