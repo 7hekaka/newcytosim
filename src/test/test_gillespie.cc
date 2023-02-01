@@ -1,5 +1,5 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// Created by Francois Nedelec on 04/04/2012.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
+// Created by Francois Nedelec on 04/04/2012. Updated 01/02/2023
 
 
 #include <list>
@@ -11,24 +11,24 @@
 
 real sim_time = 0;
 
-/// the link of a doubly-linked list
+/// Node of a doubly-linked list
 class Linkable
 {
 public:
     
-    Linkable * prev;
-    Linkable * next;
+    Linkable * prev_;
+    Linkable * next_;
     
 public:
     
-    Linkable() : prev(0), next(0) {}
+    Linkable() : prev_(0), next_(0) {}
     
     void push_front(Linkable *& head, Linkable *& tail)
     {
-        prev = 0;
-        next = head;
+        prev_ = nullptr;
+        next_ = head;
         if ( head )
-            head->prev = this;
+            head->prev_ = this;
         else
             tail = this;
         head = this;
@@ -36,10 +36,10 @@ public:
 
     void push_back(Linkable *& head, Linkable *& tail)
     {
-        prev = tail;
-        next = 0;
+        prev_ = tail;
+        next_ = nullptr;
         if ( tail )
-            tail->next = this;
+            tail->next_ = this;
         else
             head = this;
         tail = this;
@@ -47,22 +47,20 @@ public:
     
     void pop(Linkable *& head, Linkable *& tail)
     {
-        if ( prev )
-            prev->next = next;
+        if ( prev_ )
+            prev_->next_ = next_;
         else
-            head = next;
+            head = next_;
         
-        if ( next )
-            next->prev = prev;
+        if ( next_ )
+            next_->prev_ = prev_;
         else
-            tail = prev;
-        prev = 0;
-        next = 0;
+            tail = prev_;
     }
 };
 
 
-/// a stochastic event
+/// Stochastic event
 template < typename ENGINE >
 class Reaction : public Linkable
 {
@@ -72,8 +70,8 @@ public:
 
 private:
     
-    real            mRand;
-    real            mTime;
+    real mRand;
+    real mTime;
     MembFuncPointer mFunc;
     
 public:
@@ -99,14 +97,14 @@ public:
             mTime = mRand / rate;
     }
     
+    /// call engine's member function:
     void act(ENGINE & obj)
     {
-        // call engine's member function:
         (obj.*mFunc)(this);
-        std::cout << " at time " << sim_time + mTime << '\n';
+        std::cout << " @ " << sim_time + mTime << '\n';
     }
     
-    // increment Gillespie time
+    /// increment Gillespie time
     void renew(real rate)
     {
         if ( mRand < 0 )
@@ -132,7 +130,7 @@ public:
 };
 
 
-/// a stochastic engine
+/// Stochastic engine
 class Engine
 {
 public:
@@ -142,27 +140,21 @@ public:
     
 protected:
     
-    /// this are the ends of the event list:
-    Linkable * head, * tail;
-    
-    
-    void add(real r, Event::MembFuncPointer mfp)
-    {
-        (new Event(r, mfp)) -> push_front(head, tail);
-    }
-    
-    void remove(Event * e)
-    {
-        e->pop(head, tail);
-        delete(e);
-    }
-    
-    
+    /// reaction rates
     real rate1, rate2, rate3;
+
+    /// list heads to hold the events:
+    Linkable * head_, * tail_;
+    
+    void renew(Event * e, real rate)
+    {
+        e->push_back(head_, tail_);
+        e->renew(rate);
+    }
 
 public:
     
-    Engine(real r1, real r2, real r3) : head(0), tail(0)
+    Engine(real r1, real r2, real r3) : head_(nullptr), tail_(nullptr)
     {
         rate1 = r1;
         rate2 = r2;
@@ -170,29 +162,38 @@ public:
         initialize();
     }
     
+    void add(real r, Event::MembFuncPointer mfp)
+    {
+        (new Event(r, mfp))->push_back(head_, tail_);
+    }
+
     void step(real interval)
     {
-        real next_time = 0;
-        Event * earliest = 0;
+        Linkable * H = nullptr;
+        Linkable * T = nullptr;
         
-        for ( iterator i = head; i; i = i->next )
+        /* Update events; move the ones that will fire to [H,T] list */
+        iterator stop = head_;
+        iterator i = head_;
+        while ( i )
         {
             Event * e = static_cast<Event*>(i);
+            i = i->next_;
             e->step(interval);
-            real t = e->time();
-            if ( t < next_time )
+            if ( e->time() < 0 )
             {
-                next_time = t;
-                earliest = e;
+                e->pop(head_, tail_);
+                e->push_back(H, T);
             }
         }
         
-        while ( next_time < 0 )
+        /* Fire events from [H,T] list in the order of time */
+        while ( H )
         {
-            earliest->act(*this);
-            
-            next_time = 0;
-            for ( iterator i = head; i; i = i->next )
+            Event * earliest = static_cast<Event*>(H);
+            real next_time = earliest->time();
+            // find earliest event in [H,T] list:
+            for ( iterator i = H->next_; i; i = i->next_ )
             {
                 Event * e = static_cast<Event*>(i);
                 real t = e->time();
@@ -202,34 +203,35 @@ public:
                     earliest = e;
                 }
             }
+            earliest->pop(H, T);
+            earliest->act(*this);
         }
     }
+    
+    void initialize()
+    {
+    }
 
-    //-------------------------------------------------    
+    //----------------------Event's action callbacks---------------------------
     
     void event1(Event* e)
     {
         std::cout << "event 1";
-        remove(e);
-        add(rate2, &Engine::event2);
-        add(rate3, &Engine::event3);
+        add(rate1, &Engine::event2);
+        add(rate1, &Engine::event3);
+        delete(e);
     }
     
     void event2(Event* e)
     {
         std::cout << "event 2";
-        e->renew(rate2);
+        renew(e, rate2);
     }
     
     void event3(Event* e)
     {
         std::cout << "event 3";
-        e->renew(rate3);
-    }
-    
-    void initialize()
-    {
-        add(rate1, &Engine::event1);
+        renew(e, rate3);
     }
     
 };
@@ -238,7 +240,9 @@ public:
 int main(int argc, char * argv[])
 {
     RNG.seed();
-    Engine engine(1,1,1);
+    Engine engine(2,1,1);
+    engine.add(1, &Engine::event1);
+    engine.add(1, &Engine::event1);
 
     real time_step = 1;
     for ( int i = 0; i < 10; ++i )
