@@ -162,7 +162,7 @@ void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& 
     real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
     // distance for distal point, offset by `len` from the bead surface
     real alpha = ( rad + len ) / rad;
-    // calculat coefficients to interpolate the offset point:
+    // calculate coefficients to interpolate the offset point:
     alp[1] *= alpha;
     alp[2] *= alpha;
     alp[3] *= alpha;

@@ -829,7 +829,7 @@ static void markMecables(BitMap<1>& bmap, Array<Mecable*> const& mecables)
 }
 
 
-void Meca::saveMatrixBitmaps() const
+void Meca::saveMatrixBitmaps(const char arg[]) const
 {
     static size_t cnt = 0;
     const size_t nbv = nbVertices();
@@ -838,7 +838,7 @@ void Meca::saveMatrixBitmaps() const
     FILE * f;
     
 #if USE_ISO_MATRIX
-    snprintf(str, sizeof(str), "iso%08lu.bmp", cnt);
+    snprintf(str, sizeof(str), "%siso%08lu.bmp", arg, cnt);
     f = fopen(str, "w");
     if ( f ) {
         if ( !ferror(f) ) {
@@ -851,7 +851,7 @@ void Meca::saveMatrixBitmaps() const
     }
 #endif
 #if USE_MATRIX_BLOCK
-    snprintf(str, sizeof(str), "ful%08lu.bmp", cnt++);
+    snprintf(str, sizeof(str), "%sful%08lu.bmp", arg, cnt++);
     f = fopen(str, "w");
     if ( f ) {
         if ( !ferror(f) ) {

@@ -1294,7 +1294,7 @@ void Interface::execute_dump(std::string const& path, int mode)
     if ( mode & 1 ) sim_->sMeca.saveSystem();
     if ( mode & 2 ) sim_->sMeca.dumpSystem();
     if ( mode & 4 ) sim_->sMeca.exportSystem();
-    if ( mode & 8 ) sim_->sMeca.saveMatrixBitmaps();
+    if ( mode & 8 ) sim_->sMeca.saveMatrixBitmaps("");
     if ( mode & 16 ) sim_->sMeca.saveConnectivityBitmap();
     
     FilePath::change_dir(cwd);
