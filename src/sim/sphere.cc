@@ -240,8 +240,8 @@ void Sphere::setDragCoefficientStokes()
     const real rad = spRadius;
     
     //hydrodynamic not corrected: infinite fluid is assumed
-    spDrag    = 6 * M_PI * prop->viscosity * rad;
-    spDragRot = 8 * M_PI * prop->viscosity * rad * rad * rad;
+    spDrag    = ( 6 * M_PI ) * ( prop->viscosity * rad );
+    spDragRot = ( 8 * M_PI ) * ( prop->viscosity * rad * ( rad * rad ));
 
     //Cytosim::log("Sphere of radius %.3f has mobility %.2e\n", spRadius, spDrag);
 }
