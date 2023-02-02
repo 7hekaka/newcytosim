@@ -148,7 +148,7 @@ private:
     /// time step for Brownian Mechanics = copy of simul:time_step
     real tau_;
     
-    /// simul:kT / simul:time_step
+    /// magnitude of Brownian motion = 2 * simul:kT / simul:time_step
     real alpha_;
     
     /// accepted residual threshold when solving linear system

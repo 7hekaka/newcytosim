@@ -1353,7 +1353,7 @@ real Solid::addBrownianForces(real const* rnd, real alpha, real* rhs) const
         return INFINITY;
     
     // amplitude of Brownian motion
-    const real b = std::sqrt( 2 * alpha * drag / (real)nPoints );
+    const real b = std::sqrt( alpha * drag / (real)nPoints );
 
     for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];
