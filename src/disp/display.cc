@@ -1877,10 +1877,15 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
         gym::enableClipPlane(5-i);
         gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
     }
+    gym_color col = bodyColorF(obj);
+#if NEW_SOLID_HAS_TWIN
+    if ( obj.twin() )
+        col = bodyColorF(*obj.twin()).tweak(obj.signature());
+#endif
 #if ( DIM > 2 )
-    drawBallT(X, obj.radius(inx), bodyColorF(obj), obj.mark()*(inx==0));
+    drawBallT(X, obj.radius(inx), col, obj.mark());
 #else
-    drawDiscT(X, obj.radius(inx), bodyColorF(obj));
+    drawDiscT(X, obj.radius(inx), col);
 #endif
     for ( size_t i = 0; i < num; ++i )
         gym::disableClipPlane(5-i);
@@ -1895,7 +1900,7 @@ static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color 
     Vector B = obj.posP(inx+2) - X;
     Vector C = obj.posP(inx+3) - X;
     gym::transRotate(X, A, B, C);
-    //flip = ( dot(cross(A,B), C) < 0 );
+    //bool flip = ( dot(cross(A,B), C) < 0 );
 #else
     gym::transScale(X, obj.radius(inx));
 #endif
@@ -1927,8 +1932,10 @@ void Display::drawSolids(SolidSet const& set)
                     gym::enableLighting();
                     //real len = std::sqrt(obj->twinTensionSqr());
                     gym_color black(0,0,0,1);
-                    drawFootball(*obj, inx, bodyColorF(*obj), black, false);
-                    drawFootball(*twi, inx, bodyColorF(*twi), black, true);
+                    gym_color tcol = bodyColorF(*twi);
+                    gym_color scol = tcol.tweak(obj->signature());
+                    drawFootball(*obj, inx, scol, black, true);
+                    drawFootball(*twi, inx, tcol, black, false);
                 }
 #endif
                 if ( obj->prop->disp->color.transparent() )

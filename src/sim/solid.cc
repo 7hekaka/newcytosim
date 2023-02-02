@@ -742,14 +742,14 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         real R0 = radius(0);
         if ( str == "mirror" )
         {
-            // build rotation that brings (1,1,1) into the X axis:
+            // build direct rotation that brings (1,1,1) into the X axis:
 #if ( DIM > 2 )
             real X = 1.0/M_SQRT3, Y = -sqrt((2+M_SQRT3)/6.0), Z = (3-M_SQRT3)/6.0;
-            Isometry iso(Rotation(-X,Y,Z,-X,Z,Y,-X,X,X), Vector(X*R0,0,0));
+            Isometry iso(Rotation(X,Y,Z,X,Z,Y,X,X,X), Vector(-X*R0,0,0));
             ObjectSet::moveObjects(objs, iso);
 #elif ( DIM > 1 )
             real X = M_SQRT1_2;
-            Isometry iso(Rotation(-X,X,-X,-X), Vector(X*R0,0,0));
+            Isometry iso(Rotation(X,X,X,-X), Vector(-X*R0,0,0));
             ObjectSet::moveObjects(objs, iso);
 #endif
             if ( !soTwin )
@@ -777,9 +777,10 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 real y = ( i / 15.0 ) * len - chi; // in [-chi, len-chi]
                 if ( abs_real(y) > M_SQRT2*R0 )
                 {
-                    real rad = R0 * ( 2.0 + std::tanh(5.0 * abs_real(y) - M_SQRT2) ); // in [1, 3]
-                    size_t ref = addSphere(Vector(rad, y, 0), rad);
-                    //addTriad(rad);
+                    real R = R0 * ( 2.0 + std::tanh(5.0 * abs_real(y) - M_SQRT2) ); // in [1, 3]
+                    addSphere(Vector(-R, y, 0), R);
+                    //addTriad(R);
+                    /* Could add chromokinesins here */
                 }
             }
         }
