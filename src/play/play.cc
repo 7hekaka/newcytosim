@@ -225,7 +225,10 @@ int main(int argc, char* argv[])
     
     if ( arg.use_key("live") || arg.has_key(".cym") )
         player.goLive = true;
-
+    
+    if ( arg.has_key(".cmi") )
+        simul.prop.system_file = arg.value(".cmi");
+    
     if ( arg.use_key("image") )
     {
         prop.image_name = "image%";
