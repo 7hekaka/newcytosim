@@ -55,12 +55,17 @@ void inventory(Simul& simul, size_t frame)
 
 //------------------------------------------------------------------------------
 
+char * get_input(char * str, size_t len)
+{
+    printf("? ");
+    return fgets(str, len, stdin);
+}
+
 int main(int argc, char* argv[])
 {
     Simul simul;
     Glossary arg;
     FrameReader reader;
-    char cmd[1024] = "\0";
     size_t frm = 0;
 
     if ( arg.read_strings(argc-1, argv+1) )
@@ -77,7 +82,7 @@ int main(int argc, char* argv[])
         FilePath::change_dir(arg.value("directory"));
 
     std::string input = Simul::TRAJECTORY;
-    std::string output = "output.cmo";
+    std::string output = "system.cmo";
     
     arg.set(output, "output");
     arg.set(input, "input") || arg.set(input, ".cmo");
@@ -110,8 +115,8 @@ int main(int argc, char* argv[])
     }
     
     instructions();
-    printf("? ");
-    while ( fgets(cmd, sizeof(cmd), stdin) )
+    char cmd[1024] = "\0";
+    while ( get_input(cmd, sizeof(cmd)) )
     {
         if ( isdigit(cmd[0]))
         {
@@ -149,7 +154,8 @@ int main(int argc, char* argv[])
                 break;
             case 'w':
                 simul.writeObjects(output, true, binary);
-                break;
+                printf("%s <--- frame %lu\n", output.c_str(), reader.currentFrame());
+                continue;
             case 'e':
                 simul.eraseObjects();
                 simul.eraseProperties();
@@ -157,10 +163,10 @@ int main(int argc, char* argv[])
             case 'b':
                 binary = !binary;
                 printf("Reader: binary = %i\n", binary);
-                break;
+                continue;
             case 'c':
                 reader.clearPositions();
-                break;
+                continue;
             case 'r':
                 reader.rewind();
                 break;
@@ -171,6 +177,5 @@ int main(int argc, char* argv[])
                 break;
         }
         inventory(simul, reader.currentFrame());
-        printf("? ");
     }
 }
