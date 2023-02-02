@@ -155,7 +155,7 @@ public:
     /// operator access to a cell by index
     CELL & operator[](const size_t inx) const
     {
-        assert_true( inx < MAP::mNbCells );
+        assert_true( inx <= MAP::mNbCells );
         return gCell[ inx ];
     }
 

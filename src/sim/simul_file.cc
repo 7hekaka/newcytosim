@@ -710,7 +710,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
 #endif
             {
                 // check that we are using the correct ObjectSet:
-                assert_true( objset == findSetT(tag) );
+                assert_true( isupper(tag) || objset == findSetT(tag) );
                 objset->loadObject(in, tag, fat);
             }
         }
