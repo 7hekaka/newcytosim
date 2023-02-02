@@ -1629,15 +1629,19 @@ void Solid::write(Outputter& out) const
         out.writeSoftSpace();
         out.writeFloat(soRadius[p]);
     }
+}
+
 #if NEW_SOLID_HAS_TWIN
+void Solid::writeTwin(Outputter& out) const
+{
     writeMarker(out, TAG_SOLID);
     if ( soTwin )
         out.writeUInt32(soTwin->identity());
     else
         out.writeUInt32(0);
     out.writeFloat(0.0);
-#endif
 }
+#endif
 
 
 void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
@@ -1666,6 +1670,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
         ObjectID id = in.readUInt32();
         in.readFloat();
 #if NEW_SOLID_HAS_TWIN
+        /* This only works if the twin Solid is already loaded */
         soTwin = sim.solids.findID(id);
 #endif
     }

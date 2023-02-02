@@ -235,6 +235,9 @@ public:
             res += distanceSqr(posPoint(i), soTwin->posPoint(i));
         return res;
     }
+    
+    /// save info to file
+    void writeTwin(Outputter&) const;
 #endif
 
     //--------------------------------------------------------------------------

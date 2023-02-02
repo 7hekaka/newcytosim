@@ -112,6 +112,10 @@ void SolidSet::writeSet(Outputter& out) const
     {
         out.write("\n#section "+title());
         writeObjects(out, pool_);
+#if NEW_SOLID_HAS_TWIN
+        for ( Object const* n=pool_.front(); n; n=n->next() )
+            static_cast<Solid const*>(n)->writeTwin(out);
+#endif
     }
 }
 
