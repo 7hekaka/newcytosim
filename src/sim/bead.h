@@ -76,7 +76,7 @@ public:
     real volume() const { return ((M_PI*4.0/3.0) * paRadius) * (paRadius * paRadius); }
 
     /// set the radius of the Bead
-    void resize(real R) { assert_true(R>0); paRadius = R; }
+    void resize(real R) { assert_true(R>0); paRadius = R; setDragCoefficient(); }
     
     //--------------------------------------------------------------------------
     
@@ -89,8 +89,8 @@ public:
     /// The mobility of a model vertex ( speed = mobility * point_force )
     real pointMobility() const { return 1 / paDrag; }
 
-    /// sets the mobility
-    void prepareMecable() { setDragCoefficient(); }
+    /// the mobility is already set in resize()
+    void prepareMecable() { }
     
     /// calculates the speed of points in Y, for the forces given in X
     void projectForces(const real* X, real* Y) const;
