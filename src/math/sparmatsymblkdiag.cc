@@ -1381,40 +1381,41 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
     vec2 xx, yy, zz;
     {
         vec2 xy = loadu2(X+jj);
-        vec2 z0 = load1(X+jj+2);
+        zz = load1Z(X+jj+2);
         //multiply with the symmetrized block, assuming it has been symmetrized:
         // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
         // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
         // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
-        double const* mat = dia_.data();
-        s0 = fmadd2(loadu2(mat  ), xy, load1(Y+jj));
-        s1 = fmadd2(loadu2(mat+3), xy, load1(Y+jj+1));
-        s2 = fmadd2(loadu2(mat+6), xy, load1(Y+jj+2));
+        auto const& mat = dia_.data();
+        yy = load2(Y+jj);
+        s0 = fmadd2(loadu2(mat  ), xy, unpacklo2(yy, setzero2()));
+        s1 = fmadd2(loadu2(mat+3), xy, unpackhi2(yy, setzero2()));
+        s2 = fmadd2(loadu2(mat+6), xy, load1Z(Y+jj+2));
         // prepare broadcasted vectors:
         xx = duplo2(xy);
         yy = duphi2(xy);
-        zz = duplo2(z0);
         // add last column:
-        s0 = fmadd1(load1(mat+2), z0, s0);
-        s1 = fmadd1(load1(mat+5), z0, s1);
-        s2 = fmadd1(load1(mat+8), z0, s2);
+        s0 = fmadd1(loadu2(mat+2), zz, s0);
+        s1 = fmadd1(loadu2(mat+5), zz, s1);
+        s2 = fmadd1(loadu2(mat+8), zz, s2);
+        zz = duplo2(zz);
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     for ( size_t n = 0; n < noff_; ++n )
     {
         const auto ii = 3 * inx_[n];
-        double const* mat = blk_[n].data();
+        auto const& mat = blk_[n].data();
         // multiply with the full block in vectors { XY, Z0 }:
         //Y[ii  ] +=  M[0] * X0 + M[3] * X1 + M[6] * X2;
         //Y[ii+1] +=  M[1] * X0 + M[4] * X1 + M[7] * X2;
         //Y[ii+2] +=  M[2] * X0 + M[5] * X1 + M[8] * X2;
         vec2 mat0 = loadu2(mat);
-        vec2 mat2 = load1(mat+2);
-        
-        vec2 xyi = loadu2(X+ii);
-        vec2 z0i = load1(X+ii+2);
+        vec2 mat2 = loadu2(mat+2);
         vec2 XY = fmadd2(mat0, xx, loadu2(Y+ii));
-        vec2 Z0 = fmadd1(mat2, xx, load1(Y+ii+2));
+        vec2 Z0 = fmadd1(mat2, xx, load1Z(Y+ii+2));
+
+        vec2 xyi = loadu2(X+ii);
+        vec2 z0i = load1Z(X+ii+2);
         s0 = fmadd2(mat0, xyi, s0);
         s0 = fmadd1(mat2, z0i, s0);
 
@@ -1423,14 +1424,15 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
 
-        vec2 mat3 = loadu2(mat+3);
-        vec2 mat5 = load1(mat+5);
+        vec2 mat4 = loadu2(mat+4);
+        vec2 mat3 = catshift(mat2, mat4);
         s1 = fmadd2(mat3, xyi, s1);
         XY = fmadd2(mat3, yy, XY);
+        vec2 mat6 = loadu2(mat+6);
+        vec2 mat5 = catshift(mat4, mat6);
         s1 = fmadd1(mat5, z0i, s1);
         Z0 = fmadd1(mat5, yy, Z0);
-        vec2 mat6 = loadu2(mat+6);
-        vec2 mat8 = load1(mat+8);
+        vec2 mat8 = loadu2(mat+8);
         s2 = fmadd2(mat6, xyi, s2);
         XY = fmadd2(mat6, zz, XY);
         Z0 = fmadd1(mat8, zz, Z0);

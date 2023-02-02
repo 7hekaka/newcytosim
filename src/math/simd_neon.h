@@ -13,7 +13,7 @@ LOCAL vec2 set2(double a)            { return vdupq_n_f64(a); }
 LOCAL vec2 setzero2()                { return vdupq_n_f64(0); }
 
 LOCAL vec2 load1(double const* a) { return vsetq_lane_f64(*a, setzero2(), 0); }
-LOCAL vec2 load1Z(double const* a) { return vsetq_lane_f64(*a, setzero2(), 0); }
+LOCAL vec2 load1Z(double const* a) { return vandq_u32(vld1q_f64(a), uint32x4_t{~0U,~0U,0,0}); }
 LOCAL vec2 load1upper(double const* b) { return vsetq_lane_f64(*b, setzero2(), 1); }
 LOCAL vec2 load1lower(vec2 a, double const* b) { return vsetq_lane_f64(*b, a, 0); }
 LOCAL vec2 load1upper(vec2 a, double const* b) { return vsetq_lane_f64(*b, a, 1); }
