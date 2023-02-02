@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <cmath>
+#include <vector>
 
 
 class Base
@@ -54,4 +55,25 @@ int main ()
         std::cout << " " << x;
     }
     std::cout << std::endl;
+    
+    if ( 1 )
+    {
+        std::vector<double> vec(3);
+        vec[0] = 1;
+        vec[1] = 2;
+        vec[2] = 3;
+        std::clog << "sizeof std::vector<>(3) = " << sizeof(vec) << '\n';
+        std::clog << "  vec    @ " << &vec << '\n';
+        std::clog << "  vec[0] @ " << &vec[0] << '\n';
+        std::clog << "  vec[1] @ " << &vec[1] << '\n';
+        std::clog << "  vec[2] @ " << &vec[2] << '\n';
+    }
+    if ( 1 )
+    {
+        std::vector<double> vec(6);
+        vec[0] = 1;
+        vec[1] = 2;
+        vec[2] = 3;
+        std::clog << "sizeof std::vector<>(6) = " << sizeof(vec) << '\n';
+    }
 }
