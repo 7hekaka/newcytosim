@@ -66,17 +66,18 @@ class Reaction : public Linkable
 {
 public:
     
-    typedef void (ENGINE::*MembFuncPointer)(Reaction<ENGINE>*);
+    /// pointer to a member function
+    typedef void (ENGINE::*MFPR)(Reaction<ENGINE>*);
 
 private:
     
     real mRand;
     real mTime;
-    MembFuncPointer mFunc;
+    MFPR mFunc;
     
 public:
     
-    Reaction(real rate, MembFuncPointer mfp)
+    Reaction(real rate, MFPR mfp)
     {
         mRand = RNG.exponential();
         mTime = mRand / rate;
@@ -162,7 +163,7 @@ public:
         initialize();
     }
     
-    void add(real r, Event::MembFuncPointer mfp)
+    void add(real r, Event::MFPR mfp)
     {
         (new Event(r, mfp))->push_back(head_, tail_);
     }
