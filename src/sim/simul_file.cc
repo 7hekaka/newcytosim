@@ -344,8 +344,8 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
 }
 
 
-/// InputLock is a helper class used to import a cytosim state from a file
-class Simul::InputLock
+/// InportLock is a helper class used to import a cytosim state from a file
+class Simul::InportLock
 {
 private:
     
@@ -355,10 +355,10 @@ private:
 public:
     
     /// move objects on ice buckets
-    InputLock(Simul * s)
+    InportLock(Simul * s)
     : sim(s)
     {
-        //Cytosim::log("Simul::InputLock created with %i objects\n", sim->nbObjects());
+        //Cytosim::log("Simul::InportLock created with %i objects\n", sim->nbObjects());
         sim->couples.freeze();
         sim->singles.freeze();
         sim->fibers.freeze();
@@ -416,11 +416,11 @@ public:
     }
 
     /// reset flags
-    ~InputLock()
+    ~InportLock()
     {
         if ( sim )
             thaw_all();
-        //Cytosim::log("Simul::InputLock deleted with %i objects\n", sim->nbObjects());
+        //Cytosim::log("Simul::InportLock deleted with %i objects\n", sim->nbObjects());
     }
 };
 
@@ -444,7 +444,7 @@ public:
 int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
 {
     in.lock();
-    InputLock lock(this);
+    InportLock lock(this);
     try
     {
         int res = readObjects(in, subset);
