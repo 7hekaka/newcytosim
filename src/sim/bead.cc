@@ -22,6 +22,7 @@ Bead::Bead(BeadProp const* p, Vector pos, real rad)
     assert_true(rad >= 0);
     setNbPoints(1);
     setPoint(0, pos);
+    setDragCoefficient();
 }
 
 
@@ -44,7 +45,7 @@ void Bead::setInteractions(Meca& meca) const
 
     if ( prop->confine != CONFINE_OFF )
     {
-        Space const* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_pointer;
         
         switch ( prop->confine )
         {
