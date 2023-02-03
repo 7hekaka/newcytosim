@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2022
-# This is PRECONFIG version 1.58, last modified on 29.09.2022
+# This is PRECONFIG version 1.59, last modified on 03.02.2023
 
 """
 # SYNOPSIS
@@ -433,7 +433,6 @@ class Preconfig:
             key = ''
             code = blok[2:-2].strip()
             # print("%4i characters... " % len(pre), end='')
-            # print("code block `%s'" % blok)
             if code[0]==CODE and code[1]==CODE and code[-1]==DECO and code[-2]==DECO:
                 # any further level of bracketting is not evaluated:
                 val = code
@@ -443,6 +442,7 @@ class Preconfig:
             else:
                 # check the code for assigment, and evaluate code:
                 key, vals = self.try_assignment(code, blok)
+                # print("code block `%s' -> %s" % (blok, vals))
                 if key:
                     self.locals[key] = vals
                 try:
@@ -522,6 +522,11 @@ class Preconfig:
         # get ready for next file:
         self.locals['n'] += 1
 
+    def clear_locals(self):
+        n = self.locals['n']
+        self.locals.clear()
+        self.locals['n'] = n
+
     def expand(self, values, file, text):
         """
             Calls itself recursively to remove all entries of the `values`
@@ -562,6 +567,8 @@ class Preconfig:
             except IOError:
                 sys.stderr.write("Preconfig could not load `%s`\n"%name)
                 break
+            self.clear_locals()
+            file.seek(0)
         return self.files_made
 
     def main(self, args):
