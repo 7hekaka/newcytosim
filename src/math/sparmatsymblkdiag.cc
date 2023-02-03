@@ -1397,7 +1397,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         // add last column:
         s0 = fmadd1(loadu2(mat+2), zz, s0);
         s1 = fmadd1(loadu2(mat+5), zz, s1);
-        s2 = fmadd1(loadu2(mat+8), zz, s2);
+        s2 = fmadd1(load1Z(mat+8), zz, s2);
         zz = duplo2(zz);
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
@@ -1432,7 +1432,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         vec2 mat5 = catshift(mat4, mat6);
         s1 = fmadd1(mat5, z0i, s1);
         Z0 = fmadd1(mat5, yy, Z0);
-        vec2 mat8 = loadu2(mat+8);
+        vec2 mat8 = load1Z(mat+8);
         s2 = fmadd2(mat6, xyi, s2);
         XY = fmadd2(mat6, zz, XY);
         Z0 = fmadd1(mat8, zz, Z0);
