@@ -132,8 +132,17 @@ void Fiber::step(real addM, real addP, bool split)
     {
         if ( len > prop->min_length )
         {
-            if ( addM != 0 ) growM(addM);
-            if ( addP != 0 ) growP(addP);
+            // perform the growth before the shrinkage:
+            if ( addP > addM )
+            {
+                growP(addP);
+                if ( addM != 0 ) growM(addM);
+            }
+            else
+            {
+                if ( addM != 0 ) growM(addM);
+                if ( addP != 0 ) growP(addP);
+            }
         }
         else
         {
@@ -162,12 +171,21 @@ void Fiber::step(real addM, real addP, bool split)
     {
         if ( len < prop->max_length )
         {
-            if ( addM != 0 ) growM(addM);
-            if ( addP != 0 ) growP(addP);
+            // perform the growth before the shrinkage:
+            if ( addP > addM )
+            {
+                growP(addP);
+                if ( addM != 0 ) growM(addM);
+            }
+            else
+            {
+                growM(addM);
+                if ( addP != 0 ) growP(addP);
+            }
         }
         else
         {
-            if ( split &&  length() < prop->max_length )
+            if ( split && length() < prop->max_length )
             {
                 // the remaining possible growth is distributed to the two ends:
                 inc = ( prop->max_length - length() ) / inc;
