@@ -64,12 +64,14 @@ public:
     Vector project(Vector const& pos) const;
 
     /// apply a force directed towards the edge of the Space
-    void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff) const;
-    
+    void setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
+    {
+        setConfinement(pos, mp, meca, stiff, half_, radius_);
+    }
+
     /// apply a force directed towards the edge of the Space
     void setConfinement(Vector const& pos, Mecapoint const&, real rad, Meca&, real stiff) const;
 
-    
     /// write to file
     void write(Outputter&) const;
 
@@ -78,7 +80,6 @@ public:
     
     /// read from file
     void read(Inputter&, Simul&, ObjectTag);
-
     
     /// OpenGL display function
     void draw3D() const;

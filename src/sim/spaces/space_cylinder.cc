@@ -166,15 +166,6 @@ void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& mp, Meca&
  This applies the correct forces in the cylindrical and spherical parts.
  */
 void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& mp,
-                                   Meca& meca, real stiff) const
-{
-    setConfinement(pos, mp, meca, stiff, half_, radius_);
-}
-
-/**
- This applies the correct forces in the cylindrical and spherical parts.
- */
-void SpaceCylinder::setConfinement(Vector const& pos, Mecapoint const& mp,
                                    real rad, Meca& meca, real stiff) const
 {
     real R = max_real(0, radius_ - rad);
