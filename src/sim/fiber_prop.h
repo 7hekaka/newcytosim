@@ -357,11 +357,11 @@ public:
     FiberDisp * disp;
     
     /// pointer to actual confinement Space, derived from `confine_space`
-    Space const* confine_space_ptr;
+    Space const* confine_pointer;
    
 #if NEW_FIBER_CONFINE2
     /// pointer to actual confinement Space, derived from `confine_space`
-    Space const* confine2_space_ptr;
+    Space const* confine2_pointer;
 #endif
 #if NEW_FIBER_MAKE_COUPLE
     /// rate

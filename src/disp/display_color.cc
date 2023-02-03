@@ -116,7 +116,7 @@ namespace {
     {
         const real beta = fib.disp->color_scale;
         real Z = 0;
-        Space const* spc = fib.prop->confine_space_ptr;
+        Space const* spc = fib.prop->confine_pointer;
         if ( spc && fib.prop->confine )
             Z = -spc->signedDistanceToEdge(fib.posPoint(pti));
 #if ( DIM > 2 )

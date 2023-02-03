@@ -111,7 +111,7 @@ public:
 protected:
     
     /// pointer to actual confinement Space, derived from `confine_space`
-    Space const* confine_space_ptr;
+    Space const* confine_pointer;
 
     /// displacement in one time step
     real diffusion_dt;

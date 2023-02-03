@@ -110,7 +110,7 @@ void SingleProp::clear()
     confine       = CONFINE_INSIDE;
     //confine_stiffness = 0;
     confine_space = "first";
-    confine_space_ptr = nullptr;
+    confine_pointer = nullptr;
 }
 
 
@@ -156,11 +156,11 @@ void SingleProp::complete(Simul const& sim)
 {
     if ( confine != CONFINE_OFF )
     {
-        confine_space_ptr = sim.findSpace(confine_space);
-        if ( confine_space_ptr )
+        confine_pointer = sim.findSpace(confine_space);
+        if ( confine_pointer )
         {
             if ( confine_space.empty() )
-                confine_space = confine_space_ptr->name();
+                confine_space = confine_pointer->name();
         }
         else
         {
@@ -170,7 +170,7 @@ void SingleProp::complete(Simul const& sim)
         }
     }
     else
-        confine_space_ptr = nullptr;
+        confine_pointer = nullptr;
 
     if ( hand.empty() )
         throw InvalidParameter(name()+":hand must be defined");
@@ -240,10 +240,10 @@ void SingleProp::write_values(std::ostream& os) const
 
 real SingleProp::spaceVolume() const
 {
-    if ( !confine_space_ptr )
+    if ( !confine_pointer )
         throw InvalidParameter("no single:confinement defined for `"+name()+"'");
     
-    real res = confine_space_ptr->volume();
+    real res = confine_pointer->volume();
     
     if ( res <= 0 )
         throw InvalidParameter(name()+":confinement has null volume");

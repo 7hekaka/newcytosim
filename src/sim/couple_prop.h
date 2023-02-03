@@ -178,7 +178,7 @@ protected:
     /// magnitude of diffusion:
     real diffusion_dt;
     /// pointer to actual confinement Space, derived from `confine_space`
-    Space const* confine_space_ptr;
+    Space const* confine_pointer;
 
 public:
     

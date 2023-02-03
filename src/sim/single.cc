@@ -99,9 +99,9 @@ void Single::randomizePosition()
     if ( prop->diffusion > 0 || prop->fast_diffusion )
     {
         if ( prop->confine == CONFINE_ON )
-            sPos = prop->confine_space_ptr->placeOnEdge(1.0);
+            sPos = prop->confine_pointer->placeOnEdge(1.0);
         else if ( prop->confine == CONFINE_INSIDE )
-            sPos = prop->confine_space_ptr->place();
+            sPos = prop->confine_pointer->place();
         else if ( prop->confine != CONFINE_OFF )
             throw InvalidParameter("`confine` is incompatible with `fast_diffusion`");
     }
@@ -123,11 +123,11 @@ void Single::stepF()
     // confinement:
     if ( prop->confine == CONFINE_INSIDE )
     {
-        sPos = prop->confine_space_ptr->bounce(pos);
+        sPos = prop->confine_pointer->bounce(pos);
     }
     else if ( prop->confine == CONFINE_ON )
     {
-        sPos = prop->confine_space_ptr->project(pos);
+        sPos = prop->confine_pointer->project(pos);
     }
     else
     {
@@ -167,7 +167,7 @@ void Single::setInteractions(Meca& meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        Space const* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_pointer;
         spc->setConfinement(sHand->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif

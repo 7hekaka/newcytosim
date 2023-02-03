@@ -1170,7 +1170,7 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
 {
     Space const* spc = spaces.master();
     if ( sel )
-        spc = static_cast<FiberProp const*>(sel)->confine_space_ptr;
+        spc = static_cast<FiberProp const*>(sel)->confine_pointer;
     if ( !isSymmetricAroundAxisZ(spc->prop->shape) )
         throw InvalidParameter("reportFiberDirections() cannot handle non symmetric Space");
 

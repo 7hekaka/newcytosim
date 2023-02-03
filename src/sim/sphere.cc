@@ -264,10 +264,10 @@ void Sphere::setDragCoefficientStokes()
 void Sphere::setDragCoefficientPiston()
 {
     assert_true( radius() > 0 );
-    assert_true( prop->confine_space_ptr );
+    assert_true( prop->confine_pointer );
     
     const real rad = radius();
-    real thick = 0.5 * prop->confine_space_ptr->thickness();
+    real thick = 0.5 * prop->confine_pointer->thickness();
     real eps = ( thick - rad ) / rad;
     
     if ( eps <= 0 )
@@ -292,7 +292,7 @@ void Sphere::setDragCoefficient()
 
     if ( prop->piston_effect )
     {
-        if ( prop->confine_space_ptr )
+        if ( prop->confine_pointer )
             setDragCoefficientPiston();
         else
             Cytosim::warn << "Piston effect ignored because space is undefined\n";
@@ -330,7 +330,7 @@ void Sphere::setInteractions(Meca& meca) const
 {
     if ( prop->confine != CONFINE_OFF )
     {
-        Space const* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_pointer;
         
         switch ( prop->confine )
         {

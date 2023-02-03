@@ -325,14 +325,14 @@ void FiberProp::clear()
     confine_stiff[0] = 0;
     confine_stiff[1] = 0;
     confine_space = "first";
-    confine_space_ptr = nullptr;
+    confine_pointer = nullptr;
     
 #if NEW_FIBER_CONFINE2
     confine2 = CONFINE_OFF;
-    confine2_stiff[0]  = 0;
-    confine2_stiff[1]  = 0;
-    confine2_space     = "first";
-    confine2_space_ptr = nullptr;
+    confine2_stiff[0] = 0;
+    confine2_stiff[1] = 0;
+    confine2_space = "first";
+    confine2_pointer = nullptr;
 #endif
 #if NEW_CONFINE_RANGE
     confine_range[0] = 0;
@@ -563,11 +563,11 @@ void FiberProp::complete(Simul const& sim)
 
     /* confine_space is also used for `glue' and `shrink_outside',
      and needs to be set here */
-    confine_space_ptr = sim.findSpace(confine_space);
-    if ( confine_space_ptr )
+    confine_pointer = sim.findSpace(confine_space);
+    if ( confine_pointer )
     {
         if ( confine_space.empty() )
-            confine_space = confine_space_ptr->name();
+            confine_space = confine_pointer->name();
     }
     else
     {
@@ -582,9 +582,9 @@ void FiberProp::complete(Simul const& sim)
 #if NEW_FIBER_CONFINE2
     if ( confine2 != CONFINE_OFF )
     {
-        confine2_space_ptr = sim.findSpace(confine2_space);
-        if ( confine2_space_ptr )
-            confine2_space = confine2_space_ptr->name();
+        confine2_pointer = sim.findSpace(confine2_space);
+        if ( confine2_pointer )
+            confine2_space = confine2_pointer->name();
         else
         {
             if ( primed(sim) )
@@ -593,7 +593,7 @@ void FiberProp::complete(Simul const& sim)
         }
     }
     else
-        confine2_space_ptr = nullptr;
+        confine2_pointer = nullptr;
 
     if ( confine2 && confine2_stiff[0] < 0 )
         throw InvalidParameter(name()+":confine2_stiffness must be specified and >= 0");

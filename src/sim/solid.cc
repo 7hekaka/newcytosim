@@ -71,7 +71,7 @@ void Solid::setInteractions(Meca& meca) const
 #endif
     if ( prop->confine != CONFINE_OFF )
     {
-        Space const* spc = prop->confine_space_ptr;
+        Space const* spc = prop->confine_pointer;
         switch ( prop->confine )
         {
             case CONFINE_INSIDE:

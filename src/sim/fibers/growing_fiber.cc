@@ -52,7 +52,7 @@ void GrowingFiber::step()
     real addP = 0, addM = 0;
     
     // PLUS_END
-    if ( prop()->shrink_outside[P] && prop()->confine_space_ptr->outside(posEndP()) )
+    if ( prop()->shrink_outside[P] && prop()->confine_pointer->outside(posEndP()) )
     {
         addP = prop()->shrinking_speed_dt[P];
     }
@@ -72,7 +72,7 @@ void GrowingFiber::step()
     }
     
     // MINUS_END
-    if ( prop()->shrink_outside[M] && prop()->confine_space_ptr->outside(posEndM()) )
+    if ( prop()->shrink_outside[M] && prop()->confine_pointer->outside(posEndM()) )
     {
         addM = prop()->shrinking_speed_dt[M];
     }

@@ -24,7 +24,7 @@ void SphereProp::clear()
     confine           = CONFINE_OFF;
     confine_stiffness = 0;
     confine_space     = "first";
-    confine_space_ptr = nullptr;
+    confine_pointer = nullptr;
     
     display           = "";
     display_fresh     = false;
@@ -78,11 +78,11 @@ void SphereProp::complete(Simul const& sim)
     
     if ( confine != CONFINE_OFF )
     {
-        confine_space_ptr = sim.findSpace(confine_space);
-        if ( confine_space_ptr )
+        confine_pointer = sim.findSpace(confine_space);
+        if ( confine_pointer )
         {
             if ( confine_space.empty() )
-                confine_space = confine_space_ptr->name();
+                confine_space = confine_pointer->name();
         }
         else
         {
