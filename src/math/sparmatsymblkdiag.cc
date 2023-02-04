@@ -443,7 +443,7 @@ static void printSparseBlock(std::ostream& os, real inf, SparMatSymBlkDiag::Bloc
     for ( size_t y = (ii==jj?x:0); y < B.dimension(); ++y )
     {
         real v = B(y, x);
-        if ( abs_real(v) >= inf )
+        if ( abs_real(v) > inf )
             os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << std::setw(16) << v << "\n";
     }
 }
@@ -1376,6 +1376,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_SSE(const float* X, float* Y,
 #if ( SD_BLOCK_SIZE == 3 ) && REAL_IS_DOUBLE && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size_t jj) const
 {
+    vec2 zero = setzero2();
     /* vec4 s0, s1, s2 accumulate lines of the transposed-matrix multiplied by 'xyz' */
     vec2 s0, s1, s2;
     vec2 xx, yy, zz;
@@ -1387,17 +1388,18 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
         // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
         auto const& mat = dia_.data();
-        yy = load2(Y+jj);
-        s0 = fmadd2(loadu2(mat  ), xy, unpacklo2(yy, setzero2()));
-        s1 = fmadd2(loadu2(mat+3), xy, unpackhi2(yy, setzero2()));
-        s2 = fmadd2(loadu2(mat+6), xy, load1Z(Y+jj+2));
+        yy = loadu2(Y+jj);
+        vec2 mat6 = loadu2(mat+6);
+        s0 = fmadd2(loadu2(mat  ), xy, unpacklo2(yy, zero));
+        s1 = fmadd2(loadu2(mat+3), xy, unpackhi2(yy, zero));
+        s2 = fmadd2(mat6, xy, load1Z(Y+jj+2));
         // prepare broadcasted vectors:
         xx = duplo2(xy);
         yy = duphi2(xy);
-        // add last column:
-        s0 = fmadd1(loadu2(mat+2), zz, s0);
-        s1 = fmadd1(loadu2(mat+5), zz, s1);
-        s2 = fmadd1(load1Z(mat+8), zz, s2);
+        // add last column, keeping the upper value from s0, s1, s2:
+        s0 = fmadd2(unpacklo2(mat6, zero), zz, s0);
+        s1 = fmadd2(unpackhi2(mat6, zero), zz, s1);
+        s2 = fmadd2(load1Z(mat+8), zz, s2);
         zz = duplo2(zz);
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
@@ -1417,7 +1419,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         vec2 xyi = loadu2(X+ii);
         vec2 z0i = load1Z(X+ii+2);
         s0 = fmadd2(mat0, xyi, s0);
-        s0 = fmadd1(mat2, z0i, s0);
+        s0 = fmadd2(mat2, z0i, s0);
 
         // multiply with the transposed block in lines { s0, s1, s2 }:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
@@ -1430,13 +1432,13 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         XY = fmadd2(mat3, yy, XY);
         vec2 mat6 = loadu2(mat+6);
         vec2 mat5 = catshift(mat4, mat6);
-        s1 = fmadd1(mat5, z0i, s1);
+        s1 = fmadd2(mat5, z0i, s1);
         Z0 = fmadd1(mat5, yy, Z0);
         vec2 mat8 = load1Z(mat+8);
         s2 = fmadd2(mat6, xyi, s2);
         XY = fmadd2(mat6, zz, XY);
         Z0 = fmadd1(mat8, zz, Z0);
-        s2 = fmadd1(mat8, z0i, s2);
+        s2 = fmadd2(mat8, z0i, s2);
         storeu2(Y+ii, XY);
         store1(Y+ii+2, Z0);
     }
