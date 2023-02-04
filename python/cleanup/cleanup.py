@@ -82,8 +82,9 @@ def process_dir(path):
 def archive(path):
     """compress a directory"""
     process_dir(path)
-    subprocess.call(['tar', '-czf', path+'.tar.gz', path])
-    shutil.rmtree(path)
+    code = subprocess.call(['tar', '-czf', path+'.tar.gz', path])
+    if ~code:
+        shutil.rmtree(path)
 
 
 #------------------------------------------------------------------------
