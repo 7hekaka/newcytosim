@@ -6,9 +6,9 @@
 #pragma mark - Mecable ordering
 
 
-template < typename MatrixClass >
+template < typename MATRIX >
 static void setAdjacency(int mat[], const size_t lld, unsigned table[],
-                         const size_t nbv, MatrixClass const& MAT)
+                         const size_t nbv, MATRIX const& MAT)
 {
     // process all matrix columns:
     for ( size_t j = 0; j < nbv; ++j )
@@ -204,9 +204,9 @@ void Meca::reorderMecables()
 
 
 /// equalize flags for any existing matrix element between Mecables
-template < typename MatrixClass >
+template < typename MATRIX >
 static void flagConnectedMecables(Array<Mecable*> const mecables, const size_t sup,
-                                  Mecable** table, MatrixClass const& MAT)
+                                  Mecable** table, MATRIX const& MAT)
 {
     // process all matrix columns:
     for ( size_t j = 0; j < sup; ++j )
@@ -746,16 +746,16 @@ void Meca::dumpSystem(bool nat) const
 
 
 // Just considering Couple between Fibers here:
-void markConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecables)
+void markConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecs)
 {
     bmap.clear();
     ObjectFlag i = 0;
-    for ( Mecable * mec : mecables )
+    for ( Mecable * mec : mecs )
         mec->flag(i++);
-    if ( (size_t)i != mecables.size() )
+    if ( (size_t)i != mecs.size() )
         throw InvalidParameter("ObjectFlag overflow in markConnectivity()");
 
-    for ( Mecable const* mec : mecables )
+    for ( Mecable const* mec : mecs )
     {
         i = mec->flag();
 
@@ -797,14 +797,14 @@ void Meca::saveConnectivityBitmap() const
 }
 
 
-template < typename MatrixClass >
-static void markMatrix(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT)
+template < typename MATRIX >
+static void markMatrix(BitMap<1>& bmap, size_t sup, MATRIX const& mat)
 {
     for ( size_t j = 0; j < sup; ++j )
     {
-        for ( size_t n = 0; n < MAT.column_size(j); ++n )
+        for ( size_t n = 0; n < mat.column_size(j); ++n )
         {
-            size_t i = MAT.column_index(j, n);
+            size_t i = mat.column_index(j, n);
             if ( i < sup )
                 bmap.set(i, j, 1);
         }
@@ -813,9 +813,9 @@ static void markMatrix(BitMap<1>& bmap, size_t sup, MatrixClass const& MAT)
 
 
 /// add vertical and horizontal lines to indicate mecables indices
-static void markMecables(BitMap<1>& bmap, Array<Mecable*> const& mecables)
+static void markMecables(BitMap<1>& bmap, Array<Mecable*> const& mecs)
 {
-    for ( Mecable * mec : mecables )
+    for ( Mecable * mec : mecs )
     {
         size_t i = mec->matIndex();
         size_t s = i + mec->nbPoints() - 1;
@@ -828,40 +828,35 @@ static void markMecables(BitMap<1>& bmap, Array<Mecable*> const& mecables)
     }
 }
 
+template < typename MATRIX >
+static void saveMatrixBitmap(MATRIX& mat, Array<Mecable*> mecs, size_t nbv, const char str[])
+{
+    BitMap<1> bmap(nbv, nbv);
+    FILE * f = fopen(str, "w");
+    if ( f ) {
+        if ( !ferror(f) ) {
+            bmap.clear();
+            markMatrix(bmap, nbv, mat);
+            markMecables(bmap, mecs);
+            bmap.save(f);
+        }
+        fclose(f);
+    }
+}
 
-void Meca::saveMatrixBitmaps(const char arg[]) const
+void Meca::saveMatrixBitmaps(const char prefix[]) const
 {
     static size_t cnt = 0;
-    const size_t nbv = nbVertices();
-    BitMap<1> bmap(nbv, nbv);
-    char str[32] = { 0 };
-    FILE * f;
+    char str[64] = { 0 };
     
 #if USE_ISO_MATRIX
-    snprintf(str, sizeof(str), "%siso%08lu.bmp", arg, cnt);
-    f = fopen(str, "w");
-    if ( f ) {
-        if ( !ferror(f) ) {
-            bmap.clear();
-            markMatrix(bmap, nbv, mISO);
-            markMecables(bmap, mecables);
-            bmap.save(f);
-        }
-        fclose(f);
-    }
+    snprintf(str, sizeof(str), "%siso%08lu.bmp", prefix, cnt);
+    saveMatrixBitmap(mISO, mecables, nbVertices(), str);
 #endif
 #if USE_MATRIX_BLOCK
-    snprintf(str, sizeof(str), "%sful%08lu.bmp", arg, cnt++);
-    f = fopen(str, "w");
-    if ( f ) {
-        if ( !ferror(f) ) {
-            bmap.clear();
-            markMatrix(bmap, nbv, mFUL);
-            markMecables(bmap, mecables);
-            bmap.save(f);
-        }
-        fclose(f);
-    }
+    snprintf(str, sizeof(str), "%sful%08lu.bmp", prefix, cnt);
+    saveMatrixBitmap(mFUL, mecables, nbVertices(), str);
 #endif
+    ++cnt;
 }
 
