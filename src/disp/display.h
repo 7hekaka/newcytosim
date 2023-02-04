@@ -165,17 +165,10 @@ public:
     float pixwidth(float w) const { return std::max(w * unitValue, 0.25f); }
     
     /// draw primitive `obj` at given position
-    void drawObject(Vector const& pos, float rad, void (*obj)()) const;
+    static void drawObject(Vector const& pos, float rad, void (*obj)());
     
     /// draw primitive `obj` at `pos` with Z-axis oriented toward `dir`
-    void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)()) const;
-    
-    /// draw a fine spherical object
-    void drawBallT(Vector const&, real radius, gym_color const&, unsigned mark) const;
-    
-    /// draw a fine spherical object
-    void drawDiscT(Vector const&, real radius, gym_color const&) const;
-
+    static void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)());
 
     
     /// draw a scalar field

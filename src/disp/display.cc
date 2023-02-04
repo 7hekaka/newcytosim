@@ -97,21 +97,21 @@ PointDisp const* Couple::disp21() const
 //------------------------------------------------------------------------------
 #pragma mark - drawObject
 
-void Display::drawObject(Vector const& pos, float rad, void(*obj)()) const
+void Display::drawObject(Vector const& pos, float rad, void(*obj)())
 {
     gym::transScale(pos, rad);
     obj();
 }
 
 
-void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*obj)()) const
+void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*obj)())
 {
     gym::transAlignZ(pos, rad, dir);
     obj();
 }
 
 
-void Display::drawBallT(Vector const& pos, real rad, gym_color const& col, unsigned mark) const
+void drawBallT(Vector const& pos, real rad, gym_color const& col, unsigned mark)
 {
     gym::transScale(pos, rad);
     //gym::enableLighting();
@@ -124,8 +124,22 @@ void Display::drawBallT(Vector const& pos, real rad, gym_color const& col, unsig
     }
 }
 
+// using sphere4() for presumably smaller objects
+void drawBeadS(Vector const& pos, real rad, gym_color const& col, unsigned mark)
+{
+    gym::transScale(pos, rad);
+    //gym::enableLighting();
+    gym::color_both(col);
+    gle::dualPassSphere4();
+    if ( mark )
+    {
+        gym::color_front(0,0,0);
+        gle::footballPentagons();
+    }
+}
 
-void Display::drawDiscT(Vector const& pos, real rad, gym_color const& col) const
+
+void drawDiscT(Vector const& pos, real rad, gym_color const& col)
 {
     gym::transScale(pos, rad);
     gym::disableLighting();
@@ -139,6 +153,26 @@ inline void drawMonomer(Vector3 const& pos, float rad)
 {
     gym::transScale(pos, rad);
     gle::sphere2();
+}
+
+static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color bak, bool flip)
+{
+    Vector X = obj.posP(inx);
+#if ( DIM >= 3 )
+    Vector A = obj.posP(inx+1) - X;
+    Vector B = obj.posP(inx+2) - X;
+    Vector C = obj.posP(inx+3) - X;
+    gym::transRotate(X, A, B, C);
+    //bool flip = ( dot(cross(A,B), C) < 0 );
+#else
+    gym::transScale(X, obj.radius(inx));
+#endif
+    if ( flip ) glFrontFace(GL_CW);
+    gym::color_front(col, 1.0);
+    gle::sphere1();
+    gym::color_front(bak);
+    gle::footballPentagons();
+    if ( flip ) glFrontFace(GL_CCW);
 }
 
 //------------------------------------------------------------------------------
@@ -1892,27 +1926,6 @@ void Display::drawSolidT(Solid const& obj, size_t inx) const
 }
 
 
-static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color bak, bool flip)
-{
-    Vector X = obj.posP(inx);
-#if ( DIM >= 3 )
-    Vector A = obj.posP(inx+1) - X;
-    Vector B = obj.posP(inx+2) - X;
-    Vector C = obj.posP(inx+3) - X;
-    gym::transRotate(X, A, B, C);
-    //bool flip = ( dot(cross(A,B), C) < 0 );
-#else
-    gym::transScale(X, obj.radius(inx));
-#endif
-    if ( flip ) glFrontFace(GL_CW);
-    gym::color_front(col, 1.0);
-    gle::sphere1();
-    gym::color_front(bak);
-    gle::footballPentagons();
-    if ( flip ) glFrontFace(GL_CCW);
-}
-
-
 void Display::drawSolids(SolidSet const& set)
 {
     for ( Solid * obj = set.first(); obj; obj=obj->next() )
@@ -1995,7 +2008,7 @@ void Display::drawBeadT(Bead const& obj) const
     {
         gym_color col = bodyColorF(obj);
 #if ( DIM > 2 )
-        drawBallT(obj.position(), obj.radius(), col, obj.mark());
+        drawBeadS(obj.position(), obj.radius(), col, obj.mark());
 #else
         drawDiscT(obj.position(), obj.radius(), col);
 #endif
