@@ -30,6 +30,9 @@ class Bead : public Mecable
 {
 private:
     
+    /// position of center
+    Vector paCen;
+    
     /// radius
     real paRadius;
 
@@ -53,16 +56,16 @@ public:
     int mobile() const { return 1; }
 
     /// return the position in space of the object
-    Vector pos() const { return Vector(pPos); }
+    Vector pos() const { return paCen; }
 
     /// return the position in space of the object (virtual function)
-    Vector position() const { return Vector(pPos); }
+    Vector position() const { return paCen; }
     
     /// move the object position ( position += given vector )
-    void translate(Vector const& x) { x.add_to(pPos); }
+    void translate(Vector const& x) { paCen += x; }
     
     /// set the object position ( position = given vector )
-    void setPosition(Vector const& x) { x.store(pPos); }
+    void setPosition(Vector const& x) { paCen = x; }
 
     //--------------------------------------------------------------------------
         
@@ -80,6 +83,9 @@ public:
     
     //--------------------------------------------------------------------------
     
+    /// allocate memory
+    void allocateMecable(size_t);
+
     /// sets the mobility
     void setDragCoefficient();
     

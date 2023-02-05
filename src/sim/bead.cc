@@ -34,6 +34,18 @@ Bead::~Bead()
 }
 
 
+void Bead::allocateMecable(const size_t nbp)
+{
+    assert_true( nbp == 1 );
+    //Mecable::allocateMemory(nbp, 0);
+    /* Directly setting the Vertex pointer to the member data,
+     avoids the minuscule allocation (3 reals) that would occur
+     for each Bead in the system.
+     This will work as long as Vector can directly match a real[]
+     */
+    pPos = paCen.data();
+}
+
 //------------------------------------------------------------------------------
 
 void Bead::setInteractions(Meca& meca) const
@@ -52,29 +64,26 @@ void Bead::setInteractions(Meca& meca) const
             case CONFINE_INSIDE:
             {
                 // Confine only the center
-                Vector cen(pPos);
-                if ( ! spc->inside(cen) )
-                    spc->setConfinement(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                if ( ! spc->inside(paCen) )
+                    spc->setConfinement(paCen, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_OUTSIDE:
             {
                 // confine the center outside
-                Vector cen(pPos);
-                if ( spc->inside(cen) )
-                    spc->setConfinement(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                if ( spc->inside(paCen) )
+                    spc->setConfinement(paCen, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_ALL_INSIDE:
             {
                 // Confine the entire bead
-                Vector cen(pPos);
-                if ( ! spc->allInside(cen, paRadius) )
-                    spc->setConfinement(cen, Mecapoint(this, 0), paRadius, meca, prop->confine_stiffness);
+                if ( ! spc->allInside(paCen, paRadius) )
+                    spc->setConfinement(paCen, Mecapoint(this, 0), paRadius, meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_ON:
-                spc->setConfinement(position(), Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(paCen, Mecapoint(this, 0), meca, prop->confine_stiffness);
                 break;
                 
             default:
@@ -140,7 +149,7 @@ void Bead::projectForces(const real* X, real* Y) const
 void Bead::write(Outputter& out) const
 {
     writeMarker(out, TAG);
-    out.writeFloats(position(), DIM, '\n');
+    out.writeFloats(paCen, DIM, '\n');
     out.writeSoftSpace();
     out.writeFloat(paRadius);
 }
