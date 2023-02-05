@@ -337,7 +337,7 @@ public:
     void deallocate()
     {
         //printf("Array %p deallocate %i\n", this, allocated);
-        delete[] val_;
+        if ( alc_ ) delete[] val_;
         val_ = nullptr;
         alc_ = 0;
         nbo_ = 0;

@@ -63,7 +63,6 @@ Object * BeadSet::newObject(const ObjectTag tag, PropertyID pid)
 
 ObjectList BeadSet::newObjects(Property const* p, Glossary& opt)
 {
-    ObjectList res(4, 4);
     BeadProp const* pp = static_cast<BeadProp const*>(p);
     real rad = -1;
     size_t inx = 2;
@@ -106,9 +105,10 @@ ObjectList BeadSet::newObjects(Property const* p, Glossary& opt)
         throw InvalidParameter("bead:radius must be specified and > 0");
 
     Bead * obj = new Bead(pp, Vector(0,0,0), rad);
-    
-    res.push_back(obj);
-    
+
+    // create list with one object:
+    ObjectList res(obj);
+
     std::string str;
     // attach anchored Singles:
     while ( opt.set(str, var, inx++) )
