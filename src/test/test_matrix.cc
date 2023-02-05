@@ -205,6 +205,7 @@ void compareMatrices(unsigned S, MATRIX & mat1, MATROX& mat2, size_t fill)
 template <typename MATRIX>
 void fillMatrix(MATRIX& mat)
 {
+    mat.reset();
 #if ( DIM == 3 )
     Matrix33 S(alpha, beta, -beta, beta, -alpha, beta, -beta, beta, alpha);
     Matrix33 U(kappa, iota, iota, -iota, kappa, iota, -iota,-iota, kappa);
@@ -220,11 +221,11 @@ void fillMatrix(MATRIX& mat)
     {
         size_t i = DIM * iny_[n];
         size_t j = DIM * inx_[n];
-        
+        //printf("\n  ( %lu %lu ) ", i, j); S.print_smart(std::cout);
         // this is a block on the diagonal:
-        for ( size_t x = 0; x < DIM; ++x )
+        for ( size_t x = 0; x < 1; ++x )
         for ( size_t y = x; y < DIM; ++y )
-            mat(i+y, i+x) += S(y,x);
+            mat(i+y, i+x) += S(y, x);
         
         if ( i != j )
         {
@@ -242,22 +243,37 @@ void fillMatrix(MATRIX& mat)
 
 // check the results of Z = Mat * X + Y with different methods
 template <typename MATRIX>
-void checkMatrix(MATRIX & mat, real const* x, real const* y, real * z)
+real checkMatrix(MATRIX & mat, real const* x, real const* y, real * z, size_t print)
 {
+    mat.prepareForMultiply(1);
     size_t N = mat.size();
+    size_t NP = std::min(N, print);
+    if ( print > 1 ) VecPrint::print("xxxx", NP, x);
+    if ( print > 1 ) VecPrint::print("yyyy", NP, y);
     copy_real(N, y, z);
     mat.vecMulAdd(x, z);
     real sum1 = checksum(N, z);
-    
+    if ( print > 1 ) VecPrint::print("vec1", NP, z);
+
     copy_real(N, y, z);
     mat.vecMulAdd_ALT(x, z);
     real sum2 = checksum(N, z);
-    
+    if ( print > 1 ) VecPrint::print("vec2", NP, z);
+
     mat.vecMul(x, z);
     for ( size_t i = 0; i < N; ++i ) z[i] += y[i];
     real sum3 = checksum(N, z);
+    if ( print > 1 ) VecPrint::print("vec3", NP, z);
     
-    printf("  check %+16.6f %+16.6f %+16.6f ", sum1, sum2, sum3);
+    real n = std::max(abs_real(sum1-sum2), abs_real(sum2-sum3));
+    if ( print ) {
+        if ( n > REAL_EPSILON )
+            printf(" FAILED");
+        else
+            printf("  check");
+        printf(" %+16.6f %+16.6f %+16.6f ", sum1, sum2, sum3);
+    }
+    return n;
 }
 
 
@@ -267,7 +283,6 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
     tick();
     for ( size_t n=0; n<N_RUN; ++n )
     {
-        mat.reset();
         fill(mat);
         mat.prepareForMultiply(1);
     }
@@ -299,7 +314,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 
     printf("\n%-32s ", mat.what().c_str());
     printf("set %9.0f  muladd %9.0f  alt %9.0f  mul %9.0f", ts, t1, t2, t3);
-    checkMatrix(mat, x, y, z);
+    checkMatrix(mat, x, y, z, 0);
     fflush(stdout);
 }
 
@@ -422,7 +437,6 @@ void testParallelVecmul(const unsigned S, const size_t F)
 
     SparMatA mat;
     mat.resize(DIM*S);
-    mat.reset();
     fillMatrix(mat);
     mat.prepareForMultiply(1);
 
@@ -473,6 +487,7 @@ void testParallelVecmul(const unsigned S, const size_t F)
 template <typename MATRIX>
 void fillMatrixIso(MATRIX& mat)
 {
+    mat.reset();
     for ( size_t n = 0; n < icnt_; ++n )
     {
         size_t i = iny_[n];
@@ -545,10 +560,7 @@ void testIsoMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 {
     tick();
     for ( size_t i=0; i<N_RUN; ++i )
-    {
-        mat.reset();
         fillMatrixIso(mat);
-    }
     double ts = tock(N_RUN);
     
     tick();
@@ -615,6 +627,23 @@ void testMatrices(const unsigned S, const size_t F)
         setIndices(S, F);
         testIsoMatrices(S, x, y, z);
         printf("\n");
+    }
+    if ( 1 )
+    {
+        printf("------ %i x %i  strain-test:", DIM, S);
+        SparMatD mat;
+        mat.resize(DIM*S);
+        real err = 0;
+        for ( int i = 0; i < 1024; ++i )
+        {
+            setIndices(S, F);
+            fillMatrix(mat);
+            err = checkMatrix(mat, x, y, z, 0);
+            if ( err > REAL_EPSILON ) break;
+        }
+        printf(" error %e\n", err);
+        checkMatrix(mat, x, y, z, 10*(err>1e-6));
+        //mat.printSparse(std::cout, 0, 0, 1000);
     }
     if ( 1 )
     {
@@ -740,6 +769,7 @@ int main( int argc, char* argv[] )
     //testBlockMatrix(DIM*3217, 671234);
 #endif
 #if ( 0 )
+    testMatrices(3, 1);
     //testMatrices(7, 23);
     //testMatrices(17, 23);
     //testMatrices(29, 1<<12);
@@ -748,12 +778,13 @@ int main( int argc, char* argv[] )
     testMatrices(8*31, 1<<16);
     //testMatrices(8*56, 1<<17);
     testMatrices(8*110, 1<<18);
-#endif
+#else
     //testMatrices(37, 1<<17);
     testMatrices(5494, 131836);
     testBlockMatrix(5494, 131836);
     testBlockMatrix(5494, 431836);
     //testParallelVecmul(15464, 131836);
+#endif
 #if ( 0 )
     size_t dim[5] = { 0 };
     for ( int i = 0; i < 5; ++i ) dim[i] = RNG.pint32(1<<(i+7));
