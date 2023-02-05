@@ -76,7 +76,7 @@ protected:
 
 private:
 
-    /// Currently allocated size of arrays pPos[]
+    /// Currently allocated size: pPos[] can hold DIM*pAllocated scalars
     SIZE_T pAllocated;
     
     /// type of preconditionner
@@ -225,11 +225,11 @@ public:
 
     //--------------------------------------------------------------------------
 
-    /// Allocate memory to store given number of vertices
-    real * allocateMemory(size_t, size_t, size_t);
+    /// Allocate memory to store given number of vertices and extra vectors
+    real * allocateMemory(size_t, size_t);
 
     /// Allocate memory to store given number of vertices
-    virtual void allocateMecable(size_t n) { allocateMemory(n, 0, 0); }
+    virtual void allocateMecable(size_t n) { allocateMemory(n, 0); }
     
     /// free allocated memory
     void release();

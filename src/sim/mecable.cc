@@ -81,21 +81,22 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
 
 
 /**
- allocateMecable(N) ensures that the object can hold `N` vertices
- returns: pointer to new memory allocated, or zero if no allocation was necessary
+ allocateMecable(N) ensures that the object can hold `nbp` vertices
+ returns: pointer to new memory allocated, or nullptr if no allocation was necessary
  some extra space is allowed in 3D to allow for AVX overspill
  */
-real* Mecable::allocateMemory(const size_t nbp, size_t add, size_t top)
+real* Mecable::allocateMemory(const size_t nbp, size_t add)
 {
-    if ( pAllocated < nbp + (DIM==3) )
+    if ( nbp + (DIM==3) > pAllocated )
     {
+        // in 3D, we want one extra vector for SIMD burr
         size_t all = chunk_real(nbp+(DIM==3));
         // std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
         
         // allocate memory for vertices + requested extra:
-        real * mem = new_real(all*(DIM+add+top));
+        real * mem = new_real(all*(DIM+add));
         // reset the point for a clean start:
-        zero_real(all*(DIM+add+top), mem);
+        zero_real(all*(DIM+add), mem);
 
         // transfer existing data:
         if ( pPos )
@@ -105,7 +106,6 @@ real* Mecable::allocateMemory(const size_t nbp, size_t add, size_t top)
             copy_real(nPoints*DIM, pPos, mem);
             // copy additional chunks of data:
             copy_real(nPoints*add, pPos+pAllocated*DIM, mem+all*DIM);
-            copy_real(nPoints*top, pPos+pAllocated*(DIM+add), mem+all*(DIM+add));
             free_real(pPos);
         }
         pPos = mem;
@@ -122,7 +122,7 @@ void Mecable::release()
     pBlock = nullptr;
     pBlockAlc = 0;
     
-    free_real(pPos);
+    if ( pAllocated ) free_real(pPos);
     pPos = nullptr;
     
     pForce = nullptr;

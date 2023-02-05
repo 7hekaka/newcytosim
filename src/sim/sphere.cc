@@ -305,7 +305,7 @@ void Sphere::setDragCoefficient()
 
 void Sphere::allocateMecable(size_t nbp)
 {
-    real * ptr = Mecable::allocateMemory(nbp, DIM, 0);
+    real * ptr = Mecable::allocateMemory(nbp, DIM);
     if ( ptr )
         sDir = ptr;
 }

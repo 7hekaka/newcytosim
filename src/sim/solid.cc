@@ -212,7 +212,7 @@ Solid::~Solid()
  */
 void Solid::allocateMecable(const size_t nbp)
 {
-    real * ptr = Mecable::allocateMemory(nbp, 1, DIM);
+    real * ptr = Mecable::allocateMemory(nbp, 1+DIM);
     if ( ptr )
     {
         size_t all = allocated();
