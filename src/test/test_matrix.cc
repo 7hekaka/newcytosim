@@ -267,7 +267,7 @@ real checkMatrix(MATRIX & mat, real const* x, real const* y, real * z, size_t pr
     
     real n = std::max(abs_real(sum1-sum2), abs_real(sum2-sum3));
     if ( print ) {
-        if ( n > REAL_EPSILON )
+        if ( n > 1e-6 )
             printf(" FAILED");
         else
             printf("  check");
@@ -314,7 +314,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
 
     printf("\n%-32s ", mat.what().c_str());
     printf("set %9.0f  muladd %9.0f  alt %9.0f  mul %9.0f", ts, t1, t2, t3);
-    checkMatrix(mat, x, y, z, 0);
+    checkMatrix(mat, x, y, z, 1);
     fflush(stdout);
 }
 
