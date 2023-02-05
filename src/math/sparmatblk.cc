@@ -373,7 +373,7 @@ static void printSparseBlock(std::ostream& os, real inf, SparMatBlk::Block const
     for ( size_t y = (ii==jj?x:0); y < B.dimension(); ++y )
     {
         real v = B(y, x);
-        if ( abs_real(v) >= inf )
+        if ( abs_real(v) > inf )
             os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << std::setw(16) << v << "\n";
     }
 }
