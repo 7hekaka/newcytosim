@@ -6,10 +6,10 @@
 namespace gym
 {
 
-    /// downsample
+    /// reduce image size by 'bin'
     void downsampleRGB(uint8_t dst[], unsigned W, unsigned H, uint8_t const src[], unsigned bin);
 
-    /// downsample
+    /// reduce image size by 'bin'
     void downsampleRGBA(uint8_t dst[], unsigned W, unsigned H, uint8_t const src[], unsigned bin);
 
     /// print pixel map in ASCII
