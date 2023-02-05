@@ -37,6 +37,7 @@ void unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsigned 
  while `src` should be `bin*bin` times larger. Pixels are stored in row order
  from the lowest to the highest row, left to right in each row (as in OpenGL).
  The pixels components of `src` are averaged to produce `dst`.
+ Note that 'dst' may be equal to 'src'.
  */
 void gym::downsampleRGBA(uint8_t dst[], unsigned W, unsigned H,
                          uint8_t const src[], unsigned bin)
@@ -54,8 +55,8 @@ void gym::downsampleRGBA(uint8_t dst[], unsigned W, unsigned H,
     }
 #endif
     
-    for ( unsigned x = 0; x < W; ++x )
     for ( unsigned y = 0; y < H; ++y )
+    for ( unsigned x = 0; x < W; ++x )
     {
         uint8_t const* ptr = src + 4 * bin * ( x + bin*W*y );
         size_t r = 0, g = 0, b = 0, a = 0;
@@ -83,6 +84,7 @@ void gym::downsampleRGBA(uint8_t dst[], unsigned W, unsigned H,
  while `src` will be `bin*bin` times smaller. Pixels are stored in row order
  from the lowest to the highest row, left to right in each row (as in OpenGL).
  The pixels components of `src` are averaged to produce `dst`.
+ Note that 'dst' may be equal to 'src'.
  */
 void gym::downsampleRGB(uint8_t dst[], unsigned W, unsigned H,
                         const uint8_t src[], unsigned bin)
@@ -98,8 +100,8 @@ void gym::downsampleRGB(uint8_t dst[], unsigned W, unsigned H,
     }
 #endif
     
-    for ( size_t x = 0; x < W; ++x )
     for ( size_t y = 0; y < H; ++y )
+    for ( size_t x = 0; x < W; ++x )
     {
         uint8_t const* ptr = src + 3 * bin * ( x + bin*W*y );
         size_t r = 0, g = 0, b = 0;
