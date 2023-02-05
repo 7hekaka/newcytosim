@@ -76,6 +76,9 @@ public:
     /// set window-id
     void window(int w) { window_ = w; }
     
+    /// adjust viewport size to window_size[]
+    void resize();
+
     /// handle window resize events
     void reshape(int, int);
     
@@ -87,7 +90,7 @@ public:
 
     /// adjust parameters of projections, given window size
     void adjust(int, int) const;
-    
+
     /// set OpenGL Projection and ModelView matrices
     void adjust() const { adjust(viewport_[2], viewport_[3]); }
 

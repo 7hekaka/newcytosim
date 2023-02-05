@@ -369,6 +369,7 @@ int main(int argc, char* argv[])
     
     if ( mode != NORMAL && style == OFFSCREEN )
     {
+        view.resize();
         const int W = view.width() * view.magnify;
         const int H = view.height() * view.magnify;
         

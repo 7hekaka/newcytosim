@@ -443,14 +443,20 @@ void View::setViewport(int x, int y, size_t w, size_t h) const
 }
 
 
-void View::reshape(int W, int H)
+void View::resize()
 {
     //std::clog << "View::reshaped " << W << " " << H << '\n';
+    viewport_[2] = window_size[0];
+    viewport_[3] = window_size[1];
+    adjust(viewport_[2], viewport_[3]);
+}
+
+
+void View::reshape(int W, int H)
+{
     window_size[0] = W;
     window_size[1] = H;
-    viewport_[2] = W;
-    viewport_[3] = H;
-    adjust(W, H);
+    resize();
     loadView();
     loadViewport();
 }
