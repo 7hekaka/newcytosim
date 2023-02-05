@@ -77,7 +77,7 @@ inline static real* new_real(size_t cnt)
     if ( posix_memalign(&ptr, 64, cnt*sizeof(real)) )
         throw std::bad_alloc();
     real* res = (real*)ptr;
-    //printf("%p = new_real(%lu)  %lu\n", ptr, cnt, ((uintptr_t)ptr&63));
+    //printf("   new_real(%5zu) %p\n", cnt, ptr);
 #if CHECK_ALLOCATIONS
     allocations.insert(res);
 #endif
