@@ -109,7 +109,7 @@ sweet: sweet.cc $(TOOL_LIBS) | bin
 vpath sweet bin
 
 
-micimage: micimage.cc save_image.cc glossary.o filepath.o tokenizer.o
+micimage: micimage.cc save_image.cc save_image_gl.cc glossary.o filepath.o tokenizer.o
 micimage: stream_func.o exceptions.o random.o SFMT.o print_color.o backtrace.o
 	$(COMPILE) -Isrc/math -Isrc/base -Isrc/gym -DHAS_PNG $(OBJECTS) $(LIB_PNG) -o bin/$@
 	$(DONE)

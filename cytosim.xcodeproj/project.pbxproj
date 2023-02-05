@@ -281,6 +281,8 @@
 		BB55E56027E5120500B8026F /* space_bicylinder.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF32B3B27E3E81300F02AC8 /* space_bicylinder.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB55E56127E5123500B8026F /* space_bicylinder.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBF32B3B27E3E81300F02AC8 /* space_bicylinder.cc */; };
 		BB560C301813DC8800CB1BF5 /* vecprint.h in Headers */ = {isa = PBXBuildFile; fileRef = BB560C2F1813DC8800CB1BF5 /* vecprint.h */; };
+		BB5644DD29900F3100514CB9 /* save_image_gl.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB5644DB29900F3100514CB9 /* save_image_gl.cc */; };
+		BB5644DE29900F3100514CB9 /* save_image_gl.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5644DC29900F3100514CB9 /* save_image_gl.h */; };
 		BB56FA7712D0A0BF008B2260 /* player_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB56FA7512D0A0BF008B2260 /* player_prop.h */; };
 		BB56FA7812D0A0BF008B2260 /* player_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB56FA7612D0A0BF008B2260 /* player_prop.cc */; };
 		BB584FD328F9F45B006D6349 /* time_date.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA5E5810E8EBA620009F6D0 /* time_date.cc */; };
@@ -1836,6 +1838,8 @@
 		BB55BF380A25FB22003333C9 /* tesselator.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = tesselator.cc; path = src/math/tesselator.cc; sourceTree = SOURCE_ROOT; };
 		BB55BF390A25FB22003333C9 /* tesselator.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = tesselator.h; path = src/math/tesselator.h; sourceTree = SOURCE_ROOT; };
 		BB560C2F1813DC8800CB1BF5 /* vecprint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = vecprint.h; path = src/math/vecprint.h; sourceTree = SOURCE_ROOT; };
+		BB5644DB29900F3100514CB9 /* save_image_gl.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = save_image_gl.cc; sourceTree = "<group>"; };
+		BB5644DC29900F3100514CB9 /* save_image_gl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = save_image_gl.h; sourceTree = "<group>"; };
 		BB568CCA0BFCEAA300CB5335 /* cym */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = folder; path = cym; sourceTree = SOURCE_ROOT; };
 		BB56FA7512D0A0BF008B2260 /* player_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = player_prop.h; sourceTree = "<group>"; };
 		BB56FA7612D0A0BF008B2260 /* player_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = player_prop.cc; sourceTree = "<group>"; };
@@ -2648,6 +2652,8 @@
 			children = (
 				BB08642A281D4CE8005A6D72 /* save_image.h */,
 				BB086451281D4CE8005A6D72 /* save_image.cc */,
+				BB5644DC29900F3100514CB9 /* save_image_gl.h */,
+				BB5644DB29900F3100514CB9 /* save_image_gl.cc */,
 				BB08643F281D4CE8005A6D72 /* offscreen.h */,
 				BB086434281D4CE8005A6D72 /* offscreen.cc */,
 				BB08643C281D4CE8005A6D72 /* offscreen_glx.cc */,
@@ -3954,6 +3960,7 @@
 				BB0864A6281D51DF005A6D72 /* display3.h in Headers */,
 				BB0864A8281D51DF005A6D72 /* display2.h in Headers */,
 				BB08648B281D4CE9005A6D72 /* gym_vect.h in Headers */,
+				BB5644DE29900F3100514CB9 /* save_image_gl.h in Headers */,
 				BB08648E281D4CE9005A6D72 /* fg_font.h in Headers */,
 				BB086480281D4CE9005A6D72 /* gym_matrix.h in Headers */,
 				BB08646C281D4CE9005A6D72 /* gym_check.h in Headers */,
@@ -5297,6 +5304,7 @@
 				BB086488281D4CE9005A6D72 /* save_image.cc in Sources */,
 				BB086490281D4CE9005A6D72 /* fg_font.cc in Sources */,
 				BB08647D281D4CE9005A6D72 /* fg_stroke.cc in Sources */,
+				BB5644DD29900F3100514CB9 /* save_image_gl.cc in Sources */,
 				BB086470281D4CE9005A6D72 /* gym_flat.cc in Sources */,
 				BB08646B281D4CE9005A6D72 /* offscreen.cc in Sources */,
 				BB086477281D4CE9005A6D72 /* gym_vect.cc in Sources */,

@@ -1,5 +1,5 @@
 /*
- * Multiplay runs one simulation in a child thread and displays it live
+ * Monoplay runs one simulation in a child thread and displays it live
  * Francois J Nedelec, Cambridge University, 6 Sep. 2022
  */
 

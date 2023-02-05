@@ -8,7 +8,7 @@
 #include "display1.h"
 #include "display2.h"
 #include "display3.h"
-#include "save_image.h"
+#include "save_image_gl.h"
 #include "time_date.h"
 #include <unistd.h>
 #include <cstdlib>

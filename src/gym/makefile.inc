@@ -6,7 +6,7 @@ OBJ_GYM := gym_menu.o gym_flat.o gym_flute.o gym_flute_dim.o gym_matrix.o\
 
 OBJ_FONT := fg_font.o fg_stroke.o
 
-OBJ_GRFX := $(OBJ_GYM) $(OBJ_FONT) offscreen.o save_image.o spng.o miniz.o
+OBJ_GRFX := $(OBJ_GYM) $(OBJ_FONT) offscreen.o save_image_gl.o save_image.o spng.o miniz.o
 
 #-----------------------LIB & DEF for PNG support-------------------------------
 
@@ -36,10 +36,10 @@ $(OBJ_FONT:%.o=build/%.o): build/%.o: %.cc fg_font.h | build
 	$(COMPILE) $(INCLUDE) -DNDEBUG -c $< -o $@
 
 
-build/save_image.o: save_image.cc save_image.h | build
-	$(COMPILE) $(IMAGES_DEF) -Isrc/gym/deps -DDISPLAY -c $< -o $@
+build/save_image_gl.o: save_image_gl.cc save_image_gl.h | build
+	$(COMPILE) $(IMAGES_DEF) -Isrc/gym/deps -c $< -o $@
 
-build/save_imageNOGL.o: save_image.cc save_image.h | build
+build/save_image.o: save_image.cc save_image.h | build
 	$(COMPILE) $(IMAGES_DEF) -Isrc/gym/deps -c $< -o $@
 
 build/offscreen.o: offscreen.cc offscreen.h offscreen_fbo.cc offscreen_glx.cc | build

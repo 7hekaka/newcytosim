@@ -12,7 +12,7 @@
 #include "gym_menu.h"
 #include "gym_draw.h"
 #include "offscreen.h"
-#include "save_image.h"
+#include "save_image_gl.h"
 
 
 namespace glApp

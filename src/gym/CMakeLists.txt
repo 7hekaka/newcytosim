@@ -20,6 +20,7 @@ set(SOURCES_GYM
     gym_color.cc
     gym_color_list.cc
     save_image.cc
+    save_image_gl.cc
     offscreen.cc
     fg_font.cc
     fg_stroke.cc
@@ -31,6 +32,7 @@ list(TRANSFORM SOURCES_GYM PREPEND "${GYM_DIR}")
 
 set_property(SOURCE ${GYM_DIR}/deps/spng.c PROPERTY COMPILE_DEFINITIONS SPNG_STATIC SPNG_USE_MINIZ)
 set_property(SOURCE ${GYM_DIR}/save_image.cc PROPERTY INCLUDE_DIRECTORIES "${GYM_DIR}/deps")
+set_property(SOURCE ${GYM_DIR}/save_image_gl.cc PROPERTY INCLUDE_DIRECTORIES "${GYM_DIR}/deps")
 
 set(GYM_INCLUDES base math)
 list(TRANSFORM GYM_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")

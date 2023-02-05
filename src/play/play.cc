@@ -5,7 +5,7 @@
 #include "glossary.h"
 #include "messages.h"
 #include "offscreen.h"
-#include "save_image.h"
+#include "save_image_gl.h"
 #include "filepath.h"
 #include "splash.h"
 #include "print_color.h"

@@ -14,7 +14,7 @@
 #include "random.h"
 #include "glossary.h"
 #include "filepath.h"
-#include "save_image.h"
+#include "save_image_gl.h"
 
 
 size_t   hits = 1000;
