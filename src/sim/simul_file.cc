@@ -505,6 +505,15 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
     {
         iss >> section;
         VLOG("-- section |" << section << "|\n");
+#if 0
+        // report size occupied by sections in file
+        static std::string title;
+        static fpos_t old; fpos_t pos;
+        in.get_pos(pos);
+        std::clog << "-- size(" << title << ") " << pos-old << "\n";
+        title = section;
+        old = pos;
+#endif
         if ( section == "end" )
             return 0;
         else if ( section == "single" )
