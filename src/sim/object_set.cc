@@ -443,7 +443,7 @@ void ObjectSet::freeze()
 #ifdef MORE_ROBUST_READING
     flag(pool_, 7);
 #endif
-    ice_.append(pool_);
+    ice_.grab(pool_);
 }
 
 

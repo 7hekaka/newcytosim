@@ -456,10 +456,10 @@ void CoupleSet::freeze()
     flag(ffList, 7);
 #endif
     assert_true(ice_.empty());
-    ice_.append(aaList);
-    ice_.append(faList);
-    ice_.append(afList);
-    ice_.append(ffList);
+    ice_.grab(aaList);
+    ice_.grab(faList);
+    ice_.grab(afList);
+    ice_.grab(ffList);
 }
 
 

@@ -42,7 +42,7 @@ void ObjectPool::push_back(Object * n)
 /**
  Transfer objects in `list` to the end of `this`, until `list` is empty.
  */
-void ObjectPool::append(ObjectPool& list)
+void ObjectPool::grab(ObjectPool& list)
 {
     Object * n = list.frontO;
     

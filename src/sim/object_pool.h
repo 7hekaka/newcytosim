@@ -79,7 +79,7 @@ public:
     void push_back(Object *);
     
     /// import all objects from given list, emptying it
-    void append(ObjectPool& list);
+    void grab(ObjectPool& list);
     
     /// Remove Object `n` from list
     void pop(Object * n);

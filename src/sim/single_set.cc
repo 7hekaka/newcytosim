@@ -329,8 +329,8 @@ void SingleSet::freeze()
     flag(fList, 7);
 #endif
     assert_true(ice_.empty());
-    ice_.append(aList);
-    ice_.append(fList);
+    ice_.grab(aList);
+    ice_.grab(fList);
 }
 
 
