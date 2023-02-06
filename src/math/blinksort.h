@@ -27,7 +27,7 @@ template<typename OBJECT>
 void push_before(OBJECT *& front, OBJECT * p, OBJECT * n)
 {
     n->next(p);
-    n->prev(p->prevO);
+    n->prev(p->prev());
     if ( p->prev() )
         p->prev()->next(n);
     else

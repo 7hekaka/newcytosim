@@ -13,10 +13,10 @@ void ObjectPool::push_front(Object * n)
 {
     //std::clog << "ObjectPool: push_front " << n->reference() << "\n";
     assert_true(n->set_);
-    n->prevO = nullptr;
-    n->nextO = frontO;
+    n->prev(nullptr);
+    n->next(frontO);
     if ( frontO )
-        frontO->prevO = n;
+        frontO->prev(n);
     else
         backO = n;
     frontO = n;
@@ -28,10 +28,10 @@ void ObjectPool::push_back(Object * n)
 {
     //std::clog << "ObjectPool: push_back " << n->reference() << "\n";
     assert_true(n->set_);
-    n->prevO = backO;
-    n->nextO = nullptr;
+    n->prev(backO);
+    n->next(nullptr);
     if ( backO )
-        backO->nextO = n;
+        backO->next(n);
     else
         frontO = n;
     backO = n;
@@ -49,11 +49,11 @@ void ObjectPool::grab(ObjectPool& list)
     if ( n )
     {
         if ( backO )
-            backO->nextO = n;
+            backO->next(n);
         else
             frontO = n;
         
-        n->prevO = backO;
+        n->prev(backO);
         backO = list.backO;
         nSize += list.nSize;
         
@@ -70,14 +70,14 @@ Object* ObjectPool::pop_front()
     if ( n )
     {
         --nSize;
-        frontO = n->nextO;
+        frontO = n->next();
         
         if ( frontO )
-            frontO->prevO = nullptr;
+            frontO->prev(nullptr);
         else
             backO = nullptr;
         
-        n->nextO = nullptr;  // unnecessary?
+        n->next(nullptr);  // unnecessary?
     }
     return n;
 }
@@ -89,14 +89,14 @@ Object* ObjectPool::pop_back()
     if ( n )
     {
         --nSize;
-        backO = n->prevO;
+        backO = n->prev();
     
         if ( backO )
-            backO->nextO = nullptr;
+            backO->next(nullptr);
         else
             frontO = nullptr;
         
-        n->prevO = nullptr;  // unnecessary?
+        n->prev(nullptr);  // unnecessary?
     }
     return n;
 }
@@ -105,24 +105,24 @@ Object* ObjectPool::pop_back()
 void ObjectPool::pop(Object * n)
 {
     assert_true( nSize > 0 );
-    Object * x = n->nextO;
+    Object * x = n->next();
 
-    if ( n->prevO )
-        n->prevO->nextO = x;
+    if ( n->prev() )
+        n->prev()->next(x);
     else {
         assert_true( frontO == n );
         frontO = x;
     }
     
     if ( x )
-        x->prevO = n->prevO;
+        x->prev(n->prev());
     else {
         assert_true( backO == n );
-        backO = n->prevO;
+        backO = n->prev();
     }
     
-    n->prevO = nullptr; // unnecessary?
-    n->nextO = nullptr; // unnecessary?
+    n->prev(nullptr); // unnecessary?
+    n->next(nullptr); // unnecessary?
     --nSize;
 }
 
@@ -134,9 +134,9 @@ void ObjectPool::clear()
     Object * p, * n = frontO;
     while ( n )
     {
-        n->prevO = nullptr;
-        p = n->nextO;
-        n->nextO = nullptr;
+        n->prev(nullptr);
+        p = n->next();
+        n->next(nullptr);
         n = p;
     }
 #endif
@@ -152,7 +152,7 @@ void ObjectPool::erase()
     Object * p;
     while ( n )
     {
-        p = n->nextO;
+        p = n->next();
         delete(n);
         n = p;
     }
@@ -174,15 +174,15 @@ void ObjectPool::permute(Object * p)
     if ( p != frontO )
     {
         // close list into a loop
-        backO->nextO  = frontO;
-        frontO->prevO = backO;
+        backO->next(frontO);
+        frontO->prev(backO);
         
         // open loop at 'p'
         frontO = p;
-        backO  = p->prevO;
+        backO  = p->prev();
         
-        backO->nextO  = nullptr;
-        frontO->prevO = nullptr;
+        backO->next(nullptr);
+        frontO->prev(nullptr);
     }
     //assert_false( bad() );
 }
@@ -198,17 +198,17 @@ void ObjectPool::permute(Object * p)
 void ObjectPool::shuffle_up(Object * p, Object * q)
 {
     assert_true( p != q );
-    assert_true( p  &&  p->nextO );
-    assert_true( q  &&  q->prevO );
+    assert_true( p  &&  p->next() );
+    assert_true( q  &&  q->prev() );
     
-    if ( q != p->nextO )
+    if ( q != p->next() )
     {
-        frontO->prevO   = q->prevO;
-        q->prevO->nextO = frontO;
-        frontO          = p->nextO;
-        frontO->prevO   = nullptr;
-        p->nextO        = q;
-        q->prevO        = p;
+        frontO->prev(q->prev());
+        q->prev()->next(frontO);
+        frontO = p->next();
+        frontO->prev(nullptr);
+        p->next(q);
+        q->prev(p);
     }
     //assert_false( bad() );
 }
@@ -223,17 +223,17 @@ void ObjectPool::shuffle_up(Object * p, Object * q)
  */
 void ObjectPool::shuffle_down(Object * p, Object * q)
 {
-    assert_true( p  &&  p->nextO );
-    assert_true( q  &&  q->prevO );
+    assert_true( p  &&  p->next() );
+    assert_true( q  &&  q->prev() );
     
-    if ( q != p->nextO )
+    if ( q != p->next() )
     {
-        backO->nextO    = p->nextO;
-        p->nextO->prevO = backO;
-        p->nextO        = q;
-        backO           = q->prevO;
-        backO->nextO    = nullptr;
-        q->prevO        = p;
+        backO->next(p->next());
+        p->next()->prev(backO);
+        p->next(q);
+        backO = q->prev();
+        backO->next(nullptr);
+        q->prev(p);
     }
     //assert_false( bad() );
 }
@@ -356,7 +356,7 @@ int ObjectPool::bad() const
 {
     size_t cnt = 0;
     
-    if ( frontO && frontO->prevO != nullptr )
+    if ( frontO && frontO->prev() != nullptr )
         return 1;
     
     Object * p = frontO, * q;
@@ -370,7 +370,7 @@ int ObjectPool::bad() const
         }
         else
         {
-            if ( q->prevO != p )
+            if ( q->prev() != p )
                 return 3;
         }
         p = q;
