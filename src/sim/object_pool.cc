@@ -40,8 +40,33 @@ void ObjectPool::push_back(Object * n)
 
 
 /**
- Transfer objects in `list` to the end of `this`, until `list` is empty.
+ Transfer objects in `list` to the end of `this`, emptying `list`
  */
+void ObjectPool::grab(ObjectPool& list, Object * obj)
+{
+    if ( backO )
+        backO->next(obj);
+    else
+        frontO = obj;
+    Object * tmp = obj->prev();
+    if ( tmp )
+        tmp->next(nullptr);
+    else
+        list.frontO = nullptr;
+    obj->prev(backO);
+    backO = list.backO;
+    list.backO = tmp;
+    while ( obj )
+    {
+        ++nSize;
+        --list.nSize;
+        obj = obj->next();
+    }
+    //assert_false(bad());
+    //assert_false(list.bad());
+}
+
+
 void ObjectPool::grab(ObjectPool& list)
 {
     Object * n = list.frontO;
