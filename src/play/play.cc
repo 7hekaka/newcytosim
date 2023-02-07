@@ -45,7 +45,7 @@ using glApp::flashText;
 
 /// different modes:
 enum Style { ONSCREEN, OFFSCREEN };
-enum Mode { NORMAL = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
+enum Mode { STANDARD = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
 
 //------------------------------------------------------------------------------
 #pragma mark - Display
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 {
     Style style = OFFSCREEN;
     int menu = 1;
-    int mode = NORMAL;
+    int mode = STANDARD;
     int fullscreen = 0;
     Glossary arg;
     
@@ -271,7 +271,7 @@ int main(int argc, char* argv[])
     
     if ( arg.use_key("movie") )
     {
-        if ( mode == NORMAL )
+        if ( mode == STANDARD )
             prop.image_name = "movie%";
         mode = SAVE_MOVIE;
     }
@@ -367,7 +367,7 @@ int main(int argc, char* argv[])
     
     //-------- off-screen (non interactive) rendering -------
     
-    if ( mode != NORMAL && style == OFFSCREEN )
+    if ( mode != STANDARD && style == OFFSCREEN )
     {
         view.resize();
         const int W = view.width() * view.magnify;
