@@ -33,7 +33,7 @@ private:
     Kinesin();
     
     /// Gillespie countdown timer for stepping
-    real nextBack;
+    float nextBack;
     
 public:
     

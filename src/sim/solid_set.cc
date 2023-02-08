@@ -13,7 +13,7 @@ void SolidSet::step()
         S->step();
 #endif
 #if NEW_SOLID_MAKE_COUPLE
-    static real nextCreation = RNG.exponential();
+    static float nextCreation = RNG.exponential();
     for ( Solid * S = first(); S; S=S->next() )
     {
         nextCreation -= S->prop->source_rate_dt;

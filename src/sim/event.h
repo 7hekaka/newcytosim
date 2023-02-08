@@ -61,7 +61,7 @@ public:
     ///@}
     
     /// time of next event
-    double      nextTime;
+    double nextTime;
     
 public:
 

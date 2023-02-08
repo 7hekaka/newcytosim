@@ -75,20 +75,20 @@ class DynamicFiber : public Fiber
 private:
     
     /// Gillespie countdown timers for plus end:
-    real nextGrowthP;
-    real nextHydrolP;
-    real nextShrinkP;
+    float nextGrowthP;
+    float nextHydrolP;
+    float nextShrinkP;
     
     /// Gillespie countdown timers for minus end:
-    real nextGrowthM;
-    real nextHydrolM;
-    real nextShrinkM;
+    float nextGrowthM;
+    float nextHydrolM;
+    float nextShrinkM;
     
     /// state of units near the plus end: [0] is terminal, [1] is penultimate unit
-    unsigned unitP[2];
+    short unitP[2];
     
     /// state of units near the minus end
-    unsigned unitM[2];
+    short unitM[2];
     
     /// dynamic state of plus end
     state_t mStateP;

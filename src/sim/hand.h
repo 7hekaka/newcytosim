@@ -60,10 +60,10 @@ protected:
     HandMonitor * hMonitor;
     
     /// Gillespie normalized time for detachment (must be set at attachment)
-    real nextDetach;
+    float nextDetach;
     
     /// Gillespie countdown timer used for other activities
-    real nextAct;
+    float nextAct;
 
 public:
     
