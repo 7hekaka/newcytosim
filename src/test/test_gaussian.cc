@@ -70,7 +70,7 @@ real * makeGaussians_std(real dst[], size_t cnt, const uint32_t[])
 }
 
 
-real * makeExponentials_(real dst[], size_t cnt, const uint32_t src[])
+float * makeExponentials_(float dst[], size_t cnt, const uint32_t src[])
 {
     for ( size_t i = 0; i < cnt; ++i )
         dst[i] = -std::log(real(1) - real(src[i]) * TWO_POWER_MINUS_32);
@@ -203,17 +203,17 @@ static real* check_log(real dst[], size_t cnt, const uint32_t arg[])
 #endif
 
 
-template < real* (*FUNC)(real*, size_t, const uint32_t*) >
+template < float* (*FUNC)(float*, size_t, const uint32_t*) >
 void run(sfmt_t& sfmt, const char str[], size_t cnt)
 {
-    real * vec = new_real(SFMT_N32);
+    float * vec = new float[SFMT_N32];
     tick();
     for ( size_t i = 0; i < cnt; ++i )
     {
         sfmt_gen_rand_all(&sfmt);
         FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
     }
-    real* end = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
+    float* end = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
     printf("%-12s %5.2f :", str, tock(cnt>>10));
     check_gaussian(end-vec, vec);
     print_gaussian(std::min(end-vec, 8L), vec);

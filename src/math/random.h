@@ -42,7 +42,7 @@ class alignas(32) Random
     real gaussians_[SFMT_N32];
     
     /// reserve of exponentially-distributed numbers, with unit mean
-    real exponentials_[SFMT_N32];
+    float exponentials_[SFMT_N32];
 
     /// Mersenne Twister Generator
     sfmt_t twister_;
@@ -57,7 +57,7 @@ class alignas(32) Random
     real * next_gaussian_;
     
     /// pointer to access the next value in `exponentials_[]`
-    real * next_exponential_;
+    float * next_exponential_;
     
 protected:
     
@@ -322,7 +322,7 @@ public:
     void refill_exponentials();
 
     /// random in [0, inf[, distributed as P(x>m) = exp(-m); mean = 1.0, variance = 1.0
-    real exponential()
+    float exponential()
     {
         //return -std::log(1 - ZERO2ONE());
         if ( next_exponential_ <= exponentials_ )

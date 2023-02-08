@@ -119,7 +119,7 @@ static real * makeGaussiansBM_SIMD(real dst[], size_t cnt, const uint32_t* arg)
 }
 
 /// compute approximate exponential derivates
-static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
+static float* makeExponentials_SIMD(float dst[], size_t cnt, const uint32_t* arg)
 {
     const uint32_t * src = arg;
     const uint32_t * end = src + cnt;
@@ -137,14 +137,8 @@ static real* makeExponentials_SIMD(real dst[], size_t cnt, const uint32_t* arg)
         vec4f x = sub4f(off, log_approx4f(z));
 #endif
         src += 4;
-#if REAL_IS_DOUBLE
-        // convert 4 single-precision values
-        store2d(dst  , getlo2f(x));
-        store2d(dst+2, gethi2f(x));
-#else
         // store 4 single-precision values
         store4f(dst, x);
-#endif
         dst += 4;
     }
     return dst;

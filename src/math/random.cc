@@ -360,9 +360,9 @@ void Random::gauss_boxmuller(real& x, real& y)
 #pragma mark - Exponential derivates
 
 /// this is the default implementation
-real * makeExponentials(real dst[], size_t cnt, const uint32_t src[])
+float * makeExponentials(float dst[], size_t cnt, const uint32_t src[])
 {
-    const real alpha(TWO_POWER_MINUS_32);
+    const float alpha(TWO_POWER_MINUS_32);
     for ( size_t i = 0; i < cnt; ++i )
     {
         real x = static_cast<real>(src[i]);
@@ -376,9 +376,9 @@ real * makeExponentials(real dst[], size_t cnt, const uint32_t src[])
 void Random::refill_exponentials()
 {
 #if ( RANDOM_USES_SIMD ) && defined(__ARM_NEON__)
-    real * ptr = makeExponentials_SIMD(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
+    float * ptr = makeExponentials_SIMD(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #else
-    real * ptr = makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
+    float * ptr = makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
 #endif
     //assert_true( ptr == exponentials_ + SFMT_N32 );
     next_exponential_ = ptr;
