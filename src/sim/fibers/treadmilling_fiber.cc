@@ -84,7 +84,7 @@ void TreadmillingFiber::step()
         addM = prop()->shrinking_speed_dt[M];
     }
 
-    Fiber::step(addM, addP);
+    Fiber::growStep(addM, addP);
 }
 
 

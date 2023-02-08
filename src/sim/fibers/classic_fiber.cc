@@ -189,7 +189,7 @@ void ClassicFiber::step()
     else
         addP = stepPlusEnd();
 
-    Fiber::step(addM, addP);
+    Fiber::growStep(addM, addP);
 }
 
 

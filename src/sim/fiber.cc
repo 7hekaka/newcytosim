@@ -105,7 +105,7 @@ void Fiber::step()
 
 
 
-void Fiber::step(real addM, real addP, bool split)
+void Fiber::growStep(real addM, real addP, bool split)
 {
     //std::clog << reference() << " P " << addP << " M " << addM << " len " << length() << "\n";
 
@@ -1130,7 +1130,7 @@ void Fiber::setInteractions(Meca& meca) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Attached Hands
+#pragma mark - Counting attached Hands
 
 size_t Fiber::nbHandsInRange(real i, real s, const FiberEnd ref) const
 {

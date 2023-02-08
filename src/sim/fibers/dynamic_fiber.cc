@@ -371,7 +371,7 @@ void DynamicFiber::step()
     else
         addP = stepPlusEnd() * prop()->unit_length;
 
-    Fiber::step(addM, addP, false);
+    Fiber::growStep(addM, addP, false);
 }
 
 

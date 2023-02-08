@@ -235,7 +235,7 @@ public:
     virtual void step();
     
     /// simulation step with some growth/shrinkage from the ends
-    void step(real, real, bool = true);
+    void growStep(real, real, bool = true);
 
     /// update Lattice and Mesh ranges
     void updateRange();

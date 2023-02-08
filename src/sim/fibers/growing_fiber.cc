@@ -91,7 +91,7 @@ void GrowingFiber::step()
         addM += prop()->growing_off_speed_dt[M];
     }
 
-    Fiber::step(addM, addP);
+    Fiber::growStep(addM, addP);
 }
 
 
