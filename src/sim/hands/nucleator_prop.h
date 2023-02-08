@@ -88,6 +88,9 @@ public:
     /// the dynamic state of the fiber tip after detachment
     state_t detached_end_state;
     
+    /// stabilize attached fibers plus-ends
+    real stabilize;
+    
     /// @}
     
 private:

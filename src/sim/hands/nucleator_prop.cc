@@ -25,7 +25,8 @@ void NucleatorProp::clear()
     track_end  = NO_END;
     hold_end   = MINUS_END;
     addictive  = false;
-    detached_end_state = STATE_BLACK;
+    addictive_state = STATE_RED;
+    stabilize = 1;
     nucleation_angle = 0;
     specificity = NUCLEATE_UNSPECIFIC;
 }
@@ -51,8 +52,14 @@ void NucleatorProp::read(Glossary& glos)
 #endif
     
     glos.set(addictive, "addictive");
+<<<<<<< HEAD
     glos.set(detached_end_state, "detached_end_state");
 
+=======
+    glos.set(addictive_state, "addictive", 1);
+    glos.set(stabilize, "stabilize");
+    
+>>>>>>> d805d4ae (Cleanup nucleator::addictive + stabilize)
     if ( glos.set(track_end, "track_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}}) )
         hold_end = track_end;
@@ -92,7 +99,8 @@ void NucleatorProp::write_values(std::ostream& os) const
     write_value(os, "nucleation_angle", nucleation_angle);
     write_value(os, "hold_end",  hold_end);
     write_value(os, "track_end", track_end);
-    write_value(os, "addictive", addictive);
+    write_value(os, "addictive", addictive, addictive_state);
+    write_value(os, "stabilize", stabilize);
     write_value(os, "specificity", specificity);
 }
 

@@ -179,11 +179,9 @@ void Nucleator::stepLoaded(Vector const& force)
 
 void Nucleator::detach()
 {
-    // if `addictive`, give a poisonous goodbye-kiss to the fiber
-    if ( prop()->detached_end_state != STATE_BLACK )
-        fiber()->setEndState(nearestEnd(), prop()->detached_end_state);
-    else if ( prop()->addictive )
-        fiber()->setEndState(nearestEnd(), STATE_RED);
+    // if `addictive`, give a poisonous goodbye kiss to the fiber
+    if ( prop()->addictive )
+        fiber()->setEndState(nearestEnd(), prop()->addictive_state);
     
     Hand::detach();
 }
