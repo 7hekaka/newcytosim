@@ -9,7 +9,7 @@
 #include "dynamic_fiber_prop.h"
 
 
-/// A Fiber with discrete growth and dynamic instability at the PLUS_END
+/// A Fiber with discrete growth and dynamic instability at the plus end
 /**
  This implements the microtubule dynamic instability model proposed by
  Brun, Rupp et al. with a 'hard-coded' coupling parameter N=2.
@@ -57,7 +57,7 @@ http://www.jcb.org/cgi/doi/10.1083/jcb.200301147
  Moreover:
  
  - Gillespie timers are used for the stochastic model
- - the MINUS_END can be static or shrinking (parameter `shrinking_rate[1]`)
+ - the minus end can be static or shrinking (parameter `shrinking_rate[1]`)
  - a simple rescue mechanism was implented as unhydrolyzed_prob[] (Maud Formanek)
  .
  
@@ -74,35 +74,35 @@ class DynamicFiber : public Fiber
 {
 private:
     
-    /// Gillespie countdown timers for PLUS_END:
+    /// Gillespie countdown timers for plus end:
     real nextGrowthP;
     real nextHydrolP;
     real nextShrinkP;
     
-    /// Gillespie countdown timers for MINUS_END:
+    /// Gillespie countdown timers for minus end:
     real nextGrowthM;
     real nextHydrolM;
     real nextShrinkM;
     
-    /// state of units near the PLUS_END: [0] is terminal, [1] is penultimate unit
+    /// state of units near the plus end: [0] is terminal, [1] is penultimate unit
     unsigned unitP[2];
     
-    /// state of units near the MINUS_END
+    /// state of units near the minus end
     unsigned unitM[2];
     
-    /// dynamic state of PLUS_END
+    /// dynamic state of plus end
     state_t mStateP;
 
-    /// dynamic state of MINUS_END
+    /// dynamic state of minus end
     state_t mStateM;
 
     /// stabilizing factor
     int stabilized_[2];
     
-    /// calculate dynamic state from unit states near PLUS_END
+    /// calculate dynamic state from unit states near plus end
     state_t calculateStateP() const;
     
-    /// calculate dynamic state from unit states near MINUS_END
+    /// calculate dynamic state from unit states near minus end
     state_t calculateStateM() const;
    
 public:
@@ -124,16 +124,16 @@ public:
     /// initialize plus end
     void initP();
 
-    /// return assembly/disassembly state of MINUS_END
+    /// return assembly/disassembly state of minus end
     state_t endStateM() const;
     
-    /// return assembly/disassembly state of PLUS_END
+    /// return assembly/disassembly state of plus end
     state_t endStateP() const;
     
-    /// change state of MINUS_END
+    /// change state of minus end
     void setEndStateM(state_t s);
     
-    /// change state of PLUS_END
+    /// change state of plus end
     void setEndStateP(state_t s);
 
     //--------------------------------------------------------------------------
@@ -141,10 +141,10 @@ public:
     /// register stabilizing effect
     void stabilize(FiberEnd e, real s) { assert_true(e>0); stabilized_[e-1] = s; }
     
-    /// simulate dynamic instability of PLUS_END
+    /// simulate dynamic instability of plus end
     int stepPlusEnd();
     
-    /// simulate dynamic instability of MINUS_END
+    /// simulate dynamic instability of minus end
     int stepMinusEnd();
     
     /// Stochastic simulation

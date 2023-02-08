@@ -12,7 +12,7 @@
 
 ///a set of Fiber held together using an fixed overlap
 /**
- The Fibers are attached to form a bundle with anti-parallel overlaps near the MINUS_END.
+ The Fibers are attached to form a bundle with anti-parallel overlaps near the minus end.
  The connections form a ring, such that each Fiber is attached to the preceding,
  and to the following Fiber in an anti-parallel manner.
  - object(n) are Fiber.

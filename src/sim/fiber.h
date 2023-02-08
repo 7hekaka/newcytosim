@@ -91,13 +91,13 @@ private:
     {
     public:
         real    abs;      ///< abscissa of the cut, from the reference
-        state_t stateM;   ///< state of the new MINUS_END
-        state_t stateP;   ///< state of the new PLUS_END
+        state_t stateM;   ///< state of the new minus end
+        state_t stateP;   ///< state of the new plus end
         
         /// constructor (abscissa, new_plus_end_state, new_minus_end_state)
         CutFacts(real a, state_t p, state_t m) { abs=a; stateP=p; stateM=m; }
         
-        /// sort from PLUS_END to MINUS_END, i.e. with decreasing abscissa
+        /// sort from plus end to minus end, i.e. with decreasing abscissa
         bool operator < (CutFacts const&b) const { return abs > b.abs; }
     };
 
@@ -132,7 +132,7 @@ protected:
     std::set<CutFacts> pendingCuts;
 
     
-    /// cut Fiber at point `pti`, return section `[ pti - PLUS_END ]`
+    /// cut Fiber at point `pti`, return section `[ pti - plus end ]`
     virtual Fiber* severPoint(size_t pti);
     
     /// return index of point where there is a kink with ( std::cos(angle) < max_cos )
@@ -151,10 +151,10 @@ protected:
     /// add confinement interactions to a Meca
     void setFiberConfinement(Meca&, Confinement, Space const*, real stiff, real stiff2) const;
     
-    /// cut fiber at distance `abs` from the MINUS_END; returns section `[ abs - PLUS_END ]`
+    /// cut fiber at distance `abs` from the minus end; returns section `[ abs - plus end ]`
     Fiber * severM(real abs);
 
-    /// cut fiber at abscissa `abs`; returns section `[ abs - PLUS_END ]`
+    /// cut fiber at abscissa `abs`; returns section `[ abs - plus end ]`
     Fiber * severNow(real abs);
     
     /// perform all the cuts registered by sever()
@@ -178,12 +178,12 @@ public:
     /// direction tangent to the Tubule surface and orthogonal to the MT symmetry axis, at the specified abscissa
     Vector orthoRadial(real a) const { a-=abscissaM(); return brother_->posM(a) - sister_->posM(a); }
 
-    /// position of a point specified by distance from the MINUS_END
+    /// position of a point specified by distance from the minus end
     Vector displayPosM(real a) const;
 
 #else
     
-    /// position of a point specified by distance from the MINUS_END
+    /// position of a point specified by distance from the minus end
     Vector displayPosM(real a) const { return posM(a); }
 
 #endif
@@ -219,10 +219,10 @@ public:
     /// flip Vertices and Hands, exchanging Plus and Minus ends
     void flipPolarity();
 
-    /// remove the portion of size `len` that includes the MINUS_END
+    /// remove the portion of size `len` that includes the minus end
     void cutM(real len);
     
-    /// remove the portion of size `len` that includes the PLUS_END
+    /// remove the portion of size `len` that includes the plus end
     void cutP(real len);
     
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
@@ -256,20 +256,20 @@ public:
     
     //--------------------------------------------------------------------------
     
-    /// return assembly/disassembly state of MINUS_END
+    /// return assembly/disassembly state of minus end
     virtual state_t endStateM() const { return STATE_WHITE; }
 
-    /// return assembly/disassembly state of PLUS_END
+    /// return assembly/disassembly state of plus end
     virtual state_t endStateP() const { return STATE_WHITE; }
 
     /// return assembly/disassembly state of the FiberEnd
     state_t endState(FiberEnd) const;
 
     
-    /// change state of MINUS_END
+    /// change state of minus end
     virtual void setEndStateM(state_t) {}
 
-    /// change state of PLUS_END
+    /// change state of plus end
     virtual void setEndStateP(state_t) {}
 
     /// change state of FiberEnd

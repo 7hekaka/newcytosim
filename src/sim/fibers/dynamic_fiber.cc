@@ -29,7 +29,7 @@ DynamicFiber::~DynamicFiber()
 //------------------------------------------------------------------------------
 #pragma mark - MINUS END
 
-/** set MINUS_END as STATE_WHITE (inactive) by default */
+/** set minus end as STATE_WHITE (inactive) by default */
 void DynamicFiber::initM()
 {
     unitM[0] = 0;
@@ -57,7 +57,7 @@ state_t DynamicFiber::endStateM() const
 void DynamicFiber::setEndStateM(state_t s)
 {
     if ( s < 0 || 4 < s )
-        throw InvalidParameter("Invalid AssemblyState for DynamicFiber MINUS_END");
+        throw InvalidParameter("Invalid AssemblyState for DynamicFiber minus end");
     
     if ( s != mStateM )
     {
@@ -120,7 +120,7 @@ int DynamicFiber::stepMinusEnd()
 		real hydrol = prop()->hydrolysis_rate_2dt[M];
 
 #if OLD_DYNAMIC_ZONE
-        // change Hydrolysis rate if PLUS_END is far from origin:
+        // change Hydrolysis rate if plus end is far from origin:
         if ( posEndM().normSqr() > prop()->zone_radius_sqr )
             hydrol = prop()->zone_hydrolysis_rate_2dt[M];
 
@@ -219,7 +219,7 @@ state_t DynamicFiber::endStateP() const
 void DynamicFiber::setEndStateP(state_t s)
 {
     if ( s < 0 || 4 < s )
-        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for DynamicFiber PLUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for DynamicFiber plus end");
     
     if ( s != mStateP )
     {
@@ -285,7 +285,7 @@ int DynamicFiber::stepPlusEnd()
         real hydrol = prop()->hydrolysis_rate_2dt[P];
         
 #if OLD_DYNAMIC_ZONE
-        // change Hydrolysis rate if PLUS_END is far from origin:
+        // change Hydrolysis rate if plus end is far from origin:
         if ( posEndP().normSqr() > prop()->zone_radius_sqr )
             hydrol = prop()->zone_hydrolysis_rate_2dt[P];
         

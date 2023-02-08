@@ -9,7 +9,7 @@
 #include "classic_fiber_prop.h"
 
 
-/// A Fiber with a standard two-state model of dynamic instability at the PLUS_END
+/// A Fiber with a standard two-state model of dynamic instability at the plus end
 /**
  This implements the 'classical' two-state model of dynamic instability:
  - a growing state, affected by force,
@@ -50,10 +50,10 @@ class ClassicFiber : public Fiber
 {   
 private:
     
-    /// state of MINUS_END
+    /// state of minus end
     state_t mStateM;
 
-    /// state of PLUS_END
+    /// state of plus end
     state_t mStateP;
      
 public:
@@ -69,17 +69,17 @@ public:
         
     //--------------------------------------------------------------------------
     
-    /// return assembly/disassembly state of MINUS_END
+    /// return assembly/disassembly state of minus end
     state_t endStateM() const { return mStateM; }
 
-    /// return assembly/disassembly state of PLUS_END
+    /// return assembly/disassembly state of plus end
     state_t endStateP() const { return mStateP; }
 
     
-    /// change state of MINUS_END
+    /// change state of minus end
     void setEndStateM(state_t s);
     
-    /// change state of PLUS_END
+    /// change state of plus end
     void setEndStateP(state_t s);
 
     ///

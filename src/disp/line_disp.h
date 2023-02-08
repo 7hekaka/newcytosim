@@ -28,7 +28,7 @@ public:
     /// color of body
     gym_color color;
     
-    /// colors of PLUS_END and MINUS_END
+    /// colors of plus end and minus end
     gym_color end_color[2];
     
     /// scale to convert to color to display lines

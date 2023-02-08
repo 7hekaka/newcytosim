@@ -104,24 +104,24 @@ public:
     void jumpToEndP() { jumpTo(lattice()->fence()); }
 
     
-    /// attempt one step towards the PLUS_END
+    /// attempt one step towards the plus end
     void stepP()      { jumpTo(site()+1); }
     
-    /// attempt one step towards the MINUS_END
+    /// attempt one step towards the minus end
     void stepM()      { jumpTo(site()-1); }
 
     
-    /// attempt one step of size `s` towards the PLUS_END
+    /// attempt one step of size `s` towards the plus end
     void jumpP(int s) { jumpTo(site()+s); }
     
-    /// attempt one step of size `s` towards the MINUS_END
+    /// attempt one step of size `s` towards the minus end
     void jumpM(int s) { jumpTo(site()-s); }
 
     
-    /// attempt `n` steps towards the PLUS_END, checking all intermediate sites
+    /// attempt `n` steps towards the plus end, checking all intermediate sites
     void crawlP(int n);
     
-    /// attempt `n` steps towards the MINUS_END, checking all intermediate sites
+    /// attempt `n` steps towards the minus end, checking all intermediate sites
     void crawlM(int n);
 
     
@@ -132,10 +132,10 @@ public:
     void stepLoaded(Vector const& force);
  
     
-    /// this is called when the attachment point is beyond the PLUS_END
+    /// this is called when the attachment point is beyond the plus end
     void handleDisassemblyM();
     
-    /// this is called when the attachment point is below the MINUS_END
+    /// this is called when the attachment point is below the minus end
     void handleDisassemblyP();
     
     /// Promote a Digit class that is not bound to the lattice

@@ -279,7 +279,7 @@ public:
     /// name of field
     std::string field;
     
-    /// type of glue (interaction between fiber PLUS_END and Space)
+    /// type of glue (interaction between fiber plus end and Space)
     /**
      Parameter fiber:glue is used to create interactions with the boundaries:
      - it creates a Single, everytime a fiber contacts the surface.

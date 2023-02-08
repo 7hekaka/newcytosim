@@ -344,7 +344,7 @@ void Fiber::flipPolarity()
 }
 
 /**
- A portion of size `len` that includes the MINUS_END is removed.
+ A portion of size `len` that includes the minus end is removed.
  The Hands bound within the deleted portion are detached.
  */
 void Fiber::cutM(real len)
@@ -418,7 +418,7 @@ Fiber* Fiber::severPoint(size_t pti)
     fib->birthTime(birthTime());
 
     assert_true( fib->abscissaM() == abscissaM() );
-    // remove MINUS_END portion on new piece:
+    // remove minus end portion on new piece:
     fib->truncateM(pti);
     assert_true(fib->abscissaM() == abs);
     fib->updateRange();
@@ -432,7 +432,7 @@ Fiber* Fiber::severPoint(size_t pti)
     }
 #endif
 
-    // remove PLUS_END portion on self
+    // remove plus end portion on self
     truncateP(pti);
     
     // transfer Hands above point P, at same abscissa
@@ -454,8 +454,8 @@ Fiber* Fiber::severPoint(size_t pti)
 
 
 /**
-The Fiber is cut at distance `abs` from its MINUS_END:
- - current Fiber is truncated to keep only the section [ MINUS_END , abs ],
+The Fiber is cut at distance `abs` from its minus end:
+ - current Fiber is truncated to keep only the section [ minus end , abs ],
  - A new Fiber is created representing the other section [ abs , PLUS_END ],
  - Hands are relocated to the new Fiber if appropriate,
  - Lattice substances are also relocated,
@@ -482,7 +482,7 @@ Fiber* Fiber::severM(real abs)
     assert_small(fib->abscissaM() - abscissaM());
     assert_small(fib->abscissaP() - abscissaP());
 
-    // remove MINUS_END portion on new piece
+    // remove minus end portion on new piece
     fib->Chain::cutM(abs);
     // initialize Lattice on new piece
     fib->updateRange();
@@ -496,7 +496,7 @@ Fiber* Fiber::severM(real abs)
     }
 #endif
     
-    // remove PLUS_END portion on self
+    // remove plus end portion on self
     Chain::cutP(length()-abs);
     
     assert_small(fib->abscissaM()-abscissaP());
@@ -570,7 +570,7 @@ void Fiber::severNow()
                 setEndStateM(cut.stateM);
             }
             /*
-             since we have deleted the MINUS_END section,
+             since we have deleted the minus end section,
              the following cuts in the list, which will be of lower abscissa,
              should not be processed.
              */
@@ -589,7 +589,7 @@ void Fiber::severNow()
         {
             Fiber * frag = severNow(cut.abs);
             
-            // special case where the PLUS_END section is simply deleted
+            // special case where the plus end section is simply deleted
             if ( cut.stateM == STATE_BLACK )
             {
                 delete(frag);
@@ -605,7 +605,7 @@ void Fiber::severNow()
                 assert_small((frag->posEndM() - posEndP()).norm());
                 
                 try {
-                    // old PLUS_END converves its state:
+                    // old plus end converves its state:
                     frag->setEndStateP(endStateP());
                     
                     // new ends are set as wished:
@@ -658,7 +658,7 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
     
     /*
      The cuts should be processed in order of decreasing abscissa,
-     hence we check intersections from PLUS_END to MINUS_END
+     hence we check intersections from plus end to minus end
     */
     for ( size_t s = nbSegments(); s >0 ; --s )
     {
@@ -672,7 +672,7 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
         Fiber * fib = severNow(abs);
         if ( fib )
         {
-            // old PLUS_END converves its state:
+            // old plus end converves its state:
             fib->setEndStateP(endStateP());
             // dynamic of new ends are set as usual:
             setEndStateP(stateP);
@@ -684,9 +684,9 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
 
 
 /**
- The given `fib` is added past the PLUS_END of `*this`,
+ The given `fib` is added past the plus end of `*this`,
  Hands bound to `fib` are relocated to *this.
- The dynamic state of the PLUS_END is also relocated.
+ The dynamic state of the plus end is also relocated.
  `fib` is enventually deleted
 */
 void Fiber::join(Fiber * fib)
@@ -703,7 +703,7 @@ void Fiber::join(Fiber * fib)
     // extend Lattice range
     updateFiber();
 
-    //transfer dynamic state of PLUS_END:
+    //transfer dynamic state of plus end:
     setEndStateP(fib->endStateP());
 
 #if FIBER_HAS_MESH
@@ -1036,7 +1036,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
 #if NEW_CONFINE_RANGE
         case CONFINE_RANGE:
         {
-            // we use here the MINUS_END as a reference... which maybe problematic
+            // we use here the minus end as a reference... which maybe problematic
             size_t S = clampedIndexM(prop->confine_range[0]);
             size_t E = clampedIndexM(prop->confine_range[1]);
             for ( size_t i = S; i < E; ++i )

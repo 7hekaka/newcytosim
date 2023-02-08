@@ -59,7 +59,7 @@ public:
     /// create filaments
     ObjectList build(real radius, Glossary&, Simul&);
 
-    /// position of centerline at distance 'dis' from the MINUS_END
+    /// position of centerline at distance 'dis' from the minus end
     Vector posCenterlineM(real dis);
 
     

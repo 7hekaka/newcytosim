@@ -29,7 +29,7 @@ void ClassicFiber::setEndStateM(state_t s)
     if (( s==STATE_WHITE ) | ( s==STATE_GREEN ) | ( s==STATE_RED ))
         mStateM = s;
     else
-        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for ClassicFiber MINUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for ClassicFiber minus end");
 }
 
 
@@ -38,7 +38,7 @@ void ClassicFiber::setEndStateP(state_t s)
     if (( s==STATE_WHITE ) | ( s==STATE_GREEN ) | ( s==STATE_RED ))
         mStateP = s;
     else
-        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for ClassicFiber PLUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for ClassicFiber plus end");
 }
 
 
@@ -127,7 +127,7 @@ real ClassicFiber::stepPlusEnd()
         //printf("ClassicFiber %5u: force %9.2f growth %9.6f cata %9.6f\n", identity(), force, addP, cata);
         
 #if NEW_CATASTROPHE_OUTSIDE
-        // Catastrophe rate is multiplied if the PLUS_END is outside
+        // Catastrophe rate is multiplied if the plus end is outside
         if ( prop()->catastrophe_space_ptr && prop()->catastrophe_space_ptr->outside(posEndP()) )
         {
             LOG_ONCE("Fiber's plus-end catastrophe rate is different outside the Space\n");

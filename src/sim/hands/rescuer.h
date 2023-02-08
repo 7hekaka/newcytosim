@@ -19,7 +19,7 @@
  The parameter @ref RescuerPar "rescue_chance" is a one-shot probability and
  is not dependent on `time_step`.
 
- Note: While inducing a rescue, the Rescuer may be pushed a bit toward the MINUS_END,
+ Note: While inducing a rescue, the Rescuer may be pushed a bit toward the minus end,
  due to the discretization in time. Smaller `time_step` minimize this effect. 
  
  See Examples and the @ref RescuerPar.
@@ -41,10 +41,10 @@ public:
     Rescuer(RescuerProp const*, HandMonitor*);
 
     
-    /// this is called when the attachment point is beyond the PLUS_END
+    /// this is called when the attachment point is beyond the plus end
     void handleDisassemblyM();
     
-    /// this is called when the attachment point is below the MINUS_END
+    /// this is called when the attachment point is below the minus end
     void handleDisassemblyP();
 
     /// simulate when `this` is attached but not under load

@@ -30,7 +30,7 @@ void TreadmillingFiber::setEndStateM(state_t s)
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )
         mStateM = s;
     else
-        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for TreadmillingFiber MINUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for TreadmillingFiber minus end");
 }
 
 
@@ -39,7 +39,7 @@ void TreadmillingFiber::setEndStateP(state_t s)
     if ( s == STATE_WHITE || s == STATE_GREEN || s == STATE_RED )
         mStateP = s;
     else
-        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for TreadmillingFiber PLUS_END");
+        throw InvalidParameter("invalid AssemblyState ("+std::to_string(s)+") for TreadmillingFiber plus end");
 }
 
 //------------------------------------------------------------------------------
@@ -66,7 +66,7 @@ void TreadmillingFiber::step()
         addP = prop()->shrinking_speed_dt[P];
     }
     
-    // MINUS_END dynamics
+    // minus end dynamics
     if ( mStateM == STATE_GREEN )
     {
         // calculate the force acting on the point at the end:

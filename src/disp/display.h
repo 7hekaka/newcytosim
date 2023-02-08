@@ -190,10 +190,10 @@ public:
     /// draw fiber Lattice
     int drawFiberLattice(Fiber const& fib, int style, float size) const;
 
-    /// draw Fiber MINUS_END
+    /// draw Fiber minus end
     virtual void drawFiberMinusEnd(Fiber const&, int style, float size) const;
     
-    /// draw Fiber PLUS_END
+    /// draw Fiber plus end
     virtual void drawFiberPlusEnd(Fiber const&, int style, float size) const;
 
     /// draw Fiber linear features

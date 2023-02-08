@@ -58,11 +58,11 @@ public:
 
     /// Flag to enable special dynamics in which growth is determined by the position of the fiber end
     /**
-     If 'shrink_outside[0] == true', the PLUS_END will:
-     - grow if the PLUS_END is inside the confining Space
-     - shrink if the PLUS_END is outside the confining Space.
+     If 'shrink_outside[0] == true', the plus end will:
+     - grow if the plus end is inside the confining Space
+     - shrink if the plus end is outside the confining Space.
      .
-     Similarly, 'shrink_outside[1]' determines the behavior of the MINUS_END.
+     Similarly, 'shrink_outside[1]' determines the behavior of the minus end.
 
      The shrinking speed is equal to the specified growing_speed.
      */

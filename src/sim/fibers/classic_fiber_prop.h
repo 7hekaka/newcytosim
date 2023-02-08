@@ -9,7 +9,7 @@
 /// Enables support for an option to make catastrophe rate dependent on fiber length
 #define NEW_LENGTH_DEPENDENT_CATASTROPHE 0
 
-/// Enables support for an option that induces catastrophe if the PLUS_END is outside
+/// Enables support for an option that induces catastrophe if the plus end is outside
 #define NEW_CATASTROPHE_OUTSIDE 0
 
 
@@ -33,7 +33,7 @@ public:
      @defgroup ClassicFiberPar Parameters of ClassicFiber
      @ingroup Parameters
      Inherits @ref FiberPar.
-     The first column of numbers applies to PLUS_END, and the second to MINUS_END
+     The first column of numbers applies to plus end, and the second to minus end
      @{
      */
     
@@ -113,7 +113,7 @@ public:
 
 #if NEW_CATASTROPHE_OUTSIDE
     
-    /// catastrophe rate scaling factor applied if the PLUS_END is outside
+    /// catastrophe rate scaling factor applied if the plus end is outside
     /**
      A value < 1 inhibits catastrophe at the edge; A value > 1 accelerates catastrophes
      */

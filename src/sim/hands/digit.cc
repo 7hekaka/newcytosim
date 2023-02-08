@@ -118,7 +118,7 @@ void Digit::crawlP(const int n)
 
 
 /**
- Try to move `n` sites in the MINUS_END direction,
+ Try to move `n` sites in the minus end direction,
  stopping if any intermediate position is already occupied.
 
  */

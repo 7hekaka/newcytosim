@@ -116,10 +116,10 @@ public:
     /// move to a different abscissa on the current fiber
     void moveTo(real a) { hAbs = a; reinterpolate(); }
 
-    /// relocate to MINUS_END of current fiber
+    /// relocate to minus end of current fiber
     void relocateM();
     
-    /// relocate to PLUS_END of current fiber
+    /// relocate to plus end of current fiber
     void relocateP();
 
     //--------------------------------------------------------------------------
@@ -156,13 +156,13 @@ public:
     /// the abscissa, from the origin of the Fiber
     real abscissa() const { return hAbs; }
 
-    /// abscissa, counted from the MINUS_END
+    /// abscissa, counted from the minus end
     real abscissaFromM() const { return hAbs - hFiber->abscissaM(); }
 
-    /// inverted abscissa counted from the PLUS_END, positive if ( abscissa < abscissa(PLUS_END) )
+    /// inverted abscissa counted from the plus end, positive if ( abscissa < abscissa(plus end) )
     real abscissaFromP() const { return hFiber->abscissaP() - hAbs; }
 
-    /// abscissa, counted from the specified FiberEnd (in reversed direction for the PLUS_END)
+    /// abscissa, counted from the specified FiberEnd (in reversed direction for the plus end)
     real abscissaFrom(FiberEnd ref) const;
             
     /// nearest end to the current attachment point

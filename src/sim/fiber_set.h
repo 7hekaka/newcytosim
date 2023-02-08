@@ -105,10 +105,10 @@ public:
     /// a site on a fiber, as specified by Glossary[key]
     FiberSite someSite(std::string const& key, Glossary&) const;
 
-    /// set random sites on newly polymerized Fiber sites at the PLUS_END
+    /// set random sites on newly polymerized Fiber sites at the plus end
     void newFiberSitesP(Array<FiberSite>&, real spread) const;
     
-    /// set random sites on newly polymerized Fiber sites at the MINUS_END
+    /// set random sites on newly polymerized Fiber sites at the minus end
     void newFiberSitesM(Array<FiberSite>&, real spread) const;
     
     /// reverse the polarity of all fibers
@@ -137,7 +137,7 @@ public:
     /// calculate: number of fibers, number of joints and number of kinks
     static size_t nbKinks(ObjectList const&);
 
-    /// calculate center of gravity G, average of MINUS_END and PLUS_END
+    /// calculate center of gravity G, average of minus end and plus end
     static real infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector& P);
 
     /// calculate the nematic directors, return the nematic scalar order parameter

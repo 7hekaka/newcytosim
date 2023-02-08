@@ -142,10 +142,10 @@ public:
     /// simulate when the Hand is attached and under load
     virtual void stepLoaded(Vector const& force);
 
-    /// this is called when disassembly occured PLUS_END
+    /// this is called when disassembly occured plus end
     virtual void handleDisassemblyM();
     
-    /// this is called when the attachment point is below the MINUS_END
+    /// this is called when the attachment point is below the minus end
     virtual void handleDisassemblyP();
 
         

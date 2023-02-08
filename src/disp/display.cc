@@ -822,7 +822,7 @@ void Display::drawMisc(Simul const& sim)
 #pragma mark -
 
 /**
- Display the MINUS_END of a Fiber, according to `style`:
+ Display the minus end of a Fiber, according to `style`:
  - 1: draw a sphere
  - 2: draw a cone
  - 3: draw a flat cylinder
@@ -848,7 +848,7 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 
 
 /**
- Display the PLUS_END of a Fiber, according to `style`:
+ Display the plus end of a Fiber, according to `style`:
  - 1: draw a sphere
  - 2: draw a cone
  - 3: draw a flat cylinder
@@ -1426,14 +1426,14 @@ void Display::drawFilament(Fiber const& fib,
     gym::enableClipPlane(4);
     
     int cnt = 0;
-    // increment until we reach the MINUS_END
+    // increment until we reach the minus end
     while ( ab <= fib.abscissaM() )
     {
         ++cnt;
         ab += dab;
     }
     Vector3 p(fib.pos(ab)), q;
-    // draw the monomers until the PLUS_END:
+    // draw the monomers until the plus end:
     while ( ab < fib.abscissaP() )
     {
         q = p;
@@ -1506,7 +1506,7 @@ void Display::drawActin(Fiber const& fib,
     gym::enableClipPlane(4);
     
     int cnt = 0;
-    // rotate until we reach the MINUS_END
+    // rotate until we reach the minus end
     while ( ab <= fib.abscissaM() )
     {
         ++cnt;
@@ -1514,7 +1514,7 @@ void Display::drawActin(Fiber const& fib,
         n = d.rotateOrtho(n, cs, sn);
     }
     p = Vector3(fib.pos(ab)) + off * n;
-    // draw the monomers until the PLUS_END:
+    // draw the monomers until the plus end:
     while ( ab < fib.abscissaP() )
     {
         q = p;

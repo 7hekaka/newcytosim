@@ -135,10 +135,10 @@ public:
     real point_gap;
     
 
-    /// style of fiber tips for { PLUS_END, MINUS_END }
+    /// style of fiber tips for { plus end, minus end }
     /**
-     `end_style[0]` determines the style of the PLUS_END,
-     and `end_style[1]` the style of the MINUS_END.
+     `end_style[0]` determines the style of the plus end,
+     and `end_style[1]` the style of the minus end.
      
      Possible end_style:
      - 0 : hide,
@@ -151,7 +151,7 @@ public:
      */
     int end_style[2];
     
-    /// size of fiber tips for { PLUS_END, MINUS_END }
+    /// size of fiber tips for { plus end, minus end }
     /**
      You can also specify:
      

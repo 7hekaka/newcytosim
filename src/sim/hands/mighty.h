@@ -32,10 +32,10 @@ public:
     Mighty(MightyProp const*, HandMonitor*);
 
 
-    /// this is called when the attachment point is beyond the PLUS_END
+    /// this is called when the attachment point is beyond the plus end
     void handleDisassemblyM();
     
-    /// this is called when the attachment point is below the MINUS_END
+    /// this is called when the attachment point is below the minus end
     void handleDisassemblyP();
 
     

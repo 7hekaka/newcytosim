@@ -52,10 +52,10 @@ private:
     /// highest valid index plus one (laSup > laInf)
     lati_t   laSup;
     
-    /// index of cell containing the MINUS_END
+    /// index of cell containing the minus end
     lati_t   laIndexM;
     
-    /// index of cell containing the PLUS_END
+    /// index of cell containing the plus end
     lati_t   laIndexP;
     
     
@@ -69,10 +69,10 @@ private:
     /// distance between adjacent sites
     real     laUnit;
     
-    /// index of first cell entirely within MINUS_END and PLUS_END
+    /// index of first cell entirely within minus end and plus end
     lati_t   laEntry;
     
-    /// index of last cell entirely within MINUS_END and PLUS_END
+    /// index of last cell entirely within minus end and plus end
     lati_t   laFence;
 
 #pragma mark - Allocation
@@ -256,10 +256,10 @@ public:
 #endif
     }
 
-    /// index of site containing the MINUS_END
+    /// index of site containing the minus end
     lati_t  indexM() const { return laIndexM; }
     
-    /// index of site containing the PLUS_END
+    /// index of site containing the plus end
     lati_t  indexP() const { return laIndexP; }
     
     /// index of lowest cell that is entirely within minus and plus ends
@@ -402,14 +402,14 @@ public:
     }
     
     
-    /// sum all sites that are entirely below the MINUS_END
+    /// sum all sites that are entirely below the minus end
     template <typename SUM>
     void collectM(SUM& res)
     {
         collectCells(res, laInf, laIndexM);
     }
     
-    /// sum all sites that are entirely above the PLUS_END
+    /// sum all sites that are entirely above the plus end
     template <typename SUM>
     void collectP(SUM& res)
     {

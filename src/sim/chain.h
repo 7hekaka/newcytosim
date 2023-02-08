@@ -108,10 +108,10 @@ private:
     
 protected:
     
-    /// length increment at MINUS_END during last time-step
+    /// length increment at minus end during last time-step
     real cDeltaM;
     
-    /// length increment at PLUS_END during last time-step
+    /// length increment at plus end during last time-step
     real cDeltaP;
 
 #if NEW_UNCONSTRAINED_LENGTH
@@ -174,7 +174,7 @@ public:
     /// set Lagrange multipliers (this is normally not needed)
     virtual void setTensions(const real*) {}
 
-    /// set position of MINUS_END and direction (length and Nb of points are not modified)
+    /// set position of minus end and direction (length and Nb of points are not modified)
     /** dir does not need to be normalized */
     void setStraight(Vector const& pos, Vector const& dir);
     
@@ -213,10 +213,10 @@ public:
     /// return Mecapoint of given end
     Mecapoint exactEnd(FiberEnd) const;
 
-    /// interpolation of MINUS_END
+    /// interpolation of minus end
     Interpolation interpolateEndM() const { return Interpolation(this, real(0.0), 0); }
 
-    /// interpolation of PLUS_END
+    /// interpolation of plus end
     Interpolation interpolateEndP() const { return Interpolation(this, real(1.0), nPoints-2); }
 
     /// interpolation of given end
@@ -228,7 +228,7 @@ public:
     /// interpolation of the site specified by its distance from the ORIGIN
     Interpolation interpolate(const real& ab) const { return interpolateM(ab-fnAbscissaM); }
     
-    /// interpolation of the site specified from the MINUS_END
+    /// interpolation of the site specified from the minus end
     Interpolation interpolateM(real ab) const;
     
     /// interpolation of a site specified by its distance from a FiberEnd
@@ -253,40 +253,40 @@ public:
     /// true if ( a < abscissaM() ) OR ( abscissaP() < a )
     bool outsideMP(const real a) const { return a < abscissaM() || abscissaP() < a; }
 
-    /// true if abscissa is smaller than abscissa of PLUS_END
+    /// true if abscissa is smaller than abscissa of plus end
     bool belowP(const real a)    const { return a <= abscissaP(); }
     
-    /// true if abscissa is greater than abscissa of MINUS_END
+    /// true if abscissa is greater than abscissa of minus end
     bool aboveM(const real a)    const { return abscissaM() <= a; }
     
     /// calculate the domain in which ab is located (near a FiberEnd, or central)
     FiberEnd whichEndDomain(real a, real lambda) const;
     
-    /// return P where segment [ P, P+1 [ contains point at distance `a` from the MINUS_END
+    /// return P where segment [ P, P+1 [ contains point at distance `a` from the minus end
     /** returns 0 if ( a < 0 ) and last point index if ( a > lastSegment() ) */
     size_t clampedIndexM(const real a) const { return std::min((size_t)(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
     
-    /// displace the ORIGIN of abscissa at distance `a` from the MINUS_END
+    /// displace the ORIGIN of abscissa at distance `a` from the minus end
     void setOrigin(real a) { fnAbscissaM = -a; fnAbscissaP = fnCut * real(nbSegments()) - a; }
 
-    /// signed distance from ORIGIN to MINUS_END (abscissa of MINUS_END)
+    /// signed distance from ORIGIN to minus end (abscissa of minus end)
     real abscissaM() const { return fnAbscissaM; }
     
-    /// abscissa of center, midway between MINUS_END and PLUS_END
+    /// abscissa of center, midway between minus end and plus end
     real abscissaC() const { return 0.5 * (fnAbscissaM + fnAbscissaP); }
 
-    /// signed distance from ORIGIN to PLUS_END (abscissa of PLUS_END)
+    /// signed distance from ORIGIN to plus end (abscissa of plus end)
     real abscissaP() const { return fnAbscissaP; }
 
     /// signed distance from ORIGIN to vertex specified with index (or intermediate position)
     real abscissaPoint(const real n) const { return fnAbscissaM + fnCut * n; }
 
-    /// distance from MINUS_END to a vertex specified as index (or intermediate position)
+    /// distance from minus end to a vertex specified as index (or intermediate position)
     real distancePointM(const real n) const { return fnCut * n; }
 
-    /// distance from PLUS_END to a vertex specified as index (or intermediate position)
+    /// distance from plus end to a vertex specified as index (or intermediate position)
     real distancePointP(const real n) const { return fnCut * ( lastPoint() - n ); }
 
     /// distance from CENTER to a vertex specified as index (or intermediate position)
@@ -304,10 +304,10 @@ public:
     //---------------------
 
 #if ( DIM == 1 )
-    /// position at distance `ab` from the MINUS_END
+    /// position at distance `ab` from the minus end
     Vector posM(real ab) const { return Vector(pPos[0]+std::copysign(ab, pPos[1]-pPos[0])); }
 #else
-    /// position at distance `ab` from the MINUS_END
+    /// position at distance `ab` from the minus end
     Vector posM(real ab) const;
 #endif
     /// position of a point specified by abscissa from the ORIGIN
@@ -322,16 +322,16 @@ public:
     /// position of a FiberEnd
     Vector posEnd(FiberEnd) const;
     
-    /// position of MINUS_END
+    /// position of minus end
     Vector posEndM() const { return Vector(pPos); }
 
-    /// position of PLUS_END
+    /// position of plus end
     Vector posEndP() const { return Vector(pPos+DIM*(nPoints-1)); }
     
-    /// external force acting on MINUS_END
+    /// external force acting on minus end
     Vector netForceEndM() const { return netForce(0); }
     
-    /// external force acting on PLUS_END
+    /// external force acting on plus end
     Vector netForceEndP() const { return netForce(nPoints-1); }
 
     //---------------------
@@ -345,10 +345,10 @@ public:
     Vector dirSegment(size_t p)  const { return normalize(diffPoints(p)); }
 #endif
 #if ( DIM == 1 )
-    /// direction at distance `ab` from the MINUS_END
+    /// direction at distance `ab` from the minus end
     Vector dirM(real ab) const { return Vector(sign_real(pPos[1]-pPos[0])); }
 #else
-    /// direction at distance `ab` from the MINUS_END
+    /// direction at distance `ab` from the minus end
     Vector dirM(real ab) const;
 #endif
     /// normalized tangent vector to the fiber at given abscissa from the origin
@@ -360,16 +360,16 @@ public:
     /// normalized tangent vector to the fiber at given end
     Vector dirEnd(FiberEnd) const;
     
-    /// normalized tangent vector at MINUS_END, orientated towards the PLUS_END
+    /// normalized tangent vector at minus end, orientated towards the plus end
     Vector dirEndM() const { return dirSegment(0); }
     
-    /// normalized tangent vector to the fiber at PLUS_END
+    /// normalized tangent vector to the fiber at plus end
     Vector dirEndP() const { return dirSegment(lastSegment()); }
 
-    /// force on the MINUS_END projected on the direction of elongation
+    /// force on the minus end projected on the direction of elongation
     real projectedForceEndM() const;
 
-    /// force on the PLUS_END projected on the direction of elongation
+    /// force on the plus end projected on the direction of elongation
     real projectedForceEndP() const;
 
     /// dot-product (force at the end of the Fiber).(direction of Fiber growth)
@@ -441,19 +441,19 @@ public:
 
     //--------------------- Growing/Shrinking
 
-    /// increase/decrease length of Fiber by `delta`, at the MINUS_END
+    /// increase/decrease length of Fiber by `delta`, at the minus end
     void growM(real delta);
-    /// increase/decrease length of Fiber by `delta`, at the PLUS_END
+    /// increase/decrease length of Fiber by `delta`, at the plus end
     void growP(real delta);
 
-    /// add a segment of length segmentation() at the MINUS_END
+    /// add a segment of length segmentation() at the minus end
     void addSegmentM();
-    /// add a segment of length segmentation() at the PLUS_END
+    /// add a segment of length segmentation() at the plus end
     void addSegmentP();
 
-    /// remove a portion of length `delta` including the MINUS_END
+    /// remove a portion of length `delta` including the minus end
     void cutM(real delta);
-    /// remove a portion of length `delta` including the PLUS_END
+    /// remove a portion of length `delta` including the plus end
     void cutP(real delta);
 
     /// Discard vertices in [ 0, P-1 ] and keep [ P, end ]
@@ -461,9 +461,9 @@ public:
     /// Keep vertices [ 0, P ] and discard the others
     virtual void truncateP(size_t P);
 
-    /// length of polymer made in last timestep, at the MINUS_END (negative for shrinking)
+    /// length of polymer made in last timestep, at the minus end (negative for shrinking)
     real freshAssemblyM() const { return cDeltaM; }
-    /// length of polymer made in last timestep, at the PLUS_END (negative for shrinking)
+    /// length of polymer made in last timestep, at the plus end (negative for shrinking)
     real freshAssemblyP() const { return cDeltaP; }
     
     /// undo last length change at minus end
@@ -482,13 +482,13 @@ public:
     /// true if the tip `end` has shrunk ( freshAssembly(which) < 0 )
     bool isShrinking(FiberEnd e) const { return freshAssembly(e) < 0; }
 
-    /// grow at specified end (PLUS_END or MINUS_END)
+    /// grow at specified end (plus end or minus end)
     void grow(FiberEnd, real delta);
     
     /// shorten or lengthen Fiber without changing the position of `end`
     void adjustLength(real len, FiberEnd);
     
-    /// merge two fibers by attaching given Chain at the PLUS_END of `this`
+    /// merge two fibers by attaching given Chain at the plus end of `this`
     void join(Chain const*);
 
     //---------------------

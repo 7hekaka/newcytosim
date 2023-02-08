@@ -61,10 +61,10 @@ public:
     /// draw the given simulation state using OpenGL commands
     void drawObjects(Simul const&);
     
-    /// draw Fiber MINUS_END
+    /// draw Fiber minus end
     void drawFiberMinusEnd(Fiber const&, int style, float size) const;
     
-    /// draw Fiber PLUS_END
+    /// draw Fiber plus end
     void drawFiberPlusEnd(Fiber const&, int style, float size) const;
     
     /// draw Fiber linear features

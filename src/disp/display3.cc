@@ -252,7 +252,7 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
 
 /**
 This draws segments of length 'len' which may not correspond to the vertices
-used to model the Fiber. All abscissa is relative to the MINUS_END.
+used to model the Fiber. All abscissa is relative to the minus end.
 The function `set_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
@@ -356,7 +356,7 @@ void Display3::drawFiberSegmentsJoin(Fiber const& fib, float rad,
 
 /**
 This draws segments of length 'len' which may not correspond to the vertices
-used to model the Fiber. All abscissa is relative to the MINUS_END.
+used to model the Fiber. All abscissa is relative to the minus end.
 The function `set_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
@@ -658,7 +658,7 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
 
 
 /**
- Display the MINUS_END of a Fiber, according to `style`:
+ Display the minus end of a Fiber, according to `style`:
  - 1: draw a sphere
  - 2: draw a cone
  - 3: draw a flat cylinder
@@ -685,7 +685,7 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 
 
 /**
- Display the PLUS_END of a Fiber, according to `style`:
+ Display the plus end of a Fiber, according to `style`:
  - 1: draw a sphere
  - 2: draw a cone
  - 3: draw a flat cylinder

@@ -156,7 +156,7 @@ void Chain::placeEnd(const FiberEnd ref)
  `pts[]` should provide `DIM * n_pts` coordinates.
 
  The given set of points do not need to be equally distributed.
- The MINUS_END and PLUS_END will be set to the first and last points in `pts[]`,
+ The MINUS_END and plus end will be set to the first and last points in `pts[]`,
  and intermediate points will be interpolated at regular intervals on `pts[]`.
  
  The length of the resulting fiber will match the sum of given segment lengths,
@@ -1200,7 +1200,7 @@ void Chain::growP(const real delta)
 
 
 /**
- This extends the fiber by adding one segment at the PLUS_END.
+ This extends the fiber by adding one segment at the plus end.
  Thus `segmentation()` is not changed, and the existing points are not displaced.
  */
 void Chain::addSegmentP()
@@ -1218,7 +1218,7 @@ void Chain::addSegmentP()
 
 
 /**
- A portion of size `delta` is removed at the PLUS_END, and vertices are recalculated.
+ A portion of size `delta` is removed at the plus end, and vertices are recalculated.
  The Fiber length is reduced by `delta` ( which must be >= 0 ).
 
  Note: after cutP(), the distance between adjacent vertices is not exactly
@@ -1305,7 +1305,7 @@ void Chain::adjustLength(real len, FiberEnd ref)
 
 
 /**
- `fib` is added at the PLUS_END of `*this`
+ `fib` is added at the plus end of `*this`
  
  The vertex are reinterpolated linearly, and the length of the
  segments will not fullfil exactly the constraints of segmentation.
@@ -1333,7 +1333,7 @@ void Chain::join(Chain const* fib)
         w.store(tmp+DIM*i);
     }
     
-    // copy position of PLUS_END:
+    // copy position of plus end:
     fib->posEndP().store(tmp+DIM*ns);
 
     setNbPoints(ns+1);
@@ -1871,7 +1871,7 @@ real Chain::someAbscissa(real dis, FiberEnd ref, int mod, real alpha) const
  - and a NO_END section in between
  .
  Note that a Fiber shorter than `2*lambda` does not have a central region,
- and is composed of PLUS_END and MINUS_END parts of equal size.
+ and is composed of plus end and MINUS_END parts of equal size.
  */    
 FiberEnd Chain::whichEndDomain(const real ab, const real lambda) const
 {
@@ -1945,7 +1945,7 @@ Interpolation Chain::interpolateCenter() const
 Interpolation Chain::interpolateM(const real ab) const
 {
     real a = std::max(ab*iCut, real(0));
-    // beyond the last point, we interpolate the PLUS_END
+    // beyond the last point, we interpolate the plus end
     real s = std::min(std::floor(a), real(nPoints-2));
     unsigned i = static_cast<unsigned>(s);
     assert_true( std::abs(i-s) < 1 );
@@ -1988,7 +1988,7 @@ Vector Chain::posM(const real ab) const
     real a = ab / fnCut;
     size_t s = (size_t)a;
     
-    // check if PLUS_END is reached:
+    // check if plus end is reached:
     if ( s+1 < nPoints )
         return midPoint(s, a-s);
     else
@@ -2004,7 +2004,7 @@ Vector Chain::dirM(const real ab) const
     real a = ab / fnCut;
     size_t s = (size_t)a;
     
-    // check if PLUS_END is reached
+    // check if plus end is reached
     if ( s+1 < nPoints )
         return dirSegment(s);
     else
@@ -2035,13 +2035,13 @@ Vector Chain::dirEnd(const FiberEnd end) const
 }
 
 
-/// force on the PLUS_END projected on the direction of elongation
+/// force on the plus end projected on the direction of elongation
 real Chain::projectedForceEndM() const
 {
     return -dot(netForce(0), dirSegment(0));
 }
 
-/// force on the PLUS_END projected on the direction of elongation
+/// force on the plus end projected on the direction of elongation
 real Chain::projectedForceEndP() const
 {
     return dot(netForce(lastPoint()), dirSegment(lastSegment()));

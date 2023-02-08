@@ -152,13 +152,13 @@ void drawFilament(Fiber const& fib)
     
     real ab = 0;
     int cnt = 0;
-    // increment until we reach the MINUS_END
+    // increment until we reach the minus end
     while ( ab <= fib.abscissaM() )
     {
         ++cnt;
         ab += dab;
     }
-    // draw the monomers until the PLUS_END:
+    // draw the monomers until the plus end:
     while ( ab < fib.abscissaP() )
     {
         // alternate colors:
@@ -193,7 +193,7 @@ void drawActin(Fiber const& fib)
     //std::clog << fib.reference() << " " << n << "    " << n.normSqr() << " " << n*d << '\n';
     
     int cnt = 0;
-    // rotate normal until we reach the MINUS_END
+    // rotate normal until we reach the minus end
     while ( ab < fib.abscissaM() )
     {
         ++cnt;
@@ -201,7 +201,7 @@ void drawActin(Fiber const& fib)
         ab += dab;
     }
     
-    // draw the monomers until the PLUS_END
+    // draw the monomers until the plus end
     while ( ab < fib.abscissaP() )
     {
         d = Vector3(fib.dir(ab));

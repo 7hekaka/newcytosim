@@ -51,7 +51,7 @@ void GrowingFiber::step()
     constexpr size_t P = 0, M = 1;
     real addP = 0, addM = 0;
     
-    // PLUS_END
+    // plus end
     if ( prop()->shrink_outside[P] && prop()->confine_pointer->outside(posEndP()) )
     {
         addP = prop()->shrinking_speed_dt[P];
@@ -71,7 +71,7 @@ void GrowingFiber::step()
         addP += prop()->growing_off_speed_dt[P];
     }
     
-    // MINUS_END
+    // minus end
     if ( prop()->shrink_outside[M] && prop()->confine_pointer->outside(posEndM()) )
     {
         addM = prop()->shrinking_speed_dt[M];
