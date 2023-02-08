@@ -53,8 +53,8 @@ void NucleatorProp::read(Glossary& glos)
     
     glos.set(addictive, "addictive");
     glos.set(addictive_state, "addictive", 1);
-    glos.set(addictive_state, "addictive_state");
-
+    glos.set(stabilize, "stabilize");
+    
     if ( glos.set(track_end, "track_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}}) )
         hold_end = track_end;
