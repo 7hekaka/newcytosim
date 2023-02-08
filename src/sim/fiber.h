@@ -263,7 +263,7 @@ public:
     virtual state_t endStateP() const { return STATE_WHITE; }
 
     /// return assembly/disassembly state of the FiberEnd
-    state_t endState(FiberEnd end) const;
+    state_t endState(FiberEnd) const;
 
     
     /// change state of MINUS_END
@@ -272,8 +272,8 @@ public:
     /// change state of PLUS_END
     virtual void setEndStateP(state_t) {}
 
-    /// change state of FiberEnd `end` to `s`
-    void setEndState(FiberEnd end, state_t s);
+    /// change state of FiberEnd
+    void setEndState(FiberEnd, state_t);
     
     //--------------------------------------------------------------------------
     
@@ -302,13 +302,13 @@ public:
     size_t nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;
     
     /// number of Hands attached at a distance less than 'len' from the specified FiberEnd
-    size_t nbHandsNearEnd(real len, FiberEnd end) const;
+    size_t nbHandsNearEnd(real len, FiberEnd) const;
     
     //--------------------------------------------------------------------------
 
 #if NEW_FIBER_END_CHEW
     /// register a chewing quantity
-    void chew(const real x, FiberEnd end) { if ( end == PLUS_END ) fChewP += x; else fChewM += x; }
+    void chew(const real x, FiberEnd e) { if ( e == PLUS_END ) fChewP += x; else fChewM += x; }
 #endif
 #if NEW_FIBER_SILHOUETTE
     real chiasma_;

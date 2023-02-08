@@ -439,11 +439,11 @@ public:
     /// print the coordinates of the vertices of each fiber
     void reportFiberDirections(std::ostream&, Property const*) const;
 
-    /// print the positions and the states of ends `end` of all fibers
-    void reportFiberEnds(std::ostream&, FiberEnd end, Property const*) const;
+    /// print the positions and the states for one ends of all fibers
+    void reportFiberEnds(std::ostream&, FiberEnd, Property const*) const;
     
     /// print number of fibers in each state of specified end
-    void reportFiberEndState(std::ostream&, FiberEnd end, Property const*) const;
+    void reportFiberEndState(std::ostream&, FiberEnd, Property const*) const;
 
     /// print the mean and standard deviation of vertices for each class of fiber
     void reportFiberMoments(std::ostream&) const;

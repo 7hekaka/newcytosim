@@ -293,7 +293,7 @@ public:
     real distancePointC(const real n) const { return fnCut * ( n - 0.5 * lastPoint() ); }
 
     /// signed distance from the ORIGIN to the specified FiberEnd
-    real abscissaEnd(FiberEnd end) const;
+    real abscissaEnd(FiberEnd) const;
     
     /// converts distance from the specified FiberEnd, to abscissa from the ORIGIN
     real abscissaFrom(real dis, FiberEnd ref) const;
@@ -320,7 +320,7 @@ public:
     Vector posMiddle() const { if ( nPoints&1 ) return posPoint(nPoints/2); return midPoint((nPoints-1)/2, 0.5); }
     
     /// position of a FiberEnd
-    Vector posEnd(FiberEnd end) const;
+    Vector posEnd(FiberEnd) const;
     
     /// position of MINUS_END
     Vector posEndM() const { return Vector(pPos); }
@@ -358,7 +358,7 @@ public:
     Vector dir(real ab, FiberEnd ref) const { return dirM(abscissaFrom(ab, ref)); }
     
     /// normalized tangent vector to the fiber at given end
-    Vector dirEnd(FiberEnd end) const;
+    Vector dirEnd(FiberEnd) const;
     
     /// normalized tangent vector at MINUS_END, orientated towards the PLUS_END
     Vector dirEndM() const { return dirSegment(0); }
@@ -373,7 +373,7 @@ public:
     real projectedForceEndP() const;
 
     /// dot-product (force at the end of the Fiber).(direction of Fiber growth)
-    real projectedForceEnd(FiberEnd end) const;
+    real projectedForceEnd(FiberEnd) const;
     
     /// direction averaged over the entire length
     Vector direction() const { return normalize(posEndP()-posEndM()); }
@@ -474,19 +474,19 @@ public:
     //---------------------
 
     /// the length of freshly assembled polymer during the last time step
-    real freshAssembly(FiberEnd end) const;
+    real freshAssembly(FiberEnd) const;
     
     /// true if the tip `end` has grown ( freshAssembly(which) > 0 )
-    bool isGrowing(FiberEnd end) const { return freshAssembly(end) > 0; }
+    bool isGrowing(FiberEnd e) const { return freshAssembly(e) > 0; }
     
     /// true if the tip `end` has shrunk ( freshAssembly(which) < 0 )
-    bool isShrinking(FiberEnd end) const { return freshAssembly(end) < 0; }
+    bool isShrinking(FiberEnd e) const { return freshAssembly(e) < 0; }
 
     /// grow at specified end (PLUS_END or MINUS_END)
-    void grow(FiberEnd end, real delta);
+    void grow(FiberEnd, real delta);
     
     /// shorten or lengthen Fiber without changing the position of `end`
-    void adjustLength(real len, FiberEnd end);
+    void adjustLength(real len, FiberEnd);
     
     /// merge two fibers by attaching given Chain at the PLUS_END of `this`
     void join(Chain const*);

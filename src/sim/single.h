@@ -108,10 +108,10 @@ public:
     void attach(FiberSite s) { if ( sHand->attachmentAllowed(s) ) sHand->attach(s); }
     
     /// attach Hand at given Fiber end
-    void attachEnd(Fiber * f, FiberEnd end) { sHand->attachEnd(f, end); }
+    void attachEnd(Fiber * f, FiberEnd e) { sHand->attachEnd(f, e); }
 
     /// move Hand at given end
-    void moveToEnd(FiberEnd end) { sHand->moveToEnd(end); }
+    void moveToEnd(FiberEnd e) { sHand->moveToEnd(e); }
     
     /// detach
     void detach() { sHand->detach(); }

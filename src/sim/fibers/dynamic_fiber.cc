@@ -369,11 +369,11 @@ void DynamicFiber::step()
     constexpr size_t P = 0;
     if ( stabilized_[P] )
     {
+        // Special case for Kinetochores: grow slowly with no catastrophe...
         real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
         nextGrowthP -= growth / stabilized_[P];
         while ( nextGrowthP < 0 )
         {
-            // add fresh unit, shifting old terminal to penultimate position
             unitP[1] = unitP[0];
             unitP[0] = 1;
             addP += prop()->unit_length;
