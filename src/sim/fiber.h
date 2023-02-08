@@ -150,6 +150,18 @@ protected:
     
     /// add confinement interactions to a Meca
     void setFiberConfinement(Meca&, Confinement, Space const*, real stiff, real stiff2) const;
+    
+    /// cut fiber at distance `abs` from the MINUS_END; returns section `[ abs - PLUS_END ]`
+    Fiber * severM(real abs);
+
+    /// cut fiber at abscissa `abs`; returns section `[ abs - PLUS_END ]`
+    Fiber * severNow(real abs);
+    
+    /// perform all the cuts registered by sever()
+    void severNow();
+
+    /// update Lattice and Mesh ranges
+    void updateRange();
 
 public:
     
@@ -190,8 +202,6 @@ public:
     /// destructor
     virtual ~Fiber();
 
-    //--------------------------------------------------------------------------
-    
     /// prepare for Meca
     void prepareMecable();
 
@@ -201,9 +211,11 @@ public:
     /// add force elements relevant for this Fiber to a Meca
     void setInteractions(Meca&) const;
     
+    //--------------------------------------------------------------------------
 
     /// adjust abscissa of Hands by applying mirror image around fiber midpoint
     void flipHandsPolarity();
+    
     /// flip Vertices and Hands, exchanging Plus and Minus ends
     void flipPolarity();
 
@@ -215,34 +227,25 @@ public:
     
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
     void planarCut(Vector const& n, real a, state_t stateP, state_t stateM);
-    
-    /// cut fiber at distance `abs` from the MINUS_END; returns section `[ abs - PLUS_END ]`
-    Fiber * severM(real abs);
-
-    /// cut fiber at abscissa `abs`; returns section `[ abs - PLUS_END ]`
-    Fiber * severNow(real abs);
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
     void sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }
-    
-    /// perform all the cuts registered by sever()
-    void severNow();
 
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
     virtual void join(Fiber *);
     
-    /// simulation step
-    virtual void step();
-    
     /// simulation step with some growth/shrinkage from the ends
     void growStep(real, real, bool = true);
-
-    /// update Lattice and Mesh ranges
-    void updateRange();
     
     /// should be called if any Fiber tip has elongated or shortened
     void updateFiber();
     
+    /// register a stabilizing effect
+    virtual void stabilize(FiberEnd, real s) {}
+    
+    /// simulation step
+    virtual void step();
+
     //--------------------------------------------------------------------------
 
     /// the energy due to bending rigidity: 1/2 * rigidity * sum( curvature(s)^2 ds ),

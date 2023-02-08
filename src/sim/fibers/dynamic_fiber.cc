@@ -17,6 +17,8 @@ DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p)
 {
     initM();
     initP();
+    stabilized_[0] = 0;
+    stabilized_[1] = 0;
 }
 
 
@@ -87,7 +89,7 @@ int DynamicFiber::stepMinusEnd()
     //std::clog << " chewing rate M " << chewing_rate / prop()->time_step << '\n';
     fChewM = 0;
 #else
-    constexpr real chewed(0);
+    constexpr real chewed = 0;
 #endif
     
     if ( mStateM == STATE_RED )
@@ -251,7 +253,7 @@ int DynamicFiber::stepPlusEnd()
     //std::clog << " chewing rate P " << chewing / prop()->time_step << '\n';
     fChewP = 0;
 #else
-    constexpr real chewed(0);
+    constexpr real chewed = 0;
 #endif
     
     if ( mStateP == STATE_RED )
@@ -351,9 +353,12 @@ void DynamicFiber::step()
 {
     real addM = 0;
     constexpr size_t M = 1;
-    // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
-    if ( mStateM == STATE_WHITE )
+    if ( stabilized_[M] )
     {
+    }
+    else if ( mStateM == STATE_WHITE )
+    {
+        // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
         if ( RNG.test(prop()->rebirth_prob[M]) )
             setEndStateM(STATE_GREEN);
     }
@@ -362,9 +367,23 @@ void DynamicFiber::step()
     
     real addP = 0;
     constexpr size_t P = 0;
-    // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
-    if ( mStateP == STATE_WHITE )
+    if ( stabilized_[P] )
     {
+        real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
+        nextGrowthP -= growth / stabilized_[P];
+        while ( nextGrowthP < 0 )
+        {
+            // add fresh unit, shifting old terminal to penultimate position
+            unitP[1] = unitP[0];
+            unitP[0] = 1;
+            addP += prop()->unit_length;
+            nextGrowthP += RNG.exponential();
+            mStateP = calculateStateP();
+        }
+    }
+    else if ( mStateP == STATE_WHITE )
+    {
+        // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
         if ( RNG.test(prop()->rebirth_prob[P]) )
             setEndStateP(STATE_GREEN);
     }

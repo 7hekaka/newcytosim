@@ -26,7 +26,7 @@ void NucleatorProp::clear()
     hold_end   = MINUS_END;
     addictive  = false;
     addictive_state = STATE_RED;
-    stabilize = 1;
+    stabilize = 0;
     nucleation_angle = 0;
     specificity = NUCLEATE_UNSPECIFIC;
 }
@@ -50,9 +50,22 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(fiber_spec, "nucleation_spec");
     glos.set(fiber_spec, "spec");
 #endif
-    
+
+    // possible dynamic states of the ends
+    Glossary::dict_type<state_t> keys{{"white",     STATE_WHITE},
+                                      {"green",     STATE_GREEN},
+                                      {"yellow",    STATE_YELLOW},
+                                      {"orange",    STATE_ORANGE},
+                                      {"red",       STATE_RED},
+                                      {"static",    STATE_WHITE},
+                                      {"grow",      STATE_GREEN},
+                                      {"growing",   STATE_GREEN},
+                                      {"shrink",    STATE_RED},
+                                      {"shrinking", STATE_RED},
+                                      {"delete",    STATE_BLACK}};
+
     glos.set(addictive, "addictive");
-    glos.set(addictive_state, "addictive", 1);
+    glos.set(addictive_state, "addictive", 1, keys);
     glos.set(stabilize, "stabilize");
     
     if ( glos.set(track_end, "track_end", {{"off", NO_END},
