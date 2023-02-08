@@ -372,8 +372,7 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
     try
     {
         size_t nb = in.readUInt16();
-        allocateMecable(nb);
-        nPoints = nb;
+        setNbPoints(nb);
 #if !REAL_IS_DOUBLE
         in.readFloats(nb, pPos, DIM);
 #else
