@@ -52,14 +52,9 @@ void NucleatorProp::read(Glossary& glos)
 #endif
     
     glos.set(addictive, "addictive");
-<<<<<<< HEAD
-    glos.set(detached_end_state, "detached_end_state");
-
-=======
     glos.set(addictive_state, "addictive", 1);
-    glos.set(stabilize, "stabilize");
-    
->>>>>>> d805d4ae (Cleanup nucleator::addictive + stabilize)
+    glos.set(addictive_state, "addictive_state");
+
     if ( glos.set(track_end, "track_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}}) )
         hold_end = track_end;
