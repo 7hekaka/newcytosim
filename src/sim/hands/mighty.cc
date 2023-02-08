@@ -67,7 +67,7 @@ void Mighty::handleDisassemblyP()
     would be positive, since another Hand might have done the same job already. */
     if ( hAbs > fib->abscissaP() && fib->freshAssemblyP() < 0 )
     {
-        if ( RNG.test(prop()->rescue_chance) )
+        if ( hMonitor->otherHand(this) && RNG.test(prop()->rescue_chance) )
         {
             //revert the last disassembly step:
             fib->undoGrowP();
