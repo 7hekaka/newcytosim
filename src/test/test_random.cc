@@ -206,17 +206,17 @@ void check_flip()
 }
 
 
-template < real (Random::*FUNC)() >
-void check_random(const char str[], size_t cnt, real off)
+template < typename REAL >
+void check_random(const char str[], size_t cnt, REAL off, REAL (Random::*FUNC)())
 {
-    real ix = INFINITY, iy = INFINITY, iz = INFINITY, it = INFINITY;
-    real avg = 0, var = 0;
+    REAL ix = INFINITY, iy = INFINITY, iz = INFINITY, it = INFINITY;
+    REAL avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
-        real x = (RNG.*FUNC)() - off;
-        real y = (RNG.*FUNC)() - off;
-        real z = (RNG.*FUNC)() - off;
-        real t = (RNG.*FUNC)() - off;
+        REAL x = (RNG.*FUNC)() - off;
+        REAL y = (RNG.*FUNC)() - off;
+        REAL z = (RNG.*FUNC)() - off;
+        REAL t = (RNG.*FUNC)() - off;
         ix = std::min(ix, x);
         iy = std::min(iy, y);
         iz = std::min(iz, z);
@@ -339,10 +339,10 @@ int main(int argc, char* argv[])
             break;
             
         case 1:
-            check_random<&Random::exponential>("EXPONENTIAL", 1<<26, 1.0);
-            check_random<&Random::preal>("UNIFORM [0,1]", 1<<20, 0.5);
-            check_random<&Random::sreal>("UNIFORM [-1,1]", 1<<20, 0.0);
-            check_random<&Random::gauss>("GAUSSIAN", 1<<20, 0.0);
+            check_random<float>("EXPONENTIAL", 1<<26, 1.0, &Random::exponential);
+            check_random<real>("UNIFORM [0,1]", 1<<20, 0.5, &Random::preal);
+            check_random<real>("UNIFORM [-1,1]", 1<<20, 0.0, &Random::sreal);
+            check_random<real>("GAUSSIAN", 1<<20, 0.0, &Random::gauss);
             break;
 
         case 2:
