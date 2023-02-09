@@ -116,12 +116,12 @@ void Fiber::growStep(real addM, real addP, bool split)
 #if NEW_FIBER_END_CHEW
     if ( split )
     {
-        if ( fChewM > 0 )
-            addM -= std::min(fChewM, prop->max_chewing_speed_dt);
-        fChewM = 0;
-        if ( fChewP > 0 )
-            addP -= std::min(fChewP, prop->max_chewing_speed_dt);
-        fChewP = 0;
+        if ( fChew[1] > 0 )
+            addM -= std::min(fChew[1], prop->max_chewing_speed_dt);
+        fChew[1] = 0;
+        if ( fChew[0] > 0 )
+            addP -= std::min(fChew[0], prop->max_chewing_speed_dt);
+        fChew[0] = 0;
     }
 #endif
     
@@ -247,8 +247,8 @@ Fiber::Fiber(FiberProp const* p)
     brother_ = nullptr;
 #endif
 #if NEW_FIBER_END_CHEW
-    fChewM = 0;
-    fChewP = 0;
+    fChew[0] = 0;
+    fChew[1] = 0;
 #endif
 #if NEW_FIBER_SILHOUETTE
     chiasma_ = -1.0;

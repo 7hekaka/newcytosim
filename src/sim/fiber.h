@@ -125,7 +125,7 @@ protected:
     
 #if NEW_FIBER_END_CHEW
     /// stored chewing at the end
-    real fChewM, fChewP;
+    real fChew[2];
 #endif
     
     /// ordered list of future severing positions
@@ -308,7 +308,7 @@ public:
 
 #if NEW_FIBER_END_CHEW
     /// register a chewing quantity
-    void chew(const real x, FiberEnd e) { if ( e == PLUS_END ) fChewP += x; else fChewM += x; }
+    void chew(const real x, FiberEnd e) { assert_true(e>0); fChew[e-1] += x; }
 #endif
 #if NEW_FIBER_SILHOUETTE
     real chiasma_;

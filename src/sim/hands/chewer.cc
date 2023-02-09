@@ -30,7 +30,7 @@ void Chewer::stepUnloaded()
     if ( engaged != NO_END )
     {
 #if NEW_FIBER_END_CHEW
-        hFiber->chew(prop->chewing_speed_dt, engaged);
+        hFiber->chew(prop()->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
         throw InvalidParameter("fiber:chew is not enabled");
@@ -66,7 +66,7 @@ void Chewer::stepLoaded(Vector const& force)
     if ( engaged != NO_END )
     {
 #if NEW_FIBER_END_CHEW
-        hFiber->chew(prop->chewing_speed_dt, engaged);
+        hFiber->chew(prop()->chewing_speed_dt, engaged);
         moveToEnd(engaged);
 #else
         throw InvalidParameter("fiber:chew is not enabled");
