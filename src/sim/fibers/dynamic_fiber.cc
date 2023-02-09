@@ -353,8 +353,9 @@ void DynamicFiber::step()
 {
     real addM = 0;
     constexpr size_t M = 1;
-    if ( stabilized_[M] )
+    if ( stabilized_[M] > 0 )
     {
+        stabilized_[M] = 0;
     }
     else if ( mStateM == STATE_WHITE )
     {
@@ -367,7 +368,7 @@ void DynamicFiber::step()
     
     real addP = 0;
     constexpr size_t P = 0;
-    if ( stabilized_[P] )
+    if ( stabilized_[P] > 0 )
     {
         // Special case for Kinetochores: grow slowly with no catastrophe...
         real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
@@ -380,6 +381,7 @@ void DynamicFiber::step()
             nextGrowthP += RNG.exponential();
             mStateP = calculateStateP();
         }
+        stabilized_[P] = 0;
     }
     else if ( mStateP == STATE_WHITE )
     {
