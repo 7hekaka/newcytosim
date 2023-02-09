@@ -7,6 +7,7 @@
 #include <iostream>
 #include <climits>
 #include <random>
+#include <new>
 
 #include "timer.h"
 #include "SFMT.h"
@@ -203,22 +204,27 @@ static real* check_log(real dst[], size_t cnt, const uint32_t arg[])
 #endif
 
 
-template < float* (*FUNC)(float*, size_t, const uint32_t*) >
-void run(sfmt_t& sfmt, const char str[], size_t cnt)
+template < typename REAL >
+void run(sfmt_t& sfmt, size_t cnt, const char str[], REAL* (*FUNC)(REAL*, size_t, const uint32_t*))
 {
-    float * vec = new float[SFMT_N32];
-    tick();
-    for ( size_t i = 0; i < cnt; ++i )
+    void * mem = nullptr;
+    if ( 0 == posix_memalign(&mem, 32, sizeof(REAL)*SFMT_N32) )
     {
-        sfmt_gen_rand_all(&sfmt);
-        FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
+        REAL * vec = (REAL*)mem;
+        tick();
+        for ( size_t i = 0; i < cnt; ++i )
+        {
+            sfmt_gen_rand_all(&sfmt);
+            FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
+        }
+        REAL * end = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
+        printf("%-12s %5.2f :", str, tock(cnt>>10));
+        check_gaussian(end-vec, vec);
+        print_gaussian(std::min(end-vec, 8L), vec);
+        std::free(mem);
     }
-    float* end = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
-    printf("%-12s %5.2f :", str, tock(cnt>>10));
-    check_gaussian(end-vec, vec);
-    print_gaussian(std::min(end-vec, 8L), vec);
-    free_real(vec);
 }
+
 
 
 int main(int argc, char* argv[])
@@ -234,22 +240,22 @@ int main(int argc, char* argv[])
     printf("sfmt.refill  %5.2f\n", tock(cnt>>10));
     //print(vec, end);
     
-    run<makeGaussians_std>(sfmt, "Gauss.STD", cnt);
-    run<makeGaussians_>(sfmt, "Gauss", cnt);
+    run(sfmt, cnt, "Gauss.STD", makeGaussians_std);
+    run(sfmt, cnt, "Gauss", makeGaussians_);
 #if USE_SIMD
-    run<makeGaussians_SIMD>(sfmt, "Gauss.SIMD", cnt);
-    run<makeGaussiansBM_SIMD>(sfmt, "GauBM.SIMD", cnt);
+    run(sfmt, cnt, "Gauss.SIMD", makeGaussians_SIMD);
+    run(sfmt, cnt, "GauBM.SIMD", makeGaussiansBM_SIMD);
 #endif
 
 #if defined(__AVX__)
-    run<makeGaussiansBM_AVX>(sfmt, "GauBM.AVX", cnt);
-    run<makeGaussians_AVX>(sfmt, "Gauss.AVX", cnt);
-    run<makeGaussians_AVX2>(sfmt, "Gauss.AVX2", cnt);
+    run(sfmt, cnt, "GauBM.AVX", makeGaussiansBM_AVX);
+    run(sfmt, cnt, "Gauss.AVX", makeGaussians_AVX);
+    run(sfmt, cnt, "Gauss.AVX2", makeGaussians_AVX2);
 #endif
     
-    run<makeExponentials_>(sfmt, "Exponential", cnt);
+    run(sfmt, cnt, "Exponential", makeExponentials_);
 #if USE_SIMD
-    run<makeExponentials_SIMD>(sfmt, "Expon.SIMD", cnt);
+    run(sfmt, cnt, "Expon.SIMD", makeExponentials_SIMD);
 #endif
 }
 
