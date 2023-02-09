@@ -196,7 +196,7 @@ public:
     /// if true, the quantities in the lattice can cut the fiber
     int mesh_cut_fiber;
 
-    /// flux speed of substance on Lattice (speed<0 is MINUS_END directed)
+    /// flux speed of substance on Lattice (speed<0 is minus end directed)
     real mesh_flux_speed;
     
     /// loading rate of substance from Field to Lattice

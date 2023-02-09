@@ -30,8 +30,8 @@ public:
     /// dynamic state of newly created Fiber ends
     /**
       This defines the dynamic state of the new ends that are created by a cut:
-      - new_end_state[0] is for the new PLUS_END,
-      - new_end_state[1] is for the new MINUS_END
+      - new_end_state[0] is for the new plus end,
+      - new_end_state[1] is for the new minus end
       .
      */
     state_t new_end_state[2];

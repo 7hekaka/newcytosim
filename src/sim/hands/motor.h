@@ -12,7 +12,7 @@
  
  A bound Motor can move along its fiber.
  The direction of the motor is set by the sign of @ref MotorPar "unloaded_speed".
- If the speed is positive, the motor attempts to move towards the PLUS_END.
+ If the speed is positive, the motor attempts to move towards the plus end.
  
  The speed is linearly proportional to the load of the motor.
  The load is the projection of the force vector on the direction of the fiber.

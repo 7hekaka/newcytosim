@@ -174,7 +174,7 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
             {
                 // close from minus end
                 if ( sit.abscissaFromP() > prop->bind_end_range )
-                    end = MINUS_END;    // too far from PLUS_END
+                    end = MINUS_END;    // too far from plus end
                 else
                     end = RNG.choice(MINUS_END, PLUS_END);
             }

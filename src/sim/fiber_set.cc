@@ -652,7 +652,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
 
 /**
  Set a list of Locations on fibers, on sections that were recently assembled at
- the PLUS_END. This relies on Fiber::freshAssemblyP() returning the length of
+ the plus end. This relies on Fiber::freshAssemblyP() returning the length of
  polymer made in the last time step.
  The number of locations returned will be proportional to the total length of
  new polymer recently made, and thus proportional to simul:timestep.
@@ -661,7 +661,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
  in a random order. However, the sites on one fiber will be listed in the order
  of increasing abscissa.
 
- This is for the PLUS_END
+ This is for the plus end
  */
 void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
 {
@@ -686,7 +686,7 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
 
 /**
  Set a list of Locations on fibers, on sections that were recently assembled at
- the MINUS_END. This relies on Fiber::freshAssemblyM() returning the length of
+ the minus end. This relies on Fiber::freshAssemblyM() returning the length of
  polymer made in the last time step.
  The number of locations returned will be proportional to the total length of
  new polymer recently made, and thus proportional to simul:timestep.
@@ -695,7 +695,7 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
  in a random order. However, the sites on one fiber will be listed in the order
  of increasing abscissa.
 
- This is for the MINUS_END
+ This is for the minus end
  */
 void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real spread) const
 {

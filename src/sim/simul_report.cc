@@ -261,7 +261,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
  `fiber:age`             | Average age of fibers
  `fiber:length`          | Average length and variance of lengths of fibers
  `fiber:distribution`    | length distribution of fiber lengths (option: `max` and `interval`)
- `fiber:dynamic`         | Number of fiber classified by PLUS_END Dynamic state
+ `fiber:dynamic`         | Number of fiber classified by Dynamic state of plus end
  `fiber:point`           | coordinates of vertices of all fibers
  `fiber:displacement`    | mean squared displacement of fibers since the last call
  `fiber:moments`         | standard deviation of vertices of all fibers
@@ -1111,7 +1111,7 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
 
 
 /**
- Export Mean Squared Displacement of fiber's MINUS_ENDs since the last call
+ Export Mean Squared Displacement of fiber's minus ends since the last call
  to this function.
  \todo: it would be simpler to add a 'Vector oldPos;' directly in class Fiber.
  */

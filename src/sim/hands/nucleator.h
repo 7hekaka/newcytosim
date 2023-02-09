@@ -19,7 +19,7 @@
  can be set to define the direction of the new fiber with respect to the
  preexisting fiber (the one that is bound by the other Hand of the Couple).
  
- By default the nucleator stays attached at the MINUS_END
+ By default the nucleator stays attached at the minus end
  of the fiber that it has created.
  This can be changed by setting: @ref NucleatorPar "hold_end"
 

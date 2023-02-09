@@ -75,7 +75,7 @@ real FiberProp::newFiberLength(Glossary& opt) const
  
  When creating a new Fiber, you may specify:
  - the initial length,
- - the initial state of the PLUS_END and MINUS_END,
+ - the initial state of the plus and minus ends,
  - if the position refers to the center or to the tip of the fiber
  - the shape, using a set of points
  .

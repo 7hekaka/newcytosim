@@ -367,7 +367,7 @@ void Fiber::cutM(real len)
 
 
 /**
- A portion of size `len` that includes the PLUS_END is removed.
+ A portion of size `len` that includes the plus end is removed.
  The Hands bound within the deleted portion are detached.
  */
 void Fiber::cutP(real len)

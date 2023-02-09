@@ -1078,7 +1078,7 @@ void Chain::growM(const real delta)
 }
 
 /**
- This extends the fiber by adding one segment at the MINUS_END.
+ This extends the fiber by adding one segment at the minus end.
  Thus `segmentation()` is not changed, and the existing points are not displaced.
  */
 void Chain::addSegmentM()
@@ -1099,7 +1099,7 @@ void Chain::addSegmentM()
 
 
 /**
- A portion of size `delta` is removed at the MINUS_END, and vertices are recalculated.
+ A portion of size `delta` is removed at the minus end, and vertices are recalculated.
  The Fiber length is reduced by `delta` ( which must be >= 0 ).
  
  Note: after cutM(), the distance between adjacent vertices is not exactly
@@ -1871,7 +1871,7 @@ real Chain::someAbscissa(real dis, FiberEnd ref, int mod, real alpha) const
  - and a NO_END section in between
  .
  Note that a Fiber shorter than `2*lambda` does not have a central region,
- and is composed of plus end and MINUS_END parts of equal size.
+ and is composed of plus end and minus end parts of equal size.
  */    
 FiberEnd Chain::whichEndDomain(const real ab, const real lambda) const
 {
@@ -1932,14 +1932,14 @@ Interpolation Chain::interpolateCenter() const
 
 
 /**
- return Interpolation corresponding to a distance `abs` from the MINUS_END
+ return Interpolation corresponding to a distance `abs` from the minus end
  The interpolation describes a position:
        X = P(i) * (1-a) + P(i+1) * a
  where
  - `i` is an integer: 0 <= i < lastPoint(),
  - `a` is a positive real coefficient: 0 <= a <= 1
  .
- When `abs` is above the PLUS_END, an interpolation of the last point is returned.
+ When `abs` is above the plus end, an interpolation of the last point is returned.
  
  */
 Interpolation Chain::interpolateM(const real ab) const
