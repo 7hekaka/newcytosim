@@ -320,9 +320,11 @@ void PointDisp::createPixelmaps(float uv)
 #endif
 
 
+/// arguments are ps = pixel_size; uv = unit_value
 void PointDisp::setPixels(float ps, float uv, bool make_maps)
 {
     float sw = size + width;
+    // object is 'perceptible' if it covers more than half a pixel:
     perceptible = visible && ( uv*sw > 0.5 );
     
     sizeR = size * uv * ps * 0.5f;

@@ -1812,7 +1812,7 @@ void Display::drawSolid(Solid const& obj)
     const PointDisp * disp = obj.prop->disp;
     
     //display points:
-    if (( disp->style & 4 ) && disp->perceptible )
+    if (( disp->style & 2 ) && disp->perceptible )
     {
         real rad = pixscale(disp->size);
         bodyColor(obj);
@@ -1820,24 +1820,34 @@ void Display::drawSolid(Solid const& obj)
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), rad, gle::hedron(obj.radius(i)>0));
         gym::cleanup(1);
-
+    }
+    
 #if NEW_SOLID_HAS_TWIN
+    // display links between twin solids
+    if (( disp->style & 6 ) && disp->perceptible )
+    {
         // draw links between 'obj' and its Twin
-        rad /= 2;
+        real rad = M_SQRT2 * pixscale(disp->size);
         const size_t inx = 0;
         Solid const* twi = obj.twin();
+        // check that three points are there:
         if ( twi && obj.radius(inx) > 0 && obj.nbPoints() > inx + 3 )
         {
-            gym::color(bodyColorF(obj));
+            bodyColor(obj);
+            gym::enableLighting();
             for ( size_t i = inx+1; i <= inx+DIM; ++i )
             {
-                gym::stretchAlignZ(obj.posPoint(i), twi->posPoint(i), rad);
+                Vector A = obj.posPoint(i);
+                Vector B = twi->posPoint(i);
+                drawObject(A, rad, gle::octahedron);
+                drawObject(B, rad, gle::octahedron);
+                gym::stretchAlignZ(A, B, rad);
                 gle::tube2();
             }
         }
-#endif
     }
-    
+#endif
+
     //display outline of spheres in 2D
     if ( disp->style & 8 )
     {
@@ -1936,6 +1946,8 @@ void Display::drawSolids(SolidSet const& set)
             drawSolid(*obj);
             if ( disp->style & 1 )
             {
+                size_t sup = obj->nbPoints();
+                if ( disp->style & 4 ) sup = 1;
 #if ( DIM >= 3 )
 #if NEW_SOLID_HAS_TWIN
                 const size_t inx = 0;
@@ -1953,14 +1965,14 @@ void Display::drawSolids(SolidSet const& set)
 #endif
                 if ( obj->prop->disp->color.transparent() )
                 {
-                    for ( size_t i = 0; i < obj->nbPoints(); ++i )
+                    for ( size_t i = 0; i < sup; ++i )
                         if ( obj->radius(i) > 0 )
                             zObjects.push_back(zObject(obj, i));
                 }
                 else
 #endif
                 {
-                    for ( size_t i = 0; i < obj->nbPoints(); ++i )
+                    for ( size_t i = 0; i < sup; ++i )
                         if ( obj->radius(i) > 0 )
                             drawSolidT(*obj, i);
                 }
@@ -2041,10 +2053,10 @@ void Display::drawBeads(BeadSet const& set)
 void Display::drawSphere(Sphere const& obj)
 {
     const PointDisp * disp = obj.prop->disp;
-    const float rad = pixscale(disp->size);
     
-    if ( rad > pixelSize )
+    if ( disp->perceptible )
     {
+        const float rad = pixscale(disp->size);
         // display surface points
         if ( disp->style & 2 )
         {

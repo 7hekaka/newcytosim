@@ -880,26 +880,23 @@ void Display3::drawSinglesF(SingleSet const& set) const
         if ( dis->perceptible )
         {
             const float rad = pixscale(dis->size);
-            if ( rad > pixelSize )
-            {
-                //drawHandF(obj->posFoot(), obj->disp());
-                gym::color_both(dis->color2.tweak(obj->signature()));
+            //drawHandF(obj->posFoot(), obj->disp());
+            gym::color_both(dis->color2.tweak(obj->signature()));
 #if ( 0 )
-                if ( dis->style == 2 )
+            if ( dis->style == 2 )
+            {
+                Space const* spc = obj->confineSpace();
+                if ( spc )
                 {
-                    Space const* spc = obj->confineSpace();
-                    if ( spc )
-                    {
-                        /// draw a disc tangent to the Space:
-                        Vector pos = obj->posFoot();
-                        Vector dir = spc->normalToEdge(pos);
-                        drawObject(pos, dir, rad, gle::disc);
-                        continue;
-                    }
+                    /// draw a disc tangent to the Space:
+                    Vector pos = obj->posFoot();
+                    Vector dir = spc->normalToEdge(pos);
+                    drawObject(pos, dir, rad, gle::disc);
+                    continue;
                 }
-#endif
-                drawObject(obj->posFoot(), pixscale(dis->size), gle::blob);
             }
+#endif
+            drawObject(obj->posFoot(), pixscale(dis->size), gle::blob);
         }
     }
 }
@@ -917,14 +914,15 @@ void Display3::drawSingleA(Single const* obj) const
 void Display3::drawSingleB(Single const* obj) const
 {
     const PointDisp * disp = obj->disp();
-    Vector ph = obj->posHand();
-    Vector pf = obj->posFoot();
-    if ( modulo ) modulo->fold(pf, ph);
-    const float wid = pixscale(disp->width);
-    const float rad = pixscale(disp->size);
 
-    if ( rad > pixelSize )
+    if ( disp->perceptible )
     {
+        Vector ph = obj->posHand();
+        Vector pf = obj->posFoot();
+        if ( modulo ) modulo->fold(pf, ph);
+        const float wid = pixscale(disp->width);
+        const float rad = pixscale(disp->size);
+
         gym::color_both(disp->color2);
 #if ( 0 )
         if ( obj->disp()->style == 2 && obj->confineSpace() )
