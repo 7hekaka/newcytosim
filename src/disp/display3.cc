@@ -904,7 +904,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
 
 void Display3::drawSingleA(Single const* obj) const
 {
-    const PointDisp * disp = obj->disp();
+    PointDisp const* disp = obj->disp();
     Vector ph = obj->posHand();
     gym::color_both(disp->color);
     drawHand(ph, disp);
@@ -913,7 +913,7 @@ void Display3::drawSingleA(Single const* obj) const
 
 void Display3::drawSingleB(Single const* obj) const
 {
-    const PointDisp * disp = obj->disp();
+    PointDisp const* disp = obj->disp();
 
     if ( disp->perceptible )
     {
@@ -1078,8 +1078,8 @@ void Display3::drawCouplesA(CoupleSet const& set) const
 
 void Display3::drawCoupleBplain(Couple const* cx) const
 {
-    const PointDisp * pd1 = cx->disp1();
-    const PointDisp * pd2 = cx->disp2();
+    PointDisp const* pd1 = cx->disp1();
+    PointDisp const* pd2 = cx->disp2();
     
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
@@ -1094,8 +1094,8 @@ void Display3::drawCoupleBplain(Couple const* cx) const
 
 void Display3::drawCoupleBside(Couple const* cx) const
 {
-    const PointDisp * pd1 = cx->disp1();
-    const PointDisp * pd2 = cx->disp2();
+    PointDisp const* pd1 = cx->disp1();
+    PointDisp const* pd2 = cx->disp2();
     
     Vector p1 = cx->posHand1();
     Vector pS = cx->sidePos1();
@@ -1153,8 +1153,8 @@ void Display3::drawCoupleBside(Couple const* cx) const
 
 void Display3::drawCoupleB(Couple const* cx) const
 {
-    const PointDisp * pd1 = cx->disp1();
-    const PointDisp * pd2 = cx->disp2();
+    PointDisp const* pd1 = cx->disp1();
+    PointDisp const* pd2 = cx->disp2();
     
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
@@ -1207,8 +1207,8 @@ void Display3::drawCoupleB(Couple const* cx) const
 
 void Display3::drawCoupleBalt(Couple const* cx) const
 {
-    const PointDisp * pd1 = cx->disp1();
-    const PointDisp * pd2 = cx->disp2();
+    PointDisp const* pd1 = cx->disp1();
+    PointDisp const* pd2 = cx->disp2();
     
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();

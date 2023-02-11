@@ -632,7 +632,7 @@ void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
  */
 void Display::drawSpace3D(Space const* obj, bool back)
 {
-    const PointDisp * disp = obj->prop->disp;
+    PointDisp const* disp = obj->prop->disp;
     bool front = back ^ ( disp->color.transparent() );
     
     back = ( disp->visible & 2 ) && back;
@@ -675,7 +675,7 @@ void Display::drawSpaces(SpaceSet const& set)
     
     for ( Space * obj = set.first(); obj; obj=obj->next() )
     {
-        const PointDisp * disp = obj->prop->disp;
+        PointDisp const* disp = obj->prop->disp;
         if ( disp->visible )
         {
             gym::disableLighting();
@@ -1809,7 +1809,7 @@ void Display::drawCouplesB(CoupleSet const& set) const
 
 void Display::drawSolid(Solid const& obj)
 {
-    const PointDisp * disp = obj.prop->disp;
+    PointDisp const* disp = obj.prop->disp;
     
     //display points:
     if (( disp->style & 2 ) && disp->perceptible )
@@ -1940,8 +1940,8 @@ void Display::drawSolids(SolidSet const& set)
 {
     for ( Solid * obj = set.first(); obj; obj=obj->next() )
     {
-        const PointDisp * disp = obj->prop->disp;
-        if ( disp->visible )
+        PointDisp const* disp = obj->prop->disp;
+        if ( disp->visible && disp->style )
         {
             drawSolid(*obj);
             if ( disp->style & 1 )
@@ -1963,7 +1963,7 @@ void Display::drawSolids(SolidSet const& set)
                     drawFootball(*twi, inx, tcol, black, false);
                 }
 #endif
-                if ( obj->prop->disp->color.transparent() )
+                if ( disp->color.transparent() )
                 {
                     for ( size_t i = 0; i < sup; ++i )
                         if ( obj->radius(i) > 0 )
@@ -1987,7 +1987,7 @@ void Display::drawSolids(SolidSet const& set)
 
 void Display::drawBead(Bead const& obj)
 {
-    const PointDisp * disp = obj.prop->disp;
+    PointDisp const* disp = obj.prop->disp;
 
     // display center:
     if ( disp->style & 2 )
@@ -2014,9 +2014,9 @@ void Display::drawBead(Bead const& obj)
  */
 void Display::drawBeadT(Bead const& obj) const
 {
-    const PointDisp * disp = obj.prop->disp;
+    PointDisp const* disp = obj.prop->disp;
     
-    if ( disp->style & 1 )
+    assert_true( disp->style & 1 );
     {
         gym_color col = bodyColorF(obj);
 #if ( DIM > 2 )
@@ -2033,15 +2033,19 @@ void Display::drawBeads(BeadSet const& set)
     gym::enableLighting();
     for ( Bead * obj = set.first(); obj; obj=obj->next() )
     {
-        if ( obj->prop->disp->visible )
+        PointDisp const* disp = obj->prop->disp;
+        if ( disp->visible && disp->style )
         {
             drawBead(*obj);
+            if ( disp->style & 1 )
+            {
 #if ( DIM >= 3 )
-            if ( obj->prop->disp->color.transparent() )
-                zObjects.push_back(zObject(obj));
-            else
+                if ( disp->color.transparent() )
+                    zObjects.push_back(zObject(obj));
+                else
 #endif
-                drawBeadT(*obj);
+                    drawBeadT(*obj);
+            }
         }
     }
 }
@@ -2052,7 +2056,7 @@ void Display::drawBeads(BeadSet const& set)
 
 void Display::drawSphere(Sphere const& obj)
 {
-    const PointDisp * disp = obj.prop->disp;
+    PointDisp const* disp = obj.prop->disp;
     
     if ( disp->perceptible )
     {
@@ -2079,7 +2083,7 @@ void Display::drawSphere(Sphere const& obj)
 
 void Display::drawSphereT(Sphere const& obj) const
 {
-    const PointDisp * disp = obj.prop->disp;
+    PointDisp const* disp = obj.prop->disp;
 
     if ( disp->style & 7 )
     {
@@ -2117,12 +2121,13 @@ void Display::drawSpheres(SphereSet const& set)
 {
     for ( Sphere * obj=set.first(); obj ; obj=obj->next() )
     {
-        if ( obj->prop->disp->visible )
+        PointDisp const* disp = obj->prop->disp;
+        if ( disp->visible && disp->style )
         {
-            if ( obj->prop->disp->perceptible )
+            if ( disp->perceptible )
                 drawSphere(*obj);
 #if ( DIM >= 3 )
-            if ( obj->prop->disp->color.transparent() )
+            if ( disp->color.transparent() )
                 zObjects.push_back(zObject(obj));
             else
 #endif

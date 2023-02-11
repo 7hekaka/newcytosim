@@ -181,7 +181,7 @@ namespace {
     template < typename T >
     gym_color bodyColorF(T const& obj)
     {
-        const PointDisp * disp = obj.prop->disp;
+        PointDisp const* disp = obj.prop->disp;
         if ( disp->coloring )
         {
             size_t i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
@@ -210,7 +210,7 @@ namespace {
     template < typename T >
     void bodyColor(T const& obj)
     {
-        const PointDisp * disp = obj.prop->disp;
+        PointDisp const* disp = obj.prop->disp;
         if ( disp->coloring )
         {
             size_t i = ( disp->coloring == 2 ? obj.mark() : obj.signature());

@@ -104,7 +104,7 @@ void Display2::drawSinglesA(const SingleSet & set) const
     // display the Hands
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
-        const PointDisp * disp = obj->disp();
+        PointDisp const* disp = obj->disp();
         if ( disp->perceptible  &&  obj->fiber()->disp->visible )
         {
             Vector ph = obj->posHand();
@@ -227,8 +227,8 @@ void Display2::drawCouplesA(CoupleSet const& set) const
 void Display2::drawCoupleB(Couple const* cx) const
 {
     gym_color air(0,0,0,0);
-    const PointDisp * pd1 = cx->disp1();
-    const PointDisp * pd2 = cx->disp2();
+    PointDisp const* pd1 = cx->disp1();
+    PointDisp const* pd2 = cx->disp2();
     
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
