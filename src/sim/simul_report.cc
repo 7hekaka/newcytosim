@@ -1490,12 +1490,12 @@ void Simul::reportFiberHands(std::ostream& out) const
         {
             out << COM << "on fiber " << fib->reference();
             fib->sortHands();
-            for ( Hand * ha = fib->firstHand(); ha; ha = ha->next() )
+            for ( Hand const* h = fib->firstHand(); h; h = h->next() )
             {
                 out << LIN << fib->prop->number();
                 out << SEP << fib->identity();
-                out << SEP << ha->prop->number();
-                out << SEP << ha->abscissa();
+                out << SEP << h->property()->number();
+                out << SEP << h->abscissa();
             }
         }
     }
@@ -1511,16 +1511,16 @@ void Simul::reportFiberLinks(std::ostream& out) const
         {
             out << COM << "on fiber " << fib->reference();
             fib->sortHands();
-            for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
+            for ( Hand const* h = fib->firstHand(); h; h = h->next() )
             {
-                if ( ha->linkStiffness() > 0 )
+                if ( h->linkStiffness() > 0 )
                 {
                     out << LIN << fib->prop->number();
                     out << SEP << fib->identity();
-                    out << SEP << ha->prop->number();
-                    out << SEP << ha->abscissa();
-                    out << SEP << ha->linkFoot();
-                    out << SEP << ha->linkStiffness();
+                    out << SEP << h->property()->number();
+                    out << SEP << h->abscissa();
+                    out << SEP << h->linkFoot();
+                    out << SEP << h->linkStiffness();
                 }
             }
         }
@@ -1636,13 +1636,13 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
     {
         map.clear();
         // check all connecting Hands and record abscissa, depending on the fiber that is linked
-        for ( Hand const* ha = fib->firstHand(); ha; ha = ha->next() )
+        for ( Hand const* h = fib->firstHand(); h; h = h->next() )
         {
-            Hand const* oh = ha->monitor()->otherHand(ha);
-            if ( oh && oh->attached() )
+            Hand const* g = h->monitor()->otherHand(h);
+            if ( g && g->attached() )
             {
-                ObjectID f2 = oh->fiber()->identity();
-                map[f2].push_back(Connector(ha->abscissa(), ha->prop->number()));
+                ObjectID f2 = g->fiber()->identity();
+                map[f2].push_back(Connector(h->abscissa(), h->property()->number()));
             }
         }
         if ( map.size() )
@@ -1728,16 +1728,16 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
     {
         map.clear();
         // check all connecting Hands and record abscissa, depending on the fiber that is linked
-        for ( Hand * ha = fib->firstHand(); ha; ha = ha->next() )
+        for ( Hand const* h = fib->firstHand(); h; h = h->next() )
         {
-            Hand const* oh = ha->monitor()->otherHand(ha);
-            if ( oh && oh->attached() )
+            Hand const* g = h->monitor()->otherHand(h);
+            if ( g && g->attached() )
             {
-                ObjectID f2 = oh->fiber()->identity();
-                if ( ha->prop == hp1 )
-                    map[f2].push_back(Connector(ha->abscissa(), 1));
-                else if ( ha->prop == hp2 )
-                    map[f2].push_back(Connector(ha->abscissa(), 2));
+                ObjectID f2 = g->fiber()->identity();
+                if ( h->property() == hp1 )
+                    map[f2].push_back(Connector(h->abscissa(), 1));
+                else if ( h->property() == hp2 )
+                    map[f2].push_back(Connector(h->abscissa(), 2));
                 else
                     out << COM << "report network:bridge can only handle 2 hand types";
             }

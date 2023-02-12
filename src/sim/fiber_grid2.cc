@@ -64,8 +64,8 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     //std::random_shuffle(allSegments.begin(), allSegments.end());
 
     // test all segments:
-    const uint64_t prob = 0x1p+32 * ha.prop->binding_prob;
-    const real sup = square(ha.prop->binding_range);
+    const uint64_t prob = 0x1p+32 * ha.property()->binding_prob;
+    const real sup = square(ha.property()->binding_range);
     for ( FiberSegment const& seg : allSegments )
     {
         if ( RNG.pint32() < prob )

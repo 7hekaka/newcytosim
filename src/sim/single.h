@@ -194,7 +194,7 @@ public:
     Property const* property() const { return prop; }
     
     /// return PointDisp of associated Hand
-    PointDisp const* disp() const { return sHand->prop->disp; }
+    PointDisp const* disp() const { return sHand->property()->disp; }
 
     /// return Property::confine_pointer
     Space const* confineSpace() const { return prop->confine_pointer; }

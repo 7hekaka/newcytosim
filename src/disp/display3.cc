@@ -1038,7 +1038,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
     for ( Couple * cx=set.firstAF(); cx ; cx=cx->next() )
     {
         Hand const* h = cx->hand1();
-        PointDisp const* disp = h->prop->disp;
+        PointDisp const* disp = h->property()->disp;
 
         if ( h->fiber()->disp->visible && disp->perceptible )
         {
@@ -1058,7 +1058,7 @@ void Display3::drawCouplesA(CoupleSet const& set) const
     for ( Couple * cx=set.firstFA(); cx ; cx=cx->next() )
     {
         Hand const* h = cx->hand2();
-        PointDisp const* disp = h->prop->disp;
+        PointDisp const* disp = h->property()->disp;
 
         if ( cx->fiber2()->disp->visible && cx->disp2()->perceptible )
         {

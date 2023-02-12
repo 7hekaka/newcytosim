@@ -597,7 +597,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserve& can)
             {
                 // Only attach if position is near the edge of the Space:
                 Vector prj = s->confineSpace()->project(pos);
-                if ( distanceSqr(pos, prj) >= square(h->prop->binding_range) )
+                if ( distanceSqr(pos, prj) >= square(h->property()->binding_range) )
                     continue;
                 // Single will be placed on the edge of the Space:
                 pos = prj;
@@ -613,7 +613,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserve& can)
                  This is important for certain Single such as Picket and PicketLong,
                  since they act as link between the anchoring position and the Hand.
                  */
-                pos += i.dirFiber().randOrthoB(h->prop->binding_range);
+                pos += i.dirFiber().randOrthoB(h->property()->binding_range);
 #endif
             }
 

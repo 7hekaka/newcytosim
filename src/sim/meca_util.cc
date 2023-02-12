@@ -760,16 +760,16 @@ void markConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecs)
         i = mec->flag();
 
         Fiber const* fib = Fiber::toFiber(mec);
-        for ( Hand * h = fib->firstHand(); h; h = h->next() )
+        for ( Hand const* h = fib->firstHand(); h; h = h->next() )
         {
             HandMonitor const* m = h->monitor();
-            Hand const* oh = m->otherHand(h);
-            if ( oh > h  &&  oh->attached() )
+            Hand const* g = m->otherHand(h);
+            if ( g > h  &&  g->attached() )
             {
-                ObjectFlag j = oh->fiber()->flag();
+                ObjectFlag j = g->fiber()->flag();
                 bmap.set(i, j, 1);
             }
-            else if ( oh )
+            else if ( g )
             {
                 
             }

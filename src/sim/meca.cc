@@ -344,13 +344,13 @@ void Meca::setSomeInteractions()
         mec->setInteractions(*this);
         
         Fiber const* fib = Fiber::toFiber(mec);
-        for ( Hand * h = fib->firstHand(); h; h = h->next() )
+        for ( Hand const* h = fib->firstHand(); h; h = h->next() )
         {
             HandMonitor const* m = h->monitor();
-            Hand const* oh = m->otherHand(h);
-            if ( oh > h  &&  oh->attached() )
+            Hand const* g = m->otherHand(h);
+            if ( g > h  &&  g->attached() )
                 static_cast<Couple const*>(m)->setInteractions(*this);
-            else if ( !oh )
+            else if ( !g )
                 static_cast<Single const*>(m)->setInteractions(*this);
         }
     }

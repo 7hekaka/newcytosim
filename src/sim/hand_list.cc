@@ -138,9 +138,9 @@ size_t HandList::countLinks(Fiber const* fib) const
     for ( Hand const* h = haFront; h; h = h->next() )
     {
         HandMonitor const* m = h->monitor();
-        Hand const* oh = m->otherHand(h);
-        if ( oh )
-            res += ( oh->fiber() == fib );
+        Hand const* g = m->otherHand(h);
+        if ( g )
+            res += ( g->fiber() == fib );
     }
     //printf("countLinks(%p) = %u\n", fib, res);
     return res;

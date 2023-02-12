@@ -60,13 +60,13 @@ void Couple::changeProperty(CoupleProp * p)
     assert_true( !cHand1->attached() && !cHand2->attached() );
     prop = p;
     
-    if ( cHand1 && cHand1->prop != prop->hand1_prop )
+    if ( cHand1 && cHand1->property() != prop->hand1_prop )
     {
         delete(cHand1);
         cHand1 = prop->hand1_prop->newHand(this);
     }
     
-    if ( cHand2 && cHand2->prop != prop->hand2_prop )
+    if ( cHand2 && cHand2->property() != prop->hand2_prop )
     {
         delete(cHand2);
         cHand2 = prop->hand2_prop->newHand(this);

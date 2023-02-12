@@ -273,10 +273,10 @@ public:
     void read(Inputter&, Simul&, ObjectTag);
     
     /// return PointDisp of Hand1
-    PointDisp const* disp1() const { return cHand1->prop->disp; }
+    PointDisp const* disp1() const { return cHand1->disp(); }
     
     /// return PointDisp of Hand2
-    PointDisp const* disp2() const { return cHand2->prop->disp; }
+    PointDisp const* disp2() const { return cHand2->disp(); }
     
     /// return PointDisp of Hand1
     PointDisp const* disp12() const;

@@ -55,6 +55,9 @@ private:
     Hand * hPrev;
 
 protected:
+    
+    /// Property is constant
+    HandProp const* prop;
 
     /// the monitor associated with this Hand
     HandMonitor * hMonitor;
@@ -66,13 +69,13 @@ protected:
     float nextAct;
 
 public:
-    
-    /// Property is constant, so we do not need to make it private
-    HandProp const* prop;
 
-    /// Property
+    /// unmodifiable Property
     HandProp const* property() const { return prop; }
     
+    /// return unmodifiable PointDisp of HandProp
+    PointDisp const* disp() const { return prop->disp; }
+
     /// constructor
     /**
      Hand are created in Single and Couple using HandProp::newHand().
