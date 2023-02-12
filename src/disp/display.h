@@ -297,7 +297,7 @@ public:
     virtual void drawCoupleB(Couple const*) const { }
 
     /// draw the bridging Couples
-    virtual void drawCouplesB(CoupleSet const&) const;
+    void drawCouplesB(CoupleSet const&) const;
 
     /// draw Organizer
     virtual void drawOrganizer(Organizer const&) const;

@@ -57,7 +57,7 @@ public:
     void drawCouplesA(CoupleSet const&) const;
     
     /// draw bridging Couples
-    void drawCouplesB(CoupleSet const&) const;
+    void drawCouplesB1(CoupleSet const&) const;
     
     /// draw bridging Couples (simplified version)
     void drawCouplesB0(CoupleSet const&) const;

@@ -1794,13 +1794,14 @@ void Display::drawCouplesB(CoupleSet const& set) const
             continue;
         
         // do not display Couple if the associated Fibers are both hidden
-        bool vis1 = cx->fiber1()->disp->visible | cx->fiber2()->disp->visible;
+        if ( !cx->fiber1()->disp->visible && !cx->fiber2()->disp->visible )
+            continue;
         
         // do not display Couple if both hands are hidden
-        bool vis2 = cx->disp1()->visible | cx->disp2()->visible;
+        if ( !cx->disp1()->visible && !cx->disp2()->visible )
+            continue;
         
-        if ( vis1 & vis2 )
-            drawCoupleB(cx);
+        drawCoupleB(cx);
     }
 }
 

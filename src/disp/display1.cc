@@ -73,7 +73,7 @@ void Display1::drawObjects(Simul const& sim)
         drawCouplesA(sim.couples);
 
     if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
-        drawCouplesB(sim.couples);
+        drawCouplesB1(sim.couples);
     
     if (( prop->single_select & 2 ) && ( sim.singles.sizeA() > 0 ))
         drawSinglesA(sim.singles);
@@ -319,7 +319,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
 }
 
 
-void Display1::drawCouplesB(CoupleSet const& set) const
+void Display1::drawCouplesB1(CoupleSet const& set) const
 {
     gym::ref_view();
     gym_color air(0,0,0,0);

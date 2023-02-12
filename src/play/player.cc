@@ -180,7 +180,7 @@ void Player::extendLive()
     if ( worker.holding() == 2 )
         worker.stop();
     if ( 0 == worker.prolong() )
-        flashText("Prolong simulation...");
+        flashText("Extending simulation...");
     goLive = 1;
 }
 
