@@ -347,7 +347,7 @@ void Meca::setSomeInteractions()
         for ( Hand const* h = fib->firstHand(); h; h = h->next() )
         {
             HandMonitor const* m = h->monitor();
-            Hand const* g = m->otherHand(h);
+            Hand const* g = h->otherHand();
             if ( g > h  &&  g->attached() )
                 static_cast<Couple const*>(m)->setInteractions(*this);
             else if ( !g )

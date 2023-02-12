@@ -126,6 +126,9 @@ public:
     /// return Monitor
     HandMonitor const* monitor() const { return hMonitor; }
     
+    /// the other hand, if this is part of a Couple, or nullptr
+    Hand const* otherHand() const;
+
     
     /// tell if attachment at given site is permitted
     virtual bool attachmentAllowed(FiberSite&) const;

@@ -27,7 +27,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     ObjectMark mk = 0;
     // determine direction of nucleation:
     Vector dir;
-    Hand const* h = hMonitor->otherHand(this);
+    Hand const* h = otherHand();
     if ( h && h->attached() )
     {
         // nucleating on the side of a 'mother' fiber:

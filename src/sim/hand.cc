@@ -33,6 +33,12 @@ Hand::~Hand()
 }
 
 
+Hand const* Hand::otherHand() const
+{
+    return hMonitor->otherHand(this);
+}
+
+
 Vector Hand::linkFoot() const
 {
     return hMonitor->linkFoot(this);
@@ -226,7 +232,7 @@ void Hand::attach(FiberSite const& s)
     //std::clog << "offset " << s.abscissa() -  hLattice->unit() * hSite << "\n";
 #endif
 #if 0
-    Hand const* h = hMonitor->otherHand(this);
+    Hand const* h = otherHand();
     if ( h && h->attached() )
     {
         real x = dot( h->pos() - s.pos(), s.dirFiber());
