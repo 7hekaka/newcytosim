@@ -272,6 +272,7 @@ Vector Fiber::displayPosM(real ab) const
 
 Fiber::~Fiber()
 {
+    //std::clog << reference() << " deleted\n";
     fHands.detachAll();
     
 #if FIBER_HAS_MESH
@@ -1948,3 +1949,20 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 }
 
 
+/**  Performs some basic validity check.
+ If these fails, it could mean that the pointer *this is invalid.
+ */
+int Fiber::bad() const
+{
+    if ( targetSegmentation() < 1e-6 )
+        return 1;
+    if ( segmentation() < 1e-6 )
+        return 2;
+    if ( abscissaM() > abscissaP() )
+        return 4;
+    if ( ! valid() )
+        return 8;
+    if ( ! objset() )
+        return 16;
+    return 0;
+}

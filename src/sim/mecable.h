@@ -206,7 +206,8 @@ public:
     /** returns P if A=0; returns P+1 if A=1, and returns middle of segment if A = 0.5*/
     Vector midPoint(const size_t P, const real A) const
     {
-        assert_true( P+1 < nPoints );
+        assert_true( P < nPoints );
+        assert_true( A == 0 || P+1 < nPoints );
         //assert_true( 0 <= A && A <= 1 );
         return Vector::interpolated(pPos+DIM*P, A, pPos+DIM*P+DIM);
     }

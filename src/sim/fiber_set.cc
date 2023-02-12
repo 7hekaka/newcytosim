@@ -295,7 +295,10 @@ void FiberSet::step()
         static_cast<FiberProp*>(i)->used_polymer = 0;
 
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
+    {
+        assert_false(fib->bad());
         fib->prop->used_polymer += fib->length();
+    }
     
     // calculate the ratio of free polymer for each class of Fiber:
     for ( Property * i : plist )
@@ -737,6 +740,7 @@ void FiberSet::updateFibers()
     while ( i )
     {
         Fiber * o = static_cast<Fiber*>(i);
+        assert_false(o->bad());
         i = i->next();
         o->updateHands();
         o->resetLattice();

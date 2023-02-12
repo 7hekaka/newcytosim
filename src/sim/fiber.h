@@ -489,6 +489,9 @@ public:
     
     /// read from file
     void read(Inputter&, Simul&, ObjectTag);
+    
+    /// check data integrity
+    int bad() const;
 
 };
 

@@ -653,6 +653,8 @@ int CoupleSet::bad() const
     {
         if ( !obj->attached1() || obj->attached2() )
             code |= 16;
+        if ( simul_.fibers.badIdentity(obj->fiber1()) )
+            code |= 512;
         if ( obj->hand1()->bad() )
             code |= 128;
     }
@@ -661,6 +663,8 @@ int CoupleSet::bad() const
     {
         if ( obj->attached1() || !obj->attached2() )
             code |= 32;
+        if ( simul_.fibers.badIdentity(obj->fiber2()) )
+            code |= 512;
         if ( obj->hand2()->bad() )
             code |= 128;
     }
@@ -669,6 +673,10 @@ int CoupleSet::bad() const
     {
         if ( !obj->attached1() || !obj->attached2() )
             code |= 64;
+        if ( simul_.fibers.badIdentity(obj->fiber1()) )
+            code |= 512;
+        if ( simul_.fibers.badIdentity(obj->fiber2()) )
+            code |= 512;
         if ( obj->hand1()->bad() )
             code |= 256;
         if ( obj->hand2()->bad() )
