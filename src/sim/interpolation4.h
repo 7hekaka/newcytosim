@@ -84,7 +84,7 @@ public:
     void addOffsetLink(Meca&, real len, Mecapoint const&, real weight) const;
 
     /// check validity
-    int  bad() const;
+    int  invalid() const;
     
     /// output
     void write(Outputter& out) const;

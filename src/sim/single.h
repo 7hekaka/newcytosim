@@ -205,6 +205,8 @@ public:
     /// write to file
     void write(Outputter&) const;
     
+    /// check validity
+    virtual int invalid() const { return !sPos.valid(); }
 };
 
 

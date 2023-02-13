@@ -554,6 +554,35 @@ void SingleSet::deleteWrists(Object const* arg)
 }
 
 
+void SingleSet::deleteInvalidWrists()
+{
+    Single *nxt, *obj;
+
+    obj = firstF();
+    while ( obj )
+    {
+        nxt = obj->next();
+        if ( obj->invalid() )
+        {
+            std::clog << "WARNING: invalid base for " << obj->reference() << "\n";
+            delete(obj);
+        }
+        obj = nxt;
+    }
+
+    obj = firstA();
+    while ( obj )
+    {
+        nxt = obj->next();
+        if ( obj->invalid() )
+        {
+            std::clog << "WARNING: invalid base for " << obj->reference() << "\n";
+            delete(obj);
+        }
+        obj = nxt;
+    }
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Fast Diffusion
 

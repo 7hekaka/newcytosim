@@ -58,7 +58,7 @@ std::ostream& operator << (std::ostream& os, Mecapoint const& arg)
 }
 
 
-int Mecapoint::bad() const
+int Mecapoint::invalid() const
 {
     if ( !mec_ )
         return 1;

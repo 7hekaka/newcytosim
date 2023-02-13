@@ -65,7 +65,7 @@ public:
     void print(std::ostream&) const;
 
     /// debug function
-    int bad() const;
+    int invalid() const;
 };
 
 /// output operator for debugging purpose

@@ -2209,7 +2209,7 @@ void Display::drawOrganizers(OrganizerSet const& set)
 /// display sub-part `inx` of object `obj`
 void zObject::draw(Display const* disp) const
 {
-    assert_false( point_.bad() );
+    assert_false( point_.invalid() );
     Mecable const * mec = point_.mecable();
     switch( mec->tag() )
     {

@@ -10,7 +10,7 @@
 
 Object::~Object()
 {
-    //std::clog << "~Object " << this << '\n';
+    //std::clog << "~Object " << this << "  " << reference() << '\n';
 
     if ( set_ )
     {

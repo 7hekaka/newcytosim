@@ -3800,8 +3800,8 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
                                const real weight)
 {
     assert_true( weight >= 0 );
-    assert_false( ptA.bad() );
-    assert_false( ptB.bad() );
+    assert_false( ptA.invalid() );
+    assert_false( ptB.invalid() );
     
     // indices:
     const size_t ii0 = ptA.matIndex1();

@@ -95,6 +95,8 @@ public:
     /// write to file
     void write(Outputter&) const;
     
+    /// check validity of base_
+    int invalid() const { return base_.invalid(); }
 };
 
 

@@ -146,7 +146,7 @@ public:
     void print(std::ostream&) const;
     
     /// check validity
-    int bad() const;
+    int invalid() const;
 
 };
 

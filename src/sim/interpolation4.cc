@@ -186,7 +186,7 @@ void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& 
 }
 
 
-int Interpolation4::bad() const
+int Interpolation4::invalid() const
 {
     if ( !mec_ )
         return 1;

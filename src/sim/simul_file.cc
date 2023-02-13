@@ -338,7 +338,10 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     Object * res = set->findID(id);
     
     if ( !res )
-        throw InvalidIO("unknown object `"+((char)tag+std::to_string(id))+"' referenced");
+    {
+        //throw InvalidIO("unknown object `"+((char)tag+std::to_string(id))+"' referenced");
+        std::clog << "unknown object `"+((char)tag+std::to_string(id))+"' referenced\n";
+    }
     
     return res;
 }
@@ -387,6 +390,7 @@ public:
         sim->spaces.defrost();
         sim->fields.defrost();
         sim->fibers.updateFibers();
+        sim->singles.deleteInvalidWrists();
         sim = nullptr;
     }
     
@@ -412,6 +416,7 @@ public:
         sim->spaces.thaw();
         sim->fields.thaw();
         sim->fibers.updateFibers();
+        sim->singles.deleteInvalidWrists();
         sim = nullptr;
     }
 

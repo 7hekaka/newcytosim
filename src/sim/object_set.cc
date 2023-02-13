@@ -452,11 +452,12 @@ void ObjectSet::defrost()
     Object * i = ice_.pop_front();
     while ( i )
     {
-        Object * o = i;
+        std::clog << "delete " << i->reference() << "\n";
+        //inventory_.unassign(i);
+        //i->objset(nullptr);
+        link(i);
+        delete(i);
         i = ice_.pop_front();
-        inventory_.unassign(o);
-        o->objset(nullptr);
-        delete(o);
     }
 }
 

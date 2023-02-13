@@ -47,7 +47,7 @@ std::ostream& operator << (std::ostream& os, Interpolation const& arg)
 }
 
 
-int Interpolation::bad() const
+int Interpolation::invalid() const
 {
     if ( !mec_ )
         return 1;

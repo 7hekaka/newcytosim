@@ -161,7 +161,7 @@ public:
     void removePoints(size_t inx, size_t nbp);
     
     /// Remove all points
-    void clearPoints()  { nPoints = 0; }
+    void clearPoints() { nPoints = 0; }
     
     /// Shift `nbp` points starting from index `inx`
     void shiftPoints(size_t inx, size_t nbp);

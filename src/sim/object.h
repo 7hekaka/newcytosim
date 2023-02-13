@@ -105,7 +105,7 @@ public:
     virtual ObjectTag tag() const { return NULL_TAG; }
     
     /// Property associated with the Object
-    virtual Property const* property() const = 0;
+    virtual Property const* property() const { return nullptr; };
     
     /// write Object data to file
     virtual void write(Outputter&) const = 0;
