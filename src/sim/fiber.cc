@@ -1219,10 +1219,35 @@ void Fiber::updateRange()
 /**
  Update all bound Hands, allowing them to detach if they are out of range
  */
-void Fiber::updateHands()
+void Fiber::updateHands() const
 {
-    real M = abscissaM();
-    real P = abscissaP();
+    const real M = abscissaM();
+    for ( Hand * h = fHands.front(); h; h = h->next() )
+    {
+        // this is equivalent to h->reinterpolate():
+        h->reinterpolate(interpolateM(h->abscissa() - M));
+    }
+}
+
+/**
+ Assuming that the length has changed, or that the abscissa of the ends have changed,
+ this updates the segmentation of the fiber if needed, the position of the Hands,
+ and the boundaries of the Lattice if present.
+ This will trigger other events, particularly if Hands become out of range as a
+ consequence of the change at the fiber's ends.
+ */
+void Fiber::updateFiber()
+{
+    needUpdate = false;
+#if ( 0 )
+    Cytosim::log << reference() << " update [ "  << std::setw(9) << std::left << abscissaM();
+    Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << '\n';
+#endif
+    
+    updateRange();
+    const real M = abscissaM();
+    const real P = abscissaP();
+    // Update all bound Hands, allowing them to detach if they are out of range
     Hand * h = fHands.front();
     while ( h )
     {
@@ -1234,23 +1259,6 @@ void Fiber::updateHands()
         h->checkFiberRange(M, P);
         h = x;
     }
-}
-
-/**
- Assuming that the length has changed, or that the abscissa of the ends have changed,
- this updates the segmentation of the fiber if needed, the position of the Hands,
- and the boundaries of the Lattice if present.
- */
-void Fiber::updateFiber()
-{
-    needUpdate = false;
-#if ( 0 )
-    Cytosim::log << reference() << " update [ "  << std::setw(9) << std::left << abscissaM();
-    Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << '\n';
-#endif
-    
-    updateRange();
-    updateHands();
 }
 
 

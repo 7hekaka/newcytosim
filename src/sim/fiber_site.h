@@ -36,9 +36,6 @@ public:
     /// propagate Lattice cell index type
     typedef FiberLattice::lati_t lati_t;
 
-    /// allowing update of the interpolation
-    friend void Fiber::updateHands();
-
 protected:
     
     /// the Fiber of interest, or NULL

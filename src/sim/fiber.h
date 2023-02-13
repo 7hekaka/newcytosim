@@ -284,7 +284,7 @@ public:
     void removeHand(Hand* h) const { fHands.remove(h); }
     
     /// update all Hands bound to this
-    void updateHands();
+    void updateHands() const;
     
     /// sort Hands by order of increasing abscissa
     void sortHands() const { fHands.sort(); }
