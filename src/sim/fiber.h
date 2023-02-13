@@ -160,9 +160,6 @@ protected:
     /// perform all the cuts registered by sever()
     void severNow();
 
-    /// update Lattice and Mesh ranges
-    void updateRange();
-
 public:
     
 #if FIBER_HAS_FAMILY
@@ -237,6 +234,9 @@ public:
     /// simulation step with some growth/shrinkage from the ends
     void growStep(real, real, bool = true);
     
+    /// update Lattice and Mesh ranges
+    void updateRange();
+
     /// should be called if any Fiber tip has elongated or shortened
     void updateFiber();
     

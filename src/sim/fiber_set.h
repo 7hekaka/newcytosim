@@ -115,7 +115,7 @@ public:
     void flipFiberPolarity(FiberProp *);
     
     /// update object after import
-    void updateFibers();
+    void updateFibers() const;
     
     //--------------------------------------------------------------------------
     

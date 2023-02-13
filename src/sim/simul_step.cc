@@ -78,7 +78,7 @@ void Simul::prepare()
     setFiberGrid(spaces.master(), prop.binding_grid_step);
     
     // this will allocate Fiber::Lattice
-    fibers.prepare();
+    fibers.updateFibers();
     // this is necessary for diffusion in Field:
     fields.prepare();
     

@@ -269,17 +269,7 @@ void FiberSet::report(std::ostream& os) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
-
-void FiberSet::prepare()
-{
-    for ( Fiber* fib=first(); fib; fib=fib->next() )
-    {
-        fib->updateFiber();
-        fib->resetLattice();
-    }
-}
-
+#pragma mark - Step
 
 /**
  Calculate the free monomer concentration. 
@@ -734,16 +724,14 @@ void FiberSet::flipFiberPolarity(FiberProp * sel)
 /**
 Update Hands after reading all fibers from file, and reset Lattice values
 */
-void FiberSet::updateFibers()
+void FiberSet::updateFibers() const
 {
-    Object * i = pool_.front();
-    while ( i )
+    for ( Fiber* fib=first(); fib; fib=fib->next() )
     {
-        Fiber * o = static_cast<Fiber*>(i);
-        assert_false(o->bad());
-        i = i->next();
-        o->updateHands();
-        o->resetLattice();
+        assert_false(fib->bad());
+        fib->updateRange();
+        fib->updateHands();
+        fib->resetLattice();
     }
 }
 
