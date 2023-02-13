@@ -87,7 +87,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
 
     // mark fiber to highlight mode of nucleation:
     opt.set(mk, "mark");
-    Simul::mark(objs, mk);
+    fib->mark(mk);
 
     ObjectSet::rotateObjects(objs, rot);
     /*
