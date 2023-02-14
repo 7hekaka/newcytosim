@@ -422,7 +422,7 @@ Fiber* Fiber::severPoint(size_t pti)
     // remove minus end portion on new piece:
     fib->truncateM(pti);
     assert_true(fib->abscissaM() == abs);
-    fib->updateRange();
+    fib->updateRange(nullptr);
 
 #if FIBER_HAS_MESH
     if ( fMesh.data() )
@@ -486,7 +486,7 @@ Fiber* Fiber::severM(real abs)
     // remove minus end portion on new piece
     fib->Chain::cutM(abs);
     // initialize Lattice on new piece
-    fib->updateRange();
+    fib->updateRange(nullptr);
 
 #if FIBER_HAS_MESH
     if ( fMesh.data() )
@@ -1181,7 +1181,7 @@ void Fiber::setEndState(const FiberEnd end, const state_t s)
 }
 
 
-void Fiber::updateRange()
+void Fiber::updateRange(Field* field)
 {
 #if FIBER_HAS_LATTICE
     // this will allocate the Lattice's site to cover the range of Abscissa:
@@ -1195,7 +1195,6 @@ void Fiber::updateRange()
     // this will allocate the Lattice's site to cover the range of Abscissa:
     if ( fMesh.ready() )
     {
-        Field* field = prop->field_ptr;
         fMesh.setRange(abscissaM(), abscissaP());
         
         if ( field )
@@ -1244,7 +1243,8 @@ void Fiber::updateFiber()
     Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << '\n';
 #endif
     
-    updateRange();
+    updateRange(prop->field_ptr);
+    
     const real M = abscissaM();
     const real P = abscissaP();
     // Update all bound Hands, allowing them to detach if they are out of range
@@ -1871,14 +1871,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( tag == TAG )
     {
         Chain::read(in, sim, tag);
-#if FIBER_HAS_LATTICE
-        if ( fLattice.ready() )
-            fLattice.setRange(abscissaM(), abscissaP());
-#endif
-#if FIBER_HAS_MESH
-        if ( fMesh.ready() )
-            fMesh.setRange(abscissaM(), abscissaP());
-#endif
+        updateRange(nullptr);
 #if BACKWARD_COMPATIBILITY < 50
         if ( in.formatID() > 47 && in.formatID() < 50 ) // 4.7.2018 added birthTime
             birthTime(in.readFloat());
@@ -1894,7 +1887,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     else if ( tag == TAG_COMPACT )
     {
         Chain::readAngles(in, sim, tag);
-        updateRange();
+        updateRange(nullptr);
 #if FIBER_HAS_GLUE
         fGlue = nullptr;
 #endif
@@ -1902,8 +1895,6 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     else if ( tag == TAG_LATTICE )
     {
 #if FIBER_HAS_LATTICE
-        if ( fLattice.ready() )
-            fLattice.setRange(abscissaM(), abscissaP());
         fLattice.read(in);
 #else
         FiberLattice dummy;
@@ -1915,8 +1906,6 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     else if ( tag == TAG_FIBMESH )
     {
 #if FIBER_HAS_MESH
-        if ( fMesh.ready() )
-            fMesh.setRange(abscissaM(), abscissaP());
         fMesh.read(in);
         //real S = fMesh.sum();
         //if ( S ) std::cerr << reference() << " sum(mesh) = " << S << "\n";

@@ -235,13 +235,13 @@ public:
     void growStep(real, real, bool = true);
     
     /// update Lattice and Mesh ranges
-    void updateRange();
+    void updateRange(Field*);
 
     /// should be called if any Fiber tip has elongated or shortened
     void updateFiber();
     
     /// register a stabilizing effect
-    virtual void stabilize(FiberEnd, real s) {}
+    virtual void stabilize(FiberEnd, real) {}
     
     /// simulation step
     virtual void step();

@@ -729,11 +729,64 @@ void FiberSet::updateFibers() const
     for ( Fiber* fib=first(); fib; fib=fib->next() )
     {
         assert_false(fib->bad());
-        fib->updateRange();
+        fib->updateRange(nullptr);
         fib->updateHands();
         fib->resetLattice();
     }
 }
+
+
+void FiberSet::shortenSpindle(real len) const
+{
+    Fiber * L = nullptr;
+    Fiber * R = nullptr;
+    real xL = +INFINITY;
+    real xR = -INFINITY;
+    FiberEnd eL = NO_END;
+    FiberEnd eR = NO_END;
+    for ( Fiber* fib=first(); fib; fib=fib->next() )
+    {
+        real xM = fib->posEndM().XX;
+        real xP = fib->posEndM().XX;
+        if ( xM < xL )
+        {
+            eL = MINUS_END;
+            xL = xM; L = fib;
+        }
+        if ( xP < xL )
+        {
+            eL = PLUS_END;
+            xL = xP; L = fib;
+        }
+        if ( xM > xR )
+        {
+            eR = MINUS_END;
+            xR = xM; R = fib;
+        }
+        if ( xP > xR )
+        {
+            eR = PLUS_END;
+            xR = xP; R = fib;
+        }
+    }
+    if ( L )
+    {
+        std::clog << "shortenSpindle L " << L->reference() << "  " << eL << "\n";
+        if ( eL == PLUS_END )
+            L->cutP(len);
+        else
+            L->cutM(len);
+    }
+    if ( R )
+    {
+        std::clog << "shortenSpindle R " << R->reference() << "  " << eR << "\n";
+        if ( eR == PLUS_END )
+            R->cutP(len);
+        else
+            R->cutM(len);
+    }
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark -

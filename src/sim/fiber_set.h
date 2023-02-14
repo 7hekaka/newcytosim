@@ -78,6 +78,9 @@ public:
     /// Cut fibers in the list
     void planarCut(ObjectList&, Vector const& n, real a, state_t stateP, state_t stateM);
     
+    /// Special code to trim a spindle from both ends
+    void shortenSpindle(real) const;
+    
     /// get ready to do a step()
     void prepare();
 
