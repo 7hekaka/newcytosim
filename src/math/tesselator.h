@@ -175,8 +175,10 @@ public:
     /// copy coordinates of points to given array
     void store_vertices(double* vec) const;
     
-    /// transform sphere into a droplet-like surface
+    /// transform cylinder into a droplet-like surface
     void dropletify(float*, float Z);
+    
+    /// transform cylinder into a droplet-like surface
     void dropletify(double*, double Z);
 
     

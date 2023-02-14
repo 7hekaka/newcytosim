@@ -256,6 +256,11 @@ void Tesselator::dropletify(float* ptr, float Z)
     dropletify_(num_vertices_, ptr, Z);
 }
 
+void Tesselator::dropletify(double* ptr, double Z)
+{
+    dropletify_(num_vertices_, ptr, Z);
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
