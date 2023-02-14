@@ -335,7 +335,7 @@ void SpacePolygon::drawPolygon(float lines, float points) const
         gym::drawPoints(points, 0, nbp);
 #if ( 0 )
         // indicate index of each point:
-        char tmp[8];
+        char tmp[32];
         gym::color(1, 1, 0);
         for ( size_t n = 0; n < nbp; ++n )
         {

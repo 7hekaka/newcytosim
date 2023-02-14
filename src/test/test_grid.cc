@@ -210,7 +210,7 @@ int display(View& view)
     //-------------draw region
     if ( grid.hasRegions() )
     {
-        char str[16];
+        char str[32];
         int const* offset = nullptr;
         size_t nb = grid.getRegion(offset, cell_indx);
         for ( size_t j = 0; j < nb; ++j )

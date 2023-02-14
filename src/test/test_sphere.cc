@@ -122,7 +122,7 @@ void nameVertices(float scale)
 {
     gym::disableAlphaTest();
     gym::disableLighting();
-    char tmp[128] = { 0 };
+    char tmp[32] = { 0 };
     for ( size_t i=0; i < front->nbPoints(); ++i )
     {
         snprintf(tmp, sizeof(tmp), "%lu", i);

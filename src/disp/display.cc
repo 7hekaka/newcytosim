@@ -1880,7 +1880,7 @@ void Display::drawSolid(Solid const& obj)
     //print the number for each Solid
     if ( disp->style & 16 )
     {
-        char tmp[8];
+        char tmp[32];
         gym::color(bodyColorF(obj));
         snprintf(tmp, sizeof(tmp), "0:%u", obj.identity());
         drawText(obj.posP(0), tmp);
