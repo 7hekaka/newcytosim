@@ -5,12 +5,13 @@
 #include <cstdio>
 #include <stdint.h>
 
-/// Can save pixel array to files in PNG or PPM format
+/// Can save pixel array to files in PNG, TARGA or PPM format
 /**
  - PPM files do not require any library, and thus writing is supported on any platform.
    They can be read by various software, in particular the 'pbmplus' toolkit
    However, they are big and usually not supported by most viewers.
    Known viewers on Mac OS X: ImageJ, GraphicConverter, ToyViewer.
+ - TARGA is a simple color image format popular on Windows
  - PNG is a modern all-purpose file format that supports RGBA format, and is thus
    very well suited to export OpenGL scenes.
  .

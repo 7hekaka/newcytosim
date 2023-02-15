@@ -452,9 +452,12 @@ void ObjectSet::defrost()
     Object * i = ice_.pop_front();
     while ( i )
     {
-        std::clog << "delete " << i->reference() << "\n";
+        //std::clog << "delete " << i->reference() << "\n";
         //inventory_.unassign(i);
         //i->objset(nullptr);
+        /* This may seem inefficient, but we place the object back in the normal
+         list such that 'delete' can lead to its usual cleanup procedure,
+         particulary removing Wrists for Bead/Solid that are deleted */
         link(i);
         delete(i);
         i = ice_.pop_front();

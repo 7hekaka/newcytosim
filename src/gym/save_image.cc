@@ -130,7 +130,7 @@ int SaveImage::saveColorPPM(FILE* file,
 #pragma mark - TGA format
 
 /**
- save RGB Truevision TGA format
+ save RGB Truevision TGA format (also known as TARGA)
  https://en.wikipedia.org/wiki/Truevision_TGA
  */
 int SaveImage::saveTGA(FILE* file,
