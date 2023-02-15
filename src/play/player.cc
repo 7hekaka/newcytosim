@@ -27,7 +27,7 @@ Player::~Player()
 void Player::clear()
 {
     worker.stop();
-    worker.erase_simul(1);
+    worker.eraseSimul(1);
     dispList.erase();
     if ( mDisplay )
         delete(mDisplay);
@@ -190,7 +190,7 @@ void Player::restart()
     try
     {
         worker.stop();
-        worker.erase_simul(1);
+        worker.eraseSimul(1);
         dispList.erase();
         worker.start();
     }

@@ -247,7 +247,7 @@ int main(int argc, char *argv[])
     }
     
     GLFWwindow* win = initWindow(winW, winH);
-    worker.set_simul(&simul);
+    worker.simul(&simul);
     worker.start();
 
     while( !glfwWindowShouldClose(win) )
@@ -267,7 +267,7 @@ int main(int argc, char *argv[])
         {
             usleep(100000);
             //fprintf(stderr, "%2i: dead %i\n", i, worker[i].dead() );
-            worker.erase_simul(1);
+            worker.eraseSimul(1);
             worker.start();
         }
         if ( refresh )

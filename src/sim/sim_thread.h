@@ -175,7 +175,7 @@ public:
     void restart() { repeat_ = 1; signal(); };
 
     /// clear the simulation world
-    void erase_simul(bool) const;
+    void eraseSimul(bool) const;
     
     /// halt the live simulation, read the config file and change the object parameters
     void reloadParameters(std::string const& file);

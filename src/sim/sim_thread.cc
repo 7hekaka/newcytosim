@@ -136,7 +136,7 @@ void SimThread::run()
         }
         if ( --repeat_ < 0 )
             break;
-        erase_simul(1);
+        eraseSimul(1);
     }
 }
 
@@ -458,9 +458,9 @@ void SimThread::deleteHandles()
     unlock();
 }
 
-void SimThread::erase_simul(bool arg) const
+void SimThread::eraseSimul(bool arg) const
 {
-    Interface::erase_simul(arg);
+    Interface::eraseSimul(arg);
     handle_ = nullptr;
 }
 

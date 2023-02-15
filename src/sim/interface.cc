@@ -42,7 +42,7 @@ bool Interface::isCategory(std::string const& name) const
     return sim_->isCategory(name);
 }
 
-void Interface::erase_simul(bool arg) const
+void Interface::eraseSimul(bool arg) const
 {
     if ( arg )
         sim_->eraseProperties();

@@ -355,7 +355,7 @@ int main(int argc, char *argv[])
     {
         simul[i].initialize(arg);
         simul[i].prop.random_seed = RNG.pint32();
-        worker[i].set_simul(simul+i);
+        worker[i].simul(simul+i);
         worker[i].period(period);
         worker[i].start();
     }
@@ -398,7 +398,7 @@ int main(int argc, char *argv[])
                     if ( ++fate[i] == 0 )
                     {
                         //fprintf(stderr, "%2i: start\n", i);
-                        worker[i].erase_simul(1);
+                        worker[i].eraseSimul(1);
                         worker[i].start();
                     }
                 }

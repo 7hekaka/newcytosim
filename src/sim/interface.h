@@ -59,7 +59,7 @@ public:
     virtual void hold() {}
     
     /// erase all simulation objects, and all properties if 'clear_properties==true'
-    virtual void erase_simul(bool clear_properties) const;
+    virtual void eraseSimul(bool clear_properties) const;
 
     //-------------------------------------------------------------------------------
 
@@ -67,7 +67,7 @@ public:
     Simul* simul() const { return sim_; }
     
     /// change Simul pointer
-    void set_simul(Simul* s) { sim_ = s; }
+    void simul(Simul* s) { sim_ = s; }
 
     /// return unmodifiable SimulProp
     SimulProp const& simulProp() const;
