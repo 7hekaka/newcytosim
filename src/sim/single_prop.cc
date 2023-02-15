@@ -133,6 +133,9 @@ void SingleProp::read(Glossary& glos)
 #endif
     glos.set(activity,       "activity");
 
+    if ( glos.has_key("confine") && activity=="fixed" )
+        throw InvalidParameter(name()+":confine is incompatible with activity=fixed");
+
     glos.set(confine,        "confine", {{"off",     CONFINE_OFF},
                                          {"on",      CONFINE_ON},
                                          {"none",    CONFINE_OFF},

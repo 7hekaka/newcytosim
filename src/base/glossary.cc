@@ -614,7 +614,10 @@ void Glossary::read_entry(std::istream& is, int no_overwrite)
     pair_type pair;
     try
     {
-        if ( read_key(pair, is) )
+        int code = read_key(pair, is);
+        if ( code == 1 )
+            throw InvalidParameter("unexpected token");
+        if ( code )
             throw InvalidParameter("syntax error");
         
         while ( read_value(pair, is) );

@@ -30,7 +30,7 @@ void Property::read_string(std::string const& str, std::string const& msg)
     if ( str.size() > 0 )
     {
         std::string war;
-        //std::clog << "reading " << msg << "=(" << str << ")\n";
+        //std::clog << "Property::read_string " << msg << "=(" << str << ")\n";
         try {
             Glossary glos(str);
             read(glos);
@@ -41,6 +41,7 @@ void Property::read_string(std::string const& str, std::string const& msg)
             }
         } catch(Exception & e) {
             std::cerr << e.brief() << e.info() << '\n';
+            std::cerr << " in `" << msg << " = " << str << "'\n";
         }
     }
 }
