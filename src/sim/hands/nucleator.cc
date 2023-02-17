@@ -24,7 +24,7 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 
 ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Glossary& opt)
 {
-    ObjectMark mk = 0;
+    ObjectMark mk = RNG.pint32();
     // determine direction of nucleation:
     Vector dir;
     Hand const* h = otherHand();
@@ -32,13 +32,6 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     {
         // nucleating on the side of a 'mother' fiber:
         dir = h->dirFiber();
-        // equalize marks to highlight amplification:
-        mk = h->fiber()->mark();
-        if ( mk == 0 )
-        {
-            mk = h->fiber()->identity();
-            h->fiber()->mark(mk);
-        }
         // remove key to avoid unused warning:
         opt.clear("direction");
     }
