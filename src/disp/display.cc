@@ -121,6 +121,7 @@ void drawBallT(Vector const& pos, real rad, gym_color const& col, unsigned mark)
     {
         gym::color_front(0,0,0);
         gle::footballPentagons();
+        //gle::baseballSeamCurve(1.01, 1);
     }
 }
 
@@ -172,6 +173,7 @@ static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color 
     gle::sphere1();
     gym::color_front(bak);
     gle::footballPentagons();
+    //gle::baseballSeamCurve(1.01, 1);
     if ( flip ) glFrontFace(GL_CCW);
 }
 

@@ -19,7 +19,7 @@ namespace gle
 {
     /// `finesse` affects the number of triangles used to draw shapes such as cylinders
     /** Higher values are better: 2 is okay, 4 is good, 8 is nice and 16 is very nice */
-    constexpr size_t finesse = 2;
+    constexpr size_t finesse = 4;
     
     /// number of circle points stored in buffer
     constexpr size_t pi_5half = finesse * 25;
@@ -244,6 +244,10 @@ namespace gle
     void football();
     /// draw 12 pentagons distributed on a sphere
     void footballPentagons();
+    /// draw a line on the sphere
+    void baseballSeamCurve(float R, float W);
+    /// draw a line on the sphere
+    void tennisballSeamCurve(float R, float W);
 
     /// primitive used to draw the central segments of fibers
     inline void centralTube() { longTube4(); }

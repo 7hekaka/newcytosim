@@ -1478,7 +1478,7 @@ namespace gle
         ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
         ico[6].buildHemisphere(finesse/2);
-        ico[7].buildDroplet(finesse);
+        ico[7].buildDroplet(finesse/2);
         
         size_t f = 32; // for setIcoidBuffer
         size_t s = 12;
@@ -1539,29 +1539,9 @@ namespace gle
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
-    //-----------------------------------------------------------------------
-    #pragma mark - 3D primitives
     
-    /// set Triangle strip for a Torus of radius R and a thickness 2*T
-    void torusZ(float R, float T, size_t inc)
-    {
-        for ( size_t n = 0; n < pi_twice; n += inc )
-        {
-            flute6 * flu = gym::mapBufferV3N3(2+pi_twice);
-            float X0 = cos_(n), X1 = cos_(n+inc);
-            float Y0 = sin_(n), Y1 = sin_(n+inc);
-            size_t i = 0;
-            for ( size_t p = 0; p <= pi_twice; p += 2*inc )
-            {
-                float S = sin_(p), C = cos_(p);
-                flu[i++] = {X0*(R+T*C), Y0*(R+T*C), T*S, X0*C, Y0*C, S};
-                flu[i++] = {X1*(R+T*C), Y1*(R+T*C), T*S, X1*C, Y1*C, S};
-            }
-            gym::unmapBufferV3N3();
-            gym::drawTriangleStrip(0, i);
-        }
-        gym::cleanup();
-    }
+    //-----------------------------------------------------------------------
+    #pragma mark - Sphere decorations
 
     /**
      Draw a cylindrical band on the equator of a sphere of radius 1.
@@ -1601,6 +1581,68 @@ namespace gle
         arrowStrip(w, inc);
         gym::rotateY(0, 1);
         arrowStrip(w, inc);
+    }
+    
+    /** The path followed by the seam of a tennis ball */
+    size_t setSeamCurve(flute3 * flu, float R, float B, float W, size_t inc)
+    {
+        float A = R - B;
+        float D = 2 * std::sqrt(A*B);
+        size_t cnt = 0;
+        for ( size_t i = 0; i < pi_twice; i += inc )
+        {
+            float C = cos_(i), S = sin_(i);
+            float C2 = C*C-S*S, S2 = S*C+C*S;
+            float C3 = C*C2-S*S2, S3 = S*C2+C*S2;
+            flute3 P = { A*S+B*S3, A*C-B*C3, D*C2 };
+            flute3 T = { A*C+3*B*C3, -A*S+3*B*S3, -2*D*S2 };
+            flute3 N = W * cross(P, T);
+            flu[cnt++] = P + N;
+            flu[cnt++] = P - N;
+        }
+        return cnt;
+    }
+
+    /** The path followed by the seam of a tennis ball */
+    void baseballSeamCurve(float R, float W)
+    {
+        flute3 * flu = gym::mapBufferV3(2*pi_twice);
+        size_t cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
+        gym::unmapBufferV3();
+        gym::drawLineStrip(3, 0, cnt);
+    }
+
+    /** The path followed by the seam of a tennis ball */
+    void tennisballSeamCurve(float R, float W)
+    {
+        flute3 * flu = gym::mapBufferV3(2*pi_twice);
+        size_t cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
+        gym::unmapBufferV3();
+        gym::drawTriangleStrip(0, cnt);
+    }
+
+    //-----------------------------------------------------------------------
+    #pragma mark - 3D volume primitives
+    
+    /// set Triangle strip for a Torus of radius R and a thickness 2*T
+    void torusZ(float R, float T, size_t inc)
+    {
+        for ( size_t n = 0; n < pi_twice; n += inc )
+        {
+            flute6 * flu = gym::mapBufferV3N3(2+pi_twice);
+            float X0 = cos_(n), X1 = cos_(n+inc);
+            float Y0 = sin_(n), Y1 = sin_(n+inc);
+            size_t i = 0;
+            for ( size_t p = 0; p <= pi_twice; p += 2*inc )
+            {
+                float S = sin_(p), C = cos_(p);
+                flu[i++] = {X0*(R+T*C), Y0*(R+T*C), T*S, X0*C, Y0*C, S};
+                flu[i++] = {X1*(R+T*C), Y1*(R+T*C), T*S, X1*C, Y1*C, S};
+            }
+            gym::unmapBufferV3N3();
+            gym::drawTriangleStrip(0, i);
+        }
+        gym::cleanup();
     }
     
     /**
