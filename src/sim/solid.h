@@ -80,8 +80,6 @@ private:
     /// another Solid mechanically linked to this one
     Solid * soTwin;
 #endif
-    /// a counter used in reshape()
-    unsigned soReshapeTimer;
     
     /// the number of points when fixShape() was last called, used for verifications.
     unsigned soAmount;

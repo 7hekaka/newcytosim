@@ -152,7 +152,6 @@ void Solid::reset()
 #if ( DIM > 2 )
     soMomentum = Matrix33(0, 1);
 #endif
-    soReshapeTimer = RNG.pint32(7);
 #if NEW_SOLID_HAS_TWIN
     soTwin = nullptr;
 #endif
@@ -1038,17 +1037,17 @@ void Solid::fixShape()
  */
 void Solid::scaleShape(const real mag[DIM])
 {
-    //scale in only in the specified dimension
+    //recalculate the momentum needed in rescale():
+    soVariance = 0;
+    // scale the specified dimension
     for ( size_t p = 0; p < soAmount; ++p )
     {
         for ( size_t d = 0; d < DIM; ++d )
+        {
             soShape[DIM*p+d] *= mag[d];
+            soVariance += square(soShape[DIM*p+d]);
+        }
     }
-    
-    //recalculate the momentum needed in rescale():
-    soVariance = 0;
-    for ( size_t i = 0; i < DIM * soAmount; ++i )
-        soVariance += soShape[i] * soShape[i];
 }
 
 
@@ -1098,9 +1097,7 @@ void Solid::rescale()
 
 void Solid::reshape()
 {    
-    //we check that the number of points is the same as when fixShape() was called.
-    if ( soAmount != nPoints )
-        ABORT_NOW("mismatch with current number of points: fixShape() not called?");
+    assert_true( soAmount == nPoints );
          
     real cc = 0, a = 0;
     for ( size_t i = 0; i < nPoints; ++i )
@@ -1120,10 +1117,8 @@ void Solid::reshape()
 
 void Solid::reshape()
 {    
-    // the number of points should be the same as when fixShape() was called.
-    if ( soAmount != nPoints )
-        ABORT_NOW("mismatch with current number of points: fixShape() not called?");
-    
+    assert_true( soAmount == nPoints );
+
     Vector avg = Mecable::position();
     
     /*
@@ -1161,72 +1156,64 @@ void Solid::reshape()
 
 #elif ( DIM >= 3 )
 
+/**
+ We follow the procedure described by Berthold K.P. Horn in
+ "Closed-form solution of absolute orientation using unit quaternions"
+ Journal of the optical society of America A, Vol 4, Page 629, April 1987
+*/
 void Solid::reshape()
 {
-    // the number of points should be the same as when fixShape() was called.
-    if ( soAmount != nPoints )
-        ABORT_NOW("mismatch with current number of points: fixShape() not called?");
-    
-    /*
-     We follow the procedure described by Berthold K.P. Horn in
-     "Closed-form solution of absolute orientation using unit quaternions"
-     Journal of the optical society of America A, Vol 4, Page 629, April 1987
-    */
-    
+    assert_true( soAmount == nPoints );
     Vector avg = Mecable::position();
     
     Matrix33 S(0,0);
     for ( size_t i = 0; i < nPoints; ++i )
         S.addOuterProduct(soShape+DIM*i, pPos+DIM*i);
     
+    // rescale matrix to keep its magnitude in range
+    real alpha = S.diagonal().abs().e_sum();
+    S.scale(1.0/alpha);
+
     real N[4*4] = { 0 };
     
-    // set upper triangle of the 4x4 matrix:
-    N[0+4*0] = S(0,0) + S(1,1) + S(2,2);
-    N[0+4*1] = S(1,2) - S(2,1);
-    N[0+4*2] = S(2,0) - S(0,2);
-    N[0+4*3] = S(0,1) - S(1,0);
+    // set lower triangle of the 4x4 traceless matrix:
+    N[0*4+0] = S(0,0) + S(1,1) + S(2,2);
+    N[0*4+1] = S(1,2) - S(2,1);
+    N[0*4+2] = S(2,0) - S(0,2);
+    N[0*4+3] = S(0,1) - S(1,0);
     
-    N[1+4*1] = S(0,0) - S(1,1) - S(2,2);
-    N[1+4*2] = S(0,1) + S(1,0);
-    N[1+4*3] = S(2,0) + S(0,2);
+    N[1*4+1] = S(0,0) - S(1,1) - S(2,2);
+    N[1*4+2] = S(0,1) + S(1,0);
+    N[1*4+3] = S(2,0) + S(0,2);
     
-    N[2+4*2] = S(1,1) - S(0,0) - S(2,2);
-    N[2+4*3] = S(1,2) + S(2,1);
+    N[2*4+2] = S(1,1) - S(0,0) - S(2,2);
+    N[2*4+3] = S(1,2) + S(2,1);
     
-    N[3+4*3] = S(2,2) - S(1,1) - S(0,0);
+    N[3*4+3] = S(2,2) - S(1,1) - S(0,0);
 
-    {
-    // rescale matrix to keep its magnitude in range
-    real alpha = 1.0 / ( S.diagonal().abs().e_sum() );
-    for ( int i = 0; i < 16; ++i )
-        N[i] *= alpha;
-    }
-    
     //VecPrint::full(4, 4, N, 4, 3);
 
     /* 
-     Use LApack to find the largest Eigenvalue, and associated Eigenvector,
-     which is the quaternion corresponding to the best rotation
+     Use LApack to find the largest Eigenvalue (unused), and associated Eigenvector,
+     which is the quaternion corresponding to the best rotation.
      */
     
     int nbv;
     real val[4];
     Quaternion<real> quat;
-    real work[8*4];
+    const int lwork = 35*4;
+    real work[lwork];
     int iwork[5*4];
     int ifail[4];
     int info = 0;
     
-    lapack::xsyevx('V','I','U', 4, N, 4, 0, 0, 4, 4, REAL_EPSILON,
-                   &nbv, val, quat, 4, work, 8*4, iwork, ifail, &info);
+    lapack::xsyevx('V','I','L', 4, N, 4, 0, 0, 4, 4, REAL_EPSILON,
+                   &nbv, val, quat.data(), 4, work, lwork, iwork, ifail, &info);
     
-    //Cytosim::log("optimal LWORK = %i\n", work[0]);
-    //Cytosim::log("eigenvalue %6.2f,", val[0]);
-    //quat.println();
-    
+    //printf("optimal LWORK = %f\n", work[0]);
     if ( info == 0 )
     {
+        //printf("eigenvalue %6.2f :", val[0]); quat.println();
         //get the rotation matrix corresponding to the quaternion:
         quat.setMatrix3(S);
 
@@ -1263,13 +1250,7 @@ void Solid::getPoints(real const* ptr)
     if ( nPoints < 2 )
         return;
     
-    if ( ++soReshapeTimer > 7 )
-    {
-        reshape();
-        soReshapeTimer = 0;
-    }
-    else
-        rescale();
+    reshape();
 }
 
 
