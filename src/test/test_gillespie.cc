@@ -1,5 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
-// Created by Francois Nedelec on 04/04/2012. Updated 01/02/2023
+// Created by Francois Nedelec on 04/04/2012. Updated 01/02/2023, 18/2/2023
 
 
 #include <list>
@@ -67,7 +67,7 @@ class Reaction : public Linkable
 public:
     
     /// pointer to a member function
-    typedef void (ENGINE::*MFPR)(Reaction<ENGINE>*);
+    typedef int (ENGINE::*MFPR)(Reaction<ENGINE>*);
 
 private:
     
@@ -99,14 +99,13 @@ public:
     }
     
     /// call engine's member function:
-    void act(ENGINE & obj)
+    int act(ENGINE & obj)
     {
-        (obj.*mFunc)(this);
-        std::cout << " @ " << sim_time + mTime << '\n';
+        return (obj.*mFunc)(this);
     }
     
     /// increment Gillespie time
-    void renew(real rate)
+    void refresh(real rate)
     {
         if ( mRand < 0 )
         {
@@ -146,12 +145,6 @@ protected:
 
     /// list heads to hold the events:
     Linkable * head_, * tail_;
-    
-    void renew(Event * e, real rate)
-    {
-        e->push_back(head_, tail_);
-        e->renew(rate);
-    }
 
 public:
     
@@ -163,6 +156,10 @@ public:
         initialize();
     }
     
+    void initialize()
+    {
+    }
+
     void add(real r, Event::MFPR mfp)
     {
         (new Event(r, mfp))->push_back(head_, tail_);
@@ -191,8 +188,8 @@ public:
         /* Fire events from [H,T] list in the order of time */
         while ( H )
         {
-            Event * earliest = static_cast<Event*>(H);
-            real next_time = earliest->time();
+            Event * evt = static_cast<Event*>(H);
+            real next_time = evt->time();
             // find earliest event in [H,T] list:
             for ( iterator i = H->next_; i; i = i->next_ )
             {
@@ -201,38 +198,48 @@ public:
                 if ( t < next_time )
                 {
                     next_time = t;
-                    earliest = e;
+                    evt = e;
                 }
             }
-            earliest->pop(H, T);
-            earliest->act(*this);
+            // fire event, and proceed depending on outcome:
+            if ( 0 == evt->act(*this) )
+            {
+                // case 1: the event only fires once and is deleted:
+                evt->pop(H, T);
+                delete(evt);
+            }
+            else if ( evt->time() >= 0 )
+            {
+                // case 2: event can fire more, but will only do in the future:
+                evt->pop(H, T);
+                evt->push_back(head_, tail_);
+            }
+            // case 3: event fires again in the same interval ( time() < 0 )
         }
-    }
-    
-    void initialize()
-    {
     }
 
     //----------------------Event's action callbacks---------------------------
     
-    void event1(Event* e)
+    int event1(Event* e)
     {
-        std::cout << "event 1";
+        std::cout << "event 1 @ " << sim_time+e->time() << '\n';
         add(rate1, &Engine::event2);
         add(rate1, &Engine::event3);
-        delete(e);
+        return 0;
     }
     
-    void event2(Event* e)
+    int event2(Event* e)
     {
-        std::cout << "event 2";
-        renew(e, rate2);
+        std::cout << "event 2 @ " << sim_time+e->time() << '\n';
+        e->refresh(rate2);
+        return 1;
     }
     
-    void event3(Event* e)
+    int event3(Event* e)
     {
-        std::cout << "event 3";
-        renew(e, rate3);
+        std::cout << "event 3 @ " << sim_time+e->time() << '\n';
+        e->refresh(rate3);
+        return 1;
     }
     
 };
@@ -250,7 +257,7 @@ int main(int argc, char * argv[])
     {
         sim_time += time_step;
         engine.step(time_step);
-        std::cout << "------" << std::endl;
+        std::cout << "------  " << sim_time << std::endl;
     }
 }
 
