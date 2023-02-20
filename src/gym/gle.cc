@@ -330,33 +330,43 @@ namespace gle
     size_t setOctahedron(flute6* flt, float R=1.46459188756f)
     {
         // the default size is set to match the volume of the unit sphere
-        // Eight triangles, ordered counterclockwise
+        // triangles ordered counterclockwise
         const float N = 1 / M_SQRT3;
-        flt[0] = { R, 0, 0,  N,-N, N};
-        flt[1] = { 0, 0, R,  N,-N, N};
-        flt[2] = { 0,-R, 0,  N,-N, N};
-        flt[3] = { 0, 0,-R, -N, N,-N};
-        flt[4] = {-R, 0, 0, -N, N,-N};
-        flt[5] = { 0, R, 0, -N, N,-N};
-        flt[6] = { 0, 0, R, -N,-N, N};
-        flt[7] = {-R, 0, 0, -N,-N, N};
-        flt[8] = { 0,-R, 0, -N,-N, N};
-        flt[9] = { 0, 0,-R,  N, N,-N};
-        flt[10] = { 0, R, 0,  N, N,-N};
-        flt[11] = { R, 0, 0,  N, N,-N};
-        flt[12] = {-R, 0, 0, -N, N, N};
-        flt[13] = { 0, 0, R, -N, N, N};
-        flt[14] = { 0, R, 0, -N, N, N};
-        flt[15] = { 0, 0,-R,  N,-N,-N};
-        flt[16] = { R, 0, 0,  N,-N,-N};
-        flt[17] = { 0,-R, 0,  N,-N,-N};
-        flt[18] = { 0, 0, R,  N, N, N};
-        flt[19] = { R, 0, 0,  N, N, N};
-        flt[20] = { 0, R, 0,  N, N, N};
-        flt[21] = { 0, 0,-R, -N,-N,-N};
-        flt[22] = { 0,-R, 0, -N,-N,-N};
-        flt[23] = {-R, 0, 0, -N,-N,-N};
-        return 24;
+        size_t i = 0;
+        // lower size Z < 0
+        flt[i++] = { 0, 0,-R, -N, N,-N};
+        flt[i++] = {-R, 0, 0, -N, N,-N};
+        flt[i++] = { 0, R, 0, -N, N,-N};
+        flt[i++] = { 0, 0,-R, -N,-N,-N};
+        flt[i++] = { 0,-R, 0, -N,-N,-N};
+        flt[i++] = {-R, 0, 0, -N,-N,-N};
+        flt[i++] = { 0, 0,-R,  N, N,-N};
+        flt[i++] = { 0, R, 0,  N, N,-N};
+        flt[i++] = { R, 0, 0,  N, N,-N};
+        flt[i++] = { 0, 0,-R,  N,-N,-N};
+        flt[i++] = { R, 0, 0,  N,-N,-N};
+        flt[i++] = { 0,-R, 0,  N,-N,-N};
+        // upper size Z > 0
+        flt[i++] = { 0, 0, R, -N,-N, N};
+        flt[i++] = {-R, 0, 0, -N,-N, N};
+        flt[i++] = { 0,-R, 0, -N,-N, N};
+        flt[i++] = {-R, 0, 0, -N, N, N};
+        flt[i++] = { 0, 0, R, -N, N, N};
+        flt[i++] = { 0, R, 0, -N, N, N};
+        flt[i++] = { R, 0, 0,  N,-N, N};
+        flt[i++] = { 0, 0, R,  N,-N, N};
+        flt[i++] = { 0,-R, 0,  N,-N, N};
+        flt[i++] = { 0, 0, R,  N, N, N};
+        flt[i++] = { R, 0, 0,  N, N, N};
+        flt[i++] = { 0, R, 0,  N, N, N};
+        // base at Z = 0:
+        flt[i++] = {-R, 0, 0,  0, 0,-1};
+        flt[i++] = { 0, R, 0,  0, 0,-1};
+        flt[i++] = { 0,-R, 0,  0, 0,-1};
+        flt[i++] = { 0, R, 0,  0, 0,-1};
+        flt[i++] = { R, 0, 0,  0, 0,-1};
+        flt[i++] = { 0,-R, 0,  0, 0,-1};
+        return i; // 32 vertices
     }
 
     
@@ -933,12 +943,14 @@ namespace gle
 
     void tetrahedron() { doVNTriangles(cubes_[0], 12); }
     void upsideTetra() { doVNTriangles(cubes_[1], 12); }
+
     void octahedron()  { doVNTriangles(cubes_[2], 24); }
+    void pyramid()     { doVNTriangles(cubes_[2]+12, 18); }
     void icosahedron() { doVNTriangles(cubes_[3], 60); }
     
     void arrowTail() { doVNTriangles(cubes_[4], 45); }
     void cube()      { doVNTriangles(cubes_[5], 36); }
-    void star()      { doVNTriangles(cubes_[0], 24); }
+    void star()      { doVNTriangles(cubes_[0], 24); } // union of 2 tetrahedrons
     
     void hexTube()      { doVNTriangleStrip(cubes_[6], 14); }
     void thinTube()     { doVNTriangleStrip(cubes_[7], 14); }

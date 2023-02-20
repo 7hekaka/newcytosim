@@ -108,6 +108,8 @@ namespace gle
     void upsideTetra();
     /// draw a octahedron of radius 1
     void octahedron();
+    /// draw squared-based pyramid of radius 1
+    void pyramid();
     /// draw a icosahedron of radius 1
     void icosahedron();
     /// draw a icosahedron of radius 1
