@@ -763,8 +763,8 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         {
             Solid * S = sim.pickSolid(str);
             if ( !S )
-                std::cerr << "Warning: could not find twin Solid `" << str << "'\n";
-            if ( S->nbPoints() <= DIM )
+                std::cerr << " INCIDENT: could not find twin Solid `" << str << "'\n";
+            else if ( S->nbPoints() <= DIM )
                 throw InvalidParameter("Solid's twin lacks sufficient points");
         }
         real len = 2, chi = 0.5;
