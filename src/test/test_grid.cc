@@ -186,7 +186,7 @@ int display(View& view)
     for ( size_t c = 0 ; c < grid.nbCells(); ++c )
     {
         int cnt = grid.icell(c);
-        // use Fibonacci's spiral on the sphere:
+        // use Fibonacci's spiral:
         if ( cnt > 0 )
         {
             Vector x, y;

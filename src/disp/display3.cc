@@ -879,15 +879,18 @@ void Display3::drawSinglesF(SingleSet const& set) const
         PointDisp const* dis = obj->disp();
         if ( dis->perceptible )
         {
-            const float rad = pixscale(dis->size);
             //drawHandF(obj->posFoot(), obj->disp());
-            gym::color_both(dis->color2.tweak(obj->signature()));
+            if ( obj->base() )
+                gym::color_both(dis->color2);
+            else
+                gym::color_both(dis->color2.tweak(obj->signature()));
 #if ( 0 )
             if ( dis->style == 2 )
             {
                 Space const* spc = obj->confineSpace();
                 if ( spc )
                 {
+                    const float rad = pixscale(dis->size);
                     /// draw a disc tangent to the Space:
                     Vector pos = obj->posFoot();
                     Vector dir = spc->normalToEdge(pos);
