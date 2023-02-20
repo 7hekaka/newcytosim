@@ -19,7 +19,7 @@ namespace gle
 {
     /// `finesse` affects the number of triangles used to draw shapes such as cylinders
     /** Higher values are better: 2 is okay, 4 is good, 8 is nice and 16 is very nice */
-    constexpr size_t finesse = 1;
+    constexpr size_t finesse = 4;
     
     /// number of circle points stored in buffer
     constexpr size_t pi_5half = finesse * 25;
@@ -242,15 +242,19 @@ namespace gle
     inline void sphere() { sphere1(); }
     /// draw nicest hemisphere available
     inline void hemisphere() { hemisphere1(); }
-    /// draw a sphere decorated with 12 pentagons
-    void football();
     /// draw 12 pentagons distributed on a sphere
     void footballPentagons();
     /// draw a line on the sphere
     void baseballSeamCurve(float R, float W);
     /// draw a line on the sphere
     void tennisballSeamCurve(float R, float W);
-
+    /// draw a sphere decorated with 12 pentagons
+    void football();
+    /// draw a white baseball
+    void baseball();
+    /// draw a yellow tennisball
+    void tennisball();
+    
     /// primitive used to draw the central segments of fibers
     inline void centralTube() { longTube4(); }
     /// primitive used to draw the MINUS ends of fibers

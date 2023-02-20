@@ -962,8 +962,6 @@ namespace gle
     //void icoidS() { doTriangleStrip(blobs_[3], 32); }
     
     void footballPentagons() { doVNTriangleStrip(cubes_[9], 8*12); }
-    
-    void football() { sphere1(); gym::color_front(0, 0, 0); footballPentagons(); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D Circle
@@ -1601,7 +1599,7 @@ namespace gle
         float A = R - B;
         float D = 2 * std::sqrt(A*B);
         size_t cnt = 0;
-        for ( size_t i = 0; i < pi_twice; i += inc )
+        for ( size_t i = 0; i <= pi_twice; i += inc )
         {
             float C = cos_(i), S = sin_(i);
             float C2 = C*C-S*S, S2 = S*C+C*S;
@@ -1631,6 +1629,29 @@ namespace gle
         size_t cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
         gym::unmapBufferV3();
         gym::drawTriangleStrip(0, cnt);
+    }
+    
+    void baseball()
+    {
+        gym::color_front(1,1,1);
+        sphere2();
+        gym::color_front(1,0,0);
+        baseballSeamCurve(1, 1.5);
+    }
+
+    void tennisball()
+    {
+        gym::color_front(1,1,0);
+        sphere2();
+        gym::color_front(1,1,1);
+        tennisballSeamCurve(1.02, 1);
+    }
+    
+    void football()
+    {
+        sphere1();
+        gym::color_front(0, 0, 0);
+        footballPentagons();
     }
 
     //-----------------------------------------------------------------------
