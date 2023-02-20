@@ -183,7 +183,7 @@ new 0 katanin
 
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (3 corona sphere 1 0 if (S>0.9))
+    sphere1 = 0 0 0, 0.100, corona -0.8 -0.5 -0.5, corona -0.5 -0.8 -0.5, corona -0.5 -0.5 -0.8
     position = 0 0 0
     direction = 1 0 0
     twin = mirror
