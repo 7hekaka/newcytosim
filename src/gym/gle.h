@@ -19,7 +19,7 @@ namespace gle
 {
     /// `finesse` affects the number of triangles used to draw shapes such as cylinders
     /** Higher values are better: 2 is okay, 4 is good, 8 is nice and 16 is very nice */
-    constexpr size_t finesse = 4;
+    constexpr size_t finesse = 1;
     
     /// number of circle points stored in buffer
     constexpr size_t pi_5half = finesse * 25;
@@ -173,11 +173,11 @@ namespace gle
     void thinTube();
     /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 256]
     void thinLongTube();
-    /// display a cone of axis Z, radius 1 at Z=0, summit at Z=1
+    /// display a super nice cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone1();
     /// display a nicer cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone2();
-    /// display a long cone of axis Z, radius 1 at Z=0, summit at Z=3
+    /// display a rough cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone3();
 
     /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
