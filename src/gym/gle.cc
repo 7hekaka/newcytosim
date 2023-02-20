@@ -366,7 +366,7 @@ namespace gle
         flt[i++] = { 0, R, 0,  0, 0,-1};
         flt[i++] = { R, 0, 0,  0, 0,-1};
         flt[i++] = { 0,-R, 0,  0, 0,-1};
-        return i; // 32 vertices
+        return i; // 30 vertices
     }
 
     
@@ -866,7 +866,7 @@ namespace gle
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12 + 12 + 60 + 45 + 36 + 24 + 3 * 14 + 16 + 12*8 );
+        return ( 12 + 12 + 30 + 60 + 45 + 36 + 3 * 14 + 16 + 12*8 );
     }
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori)
