@@ -5,8 +5,8 @@
 
 set simul system
 {
-    viscosity = 1
-    time_step = 0.01
+    viscosity = 0.1
+    time_step = 0.005
     steric = 1, 1111, 222
     display = ( size=2560,768; point_value=0.01; point_size=0.5; line_width=1; zoom=2; style=3;)
     skip_free_couple = 1
@@ -152,7 +152,7 @@ set single corona
 set solid kinetochore
 {
     steric = 1
-    viscosity = 0.01
+    viscosity = 1
     source = 1, augmin
     twin_stiffness = 200
     twin_metastiff = 20
@@ -189,7 +189,7 @@ new kinetochore
     twin = mirror
 }
 
-run 500000 system
+run 1000000 system
 {
     nb_frames = 10
 }
