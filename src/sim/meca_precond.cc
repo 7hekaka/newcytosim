@@ -262,14 +262,15 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
     
     extractBlock(mec, wrk);
     
+    real mag = blas::nrm2(bks*bks, blk);
     blas::xaxpy(bks*bks, -1.0, blk, 1, wrk, 1);
     real err = blas::nrm2(bks*bks, wrk);
  
-    std::clog << "\nverifyBlock ";
+    std::clog << "verifyBlock ";
     std::clog << std::setw(8) << mec->reference() << "  " << std::setw(4) << bks;
     std::clog << " | B - K | = " << err << ' ';
 
-    if ( err > bks * bks * REAL_EPSILON )
+    if ( err > mag * 1e-6 )
     {
         //VecPrint::sparse(std::clog, bks, bks, wrk, bks, 3, (real)0.1);
         extractBlock(mec, wrk);
@@ -284,7 +285,7 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
 
 
 /**
- Multiply here `blk` with the dynamic block extracted by extractBlockSlow()
+ Multiply here `blk` with the dynamic block extracted by extractBlock()
  and check that we recover the identity matrix
  */
 void Meca::checkBlock(const Mecable * mec, const real* blk)
@@ -314,7 +315,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     
     if ( 1 == mec->blockType() )
     {
-        // chose initial vector for power iteration
+        // use power iterations to estimate largest eigenvalue
         blas::xcopy(bks, vRHS+DIM*mec->matIndex(), 1, vec, 1);
         real eig = largest_eigenvalue(bks, blk, mec->pivot(), wrk, -1.0, vec, mat);
         std::clog << "  eigen(1-PM) = " << eig;

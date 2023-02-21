@@ -138,7 +138,7 @@ void Meca::allocate(size_t alc)
         allocate_vector(alc, vRND, 1);
         allocate_vector(alc, vRHS, 1);
         vFOR = vRHS; //allocate_vector(alc, vFOR, 1);
-        vTMP = vSOL; //allocate_vector(alc, vTMP, 0);
+        allocate_vector(alc, vTMP, 0);
         //std::clog << "Meca::allocate(" << allocated_ << ")\n";
     }
 }
@@ -632,12 +632,12 @@ unsigned Meca::solve()
     
     /*
      Add Brownian motions to 'vRHS', and calculate vRHS by multiplying by mobilities.
-     As Brownian terms are added, we record the magnitude of the typical smallest
-     scalar contribution in `noiseLevel`. The dynamics will later be solved with 
-     a residual that is proportional to this level:
+     As Brownian terms are added, we record their magnitude in `noiseLevel`,
+     which will represent the magnitude of displacement due to Brownian motion.
+     The dynamics will later be solved with a residual that is proportional:
      SimulProp::tolerance * noiseLevel
      As long as SimulProp::tolerance is smaller than 1, this should allow for a
-     level of numerical error is small with respect to the Brownian noise in
+     level of numerical error that is small with respect to the Brownian noise in
      the system, and the results should be physically appropriate.
      */
     
@@ -665,10 +665,11 @@ unsigned Meca::solve()
 
     // scale minimum noise level to serve as a measure of required precision
     noiseLevel *= tau_;
+#if 0
+    real n = blas::nrm2(dimension(), vRHS) / (noiseLevel * std::sqrt(dimension()));
+    printf("noiseLeveld = %8.2e   variance(vRHS) / estimate = %8.4f\n", noiseLevel, n);
+#endif
     
-    //printf("noiseLeveld = %8.2e   variance(vRHS) / estimate = %8.4f\n",
-    //       noiseLevel, blas::nrm2(dimension(), vRHS) / (noiseLevel * std::sqrt(dimension())) );
-
 #if NEW_CYTOPLASMIC_FLOW
     /**
      Includes a constant fluid flow displacing all the objects along
@@ -747,13 +748,13 @@ unsigned Meca::solve()
     {
         // change initial condition to be `P * RHS`:
         precondition(vRHS, vSOL);
-        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
+        LinearSolvers::BCGSP<0>(*this, vRHS, vSOL, monitor, allocator_);
         //fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator_, mH, mV, temporary_);
     }
     else
     {
-        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
+        LinearSolvers::BCGS<0>(*this, vRHS, vSOL, monitor, allocator_);
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
     }
     
@@ -790,46 +791,49 @@ unsigned Meca::solve()
         Cytosim::out("Failed with size %lu precond %i flag %u count %4u residual %.3e (%.3f)",
             dimension(), precond_, monitor.flag(), monitor.count(), monitor.residual(), monitor.residual()/tolerance_);
         
-        // in case the solver did not converge, we try other methods:
+        // in case the solver did not converge, we try safer mode:
         monitor.reset();
-#if !SAFER_CONVERGENCE
-        // try with a different seed
-        precondition(vRHS, vSOL);
-#endif
+        zero_real(dimension(), vSOL);
         if ( precond_ )
-            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
+            LinearSolvers::BCGSP<1>(*this, vRHS, vSOL, monitor, allocator_);
         else
-            LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
+            LinearSolvers::BCGS<1>(*this, vRHS, vSOL, monitor, allocator_);
         
         Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), monitor.residual());
-
+        
+        if ( monitor.residual() > tolerance_ )
+        {
+            monitor.reset();
+            if ( precond_ )
+                LinearSolvers::BCGSP<1>(*this, vRHS, vSOL, monitor, allocator_);
+            else
+                LinearSolvers::BCGS<1>(*this, vRHS, vSOL, monitor, allocator_);
+            Cytosim::out(" --> continued: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+        }
+        
         // relax the convergence criteria a bit
-        if ( monitor.residual() > 1.4142 * tolerance_ )
+        //tolerance_ *= M_SQRT2;
+        
+        if ( monitor.residual() > tolerance_ )
         {
-            // try with our strongest preconditioner
-            precond_ = 6;
-            computePreconditionner();
             monitor.reset();
-#if !SAFER_CONVERGENCE
-            zero_real(dimension(), vSOL);
-#endif
-            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
-            Cytosim::out(" --> restarted precond 6: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+            if ( precond_ )
+            {
+                LinearSolvers::BCGS<1>(*this, vRHS, vSOL, monitor, allocator_);
+                Cytosim::out(" --> extended: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+            }
+            else
+            {
+                // try with our strongest preconditioner
+                precond_ = 6;
+                computePreconditionner();
+                LinearSolvers::BCGSP<1>(*this, vRHS, vSOL, monitor, allocator_);
+                Cytosim::out(" --> restarted precond 6: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+            }
         }
-
-#if SAFER_CONVERGENCE
-        // relax the convergence criteria a bit more
-        if ( monitor.residual() > 1.4142 * tolerance_ )
-        {
-            // try with different seed and strongest preconditioner
-            monitor.reset();
-            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
-            Cytosim::out(" -> final: count %4i residual %.3e\n", monitor.count(), monitor.residual());
-        }
-#endif
 
         // if the solver did not converge, its result cannot be used!
-        if ( monitor.residual() > 1.4142 * tolerance_ )
+        if ( monitor.residual() > 2 * tolerance_ )
             throw Exception("no convergence, residual ", monitor.residual(),
                             " achieved ", monitor.residual()/tolerance_);
     }

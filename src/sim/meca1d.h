@@ -179,7 +179,7 @@ public:
         mat.prepareForMultiply(1);
         LinearSolvers::Monitor monitor(dimension(), precision);
         // solve system using Bi-Conjugate Gradient Stabilized Method:
-        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
+        LinearSolvers::BCGS<0>(*this, vRHS, vSOL, monitor, allocator_);
         ready_ = monitor.converged();
         return monitor.count();
     }
