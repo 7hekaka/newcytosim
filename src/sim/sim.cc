@@ -97,14 +97,16 @@ int main(int argc, char* argv[])
         Cytosim::log.silent();
         Cytosim::warn.silent();
     }
+    else if ( arg.use_key("+") )
+    {
+        Cytosim::log.redirect(std::cerr);
+        Cytosim::warn.redirect(std::cerr);
+    }
     else
     {
         Cytosim::out.open("messages.cmo");
         Cytosim::log.redirect(Cytosim::out);
-        if ( arg.use_key("+") )
-            Cytosim::warn.redirect(std::cerr);
-        else
-            Cytosim::warn.redirect(Cytosim::out);
+        Cytosim::warn.redirect(Cytosim::out);
     }
 
     // change working directory if specified:
