@@ -96,7 +96,7 @@ void SingleProp::clear()
     hand           = "";
     hand_prop      = nullptr;
     stiffness      = 0;
-#if NEW_ANCHOR_NORMAL
+#if NEW_ANCHOR_STIFFNESS
     anchor_stiffness = 0;
 #endif
     length         = 0;
@@ -118,7 +118,7 @@ void SingleProp::read(Glossary& glos)
 {
     glos.set(hand,           "hand");
     glos.set(stiffness,      "stiffness");
-#if NEW_ANCHOR_NORMAL
+#if NEW_ANCHOR_STIFFNESS
     glos.set(anchor_stiffness, "anchor_stiffness") || glos.set(anchor_stiffness, "stiffness", 1);
 #endif
     glos.set(length,         "length");
@@ -225,7 +225,7 @@ void SingleProp::write_values(std::ostream& os) const
 {
     write_value(os, "hand",           hand);
     write_value(os, "stiffness",      stiffness);
-#if NEW_ANCHOR_NORMAL
+#if NEW_ANCHOR_STIFFNESS
     write_value(os, "anchor_stiffness", anchor_stiffness);
 #endif
     write_value(os, "length",         length);
