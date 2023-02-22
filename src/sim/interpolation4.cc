@@ -151,7 +151,7 @@ void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real we
 }
 
 
-void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& arg, const real weight) const
+void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, const real weight) const
 {
     assert_true(mec_);
     size_t off = mec_->matIndex() + prime_;
@@ -161,12 +161,46 @@ void Interpolation4::addOffsetLink(Meca& meca, const real len, Mecapoint const& 
     // extract distance in current configuration:
     real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
     // distance for distal point, offset by `len` from the bead surface
-    real alpha = ( rad + len ) / rad;
+    real alpha = 1.0 + len / rad;
     // calculate coefficients to interpolate the offset point:
-    alp[1] *= alpha;
-    alp[2] *= alpha;
-    alp[3] *= alpha;
+    alp[1] = alpha * coef_[1];
+    alp[2] = alpha * coef_[2];
+    alp[3] = alpha * coef_[3];
     alp[0] = ( real(1) - alp[1] ) - ( alp[2] + alp[3] );
+    switch ( rank_ )
+    {
+        case 0:
+            break;
+        case 1:
+            break;
+        case 2:
+            meca.addLink2(arg, off, alp[0], alp[1], weight);
+            break;
+        case 3:
+            meca.addLink3(arg, off, alp[0], alp[1], alp[2], weight);
+            break;
+        case 4:
+            meca.addLink4(arg, off, alp[0], alp[1], alp[2], alp[3], weight);
+        break;
+    }
+}
+
+
+/** This induces a link aligned with Vector(-1,-1,-1) */
+void Interpolation4::addAlignedOffsetLink(Meca& meca, real len, Mecapoint const& arg, const real weight) const
+{
+    assert_true(mec_);
+    size_t off = mec_->matIndex() + prime_;
+    // coefficients to extract ( surface_point - center )
+    real alp[4] = { coef_[0] - real(1), coef_[1], coef_[2], coef_[3] };
+    // extract distance in current configuration:
+    real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
+    // coefficients to offset the point by 'len' along the diagonal:
+    real inc = len / ( -M_SQRT3 * rad );
+    alp[0] = coef_[0] - inc * 3;
+    alp[1] = coef_[1] + inc;
+    alp[2] = coef_[2] + inc;
+    alp[3] = coef_[3] + inc;
     switch ( rank_ )
     {
         case 0:

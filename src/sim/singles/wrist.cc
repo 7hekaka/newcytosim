@@ -82,7 +82,7 @@ void Wrist::setInteractions(Meca& meca) const
          to contrain the fiber to be aligned with the direction of the anchor point.
          */
         size_t j = i.lightest_point();
-        base_.addOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiffness);
+        base_.addAlignedOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiffness);
     }
 #endif
 }

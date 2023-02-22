@@ -82,6 +82,9 @@ public:
     
     /// call Meca::addLink with point offset by `len` from bead surface
     void addOffsetLink(Meca&, real len, Mecapoint const&, real weight) const;
+    
+    /// call Meca::addLink with point offset by `len` from bead surface
+    void addAlignedOffsetLink(Meca&, real len, Mecapoint const&, real weight) const;
 
     /// check validity
     int  invalid() const;
