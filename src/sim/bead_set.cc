@@ -127,6 +127,21 @@ void BeadSet::writeSet(Outputter& out) const
 }
 
 
+void BeadSet::defrostMore()
+{
+    Object * i;
+    while (( i = ice_.front() ))
+    {
+        ice_.pop_front();
+        //std::clog << "delete " << i->reference() << "\n";
+        inventory_.unassign(i);
+        i->objset(nullptr);
+        simul_.singles.deleteWrists(i);
+        delete(i);
+    }
+}
+
+
 void BeadSet::remove(Object * obj)
 {
     ObjectSet::remove(obj);

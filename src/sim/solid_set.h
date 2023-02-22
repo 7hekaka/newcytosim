@@ -31,7 +31,10 @@ public:
     
     /// write all Objects to file
     void writeSet(Outputter&) const;
-        
+    
+    /// like defrost() but also delete Wrist attached to deleted Solids
+    void defrostMore();
+
     /// print a summary of the content (nb of objects, class)
     void report(std::ostream& os) const { writeReport(os, title()); }
 

@@ -119,7 +119,20 @@ void SolidSet::writeSet(Outputter& out) const
     }
 }
 
-//------------------------------------------------------------------------------
+
+void SolidSet::defrostMore()
+{
+    Object * i;
+    while (( i = ice_.front() ))
+    {
+        ice_.pop_front();
+        //std::clog << "delete " << i->reference() << "\n";
+        inventory_.unassign(i);
+        i->objset(nullptr);
+        simul_.singles.deleteWrists(i);
+        delete(i);
+    }
+}
 
 
 void SolidSet::remove(Object * obj)

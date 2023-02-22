@@ -383,8 +383,8 @@ public:
         sim->tubules.defrost();
         sim->couples.defrost();
         sim->singles.defrost();
-        sim->beads.defrost();
-        sim->solids.defrost();
+        sim->beads.defrostMore();
+        sim->solids.defrostMore();
         sim->spheres.defrost();
         sim->fibers.defrost();
         sim->spaces.defrost();
