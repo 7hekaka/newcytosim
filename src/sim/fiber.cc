@@ -525,26 +525,25 @@ Fiber* Fiber::severM(real abs)
 
 Fiber* Fiber::severNow(const real abs)
 {
+    real min = prop->min_length;
     //std::clog << "sever " << reference() << " at " << abs << '\n';
-    if ( abs - REAL_EPSILON < abscissaM() )
+    real disM = abs - abscissaM();
+    if ( disM < min )
     {
-#if 0
         // this will remove a tiny fraction of the fiber at the minus-end
-        if ( 0 < abs-abscissaM() && abs < abscissaP() )
-            cutM(abs-abscissaM());
-#endif
+        if ( 0 < disM && abs < abscissaP() )
+            cutM(disM);
         return nullptr;
     }
-    if ( abs + REAL_EPSILON > abscissaP() )
+    real disP = abscissaP() - abs;
+    if ( disP < min )
     {
-#if 0
         // this will remove a tiny fraction of the fiber at the plus-end
-        if ( abscissaM() < abs && 0 < abscissaP()-abs )
-            cutP(abscissaP()-abs);
-#endif
+        if ( 0 < disP && abscissaM() < abs )
+            cutP(disP);
         return nullptr;
     }
-    return severM(abs-abscissaM());
+    return severM(disM);
 }
 
 
@@ -1953,7 +1952,7 @@ int Fiber::bad() const
 {
     if ( targetSegmentation() < 1e-6 )
         return 1;
-    if ( segmentation() < 1e-6 )
+    if ( segmentation() < 1e-9 )
         return 2;
     if ( abscissaM() > abscissaP() )
         return 4;
