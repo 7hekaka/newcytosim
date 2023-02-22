@@ -129,6 +129,9 @@ public:
 
     /// write
     void write_values(std::ostream&) const;
+    
+    /// info
+    void splash(std::ostream& os);
 
 };
 

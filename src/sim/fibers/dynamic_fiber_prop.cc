@@ -49,7 +49,7 @@ void DynamicFiberProp::clear()
  Brun L, Rupp B, Ward J, Nedelec F\n
  PNAS 106 (50) 21173-21178; 2009\n
  */
-static void splash(std::ostream& os, real g, real h, real unit)
+static void splashGHU(std::ostream& os, real g, real h, real unit)
 {
     real ctime = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
     real len = g * unit * ctime;
@@ -60,6 +60,23 @@ static void splash(std::ostream& os, real g, real h, real unit)
     os << "  catastrophe_time " << ctime << "s  rate " << 1/ctime << "/s";
     os << "  length " << len << "um \n";
     os.precision(p);
+}
+
+
+void DynamicFiberProp::splash(std::ostream& os)
+{
+    std::clog << std::setw(16) << name();
+    if ( 0 == growing_off_speed[0] )
+    {
+        splashGHU(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
+    }
+    else
+    {
+        // calculate stall force, from:
+        // 0 = growing_speed * std::exp(force/growing_force) + growing_off_speed;
+        real f = -growing_force[0] * std::log(-growing_off_speed[0]/growing_speed[0]);
+        std::clog << ":stall_force " << f;
+    }
 }
 
 /** Calculate the Hydrolysis rate resulting in a lifetime == t, given the growth */
@@ -118,7 +135,7 @@ void DynamicFiberProp::read(Glossary& glos)
     {
         real g = growing_speed[0]/unit_length;
         real h = back_calculate(g, len/growing_speed[0]);
-        splash(std::clog, g, h, unit_length);
+        splashGHU(std::clog, g, h, unit_length);
     }
 }
 
@@ -126,6 +143,11 @@ void DynamicFiberProp::read(Glossary& glos)
 void DynamicFiberProp::complete(Simul const& sim)
 {
     FiberProp::complete(sim);
+
+    /// print predicted average length in verbose mode:
+    bool undone = sim.fibers.count(match_property, this);
+    if ( undone && primed(sim) && sim.prop.verbose )
+        splash(std::clog);
 
     for ( int i = 0; i < 2; ++i )
     {
@@ -170,18 +192,6 @@ void DynamicFiberProp::complete(Simul const& sim)
 
     if ( min_length <= 0 )
         min_length = unit_length;
-     
-    /// print predicted average length in verbose mode:
-    if ( primed(sim) && sim.prop.verbose && sim.fibers.count(match_property, this)  )
-    {
-        // calculate stall force, from:
-        // 0 = growing_speed * std::exp(force/growing_force) + growing_off_speed;
-        real f = -growing_force[0] * std::log(-growing_off_speed[0]/growing_speed[0]);
-        std::clog << std::setw(16) << name() << ":stall_force " << f;
-
-        if ( 0 == growing_off_speed[0] )
-            splash(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
-    }
 }
 
 
