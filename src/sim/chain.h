@@ -274,7 +274,7 @@ public:
     /// signed distance from ORIGIN to minus end (abscissa of minus end)
     real abscissaM() const { return fnAbscissaM; }
     
-    /// abscissa of center, midway between minus end and plus end
+    /// abscissa of center, midway between minus and plus ends
     real abscissaC() const { return 0.5 * (fnAbscissaM + fnAbscissaP); }
 
     /// signed distance from ORIGIN to plus end (abscissa of plus end)
