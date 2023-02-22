@@ -585,7 +585,6 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
             std::clog << "' to load object with property #" << pid << '\n';
             // the orphan Object remains on the 'ice_' to be deleted during pruning:
             inventory_.unassign(obj);
-            obj->objset(nullptr);
             obj->setIdentity(0);
             obj = nullptr;
         }
