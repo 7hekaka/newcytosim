@@ -88,10 +88,10 @@ public:
     void pop(Object * n);
     
     /// Remove top Object from list, returning it
-    Object* pop_front();
+    void pop_front();
     
     /// Remove last Object from list
-    Object* pop_back();
+    void pop_back();
     
     /// clear the list
     void clear();

@@ -181,12 +181,12 @@ void ObjectSet::erase(Object * obj)
 
 void ObjectSet::erasePool(ObjectPool & list)
 {
-    Object * i = list.pop_front();
-    while ( i )
+    Object * i;
+    while (( i = list.front() ))
     {
+        list.pop_front();
         static_cast<Object*>(i)->objset(nullptr);
         delete(i);
-        i = list.pop_front();
     }
 }
 
@@ -449,9 +449,10 @@ void ObjectSet::freeze()
 
 void ObjectSet::defrost()
 {
-    Object * i = ice_.pop_front();
-    while ( i )
+    Object * i;
+    while (( i = ice_.front() ))
     {
+        ice_.pop_front();
         //std::clog << "delete " << i->reference() << "\n";
         //inventory_.unassign(i);
         //i->objset(nullptr);
@@ -460,18 +461,17 @@ void ObjectSet::defrost()
          particulary removing Wrists for Bead/Solid that are deleted */
         link(i);
         delete(i);
-        i = ice_.pop_front();
     }
 }
 
 
 void ObjectSet::thaw()
 {
-    Object * i = ice_.pop_front();
-    while ( i )
+    Object * i;
+    while (( i = ice_.front() ))
     {
+        ice_.pop_front();
         link(i);
-        i = ice_.pop_front();
     }
 }
 

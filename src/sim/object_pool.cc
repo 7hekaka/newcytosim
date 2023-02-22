@@ -89,41 +89,32 @@ void ObjectPool::grab(ObjectPool& list)
 }
 
 
-Object* ObjectPool::pop_front()
+void ObjectPool::pop_front()
 {
+    --nSize;
     Object * n = frontO;
-    if ( n )
-    {
-        --nSize;
-        frontO = n->next();
+    frontO = frontO->next();
+    n->next(nullptr);  // unnecessary?
+
+    if ( frontO )
+        frontO->prev(nullptr);
+    else
+        backO = nullptr;
         
-        if ( frontO )
-            frontO->prev(nullptr);
-        else
-            backO = nullptr;
-        
-        n->next(nullptr);  // unnecessary?
-    }
-    return n;
 }
 
 
-Object* ObjectPool::pop_back()
+void ObjectPool::pop_back()
 {
+    --nSize;
     Object * n = backO;
-    if ( n )
-    {
-        --nSize;
-        backO = n->prev();
-    
-        if ( backO )
-            backO->next(nullptr);
-        else
-            frontO = nullptr;
-        
-        n->prev(nullptr);  // unnecessary?
-    }
-    return n;
+    backO = backO->prev();
+    n->prev(nullptr);  // unnecessary?
+
+    if ( backO )
+        backO->next(nullptr);
+    else
+        frontO = nullptr;
 }
 
 
