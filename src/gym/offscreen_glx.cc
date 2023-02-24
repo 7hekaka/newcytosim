@@ -12,7 +12,7 @@
 #include <GL/glx.h>
 
 Display * dpy = 0;
-GLXPbuffer pbuf;
+GLXPbuffer pbuf = 0;
 GLXContext glxContext;
 
 
@@ -43,7 +43,7 @@ unsigned OffScreen::openContext()
 }
 
 
-unsigned OffScreen::makeBuffer(const int width, const int height, int)
+GLXPbuffer OffScreen::makeBuffer(const int width, const int height, int)
 {
     dpy = XOpenDisplay(0);
     
@@ -116,12 +116,12 @@ unsigned OffScreen::makeBuffer(const int width, const int height, int)
         return 0;
     }
     
-    return 1;
+    return pbuf;
 }
 
-unsigned OffScreen::openBuffer(const int width, const int height, int)
+GLXPbuffer OffScreen::openBuffer(const int width, const int height, int)
 {
-    unsigned buf = makeBuffer(width, height, 0);
+    GLXPbuffer buf = makeBuffer(width, height, 0);
     glViewport(0, 0, width, height);
     return buf;
 }
