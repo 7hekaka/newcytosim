@@ -736,7 +736,7 @@ void FiberSet::updateFibers() const
 }
 
 
-void FiberSet::shortenSpindle(real len) const
+void FiberSet::shortenSpindle(real dL, real dR) const
 {
     Fiber * L = nullptr;
     Fiber * R = nullptr;
@@ -747,7 +747,7 @@ void FiberSet::shortenSpindle(real len) const
     for ( Fiber* fib=first(); fib; fib=fib->next() )
     {
         real xM = fib->posEndM().XX;
-        real xP = fib->posEndM().XX;
+        real xP = fib->posEndP().XX;
         if ( xM < xL )
         {
             eL = MINUS_END;
@@ -773,17 +773,17 @@ void FiberSet::shortenSpindle(real len) const
     {
         std::clog << "shortenSpindle L " << L->reference() << "  " << eL << "\n";
         if ( eL == PLUS_END )
-            L->cutP(len);
+            L->cutP(dL);
         else
-            L->cutM(len);
+            L->cutM(dL);
     }
     if ( R )
     {
         std::clog << "shortenSpindle R " << R->reference() << "  " << eR << "\n";
         if ( eR == PLUS_END )
-            R->cutP(len);
+            R->cutP(dR);
         else
-            R->cutM(len);
+            R->cutM(dR);
     }
 }
 
