@@ -18,9 +18,9 @@
 #include "meca.h"
 
 
+/* this implements nucleation on empty sites */
 void Aster::step()
 {
-    // nucleation:
     for ( size_t i = 0; i < asLinks.size(); ++i )
     {
         if ( !fiber(i) &&  RNG.test(prop->fiber_prob) )
@@ -234,16 +234,16 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
     if ( prop->joint == PLUS_END )
         dir.negate();
     
-    if ( fos.empty() )
-        throw InvalidParameter("aster:fibers must be specified");
-    
-    ObjectList list;
-    Fiber * F = sim.fibers.newFiber(list, fip, fos);
-    //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
-    ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
-    ObjectSet::translateObjects(list, asRadius*pos - F->posEnd(prop->joint));
-    
-    objs.append(list);
+    Fiber * F = nullptr;
+    if ( fos.size() )
+    {
+        ObjectList list;
+        F = sim.fibers.newFiber(list, fip, fos);
+        //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
+        ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
+        ObjectSet::translateObjects(list, pos - F->posEnd(prop->joint));
+        objs.append(list);
+    }
     return F;
 }
 
@@ -272,7 +272,7 @@ void Aster::placeFiber(ObjectList& objs, Simul& sim, const Vector A, const Vecto
 {
     size_t i = placeAnchor(A, B, ref);
     FiberProp const* fip = sim.findProperty<FiberProp>("fiber", fiber_type);
-    Fiber * F = makeFiber(objs, sim, A, B-A, fip, fos);
+    Fiber * F = makeFiber(objs, sim, asRadius*A, B-A, fip, fos);
     assert_true( i == nbOrganized() );
     nbOrganized(i+1);
     grasp(F, i);
