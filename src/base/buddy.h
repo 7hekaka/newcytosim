@@ -6,18 +6,20 @@
 
 /// Establishes `circles of friends' within objects.
 /**
- Buddy implements mutual relationship between objects.
+ Buddy implements mutual, symmetric, relationships between objects.
  
- The class is used to record a circle of `buddies` using a single-linked list.
+ The class is used to record a circle of `buddies` using a simple linked list.
  Relationship is established with connect().
- When an object is destroyed, it calls goodbye() for all its buddies.
+ When an Object is destroyed, goodbye() if called for all its buddies.
  
- This class is used when an object needs to know if another object is destroyed.
- It also implements a virtual 'salute()' function that can be used
- to implement some basic form of communication between objects of the same circle.
+ This class is used when an object needs to know if another object is destroyed,
+ for example to inform Aster that one of its Fiber was destroyed.
+ It also implements a virtual 'salute()' function that can be used to implement
+ some basic form of communication between objects within the circle of buddies.
  
  F. Nedelec 11.08.2012 -- 16.04.2020.
  21.09.2022: implemented circular list using one pointer.
+ 28.02.2023: fixed unlist()
  */
 class Buddy
 {
@@ -44,10 +46,10 @@ public:
         return nullptr;
     }
     
-    /// true if 'guy' is not within the circle of buddies
-    bool notBuddy(Buddy const* guy) const
+    /// true if 'guy' is within the circle of buddies
+    bool isBuddy(Buddy const* guy) const
     {
-        return ! this->findBuddy(guy);
+        return this->findBuddy(guy);
     }
     
     /// return number of buddies in circle of friends
@@ -70,12 +72,9 @@ public:
         if ( !findBuddy(guy) )
         {
             // join the two circles:
-            Buddy * e = guy;
-            while ( e->buddy_ != guy )
-                e = e->buddy_;
             Buddy * b = buddy_;
-            buddy_ = guy;
-            e->buddy_ = b;
+            buddy_ = guy->buddy_;
+            guy->buddy_ = b;
             //std::clog << this << " has " << nbBuddies() << " buddies\n";
         }
     }
@@ -88,6 +87,7 @@ public:
         {
             assert_true( b->buddy_ == guy );
             b->buddy_ = guy->buddy_;
+            guy->buddy_ = guy;
         }
         else
             std::clog << " Warning: Buddy::unlist(unlisted)\n";

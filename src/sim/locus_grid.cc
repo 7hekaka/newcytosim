@@ -714,7 +714,7 @@ static inline bool not_adjacentPL(BigPoint const& a, BigLocus const& b)
 {
     //a->mec_->Buddy::print(std::clog);
     //b->obj_->Buddy::print(std::clog);
-    return b.obj_->notBuddy(a.obj_);
+    return ! b.obj_->isBuddy(a.obj_);
 }
 
 
