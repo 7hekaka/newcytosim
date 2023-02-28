@@ -2035,7 +2035,7 @@ Vector Chain::dirEnd(const FiberEnd end) const
 }
 
 
-/// force on the plus end projected on the direction of elongation
+/// force on the minus end projected on the direction of elongation
 real Chain::projectedForceEndM() const
 {
     return -dot(netForce(0), dirSegment(0));

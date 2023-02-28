@@ -945,7 +945,7 @@ void CoupleSet::uniRelax()
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Equilibrate
+#pragma mark - Direct Attachment
 
 
 void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleReserve& can)
