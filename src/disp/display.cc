@@ -1813,12 +1813,17 @@ void Display::drawCouplesB(CoupleSet const& set) const
 void Display::drawSolid(Solid const& obj)
 {
     PointDisp const* disp = obj.prop->disp;
-    
+    gym_color col = bodyColorF(obj);
+#if NEW_SOLID_HAS_TWIN
+    if ( obj.twin() )
+        col = bodyColorF(*obj.twin()).tweak(obj.signature());
+#endif
+
     //display points:
     if (( disp->style & 2 ) && disp->perceptible )
     {
         real rad = pixscale(disp->size);
-        bodyColor(obj);
+        gym::color_both(col);
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), rad, gle::hedron(obj.radius(i)>0));
@@ -1833,10 +1838,10 @@ void Display::drawSolid(Solid const& obj)
         real rad = M_SQRT2 * pixscale(disp->size);
         const size_t inx = 0;
         Solid const* twi = obj.twin();
-        // check that three points are there:
+        // three points are expected:
         if ( twi && obj.radius(inx) > 0 && obj.nbPoints() > inx + 3 )
         {
-            bodyColor(obj);
+            gym::color_both(col, 1);
             gym::enableLighting();
             for ( size_t i = inx+1; i <= inx+DIM; ++i )
             {
@@ -1854,9 +1859,9 @@ void Display::drawSolid(Solid const& obj)
     //display outline of spheres in 2D
     if ( disp->style & 8 )
     {
+        gym::color(col);
 #if ( DIM == 2 )
         gym::disableLighting();
-        gym::color(bodyColorF(obj));
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
         {
             if ( obj.radius(i) > pixelSize )
@@ -1871,7 +1876,6 @@ void Display::drawSolid(Solid const& obj)
         if ( obj.mark()  &&  obj.nbPoints() > 1 )
         {
             gym::enableLighting();
-            bodyColor(obj);
             //drawObject(obj.posP(0), obj.diffPoints(1, 0), obj.radius(0), gle::circle);
             gym::stretchAlignZ(obj.posP(0), obj.posP(1), obj.radius(0));
             gle::cylinder1();
@@ -1883,7 +1887,7 @@ void Display::drawSolid(Solid const& obj)
     if ( disp->style & 16 )
     {
         char tmp[32];
-        gym::color(bodyColorF(obj));
+        gym::color(col);
         snprintf(tmp, sizeof(tmp), "0:%u", obj.identity());
         drawText(obj.posP(0), tmp);
         for ( size_t i = 1; i < obj.nbPoints(); ++i )
@@ -1897,7 +1901,7 @@ void Display::drawSolid(Solid const& obj)
     if ( disp->style & 32 )
     {
         gym::disableLighting();
-        gym::color(bodyColorF(obj));
+        gym::color(col);
         gym::ref_view();
         gym::loadPoints(obj.nbPoints(), obj.addrPoints());
         gym::drawLineStrip(disp->widthX, 0, obj.nbPoints());
@@ -1991,11 +1995,12 @@ void Display::drawSolids(SolidSet const& set)
 void Display::drawBead(Bead const& obj)
 {
     PointDisp const* disp = obj.prop->disp;
-
+    gym_color col = bodyColorF(obj);
+    
     // display center:
     if ( disp->style & 2 )
     {
-        bodyColor(obj);
+        gym::color_both(col);
         drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
     }
     
@@ -2004,7 +2009,7 @@ void Display::drawBead(Bead const& obj)
     if (( disp->style & 4 ) && obj.radius() > pixelSize )
     {
         gym::disableLighting();
-        gym::color(bodyColorF(obj));
+        gym::color_both(col);
         gym::transScale(obj.position(), obj.radius());
         gle::circle1(disp->width);
     }
