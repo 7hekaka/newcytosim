@@ -663,7 +663,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     if ( opt.has_key("point0") || opt.has_key("sphere0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
     
-    // options named 'point???' will add points:
+    // parameter 'point###' will add a point, with Single attached
     size_t inp = 1;
     std::string var = "point1";
     while ( opt.has_key(var) )
@@ -672,7 +672,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         var = "point" + std::to_string(++inp);
     }
 
-    // options named 'sphere???' will add spheres, with Singles on the surface:
+    // parameter 'sphere###' will add a sphere, with Singles on their surface
     inp = 1;
     var = "sphere1";
     while ( opt.has_key(var) )
@@ -681,7 +681,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         var = "sphere" + std::to_string(++inp);
     }
     
-    // options named 'ball???' will add spheres, with Singles in the volume
+    // parameter 'ball###' will add a sphere, with Singles in their volume
     inp = 1;
     var = "ball1";
     while ( opt.has_key(var) )
@@ -691,7 +691,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     }
 
 #if BACKWARD_COMPATIBILITY < 100
-    /* distribute Singles over all points. Deprecated, since since 03.2017 */
+    /* distribute Singles over all points. Deprecated, since 03.2017 */
     inp = 0;
     while ( opt.set(str, "anchor", inp++) )
         sim.singles.makeWrists(objs, this, 0, nPoints, str);
@@ -767,6 +767,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             else if ( S->nbPoints() <= DIM )
                 throw InvalidParameter("Solid's twin lacks sufficient points");
         }
+        /* 01.2023: Michelin's chromosomes: create overlapping spheres to outline a silhouette */
         real len = 2, chi = 0.5;
         if ( opt.set(len, "chromosome") )
         {
@@ -778,14 +779,14 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
                 {
                     real R = R0 * ( 2.0 + std::tanh(5.0 * abs_real(y) - M_SQRT2) ); // in [1, 3]
                     addSphere(Vector(-R, y, 0), R);
-                    //addTriad(R);
                     /* Could add chromokinesins here */
+                    //addTriad(R);
                 }
             }
         }
         if ( soTwin )
         {
-            // we flip 'S' with a X -> -X to make it mirror image of its twin:
+            // flip 'S' (X -> -X) resulting in the twins being mirror-images
             ObjectSet::rotateObjects(objs, Rotation::flipX());
         }
     }
