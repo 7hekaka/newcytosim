@@ -296,10 +296,11 @@ static void flashFiberStyle(FiberDisp const* p)
     switch ( p->style )
     {
         case 0: flashText("%s: default style", n); break;
-        case 1: flashText("%s: style=filament", n); break;
-        case 2: flashText("%s: style=actin", n); break;
-        case 3: flashText("%s: style=microtubule", n); break;
-        case 4: flashText("%s: style=backbone", n); break;
+        case 1: flashText("%s: style=1 (backbone)", n); break;
+        case 2: flashText("%s: style=2 (striped)", n); break;
+        case 3: flashText("%s: style=3 (filament)", n); break;
+        case 4: flashText("%s: style=4 (actin)", n); break;
+        case 5: flashText("%s: style=5 (microtubule)", n); break;
         default: flashText("unknown %s:style", n); break;
     }
 }
@@ -445,8 +446,6 @@ static void changePointStyle(FiberDisp* p, int arg)
 static void toggleLineStyle(FiberDisp* p, int val)
 {
     p->line_style = ( p->line_style != val ) * val;
-    if ( p->style == 4 ) // override the 'backbone' style
-        p->style = 0;
     flashLineStyle(p);
 }
 
@@ -456,9 +455,9 @@ static void changeLineStyle(FiberDisp* p, int inc)
     flashLineStyle(p);
 }
 
-static void toggleStyle(FiberDisp* p, int val)
+static void toggleFiberStyle(FiberDisp* p, int inc)
 {
-    p->style = ( p->style != val ) * val;
+    p->style = ( p->style + inc ) % 6;
     flashFiberStyle(p);
 }
 
@@ -1050,7 +1049,7 @@ void processKey(unsigned char key, int modifiers = 0)
             
         case '?':
         case 177:
-            setFiberDisp(player.allVisibleFiberDisp(), toggleStyle, 4);
+            setFiberDisp(player.allVisibleFiberDisp(), toggleFiberStyle, 1);
             break;
 
         case '1':

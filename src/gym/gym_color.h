@@ -29,6 +29,9 @@ public:
     typedef float COLOF;
 
 private:
+    
+    /// color components: Red, Green, Blue, Alpha
+    COLOF col_[4];
 
     /// concatenate 4 bytes into an int
     static uint32_t combine(uint32_t R, uint32_t G, uint32_t B, uint32_t A)
@@ -45,9 +48,6 @@ private:
     
     /// return value clamped to [0, 1]
     static COLOF clamp(COLOF s) { return std::max(COLOF(0), std::min(s, COLOF(1))); }
-    
-    /// COLOF components: Red, Green, Blue, Alpha
-    COLOF col_[4];
 
 #pragma mark - Private methods
 
