@@ -203,13 +203,16 @@ public:
     virtual void drawFiberSegmentT(Fiber const&, size_t) const;
 
     /// actin-like rendering using a sphere to represent each monomer
-    void         drawFilament(Fiber const& fib, gym_color const&, gym_color const&, gym_color const&) const;
+    void drawFilament(Fiber const& fib, real, gym_color, gym_color, gym_color) const;
+    
+    /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
+    void drawFilamentStriped(Fiber const&, float rad, real inc, gym_color, gym_color) const;
 
     /// actin-like rendering using a sphere to represent each monomer
-    void         drawActin(Fiber const& fib, gym_color const&, gym_color const&, gym_color const&) const;
+    void drawActin(Fiber const& fib, gym_color, gym_color, gym_color) const;
     
     /// microtubule-like rendering using a sphere to represent each monomer
-    void         drawMicrotubule(Fiber const& fib, gym_color const&, gym_color const&, gym_color const&) const;
+    void drawMicrotubule(Fiber const& fib, gym_color, gym_color, gym_color) const;
     
     /// draw Fiber point-like features
     virtual void drawFiberPoints(Fiber const&) const;

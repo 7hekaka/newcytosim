@@ -1406,52 +1406,37 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Specific styles
+#pragma mark - Specific Fiber styles
 
 
 /**
- This renders a protofilament by drawing spheres of alternating colors,
- along the backbone of the `Fiber` at distance 4nm from each other.
+ Renders a protofilament by drawing spheres of alternating colors,
+ at distance `inc` from each other along the backbone of the `Fiber`.
  */
-void Display::drawFilament(Fiber const& fib,
-                           gym_color const& color1,
-                           gym_color const& color2,
-                           gym_color const& colorE) const
+void Display::drawFilament(Fiber const& fib, const real inc,
+                           gym_color col1, gym_color col2, gym_color colE) const
 {
-    // axial translation between two sucessive monomers:
-    const real dab = 0.004;
     // enlarge radius of monomers to make them overlap
-    const float rad = 0.65 * dab;
-    
-    real ab = 0;
-    
+    const float rad = 0.65 * inc;
     gym::enableClipPlane(4);
     
-    int cnt = 0;
-    // increment until we reach the minus end
-    while ( ab <= fib.abscissaM() )
-    {
-        ++cnt;
-        ab += dab;
-    }
-    Vector3 p(fib.pos(ab)), q;
-    // draw the monomers until the plus end:
-    while ( ab < fib.abscissaP() )
+    int cnt = (int)std::ceil(fib.abscissaM()/inc);
+    real abs = inc * cnt;
+    Vector3 p(fib.pos(abs)), q;
+    // draw a monomer every 'inc'
+    while ( abs < fib.abscissaP() )
     {
         q = p;
-        ab += dab;
-        p = Vector3(fib.pos(ab));
+        abs += inc;
+        p = Vector3(fib.pos(abs));
 
         // use different tones to individualize the two strands:
-        if ( ++cnt & 1 )
-            gym::color_load(color1);
-        else
-            gym::color_load(color2);
+        gym::color_front((++cnt & 1)?col1:col2);
         
         // change color for the last monomer:
-        if ( ab + dab > fib.abscissaP() )
+        if ( abs + inc > fib.abscissaP() )
         {
-            gym::color_load(colorE);
+            gym::color_front(colE);
             gym::disableClipPlane(4);
         }
         
@@ -1470,16 +1455,61 @@ void Display::drawFilament(Fiber const& fib,
 
 
 /**
+Draw segments of length 'inc' of alternating colors, in register with Fiber's abscissa
+*/
+void Display::drawFilamentStriped(Fiber const& fib, float rad, const real inc,
+                                  gym_color col1, gym_color col2) const
+{
+    const real sup = fib.length();
+    int cnt = 1 + (int)std::floor(fib.abscissaM()/inc);
+    real abs = inc * cnt - fib.abscissaM();
+    Vector old = fib.displayPosM(abs-inc);
+    Vector pos = fib.displayPosM(abs);
+    Vector nxt = fib.displayPosM(abs+inc);
+    Vector dir = normalize(nxt-pos);
+    
+    // alternate different tones:
+    gym::color_front((++cnt & 1)?col1:col2);
+    gym::enableClipPlane(4);
+    gym::setClipPlane(4, -dir, pos);
+    gym::transAlignZ(old, rad, pos-old);
+    gle::capedTube();
+    gym::setClipPlane(4, dir, pos);
+
+    gym::enableClipPlane(5);
+    // draw segments
+    while ( abs < sup )
+    {
+        abs += inc;
+        old = pos;
+        pos = nxt;
+        nxt = fib.displayPosM(abs+inc);
+        dir = normalize(nxt-old);
+        // alternate different tones:
+        gym::color_front((++cnt & 1)?col1:col2);
+        gym::setClipPlane(5, -dir, pos);
+        gym::transAlignZ(old, rad, pos-old);
+        gle::centralTube();
+        gym::setClipPlane(4, dir, pos);
+    }
+    gym::disableClipPlane(5);
+
+    // draw last segment, which may be truncated:
+    gym::color_front((++cnt & 1)?col1:col2);
+    gym::stretchAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
+    gle::endedTube();
+    gym::disableClipPlane(4);
+}
+
+
+/**
  This renders 26 spheres positionned on a right-handed helix,
  making one turn every 74nm, with a max width of ~ 9nm.
  This is roughly Ken Holmes' model of F-actin:
  Nature 347, 44 - 49 (06 September 1990); doi:10.1038/347044a0
  which shows half a turn in 37nm containing 13 monomers.
  */
-void Display::drawActin(Fiber const& fib,
-                        gym_color const& color1,
-                        gym_color const& color2,
-                        gym_color const& colorE) const
+void Display::drawActin(Fiber const& fib, gym_color col1, gym_color col2, gym_color colE) const
 {    
     // axial translation between two sucessive monomers:
     const real dab = 0.00275;
@@ -1527,14 +1557,14 @@ void Display::drawActin(Fiber const& fib,
         
         // use different tones to individualize the two strands:
         if ( ++cnt & 1 )
-            gym::color_load(color1);
+            gym::color_load(col1);
         else
-            gym::color_load(color2);
+            gym::color_load(col2);
 
         // change color for the last monomer:
         if ( ab + dab > fib.abscissaP() )
         {
-            gym::color_load(colorE);
+            gym::color_load(colE);
             gym::disableClipPlane(4);
         }
         
@@ -1558,10 +1588,7 @@ void Display::drawActin(Fiber const& fib,
  colorA for alpha-tubulin
  colorB for beta-tubulin
  */
-void Display::drawMicrotubule(Fiber const& fib,
-                              gym_color const& colorA,
-                              gym_color const& colorB,
-                              gym_color const& colorE) const
+void Display::drawMicrotubule(Fiber const& fib, gym_color colA, gym_color colB, gym_color colE) const
 {
     // precalculated 3-start helical trajectory, for 13 monomers:
     //real dx[] = {0,0.000923,0.001846,0.002769,0.003692,0.004615,0.005538,0.006461,0.007384,0.008308,0.009231,0.010154,0.011077};
@@ -1594,11 +1621,11 @@ void Display::drawMicrotubule(Fiber const& fib,
         Vector3 e = n * off;
         Vector3 f = cross(d, e);
 
-        gym::color_load(colorA);
+        gym::color_load(colA);
         for ( int i = 0; i < 13; ++i )
             drawMonomer(p+dx[i]*d+dy[i]*e+dz[i]*f, rad);
 
-        gym::color_load(colorB);
+        gym::color_load(colB);
         for ( int i = 0; i < 13; ++i )
             drawMonomer(p+(sa+dx[i])*d+dy[i]*e+dz[i]*f, rad);
 
@@ -1619,12 +1646,12 @@ void Display::drawMicrotubule(Fiber const& fib,
         {
             if ( ab+sa+dx[i] < abmax )
             {
-                gym::color_load(colorA);
+                gym::color_load(colA);
                 drawMonomer(p+dx[i]*d+dy[i]*e+dz[i]*f, rad);
                 if ( ab+5.2*sa+dx[i] < abmax )
-                    gym::color_load(colorB);
+                    gym::color_load(colB);
                 else
-                    gym::color_load(colorE);
+                    gym::color_load(colE);
                 drawMonomer(p+(sa+dx[i])*d+dy[i]*e+dz[i]*f, rad);
             }
         }
@@ -1662,7 +1689,7 @@ void Display::drawFiber(Fiber const& fib)
     
     if ( disp->style )
     {
-        if ( disp->style & 4 )
+        if ( disp->style == 1 )
             return drawFiberBackbone(fib);
 
         gym_color col1 = fib.disp->color;
@@ -1674,14 +1701,19 @@ void Display::drawFiber(Fiber const& fib)
             gym::color_back(col1);
         else
             gym::color_back(fib.prop->disp->back_color);
+        
+        if ( col1.transparent() )
+            gym::enableCullFace(GL_BACK);
 
         switch( disp->style )
         {
-            case 1: drawFilament(fib, col1, col2, colE); break;
-            case 2: drawActin(fib, col1, col2, colE); break;
-            case 3: drawMicrotubule(fib, col1, col2, colE); break;
+            case 2: drawFilamentStriped(fib, pixscale(disp->line_width), 0.008, col1, col2); break;
+            case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
+            case 4: drawActin(fib, col1, col2, colE); break;
+            case 5: drawMicrotubule(fib, col1, col2, colE); break;
         }
         style = 0;
+        gym::restoreCullFace();
     }
 
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
