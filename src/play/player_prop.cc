@@ -90,23 +90,21 @@ static std::string standardReport(unsigned inx)
     switch( inx )
     {
         case 0: return "";
-        case 1: return "fiber:lengths";
+        case 1: return "fiber:lengths,fiber:segment";
         case 2: return "fiber:dynamics{split=1}";
-        case 3: return "fiber:segment";
-        case 4: return "single,couple";
-        case 5: return "single:force,couple:force";
-        case 6: return "couple:configuration{split=1}";
-        case 7: return "simul";
-        case 8: return "simul:inventory";
-        case 9: return "platelet";
-        case 10: return "space";
-        case 11: return "fiber:energy";
-        case 12: return "fiber:mesh,field";
-        case 13: return "fiber:lattice";
-        case 14: return "fiber:segment";
-        case 15: return "fiber:cluster{couple=1}";
-        case 16: return "fiber:age";
-        case 17: return "fiber:distribution";
+        case 3: return "single,couple";
+        case 4: return "single:force,couple:force";
+        case 5: return "couple:configuration{split=1}";
+        case 6: return "simul";
+        case 7: return "simul:inventory";
+        case 8: return "fiber:energy";
+        case 9: return "space";
+        case 10: return "platelet";
+        case 11: return "fiber:mesh,field";
+        case 12: return "fiber:lattice";
+        case 13: return "fiber:cluster{couple=1}";
+        case 14: return "fiber:age";
+        case 15: return "fiber:distribution";
     }
     return "";
 }
