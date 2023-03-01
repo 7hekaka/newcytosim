@@ -1692,7 +1692,7 @@ void Display::drawFiber(Fiber const& fib)
         if ( disp->style == 1 )
             return drawFiberBackbone(fib);
 
-        gym_color col1 = fib.disp->color;
+        gym_color col1 = fib.disp->color.alpha(1.0);
         gym_color col2 = fib.disp->color.darken(0.75);
         gym_color colE = fib.disp->end_color[0];
         
@@ -1701,9 +1701,6 @@ void Display::drawFiber(Fiber const& fib)
             gym::color_back(col1);
         else
             gym::color_back(fib.prop->disp->back_color);
-        
-        if ( col1.transparent() )
-            gym::enableCullFace(GL_BACK);
 
         switch( disp->style )
         {
@@ -1713,7 +1710,6 @@ void Display::drawFiber(Fiber const& fib)
             case 5: drawMicrotubule(fib, col1, col2, colE); break;
         }
         style = 0;
-        gym::restoreCullFace();
     }
 
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
