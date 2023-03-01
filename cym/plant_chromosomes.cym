@@ -8,7 +8,7 @@
 
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = sphere 1.0
     twin = mirror
 }
@@ -64,7 +64,7 @@ run 100 system
 
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = sphere 1.0
     twin = mirror
 }
@@ -117,7 +117,7 @@ run 100 system
 
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = sphere 1.0
     twin = mirror
 }
@@ -170,7 +170,7 @@ run 100 system
 
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = sphere 1.0
     twin = mirror
 }
@@ -222,7 +222,7 @@ run 100 system
 
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = sphere 1.0
     twin = mirror
 }

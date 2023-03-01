@@ -54,7 +54,7 @@ set solid kinetochore
 repeat 2 {
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = cylinder 0.5 2.0
     direction = X
     chromosome = 2, 1
@@ -63,7 +63,7 @@ new kinetochore
 run 100 system
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = cylinder 0.5 2.0
     direction = X
     chromosome = 1.3, 1.05
@@ -72,7 +72,7 @@ new kinetochore
 run 100 system
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = cylinder 0.5 2.0
     direction = X
     chromosome = 1.55, 0.95
@@ -81,7 +81,7 @@ new kinetochore
 run 100 system
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = cylinder 0.5 2.0
     direction = X
     chromosome = 1.2, 0.90
@@ -90,7 +90,7 @@ new kinetochore
 run 100 system
 new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S>0.97))
+    sphere1 = 0 0 0, 0.100, (2 corona sphere 1 0 if (S<-0.97))
     position = cylinder 0.5 2.0
     direction = X
     chromosome = 1.8, 0.98

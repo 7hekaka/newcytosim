@@ -554,7 +554,7 @@ Vector Cytosim::readPosition(std::istream& is, Space const* spc)
         else if ( tok == "if" )
         {
             tok = Tokenizer::get_token(is);
-            real S = -pos.e_sum()/std::sqrt(DIM);
+            real S = pos.e_sum()/std::sqrt(DIM);
             Evaluator evaluator{{"X", pos.x()}, {"Y", pos.y()}, {"Z", pos.z()}, {"S", S}};
             try {
                 if ( 0 == evaluator.eval(tok) )
