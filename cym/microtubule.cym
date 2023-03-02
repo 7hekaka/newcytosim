@@ -26,7 +26,7 @@ set fiber microtubule
     confine = inside, 200
     activity = grow
     growing_speed = 0.1
-    display = ( style=microtubule; point=7, 0; color=green, dark_green; end_color=white,purple; )
+    display = ( style=microtubule; point=7, 0; color=green, dark_green; end_color=white,purple; line=25; )
 }
 
 new 1 microtubule

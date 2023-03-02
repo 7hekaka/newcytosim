@@ -1431,7 +1431,7 @@ void Display::drawFilament(Fiber const& fib, const real inc,
         p = Vector3(fib.pos(abs));
 
         // use different tones to individualize the two strands:
-        gym::color_front((++cnt & 1)?col1:col2);
+        gym::color_front((++cnt&1)?col1:col2);
         
         // change color for the last monomer:
         if ( abs + inc > fib.abscissaP() )
@@ -1467,9 +1467,10 @@ void Display::drawFilamentStriped(Fiber const& fib, float rad, const real inc,
     Vector pos = fib.displayPosM(abs);
     Vector nxt = fib.displayPosM(abs+inc);
     Vector dir = normalize(nxt-pos);
-    
+    abs += inc;
+
     // alternate different tones:
-    gym::color_front((++cnt & 1)?col1:col2);
+    gym::color_front((++cnt&1)?col1:col2);
     gym::enableClipPlane(4);
     gym::setClipPlane(4, -dir, pos);
     gym::transAlignZ(old, rad, pos-old);
@@ -1483,10 +1484,10 @@ void Display::drawFilamentStriped(Fiber const& fib, float rad, const real inc,
         abs += inc;
         old = pos;
         pos = nxt;
-        nxt = fib.displayPosM(abs+inc);
+        nxt = fib.displayPosM(abs);
         dir = normalize(nxt-old);
         // alternate different tones:
-        gym::color_front((++cnt & 1)?col1:col2);
+        gym::color_front((++cnt&1)?col1:col2);
         gym::setClipPlane(5, -dir, pos);
         gym::transAlignZ(old, rad, pos-old);
         gle::centralTube();
@@ -1495,8 +1496,8 @@ void Display::drawFilamentStriped(Fiber const& fib, float rad, const real inc,
     gym::disableClipPlane(5);
 
     // draw last segment, which may be truncated:
-    gym::color_front((++cnt & 1)?col1:col2);
-    gym::stretchAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
+    gym::color_front((++cnt&1)?col1:col2);
+    gym::transAlignZ(nxt, rad, -fib.dirEndP());
     gle::endedTube();
     gym::disableClipPlane(4);
 }

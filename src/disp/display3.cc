@@ -277,7 +277,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
     gym::setClipPlane(4, dir, pos);
     
     // keep abs to match to the end of the section already drawn
-    abs += inc;
+    abs += 2 * inc;
 
     gym::enableClipPlane(5);
     // draw segments
@@ -286,7 +286,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
         abs += inc;
         old = pos;
         pos = nxt;
-        nxt = fib.displayPosM(abs+inc);
+        nxt = fib.displayPosM(abs);
         dir = normalize(nxt-old);
         gym::color_front(select_color(fib, inx++, fac));
         gym::setClipPlane(5, -dir, pos);
@@ -298,9 +298,9 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
 
     // draw last segment, which may be truncated:
     gym::color_front(select_color(fib, last, facP));
-    if ( abs+inc >= fib.length() )
+    if ( abs >= fib.length() )
     {
-        gym::stretchAlignZ1(nxt, rad, -fib.dirEndP(), fib.length()-abs);
+        gym::transAlignZ(nxt, rad, -fib.dirEndP());
         gle::endedTube();
     }
     else
