@@ -1693,7 +1693,7 @@ void Display::drawFiber(Fiber const& fib)
             return drawFiberBackbone(fib);
 
         gym_color col1 = fib.disp->color.alpha(1.0);
-        gym_color col2 = fib.disp->color.darken(0.75);
+        gym_color col2 = col1.darken(0.75);
         gym_color colE = fib.disp->end_color[0];
         
         // load backface color:
