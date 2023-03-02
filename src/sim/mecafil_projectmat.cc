@@ -4,6 +4,7 @@
  This is a slow method, but it can be useful to compare with other methods
 */
 #include "vecprint.h"
+#include "cytoblas.h"
 
 
 void Mecafil::initProjection()
@@ -175,7 +176,8 @@ void Mecafil::makeProjectionDiff(const real* force)
     const size_t nbv = DIM * nbPoints();         //number of variables
     
     // calculate the lagrangian coefficients:
-    blas::xgemv('N', nbs, nbv, 1., iJJtiJ, nbs, force, 1, 0., iLag, 1);
+    if ( force )
+        blas::xgemv('N', nbs, nbv, 1., iJJtiJ, nbs, force, 1, 0., iLag, 1);
     
     //VecPrint::print("Lagrange: ", nbc, iLag);
     
@@ -225,6 +227,13 @@ void Mecafil::addProjectionDiff( const real* X, real* Y ) const
 {
     size_t nbv = DIM * nbPoints();
     blas::xsymv('U', nbv, 1.0, iDProj, nbv, X, 1, 1.0, Y, 1);
+}
+
+/// Add projection-diff matrix
+void Mecafil::addProjectionDiff(real* mat) const
+{
+    size_t nbv = DIM * nbPoints();
+    blas::xadd(nbv*nbv, iDProj, mat);
 }
 
 #endif
