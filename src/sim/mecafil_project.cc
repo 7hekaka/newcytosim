@@ -422,6 +422,7 @@ void Mecafil::setProjectionDiff(const real threshold)
         #pragma omp simd
         for ( size_t jj = 0; jj < nbs; ++jj )
             iJJtJF[jj] = std::max(threshold, alpha * iLLG[jj]);
+        iJJtJF[nbs] = 0;
         
         //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtJF) << '\n';
         //VecPrint::print("projectionDiff:", std::min(20u,nbs), iJJtJF);
@@ -431,26 +432,73 @@ void Mecafil::setProjectionDiff(const real threshold)
 
 /// Reference (scalar) code
 /**
- This looks similar to addProjectionD() except with dir[i] = X[i+DIM]-x[i]
+ This looks similar to projectForcesD_() except with dir[i] = X[i+DIM]-X[i]
  */
 inline void addProjectionDiff_(const size_t nbs, const real* mul, const real* X, real* Y)
 {
     for ( size_t i = 0; i < nbs; ++i )
     {
+        real const* xx = X + DIM*i;
+        real * yy = Y + DIM*i;
         for ( size_t d = 0; d < DIM; ++d )
         {
-            const real w = mul[i] * ( X[DIM*i+DIM+d] - X[DIM*i+d] );
-            Y[DIM*i+(    d)] += w;
-            Y[DIM*i+(DIM+d)] -= w;
+            const real w = mul[i] * ( xx[DIM+d] - xx[d] );
+            yy[    d] += w;
+            yy[DIM+d] -= w;
         }
     }
+}
+
+
+/// Add projection-diff matrix
+void Mecafil::addProjectionDiff(real* mat) const
+{
+    size_t nbs = nbSegments();
+    size_t bks = DIM * nPoints;
+#if CHECK_PROJECTION_DIFF
+    real * dup = new_real(bks*bks);
+    real * tmp = new_real(bks*bks);
+    copy_real(bks*bks, mat, dup);
+    zero_real(bks*bks, tmp);
+    // use addProjectionDiff() to add all column vectors:
+    for ( size_t i = 0; i < bks; ++i )
+    {
+        tmp[i] = 1;
+        addProjectionDiff(tmp, dup+bks*i);
+        tmp[i] = 0;
+    }
+    free_real(tmp);
+#endif
+    for ( size_t i = 0; i < nbs; ++i )
+    {
+        real w = iJJtJF[i];
+        if ( w ) for ( int d = 0; d < DIM; ++d )
+        {
+            real * yy = mat + (1+bks)*(DIM*i+d);
+            yy[0  ] -= w;
+            yy[DIM] += w;
+            real * zz = yy + DIM * bks;
+            zz[0  ] += w;
+            zz[DIM] -= w;
+        }
+    }
+#if CHECK_PROJECTION_DIFF
+    real e = blas::difference(bks*bks, mat, dup);
+    if ( e > 1e-6 )
+    {
+        VecPrint::print("iJJtJF", nPoints-1, iJJtJF);
+        VecPrint::full("diffP", bks, bks, dup, bks);
+        VecPrint::full("---dP", bks, bks, mat, bks);
+    }
+    free_real(dup);
+#endif
 }
 
 
 void Mecafil::addProjectionDiff(const real* X, real* Y) const
 {
 #if CHECK_PROJECTION_DIFF
-    size_t nbp = nbPoints()*DIM;
+    size_t nbp = DIM * nbPoints();
     real * vec = new_real(nbp);
     copy_real(nbp, Y, vec);
     addProjectionDiff_(nbSegments(), iJJtJF, X, vec);

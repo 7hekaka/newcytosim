@@ -81,7 +81,7 @@ and also forces that are internal to an object, for instance bending elasticity
 for Fibers, and external forces such as confinements.
 The equation is formulated using linear-algebra:
  
-    d vPTS/dt = mobility * mP * ( Force + mdiffP * vPTS )
+    d vPTS/dt = mobility * mP * ( Force + mDiffP * vPTS )
  
  with
  
@@ -124,9 +124,9 @@ The equation is formulated using linear-algebra:
    mP is not actually calculated as a matrix:
    its application on each block is done by Mecable::projectForces()
  
- - mdiffP is a term coming from the derivative of the projection P.
+ - mDiffP is a term coming from the derivative of the projection P.
    It can provide better numerical stability in some situations where the filament are stretched.
-   You can however define ADD_PROJECTION_DIFF=0 to remove mdiffP.
+   You can however define ADD_PROJECTION_DIFF=0 to remove mDiffP.
  .
  
  

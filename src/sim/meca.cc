@@ -138,7 +138,7 @@ void Meca::allocate(size_t alc)
         allocate_vector(alc, vRND, 1);
         allocate_vector(alc, vRHS, 1);
         vFOR = vRHS; //allocate_vector(alc, vFOR, 1);
-        allocate_vector(alc, vTMP, 0);
+        //allocate_vector(alc, vTMP, 0);
         //std::clog << "Meca::allocate(" << allocated_ << ")\n";
     }
 }
@@ -224,7 +224,7 @@ void Meca::addAllRigidity(const real* X, real* Y) const
 /**
 calculate the matrix vector product corresponding to 'mec'
 
-    Y <- X + alpha * speed( Y + P' * X );
+    Y <- X + alpha * speed( Y + diffP * X );
 
 */
 void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
@@ -253,7 +253,7 @@ void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
 /**
  calculate the matrix product needed for the conjugate gradient algorithm
  
-     Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
+     Y <- X - time_step * speed( mISO + mFUL + diffP ) * X;
  
  */
 void Meca::multiply(const real* X, real* Y) const
@@ -285,7 +285,7 @@ void Meca::multiply(const real* X, real* Y) const
 
 #else  // PARALLELIZE_MATRIX
 
-/// Y <- X - time_step * speed( mISO + mFUL + P' ) * X;
+/// Y <- X - time_step * speed( mISO + mFUL + diffP ) * X;
 void Meca::multiply(const real* X, real* Y) const
 {
 #if USE_ISO_MATRIX
@@ -685,8 +685,8 @@ unsigned Meca::solve()
 #if EXPLICIT_INTEGRATION
     /*
      This implements the forward Euler integration, for testing purposes.
-     The result is very inefficient, since we have built the stiffness matrix,
-     which is not necessary for this explicit scheme.
+     The method is quite inefficient, since we have constructed the stiffness matrix,
+     which is not necessary for this explicit scheme. Force would be sufficient.
      */
     blas::xadd(dimension(), vRHS, vPTS);
     ready_ = 1;

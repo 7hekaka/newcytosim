@@ -83,7 +83,7 @@ private:
     SIZE_T pBlockType;
 
 #if RECYCLED_PRECONDITIONNER
-    /// Flag that pBlock[] is used for preconditionning
+    /// Number of time_step current pBlock[] was used for preconditionning
     SIZE_T pBlockAge;
     
     /// Matrix used for preconditionning
@@ -358,9 +358,12 @@ public:
     /// set terms derived from the Projection operator, from the given forces
     virtual void makeProjectionDiff(const real* force) {}
     
-    /// add terms from projection correction terms: Y <- Y + P' * X;
+    /// add terms from projection correction terms: Y <- Y + diffP * X;
     virtual void addProjectionDiff(const real* X, real* Y) const {}
     
+    /// add terms from projection correction matrix: mat <- diffP
+    virtual void addProjectionDiff(real* mat) const {}
+
     /// true if addProjectionDiff() does something
     virtual bool hasProjectionDiff() const { return false; }
 #endif

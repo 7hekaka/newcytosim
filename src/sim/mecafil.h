@@ -82,7 +82,7 @@ private:
     /// vector for the correction to the projection of size (nbPoints-1)
     real * iJJtJF;
     
-    /// true if all elements of iJJtJF[] are null
+    /// true if not all elements of iJJtJF[] are null
     bool useProjectionDiff;
 #endif
 protected:
@@ -186,6 +186,9 @@ public:
     /// add the contribution from the projection correction
     void addProjectionDiff(const real*, real*) const;
     
+    /// add projection correction matrix
+    void addProjectionDiff(real*) const;
+
     /// true if addProjectionDiff() does something
     bool hasProjectionDiff() const { return useProjectionDiff; }
 #endif

@@ -384,12 +384,12 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t l
 
 
 /**
- Get the total diagonal block corresponding to an Object, which is:
+ Extract block of reduced dimension that does not include projection:
  
-     I - time_step * P ( mISO + mFUL + P' )
+     I - time_step * point_mobility ( mISO + mFUL )
  
- The result is constructed by using functions from mISO and mFUL
- This block is square but not symmetric if the projection is included!
+ The result is constructed by using efficient methods from mISO and mFUL
+ The block is symmetric and can be factorized by Cholesky, which may fail
  */
 void Meca::getIsoBlock(const Mecable * mec, real* res) const
 {
@@ -409,32 +409,8 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
 #endif
         mFUL.addDiagonalTrace(1.0/DIM, res, nbp, mec->matIndex(), nbp, DIM, nbp, true);
 
-#if ( 0 )
-#if ADD_PROJECTION_DIFF
-    if ( mec->hasProjectionDiff() )
-    {
-        // Include the corrections P' in preconditioner, vector by vector.
-        real* tmp = vTMP + DIM * mec->matIndex();
-        zero_real(bks, tmp);
-        for ( size_t i = 0; i < bks; ++i )
-        {
-            tmp[i] = 1;
-            mec->addProjectionDiff(tmp, res+bks*i);
-            tmp[i] = 0;
-        }
-        //VecPrint::full("dynamic with P'", bs, bs, res, bs);
-    }
-#endif
-    
-    //include the projection, by applying it to each column vector:
-    for ( size_t i = 0; i < bks; ++i )
-        mec->projectForces(res+bks*i, res+bks*i);
-
-    const real beta = -tau_ * mec->leftoverMobility();
-#else
     // the projection is not called, so we scale by mobility
     const real beta = -tau_ * mec->pointMobility();
-#endif
 
     //blas::xscal(bs*bs, beta, res, 1);
     for ( size_t n = 0; n < nbp*nbp; ++n )
@@ -537,7 +513,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
 /**
  Get the total diagonal block corresponding to an Object, which is:
  
-     I - time_step * P ( mISO + mFUL + P' )
+     I - time_step * P ( mISO + mFUL + diffP )
  
  The result is constructed by using functions from mISO and mFUL
  This block is square but not symmetric!
@@ -570,18 +546,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     
 #if ADD_PROJECTION_DIFF
     if ( mec->hasProjectionDiff() )
-    {
-        // Include the corrections P' in preconditioner, vector by vector.
-        real* tmp = vTMP + DIM * mec->matIndex();
-        zero_real(bks, tmp);
-        for ( size_t i = 0; i < bks; ++i )
-        {
-            tmp[i] = 1;
-            mec->addProjectionDiff(tmp, res+bks*i);
-            tmp[i] = 0;
-        }
-        //VecPrint::full("dynamic with P'", bs, bs, res, bs);
-    }
+        mec->addProjectionDiff(res);
 #endif
     
     // include the projection, by applying it to each column vector:
@@ -714,7 +679,7 @@ void Meca::computePrecondIsoS(Mecable* mec)
 
 /**
 Compute a preconditionner block corresponding to 'mec':
- Block of dimension reduced by DIM, with projection
+ Block of dimension reduced by DIM, including the projection
  The block is not symmetric and is factorized by LU decomposition
  */
 void Meca::computePrecondIsoP(Mecable* mec)
@@ -960,7 +925,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         mec->blockSize(bks, bks*bks, bks);
     
     real* blk = mec->pblock();
-    real* vec = vTMP + DIM * mec->matIndex();
+    real* vec = new_real(bks);
 
     if ( may_keep )
     {
@@ -978,6 +943,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         {
             //std::clog << "    keep     eigen(1-PM) = " << eig << '\n';
             mec->blockType(6);
+            free_real(vec);
             return;
         }
         else
@@ -991,7 +957,7 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
         // extract diagonal matrix block corresponding to this Mecable:
         getFullBlock(mec, blk);
     }
-    
+    free_real(vec);
     //verifyBlock(mec, blk);
 
     int info = 0;

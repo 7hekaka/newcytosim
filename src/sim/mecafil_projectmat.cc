@@ -191,7 +191,7 @@ void Mecafil::makeProjectionDiff(const real* force)
         else
             iJJtJF[ii] = 0.0;
     }
-    
+    iJJtJF[nbs] = 0.0;
     //VecPrint::print("diffP ", nbs, iJJtJF);
     
     //set up the first term in the derivative of J with respect to variable x[ii]
