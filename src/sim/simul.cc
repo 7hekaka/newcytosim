@@ -518,11 +518,13 @@ PropertyList Simul::findAllProperties(const std::string& cat) const
  .
  
  */
-Property* Simul::newProperty(const std::string& cat, const std::string& nom, Glossary& glos)
+Property* Simul::makeProperty(const std::string& cat, const std::string& nom, Glossary& glos)
 {
     if ( cat.empty() || nom.empty() )
         throw InvalidSyntax("unexpected syntax");
     
+    /* We do not permit using a class name to name a property,
+     as this is tempting, but would create confusion in the config file */
     if ( nom == "display" | isCategory(nom) )
         throw InvalidSyntax("`"+nom+"' is a reserved keyword");
 

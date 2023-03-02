@@ -66,10 +66,7 @@ Property* Interface::execute_set(std::string const& cat, std::string const& name
 {
     VLOG("+SET " << cat << " `" << name << "'");
     
-    /* We do not allow for using the class name to name a property,
-    as this should create confusion in the config file */
-    
-    Property* pp = sim_->newProperty(cat, name, def);
+    Property* pp = sim_->makeProperty(cat, name, def);
     
     if ( !pp )
         throw InvalidSyntax("failed to create property of class `"+cat+"'");

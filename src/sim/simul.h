@@ -354,7 +354,7 @@ public:
     }
 
     /// create a new property
-    Property* newProperty(const std::string&, const std::string&, Glossary&);
+    Property* makeProperty(const std::string&, const std::string&, Glossary&);
     
     /// export all Properties to speficied file
     void writeProperties(std::ostream&, bool prune) const;
