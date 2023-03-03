@@ -122,6 +122,8 @@ void gym::transRotate(Vector3 const& T, Vector3 const& A,
     apply(mat);
 }
 
+#pragma mark - Vector1
+
 // rotate to align Z with 'D' and translate to center 'P'
 void gym::transAlignZ(Vector1 const& P, float R, Vector1 const& D)
 {
@@ -133,6 +135,21 @@ void gym::transAlignZ(Vector1 const& P, float R, Vector1 const& D)
         float(P.XX), 0, 0, 1};
     apply(mat);
 }
+
+// rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
+void gym::stretchAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
+{
+    float X = std::copysign(R, float(D.XX));
+    float Z = std::copysign(S, float(D.XX));
+    float mat[16] = {
+        0, -X,  0,  0,
+        0,  0, -R,  0,
+        Z,  0,  0,  0,
+        float(P.XX), 0, 0, 1};
+    apply(mat);
+}
+
+#pragma mark - Vector2
 
 // rotate to align Z with 'D' and translate to center 'P'
 void gym::transAlignZ(Vector2 const& P, float R, Vector2 const& D)
@@ -149,6 +166,21 @@ void gym::transAlignZ(Vector2 const& P, float R, Vector2 const& D)
         float(P.XX), float(P.YY), 0, 1};
     apply(mat);
 }
+
+// rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
+void gym::stretchAlignZ1(Vector2 const& P, float R, Vector2 const& D, float S)
+{
+    float X(D.XX);
+    float Y(D.YY);
+    float mat[16] = {
+        R*Y, -R*X,  0,  0,
+        0,      0, -R,  0,
+        S*X,  S*Y,  0,  0,
+        float(P.XX), float(P.YY), 0, 1};
+    apply(mat);
+}
+
+#pragma mark - Vector3
 
 // rotate to align Z with 'D' and translate to center 'P', scale uniformly by `R`
 void gym::transAlignZ(Vector3 const& P, float R, Vector3 const& D)
@@ -167,32 +199,6 @@ void gym::transAlignZ(Vector3 const& P, float R, Vector3 const& D)
     apply(mat);
 }
 
-// rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
-void gym::stretchAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
-{
-    float X = std::copysign(R, float(D.XX));
-    float Z = std::copysign(S, float(D.XX));
-    float mat[16] = {
-        0, -X,  0,  0,
-        0,  0, -R,  0,
-        Z,  0,  0,  0,
-        float(P.XX), 0, 0, 1};
-    apply(mat);
-}
-
-// rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
-void gym::stretchAlignZ1(Vector2 const& P, float R, Vector2 const& D, float S)
-{
-    float X(D.XX);
-    float Y(D.YY);
-    float mat[16] = {
-        R*Y, -R*X,  0,  0,
-        0,      0, -R,  0,
-        S*X,  S*Y,  0,  0,
-        float(P.XX), float(P.YY), 0, 1};
-    apply(mat);
-}
-
 // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P', scale Z axis by S
 void gym::stretchAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
 {
@@ -205,6 +211,6 @@ void gym::stretchAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
         0, 0, 0, 0,
         S*X, S*Y, S*Z, 0,
         float(P.XX), float(P.YY), float(P.ZZ), 1};
-    orthonormal(vec, R, mat, mat+4);
+    orthonormal(vec, std::fabs(R), mat, mat+4);
     apply(mat);
 }

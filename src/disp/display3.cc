@@ -300,7 +300,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
     gym::color_front(select_color(fib, last, facP));
     if ( abs >= fib.length() )
     {
-        gym::transAlignZ(nxt, rad, -fib.dirEndP());
+        gym::stretchAlignZ1(nxt, rad, fib.dirEndP(), -rad);
         gle::endedTube();
     }
     else
@@ -327,7 +327,7 @@ void Display3::drawFiberSegmentsJoin(Fiber const& fib, float rad,
     
     gym::color_front(select_color(fib, 0));
     gym::transAlignZ(pos, rad, nxt-pos);
-    gle::hemisphere4();
+    gle::hemisphereF();
     gym::scale(1, 1, fib.segmentation()/rad);
     if ( last == 0 )
     {
@@ -372,9 +372,9 @@ void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
     if ( abs <= 0 )
     {
         real len = (nxt-pos).norm();
-        gym::stretchAlignZ1(pos, rad, (nxt-pos)/len, rad);
+        gym::stretchAlignZ1(pos, rad, (nxt-pos)/len, 0.75*rad);
         gle::hemisphere4();
-        gym::scale(1, 1, len/rad);
+        gym::scale(1, 1, len/(0.75*rad));
     }
     else
     {

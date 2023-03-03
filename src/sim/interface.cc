@@ -519,7 +519,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         cnt = target - amount;
     }
 
-    // syntax sugar, to distribute objects regularly between two points:
+    // syntax sugar: distribute objects regularly between two points
     if ( opt.has_key("range") )
     {
         Vector A, B;
@@ -535,6 +535,17 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
             res.append(new_object(set, pp, opt));
         }
     }
+    // syntax sugar: positions specified for multiple objects
+    else if ( opt.has_key("positions") )
+    {
+        for ( size_t n = 0; n < cnt; ++n )
+        {
+            Vector pos(0, 0, 0);
+            opt.set_from_least_used_value(pos, "positions");
+            opt.define("position", pos);
+            res.append(new_object(set, pp, opt));
+        }
+    }
     else if ( set == &sim_->singles && opt.has_key("multi_base") )
     {
         // particular case: distribute Single onto beads (31.01.2023):
@@ -543,7 +554,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
     }
     else
     {
-        // syntax sugar, to specify the position of the Fiber ends
+        // syntax sugar: specify the positions of the Fiber's ends
         if ( opt.has_key("position_ends") )
         {
             Vector A, B;
@@ -554,6 +565,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
             opt.define("direction", (B-A).normalized());
         }
         
+        // normal pathway:
         for ( size_t n = 0; n < cnt; ++n )
             res.append(new_object(set, pp, opt));
     }

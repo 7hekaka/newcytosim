@@ -70,7 +70,7 @@ namespace gym
     }
     
     
-#pragma mark - Colors
+#pragma mark - Functions to set the Current Color
     
     /// make RGBA color current
     inline void color(const float col[]) { glColor4fv(col); }
@@ -188,7 +188,7 @@ namespace gym
 
     inline void clearStencil(GLint x) { glClearStencil(x); glClear(GL_STENCIL_BUFFER_BIT); }
 
-    /// display back faces followed by front faces
+    /// display back facing triangles followed by front facing ones
     void dualPass(void primitive());
 }
 

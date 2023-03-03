@@ -201,12 +201,12 @@ public:
     
     /// draw one segment of a Fiber (used to display transparent fibers)
     virtual void drawFiberSegmentT(Fiber const&, size_t) const;
+    
+    /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
+    void drawFiberStriped(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
 
     /// actin-like rendering using a sphere to represent each monomer
     void drawFilament(Fiber const& fib, real, gym_color, gym_color, gym_color) const;
-    
-    /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
-    void drawFilamentStriped(Fiber const&, float rad, real inc, gym_color, gym_color) const;
 
     /// actin-like rendering using a sphere to represent each monomer
     void drawActin(Fiber const& fib, gym_color, gym_color, gym_color) const;

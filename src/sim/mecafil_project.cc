@@ -427,6 +427,8 @@ void Mecafil::setProjectionDiff(const real threshold)
         //std::clog << "projectionDiff: " << blas::nrm2(nbs, iJJtJF) << '\n';
         //VecPrint::print("projectionDiff:", std::min(20u,nbs), iJJtJF);
     }
+    else // this is not necessary:
+        zero_real(nPoints, iJJtJF);
 }
 
 

@@ -28,7 +28,7 @@ namespace gle
     constexpr size_t pi_once = finesse * 10;
     constexpr size_t pi_half = finesse * 5;
 
-    /// values of cosine, sine over two full circle
+    /// values of cosine, sine over two full circonvolutions
     extern float circle_[4*pi_twice+8];
 
     /// access to precomputed cosine
@@ -235,6 +235,8 @@ namespace gle
     void hemisphere2();
     /// draw half a sphere of radius 1 in Z < 0
     void hemisphere4();
+    /// draw a falt hemisphere of radius 1 in Z < 0
+    void hemisphereF();
 
     /// draw a blob with a pointy ends up in Z
     void droplet();
@@ -258,7 +260,7 @@ namespace gle
     /// primitive used to draw the central segments of fibers
     inline void centralTube() { longTube4(); }
     /// primitive used to draw the MINUS ends of fibers
-    inline void capedTube() { halfTube4(); hemisphere4(); }
+    inline void capedTube() { halfTube4(); hemisphereF(); }
     //inline void capedTube() { halfTube2(); discBottom2(); }
     /// primitive used to draw the PLUS ends of fibers
     inline void endedTube() { halfTube4(); discBottom2(); }

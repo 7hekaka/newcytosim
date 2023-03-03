@@ -1414,7 +1414,7 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
  at distance `inc` from each other along the backbone of the `Fiber`.
  */
 void Display::drawFilament(Fiber const& fib, const real inc,
-                           gym_color col1, gym_color col2, gym_color colE) const
+                           gym_color col, gym_color lor, gym_color colE) const
 {
     // enlarge radius of monomers to make them overlap
     const float rad = 0.65 * inc;
@@ -1430,9 +1430,8 @@ void Display::drawFilament(Fiber const& fib, const real inc,
         abs += inc;
         p = Vector3(fib.pos(abs));
 
-        // use different tones to individualize the two strands:
-        gym::color_front((++cnt&1)?col1:col2);
-        
+        // alternate tones:
+        gym::color_load((++cnt&1)?col:lor);
         // change color for the last monomer:
         if ( abs + inc > fib.abscissaP() )
         {
@@ -1457,37 +1456,56 @@ void Display::drawFilament(Fiber const& fib, const real inc,
 /**
 Draw segments of length 'inc' of alternating colors, in register with Fiber's abscissa
 */
-void Display::drawFilamentStriped(Fiber const& fib, float rad, const real inc,
-                                  gym_color col1, gym_color col2) const
+void Display::drawFiberStriped(Fiber const& fib, float rad, const real inc,
+                               gym_color col, real onc, gym_color lor) const
 {
+    real uni = inc + onc;
+    Vector old, pos, nxt;
     const real sup = fib.length();
-    int cnt = 1 + (int)std::floor(fib.abscissaM()/inc);
-    real abs = inc * cnt - fib.abscissaM();
-    Vector old = fib.displayPosM(abs-inc);
-    Vector pos = fib.displayPosM(abs);
-    Vector nxt = fib.displayPosM(abs+inc);
-    Vector dir = normalize(nxt-pos);
-    abs += inc;
-
-    // alternate different tones:
-    gym::color_front((++cnt&1)?col1:col2);
+    int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
+    real abs = uni * cnt - fib.abscissaM(); // now relative to minus end
+    if ( abs > onc )
+    {
+        cnt = 1; // drawing first slice of size `inc`
+        old = fib.displayPosM(abs-uni);
+        pos = fib.displayPosM(abs-onc);
+        nxt = fib.displayPosM(abs);
+        gym::color_load(col);
+    }
+    else
+    {
+        cnt = 0; // drawing second slice of size `onc`
+        old = fib.displayPosM(abs-onc);
+        pos = fib.displayPosM(abs);
+        nxt = fib.displayPosM(abs+inc);
+        gym::color_load(lor);
+        abs += inc;
+    }
+    Vector dir = fib.dirEndM();
+    
     gym::enableClipPlane(4);
     gym::setClipPlane(4, -dir, pos);
-    gym::transAlignZ(old, rad, pos-old);
+    gym::stretchAlignZ1(old, rad, dir, rad);
     gle::capedTube();
     gym::setClipPlane(4, dir, pos);
-
+#if 0
+    gym::disableClipPlane(4);
+    gym::color_load(gym_color(1,1,1)); drawObject(old, 0.002, gle::octahedron);
+    gym::color_load(gym_color(0,0,1)); drawObject(pos, 0.002, gle::octahedron);
+    gym::color_load(gym_color(1,1,1)); drawObject(nxt, 0.002, gle::octahedron);
+    gym::enableClipPlane(4);
+#endif
     gym::enableClipPlane(5);
     // draw segments
     while ( abs < sup )
     {
-        abs += inc;
+        abs += (cnt&1)?inc:onc;
         old = pos;
         pos = nxt;
         nxt = fib.displayPosM(abs);
         dir = normalize(nxt-old);
         // alternate different tones:
-        gym::color_front((++cnt&1)?col1:col2);
+        gym::color_load((++cnt&1)?col:lor);
         gym::setClipPlane(5, -dir, pos);
         gym::transAlignZ(old, rad, pos-old);
         gle::centralTube();
@@ -1496,8 +1514,8 @@ void Display::drawFilamentStriped(Fiber const& fib, float rad, const real inc,
     gym::disableClipPlane(5);
 
     // draw last segment, which may be truncated:
-    gym::color_front((++cnt&1)?col1:col2);
-    gym::transAlignZ(nxt, rad, -fib.dirEndP());
+    gym::color_load((++cnt&1)?col:lor);
+    gym::stretchAlignZ1(nxt, -rad, fib.dirEndP(), -rad);
     gle::endedTube();
     gym::disableClipPlane(4);
 }
@@ -1510,7 +1528,7 @@ void Display::drawFilamentStriped(Fiber const& fib, float rad, const real inc,
  Nature 347, 44 - 49 (06 September 1990); doi:10.1038/347044a0
  which shows half a turn in 37nm containing 13 monomers.
  */
-void Display::drawActin(Fiber const& fib, gym_color col1, gym_color col2, gym_color colE) const
+void Display::drawActin(Fiber const& fib, gym_color col, gym_color lor, gym_color colE) const
 {    
     // axial translation between two sucessive monomers:
     const real dab = 0.00275;
@@ -1557,10 +1575,7 @@ void Display::drawActin(Fiber const& fib, gym_color col1, gym_color col2, gym_co
         p = Vector3(fib.pos(ab)) + off * n;
         
         // use different tones to individualize the two strands:
-        if ( ++cnt & 1 )
-            gym::color_load(col1);
-        else
-            gym::color_load(col2);
+        gym::color_load((++cnt&1)?col:lor);
 
         // change color for the last monomer:
         if ( ab + dab > fib.abscissaP() )
@@ -1705,7 +1720,7 @@ void Display::drawFiber(Fiber const& fib)
 
         switch( disp->style )
         {
-            case 2: drawFilamentStriped(fib, pixscale(disp->line_width), 0.008, col1, col2); break;
+            case 2: drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2); break;
             case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
             case 4: drawActin(fib, col1, col2, colE); break;
             case 5: drawMicrotubule(fib, col1, col2, colE); break;
@@ -1801,7 +1816,7 @@ void Display::drawFibers(FiberSet const& set)
     for( Fiber const* fib = set.firstID(); fib; fib=set.nextID(fib) )
 #endif
     {
-        if ( fib->disp->visible )
+        if ( fib->disp && fib->disp->visible )
             drawFiber(*fib);
     }
     CHECK_GL_ERROR("in Display::drawFibers()");
