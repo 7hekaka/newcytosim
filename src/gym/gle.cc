@@ -1315,10 +1315,12 @@ namespace gle
         tubes_[10] = i+s; i += setTube(ptr+i, 1, 0, T);
         tubes_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
         tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
+        
         tubes_[13] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0); // cone1
         tubes_[14] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone2
         tubes_[15] = i+s; i += setCone(ptr+i, 4, 0, 1, 1, 0); // cone3
         tubes_[16] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
+        
         tubes_[17] = i+s; i += setDisc(ptr+i, 1, 0, 1);
         tubes_[18] = i+s; i += setDisc(ptr+i, 2, 0, 1);
         tubes_[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);

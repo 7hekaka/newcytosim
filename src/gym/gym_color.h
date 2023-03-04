@@ -295,6 +295,9 @@ public:
     static gym_color radial_color(COLOF x, COLOF y, COLOF z, COLOF alpha);
 
     /// return new jet color for h in [0, 5] with specified alpha component
+    static gym_color bgr_color(COLOF h, COLOF alpha = 1.0f);
+
+    /// return new jet color for h in [0, 5] with specified alpha component
     static gym_color jet_color(COLOF h, COLOF alpha = 1.0f);
     
     /// return new jet color extended

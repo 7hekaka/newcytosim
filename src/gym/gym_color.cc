@@ -273,6 +273,21 @@ gym_color gym_color::hue_color(const COLOF h, const COLOF a)
 /**
 set a RGB color as a function of a value `h` in [0, 4] with transparency `a`.
 The result varies from dark-blue, blue, cyan, yellow, orange to red:
+- 0 : green
+- 1 : blue
+- 2 : red
+*/
+gym_color gym_color::bgr_color(const COLOF h, const COLOF a)
+{
+    COLOF r = clamp(h-1);
+    COLOF g = clamp(1-h);
+    COLOF b = clamp(h);
+    return gym_color(r, g, b, a);
+}
+
+/**
+set a RGB color as a function of a value `h` in [0, 4] with transparency `a`.
+The result varies from dark-blue, blue, cyan, yellow, orange to red:
 - 0 : dark-blue
 - 1 : blue
 - 2 : cyan
