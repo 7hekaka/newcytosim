@@ -163,10 +163,10 @@ void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, c
     // distance for distal point, offset by `len` from the bead surface
     real alpha = 1.0 + len / rad;
     // calculate coefficients to interpolate the offset point:
-    alp[1] = alpha * coef_[1];
-    alp[2] = alpha * coef_[2];
-    alp[3] = alpha * coef_[3];
-    alp[0] = ( real(1) - alp[1] ) - ( alp[2] + alp[3] );
+    real c1 = alpha * coef_[1];
+    real c2 = alpha * coef_[2];
+    real c3 = alpha * coef_[3];
+    real c0 = ( real(1) - alp[1] ) - ( alp[2] + alp[3] );
     switch ( rank_ )
     {
         case 0:
@@ -174,13 +174,13 @@ void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, c
         case 1:
             break;
         case 2:
-            meca.addLink2(arg, off, alp[0], alp[1], weight);
+            meca.addLink2(arg, off, c0, c1, weight);
             break;
         case 3:
-            meca.addLink3(arg, off, alp[0], alp[1], alp[2], weight);
+            meca.addLink3(arg, off, c0, c1, c2, weight);
             break;
         case 4:
-            meca.addLink4(arg, off, alp[0], alp[1], alp[2], alp[3], weight);
+            meca.addLink4(arg, off, c0, c1, c2, c3, weight);
         break;
     }
 }
@@ -196,26 +196,24 @@ void Interpolation4::addAlignedOffsetLink(Meca& meca, real len, Mecapoint const&
     // extract distance in current configuration:
     real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
     // coefficients to offset the point by 'len' along the diagonal:
-    real inc = len / ( -M_SQRT3 * rad );
-    alp[0] = coef_[0] - inc * 3;
-    alp[1] = coef_[1] + inc;
-    alp[2] = coef_[2] + inc;
-    alp[3] = coef_[3] + inc;
     switch ( rank_ )
     {
         case 0:
             break;
         case 1:
             break;
-        case 2:
-            meca.addLink2(arg, off, alp[0], alp[1], weight);
-            break;
-        case 3:
-            meca.addLink3(arg, off, alp[0], alp[1], alp[2], weight);
-            break;
-        case 4:
-            meca.addLink4(arg, off, alp[0], alp[1], alp[2], alp[3], weight);
-        break;
+        case 2: {
+            real inc = len / rad;
+            meca.addLink2(arg, off, coef_[0]-inc, coef_[1]+inc, weight);
+        } break;
+        case 3: {
+            real inc = len / ( -M_SQRT2 * rad );
+            meca.addLink3(arg, off, coef_[0]-inc*2, coef_[1]+inc, coef_[2]+inc, weight);
+        } break;
+        case 4: {
+            real inc = len / ( -M_SQRT3 * rad );
+            meca.addLink4(arg, off, coef_[0]-inc*3, coef_[1]+inc, coef_[2]+inc, coef_[3]+inc, weight);
+        } break;
     }
 }
 
