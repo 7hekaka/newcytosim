@@ -52,10 +52,10 @@ public:
     /// tension in the link = stiffness * stretch()
     Vector force() const;
 
-    /// Monte-Carlo step for a free Single
+    /// Monte-Carlo step if Hand is detached
     void stepF();
     
-    /// Monte-Carlo step for a bound Single
+    /// Monte-Carlo step if Hand is attached
     void stepA();
     
     /// add interactions to a Meca

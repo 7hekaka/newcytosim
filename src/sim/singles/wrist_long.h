@@ -42,15 +42,15 @@ public:
     ~WristLong();
 
     //--------------------------------------------------------------------------
-    
+
     /// position on the side of fiber used for sideInteractions
     Vector sidePos() const;
     
     /// force = stiffness * ( posFoot() - posHand() )
     Vector force() const;
     
-    /// simulation step for a doubly-attached Couple
-    void stepAA();
+    /// Monte-Carlo step if Hand is attached
+    void stepA();
 
     /// add interactions to a Meca
     void setInteractions(Meca&) const;

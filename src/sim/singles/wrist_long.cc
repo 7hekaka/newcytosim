@@ -35,6 +35,17 @@ Vector WristLong::force() const
 }
 
 
+void WristLong::stepA()
+{
+    assert_true( sHand->attached() );
+    Vector f = WristLong::force();
+    if ( sHand->checkKramersDetachment(f.norm()) )
+        sHand->detach();
+    else
+        sHand->stepLoaded(f);
+}
+
+
 #if WRIST_USES_LONGLINK
 
 Vector WristLong::calcArm(Interpolation const& itp, Vector const& pos, real len)

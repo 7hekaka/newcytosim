@@ -2411,7 +2411,7 @@ void Meca::addLongLink4(Interpolation const& ptA,
     if ( any_equal(ii0, ii2, ii3, ii4, ii5) | any_equal(ii1, ii2, ii3, ii4, ii5) )
         return;
     
-    // coefficients to form B-A:
+    // coefficients to form -A:
     const real cc0 = -ptA.coef0();
     const real cc1 = -ptA.coef1();
     
