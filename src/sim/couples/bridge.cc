@@ -7,8 +7,6 @@
 #include "meca.h"
 #include "random.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 Bridge::Bridge(BridgeProp const* p, Vector const& w)

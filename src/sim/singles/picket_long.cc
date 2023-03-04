@@ -5,8 +5,6 @@
 #include "modulo.h"
 
 
-extern Modulo const* modulo;
-
 
 PicketLong::PicketLong(SingleProp const* p, Vector const& w)
 : Picket(p, w), mArm(nullTorque)

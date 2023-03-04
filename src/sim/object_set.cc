@@ -12,8 +12,6 @@
 #include "simul.h"
 #include <errno.h>
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 /**

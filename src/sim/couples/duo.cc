@@ -8,8 +8,6 @@
 #include "space.h"
 #include "cymdef.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 Duo::Duo(DuoProp const* p, Vector const& w)

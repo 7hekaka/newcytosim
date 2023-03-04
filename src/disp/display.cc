@@ -29,8 +29,6 @@
 #include "line_disp.h"
 #include "display_color.cc"
 
-extern Modulo const* modulo;
-
 
 Display::Display(DisplayProp const* dp)
 : pixelSize(1), unitValue(1), sizeScale(1), depthAxis(0,0,1), prop(dp)

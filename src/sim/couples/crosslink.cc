@@ -9,8 +9,6 @@
 #include "space.h"
 #include "meca.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 Crosslink::Crosslink(CrosslinkProp const* p, Vector const& w)
 : Couple(p, w)

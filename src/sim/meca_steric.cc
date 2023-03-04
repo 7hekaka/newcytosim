@@ -228,7 +228,7 @@ static void distributeStericMecables(LocusGrid& grid, Simul const& sim)
     }
 }
 
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
 /// distribute Mecables with steric enabled to `grid`, given periodic boundaries
 static void distributeStericMecablesModulo(LocusGrid& grid, Simul const& sim)
 {
@@ -300,7 +300,7 @@ void Meca::addStericInteractions(LocusGrid& grid, Simul const& sim)
 {
     grid.clear();
 
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
     if ( modulo )
         distributeStericMecablesModulo(grid, sim);
     else

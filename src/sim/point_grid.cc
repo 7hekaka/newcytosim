@@ -9,8 +9,6 @@
 #include "solid.h"
 #include "meca.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 size_t PointGrid::setGrid(Space const* spc, real min_width)
@@ -28,9 +26,8 @@ size_t PointGrid::setGrid(Space const* spc, real min_width)
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
         
-#if GRID_HAS_PERIODIC
         assert_true( modulo == spc->getModulo() );
-        if ( modulo  &&  modulo->isPeriodic(d) )
+        if ( modulo && modulo->isPeriodic(d) )
         {
             assert_small( modulo->period_[d] - sup[d] + inf[d] );
             // adjust the grid to match the edges
@@ -38,7 +35,6 @@ size_t PointGrid::setGrid(Space const* spc, real min_width)
             pGrid.setPeriodic(d, true);
         }
         else
-#endif
         {
             //extend in any dimension that is not periodic, adjusting cell size to min_width
             cnt[d] = n + 1;
@@ -93,10 +89,8 @@ void PointGrid::checkPP(FatPoint const& aa, FatPoint const& bb) const
     Vector vab = bb.cen() - aa.cen();
     const real len = aa.rad_ + bb.rad_;
     const real ran = std::max(aa.rge_ + bb.rad_, aa.rad_ + bb.rge_);
-#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(vab);
-#endif
     real ab2 = vab.normSqr();
     if ( below(ab2, ran) )
     {
@@ -136,10 +130,8 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
             if ( bb.isLast() )
             {
                 Vector vab = bb.pos2() - aa.cen();
-#if GRID_HAS_PERIODIC
                 if ( modulo )
                     modulo->fold(vab);
-#endif
                 ab2 = vab.normSqr();
                 if ( below(ab2, ran) )
                     meca_.addLongLink1(aa.pnt_, bb.vertex2(), vab, ab2, ran, push_);
@@ -150,10 +142,8 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
     {
         
         Vector vab = bb.pos1() - aa.cen();
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-#endif
         ab2 = vab.normSqr();
         /*
          This code handles the interactions will all the joints of a fiber:
@@ -201,10 +191,8 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
             if ( &bb < &aa  &&  bb.isFirst() )
             {
                 Vector vab = bb.pos1() - aa.pos1();
-#if GRID_HAS_PERIODIC
                 if ( modulo )
                     modulo->fold(vab);
-#endif
                 real ab2 = vab.normSqr();
                 real len = aa.rad_ + bb.rad_;
                 if ( below(ab2, len)  &&  dot(vab, bb.diff()) >= 0 )
@@ -218,10 +206,8 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
              and interact if 'bb.vertex1()' falls on the right side of it
              */
             Vector vab = bb.pos1() - aa.pos1();
-#if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
-#endif
             if ( dot(vab, aa.prevDiff()) >= 0 )
             {
                 real ab2 = vab.normSqr();
@@ -270,10 +256,8 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
          and interact if 'bb.vertex1()' falls on the right side of it
          */
         Vector vab = bb.pos2() - aa.pos1();
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-#endif
         if ( aa.isFirst() )
         {
             assert_true(bb.isLast());
@@ -306,10 +290,8 @@ void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
         assert_true(bb.isLast());
         
         Vector vab = bb.pos2() - aa.pos2();
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-#endif
         real ab2 = vab.normSqr();
         real len = aa.rad_ + bb.rad_;
         if ( below(ab2, len)  &&  dot(vab, bb.diff()) <= 0 )

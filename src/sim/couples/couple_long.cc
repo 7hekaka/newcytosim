@@ -7,8 +7,6 @@
 #include "modulo.h"
 #include "meca.h"
 
-extern Modulo const* modulo;
-
 
 CoupleLong::CoupleLong(CoupleProp const* p, Vector const& w)
 : Couple(p, w), mArm(nullTorque)

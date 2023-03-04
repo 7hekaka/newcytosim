@@ -25,8 +25,6 @@
 //extern void projectForcesD_(size_t, const real*, const real*, const real*, real*);
 
 
-extern Modulo const* modulo;
-
 /**
  This returns N+1, where N is the integer that minimizes
      abs_real( length / N - segmentation ),

@@ -13,16 +13,6 @@
 
 //#include "vecprint.h"
 
-extern Modulo const* modulo;
-
-/**
- Note that you can disable all the modulo code with this definition.
- The code under 'if ( modulo )' will never be executed, and should even
- be discarded during compilation if optimizations are enabled.
- */
-//constexpr Modulo * modulo = nullptr;
-
-
 /// set TRUE to update matrix mFUL using block directives
 /** This is significantly faster on machine with the AVX instruction set */
 #define USE_MATRIX_BLOCK 1

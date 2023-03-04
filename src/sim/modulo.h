@@ -6,10 +6,14 @@
 #include "real.h"
 #include "vector.h"
 
+/// enable/disable support for periodic boundary conditions at compile time
+#define ENABLE_PERIODIC_BOUNDARIES 1
+
+
 /// Modulo is a helper class used to implement periodic boundary conditions
 /**
- This class is used to apply periodic boundaries conditions to Vectors in one or
- in multiple dimensions in space: X, Y or Z.
+ This class is used to apply periodic boundaries conditions to Vector,
+ in any dimensions and selectively to only some of the coordinates: X, Y or Z.
  
  We follow the method B (Do not restrict the particle coordinates) described in
  [wikipedia](https://en.wikipedia.org/wiki/Periodic_boundary_conditions)
@@ -29,7 +33,7 @@ public:
     real inv_period_[4];
 
     /// bitfield indicating the dimensions that are periodic
-    int   mMode;
+    int mMode;
 
     
     /// adjust 'x' to canonical image in dimension i
@@ -100,6 +104,25 @@ public:
     void fold_float(float* pos, float const* ref) const;
 
 };
+
+
+#if ENABLE_PERIODIC_BOUNDARIES
+
+/**
+ This is a global variable that is initialized in Simul
+ It is used to implement periodic boundary conditions
+ */
+extern Modulo const* modulo;
+
+#else
+
+/**
+ The code under 'if ( modulo )' will never be executed, and should even
+ be discarded during compilation if optimizations are enabled.
+ */
+constexpr Modulo * modulo = nullptr;
+
+#endif
 
 #endif
 

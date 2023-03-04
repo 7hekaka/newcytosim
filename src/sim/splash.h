@@ -1,10 +1,10 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 
 #include <iostream>
 #include "assert_macro.h"
 #include "hand_prop.h"
+#include "modulo.h"
 #include "fiber.h"
-#include "grid.h"
 #include "real.h"
 #include "dim.h"
 
@@ -22,7 +22,7 @@ inline void splash(std::ostream& os)
 inline void print_version(std::ostream& os)
 {
     os << "   Dimension " << DIM;
-    os << "  Periodic " << GRID_HAS_PERIODIC;
+    os << "  Periodic " << ENABLE_PERIODIC_BOUNDARIES;
     os << "  AttachPool " << POOL_UNATTACHED;
     os << "  Precision " << sizeof(real) << " bytes\n";
 

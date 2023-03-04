@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 #include "space_set.h"
 #include "space_prop.h"
 #include "space_dynamic_prop.h"
@@ -9,12 +9,6 @@
 #include "modulo.h"
 
 //---------------------------- GLOBAL VARIABLES --------------------------------
-
-/**
- This is a global variable that is initialized in Simul
- It is used to implement periodic boundary conditions
- */
-Modulo const* modulo = nullptr;
 
 /**
  set current Space to `spc`. (spc==NULL is a valid argument).
@@ -33,10 +27,12 @@ void SpaceSet::setMaster(Space const* spc)
 #endif
     }
     
+#if ENABLE_PERIODIC_BOUNDARIES
     modulo = nullptr;
 
     if ( master_ )
         modulo = master_->getModulo();
+#endif
 }
 
 //------------------------------------------------------------------------------

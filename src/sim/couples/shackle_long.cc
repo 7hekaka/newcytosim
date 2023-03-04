@@ -4,8 +4,6 @@
 #include "modulo.h"
 #include "meca.h"
 
-extern Modulo const* modulo;
-
 
 ShackleLong::ShackleLong(ShackleProp const* p, Vector const& w)
 : Shackle(p, w), mArm(nullTorque)

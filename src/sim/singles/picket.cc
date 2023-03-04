@@ -5,8 +5,6 @@
 #include "modulo.h"
 
 
-extern Modulo const* modulo;
-
 
 Picket::Picket(SingleProp const* p, Vector const& w)
 : Single(p, w)

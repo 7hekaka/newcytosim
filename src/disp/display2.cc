@@ -16,8 +16,6 @@
 #include "gym_draw.h"
 #include "gym_check.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 Display2::Display2(DisplayProp const* dp) : Display(dp)

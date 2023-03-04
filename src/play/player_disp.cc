@@ -17,8 +17,6 @@
 
 extern void helpKeys(std::ostream&);
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 #pragma mark -
 

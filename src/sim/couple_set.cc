@@ -13,8 +13,6 @@
 #include "glossary.h"
 #include "simul.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 void CoupleSet::prepare(PropertyList const& properties)

@@ -7,8 +7,6 @@
 #include "modulo.h"
 #include "meca.h"
 
-extern Modulo const* modulo;
-
 
 CrosslinkLong::CrosslinkLong(CrosslinkProp const* p, Vector const& w)
 : Crosslink(p, w), mArm1(nullTorque), mArm2(nullTorque)

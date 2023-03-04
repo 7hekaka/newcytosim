@@ -6,8 +6,6 @@
 #include "single_set.h"
 
 
-extern Modulo const* modulo;
-
 
 Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const size_t pti)
 : Single(sp)

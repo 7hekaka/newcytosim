@@ -22,8 +22,6 @@
 /// Cliping planes permit nice junctions to be made between tubes, but are slow
 #define USE_CLIP_PLANES 1
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 /*
  Should use instanced rendering to draw multiple Sphere and Tube, etc.

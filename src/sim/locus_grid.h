@@ -18,8 +18,6 @@ class Simul;
 class Mecable;
 class FiberSegment;
 
-extern Modulo const* modulo;
-
 /// number of panes in the steric engine
 /** This should normally be set equal to 1, for optimal performance */
 #define MAX_STERIC_PANES 1
@@ -467,7 +465,7 @@ public:
 #endif
     }
     
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
     /// link in the cell containing the middle of the segment:
     void add_modulo(Fiber const* fib, size_t inx, real rad, real rge)
     {

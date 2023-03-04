@@ -12,8 +12,6 @@
 #include "space.h"
 #include "modulo.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 Couple::Couple(CoupleProp const* p, Vector const& w)

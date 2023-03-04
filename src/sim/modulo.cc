@@ -4,6 +4,12 @@
 #include "dim.h"
 #include "exceptions.h"
 
+#if ENABLE_PERIODIC_BOUNDARIES
+/// global Modulo object
+Modulo const* modulo = nullptr;
+#endif
+
+
 constexpr int PERIODIC_XYZ = 7;
 constexpr int PERIODIC_XY  = 3;
 constexpr int PERIODIC_X   = 1;

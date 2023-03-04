@@ -11,8 +11,6 @@
 #include "modulo.h"
 #include "meca.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 Single::Single(SingleProp const* p, Vector const& w)
 : sPos(w), sHand(nullptr), prop(p)

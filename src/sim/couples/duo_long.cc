@@ -6,8 +6,6 @@
 #include "random.h"
 #include "meca.h"
 
-extern Modulo const* modulo;
-
 
 DuoLong::DuoLong(DuoProp const* p, Vector const& w)
 : Duo(p, w), mArm(nullTorque)

@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 
 #include "cymdef.h"
 #include "simul.h"
@@ -16,8 +16,6 @@
 #include "field.h"
 #include "event.h"
 #include "parser.h"
-
-extern Modulo const* modulo;
 
 const char Simul::TRAJECTORY[] = "objects.cmo";
 
@@ -90,7 +88,9 @@ void Simul::eraseObjects()
     couples.erase();
     
     prop.time = 0;
+#if ENABLE_PERIODIC_BOUNDARIES
     modulo = nullptr;
+#endif
     primed_ = 0;
     fresh_ = 1;
 }

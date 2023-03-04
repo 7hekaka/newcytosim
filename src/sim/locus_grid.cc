@@ -13,8 +13,6 @@
 #include "meca.h"
 #include "simd.h"
 
-extern Modulo const* modulo;
-
 //------------------------------------------------------------------------------
 
 size_t LocusGrid::setGrid(Space const* spc, real min_width)
@@ -32,9 +30,8 @@ size_t LocusGrid::setGrid(Space const* spc, real min_width)
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
         
-#if GRID_HAS_PERIODIC
         assert_true( modulo == spc->getModulo() );
-        if ( modulo  &&  modulo->isPeriodic(d) )
+        if ( modulo && modulo->isPeriodic(d) )
         {
             assert_small( modulo->period_[d] - sup[d] + inf[d] );
             // adjust the grid to match the edges
@@ -42,7 +39,6 @@ size_t LocusGrid::setGrid(Space const* spc, real min_width)
             pGrid.setPeriodic(d, true);
         }
         else
-#endif
         {
             //extend in any dimension that is not periodic, adjusting cell size to min_width
             cnt[d] = n + 1;
@@ -108,10 +104,8 @@ void LocusGrid::checkPP(BigPoint const& aa, BigPoint const& bb) const
     Vector vab = bb.cen() - aa.cen();
     const float ran = aa.rad_ + bb.rad_;
 
-#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(vab);
-#endif
     real ab2 = vab.normSqr();
     
     if ( below(ab2, ran) )
@@ -152,10 +146,8 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
             if ( bb.isLast() )
             {
                 Vector vab = bb.pos2() - aa.cen();
-#if GRID_HAS_PERIODIC
                 if ( modulo )
                     modulo->fold(vab);
-#endif
                 ab2 = vab.normSqr();
                 if ( below(ab2, ran) )
                     meca_.addLongLink1(aa.vertex1(), bb.vertex2(), vab, ab2, ran, push_);
@@ -166,10 +158,8 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
     {
         // here abs < 0, and thus `bb` projects left past the segment
         Vector vab = bb.pos1() - aa.cen();
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-#endif
         ab2 = vab.normSqr();
         /*
          This code handles the interactions will all the joints of a fiber:
@@ -261,10 +251,8 @@ void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, rea
         assert_true(bb.isLast());
         
         Vector dab = bb.pos2() - aa.pos2();
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(dab);
-#endif
         real ab2 = dab.normSqr();
         
         if ( below(ab2, ran)  &&  dot(dab, bb.diff()) <= 0 )
@@ -303,10 +291,8 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
             if ( &bb < &aa  &&  bb.isFirst() )
             {
                 Vector vab = bb.pos1() - aa.pos1();
-            #if GRID_HAS_PERIODIC
                 if ( modulo )
                     modulo->fold(vab);
-            #endif
                 real ab2 = vab.normSqr();
                 if ( below(ab2, ran)  &&  dot(vab, bb.diff()) >= 0 )
                     meca_.addLongLink1(aa.vertex1(), bb.vertex1(), vab, ab2, ran, push_);
@@ -315,10 +301,8 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
         else
         {
             Vector vab = bb.pos1() - aa.pos1();
-        #if GRID_HAS_PERIODIC
             if ( modulo )
                 modulo->fold(vab);
-        #endif
             /*
              Check the projection to the segment located before 'aa',
              and interact if 'bb.vertex1()' falls on the right side of it
@@ -366,10 +350,8 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
          */
         Vector vab = bb.pos2() - aa.pos1();
         
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-#endif
         if ( aa.isFirst() )
         {
             assert_true(bb.isLast());
@@ -398,10 +380,8 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
         assert_true(bb.isLast());
         
         Vector vab = bb.pos2() - aa.pos2();
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold(vab);
-#endif
         real ab2 = vab.normSqr();
         
         if ( below(ab2, ran)  &&  dot(vab, bb.diff()) <= 0 )
@@ -562,10 +542,8 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     Vector daa = ( aa.pos2() - a1 ) * aa.lenInv();
     Vector dbb = ( b1 - bb.pos2() ) * bb.lenInv(); // sign inverted on purpose
     Vector off = b1 - a1;
-#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(off);
-#endif
     real m1 = dot(off, daa);
     real m2 = dot(off, dbb);
     real dis2 = off.normSqr();
@@ -853,10 +831,8 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
         BigVector pos = ii->pos_;
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold_float(pos, list2[0].pos_);
-#endif
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentLL(*ii, *jj)  )
                 checkLL(*ii, *jj);
@@ -869,10 +845,8 @@ void LocusGrid::setStericsT(BigLocusList const& list1,
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
     {
         BigVector pos = ii->pos_;
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold_float(pos, list2[0].pos_);
-#endif
         for ( BigLocus const* jj = list2.begin(); jj < mid2; ++jj )
             if ( pos.near(jj->pos_) && not_adjacentPL(*ii, *jj) )
                 checkPL(*ii, *jj);
@@ -1150,10 +1124,8 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     for ( BigLocus const* ii = list1.begin(); ii < mid1; ++ii )
     {
         BigVector pos = ii->pos_;
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold_float(pos, list2[0].pos_);
-#endif
         /* The radius is negated, such that it gets added by compute_near_bits() */
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
@@ -1206,10 +1178,8 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     for ( BigPoint const* ii = mid1; ii < list1.end(); ++ii )
     {
         BigVector pos = ii->pos_;
-#if GRID_HAS_PERIODIC
         if ( modulo )
             modulo->fold_float(pos, list2[0].pos_);
-#endif
         /* The radius is negated, such that it gets added by compute_near_bits() */
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would

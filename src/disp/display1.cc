@@ -15,8 +15,6 @@
 #include "gym_flute_dim.h"
 #include "gym_draw.h"
 
-extern Modulo const* modulo;
-
 
 #define ENABLE_EXPLODED_DISPLAY ( DIM < 2 )
 

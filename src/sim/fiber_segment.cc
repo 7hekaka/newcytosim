@@ -1,12 +1,9 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 
 #include "fiber_segment.h"
-#include "map.h"  // for GRID_HAS_PERIODIC
 #include "space.h"
 #include "fiber.h"
 #include "modulo.h"
-
-extern Modulo const* modulo;
 
 //------------------------------------------------------------------------------
 //---------------- DISTANCE FROM A POINT TO A SECTION OF FIBER -----------------
@@ -26,10 +23,8 @@ real FiberSegment::projectPoint0(Vector W, real& dis) const
     Vector A = pos1();
     W -= A;
     
-#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(W);
-#endif
     
     // project with the scalar product:
     real abs = dot(W, pos2()-A) * lenInv();
@@ -63,10 +58,8 @@ real FiberSegment::projectPoint(Vector W, real& dis) const
     Vector D = diff();
     W -= A;
     
-#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(W);
-#endif
     
     // project with the scalar product:
     real abs = dot(W, D) * lenInv();
@@ -195,10 +188,8 @@ real FiberSegment::shortestDistanceSqr(FiberSegment const& seg, real& abs1, real
     Vector d22 = ( a2 - seg.pos2() ) * seg.lenInv(); // inverted on purpose
     Vector off = a2 - a1;
 
-#if GRID_HAS_PERIODIC
     if ( modulo )
         modulo->fold(off);
-#endif
     
     real C = dot(d11, d22);  // cosine of angle
     real m1 = dot(off, d11);
