@@ -370,7 +370,7 @@ namespace sMath
     
     
     /* Find the nullpoint of a monotonously increasing function */
-    static real find_root(real (*func)(real), real a, real b)
+    inline real find_root(real (*func)(real), real a, real b)
     {
         if ( func(a) > 0 ) std::swap(a,b);
         for ( int i = 0; i < 16; ++i )
