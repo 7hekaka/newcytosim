@@ -6,7 +6,7 @@
 #include "real.h"
 #include "vector.h"
 
-/// enable/disable support for periodic boundary conditions at compile time
+///\def compile switch to enable/disable support for periodic boundary conditions
 #define ENABLE_PERIODIC_BOUNDARIES 1
 
 
@@ -117,7 +117,7 @@ extern Modulo const* modulo;
 #else
 
 /**
- The code under 'if ( modulo )' will never be executed, and should even
+ Any code under 'if ( modulo )' will not be executed, and should even
  be discarded during compilation if optimizations are enabled.
  */
 constexpr Modulo * modulo = nullptr;

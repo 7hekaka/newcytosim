@@ -9,15 +9,7 @@
 #include <cstdio>
 #include <cmath>
 #include "real.h"
-
-///\def compile switch to disable support for periodic boundaries
-/**
- Periodic boundaries are normally supported using a if statement called repeatedly.
- However, if GRID_HAS_PERIODIC==0, this test is ommitted, which might be faster,
- but Periodic boundaries cannot be supported henceforth.
- */
-#define GRID_HAS_PERIODIC 1
-
+#include "modulo.h"
 
 /// Map divides a rectangle of dimensionality ORD into regular voxels
 /** 
@@ -166,7 +158,7 @@ protected:
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
     inline size_t imagei(const int d, long c) const
     {
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
             return imagei_periodic(mDim[d], c);
         else
@@ -206,7 +198,7 @@ protected:
     inline size_t imagef(const int d, real f) const
     {
         real x = map(d, f);
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
             return imagef_periodic(mDim[d], x);
         else
@@ -218,7 +210,7 @@ protected:
     inline size_t imagef(const int d, real f, real offset) const
     {
         real x = map(d, f) + offset;
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
             return imagef_periodic(mDim[d], x);
         else
@@ -297,7 +289,7 @@ public:
     /// true if dimension `d` has periodic boundary conditions
     bool isPeriodic(int d) const
     {
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
         if ( d < ORD )
             return mPeriodic[d];
 #endif
@@ -307,19 +299,19 @@ public:
     /// change boundary conditions
     void setPeriodic(size_t d, bool p)
     {
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
         if ( d < ORD )
             mPeriodic[d] = p;
 #else
         if ( p )
-            throw InvalidParameter("grid.h was compiled with GRID_HAS_PERIODIC = 0");
+            throw InvalidParameter("grid.h was compiled with ENABLE_PERIODIC_BOUNDARIES=0");
 #endif
     }
     
     /// true if boundary conditions are periodic
     bool isPeriodic() const
     {
-#if GRID_HAS_PERIODIC
+#if ENABLE_PERIODIC_BOUNDARIES
         for ( int d = 0; d < ORD; ++d )
             if ( mPeriodic[d] )
                 return true;

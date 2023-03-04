@@ -205,10 +205,6 @@
 		BB3FF4CF2644901E00969E5E /* space.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388B10B48EC400A4028F /* space.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BB3FF4D02644902200969E5E /* space.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388C10B48EC400A4028F /* space.h */; };
 		BB3FF4D12644902300969E5E /* space.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388C10B48EC400A4028F /* space.h */; };
-		BB3FF4D22644902A00969E5E /* modulo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388810B48EC400A4028F /* modulo.h */; };
-		BB3FF4D32644902A00969E5E /* modulo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88388810B48EC400A4028F /* modulo.h */; };
-		BB3FF4D42644902D00969E5E /* modulo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388710B48EC400A4028F /* modulo.cc */; };
-		BB3FF4D52644902D00969E5E /* modulo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388710B48EC400A4028F /* modulo.cc */; };
 		BB40C8800CC6044E00EC90F8 /* meca1d.h in Sources */ = {isa = PBXBuildFile; fileRef = BB40C87F0CC6044E00EC90F8 /* meca1d.h */; };
 		BB46A4CA24A48E1900E89FE2 /* libcytospaceG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BBE82A64233D15EB00BE44DF /* libcytospaceG.a */; };
 		BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB4737BC2024B39300FE6CEC /* accumulator.h */; };
@@ -715,6 +711,12 @@
 		BB8838FA10B48EF900A4028F /* space_torus.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838DC10B48EF900A4028F /* space_torus.h */; };
 		BB88394D10B4912A00A4028F /* space_capsule.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88394B10B4912A00A4028F /* space_capsule.cc */; };
 		BB88394E10B4912A00A4028F /* space_capsule.h in Headers */ = {isa = PBXBuildFile; fileRef = BB88394C10B4912A00A4028F /* space_capsule.h */; };
+		BB89134E29B3662000423319 /* modulo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89134C29B3662000423319 /* modulo.h */; };
+		BB89135129B3662000423319 /* modulo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89134D29B3662000423319 /* modulo.cc */; };
+		BB89135229B367A400423319 /* modulo.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89134D29B3662000423319 /* modulo.cc */; };
+		BB89135329B367F500423319 /* modulo.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89134C29B3662000423319 /* modulo.h */; };
+		BB89135429B3684800423319 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
+		BB89135529B3684B00423319 /* glapp.h in Headers */ = {isa = PBXBuildFile; fileRef = BB08642E281D4CE8005A6D72 /* glapp.h */; };
 		BB89999420CECB5C00498F48 /* matrix44.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89999320CECB5C00498F48 /* matrix44.h */; };
 		BB89A3FC1A6410E000D724F4 /* event_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB89A3F01A6410CF00D724F4 /* event_set.cc */; };
 		BB89A3FD1A6410E000D724F4 /* event_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB89A3F11A6410CF00D724F4 /* event_set.h */; };
@@ -1998,8 +2000,6 @@
 		BB8481B1158348E80076C8C2 /* couple_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = couple_long.h; path = couples/couple_long.h; sourceTree = "<group>"; };
 		BB855B752667D2C700621C09 /* cympack.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cympack.cc; sourceTree = "<group>"; };
 		BB882B400EE82D6A00E29E5C /* test_bits.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_bits.cc; path = src/test/test_bits.cc; sourceTree = SOURCE_ROOT; };
-		BB88388710B48EC400A4028F /* modulo.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = modulo.cc; path = src/sim/modulo.cc; sourceTree = SOURCE_ROOT; };
-		BB88388810B48EC400A4028F /* modulo.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = modulo.h; path = src/sim/modulo.h; sourceTree = SOURCE_ROOT; };
 		BB88388910B48EC400A4028F /* space_prop.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = space_prop.cc; path = src/sim/space_prop.cc; sourceTree = SOURCE_ROOT; };
 		BB88388A10B48EC400A4028F /* space_prop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = space_prop.h; path = src/sim/space_prop.h; sourceTree = SOURCE_ROOT; };
 		BB88388B10B48EC400A4028F /* space.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = space.cc; path = src/sim/space.cc; sourceTree = SOURCE_ROOT; };
@@ -2026,6 +2026,8 @@
 		BB8838DC10B48EF900A4028F /* space_torus.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = space_torus.h; path = src/sim/spaces/space_torus.h; sourceTree = SOURCE_ROOT; };
 		BB88394B10B4912A00A4028F /* space_capsule.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = space_capsule.cc; path = src/sim/spaces/space_capsule.cc; sourceTree = SOURCE_ROOT; };
 		BB88394C10B4912A00A4028F /* space_capsule.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = space_capsule.h; path = src/sim/spaces/space_capsule.h; sourceTree = SOURCE_ROOT; };
+		BB89134C29B3662000423319 /* modulo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = modulo.h; sourceTree = "<group>"; };
+		BB89134D29B3662000423319 /* modulo.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = modulo.cc; sourceTree = "<group>"; };
 		BB893BB7228B016C00A24F16 /* misc */ = {isa = PBXFileReference; lastKnownFileType = folder; name = misc; path = src/misc; sourceTree = "<group>"; };
 		BB89999320CECB5C00498F48 /* matrix44.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = matrix44.h; path = src/math/matrix44.h; sourceTree = SOURCE_ROOT; };
 		BB89A3F01A6410CF00D724F4 /* event_set.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = event_set.cc; sourceTree = "<group>"; };
@@ -2669,6 +2671,8 @@
 				BB73588105B98DA3006956D5 /* grid.h */,
 				BB73589F05B98DA3006956D5 /* rasterizer.h */,
 				BB73589E05B98DA3006956D5 /* rasterizer.cc */,
+				BB89134C29B3662000423319 /* modulo.h */,
+				BB89134D29B3662000423319 /* modulo.cc */,
 			);
 			name = grid;
 			sourceTree = "<group>";
@@ -3437,8 +3441,6 @@
 		BB88388610B48E6900A4028F /* Space */ = {
 			isa = PBXGroup;
 			children = (
-				BB88388810B48EC400A4028F /* modulo.h */,
-				BB88388710B48EC400A4028F /* modulo.cc */,
 				BB88388C10B48EC400A4028F /* space.h */,
 				BB88388B10B48EC400A4028F /* space.cc */,
 				BB955C4C116FBF4C000E70A6 /* space_set.h */,
@@ -4067,7 +4069,6 @@
 				BB07F524116291E800A15828 /* fiber_set.h in Headers */,
 				BB846BE5116FDEB900A0CD0E /* space_set.h in Headers */,
 				BBA2954B11A1C16600FDCD2E /* bead.h in Headers */,
-				BB3FF4D22644902A00969E5E /* modulo.h in Headers */,
 				BBA295CF11A1CDEB00FDCD2E /* bead_set.h in Headers */,
 				BB50FE881268FB00005E925C /* motor_prop.h in Headers */,
 				BB50FE8A1268FB00005E925C /* motor.h in Headers */,
@@ -4205,7 +4206,6 @@
 				BB692149233D359F00F528D2 /* event.h in Headers */,
 				BB69214A233D359F00F528D2 /* object_set.h in Headers */,
 				BB69214B233D359F00F528D2 /* sphere_set.h in Headers */,
-				BB3FF4D32644902A00969E5E /* modulo.h in Headers */,
 				BB69214C233D359F00F528D2 /* field_values.h in Headers */,
 				BB69214D233D359F00F528D2 /* chewer_prop.h in Headers */,
 				BB69214E233D359F00F528D2 /* fiber_site.h in Headers */,
@@ -4362,6 +4362,7 @@
 				BB7191960EF1CD9900CED9E2 /* vector.h in Headers */,
 				BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */,
 				BB0E4BD81002698100A96B34 /* random_vector.h in Headers */,
+				BB89134E29B3662000423319 /* modulo.h in Headers */,
 				BB74F41A231C334D0019D68E /* sparmatblk.h in Headers */,
 				BBD14D462820826C00B55817 /* signal_handlers.h in Headers */,
 				BB89999420CECB5C00498F48 /* matrix44.h in Headers */,
@@ -4387,7 +4388,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				BBD49F2F2781C5CE00F31EB2 /* glossary.h in Headers */,
+				BB89135329B367F500423319 /* modulo.h in Headers */,
 				BB692132233D349E00F528D2 /* random_vector.h in Headers */,
+				BB89135529B3684B00423319 /* glapp.h in Headers */,
 				BBD49F292781C4DA00F31EB2 /* rasterizer.h in Headers */,
 				BBD49F2B2781C59A00F31EB2 /* random.h in Headers */,
 			);
@@ -5423,7 +5426,6 @@
 				BBEB846412FF339500F9D717 /* fork.cc in Sources */,
 				BB770B6E12FF3E1900D018A0 /* fork_prop.cc in Sources */,
 				BB3FF4CE2644901D00969E5E /* space.cc in Sources */,
-				BB3FF4D42644902D00969E5E /* modulo.cc in Sources */,
 				BB770C0512FF44D100D018A0 /* shackle_prop.cc in Sources */,
 				BB770C0712FF44D100D018A0 /* shackle.cc in Sources */,
 				BBA49EFB12FF5331008A7D33 /* dynamic_fiber.cc in Sources */,
@@ -5555,7 +5557,6 @@
 				BB6921C6233D359F00F528D2 /* single_prop.cc in Sources */,
 				BB6921C7233D359F00F528D2 /* couple_prop.cc in Sources */,
 				BB6921C8233D359F00F528D2 /* simul_prop.cc in Sources */,
-				BB3FF4D52644902D00969E5E /* modulo.cc in Sources */,
 				BB6921C9233D359F00F528D2 /* solid_prop.cc in Sources */,
 				BB6921CA233D359F00F528D2 /* organizer.cc in Sources */,
 				BB6921CB233D359F00F528D2 /* organizer_set.cc in Sources */,
@@ -5704,6 +5705,7 @@
 				BB7191BA0EF1CD9900CED9E2 /* vector2.cc in Sources */,
 				BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */,
 				BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */,
+				BB89135229B367A400423319 /* modulo.cc in Sources */,
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,
 				BB151D65270C85F2003ECD4E /* space_dynamic_disc.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,
@@ -5727,6 +5729,8 @@
 				BBD49F312781C5FF00F31EB2 /* vector3.cc in Sources */,
 				BBD49F342781C61C00F31EB2 /* time_date.cc in Sources */,
 				BBD49F2E2781C5C500F31EB2 /* glossary.cc in Sources */,
+				BB89135429B3684800423319 /* glapp.cc in Sources */,
+				BB89135129B3662000423319 /* modulo.cc in Sources */,
 				BBD49F2D2781C59D00F31EB2 /* random.cc in Sources */,
 				BBD49F382781C65200F31EB2 /* stream_func.cc in Sources */,
 				BBD49F362781C63600F31EB2 /* filepath.cc in Sources */,
