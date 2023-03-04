@@ -1124,16 +1124,15 @@ void processKey(unsigned char key, int modifiers = 0)
             changeSingleSelect();
             break;
             
-        case '&':
-            shufflePointDispVisible(player.allSpaceDisp(), 3);
-            break;
-            
         case 'u':
-            shufflePointDispVisible(player.allSpaceDisp(), 3);
+            if ( altKeyDown )
+                shufflePointDispVisible(player.allSpaceDisp(), 1);
+            else
+                shufflePointDispVisible(player.allSpaceDisp(), 3);
             break;
 
         case 'U':
-            shufflePointDispVisible(player.allSpaceDisp(), 1);
+            shufflePointDispVisible(player.allSpaceDisp(), 2);
             break;
 
         case '7':
