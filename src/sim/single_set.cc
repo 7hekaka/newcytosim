@@ -219,28 +219,24 @@ ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
 }
 
 
-ObjectList SingleSet::distributeWrists(SingleProp const* sp, size_t cnt, Glossary& opt) const
+ObjectList SingleSet::distributeWrists(SingleProp const* sp, size_t cnt,
+                                       std::string const& name) const
 {
     ObjectList objs;
-    std::string str;
-    if ( opt.set(str, "multi_base") )
+    BeadProp * bip = simul_.findProperty<BeadProp>("bead", name);
+    if ( !bip )
+        throw InvalidParameter("could not find Bead type `"+name+"'");
+    ObjectList list = simul_.beads.collect(bip);
+    if ( list.empty() )
+        throw InvalidParameter("could not find Bead of type `"+name+"'");
+    if ( cnt < list.size() )
     {
-        BeadProp * bip = simul_.findProperty<BeadProp>("bead", str);
-        if ( bip )
-        {
-            ObjectList list = simul_.beads.collect(bip);
-            if ( cnt < list.size() )
-            {
-                list.shuffle();
-                list.truncate(cnt);
-            }
-            // create one Single on each of 'cnt' Beads:
-            for ( Object const* i : list )
-                objs.push_back(sp->newWrist(static_cast<Bead const*>(i), 0));
-        }
-        else
-            throw InvalidParameter("could not find Bead type `"+str+"'");
+        list.shuffle();
+        list.truncate(cnt);
     }
+    // create one Single on each of 'cnt' Beads:
+    for ( Object const* i : list )
+        objs.push_back(sp->newWrist(static_cast<Bead const*>(i), 0));
     return objs;
 }
 

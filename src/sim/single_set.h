@@ -173,7 +173,7 @@ public:
     void deleteWrists(Object const*);
     
     /// create Single attached to the beads
-    ObjectList distributeWrists(SingleProp const*, size_t cnt, Glossary&) const;
+    ObjectList distributeWrists(SingleProp const*, size_t cnt, std::string const&) const;
     
     ///returns the first free Single
     Single * firstF() const { return static_cast<Single*>(fList.front()); }

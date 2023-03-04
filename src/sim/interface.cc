@@ -550,7 +550,9 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
     {
         // particular case: distribute Single onto beads (31.01.2023):
         SingleProp const* sp = static_cast<SingleProp const*>(pp);
-        res.append(sim_->singles.distributeWrists(sp, cnt, opt));
+        std::string str;
+        if ( opt.set(str, "multi_base") )
+            res.append(sim_->singles.distributeWrists(sp, cnt, str));
     }
     else
     {
