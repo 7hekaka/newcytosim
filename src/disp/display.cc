@@ -1076,7 +1076,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
     gym::unmapBufferVD();
     gym::ref_view();
     gym::disableLighting();
-    gym::color_load(fib.disp->color);
+    gym::color(fib.disp->color);
     gym::drawPoints(disp->speckle_size, 0, i);
 }
 
@@ -2051,7 +2051,7 @@ void Display::drawBead(Bead const& obj)
     if (( disp->style & 4 ) && obj.radius() > pixelSize )
     {
         gym::disableLighting();
-        gym::color_both(col);
+        gym::color(col);
         gym::transScale(obj.position(), obj.radius());
         gle::circle1(disp->width);
     }
