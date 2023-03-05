@@ -351,8 +351,6 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gym_color c
 
     if ( disp->coloring == FiberDisp::COLORING_AGE )
         prep_flag |= 4;
-    
-    disp->setPixels(pixelSize, unitValue);
 }
 
 
@@ -959,10 +957,11 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
     gym::ref_view();
     gym::disableLighting();
     gym::unmapBufferC4VD();
+    float w = pixwidth(fib.prop->disp->line_width);
     if ( strip )
-        gym::drawLineStrip(fib.prop->disp->line_widthX, 0, ptr-flu);
+        gym::drawLineStrip(w, 0, ptr-flu);
     else
-        gym::drawLines(fib.prop->disp->line_widthX, 0, ptr-flu);
+        gym::drawLines(w, 0, ptr-flu);
     gym::cleanup();
 }
 
@@ -1013,7 +1012,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     gym::disableLighting();
     gym::unmapBufferC4VD();
-    gym::drawLineStrip(disp->line_widthX, 0, ptr-flu);
+    gym::drawLineStrip(pixwidth(disp->line_width), 0, ptr-flu);
     gym::restoreLighting();
     gym::cleanup();
 }
@@ -1093,7 +1092,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         gym::disableLighting();
         gym::color(fib.disp->color);
         gym::loadPoints(fib.nbPoints(), fib.addrPoints());
-        gym::drawSquarePoints(disp->point_sizeX, 0, fib.nbPoints());
+        gym::drawSquarePoints(pixwidth(disp->point_size), 0, fib.nbPoints());
     }
     else if ( style == 2 )
     {
@@ -1138,7 +1137,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         gym::ref_view();
         gym::disableLighting();
         gym::color(fib.disp->color);
-        gym::drawLines(disp->line_widthX, 0, ptr-flu);
+        gym::drawLines(pixwidth(1), 0, ptr-flu);
     }
     else if ( style == 4 )
     {
@@ -1800,7 +1799,7 @@ void Display::drawFiber(Fiber const& fib)
         
         if ( disp->force_style )
         {
-            drawFiberForces(fib, disp->force_scale, disp->point_sizeX);
+            drawFiberForces(fib, disp->force_scale, pixwidth(disp->point_size));
         }
     }
 }

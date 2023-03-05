@@ -305,12 +305,6 @@ public:
 
     /// @}
     
-    /// rescaled line width
-    float line_widthX;
-    
-    /// rescaled point size
-    float point_sizeX;
-    
 public:
     
     /// constructor
@@ -333,9 +327,6 @@ public:
 
     /// write all values
     void write_values(std::ostream&) const;
-    
-    /// recalculate bitmaps
-    void setPixels(float pixel_size, float unit_value);
 
 };
 

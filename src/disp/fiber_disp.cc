@@ -9,14 +9,6 @@
 #define BACKWARD_COMPATIBLE 1
 
 
-void FiberDisp::setPixels(float, float unitValue)
-{
-    point_sizeX = std::max(point_size*unitValue, 0.25f);
-    line_widthX = std::max(line_width*unitValue, 0.25f);
-    //printf("width %6.3f size %6.3f\n", line_widthX, point_sizeX);
-}
-
-
 void FiberDisp::clear()
 {
     style      = 0;

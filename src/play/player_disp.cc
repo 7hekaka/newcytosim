@@ -229,9 +229,7 @@ void Player::setPixelSize(View& view)
 
     for ( Property * p : dispList )
     {
-        if ( p->category() == "fiber:display" )
-            static_cast<FiberDisp*>(p)->setPixels(pix, mag);
-        else
+        if ( p->category() != "fiber:display" )
             static_cast<PointDisp*>(p)->setPixels(pix, mag, disp.style==2);
     }
 }
