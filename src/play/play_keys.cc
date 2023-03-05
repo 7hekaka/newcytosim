@@ -8,10 +8,11 @@
 #define ENABLE_WRITE 1
 
 
-/// defines the increment for user's modifications (eg. key pressed)
+/// change `x` by adding `inc` while keeping discrete values
 static float grained(float x, int inc)
 {
     const float grain = 0.25f;
+    // if the value is large, we scale the increment up:
     float dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
     float nx = std::nearbyint( x / grain + dx );
     float ii = std::abs(inc);
@@ -106,22 +107,22 @@ static void changePointDispSize(PropertyList const& plist, int inc, bool dos, bo
         if ( dow ) p->width = grained(p->width, inc);
     }
     
+    // change global values for style 1:
     if ( disp.style == 1 || plist.size() > 1 )
     {
-        if ( dow ) {
-            disp.link_width = grained(disp.link_width, inc);
-            flashText("simul:link_width %.2f", disp.link_width);
-        }
-        if ( dos ) {
-            disp.point_size = grained(disp.point_size, inc*2);
-            flashText("simul:point_size %.2f", disp.point_size);
-        }
+        if ( dos ) disp.point_size = grained(disp.point_size, inc*2);
+        if ( dow ) disp.link_width = grained(disp.link_width, inc);
+        if ( dos & dow ) flashText("simul:point_size %.2f link_width %.2f", disp.point_size, disp.link_width);
+        else if ( dos ) flashText("simul:point_size %.2f", disp.point_size);
+        else if ( dow ) flashText("simul:link_width %.2f", disp.link_width);
     }
-    else if ( plist.size() == 1 )
+    else if ( plist.size() > 0 )
     {
         PointDisp * p = toPointDisp(plist.front());
-        if ( dow ) flashText("%s:width %.2f", p->name_str(), p->width);
-        if ( dos ) flashText("%s:size %.2f", p->name_str(), p->size);
+        char const* n = p->name_str();
+        if ( dos & dow ) flashText("%s:size %.2f width %.2f", n, p->size, p->width);
+        else if ( dow ) flashText("%s:width %.2f", n, p->width);
+        else if ( dos ) flashText("%s:size %.2f", n, p->size);
     }
 }
 
@@ -465,11 +466,12 @@ static void toggleFiberStyle(FiberDisp* p, int inc)
 static void changeSpeckleStyle(FiberDisp* p, int)
 {
     p->speckle_style = ( p->speckle_style + 1 ) % 3;
+    char const* n = p->name_str();
     switch ( p->speckle_style )
     {
-        case 0: flashText("%s: no speckles", p->name_str());       break;
-        case 1: flashText("%s: random speckles", p->name_str());   break;
-        case 2: flashText("%s: regular speckles", p->name_str());  break;
+        case 0: flashText("%s: no speckles", n);       break;
+        case 1: flashText("%s: random speckles", n);   break;
+        case 2: flashText("%s: regular speckles", n);  break;
     }
 }
 
@@ -538,12 +540,13 @@ static void changeEndStyle(FiberDisp* d, int val)
             break;
     }
     
+    char const* n = d->name_str();
     switch( (style[0]?1:0) + (style[1]?2:0) )
     {
-        case 0: flashText("%s: no ends", d->name_str());    break;
-        case 1: flashText("%s: plus-ends", d->name_str());  break;
-        case 2: flashText("%s: minus-ends", d->name_str()); break;
-        case 3: flashText("%s: both ends", d->name_str());  break;
+        case 0: flashText("%s: no ends", n);    break;
+        case 1: flashText("%s: plus-ends", n);  break;
+        case 2: flashText("%s: minus-ends", n); break;
+        case 3: flashText("%s: both ends", n);  break;
     }
 }
 
@@ -748,7 +751,7 @@ void helpKeys(std::ostream& os)
     os << "   7 ALT-7     Change Couple visibility based on state\n";
     os << "   0           Change visibility flags of Hands\n";
     os << "   8 9         Decrease; Increase point size of visible Hands\n";
-    os << "   ALT-8 ALT-9 Decrease; Increase line width of visible Hands\n";
+    os << "   * (         Decrease; Increase line width of visible Hands\n";
     os << "\nSpaces\n";
     os << "   u           Rotate visibility\n";
 }
@@ -1100,11 +1103,7 @@ void processKey(unsigned char key, int modifiers = 0)
         case '/':
             setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 2);
             break;
-
-        case '*':
-            setFiberDisp(player.allVisibleFiberDisp(), changeLatticeStyle, 0);
-            break;
-
+            
         //------------------------ Solid, Bead & Sphere ------------------------
   
         case '5':
@@ -1143,11 +1142,19 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case '8':
-            changePointDispSize(player.allVisibleHandDisp(), -1, !altKeyDown, !shiftKeyDown);
+            changePointDispSize(player.allVisibleHandDisp(), -1, 1, 1);
+            break;
+            
+        case '*':
+            changePointDispSize(player.allVisibleHandDisp(), -1, 0, 1);
             break;
             
         case '9':
-            changePointDispSize(player.allVisibleHandDisp(), +1, !altKeyDown, !shiftKeyDown);
+            changePointDispSize(player.allVisibleHandDisp(), +1, 1, 1);
+            break;
+
+        case '(':
+            changePointDispSize(player.allVisibleHandDisp(), +1, 0, 1);
             break;
 
         case '0':
