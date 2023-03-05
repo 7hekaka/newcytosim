@@ -229,7 +229,7 @@ void drawBug(Simul const& sim)
 int main(int argc, char *argv[])
 {
     Simul simul;
-    SimThread worker;
+    SimThread worker(&simul);
 
     //parse the command line:
     Glossary arg;
@@ -247,7 +247,6 @@ int main(int argc, char *argv[])
     }
     
     GLFWwindow* win = initWindow(winW, winH);
-    worker.simul(&simul);
     worker.start();
 
     while( !glfwWindowShouldClose(win) )
