@@ -15,6 +15,8 @@ class Mecable;
 class Glossary;
 class PointDisp;
 class Display;
+class Solid;
+class Sphere;
 
 /// An assemblage of Mecable
 /** 
@@ -103,11 +105,11 @@ public:
     virtual bool getLink(size_t inx, Vector&, Vector&) const { return false; }
     
     /// object from that gives its display parameters
-    virtual Mecable * core() const { return nullptr; }
+    virtual Solid * solid() const { return nullptr; }
     
-    /// display parameters
-    virtual PointDisp const* disp() const { return nullptr; }
-    
+    /// object from that gives its display parameters
+    virtual Sphere * sphere() const { return nullptr; }
+
     //--------------------------------------------------------------------------
     
     /// character identifying each class

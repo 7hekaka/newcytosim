@@ -182,24 +182,13 @@ namespace {
     gym_color bodyColorF(T const& obj)
     {
         PointDisp const* disp = obj.prop->disp;
-        if ( disp->coloring )
+        switch ( disp->coloring )
         {
-            size_t i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
-            return gym::bright_color(i).match_a(disp->color);
+            case 1: return gym::bright_color(obj.signature()).match_a(disp->color);
+            case 2: return gym::bright_color(obj.mark()).match_a(disp->color);
+            case 3: return disp->color.tweak(obj.signature());
+            default: return disp->color;
         }
-        return disp->color;
-    }
-    
-    /**
-     returns the front color used to display Object
-     if `coloring` is enabled, this loads the N-th bright color,
-     otherwise load the object's display color
-     */
-    gym_color bodyColorF(PointDisp const* disp, size_t s)
-    {
-        if ( disp->coloring )
-            return gym::bright_color(s).match_a(disp->color);
-        return disp->color;
     }
     
     /**

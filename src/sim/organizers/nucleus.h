@@ -64,12 +64,6 @@ public:
 
     /// retrieve link between Sphere and ends of Fiber
     bool getLink(size_t, Vector&, Vector&) const;
-    
-    /// return Sphere
-    Mecable* core() const { return nuSphere; }
-    
-    /// display parameters
-    PointDisp const* disp() const { if ( nuSphere ) return nuSphere->prop->disp; return nullptr; }
 
     //------------------------------ read/write --------------------------------
     

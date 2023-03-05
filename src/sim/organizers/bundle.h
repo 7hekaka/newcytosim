@@ -55,9 +55,6 @@ public:
     
     /// return the center of gravity from all MT central ends
     Vector position() const;
-    
-    /// display parameters
-    PointDisp const* disp() const { return nullptr; }
 
     //------------------------------ read/write --------------------------------
     

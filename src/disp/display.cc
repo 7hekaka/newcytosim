@@ -2193,10 +2193,15 @@ void Display::drawSpheres(SphereSet const& set)
 
 void Display::drawOrganizer(Organizer const& obj) const
 {
-    PointDisp const* disp = obj.disp();
+    Solid const* sol = obj.solid();
+    Sphere const* sph = obj.sphere();
+    if ( !sol && !sph ) return;
+    PointDisp const* disp = ( sol ? sol->prop->disp : sph->prop->disp );
+    if ( !disp ) return;
+
     size_t i = 0, cnt = obj.nbLinks();
 
-    if ( disp && ( disp->style & 2 ))
+    if ( disp->style & 2 )
     {
         Vector P, Q;
         fluteD* flu = gym::mapBufferVD(2*cnt);
@@ -2210,7 +2215,8 @@ void Display::drawOrganizer(Organizer const& obj) const
         gym::unmapBufferVD();
         gym::ref_view();
         gym::disableLighting();
-        gym::color(bodyColorF(disp, obj.signature()));
+        if ( sol ) gym::color(bodyColorF(*sol));
+        else gym::color(bodyColorF(*sph));
         gym::drawLines(disp->widthX, 0, 2*i);
         gym::rebindBufferVD(2);
         gym::drawPoints(disp->sizeX, 0, i);
@@ -2220,9 +2226,8 @@ void Display::drawOrganizer(Organizer const& obj) const
      This display the Solid connecting two Aster as a spindle.
      Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
-    if ( disp && ( disp->style & 1 ) && obj.tag() == Organizer::TAG_FAKE )
+    if ( disp->style & 1 && obj.tag() == Organizer::TAG_FAKE )
     {
-        Solid const* sol = Solid::toSolid(obj.core());
         if ( sol && sol->nbPoints() >= 4 )
         {
 #if ( DIM >= 3 )

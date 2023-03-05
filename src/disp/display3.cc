@@ -822,9 +822,13 @@ void Display3::drawFiberPoints(Fiber const& fib) const
 
 void Display3::drawOrganizer(Organizer const& obj) const
 {
-    PointDisp const* disp = obj.disp();
+    Solid const* sol = obj.solid();
+    Sphere const* sph = obj.sphere();
+    if ( !sol && !sph ) return;
+    PointDisp const* disp = ( sol ? sol->prop->disp : sph->prop->disp );
+    if ( !disp ) return;
 
-    if ( disp && ( disp->style & 2 ))
+    if ( disp->style & 2 )
     {
         Vector P, Q;
         bodyColor(disp, obj.signature());
@@ -842,9 +846,8 @@ void Display3::drawOrganizer(Organizer const& obj) const
      This displays the Solid connecting two Aster as a spindle.
      Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
-    if ( disp && ( disp->style & 1 ) && obj.tag() == Organizer::TAG_FAKE )
+    if (( disp->style & 1 ) && obj.tag() == Organizer::TAG_FAKE )
     {
-        Solid const* sol = Solid::toSolid(obj.core());
         if ( sol && sol->nbPoints() >= 4 )
         {
             bodyColor(*sol);

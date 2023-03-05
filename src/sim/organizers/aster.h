@@ -263,12 +263,6 @@ public:
     /// retrieve link of type 1 if `i` is even, of type 2 if `i` is odd
     bool getLink(size_t i, Vector&, Vector&) const;
 
-    /// return Solid
-    Mecable* core() const { return asSolid; }
-    
-    /// return PointDisp of Solid
-    PointDisp const* disp() const { if ( asSolid ) return asSolid->prop->disp; return nullptr; }
-
     //--------------------------------------------------------------------------
     
     /// return unique character identifying the class

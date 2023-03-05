@@ -60,12 +60,6 @@ public:
     /// retrieve link between Solid and Aster's core
     bool getLink(size_t, Vector&, Vector&) const;
     
-    /// return Solid
-    Mecable * core() const { return fkSolid; }
-    
-    /// return display parameters
-    PointDisp const* disp() const { if ( fkSolid ) return fkSolid->prop->disp; return nullptr; }
-    
     /// return unique character identifying the class
     ObjectTag tag() const { return TAG_FAKE; }
     
