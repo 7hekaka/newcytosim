@@ -1704,24 +1704,26 @@ void Display::drawFiber(Fiber const& fib)
     if ( disp->style )
     {
         if ( disp->style == 1 )
-            return drawFiberBackbone(fib);
-
-        gym_color col1 = fib.disp->color.alpha(1.0);
-        gym_color col2 = col1.darken(0.75);
-        gym_color colE = fib.disp->end_color[0];
-        
-        // load backface color:
-        if ( fib.prop->disp->coloring )
-            gym::color_back(col1);
+            drawFiberBackbone(fib);
         else
-            gym::color_back(fib.prop->disp->back_color);
-
-        switch( disp->style )
         {
-            case 2: drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2); break;
-            case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
-            case 4: drawActin(fib, col1, col2, colE); break;
-            case 5: drawMicrotubule(fib, col1, col2, colE); break;
+            gym_color col1 = fib.disp->color.alpha(1.0);
+            gym_color col2 = col1.darken(0.75);
+            gym_color colE = fib.disp->end_color[0];
+            
+            // load backface color:
+            if ( fib.prop->disp->coloring )
+                gym::color_back(col1);
+            else
+                gym::color_back(disp->back_color);
+            
+            switch( disp->style )
+            {
+                case 2: drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2); break;
+                case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
+                case 4: drawActin(fib, col1, col2, colE); break;
+                case 5: drawMicrotubule(fib, col1, col2, colE); break;
+            }
         }
         style = 0;
     }
