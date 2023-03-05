@@ -38,6 +38,8 @@ static real get_angle(std::istream& is)
     return RNG.sreal() * M_PI;
 }
 
+//------------------------------------------------------------------------------
+#pragma mark - Position
 
 /**
  There are different ways to specify a position:
@@ -621,8 +623,9 @@ Vector Cytosim::readPosition(std::string const& arg)
 }
 
 
-#pragma mark - Direction
 //------------------------------------------------------------------------------
+#pragma mark - Direction
+
 /**
  Reads a direction which is a unit vector (norm = 1):
  

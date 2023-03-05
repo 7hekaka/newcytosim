@@ -1,10 +1,9 @@
 
 set(SOURCES_SIM
-    modulo.cc primitives.cc
     mecable.cc meca.cc mecapoint.cc
     interpolation.cc interpolation4.cc
     fiber_segment.cc fiber_site.cc
-    lattice.cc
+    primitives.cc lattice.cc
     object.cc object_pool.cc object_set.cc
     sphere_prop.cc sphere.cc sphere_set.cc
     bead.cc bead_set.cc
