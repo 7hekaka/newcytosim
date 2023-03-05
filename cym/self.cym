@@ -10,7 +10,7 @@ set simul system
     viscosity = 0.1
     precondition = 1
     binding_grid_step = 0.5
-    display = ( label="Nedelec et al. 1998 -" )
+    display = ( label=(Nedelec et al. 1998 -) )
 }
 
 set space cell
