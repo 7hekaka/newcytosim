@@ -764,7 +764,6 @@ void processKey(unsigned char key, int modifiers = 0)
     View & view = glApp::currentView();
     
     const bool altKeyDown = modifiers & GLUT_ACTIVE_ALT;
-    const bool shiftKeyDown = modifiers & GLUT_ACTIVE_SHIFT;
     /*
      In the switch below:
      - use break if the display need to be refreshed,
@@ -1069,8 +1068,6 @@ void processKey(unsigned char key, int modifiers = 0)
         case '2':
             if ( altKeyDown)
                 setFiberDisp(player.allVisibleFiberDisp(), changePointSize, -1);
-            else if ( shiftKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changeLineWidth, -1);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, -1);
             break;
@@ -1082,8 +1079,6 @@ void processKey(unsigned char key, int modifiers = 0)
         case '3':
             if ( altKeyDown)
                 setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 1);
-            else if ( shiftKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changeLineWidth, 1);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, 1);
             break;
