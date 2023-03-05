@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 #include "space_prop.h"
 #include "glossary.h"
 #include "messages.h"
@@ -205,7 +205,6 @@ void SpaceProp::read(Glossary& glos)
         display_fresh = true;
 }
 
-//------------------------------------------------------------------------------
 
 void SpaceProp::complete(Simul const&)
 {
@@ -214,7 +213,6 @@ void SpaceProp::complete(Simul const&)
 
 }
 
-//------------------------------------------------------------------------------
 
 void SpaceProp::write_values(std::ostream& os) const
 {
