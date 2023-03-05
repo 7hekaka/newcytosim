@@ -1130,7 +1130,65 @@ void Fiber::setInteractions(Meca& meca) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Counting attached Hands
+#pragma mark - Adding/Counting attached Hands
+
+
+void Fiber::makeAttachedHands(ObjectList& objs, std::string const& name, size_t cnt,
+                              Glossary& opt, std::string const& var, Simul& sim)
+{
+    // search for Single and Couple:
+    SingleProp * sip = static_cast<SingleProp*>(sim.properties.find("single", name));
+    CoupleProp * cop = static_cast<CoupleProp*>(sim.properties.find("couple", name));
+    if ( sip && cop )
+        throw InvalidParameter("ambiguous fiber:attach single/couple `"+name+"'");
+    if ( !sip && !cop )
+        throw InvalidParameter("could not find single/couple specified in fiber:attach `"+name+"'");
+    
+    // variables defining an abscissa:
+    int mod = 7;
+    real abs = 0;
+    FiberEnd ref = ORIGIN;
+    if ( opt.set(abs, var, 1) )
+        mod = 0;
+    opt.set(ref, var, 2, {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}, {"center", CENTER}});
+    opt.set(mod, var, 3, {{"off", 0}, {"uniform", 1}, {"exponential", 2}, {"regular", 3}});
+
+    for ( size_t n = 0; n < cnt; ++n )
+    {
+        Object * cs = nullptr;
+        Hand * h = nullptr;
+        if ( sip )
+        {
+            Single * s = sip->newSingle();
+            h = s->hand();
+            cs = s;
+        }
+        else
+        {
+            Couple * c = cop->newCouple();
+            h = c->hand1();
+            cs = c;
+        }
+        real a = someAbscissa(abs, ref, mod, (real)n/std::max(1UL, cnt-1));
+        FiberSite sit(this, a);
+        if ( h->attachmentAllowed(sit) )
+        {
+            h->attach(sit);
+            Vector vec;
+            if ( opt.set(vec, var, 4) )
+                cs->setPosition(vec);
+            else
+                cs->setPosition(h->pos());
+            objs.push_back(cs);
+        }
+        else
+        {
+            delete(cs);
+            throw InvalidParameter("hand cannot attach to specified fiber");
+        }
+    }
+}
+
 
 size_t Fiber::nbHandsInRange(real i, real s, const FiberEnd ref) const
 {

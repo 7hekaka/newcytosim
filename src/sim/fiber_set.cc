@@ -129,71 +129,19 @@ Fiber * FiberSet::newFiber(ObjectList& objs, FiberProp const* fip, Glossary& opt
  
     size_t inp = 1;
     std::string spe, var = "attach1";
-    
+#if BACKWARD_COMPATIBILITY < 50
     if ( opt.has_key("attach") )
     {
         var = "attach";
         inp = 0;
     }
-    
+#endif
     //can add Singles or Couples to the Fiber:
     while ( opt.set(spe, var) )
     {
         size_t cnt = 1;
         Tokenizer::split_integer(cnt, spe);
-        
-        // search for Single and Couple:
-        SingleProp * sip = static_cast<SingleProp*>(simul_.properties.find("single", spe));
-        CoupleProp * cop = static_cast<CoupleProp*>(simul_.properties.find("couple", spe));
-        
-        if ( sip && cop )
-            throw InvalidParameter("ambiguous fiber:attach single/couple `"+spe+"'");
-        if ( !sip && !cop )
-            throw InvalidParameter("could not find single/couple specified in fiber:attach `"+spe+"'");
-        
-        // variables defining an abscissa:
-        int mod = 7;
-        real abs = 0;
-        FiberEnd ref = ORIGIN;
-        if ( opt.set(abs, var, 1) )
-            mod = 0;
-        opt.set(ref, var, 2, {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}, {"center", CENTER}});
-        opt.set(mod, var, 3, {{"off", 0}, {"uniform", 1}, {"exponential", 2}, {"regular", 3}});
-
-        for ( size_t n = 0; n < cnt; ++n )
-        {
-            Object * cs = nullptr;
-            Hand * h = nullptr;
-            if ( sip )
-            {
-                Single * s = sip->newSingle();
-                h = s->hand();
-                cs = s;
-            }
-            else
-            {
-                Couple * c = cop->newCouple();
-                h = c->hand1();
-                cs = c;
-            }
-            real a = fib->someAbscissa(abs, ref, mod, (real)n/std::max(1UL, cnt-1));
-            FiberSite sit(fib, a);
-            if ( h->attachmentAllowed(sit) )
-            {
-                h->attach(sit);
-                Vector vec;
-                if ( opt.set(vec, var, 4) )
-                    cs->setPosition(vec);
-                else
-                    cs->setPosition(h->pos());
-                objs.push_back(cs);
-            }
-            else
-            {
-                delete(cs);
-                throw InvalidParameter("hand cannot attach to specified fiber");
-            }
-        }
+        fib->makeAttachedHands(objs, spe, cnt, opt, var, simul_);
         var = "attach" + std::to_string(++inp);
     }
     return fib;

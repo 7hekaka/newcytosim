@@ -304,6 +304,9 @@ public:
     /// number of Hands attached at a distance less than 'len' from the specified FiberEnd
     size_t nbHandsNearEnd(real len, FiberEnd) const;
     
+    /// create Hands attached to this fiber
+    void makeAttachedHands(ObjectList&, std::string const&, size_t, Glossary&, std::string const&, Simul&);
+    
     //--------------------------------------------------------------------------
 
 #if NEW_FIBER_END_CHEW
