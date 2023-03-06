@@ -4,6 +4,7 @@
 
 *  [**Overview**](main/overview.md)
 *  [The configuration file](sim/config.md)
+*  [Placement of objects](sim/placement.md)
 *  [Units in Cytosim `(s, um, pN)`](sim/units.md)
 *  [Set of standard config files](main/examples.md)
 *  [Introduction to the command line](main/starter.md)

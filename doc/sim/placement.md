@@ -1,6 +1,6 @@
 # Object's initial position
 
-The position of an object is specified as it is created with the `new` command:
+The position of an object is specified when it is created with a `new` command:
  
      new [POSITIVE_INTEGER] NAME
      {
@@ -10,11 +10,15 @@ The position of an object is specified as it is created with the `new` command:
 		...
      }
 
-All parameters are optional. See the specifications below.
-Some POSITION primitives refer to the *master space*, but another space can be specified (`position = inside, my_space`). 
+All parameters are optional. By default, `position=inside` and `orientation=random`, but
+other values can be specified (see below).
 
+Some POSITION primitives refer to the *master space*, which is the case for the default `inside`, but another space can be specified (`position = inside, my_space`). 
 The rotation given in `orientation` is applied before the translation specified in `position`.
-But if a second value is specified in `orientation`, this rotation will be applied after the translation. The parameter `direction` is a alternative to `orientation`, by which one specifies a vector, rather than a full rotation. If `direction` is specified, `orientation` will be ignored.
+But if a second value is specified in `orientation`, this rotation will be applied after the translation. 
+
+The orientation of the object can be specified in two ways: `orientation` or `direction` but only one of them should be specified. .
+The parameter `direction` specifies a vector, while `orientation` specifies a full rotation. For a fiber, specifying `direction` is sufficient.
 
 
 # POSITION
@@ -68,6 +72,8 @@ Most primitives describe a certain area in Space, and the returned position is
  `blur REAL`            | Add centered Gaussian noise of variance REAL
  `to X Y Z`             | Interpolate with the previously specified position
  `or POSITION`          | flip randomly between two specified positions
+ 
+ If a position is specified directly using a primitive and `placement` remains unspeficied, the default value `inside` will imply that the object will only be created if its vertices are inside the current Space.
  
  
 # ROTATION
