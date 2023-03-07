@@ -351,6 +351,7 @@ int DynamicFiber::stepPlusEnd()
 
 void DynamicFiber::step()
 {
+    //std::clog << this << " " << stabilized_[0] << "  " << stabilized_[1] << "\n";
     real addM = 0;
     constexpr size_t M = 1;
     if ( stabilized_[M] > 0 )
@@ -377,9 +378,9 @@ void DynamicFiber::step()
         {
             unitP[1] = unitP[0];
             unitP[0] = 1;
+            mStateP = calculateStateP();
             addP += prop()->unit_length;
             nextGrowthP += RNG.exponential();
-            mStateP = calculateStateP();
         }
         stabilized_[P] = 0;
     }
