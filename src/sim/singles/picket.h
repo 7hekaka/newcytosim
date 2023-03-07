@@ -9,7 +9,7 @@
 /// a Single attached at a fixed position.
 /**
  This Single is fixed at its foot position in absolute space.
- A link is created if the Hand is attached.
+ An elastic link is created when the Hand is attached.
 
  @ingroup SingleGroup
  */

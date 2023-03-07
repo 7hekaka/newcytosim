@@ -49,7 +49,7 @@ public:
      @{
      */
     
-    /// rate of attachment when the Hand is within `binding_range` (also known as `binding[0]`)
+    /// rate of attachment when Hand is within `binding_range` (also known as `binding[0]`)
     /**
      This has units of 1/second.
      The molecular binding_rate of conventional kinesin is 4.7 +/- 2.4 /s:

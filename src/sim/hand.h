@@ -139,13 +139,13 @@ public:
     /// detach
     virtual void detach();
 
-    /// simulate when the Hand is not attached
+    /// simulate when Hand is not attached
     virtual void stepUnattached(Simul&, Vector const& pos);
 
-    /// simulate when the Hand is attached but not under load
+    /// simulate when Hand is attached but not under load
     virtual void stepUnloaded();
 
-    /// simulate when the Hand is attached and under load
+    /// simulate when Hand is attached and under load
     virtual void stepLoaded(Vector const& force);
 
     /// this is called when disassembly occured plus end

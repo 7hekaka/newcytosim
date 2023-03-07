@@ -162,10 +162,10 @@ public:
     /// force = stiffness * ( position_anchor - position_hand ), or zero for a diffusible Single
     virtual Vector force() const { return Vector(0,0,0); }
 
-    /// Monte-Carlo step if the Hand is not attached
+    /// Monte-Carlo step if Hand is detached
     virtual void stepF();
     
-    /// Monte-Carlo step if the Hand is attached
+    /// Monte-Carlo step if Hand is attached
     virtual void stepA();
 
     /// add interactions to a Meca
