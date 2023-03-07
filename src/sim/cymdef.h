@@ -33,7 +33,7 @@ enum FiberEnd
     PLUS_END    = 1,   ///< highest abscissa = last vertex
     MINUS_END   = 2,   ///< lowest abscissa = fist vertex at index 0
     BOTH_ENDS   = 3,   ///< used to designate any of the two ends
-    ORIGIN      = 7,   ///< refers to the origin of abscissa
+    ORIGIN      = 4,   ///< refers to the origin of abscissa
     CENTER      = 8    ///< the mid-point between the two ends
 };
 
