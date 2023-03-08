@@ -176,9 +176,10 @@ Matrix33 Matrix33::rotationToVector(const Vector3& vec)
     res.setColumns(Z, X, Y);
     return res;
 #else
-    real C = vec.XX;
+    real n = 1.0 / vec.norm();
+    real C = vec.XX * n;
     real k = 1.0 / ( 1.0 + C );
-    Vector3 dir(0, -vec.ZZ, vec.YY);
+    Vector3 dir(0, -vec.ZZ * n, vec.YY * n);
     return outerProduct(dir, k) + vectorProduct(C, dir);
 #endif
 }

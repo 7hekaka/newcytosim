@@ -164,10 +164,10 @@ void Player::autoFocus(Simul const& sim, View& view) const
     
     if ( mode & 2 )
     {
+        real S = FiberSet::infoNematic(sim.fibers.collect(), vec);
         // align with mean nematic direction
         view.align_with(vec);
-        real S = FiberSet::infoNematic(sim.fibers.collect(), vec);
-        flashText("Nematic order S = %5.3f", S);
+        //flashText("Nematic order S = %5.3f", S);
         //view.rotation.setFromMatrix3(vec);
         //view.rotation.conjugate();
         //std::clog << "auto rotate: " << Vector3(vec) << '\n';
