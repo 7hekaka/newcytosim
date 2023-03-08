@@ -640,11 +640,13 @@ public:
     {
         // axis is obtained by vector product: axis = cross(X, dir)
         REAL axis[3] = { 0, dir[2], -dir[1] };
-        real n = std::sqrt( dir[1]*dir[1] + dir[2]*dir[2] );
-        // need half-angle for Quaternion, with cosine = scalar product:
+        // norm(axis) = sin(angle) = 2 * S * C
+        //real n = std::sqrt( dir[1]*dir[1] + dir[2]*dir[2] );
+        // cosine(angle) = scalar product(dir, X):
         REAL X = std::max(REAL(-1), std::min(REAL(1), dir[0]));
-        REAL C = std::sqrt(0.5*(1+X)), S = std::sqrt(0.5*(1-X));
-        setFromAxis(axis, C, S/n);
+        // need half-angle for Quaternion, obtained by trigonometric identity:
+        REAL C = std::sqrt(0.5*(1+X));
+        setFromAxis(axis, C, 0.5/C); // since S / n = 0.5 / C
     }
 
     /// return angle of the rotation
