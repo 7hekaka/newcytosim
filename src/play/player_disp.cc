@@ -165,8 +165,8 @@ void Player::autoFocus(Simul const& sim, View& view) const
     if ( mode & 2 )
     {
         // align with mean nematic direction
+        view.align_with(vec);
         real S = FiberSet::infoNematic(sim.fibers.collect(), vec);
-        view.align_with(Vector3(vec));
         flashText("Nematic order S = %5.3f", S);
         //view.rotation.setFromMatrix3(vec);
         //view.rotation.conjugate();

@@ -678,7 +678,7 @@ void View::rotate_to(const Quaternion<real> & q)
 }
 
 
-void View::align_with(const Vector3 & dir)
+void View::align_with(const real dir[3])
 {
     rotation.setRotationToVector(dir);
     setModelView();
