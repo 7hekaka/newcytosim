@@ -29,10 +29,10 @@ void Modulo::enable(size_t d, real len)
 }
 
 
-Vector Modulo::period(size_t d) const
+Vector3 Modulo::period(size_t d) const
 {
-    Vector vec(0,0,0);
-    if ( d < DIM && ( mMode & 1<<d ))
+    Vector3 vec(0,0,0);
+    if ( d < 3 && ( mMode & 1<<d ))
         vec[d] = period_[d];
     return vec;
 }

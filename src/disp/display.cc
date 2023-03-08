@@ -280,9 +280,9 @@ void Display::drawTiled(Simul const& sim, int tile)
         }
     }
     
-    const Vector px = modulo->period(0);
-    const Vector py = modulo->period(1);
-    const Vector pz = modulo->period(2);
+    const Vector3 px = modulo->period(0);
+    const Vector3 py = modulo->period(1);
+    const Vector3 pz = modulo->period(2);
 
     Vector4 pos[32];
     int cnt = 0;
@@ -291,7 +291,7 @@ void Display::drawTiled(Simul const& sim, int tile)
     for ( int dy = l[1]; dy <= u[1]; ++dy )
     for ( int dz = l[2]; dz <= u[2]; ++dz )
     {
-        Vector P = dx * px + dy * py + dz * pz;
+        Vector3 P = dx * px + dy * py + dz * pz;
         pos[cnt] = Vector4(P);
         pos[cnt++].TT = dot(depthAxis, Vector3(P));
     }
