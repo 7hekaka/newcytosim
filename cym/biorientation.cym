@@ -131,7 +131,7 @@ set couple antikin
 set hand ndc80
 {
     binding = 0, 0.050
-    unbinding = 0.01, 5
+    unbinding = 0.01, inf  % force is high on kinetochore-MTs
     track_end = plus_end
     hold_shrinking_end = 0
     activity = nucleate
