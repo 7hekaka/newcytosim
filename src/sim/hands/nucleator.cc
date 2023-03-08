@@ -168,7 +168,8 @@ void Nucleator::stepLoaded(Vector const& force)
     else if ( prop()->track_end == PLUS_END )
         relocateP();
     
-    fiber()->stabilize(nearestEnd(), prop()->stabilize);
+    if ( prop()->stabilize )
+        fiber()->stabilize(nearestEnd(), prop()->stabilize);
 }
 
 

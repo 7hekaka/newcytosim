@@ -139,7 +139,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// register stabilizing effect
-    void stabilize(FiberEnd e, real s) { assert_true(e>0); stabilized_[e-1] = s; }
+    void stabilize(FiberEnd e, real s) { assert_true(e>0); stabilized_[e-1] += s; }
     
     /// simulate dynamic instability of plus end
     int stepPlusEnd();
