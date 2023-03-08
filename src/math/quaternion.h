@@ -594,19 +594,23 @@ public:
         v[3] = std::atan2(q[3], q[2]);
     }
     
+    
+    /// set as rotation of axis v, angle defined by cosine & sine of half-angle
+    /** argument `v` should be unitary (norm=1), or S should be divided by the norm */
+    void setFromAxis(const REAL v[3], REAL C, REAL S)
+    {
+        q[0] = C;
+        q[1] = v[0] * S;
+        q[2] = v[1] * S;
+        q[3] = v[2] * S;
+    }
 
     /// set as rotation of axis v, with angle = v.norm() in radian;
     void setFromAxis(const REAL v[3])
     {
         /** for small angles, we assume here angle ~ v.norm() */
         REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-        REAL s = std::sin(n * 0.5);
-        if ( n > 0 )
-            s /= n;
-        q[0] = std::cos(n * 0.5);
-        q[1] = v[0] * s;
-        q[2] = v[1] * s;
-        q[3] = v[2] * s;
+        setFromAxis(v, std::cos(n*0.5), std::sin(n*0.5)/n);
     }
     
     /// set from rotation of axis v, and angle 'angle' in radian around this axis
@@ -614,13 +618,11 @@ public:
     void setFromAxis(const REAL v[3], REAL angle)
     {
         REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-        REAL s = std::sin(angle * 0.5) / n;
-        q[0] = std::cos(angle * 0.5);
-        q[1] = v[0] * s;
-        q[2] = v[1] * s;
-        q[3] = v[2] * s;
+        REAL C = std::cos(angle*0.5);
+        REAL S = std::sin(angle*0.5);
+        setFromAxis(v, C, S/n);
     }
-    
+
     /// set as rotation of angle 'angle' and axis X, Y or Z (axis=0,1,2)
     /** along one of the unit axis specified by `axis`: ( 0: X, 1: Y, 2: Z ) */
     void setFromPrincipalAxis(int axis, REAL angle)
@@ -633,6 +635,18 @@ public:
         q[axis+1] = std::sin(a);
     }
     
+    /// set as rotation to transform `dir` into (1, 0, 0), assuming norm(dir)==1
+    void setRotationToVector(const REAL dir[3])
+    {
+        // axis is obtained by vector product: axis = cross(X, dir)
+        REAL axis[3] = { 0, dir[2], -dir[1] };
+        real n = std::sqrt( dir[1]*dir[1] + dir[2]*dir[2] );
+        // need half-angle for Quaternion, with cosine = scalar product:
+        REAL X = std::max(REAL(-1), std::min(REAL(1), dir[0]));
+        REAL C = std::sqrt(0.5*(1+X)), S = std::sqrt(0.5*(1-X));
+        setFromAxis(axis, C, S/n);
+    }
+
     /// return angle of the rotation
     REAL getAngle() const
     {
@@ -691,7 +705,7 @@ public:
         return Quaternion(1, 0, 0, 0);
     }
     
-    /// Linear interpolation between rotations 'this' and 'b'.
+    /// Linear interpolation between rotations 'this' and 'X': u in [0, 1].
     const Quaternion slerp(const Quaternion & X, const REAL u) const
     {
         // code from Jonathan Blow
