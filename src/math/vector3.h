@@ -613,7 +613,7 @@ public:
      From `Building an Orthonormal Basis, Revisited`,
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
      */
-    void orthonormal(Vector3& E, Vector3& F) const
+    void orthonormal(real E[3], real F[3]) const
     {
 #if 0
         if ( abs_real(normSqr() - 1.0) > 0.01 )
@@ -628,23 +628,18 @@ public:
         assert_small(normSqr() - 1.0);
 #endif
         real s = std::copysign(real(1.0), ZZ);
-#if ( 1 )
         // optimized version by Marc B. Reynolds
         const real a = YY / ( ZZ + s );
         const real b = YY * a;
         const real c = XX * a;
         // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
-        E.set(-ZZ - b, c, XX);
-        F.set(s * c, s * b - 1, s * YY);
-        // for an inverted basis, use F.set(c, b-s, YY);
-#else
-        // original code from Tom Duff et al.
-        const real a = -1 / ( ZZ + s );
-        const real b = (XX * YY) * a;
-        // below normSqr(E) = 1 + x*x*a*a*(normSqr(this)-s*s)
-        E.set(1 + s * (XX * XX) * a, s * b, -s * XX);
-        F.set(b, s + (YY * YY) * a, -YY);
-#endif
+        E[0] = -ZZ - b;
+        E[1] = c;
+        E[2] = XX;
+        F[0] = s * c;
+        F[1] = s * b - 1;
+        F[2] = s * YY;
+        // if you do not mind an inverted basis, you may use F.set(c, b-s, YY);
         //printf("orthonormal %+9.6f %+9.6f %+9.6f\n", dot(*this, E), dot(*this, F), dot(E, F));
     }
     

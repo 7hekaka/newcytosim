@@ -169,11 +169,11 @@ Matrix33 Matrix33::randomRotation(real angle)
 
 Matrix33 Matrix33::rotationToVector(const Vector3& vec)
 {
-#if 0
+#if 1
     Matrix33 res;
-    Vector3 X, Y, Z = normalize(vec);
-    Z.orthonormal(X, Y);
-    res.setColumns(Z, X, Y);
+    Vector3 Z = normalize(vec);
+    Z.orthonormal(res.addr(0, 1), res.addr(0, 2));
+    Z.store(res.addr(0, 0)); // set first column
     return res;
 #else
     real n = 1.0 / vec.norm();
