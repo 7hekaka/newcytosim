@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # This is a front-end to the mac OSX utility 'opendiff'
 # It allows to use opendiff to visualize SVN differences:

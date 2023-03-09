@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # FJN, Sainsbury Laboratory, Cambridge University
 # 25.9.2020

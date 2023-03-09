@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # scan.py executes a given command sequentially or in parallel, in specified directories
 #

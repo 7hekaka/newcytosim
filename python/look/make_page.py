@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # make_page.py creates a HTML page with links to files in given directories
 #

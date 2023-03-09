@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 #
 # PRECONFIG, a versatile configuration file generator for varying parameters
 #
