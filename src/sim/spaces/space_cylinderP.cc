@@ -43,7 +43,7 @@ void SpaceCylinderP::resize(Glossary& opt)
 void SpaceCylinderP::update()
 {
     modulo_.reset();
-    modulo_.enable(0, 2*half_);
+    modulo_.enablePeriodic(0, 2*half_);
 }
 
 

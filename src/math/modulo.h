@@ -74,7 +74,7 @@ public:
     void disable() { mMode = 0; }
     
     /// enable periodicity in dimension 'd'
-    void enable(size_t d, real size);
+    void enablePeriodic(size_t d, real size);
     
     /// true if at least one direction has periodic boundaries
     bool isPeriodic() const { return mMode; }
