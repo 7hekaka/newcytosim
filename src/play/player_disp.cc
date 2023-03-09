@@ -152,7 +152,7 @@ std::string Player::buildMemo(int type) const
 void Player::autoFocus(Simul const& sim, View& view) const
 {
     unsigned mode = view.track_fibers;
-    real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+    real mat[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     
     if ( mode & 1 )
     {
@@ -164,13 +164,16 @@ void Player::autoFocus(Simul const& sim, View& view) const
     
     if ( mode & 2 )
     {
-        real S = FiberSet::infoNematic(sim.fibers.collect(), vec);
         // align with mean nematic direction
-        view.align_with(vec);
+        static Vector3 dir(0, 0, 0);
+        real S = FiberSet::infoNematic(sim.fibers.collect(), mat);
         //flashText("Nematic order S = %5.3f", S);
-        //view.rotation.setFromMatrix3(vec);
-        //view.rotation.conjugate();
-        //std::clog << "auto rotate: " << Vector3(vec) << '\n';
+        Vector3 vec(mat);
+        real alpha = std::copysign(0.25, dot(dir, vec));
+        // time-average the direction vector:
+        dir = dir * 0.75 + vec * alpha;
+        view.align_with(dir);
+        //std::clog << "auto align with: " << vec << '\n';
     }
 
     if ( mode & 4 )
@@ -178,9 +181,8 @@ void Player::autoFocus(Simul const& sim, View& view) const
         real sum = 0;
         real avg[3] = { 0 };
         real mom[9] = { 0 };
-        FiberSet::infoComponents(sim.fibers.collect(), sum, avg, mom, vec);
-        // get rotation from matrix:
-        view.rotation.setFromMatrix3(vec);
+        FiberSet::infoComponents(sim.fibers.collect(), sum, avg, mom, mat);
+        view.rotation.setFromMatrix3(mat);
         // inverse rotation:
         view.rotation.conjugate();
         //std::clog << "auto quat: " << view.rotation << '\n';

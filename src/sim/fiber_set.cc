@@ -989,36 +989,34 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
                    &nbv, val, vec, 3, work, 32, iwork, ifail, &info);
 
 #if ( DIM > 2 )
-    //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << '\n';
-    //std::clog << "Eigen value2 " << val[1] << "  vector  " << Vector(vec+3) << '\n';
-    real u = sign_real(vec[3]);
-    real v = sign_real(vec[0]);
+    //std::clog << "EigenVector1 " << Vector3(vec) << " (" << val[0] << ")\n";
+    //std::clog << "EigenVector2 " << Vector3(vec+3) << " (" << val[1] << ")\n";
     // order the 2 vectors in decreasing eigenvalues (reverse order from LAPACK).
-    res[0] = u * vec[3];
-    res[1] = u * vec[4];
-    res[2] = u * vec[5];
-    res[3] = v * vec[0];
-    res[4] = v * vec[1];
-    res[5] = v * vec[2];
+    res[0] = vec[3];
+    res[1] = vec[4];
+    res[2] = vec[5];
+    res[3] = vec[0];
+    res[4] = vec[1];
+    res[5] = vec[2];
     // calculate third vector as vector product of first two:
     res[6] = res[1]*res[5] - res[2]*res[4];
     res[7] = res[2]*res[3] - res[0]*res[5];
     res[8] = res[0]*res[4] - res[1]*res[3];
 #else
-    //std::clog << "Eigen value1 " << val[0] << "  vector  " << Vector(vec) << '\n';
-    real u = sign_real(vec[0]);
-    res[0] =  u * vec[0];
-    res[1] =  u * vec[1];
-    res[2] =  0;
+    //std::clog << "EigenVector1 " << Vector2(vec) << " (" << val[0] << ")\n";
+    res[0] = vec[0];
+    res[1] = vec[1];
+    res[2] = 0;
     // second vector is orthogonal:
-    res[3] = -u * vec[1];
-    res[4] =  u * vec[0];
-    res[5] =  0;
+    res[3] =-vec[1];
+    res[4] = vec[0];
+    res[5] = 0;
     // third vector set in Z-direction
-    res[6] =  0;
-    res[7] =  0;
-    res[8] =  1;
+    res[6] = 0;
+    res[7] = 0;
+    res[8] = 1;
 #endif
+
     // return highest eigen value, which is the scalar order parameter
     return val[nbv-1];
 }
