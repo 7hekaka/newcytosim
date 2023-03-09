@@ -282,7 +282,7 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             real R = -1, T = 0;
             if ( !extract(is, R) || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `circle R T`");
-            if ( extract(is, R) && T < 0 )
+            if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `circle R T`");
 #if ( DIM >= 3 )
             const Vector2 V = Vector2::randU(R);
