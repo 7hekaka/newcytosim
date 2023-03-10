@@ -292,7 +292,10 @@ namespace gle
     
     /// draw two discs in A and B, connected with a line
     void drawDumbbell(Vector2 const& A, Vector2 const& B, float diameter);
-
+    
+    /// draw Dome built on a
+    void drawTipi(real*, int, real);
+    
     /// display cone, dir should be normalized
     void drawCone(Vector1 const& center, Vector1 const& dir, float rad);
     /// display arrow-head, dir should be normalized
@@ -322,7 +325,9 @@ namespace gle
     /// draw a set of 2 or 3 axes, depending on `dim`
     void drawAxes(float size, int dim);
 
-    void drawCuboid(Vector3 const& A, Vector3 const& B, float w);
+    void strokeCuboid(Vector3 const& A, Vector3 const& B, float width);
+    void paintCuboid(Vector3 const& A, Vector3 const& B, float rad);
+    void paintTrapezoid(Vector3 const& A, Vector3 const& B, float rad);
 }
 
 

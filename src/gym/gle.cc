@@ -1948,6 +1948,19 @@ namespace gle
         gym::drawTriangleStrip(0, 12);
     }
     
+    void drawTipi(real* ref, int inx, real rad)
+    {
+        gym::ref_view();
+        flute3 S(ref+3*inx);
+        flute3 A(ref+3*inx+1);
+        flute3 B(ref+3*inx+2);
+        flute3 C(ref+3*inx+3);
+        flute6 * pts = gym::mapBufferV3N3(18);
+        pts[0] = {S, B};
+        gym::unmapBufferV3N3();
+        gym::drawTriangles(0, 4);
+    }
+
     //-----------------------------------------------------------------------
 #pragma mark - Arrows
     
@@ -2143,8 +2156,8 @@ namespace gle
         gym::restoreLighting();
     }
     
-
-    void drawCuboid(Vector3 const& A, Vector3 const& B, float w)
+    /// draw two rectangles parallel with the XY plane
+    void strokeCuboid(Vector3 const& A, Vector3 const& B, float w)
     {
         float AX = A.XX, AY = A.YY, AZ = A.ZZ;
         float BX = B.XX, BY = B.YY, BZ = B.ZZ;
@@ -2164,6 +2177,65 @@ namespace gle
         gym::drawLineStrip(w, 5, 5);
     }
 
+    /// draw faces of cuboid of axis [A,B] and size `rad`
+    void paintCuboid(Vector3 const& A3, Vector3 const& B3, float rad)
+    {
+        flute3 A(A3), B(B3);
+        flute3 X, Y, AB(B-A);
+        float n = norm(AB);
+        gym::orthonormal(AB, n, X, Y);
+        X = X * ( rad / n );
+        Y = Y * ( rad / n );
+        flute6 * flu = gym::mapBufferV3N3(16);
+        flu[0] = { A + X - Y, X };
+        flu[1] = { A + X + Y, X };
+        flu[2] = { B + X - Y, X };
+        flu[3] = { B + X + Y, X };
+        flu[4] = { B - X - Y,-X };
+        flu[5] = { B - X + Y,-X };
+        flu[6] = { A - X - Y,-X };
+        flu[7] = { A - X + Y,-X };
+        
+        flu[ 8] = { B - X + Y, Y };
+        flu[ 9] = { B + X + Y, Y };
+        flu[10] = { A - X + Y, Y };
+        flu[11] = { A + X + Y, Y };
+        flu[12] = { A - X - Y,-Y };
+        flu[13] = { A + X - Y,-Y };
+        flu[14] = { B - X - Y,-Y };
+        flu[15] = { B + X - Y,-Y };
+        gym::unmapBufferV3N3();
+        gym::drawTriangleStrip(0, 8);
+        gym::drawTriangleStrip(8, 8);
+    }
+
+    /// draw faces of cuboid of axis [A,B] and size `rad`
+    void paintTrapezoid(Vector3 const& A3, Vector3 const& B3, float rad)
+    {
+        flute3 A(A3), B(B3);
+        flute3 X(rad, 0, 0), Y(0, rad, 0);
+        flute3 * flu = gym::mapBufferV3(16);
+        flu[0] = { A + X - Y };
+        flu[1] = { A + X + Y };
+        flu[2] = { B + X - Y };
+        flu[3] = { B + X + Y };
+        flu[4] = { B - X - Y };
+        flu[5] = { B - X + Y };
+        flu[6] = { A - X - Y };
+        flu[7] = { A - X + Y };
+        
+        flu[ 8] = { B - X + Y };
+        flu[ 9] = { B + X + Y };
+        flu[10] = { A - X + Y };
+        flu[11] = { A + X + Y };
+        flu[12] = { A - X - Y };
+        flu[13] = { A + X - Y };
+        flu[14] = { B - X - Y };
+        flu[15] = { B + X - Y };
+        gym::unmapBufferV3();
+        gym::drawTriangleStrip(0, 8);
+        gym::drawTriangleStrip(8, 8);
+    }
 
 }
 

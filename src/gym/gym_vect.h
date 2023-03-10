@@ -11,6 +11,9 @@
 
 namespace gym
 {
+    /// set X and Y as orthogonal vectors to Z, forming a orthonormal basis
+    void orthonormal(const float Z[3], float N, float X[3], float Y[3]);
+
     /// translate by V and then scale by S
     inline void translate(Vector1 const& V) { translate(V.XX, 0, 0); }
     /// translate by V and then scale by S
@@ -24,6 +27,9 @@ namespace gym
     inline void transScale(Vector2 const& V, float S) { transScale(V.XX, V.YY, 0, S); }
     /// translate by V and then scale by S
     inline void transScale(Vector3 const& V, float S) { transScale(V.XX, V.YY, V.ZZ, S); }
+
+    /// translate by T; rotate to align X with A and Y with B
+    void transRotate(Vector2 const& T, Vector2 const& A, Vector2 const& B);
 
     /// translate by T; rotate to align X with A, Y with B and Z with C
     void transRotate(Vector3 const& T, Vector3 const& A, Vector3 const& B, Vector3 const& C);

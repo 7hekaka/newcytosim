@@ -1883,20 +1883,45 @@ void Display::drawSolid(Solid const& obj)
         real rad = M_SQRT2 * pixscale(disp->size);
         const size_t inx = 0;
         // three points are expected:
-        if ( obj.radius(inx) > 0 && obj.nbPoints() > inx + 3 )
+        if ( obj.radius(inx) > 0 && obj.nbPoints() > inx+DIM )
         {
             gym::enableLighting();
-            for ( size_t i = inx+1; i <= inx+DIM; ++i )
-            {
-                Vector A = obj.posPoint(i);
-                Vector B = twi->posPoint(i);
-                gym::color_both(lor, 1);
-                drawObject(A, rad, gle::pyramid);
-                gym::color_both(col, 1);
-                drawObject(B, rad, gle::invPyramid);
-                gym::stretchAlignZ(A, B, rad);
-                gle::tube2();
-            }
+            gym::color_both(col, 1);
+            //gle::drawTipi(obj.addrPoint(inx), 1, 0.128);
+            Vector3 S(obj.posPoint(inx));
+            Vector3 A(obj.posP(inx+1));
+            Vector3 B(obj.posP(inx+2));
+#if ( DIM >= 3 )
+            Vector3 C(obj.posP(inx+3));
+            Vector3 N = ( 3 * S - A ) - ( B + C );
+            gym::transAlignZ(C, rad, N); gle::pyramid();
+#else
+            Vector3 C(0, 0, 1);
+            Vector3 N = 2 * S - ( A + B );
+#endif
+            gym::transAlignZ(A, rad, N); gle::pyramid();
+            gym::transAlignZ(B, rad, N); gle::pyramid();
+            
+            gym::color_both(lor, 1);
+            Vector3 T(twi->posPoint(inx));
+            Vector3 X(twi->posP(inx+1));
+            Vector3 Y(twi->posP(inx+2));
+#if ( DIM >= 3 )
+            Vector3 Z(twi->posP(inx+3));
+            Vector3 D = ( 3 * T - X ) - ( Y + Z );
+            gym::transAlignZ(Z, rad, D); gle::pyramid();
+#else
+            Vector3 C(0, 0, 1);
+            Vector3 N = 2 * S - ( A + B );
+#endif
+            gym::transAlignZ(X, rad, D); gle::pyramid();
+            gym::transAlignZ(Y, rad, D); gle::pyramid();
+            /// draw links:
+            rad *= M_SQRT1_2;
+            gym::ref_view();
+            gle::paintCuboid(A, X, rad);
+            gle::paintCuboid(B, Y, rad);
+            gle::paintCuboid(C, Z, rad);
         }
     }
 #endif

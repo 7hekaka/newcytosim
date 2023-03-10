@@ -3,12 +3,12 @@
 #include "gym_vect.h"
 
 /**
- This works if norm(z[]) == n!
+ This calculates vectors X and Y of norm N, assuming that Z is given with norm N
  Derived from `Building an Orthonormal Basis, Revisited`,
  Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
  optimized by Marc B. Reynolds
  */
-static void orthonormal(const float z[3], float n, float x[3], float y[3])
+void gym::orthonormal(const float z[3], float n, float x[3], float y[3])
 {
     const float s = std::copysign(1.f, z[2]);
     const float a = z[1] / ( z[2] + s * n );
@@ -73,7 +73,7 @@ void gym::stretchAlignZ(Vector3 const& A, Vector3 const& B, float R)
         0, 0, 0, 0,
         X, Y, Z, 0,
         float(A.XX), float(A.YY), float(A.ZZ), 1};
-    orthonormal(vec, R, mat, mat+4);
+    gym::orthonormal(vec, R, mat, mat+4);
     apply(mat);
 }
 
@@ -108,6 +108,19 @@ void gym::rotateInverse(Vector3 const& A, Vector3 const& B, Vector3 const& C)
     apply(mat);
 }
 
+
+// translate to center T and rotate to align with axes A, B, C
+void gym::transRotate(Vector2 const& T, Vector2 const& A,
+                      Vector2 const& B)
+{
+    //warning! this matrix is displayed here transposed
+    float mat[16] = {
+        (float)A.XX, (float)A.YY, 0, 0,
+        (float)B.XX, (float)B.YY, 0, 0,
+        0, 0, 1, 0,
+        (float)T.XX, (float)T.YY, 0, 1 };
+    apply(mat);
+}
 
 // translate to center T and rotate to align with axes A, B, C
 void gym::transRotate(Vector3 const& T, Vector3 const& A,
@@ -195,7 +208,7 @@ void gym::transAlignZ(Vector3 const& P, float R, Vector3 const& D)
         0, 0, 0, 0,
         vec[0], vec[1], vec[2], 0,
         float(P.XX), float(P.YY), float(P.ZZ), 1};
-    orthonormal(vec, R, mat, mat+4);
+    gym::orthonormal(vec, R, mat, mat+4);
     apply(mat);
 }
 
@@ -211,6 +224,6 @@ void gym::stretchAlignZ1(Vector3 const& P, float R, Vector3 const& D, float S)
         0, 0, 0, 0,
         S*X, S*Y, S*Z, 0,
         float(P.XX), float(P.YY), float(P.ZZ), 1};
-    orthonormal(vec, std::fabs(R), mat, mat+4);
+    gym::orthonormal(vec, std::fabs(R), mat, mat+4);
     apply(mat);
 }

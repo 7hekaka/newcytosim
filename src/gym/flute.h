@@ -47,10 +47,13 @@ struct flute3
     void set(float x, float y, float z) { xyz[0] = x; xyz[1] = y; xyz[2] = z; }
     void set(double x, double y, double z) { xyz[0] = float(x); xyz[1] = float(y); xyz[2] = float(z); }
     
+    flute3(void*);
     flute3(const float v[3]) : xyz{v[0], v[1], v[2]} {}
     flute3(const double v[3]) : xyz{float(v[0]), float(v[1]), float(v[2])} {}
     void operator = (const float v[3]) { xyz[0] = v[0]; xyz[1] = v[1]; xyz[2] = v[2]; }
     void operator = (const double v[3]) { xyz[0] = float(v[0]); xyz[1] = float(v[1]); xyz[2] = float(v[2]); }
+    operator float const*() const { return xyz; }
+    operator float*() { return xyz; }
 
 #if 0
     flute3(Vector3 const& v) : xyz{float(v.XX), float(v.YY), float(v.ZZ)} {}
@@ -62,7 +65,9 @@ struct flute3
     float operator[](size_t i) const { return xyz[i]; }
     friend flute3 operator +(flute3 const& a, flute3 const& b) { return flute3{a[0]+b[0], a[1]+b[1], a[2]+b[2]}; }
     friend flute3 operator -(flute3 const& a, flute3 const& b) { return flute3{a[0]-b[0], a[1]-b[1], a[2]-b[2]}; }
+    friend flute3 operator -(flute3 const& a) { return flute3{-a[0], -a[1], -a[2]}; }
     friend flute3 operator *(float const& a, flute3 const& b) { return flute3{a*b[0], a*b[1], a*b[2]}; }
+    friend flute3 operator *(flute3 const& b, float const& a) { return flute3{a*b[0], a*b[1], a*b[2]}; }
     friend float normSqr(flute3 const& b) { return b[0]*b[0] + b[1]*b[1] + b[2]*b[2]; }
     friend float norm(flute3 const& b) { return std::sqrt(normSqr(b)); }
     friend flute3 normalize(flute3 const& b) { return (1/sqrt(normSqr(b))) * b; }

@@ -335,7 +335,7 @@ void View::drawInteractiveFeatures() const
     if ( hasROI )
     {
         gym::color(front_color);
-        gle::drawCuboid(mROI[0], mROI[1], 1);
+        gle::strokeCuboid(mROI[0], mROI[1], 1);
     }
     //set pixel coordinate system:
     gym::disableDepthTest();
