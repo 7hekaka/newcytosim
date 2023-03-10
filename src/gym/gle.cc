@@ -333,6 +333,13 @@ namespace gle
         // triangles ordered counterclockwise
         const float N = 1 / M_SQRT3;
         size_t i = 0;
+        // base at Z = 0, faces orientated up:
+        flt[i++] = {-R, 0, 0,  0, 0,-1};
+        flt[i++] = { 0,-R, 0,  0, 0,-1};
+        flt[i++] = { 0, R, 0,  0, 0,-1};
+        flt[i++] = { 0, R, 0,  0, 0,-1};
+        flt[i++] = { 0,-R, 0,  0, 0,-1};
+        flt[i++] = { R, 0, 0,  0, 0,-1};
         // lower size Z < 0
         flt[i++] = { 0, 0,-R, -N, N,-N};
         flt[i++] = {-R, 0, 0, -N, N,-N};
@@ -359,14 +366,14 @@ namespace gle
         flt[i++] = { 0, 0, R,  N, N, N};
         flt[i++] = { R, 0, 0,  N, N, N};
         flt[i++] = { 0, R, 0,  N, N, N};
-        // base at Z = 0:
+        // base at Z = 0, faces orientated down:
         flt[i++] = {-R, 0, 0,  0, 0,-1};
         flt[i++] = { 0, R, 0,  0, 0,-1};
         flt[i++] = { 0,-R, 0,  0, 0,-1};
         flt[i++] = { 0, R, 0,  0, 0,-1};
         flt[i++] = { R, 0, 0,  0, 0,-1};
         flt[i++] = { 0,-R, 0,  0, 0,-1};
-        return i; // 30 vertices
+        return i; // 12+12+6+6 = 36 vertices
     }
 
     
@@ -866,7 +873,7 @@ namespace gle
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12 + 12 + 30 + 60 + 45 + 36 + 3 * 14 + 16 + 12*8 );
+        return ( 12 + 12 + 36 + 60 + 45 + 36 + 3 * 14 + 16 + 12*8 );
     }
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori)
@@ -944,8 +951,9 @@ namespace gle
     void tetrahedron() { doVNTriangles(cubes_[0], 12); }
     void upsideTetra() { doVNTriangles(cubes_[1], 12); }
 
-    void octahedron()  { doVNTriangles(cubes_[2], 24); }
-    void pyramid()     { doVNTriangles(cubes_[2]+12, 18); }
+    void octahedron()  { doVNTriangles(cubes_[2]+6, 24); }
+    void invPyramid()  { doVNTriangles(cubes_[2], 18); }
+    void pyramid()     { doVNTriangles(cubes_[2]+18, 18); }
     void icosahedron() { doVNTriangles(cubes_[3], 60); }
     
     void arrowTail() { doVNTriangles(cubes_[4], 45); }

@@ -1890,8 +1890,8 @@ void Display::drawSolid(Solid const& obj)
             {
                 Vector A = obj.posPoint(i);
                 Vector B = twi->posPoint(i);
-                drawObject(A, rad, gle::octahedron);
-                drawObject(B, rad, gle::octahedron);
+                drawObject(A, rad, gle::pyramid);
+                drawObject(B, rad, gle::invPyramid);
                 gym::stretchAlignZ(A, B, rad);
                 gle::tube2();
             }

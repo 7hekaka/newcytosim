@@ -110,6 +110,8 @@ namespace gle
     void octahedron();
     /// draw squared-based pyramid of radius 1
     void pyramid();
+    /// draw squared-based pyramid of radius 1 pointing down
+    void invPyramid();
     /// draw a icosahedron of radius 1
     void icosahedron();
     /// draw a icosahedron of radius 1
