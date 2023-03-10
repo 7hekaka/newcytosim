@@ -1875,22 +1875,24 @@ void Display::drawSolid(Solid const& obj)
     
 #if NEW_SOLID_HAS_TWIN
     // display links between twin solids
-    if (( disp->style & 6 ) && disp->perceptible )
+    Solid const* twi = obj.twin();
+    if ( twi && ( disp->style & 6 ) && disp->perceptible )
     {
+        gym_color lor = bodyColorF(*twi);
         // draw links between 'obj' and its Twin
         real rad = M_SQRT2 * pixscale(disp->size);
         const size_t inx = 0;
-        Solid const* twi = obj.twin();
         // three points are expected:
-        if ( twi && obj.radius(inx) > 0 && obj.nbPoints() > inx + 3 )
+        if ( obj.radius(inx) > 0 && obj.nbPoints() > inx + 3 )
         {
-            gym::color_both(col, 1);
             gym::enableLighting();
             for ( size_t i = inx+1; i <= inx+DIM; ++i )
             {
                 Vector A = obj.posPoint(i);
                 Vector B = twi->posPoint(i);
+                gym::color_both(lor, 1);
                 drawObject(A, rad, gle::pyramid);
+                gym::color_both(col, 1);
                 drawObject(B, rad, gle::invPyramid);
                 gym::stretchAlignZ(A, B, rad);
                 gle::tube2();
