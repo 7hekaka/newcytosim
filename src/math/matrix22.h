@@ -892,6 +892,9 @@ public:
     /// mirror image: X -> -X
     static Matrix22 flipX();
 
+    /// a rotation that brings (1, 1) into X
+    static Matrix22 align111();
+    
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix22 rotationToVector(const Vector2& vec);
     

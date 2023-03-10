@@ -22,6 +22,11 @@ Matrix22 Matrix22::flipX()
 }
 
 
+Matrix22 Matrix22::align111()
+{
+    return Matrix22(M_SQRT1_2, M_SQRT1_2, M_SQRT1_2, -M_SQRT1_2);
+}
+
 Matrix22 Matrix22::randomRotation()
 {
     real a = M_PI*RNG.sreal();

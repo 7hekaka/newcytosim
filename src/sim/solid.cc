@@ -741,16 +741,10 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         real R0 = radius(0);
         if ( str == "mirror" )
         {
-            // build direct rotation that brings (1,1,1) into the X axis:
-#if ( DIM > 2 )
-            real X = 1.0/M_SQRT3, Y = -sqrt((2+M_SQRT3)/6.0), Z = (3-M_SQRT3)/6.0;
-            Isometry iso(Rotation(X,Y,Z,X,Z,Y,X,X,X), Vector(-X*R0,0,0));
+            // align (1,1,1) with the X axis, translate to bring plate to origin:
+            real X = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
+            Isometry iso(Rotation::align111(), Vector(-X*R0, 0, 0));
             ObjectSet::moveObjects(objs, iso);
-#elif ( DIM > 1 )
-            real X = M_SQRT1_2;
-            Isometry iso(Rotation(X,X,X,-X), Vector(-X*R0,0,0));
-            ObjectSet::moveObjects(objs, iso);
-#endif
             if ( !soTwin )
             {
                 // create a twin Solid that is the mirror image of *this:

@@ -57,6 +57,14 @@ Matrix33 Matrix33::flipX()
     return Matrix33(-1, 0, 0, 0, 1, 0, 0, 0, 1);
 }
 
+Matrix33 Matrix33::align111()
+{
+    real X = 1.0/M_SQRT3;
+    real Y = -sqrt((2+M_SQRT3)/6.0);
+    real Z = (3-M_SQRT3)/6.0;
+    return Matrix33(X,Y,Z,X,Z,Y,X,X,X);
+}
+
 Matrix33 Matrix33::rotationAroundX(const real angle)
 {
     real c = std::cos(angle);

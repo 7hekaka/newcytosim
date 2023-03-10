@@ -440,6 +440,9 @@ public:
     /// mirror image: X -> -X
     static Matrix11 flipX();
 
+    /// the identity
+    static Matrix11 align111() { return Matrix11(1); }
+
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix11 rotationToVector(const Vector1& vec);
     
