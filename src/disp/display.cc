@@ -1919,6 +1919,7 @@ void Display::drawSolid(Solid const& obj)
             /// draw links:
             rad *= M_SQRT1_2;
             gym::ref_view();
+            gym::color_both(col.mix(lor), 1);
             gle::paintCuboid(A, X, rad);
             gle::paintCuboid(B, Y, rad);
             gle::paintCuboid(C, Z, rad);

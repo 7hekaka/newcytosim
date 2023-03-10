@@ -266,11 +266,15 @@ public:
         return gym_color(1-col_[0], 1-col_[1], 1-col_[2], col_[3]);
     }
     
-    gym_color tweak(uint32_t arg) const
+    gym_color mix(gym_color C) const
     {
-        gym_color C(arg);
         constexpr COLOF A = 0.5, B = 0.5;
         return gym_color(col_[0]*A+C[0]*B, col_[1]*A+C[1]*B, col_[2]*A+C[2]*B, col_[3]);
+    }
+
+    gym_color tweak(uint32_t arg) const
+    {
+        return mix(gym_color(arg));
     }
     
 #pragma mark -
