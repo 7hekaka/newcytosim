@@ -2,7 +2,7 @@
 #
 # make_page.py creates a HTML page with links to files in given directories
 #
-# Copyright FJ Nedelec, 14.12.2007 -- 4.2015 & 7.3.2022
+# Copyright FJ Nedelec, 14.12.2007 -- 4.2015 & 7.3.2022, 11.3.2023
 
 """
 Synopsis:
@@ -23,7 +23,7 @@ Info:
 
 Copyright F.J. Nedelec, Cambridge University
 Created  14.12.2007
-Modified 3.2010, 5.2012, 11.2012, 7.2013, 11.2013, 4.2015, 7.3.2022
+Modified 3.2010, 5.2012, 11.2012, 7.2013, 11.2013, 4.2015, 7.3.2022, 11.3.2023
 """
 
 import sys, os, subprocess
@@ -35,6 +35,7 @@ iarg = ''
 tile = 0
 curs = 0
 excluded = []
+master = ''
 output = 'page.html'
 
 
@@ -149,6 +150,25 @@ def writeMovieLinks(files):
         out.write('\n')
 
 
+def writeDifferences(left, right):
+    """
+    Extract differences in 'right' compare to left, and print them to 'out'
+    """
+    if not os.path.isfile(left):
+        return 'file not found: ' + left
+    if not os.path.isfile(right):
+        return 'file not found: ' + right
+    sub = subprocess.Popen(['diff', left, right], stdout=subprocess.PIPE)
+    for data in sub.stdout:
+        try:
+            line = data.decode('utf-8')
+        except:
+            line = data
+        if line[0] == '>':
+            out.write(line+'<br>')
+    sub.stdout.close()
+
+
 def process(dirpath, subdir, files, images, movies):
     """
     Write HTML code for given directory
@@ -156,10 +176,13 @@ def process(dirpath, subdir, files, images, movies):
     global out, indx, tile, curs
     if tile > 0:
         out.write('<td>\n')
-    out.write('<h3 style="padding:3px;margin:3px"> '+dirpath.lstrip('./'))
+    out.write('<h3 style="padding:3px;margin:3px">')
+    out.write(dirpath.lstrip('./'))
     for f in files:
         out.write('\n  &mdash; <a href="%s/%s">%s</a>' % (dirpath, f, f))
     out.write('\n</h3>\n')
+    if master in files:
+        writeDifferences(master, os.path.join(dirpath, master))
     writeImageLinks(images)
     writeMovieLinks(movies)
     if curs:
@@ -199,7 +222,7 @@ def process_dir(dirpath):
 
 def main(args):
     """generates HTML page"""
-    global output, out, iarg, tile, curs
+    global output, out, iarg, tile, curs, master
     paths = []
     
     for arg in args:
@@ -215,6 +238,8 @@ def main(args):
                 curs = int(val)
             elif key=='exclude':
                 excluded.append(val)
+            elif key=='master':
+                master = val
             else:
                 sys.stderr.write("ignored '%s' on command line\n" % arg)
         else:
