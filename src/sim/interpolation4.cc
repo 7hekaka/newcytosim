@@ -150,6 +150,11 @@ void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real we
     }
 }
 
+/**
+ This creates a second link, which is offset with respect to the point defined by `this`,
+ in the radial direction from the origin of the local reference system of the Solid.
+ Thus together with addLink() this will align a fiber in a radial direction.
+ */
 
 void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, const real weight) const
 {
@@ -186,7 +191,11 @@ void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, c
 }
 
 
-/** This induces a link aligned with Vector(-1,-1,-1) */
+/**
+ This creates a second link, which is offset with respect to the point defined by `this`,
+ in the direction (-1,-1,-1) relative to the local reference system of the Solid.
+ Thus together with addLink() this will align a fiber with the diagonal axis of the Solid.
+ */
 void Interpolation4::addAlignedOffsetLink(Meca& meca, real len, Mecapoint const& arg, const real weight) const
 {
     assert_true(mec_);

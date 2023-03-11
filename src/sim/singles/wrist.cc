@@ -77,10 +77,12 @@ void Wrist::setInteractions(Meca& meca) const
         real seg = sHand->fiber()->segmentation();
         /*
          Add a second link to the distal point of the fiber, inducing torque such as
-         to contrain the fiber to be aligned with the direction of the anchor point.
+         to contrain the fiber to be aligned with the diagonal direction, corresponding
+         to the 'south-north' axis of the kinetochore.
+         To keep the angular stiffness constant, we scale `weight` by the distance.
          */
         size_t j = i.lightest_point();
-        base_.addAlignedOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiffness);
+        base_.addAlignedOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiffness/seg);
     }
 #endif
 }
