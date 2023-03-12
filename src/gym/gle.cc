@@ -700,14 +700,15 @@ namespace gle
             flute3 Y = cross(Z, X);
 
             //float pentagon[] = { R,0, C,S, C,-S, D,T, D,-T };
-            flu[i++] = { Z+R*X, normalize(Z+R*X) };
-            flu[i] = flu[i-1]; ++i;
-            flu[i++] = { Z+C*X-S*Y, normalize(Z+C*X-S*Y) };
-            flu[i++] = { Z+C*X+S*Y, normalize(Z+C*X+S*Y) };
-            flu[i++] = { Z+D*X-T*Y, normalize(Z+D*X-T*Y) };
-            flu[i++] = { Z+D*X+T*Y, normalize(Z+D*X+T*Y) };
-            flu[i] = flu[i-1]; ++i;
-            flu[i] = flu[i-1]; ++i;
+            flu[i+0] = { Z+R*X, normalize(Z+R*X) };
+            flu[i+1] = flu[i];
+            flu[i+2] = { Z+C*X-S*Y, normalize(Z+C*X-S*Y) };
+            flu[i+3] = { Z+C*X+S*Y, normalize(Z+C*X+S*Y) };
+            flu[i+4] = { Z+D*X-T*Y, normalize(Z+D*X-T*Y) };
+            flu[i+5] = { Z+D*X+T*Y, normalize(Z+D*X+T*Y) };
+            flu[i+6] = flu[i+5];
+            flu[i+7] = flu[i+6];
+            i += 8;
         }
         return i;
     }
