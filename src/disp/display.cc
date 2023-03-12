@@ -1896,7 +1896,6 @@ void Display::drawSolid(Solid const& obj)
             Vector3 N = ( 3 * S - A ) - ( B + C );
             gym::transAlignZ(C, rad, N); gle::pyramid();
 #else
-            Vector3 C(0, 0, 1);
             Vector3 N = 2 * S - ( A + B );
 #endif
             gym::transAlignZ(A, rad, N); gle::pyramid();
@@ -1911,8 +1910,7 @@ void Display::drawSolid(Solid const& obj)
             Vector3 D = ( 3 * T - X ) - ( Y + Z );
             gym::transAlignZ(Z, rad, D); gle::pyramid();
 #else
-            Vector3 C(0, 0, 1);
-            Vector3 N = 2 * S - ( A + B );
+            Vector3 D = 2 * T - ( A + B );
 #endif
             gym::transAlignZ(X, rad, D); gle::pyramid();
             gym::transAlignZ(Y, rad, D); gle::pyramid();
@@ -1922,7 +1920,9 @@ void Display::drawSolid(Solid const& obj)
             gym::color_both(col.mix(lor), 1);
             gle::paintCuboid(A, X, rad);
             gle::paintCuboid(B, Y, rad);
+#if ( DIM >= 3 )
             gle::paintCuboid(C, Z, rad);
+#endif
         }
     }
 #endif
