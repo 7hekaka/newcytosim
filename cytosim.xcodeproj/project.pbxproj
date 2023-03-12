@@ -2193,7 +2193,7 @@
 		BBD14D452820826C00B55817 /* signal_handlers.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = signal_handlers.cc; sourceTree = "<group>"; };
 		BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = project_ellipse.cc; path = src/math/project_ellipse.cc; sourceTree = SOURCE_ROOT; };
 		BBD1B1EF18FFD97800E5D80A /* project_ellipse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = project_ellipse.h; path = src/math/project_ellipse.h; sourceTree = SOURCE_ROOT; };
-		BBD3030225798FC600C6D61A /* test_ortho.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_ortho.cc; sourceTree = "<group>"; };
+		BBD3030225798FC600C6D61A /* test_orthonormal.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_orthonormal.cc; sourceTree = "<group>"; };
 		BBD4BB391007F2D300D00914 /* fiber_disp.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; path = fiber_disp.cc; sourceTree = "<group>"; };
 		BBD4BB3A1007F2D300D00914 /* fiber_disp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = fiber_disp.h; sourceTree = "<group>"; };
 		BBD5DA760FF7956C0010D08D /* organizer_set.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = organizer_set.cc; path = src/sim/organizer_set.cc; sourceTree = SOURCE_ROOT; };
@@ -3334,7 +3334,7 @@
 				BBA5E4E00E8EB4A60009F6D0 /* test_matrix.cc */,
 				BBF9A315208C8C9700A9E5E5 /* test_omp.cc */,
 				BB73590A05B98DA3006956D5 /* test_opengl.cc */,
-				BBD3030225798FC600C6D61A /* test_ortho.cc */,
+				BBD3030225798FC600C6D61A /* test_orthonormal.cc */,
 				BBC91299204EC2DC00219DC5 /* test_pipe.cc */,
 				BB9A56010A74E9E40069E362 /* test_tesselator.cc */,
 				BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */,

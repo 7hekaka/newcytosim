@@ -3,7 +3,7 @@
 
 TESTS:=test_bits test_gillespie test_random test_math test_glossary\
        test_xpttrs test_xtbsv test_quaternion test_rigidity test_project\
-       test_ortho test_matrix test_thread test_blas test_solver test_dot test_simd
+       test_orthonormal test_matrix test_thread test_blas test_solver test_dot test_simd
 
 TESTS_GL:=test_solve test_opengl test_vbo test_glut test_glapp test_tesselator\
           test_rasterizer test_space test_grid test_sphere test_pipe
@@ -39,7 +39,7 @@ test_file: test_file.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_ortho: test_ortho.cc $(TEST_OBJ) | bin
+test_orthonormal: test_orthonormal.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 

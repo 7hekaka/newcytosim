@@ -14,13 +14,7 @@ typedef double real;
 inline real abs_real(const real x) { return std::fabs(x); }
 
 /// return `neg` if `val < 0` and `pos` otherwise
-inline float sign_select(float const val, float const neg, float const pos)
-{
-    return ( val < 0 ? neg : pos );
-}
-
-/// return `neg` if `val < 0` and `pos` otherwise
-inline double sign_select(double const val, double const neg, double const pos)
+inline real sign_select(const real val, const real neg, const real pos)
 {
     return ( val < 0 ? neg : pos );
 }
@@ -45,11 +39,11 @@ public:
     void set(real a, real b, real c) { XX=a; YY=b; ZZ=c; }
     void set_rand() { XX=srand(); YY=srand(); ZZ=srand(); }
     
-    real norm() { return sqrt(XX*XX + YY*YY + ZZ*ZZ); }
+    real norm() { return std::sqrt(XX*XX + YY*YY + ZZ*ZZ); }
 
 public:
     
-    void set_unit(real N)
+    void randomize(real N)
     {
         real nn;
         do {
@@ -58,7 +52,7 @@ public:
             ZZ = srand();
             nn = XX*XX + YY*YY + ZZ*ZZ;
         } while ( nn > 1 );
-        nn = N / sqrt(nn);
+        nn = N / std::sqrt(nn);
         XX *= nn;
         YY *= nn;
         ZZ *= nn;
@@ -121,24 +115,23 @@ void orthonormal(const real z[3], real n, real x[3], real y[3])
 
 real dot(real A[3], real B[3]) { return A[0]*B[0] + A[1]*B[1] + A[2]*B[2]; }
 
-void test_orthonormal()
+void test_orthonormal(const real N)
 {
-    const real N = 2;
     const size_t MAX = 1 << 14;
     Vector3 vec[MAX];
     
     for ( size_t i = 0; i < MAX; ++i )
     {
-        vec[i].set_unit(N);
+        vec[i].randomize(N);
         real Z[3] = { vec[i].XX, vec[i].YY, vec[i].ZZ };
         real Y[3] = { 0 };
         real X[3] = { 0 };
 
         orthonormal(Z, N, X, Y);
         printf("  %9.3f %9.3f %9.3f :", X[0], X[1], X[2]);
-        printf("  %9.3f %9.3f %9.3f ", dot(X, X), dot(X,Y), dot(X,Z));
-        printf("  %9.3f %9.3f %9.3f ", dot(Y, X), dot(Y,Y), dot(Y,Z));
-        printf("  %9.3f %9.3f %9.3f\n", dot(Z, X), dot(Z,Y), dot(Z,Z));
+        printf("  %9.3f %9.3f %9.3f ", dot(X,X), dot(X,Y), dot(X,Z));
+        printf("  %9.3f %9.3f %9.3f ", dot(Y,X), dot(Y,Y), dot(Y,Z));
+        printf("  %9.3f %9.3f %9.3f\n", dot(Z,X), dot(Z,Y), dot(Z,Z));
     }
 }
 
@@ -181,7 +174,7 @@ void test(size_t cnt)
 
 int main()
 {
-    printf("test_ortho --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
+    printf("test_orthonormal --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
     //test(1<<15);
-    test_orthonormal();
+    test_orthonormal(1);
 }
