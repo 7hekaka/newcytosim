@@ -37,7 +37,8 @@ curs = 0
 excluded = []
 master = ''
 output = 'page.html'
-
+back_color = '#111111'
+text_color = '#AAAAAA'
 
 def writeHeader():
     global out;
@@ -56,7 +57,7 @@ def writeHeader():
     #out.write('function stat(s)    { window.status=s; }\n')
     out.write('</script>\n')
     out.write('</head>\n')
-    out.write('<body bgcolor="#AAAAAA">\n')
+    out.write(f'<body bgcolor="{back_color}">\n')
     out.write('<h2>\n')
     out.write('<a href="index.html">index</a>\n')
     out.write('</h2>\n')
@@ -159,14 +160,18 @@ def writeDifferences(left, right):
     if not os.path.isfile(right):
         return 'file not found: ' + right
     sub = subprocess.Popen(['diff', left, right], stdout=subprocess.PIPE)
+    out.write(f'<tt style="color:{text_color}">\n')
+    br = ''
     for data in sub.stdout:
         try:
             line = data.decode('utf-8')
         except:
             line = data
-        if line[0] == '>':
-            out.write(line+'<br>')
+        if line[0] == '>' and not line[1:].isspace():
+            out.write(br+line)
+            br = '<br> '
     sub.stdout.close()
+    out.write('</tt>\n')
 
 
 def process(dirpath, subdir, files, images, movies):
@@ -176,10 +181,10 @@ def process(dirpath, subdir, files, images, movies):
     global out, indx, tile, curs
     if tile > 0:
         out.write('<td>\n')
-    out.write('<h3 style="padding:3px;margin:3px">')
+    out.write('<h3 style="color:Yellow;padding:3px;margin:3px">\n')
     out.write(dirpath.lstrip('./'))
     for f in files:
-        out.write('\n  &mdash; <a href="%s/%s">%s</a>' % (dirpath, f, f))
+        out.write(' &mdash; <a href="%s/%s">%s</a>' % (dirpath, f, f))
     out.write('\n</h3>\n')
     if master in files:
         writeDifferences(master, os.path.join(dirpath, master))
@@ -196,7 +201,7 @@ def process(dirpath, subdir, files, images, movies):
 
 
 def process_dir(dirpath):
-    """select relevant files and call process()"""
+    """select relevant files in given sub-directory and call process()"""
     subdir = []
     files = []
     images = []
@@ -260,18 +265,14 @@ def main(args):
         sys.stderr.write("Error creating file `%s': %s\n" % (output, repr(e)))
         out = sys.stdout
     writeHeader()
-    
     if tile > 0:
         out.write('<table border="0" align="center" cellpadding="1">\n')
         out.write('<tr>\n')
-
     for p in paths:
         process_dir(p)
-    
     if tile > 0:
         out.write('</tr>\n')
         out.write('</table>\n')
-    
     writeFooter()
     if out != sys.stdout:
         out.close()
