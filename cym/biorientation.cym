@@ -6,16 +6,28 @@
 set simul system
 {
     viscosity = 0.1
-    time_step = 0.005
+    time_step = 0.002
     steric = 1, 1111, 222
     display = ( size=2560,768; point_value=0.01; point_size=0.5; line_width=1; zoom=2; style=3;)
     skip_free_couple = 1
     verbose = 7
 }
 
+set system display
+{
+    size=2560,768; 
+    point_value=0.01; 
+    point_size=0.5; 
+    line_width=1; 
+    zoom=2;
+    style=3;
+    magic_key1 = x, (set kinetochore {twin_stiffness=0})
+    label = (Press 'x' to delete cohesins!)
+}
+
 set space cell
 {
-    shape = capsule
+    shape = ring
     display = ( color=0xFFFFFF04; visible=1 )
 }
 
@@ -42,7 +54,7 @@ set fiber microtubule
     hydrolysis_rate = 1.0
     growing_force = 5
     total_polymer = 4000
-    display = ( color=0xFFFFFF88; line_width=2.5; end_size=8, 10; coloring=2; speckles=7; )
+    display = ( color=0xFFFFFF88; line_width=2.5; style=2; coloring=2; )
 }
 
 % ---------------------- AMPLIFICATION ------------------------
@@ -153,7 +165,7 @@ set solid kinetochore
 {
     steric = 1
     source = 1, augmin
-    twin_stiffness = 200
+    twin_stiffness = 400
     twin_metastiff = 0
     display = ( coloring=1; color=0x00FFFF44; size=2; style=5; )
 }

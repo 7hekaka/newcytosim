@@ -1977,15 +1977,18 @@ void Display::drawSolid(Solid const& obj)
 #endif
             gym::transAlignZ(X, rad, D); gle::pyramid();
             gym::transAlignZ(Y, rad, D); gle::pyramid();
-            /// draw links:
-            rad *= M_SQRT1_2;
-            gym::ref_view();
-            gym::color_both(col.mix(lor), 1);
-            gle::paintCuboid(A, X, rad);
-            gle::paintCuboid(B, Y, rad);
+            if ( obj.prop->twin_stiffness > 0 )
+            {
+                /// draw links:
+                rad *= M_SQRT1_2;
+                gym::ref_view();
+                gym::color_both(col.mix(lor), 1);
+                gle::paintCuboid(A, X, rad);
+                gle::paintCuboid(B, Y, rad);
 #if ( DIM >= 3 )
-            gle::paintCuboid(C, Z, rad);
+                gle::paintCuboid(C, Z, rad);
 #endif
+            }
         }
     }
 #endif
