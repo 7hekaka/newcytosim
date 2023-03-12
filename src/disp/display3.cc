@@ -804,7 +804,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         else if ( style == 3 )
         {
             gym::enableLighting();
-            // display chevrons along the fiber:
+            // display cones regularly along the fiber:
             const real gap = disp->point_gap;
             real ab = std::ceil(fib.abscissaM()/gap) * gap;
             for ( ; ab <= fib.abscissaP(); ab += gap )

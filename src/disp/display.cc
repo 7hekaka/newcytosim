@@ -708,12 +708,6 @@ void Display::drawTransparentSpaces(SpaceSet const& set)
  */
 void Display::drawFields(FieldSet const& set)
 {
-#if ( DIM >= 3 )
-    Vector3 dir = depthAxis;
-#else
-    Vector3 dir(0,0,1);
-#endif
-    
 #if ( 1 )
     Field * obj = set.first();
 #else
@@ -723,7 +717,7 @@ void Display::drawFields(FieldSet const& set)
     if ( obj && obj->hasField() )
     {
         if ( obj->prop->visible == 1 )
-            obj->draw(obj->prop->field_space_ptr, dir, 0);
+            obj->draw(obj->prop->field_space_ptr, depthAxis, 0);
         else if ( obj->prop->visible == 2 )
             obj->draw();
     }
@@ -1115,14 +1109,13 @@ void Display::drawFiberPoints(Fiber const& fib) const
         fluteD* flu = gym::mapBufferVD(cnt);
         fluteD* ptr = flu;
         real a = std::ceil(fib.abscissaM()/gap) * gap - fib.abscissaM();
-        Vector axis(depthAxis);
         for ( ; a <= fib.length(); a += gap )
         {
             Interpolation i = fib.interpolateM(a);
             Vector pos = i.pos();
             Vector dir = i.diff() * beta;
 #if ( DIM == 3 )
-            Vector nor = cross(axis, dir).normalized(rad);
+            Vector nor = cross(dir, depthAxis).normalized(rad);
 #else
             Vector nor = dir.orthogonal(rad);
 #endif
@@ -1403,68 +1396,88 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Specific Fiber styles
+#pragma mark - Striped Fiber styles
 
-
-/**
- Renders a protofilament by drawing spheres of alternating colors,
- at distance `inc` from each other along the backbone of the `Fiber`.
- */
-void Display::drawFilament(Fiber const& fib, const real inc,
-                           gym_color col, gym_color lor, gym_color colE) const
+void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
+                                 gym_color col, real onc, gym_color lor) const
 {
-    // enlarge radius of monomers to make them overlap
-    const float rad = 0.65 * inc;
-    gym::enableClipPlane(4);
-    
-    int cnt = (int)std::ceil(fib.abscissaM()/inc);
-    real abs = inc * cnt;
-    Vector3 p(fib.pos(abs)), q;
-    // draw a monomer every 'inc'
-    while ( abs < fib.abscissaP() )
+    const real uni = inc + onc;
+    const real sup = fib.length();
+    int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
+    real abs = uni * cnt - fib.abscissaM();
+    // abs in [0, uni] is now relative to minus end
+    if ( abs > onc )
     {
-        q = p;
-        abs += inc;
-        p = Vector3(fib.pos(abs));
-
-        // alternate tones:
-        gym::color_load((++cnt&1)?col:lor);
-        // change color for the last monomer:
-        if ( abs + inc > fib.abscissaP() )
-        {
-            gym::color_front(colE);
-            gym::disableClipPlane(4);
-        }
-        
-        // set clipping plane with the next monomer
-        gym::setClipPlane(4, normalize(q-p), (p+q)*0.5);
-        
-        drawMonomer(q, rad);
-        
-        // set clipping plane with the previous:
-        gym::setClipPlane(5, normalize(p-q), (p+q)*0.5);
-        gym::enableClipPlane(5);
+        // drawing first slice of size `inc`
+        abs -= onc;
     }
-    gym::disableClipPlane(4);
-    gym::disableClipPlane(5);
+    else
+    {
+        // drawing second slice of size `onc`
+        std::swap(inc, onc);
+        std::swap(col, lor);
+    }
+    // draw segments
+    size_t top = 8 * fib.length() / uni + 8;
+    flute4D* flu = gym::mapBufferC4VD(top);
+    flute4D* ptr = flu;
+    Vector pos = fib.posEndM();
+    Vector dir = fib.dirEndM();
+#if ( DIM == 3 )
+    Vector nor = cross(dir, depthAxis).normalized(rad);
+#else
+    Vector nor = dir.orthogonal(rad);
+#endif
+    ptr[0] = { col, pos - nor };
+    ptr[1] = { col, pos + nor };
+    ptr += 2;
+
+    while ( abs < sup )
+    {
+        dir = fib.dir(abs);
+        pos = fib.displayPosM(abs);
+#if ( DIM == 3 )
+        nor = cross(dir, depthAxis).normalized(rad);
+#else
+        nor = dir.orthogonal(rad);
+#endif
+        // alternate different tones:
+        ptr[0] = { col, pos - nor };
+        ptr[1] = { col, pos + nor };
+        std::swap(col, lor);
+        std::swap(inc, onc);
+        ptr[2] = { col, pos - nor };
+        ptr[3] = { col, pos + nor };
+        ptr += 4;
+        abs += inc;
+    }
+    pos = fib.posEndP();
+    ptr[0] = { col, pos - nor };
+    ptr[1] = { col, pos + nor };
+    ptr += 2;
+
+    gym::unmapBufferC4VD();
+    gym::ref_view();
+    gym::disableLighting();
+    gym::drawTriangleStrip(0, ptr-flu);
 }
 
 
 /**
 Draw segments of length 'inc' of alternating colors, in register with Fiber's abscissa
 */
-void Display::drawFiberStriped(Fiber const& fib, float rad, const real inc,
+void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
                                gym_color col, real onc, gym_color lor) const
 {
-    real uni = inc + onc;
-    Vector old, pos, nxt;
+    const real uni = inc + onc;
+    Vector pos, nxt, old = fib.posEndM();
     const real sup = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
-    real abs = uni * cnt - fib.abscissaM(); // now relative to minus end
+    real abs = uni * cnt - fib.abscissaM();
+    // abs in [0, uni] is now relative to minus end
     if ( abs > onc )
     {
         cnt = 1; // drawing first slice of size `inc`
-        old = fib.displayPosM(abs-uni);
         pos = fib.displayPosM(abs-onc);
         nxt = fib.displayPosM(abs);
         gym::color_load(col);
@@ -1472,7 +1485,6 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, const real inc,
     else
     {
         cnt = 0; // drawing second slice of size `onc`
-        old = fib.displayPosM(abs-onc);
         pos = fib.displayPosM(abs);
         nxt = fib.displayPosM(abs+inc);
         gym::color_load(lor);
@@ -1515,6 +1527,52 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, const real inc,
     gym::stretchAlignZ1(nxt, -rad, fib.dirEndP(), -rad);
     gle::endedTube();
     gym::disableClipPlane(4);
+}
+
+//------------------------------------------------------------------------------
+#pragma mark - Specific Fiber styles
+
+/**
+ Renders a protofilament by drawing spheres of alternating colors,
+ at distance `inc` from each other along the backbone of the `Fiber`.
+ */
+void Display::drawFilament(Fiber const& fib, const real inc,
+                           gym_color col, gym_color lor, gym_color colE) const
+{
+    // enlarge radius of monomers to make them overlap
+    const float rad = 0.65 * inc;
+    gym::enableClipPlane(4);
+    
+    int cnt = (int)std::ceil(fib.abscissaM()/inc);
+    real abs = inc * cnt;
+    Vector3 p(fib.pos(abs)), q;
+    // draw a monomer every 'inc'
+    while ( abs < fib.abscissaP() )
+    {
+        q = p;
+        abs += inc;
+        p = Vector3(fib.pos(abs));
+
+        // alternate tones:
+        gym::color_load((++cnt&1)?col:lor);
+        // change color for the last monomer:
+        if ( abs + inc > fib.abscissaP() )
+        {
+            gym::color_front(colE);
+            gym::disableClipPlane(4);
+        }
+        
+        // set clipping plane with the next monomer
+        gym::setClipPlane(4, normalize(q-p), (p+q)*0.5);
+        
+        drawMonomer(q, rad);
+        
+        // set clipping plane with the previous:
+        gym::setClipPlane(5, normalize(p-q), (p+q)*0.5);
+        gym::enableClipPlane(5);
+    }
+    gym::disableClipPlane(4);
+    gym::disableClipPlane(5);
 }
 
 
@@ -1718,7 +1776,12 @@ void Display::drawFiber(Fiber const& fib)
             
             switch( disp->style )
             {
-                case 2: drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2); break;
+                case 2:
+                    if ( prop->style == 1 )
+                        drawFiberStriped2D(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2);
+                    else
+                        drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2);
+                        break;
                 case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
                 case 4: drawActin(fib, col1, col2, colE); break;
                 case 5: drawMicrotubule(fib, col1, col2, colE); break;
