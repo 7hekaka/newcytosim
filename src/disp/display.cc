@@ -1398,6 +1398,65 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 //------------------------------------------------------------------------------
 #pragma mark - Striped Fiber styles
 
+/**
+Draw segments of length 'inc' with a triangle of length 'off'
+*/
+void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
+                                 gym_color col, real off, gym_color lor) const
+{
+    const real sup = fib.length() + off;
+    int cnt = 1 + (int)std::floor(fib.abscissaM()/inc);
+    // abs in [0, uni] is now relative to minus end
+    real abs = inc * cnt - fib.abscissaM();
+    // draw segments
+    size_t top = 10 * fib.length() / inc + 8;
+    flute4D* flu = gym::mapBufferC4VD(top);
+    flute4D* ptr = flu;
+    Vector pos = fib.posEndM();
+    Vector dir = fib.dirEndM();
+
+    Vector nor, nxt = pos;
+    while ( abs < sup )
+    {
+        pos = nxt;
+        nxt = fib.displayPosM(abs);
+        dir = fib.dir(abs);
+#if ( DIM == 3 )
+        nor = cross(dir, depthAxis).normalized(rad);
+#else
+        nor = dir.orthogonal(rad);
+#endif
+        // alternate different tones:
+        ptr[0] = { col, pos + nor };
+        ptr[1] = { col, pos - nor };
+        ptr[2] = { col, pos + dir * off };
+        ptr[3] = { lor, pos - nor };
+        ptr[4] = { lor, pos - nor };
+        ptr[5] = { lor, nxt - nor };
+        ptr[6] = { lor, pos + dir * off };
+        ptr[7] = { lor, nxt + nor };
+        ptr[8] = { lor, pos + nor };
+        ptr[9] = { lor, nxt + nor };
+        ptr += 10;
+        abs += inc;
+    }
+    pos = fib.posEndP();
+    ptr[0] = { col, nxt + nor };
+    ptr[1] = { col, pos + nor };
+    ptr[2] = { col, nxt - nor };
+    ptr[3] = { col, pos - nor };
+    ptr += 4;
+
+    gym::unmapBufferC4VD();
+    gym::ref_view();
+    gym::disableLighting();
+    gym::drawTriangleStrip(0, ptr-flu);
+}
+
+
+/**
+Draw segments of length 'inc' and 'onc' of alternating colors, in register with Fiber's abscissa
+*/
 void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
                                  gym_color col, real onc, gym_color lor) const
 {
@@ -1464,7 +1523,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
 
 
 /**
-Draw segments of length 'inc' of alternating colors, in register with Fiber's abscissa
+Draw segments of length 'inc, onc' of alternating colors, in register with Fiber's abscissa
 */
 void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
                                gym_color col, real onc, gym_color lor) const
@@ -1778,7 +1837,7 @@ void Display::drawFiber(Fiber const& fib)
             {
                 case 2:
                     if ( prop->style == 1 )
-                        drawFiberStriped2D(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2);
+                        drawFiberArrowed2D(fib, pixscale(disp->line_width), 0.016, col1, 0.008, col2);
                     else
                         drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2);
                         break;

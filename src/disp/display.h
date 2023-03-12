@@ -206,6 +206,9 @@ public:
     void drawFiberStriped2D(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
     
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
+    void drawFiberArrowed2D(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
+
+    /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
     void drawFiberStriped(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
 
     /// actin-like rendering using a sphere to represent each monomer
