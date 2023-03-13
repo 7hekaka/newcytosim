@@ -46,7 +46,7 @@ set hand slider
     unbinding = 0.1, 6
     activity = slide
     hold_growing_end = 1
-    mobility = 2
+    mobility = 2.5
     display = ( color=white; size=0.5; )
 }
 
