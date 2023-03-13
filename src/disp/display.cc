@@ -1426,16 +1426,18 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
 #else
         nor = dir.orthogonal(rad);
 #endif
-        // alternate different tones:
-        ptr[0] = { lor, pos + nor };
+        // first triangle in 'lor', the reset in 'col'
+        flute3 A(pos + nor), B(pos - nor);
+        flute3 mid(pos + dir * off);
+        ptr[0] = { lor, A };
         ptr[1] = { lor, nxt + nor };
-        ptr[2] = { lor, pos + dir * off };
+        ptr[2] = { lor, mid };
         ptr[3] = { lor, nxt - nor };
-        ptr[4] = { lor, pos - nor };
-        ptr[5] = { col, pos - nor };
-        ptr[6] = { col, pos + dir * off };
-        ptr[7] = { col, pos + nor };
-        ptr[8] = { col, pos + nor };
+        ptr[4] = { lor, B };
+        ptr[5] = { col, B };
+        ptr[6] = { col, mid };
+        ptr[7] = { col, A };
+        ptr[8] = { col, A };
         ptr += 9;
         abs += inc;
     }
