@@ -436,13 +436,23 @@ public:
         for ( int d = 0; d < ORD; ++d )
             coord[d] = imagef(d, w[d], offset);
     }
-
-    /// conversion from Index to Position (offset should be in [0,1])
-    void setPositionFromIndex(real w[ORD], size_t indx, real offset) const
+    
+    void setPositionFromIndex(real res[ORD], size_t indx, real offset) const
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            w[d] = mInf[d] + cWidth[d] * ( offset + indx % mDim[d] );
+            res[d] = mInf[d] + cWidth[d] * ( offset + indx % mDim[d] );
+            indx /= mDim[d];
+        }
+    }
+
+    /// conversion from Index to Position (offset should be in [0,1])
+    template < typename REAL >
+    void setPositionFromIndex(REAL res[ORD], size_t indx, real offset) const
+    {
+        for ( int d = 0; d < ORD; ++d )
+        {
+            res[d] = mInf[d] + cWidth[d] * ( offset + indx % mDim[d] );
             indx /= mDim[d];
         }
     }

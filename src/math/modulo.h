@@ -12,8 +12,8 @@
 
 /// Modulo is a helper class used to implement periodic boundary conditions
 /**
- This class is used to apply periodic boundaries conditions to Vector,
- in any dimensions and selectively to only some of the coordinates: X, Y or Z.
+ This class implements periodic boundaries conditions for Vector,
+ in all dimensions and selectively to only some of the coordinates: X, Y or Z.
  
  We follow the method B (Do not restrict the particle coordinates) described in
  [wikipedia](https://en.wikipedia.org/wiki/Periodic_boundary_conditions)
