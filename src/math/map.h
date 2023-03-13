@@ -878,9 +878,12 @@ public:
     {
         char str[512], *ptr = str;
         char*const end = str+sizeof(str);
-        ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells:", arg, ORD, mNbCells);
+        ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells: ", arg, ORD, mNbCells);
         for ( int d = 0; d < ORD; ++d )
-            ptr += snprintf(ptr, end-ptr, " [%9.3f,%9.3f]/%lu = %4.3f", mInf[d], mSup[d], mDim[d], cWidth[d]);
+        {
+            if ( mPeriodic[d] ) *ptr++ = 'P';
+            ptr += snprintf(ptr, end-ptr, "[%9.3f,%9.3f]/%lu = %4.3f ", mInf[d], mSup[d], mDim[d], cWidth[d]);
+        }
         os << str << std::endl;
     }
 };
