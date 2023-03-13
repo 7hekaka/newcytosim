@@ -2,6 +2,7 @@
 #include "dim.h"
 #include "slider_prop.h"
 #include "exceptions.h"
+#include "messages.h"
 #include "glossary.h"
 #include "cymdef.h"
 #include <cmath>
@@ -76,15 +77,17 @@ void SliderProp::checkStiffness(real stiff, real len, real mul, real kT) const
      Estimate numerical stability from mobility and stiffness
      */
     real e = mobility_dt * stiff * mul;
-    if ( e > 0.5 )
+    if ( e > 2.0 )
     {
         std::ostringstream oss;
-        oss << "Simulating `" << name() << "' may fail as:\n";
+        oss << "Slider `" << name() << "' is unstable since:\n";
         oss << PREF << "time_step * mobility * stiffness = " << e << '\n';
         oss << PREF << "-> reduce mobility or time_step\n";
-        //throw InvalidParameter(oss.str());
-        std::clog << oss.str();
+        throw InvalidParameter(oss.str());
+        //std::clog << oss.str();
     }
+    else
+        Cytosim::log << "Slider `" << name() << "' stability = " << e << "\n";
 }
 
 
