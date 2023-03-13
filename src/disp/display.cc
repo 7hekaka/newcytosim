@@ -1409,7 +1409,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     // abs in [0, uni] is now relative to minus end
     real abs = inc * cnt - fib.abscissaM();
     // draw segments
-    size_t top = 10 * fib.length() / inc + 8;
+    size_t top = 9 * fib.length() / inc + 8;
     flute4D* flu = gym::mapBufferC4VD(top);
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
@@ -1427,17 +1427,16 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
         nor = dir.orthogonal(rad);
 #endif
         // alternate different tones:
-        ptr[0] = { col, pos + nor };
-        ptr[1] = { col, pos - nor };
-        ptr[2] = { col, pos + dir * off };
-        ptr[3] = { lor, pos - nor };
+        ptr[0] = { lor, pos + nor };
+        ptr[1] = { lor, nxt + nor };
+        ptr[2] = { lor, pos + dir * off };
+        ptr[3] = { lor, nxt - nor };
         ptr[4] = { lor, pos - nor };
-        ptr[5] = { lor, nxt - nor };
-        ptr[6] = { lor, pos + dir * off };
-        ptr[7] = { lor, nxt + nor };
-        ptr[8] = { lor, pos + nor };
-        ptr[9] = { lor, nxt + nor };
-        ptr += 10;
+        ptr[5] = { col, pos - nor };
+        ptr[6] = { col, pos + dir * off };
+        ptr[7] = { col, pos + nor };
+        ptr[8] = { col, pos + nor };
+        ptr += 9;
         abs += inc;
     }
     pos = fib.posEndP();
