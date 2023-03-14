@@ -401,8 +401,6 @@ void Parser::parse_new(std::istream& is)
         Space const* spc = sim_->spaces.master();
         real vol = spc->volume();
         real suf = spc->surface();
-        if ( vol < 0 || suf < 0 )
-            throw InvalidParameter("Could not evaluate volume of "+spc->name());
         Evaluator evaluator{{"volume", vol}, {"surface", suf}};
         cnt = (int)std::round(evaluator.eval(blok));
         //std::clog << blok << " <--- " << cnt << "\n";
