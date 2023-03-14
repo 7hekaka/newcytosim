@@ -1299,6 +1299,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     real abs = (inf+1) * uni - fib.abscissaM();
     for ( auto h = inf+1; h <= sup; ++h, abs += uni )
         *ptr++ = fib.posM(abs);
+    assert_true(ptr-flu <= cnt);
     gym::unmapBufferVD();
     gym::ref_view();
     gym::disableLighting();
@@ -1441,7 +1442,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     // abs in [0, uni] is now relative to minus end
     real abs = inc * cnt - fib.abscissaM();
     // draw segments
-    size_t top = 10 * fib.length() / inc + 10;
+    size_t top = 10 * fib.length() / inc + 20;
     flute4D* flu = gym::mapBufferC4VD(top);
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
@@ -1478,6 +1479,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     ptr[2] = { col, nxt - off };
     ptr[3] = { col, pos - off };
     ptr += 4;
+    assert_true(ptr-flu <= top);
 
     gym::unmapBufferC4VD();
     gym::ref_view();
@@ -1538,6 +1540,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     ptr[0] = { col, pos - off };
     ptr[1] = { col, pos + off };
     ptr += 2;
+    assert_true(ptr-flu <= top);
 
     gym::unmapBufferC4VD();
     gym::ref_view();
