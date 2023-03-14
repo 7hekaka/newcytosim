@@ -321,7 +321,10 @@ public:
     
     /// set from a Glossary
     void read(Glossary&);
-    
+
+    /// print some info
+    void splash(std::ostream&) const;
+
     /// check and derive parameters
     void complete(Simul const&);
 

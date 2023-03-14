@@ -120,7 +120,10 @@ public:
        
     /// set using a Glossary
     void read(Glossary&);
-   
+    
+    /// print some info
+    void splash(std::ostream& os) const;
+
     /// check and derive parameter values
     void complete(Simul const&);
     
@@ -129,9 +132,6 @@ public:
 
     /// write
     void write_values(std::ostream&) const;
-    
-    /// info
-    void splash(std::ostream& os);
 
 };
 

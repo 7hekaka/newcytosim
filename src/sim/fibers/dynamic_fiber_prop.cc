@@ -56,26 +56,33 @@ static void splashGHU(std::ostream& os, real g, real h, real unit)
     
     //const real ctime = g / ( 3*h*h );  // that is only true if g >> h
     std::streamsize p = os.precision(5);
-    os << "  hydrolysis " << h << "/s growth " << g << "/s";
+    os << " hydrolysis " << h << "/s growth " << g << "/s";
     os << "  catastrophe_time " << ctime << "s  rate " << 1/ctime << "/s";
     os << "  length " << len << "um \n";
     os.precision(p);
 }
 
 
-void DynamicFiberProp::splash(std::ostream& os)
+void DynamicFiberProp::splash(std::ostream& os) const
 {
-    std::clog << std::setw(16) << name();
+    static std::string msg;
+    std::ostringstream oss;
+    oss << std::setw(16) << name() << ":";
     if ( 0 == growing_off_speed[0] )
     {
-        splashGHU(std::clog, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
+        splashGHU(oss, growing_speed[0]/unit_length, hydrolysis_rate[0], unit_length);
     }
     else
     {
         // calculate stall force, from:
         // 0 = growing_speed * std::exp(force/growing_force) + growing_off_speed;
         real f = -growing_force[0] * std::log(-growing_off_speed[0]/growing_speed[0]);
-        std::clog << ":stall_force " << f;
+        oss << " stall_force " << f;
+    }
+    if ( oss.str() != msg )
+    {
+        msg = oss.str();
+        os << msg;
     }
 }
 

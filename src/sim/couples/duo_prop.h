@@ -62,6 +62,9 @@ public:
     /// set from a Glossary
     void read(Glossary&);
     
+    /// print some info
+    void splash(std::ostream&) const;
+
     /// compute values derived from the parameters
     void complete(Simul const&);
     

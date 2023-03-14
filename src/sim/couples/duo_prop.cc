@@ -46,7 +46,6 @@ void DuoProp::clear()
     activation_space = nullptr;
 }
 
-
 void DuoProp::read(Glossary& glos)
 {
     CoupleProp::read(glos);
@@ -55,6 +54,21 @@ void DuoProp::read(Glossary& glos)
     glos.set(deactivation_type, "deactivation", 1, {{"normal", 0}, {"delete", 1}});
     glos.set(activation, "activation", "activation_space");
     glos.set(vulnerable, "vulnerable");
+}
+
+
+void DuoProp::splash(std::ostream& os) const
+{
+    static std::string msg;
+    std::ostringstream oss;
+    real L = std::sqrt(diffusion/deactivation_rate);
+    oss << std::setw(10) << name() << ": deactivation_rate " << deactivation_rate;
+    oss << "  traveled_distance " << L << "\n";
+    if ( oss.str() != msg )
+    {
+        msg = oss.str();
+        os << msg;
+    }
 }
 
 
@@ -70,12 +84,8 @@ void DuoProp::complete(Simul const& sim)
     deactivation_rate_dt = deactivation_rate * time_step(sim) * POOL_UNATTACHED;
     
     /// print predicted decay distance in verbose mode:
-    if ( primed(sim) && sim.prop.verbose && sim.couples.count(match_property, this) )
-    {
-        real L = std::sqrt(diffusion / deactivation_rate);
-        std::clog << std::setw(10) << name() << ":deactivation_rate " << deactivation_rate;
-        std::clog << "  length " << L << "\n";
-    }
+    if ( primed(sim) && sim.prop.verbose )
+        splash(std::clog);
 }
 
 

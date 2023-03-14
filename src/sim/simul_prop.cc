@@ -124,6 +124,18 @@ void SimulProp::read(Glossary& glos)
         display_fresh = true;
 }
 
+void SimulProp::splash(std::ostream& os) const
+{
+    static std::string msg;
+    std::ostringstream oss;
+    oss << "  Simul " << name() << " is ready \n";
+    if ( oss.str() != msg )
+    {
+        msg = oss.str();
+        os << msg;
+    }
+}
+
 
 /**
  If the Global parameters have changed, we update all derived parameters.
