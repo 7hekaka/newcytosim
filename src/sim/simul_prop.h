@@ -302,6 +302,9 @@ public:
 
     /// @}
 
+    /// last message from splash()
+    mutable std::string splashed;
+
     /// this is set to true when 'display' is modified, and to 'false' when it is read
     bool display_fresh;
 

@@ -59,15 +59,14 @@ void DuoProp::read(Glossary& glos)
 
 void DuoProp::splash(std::ostream& os) const
 {
-    static std::string msg;
     std::ostringstream oss;
     real L = std::sqrt(diffusion/deactivation_rate);
     oss << std::setw(10) << name() << ": deactivation_rate " << deactivation_rate;
     oss << "  traveled_distance " << L << "\n";
-    if ( oss.str() != msg )
+    if ( oss.str() != splashed )
     {
-        msg = oss.str();
-        os << msg;
+        splashed = oss.str();
+        os << splashed;
     }
 }
 

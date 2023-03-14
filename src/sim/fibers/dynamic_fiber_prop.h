@@ -92,6 +92,9 @@ public:
     
 private:
     
+    /// last message from splash()
+    mutable std::string splashed;
+
     real growing_rate_dt[2];
     real growing_off_rate_dt[2];
     real growing_force_inv[2];

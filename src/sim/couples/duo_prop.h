@@ -39,6 +39,9 @@ public:
     
     /// @}
 
+    /// last message from splash()
+    mutable std::string splashed;
+
     /// deactivation_rate * time_step
     real deactivation_rate_dt;
     

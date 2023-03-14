@@ -126,13 +126,12 @@ void SimulProp::read(Glossary& glos)
 
 void SimulProp::splash(std::ostream& os) const
 {
-    static std::string msg;
     std::ostringstream oss;
-    oss << "  Simul " << name() << " is ready \n";
-    if ( oss.str() != msg )
+    oss << "  Ready simul " << name() << "!\n";
+    if ( oss.str() != splashed )
     {
-        msg = oss.str();
-        os << msg;
+        splashed = oss.str();
+        os << splashed;
     }
 }
 

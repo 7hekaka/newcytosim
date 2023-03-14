@@ -65,7 +65,6 @@ static void splashGHU(std::ostream& os, real g, real h, real unit)
 
 void DynamicFiberProp::splash(std::ostream& os) const
 {
-    static std::string msg;
     std::ostringstream oss;
     oss << std::setw(16) << name() << ":";
     if ( 0 == growing_off_speed[0] )
@@ -79,10 +78,10 @@ void DynamicFiberProp::splash(std::ostream& os) const
         real f = -growing_force[0] * std::log(-growing_off_speed[0]/growing_speed[0]);
         oss << " stall_force " << f;
     }
-    if ( oss.str() != msg )
+    if ( oss.str() != splashed )
     {
-        msg = oss.str();
-        os << msg;
+        splashed = oss.str();
+        os << splashed;
     }
 }
 
