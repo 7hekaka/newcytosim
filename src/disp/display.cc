@@ -1442,7 +1442,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     // abs in [0, uni] is now relative to minus end
     real abs = inc * cnt - fib.abscissaM();
     // draw segments
-    size_t top = 10 * fib.length() / inc + 20;
+    size_t top = 10 * std::floor(sup/inc) + 14;
     flute4D* flu = gym::mapBufferC4VD(top);
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
