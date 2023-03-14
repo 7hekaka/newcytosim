@@ -1409,37 +1409,44 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     // abs in [0, uni] is now relative to minus end
     real abs = inc * cnt - fib.abscissaM();
     // draw segments
-    size_t top = 9 * fib.length() / inc + 8;
+    size_t top = 10 * fib.length() / inc + 10;
     flute4D* flu = gym::mapBufferC4VD(top);
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
     Vector dir = fib.dirEndM();
-
-    Vector nor, nxt = pos;
+#if ( DIM == 3 )
+    Vector nor = cross(dir, depthAxis).normalized(rad);
+#else
+    Vector nor = dir.orthogonal(rad);
+#endif
+    Vector nxt = pos;
     while ( abs < sup )
     {
         pos = nxt;
         nxt = fib.displayPosM(abs);
+        abs += inc;
+        flute3 A(pos + nor), B(pos - nor);
+        flute3 M(pos + dir * off);
+        //
         dir = fib.dir(abs);
 #if ( DIM == 3 )
         nor = cross(dir, depthAxis).normalized(rad);
 #else
         nor = dir.orthogonal(rad);
 #endif
-        // first triangle in 'lor', the reset in 'col'
-        flute3 A(pos + nor), B(pos - nor);
-        flute3 mid(pos + dir * off);
+        // paint triangle complement:
         ptr[0] = { lor, A };
         ptr[1] = { lor, nxt + nor };
-        ptr[2] = { lor, mid };
+        ptr[2] = { lor, M };
         ptr[3] = { lor, nxt - nor };
         ptr[4] = { lor, B };
+        // paint plus-end facing triangle:
         ptr[5] = { col, B };
-        ptr[6] = { col, mid };
+        ptr[6] = { col, M };
         ptr[7] = { col, A };
         ptr[8] = { col, A };
-        ptr += 9;
-        abs += inc;
+        ptr[9] = { col, nxt + nor };
+        ptr += 10;
     }
     pos = fib.posEndP();
     ptr[0] = { col, nxt + nor };
@@ -1496,6 +1503,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     {
         dir = fib.dir(abs);
         pos = fib.displayPosM(abs);
+        abs += inc;
 #if ( DIM == 3 )
         nor = cross(dir, depthAxis).normalized(rad);
 #else
@@ -1509,7 +1517,6 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
         ptr[2] = { col, pos - nor };
         ptr[3] = { col, pos + nor };
         ptr += 4;
-        abs += inc;
     }
     pos = fib.posEndP();
     ptr[0] = { col, pos - nor };
@@ -1838,7 +1845,10 @@ void Display::drawFiber(Fiber const& fib)
             {
                 case 2:
                     if ( prop->style == 1 )
-                        drawFiberArrowed2D(fib, pixscale(disp->line_width), 0.016, col1, 0.008, col2);
+                    {
+                        float w = pixscale(disp->line_width);
+                        drawFiberArrowed2D(fib, w, 2*w, col1, w, col2);
+                    }
                     else
                         drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2);
                         break;
