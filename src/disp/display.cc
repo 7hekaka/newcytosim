@@ -1114,15 +1114,11 @@ void Display::drawFiberPoints(Fiber const& fib) const
             Interpolation i = fib.interpolateM(a);
             Vector pos = i.pos();
             Vector dir = i.diff() * beta;
-#if ( DIM == 3 )
-            Vector nor = cross(dir, depthAxis).normalized(rad);
-#else
-            Vector nor = dir.orthogonal(rad);
-#endif
-            ptr[0] = pos + dir - nor;
+            Vector off = inViewPlane(dir, rad);
+            ptr[0] = pos + dir - off;
             ptr[1] = pos - dir;
             ptr[2] = pos - dir;
-            ptr[3] = pos + dir + nor;
+            ptr[3] = pos + dir + off;
             ptr += 4;
         }
         assert_true(ptr-flu < cnt);
@@ -1396,15 +1392,51 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Striped Fiber styles
+#pragma mark - Wide and Striped Fiber styles
+
+
+/** Using triangles to draw a broken line of thickness `2*rad` */
+void Display::drawFiberWide(Fiber const& fib, float rad) const
+{
+    fluteD* flu = gym::mapBufferVD(2*fib.nbPoints()+4);
+    fluteD* ptr = flu;
+    
+    Vector pos = fib.posPoint(0);
+    Vector nxt = fib.posPoint(1);
+    Vector off = inViewPlane(nxt-pos, rad);
+    ptr[0] = pos + off;
+    ptr[1] = pos - off;
+    ptr += 2;
+    
+    Vector old;
+    for ( size_t i = 1; i < fib.nbSegments(); ++i )
+    {
+        old = pos;
+        pos = nxt;
+        nxt = fib.posPoint(i+1);
+        off = inViewPlane(nxt-old, rad);
+        ptr[0] = pos + off;
+        ptr[1] = pos - off;
+        ptr += 2;
+    }
+    off = inViewPlane(nxt-pos, rad);
+    ptr[0] = nxt + off;
+    ptr[1] = nxt - off;
+    ptr += 2;
+    gym::ref_view();
+    gym::disableLighting();
+    gym::unmapBufferVD();
+    gym::drawTriangleStrip(0, ptr-flu);
+}
+
 
 /**
 Draw segments of length 'inc' with a triangle of length 'off'
 */
 void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
-                                 gym_color col, real off, gym_color lor) const
+                                 gym_color col, real len, gym_color lor) const
 {
-    const real sup = fib.length() + off;
+    const real sup = fib.length() + len;
     int cnt = 1 + (int)std::floor(fib.abscissaM()/inc);
     // abs in [0, uni] is now relative to minus end
     real abs = inc * cnt - fib.abscissaM();
@@ -1414,45 +1446,37 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
     Vector dir = fib.dirEndM();
-#if ( DIM == 3 )
-    Vector nor = cross(dir, depthAxis).normalized(rad);
-#else
-    Vector nor = dir.orthogonal(rad);
-#endif
+    Vector off = inViewPlane(dir, rad);
     Vector nxt = pos;
     while ( abs < sup )
     {
         pos = nxt;
         nxt = fib.displayPosM(abs);
         abs += inc;
-        flute3 A(pos + nor), B(pos - nor);
-        flute3 M(pos + dir * off);
+        flute3 A(pos + off), B(pos - off);
+        flute3 M(pos + dir * len);
         //
         dir = fib.dir(abs);
-#if ( DIM == 3 )
-        nor = cross(dir, depthAxis).normalized(rad);
-#else
-        nor = dir.orthogonal(rad);
-#endif
+        off = inViewPlane(dir, rad);
         // paint triangle complement:
         ptr[0] = { lor, A };
-        ptr[1] = { lor, nxt + nor };
+        ptr[1] = { lor, nxt + off };
         ptr[2] = { lor, M };
-        ptr[3] = { lor, nxt - nor };
+        ptr[3] = { lor, nxt - off };
         ptr[4] = { lor, B };
         // paint plus-end facing triangle:
         ptr[5] = { col, B };
         ptr[6] = { col, M };
         ptr[7] = { col, A };
         ptr[8] = { col, A };
-        ptr[9] = { col, nxt + nor };
+        ptr[9] = { col, nxt + off };
         ptr += 10;
     }
     pos = fib.posEndP();
-    ptr[0] = { col, nxt + nor };
-    ptr[1] = { col, pos + nor };
-    ptr[2] = { col, nxt - nor };
-    ptr[3] = { col, pos - nor };
+    ptr[0] = { col, nxt + off };
+    ptr[1] = { col, pos + off };
+    ptr[2] = { col, nxt - off };
+    ptr[3] = { col, pos - off };
     ptr += 4;
 
     gym::unmapBufferC4VD();
@@ -1490,13 +1514,9 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
     Vector dir = fib.dirEndM();
-#if ( DIM == 3 )
-    Vector nor = cross(dir, depthAxis).normalized(rad);
-#else
-    Vector nor = dir.orthogonal(rad);
-#endif
-    ptr[0] = { col, pos - nor };
-    ptr[1] = { col, pos + nor };
+    Vector off = inViewPlane(dir, rad);
+    ptr[0] = { col, pos - off };
+    ptr[1] = { col, pos + off };
     ptr += 2;
 
     while ( abs < sup )
@@ -1504,23 +1524,19 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
         dir = fib.dir(abs);
         pos = fib.displayPosM(abs);
         abs += inc;
-#if ( DIM == 3 )
-        nor = cross(dir, depthAxis).normalized(rad);
-#else
-        nor = dir.orthogonal(rad);
-#endif
+        off = inViewPlane(dir, rad);
         // alternate different tones:
-        ptr[0] = { col, pos - nor };
-        ptr[1] = { col, pos + nor };
+        ptr[0] = { col, pos - off };
+        ptr[1] = { col, pos + off };
         std::swap(col, lor);
         std::swap(inc, onc);
-        ptr[2] = { col, pos - nor };
-        ptr[3] = { col, pos + nor };
+        ptr[2] = { col, pos - off };
+        ptr[3] = { col, pos + off };
         ptr += 4;
     }
     pos = fib.posEndP();
-    ptr[0] = { col, pos - nor };
-    ptr[1] = { col, pos + nor };
+    ptr[0] = { col, pos - off };
+    ptr[1] = { col, pos + off };
     ptr += 2;
 
     gym::unmapBufferC4VD();
@@ -1848,6 +1864,7 @@ void Display::drawFiber(Fiber const& fib)
                     {
                         float w = pixscale(disp->line_width);
                         drawFiberArrowed2D(fib, w, 2*w, col1, w, col2);
+                        //drawFiberWide(fib, w);
                     }
                     else
                         drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2);

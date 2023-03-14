@@ -164,6 +164,16 @@ public:
     /// scale from size into OpenGL line width (pixel) units
     float pixwidth(float w) const { return std::max(w * unitValue, 0.25f); }
     
+    /// return vector orthogonal to `dir` and to the view depth axis
+    Vector inViewPlane(Vector const& dir, const real rad) const
+    {
+#if ( DIM == 3 )
+        return cross(dir, depthAxis).normalized(rad);
+#else
+        return dir.orthogonal(rad);
+#endif
+    }
+    
     /// draw primitive `obj` at given position
     static void drawObject(Vector const& pos, float rad, void (*obj)());
     
@@ -202,6 +212,9 @@ public:
     /// draw one segment of a Fiber (used to display transparent fibers)
     virtual void drawFiberSegmentT(Fiber const&, size_t) const;
     
+    /// Using triangles to draw a broken line with thickness `2*rad`
+    void drawFiberWide(Fiber const& fib, float rad) const;
+
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
     void drawFiberStriped2D(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
     
