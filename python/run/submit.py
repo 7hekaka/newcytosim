@@ -2,7 +2,7 @@
 #
 # A script to submit jobs to the SLURM queuing system
 #
-# F. Nedelec, 10.2007 --- 9.02.2021, 10.01.2022
+# F. Nedelec, 10.2007 --- 9.02.2021, 10.01.2022, 14.03.2023
 # Adapted to SLURM at Cambridge on 29.01.2021
 
 """
@@ -44,21 +44,21 @@ Last updated 26.09.2018
 F. Nedelec
 """
 
-
-import sys, os, shutil, subprocess
-
 # default parameters for submission:
 submit  = 'sbatch'
 queue   = 'skylake'
 runtime = '12:00:00' # 12 hours
-memory  = '3420'     # in MB
+memory  = '4048'     # in MB
 ncpu    = 1          # nb of threads per job
 
-# parameters of the program:
-jdir    = 'job00'
-out     = sys.stderr
+# output for error messages:
+out  = sys.stderr
+# name of subdirectory to create (will be set below)
+jdir = 'job00'
 
 #-------------------------------------------------------------------------------
+
+import sys, os, shutil, subprocess
 
 def execute(cmd):
     """execute given command with subprocess.call()"""
@@ -71,7 +71,7 @@ def execute(cmd):
         out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
 
-def makeNumberedDirectory(root):
+def make_new_directory(root):
     """Create an empty directory named as 'rootXX' with a 2-digits number XX"""
     cnt = 0
     while cnt < 10000:
@@ -96,19 +96,21 @@ def write_script(filename, cmd):
 
 #------------------------------------------------------------------------
 
-def job(path, conf, jarg):
-    """return bash script that will run one simulation"""
+def job_script(path, conf, jarg):
+    """return bash script that will run one job"""
     cmd  = ['cd %s;' % path]
+    # change time of script file to indicate activity:
     cmd += ['touch %s;' % conf]
-    # the job will call go_sim.py once:
+    # actual work: the job will call go_sim.py once:
     cmd += ['go_sim.py %s %s;' % (jarg, conf)]
+    # cleanup: move config file into subdirectory 'done'
     cmd += ['mv '+conf+' '+jdir+'/done/.;']
-    # cleanup
+    # cleanup: move itself into subdirectory 'done'
     cmd += ['mv $0 '+jdir+'/done/.;']
     return cmd
 
 
-def sub(exe):
+def sub_script(exe):
     """return command that will submit one job"""
     # specify memory, shell, minimum number of cores and queue
     cmd  = [submit, '--nodes=1', '--ntasks=1']
@@ -130,7 +132,7 @@ def sub(exe):
     return cmd
 
 
-def array(jobcnt):
+def array_script(jobcnt):
     """return command that will submit a job-array"""
     # define parameters directly in the script:
     cmd  = ['#SBATCH --nodes=1']
@@ -151,6 +153,7 @@ def array(jobcnt):
     cmd += ['#SBATCH --job-name='+jdir]
     cmd += ['#SBATCH --array=1-%i' % jobcnt]
     cmd += ['']
+    # this will execute 'R????' files in `todo` subdirectory:
     cmd += [jdir+'/todo/R$SLURM_ARRAY_TASK_ID']
     return cmd
 
@@ -177,19 +180,19 @@ def main(args):
         sys.exit()
     
     # make new directories for this job
-    jdir = makeNumberedDirectory('job')
-    os.mkdir(os.path.join(jdir, 'todo'))
+    jdir = make_new_directory('job')
+    todo = os.path.join(jdir,'todo')
+    os.mkdir(todo)
     os.mkdir(os.path.join(jdir, 'done'))
     os.mkdir(os.path.join(jdir, 'save'))
     os.mkdir(os.path.join(jdir, 'logs'))
 
     print("    go_sim.py will run `%s' in %s" % (jarg, jdir))
 
-    jdup = 1
-    jcnt = 0
-    jame = ''
+    jdup = 1  # number of time each job should be repeated
+    jcnt = 0  # number of jobs
+    jame = '' # name of file containing job script
     wdir = os.getcwd()
-    todo = os.path.join(jdir,'todo')
     
     for arg in args:
         if os.path.isfile(arg):
@@ -201,7 +204,7 @@ def main(args):
                 conf = todo + '/config%04i.cym' % jcnt
                 shutil.copyfile(arg, conf)
                 jame = todo + '/R' + str(jcnt)
-                cmd = job(wdir, conf, jarg+' name=run%04i'%jcnt+' park='+jdir+'/save')
+                cmd = job_script(wdir, conf, jarg+' name=run%04i'%jcnt+' park='+jdir+'/save')
                 write_script(jame, cmd)
         elif arg.isdigit():
             jdup = int(arg)
@@ -239,14 +242,14 @@ def main(args):
 
     if jcnt > 1:
         print("    submit.py created %i scripts in `%s'" % (jcnt, todo))
-        cmd = array(jcnt)
-        # create script file to run job array:
         jame = jdir + '/job.bash';
+        # create script file to run job array:
+        cmd = array_script(jcnt)
         write_script(jame, cmd)
         # make command to submit this script:
         cmd = (submit, jame)
     else:
-        cmd = sub(jame)
+        cmd = sub_script(jame)
     execute(cmd)
 
 
