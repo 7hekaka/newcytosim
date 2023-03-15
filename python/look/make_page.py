@@ -2,7 +2,7 @@
 #
 # make_page.py creates a HTML page with links to files in given directories
 #
-# Copyright FJ Nedelec, 14.12.2007 -- 4.2015 & 7.3.2022, 11.3.2023
+# Copyright FJ Nedelec, 14.12.2007 -- 4.2015 & 7.3.2022, 15.3.2023
 
 """
 Synopsis:
@@ -35,7 +35,7 @@ iarg = ''
 tile = 0
 curs = 0
 excluded = []
-master = ''
+master = 'config.cym'
 output = 'page.html'
 back_color = '#111111'
 text_color = '#AAAAAA'
@@ -155,23 +155,19 @@ def writeDifferences(left, right):
     """
     Extract differences in 'right' compare to left, and print them to 'out'
     """
-    if not os.path.isfile(left):
-        return 'file not found: ' + left
-    if not os.path.isfile(right):
-        return 'file not found: ' + right
+    if not os.path.isfile(left) or not os.path.isfile(right):
+        return
     sub = subprocess.Popen(['diff', left, right], stdout=subprocess.PIPE)
-    out.write(f'<tt style="color:{text_color}">\n')
-    br = ''
+    out.write(f'<pre style="color:{text_color}">\n')
     for data in sub.stdout:
         try:
             line = data.decode('utf-8')
         except:
             line = data
         if line[0] == '>' and not line[1:].isspace():
-            out.write(br+line)
-            br = '<br> '
+            out.write(line)
     sub.stdout.close()
-    out.write('</tt>\n')
+    out.write('</pre>\n')
 
 
 def process(dirpath, subdir, files, images, movies):
@@ -218,7 +214,7 @@ def process_dir(dirpath):
                 images.append(path)
             elif ext in ['.mp4', '.mov']:
                 movies.append(path)
-            elif f in ['config.cym', 'movie.mp4']:
+            elif f in [master, 'movie.mp4']:
                 files.append(f)
     process(dirpath, subdir, files, images, movies)
 
