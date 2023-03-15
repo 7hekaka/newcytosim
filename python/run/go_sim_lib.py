@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 # `go_sim_lib.py` is a miniature library to run Cytosim.
-#  It is not executable by directly, but it used by go_sim.py
-#  to create directory, copy files, move directories, etc.
+#  It is not executable directly, and instead it is used by go_sim.py
+#  to create a directory, copy files, move directories, etc.
 #
-# Copyright F. Nedelec 2007--2022 with S. Dmitrieff 2019
+# Copyright F. Nedelec 2007--2023 with S. Dmitrieff 2019
 
 
 try:
@@ -30,8 +30,7 @@ class Error( exceptions.Exception ):
     def __str__(self):
         return repr(self.value)
 
-# default name of the config file:
-config_name = 'config.cym'
+# name of the log file:
 logfile_name = 'log.txt'
 
 # default output for error messages:
@@ -180,7 +179,7 @@ def run_sim(exe, args):
     return val
 
 
-def info_start(filename, exe, args, conf, pid):
+def info_start(filename, exe, conf, args, pid):
     import time
     with open(filename, "w") as f:
         f.write("host      %s\n" % os.getenv('HOSTNAME', 'unknown'))
@@ -200,7 +199,7 @@ def info_end(filename, val):
         f.write("stop      %s\n" % time.asctime())
 
 
-def run(exe, conf, name, args=[], config = None):
+def run(exe, conf, args, job_name, exe_input_name):
     """
     Run one simulation in a new sub directory and wait for completion.
     The config file 'conf' is copied to the subdirectory.
@@ -210,22 +209,18 @@ def run(exe, conf, name, args=[], config = None):
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf);
-    wdir = make_run_directory(name)
+    wdir = make_run_directory(job_name)
     os.chmod(wdir, 504)
     os.chdir(wdir)
-
-    if config is None:
-        config = config_name
-
-    shutil.copyfile(conf, config)
-    info_start(logfile_name, exe, args, conf, os.getpid())
+    shutil.copyfile(conf, exe_input_name)
+    info_start(logfile_name, exe, conf, args, os.getpid())
     val = run_sim(exe, args)
     info_end(logfile_name, val)
     os.chdir(cdir)
     return (val, wdir)
 
 
-def start(exe, conf, root, args=[]):
+def start(exe, conf, args, root, exe_input_name):
     """
     Start simulation in a new sub directory, and return immediately.
     The config file `conf` is copied to the sub-directory.
@@ -236,13 +231,13 @@ def start(exe, conf, root, args=[]):
     conf = os.path.abspath(conf)
     wdir = make_directory(root)
     os.chdir(wdir)
-    shutil.copyfile(conf, config_name)
+    shutil.copyfile(conf, exe_input_name)
     if exe != 'none':
         outfile = open('out.txt', 'w')
         errfile = open('err.txt', 'w')
         #start simulation, but do not wait for completion:
         pid = subprocess.Popen(['nohup', exe]+args, stdout=outfile, stderr=errfile).pid
-        info_start(logfile_name, exe, args, conf, pid)
+        info_start(logfile_name, exe, conf, args, pid)
     else:
         pid = 0
     os.chdir(cdir)

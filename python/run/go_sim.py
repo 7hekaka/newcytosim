@@ -95,12 +95,12 @@ class Gosimer:
         self.trust_exe = False
         self.config = "config.cym"
 
-    def run(self, conf, name):
+    def run_one(self, conf, name):
         """
             run executable 'exe' with config 'conf' in a directory starting as 'name'
         """
         try:
-            (val, res) = go_sim_lib.run(self.exe, conf, name, config = self.config, args=self.arguments)
+            (val, res) = go_sim_lib.run(self.exe, conf, self.arguments, name, self.config)
             if val == 0:
                 self.out.write("Completed `%s` in %s; " % (conf, res))
             else:
@@ -123,7 +123,7 @@ class Gosimer:
         while True:
             try:
                 arg = self.queue.get(True, 1)
-                self.run(*arg)
+                self.run_one(*arg)
             except:
                 break;
 
@@ -159,7 +159,7 @@ class Gosimer:
                 self.queue.put((f, n))
                 #print('Queued ' + f + ' ' + n)
             else:
-                self.run(f, n)
+                self.run_one(f, n)
 
     def main(self, args):
         root = 'run'

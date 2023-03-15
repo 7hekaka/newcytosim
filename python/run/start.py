@@ -26,6 +26,7 @@ except ImportError:
     sys.stderr.write("  Error: could not load necessary python modules\n")
     sys.exit()
 
+config_name = 'config.cym'
 
 #------------------------------------------------------------------------
 
@@ -33,7 +34,7 @@ def executable(arg):
     return os.path.isfile(arg) and os.access(arg, os.X_OK)
 
 
-def run(exe, conf, root, preconf, repeat):
+def start_sim(exe, conf, root, preconf, repeat):
     """
     start simulations in parallel without waiting for completion
     """
@@ -51,7 +52,7 @@ def run(exe, conf, root, preconf, repeat):
     # start simulations in parallel:
     for conf in files:
         try:
-            (i, d) = go_sim_lib.start(exe, conf, root)
+            (i, d) = go_sim_lib.start(exe, conf, [], root, config_name)
         except go_sim_lib.Error as e:
             out.write("Simulation could not be started: %s\n" % repr(e))
         print("> process %i started in %-20s" %(i, d))
@@ -98,7 +99,7 @@ def main(args):
     
     for file in files:
         root = 'run%04i' % cnt
-        run(exe, file, root, preconf, repeat)
+        start_sim(exe, file, root, preconf, repeat)
         cnt = cnt+1
 
 
