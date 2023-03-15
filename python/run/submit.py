@@ -51,14 +51,14 @@ runtime = '12:00:00' # 12 hours
 memory  = '4048'     # in MB
 ncpu    = 1          # nb of threads per job
 
+import sys, os, shutil, subprocess
+
 # output for error messages:
 out  = sys.stderr
 # name of subdirectory to create (will be set below)
 jdir = 'job00'
 
 #-------------------------------------------------------------------------------
-
-import sys, os, shutil, subprocess
 
 def execute(cmd):
     """execute given command with subprocess.call()"""

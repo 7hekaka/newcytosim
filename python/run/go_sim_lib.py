@@ -60,14 +60,16 @@ def make_directory(root, n=0):
     raise Error("failed to create new run directory on "+os.getenv('HOSTNAME', 'unknown'))
 
 
-def make_run_directory(root):
+def make_run_directory(root, conf):
     """create a temporary directory starting by `root`"""
     import tempfile
     if 'SLURM_JOB_ID' in os.environ:
         try:
             # RDS directory on Cambridge's Research Computing Services
-            rds = '/rds/user/'+os.getenv('USER', '')+'/hpc-work'
-            return tempfile.mkdtemp('', root, rds)
+            path = os.path.dirname(conf)
+            if path.endswith('todo'):
+                path = path[:-4]
+            return tempfile.mkdtemp('', root+'-', path)
         except:
             pass
         try:
@@ -209,7 +211,7 @@ def run(exe, conf, args, job_name, exe_input_name):
     if not os.path.isfile(conf):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf);
-    wdir = make_run_directory(job_name)
+    wdir = make_run_directory(job_name, conf)
     os.chmod(wdir, 504)
     os.chdir(wdir)
     shutil.copyfile(conf, exe_input_name)
