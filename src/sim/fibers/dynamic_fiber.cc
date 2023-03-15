@@ -351,7 +351,7 @@ int DynamicFiber::stepPlusEnd()
 
 void DynamicFiber::step()
 {
-    //std::clog << this << " " << stabilized_[0] << "  " << stabilized_[1] << "\n";
+    //std::clog << prop()->name() << " " << this << " " << stabilized_[0] << "  " << stabilized_[1] << "\n";
     real addM = 0;
     constexpr size_t M = 1;
     if ( stabilized_[M] > 0 )
