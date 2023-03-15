@@ -654,6 +654,9 @@ public:
     /// analysis of MT collisions in the plant cortex
     void reportFiberCollision(std::ostream&, Property const*, Glossary&) const;
 
+    /// print some coefficients calculated from the distribution of fibers
+    void reportSpindleFitness(std::ostream&) const;
+
     /// print something
     void reportSomething(std::ostream&) const;
 

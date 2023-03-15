@@ -388,7 +388,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
 
         throw InvalidSyntax("I can only report fiber: position, end, minus_end, plus_end, "\
                             "point, moment, speckle, sample, segment, dynamic, length, extension,"\
-                            "distribution, tension, force, cluster, age, energy, hand, link");
+                            "distribution, tension, force, cluster, age, energy, hand, link\n");
     }
     if ( who == "bead" )
     {
@@ -396,7 +396,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportBeadPosition(out, sel);
         if ( what == "single" )
             return reportBeadSingles(out);
-        throw InvalidSyntax("I can only report bead: position, single");
+        throw InvalidSyntax("I can only report bead: position, single\n");
     }
     if ( who == "solid" )
     {
@@ -406,7 +406,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportSolidOrientation(out, sel);
         if ( what == "position" || what.empty() )
             return reportSolidPosition(out, sel);
-        throw InvalidSyntax("I can only report solid: hand, position");
+        throw InvalidSyntax("I can only report solid: hand, position\n");
     }
     if ( who == "space" )
     {
@@ -414,13 +414,13 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportSpaceForce(out);
         if ( what.empty() )
             return reportSpace(out);
-        throw InvalidSyntax("I can only report `space` and space:force");
+        throw InvalidSyntax("I can only report `space` and space:force\n");
     }
     if ( who == "sphere" )
     {
         if ( what == "position" || what.empty() )
             return reportSpherePosition(out, sel);
-        throw InvalidSyntax("I can only report sphere:position");
+        throw InvalidSyntax("I can only report sphere:position\n");
     }
     if ( who == "single" )
     {
@@ -434,7 +434,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportSingleForce(out, sel);
         if ( what == "position" )
             return reportSinglePosition(out, sel);
-        throw InvalidSyntax("I can only report single: link, state, force, position");
+        throw InvalidSyntax("I can only report single: link, state, force, position\n");
     }
     if ( who == "couple" )
     {
@@ -456,19 +456,19 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportCoupleActive(out, sel);
         if ( what == "anatomy" )
             return reportCoupleAnatomy(out, sel);
-        throw InvalidSyntax("I can only report couple: state, link, configuration, active, force, anatomy");
+        throw InvalidSyntax("I can only report couple: state, link, configuration, active, force, anatomy\n");
     }
     if ( who == "organizer" )
     {
         if ( what.empty() )
             return reportOrganizer(out);
-        throw InvalidSyntax("I can only report `organizer'");
+        throw InvalidSyntax("I can only report `organizer'\n");
     }
     if ( who == "aster" )
     {
         if ( what.empty() )
             return reportAster(out);
-        throw InvalidSyntax("I can only report `aster'");
+        throw InvalidSyntax("I can only report `aster'\n");
     }
     if ( who == "field" )
     {
@@ -484,7 +484,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportInventory(out);
         if ( what == "property" || what == "parameter" )
             return writeProperties(out, false);
-        throw InvalidSyntax("I can only report simul: time, inventory, property");
+        throw InvalidSyntax("I can only report simul: time, inventory, property\n");
     }
     if ( who == "property" )
     {
@@ -501,7 +501,9 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportIndices(out);
         if ( what == "profile" )
             return reportProfile(out);
-        throw InvalidSyntax("I can only report spindle: indices, profile");
+        if ( what == "fitnes" )
+            return reportSpindleFitness(out);
+        throw InvalidSyntax("I can only report spindle: indices, profile, fitness\n");
     }
     if ( who == "network" )
     {
@@ -519,7 +521,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "something" )
         return reportSomething(out);
 
-    throw InvalidSyntax("unknown report `"+who+":"+what+"'");
+    throw InvalidSyntax("unknown report `"+who+":"+what+"'\n");
 }
 
 //------------------------------------------------------------------------------
@@ -3291,11 +3293,56 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     }
 }
 
+
+/// print some coefficients calculated from the distribution of fibers
+void Simul::reportSpindleFitness(std::ostream& out) const
+{
+    size_t cnt = 0, left = 0;
+    real std = 0;
+    out << COM << "spindle fitness parameters";
+    real half_length = 4.0;
+    /// check positions of kinetochores (Solid):
+    SolidProp * sop = findProperty<SolidProp>("solid", "kinetochore");
+    if ( sop )
+    {
+        ObjectList list = solids.collect(sop);
+        for ( Object const* i : list )
+        {
+            ++cnt;
+            Solid const* sol = Solid::toSolid(i);
+            Vector pos = sol->posPoint(0);
+            left += ( pos.XX < 0 );
+            std += square(pos.XX);
+        }
+        std /= cnt;
+        out << LIN << left << SEP << cnt - left << SEP << std;
+    }
+    
+    /// check position of condensate (Bead):
+    cnt = 0; left = 0;
+    BeadProp * bip = findProperty<BeadProp>("bead", "condensate");
+    if ( bip )
+    {
+        ObjectList list = beads.collect(bip);
+        for ( Object const* i : list )
+        {
+            ++cnt;
+            Vector pos = i->position();
+            left += ( pos.XX < 0 );
+            std += square(abs_real(pos.XX) - half_length) + pos.normYZSqr();
+        }
+        std /= cnt;
+        out << SEP << left << SEP << cnt - left << SEP << std;
+    }
+}
+
+
 /**
  Export end-to-end distance of Fiber
  */
 void Simul::reportSomething(std::ostream& out) const
 {
+    out << COM << "something";
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         Vector ee = fib->posEndP() - fib->posEndM();
