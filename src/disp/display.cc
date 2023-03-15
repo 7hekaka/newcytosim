@@ -1866,7 +1866,8 @@ void Display::drawFiber(Fiber const& fib)
                     if ( prop->style == 1 )
                     {
                         float w = pixscale(disp->line_width);
-                        drawFiberArrowed2D(fib, w, 2*w, col1, w, col2);
+                        float l = std::max(w, 0.008f);
+                        drawFiberArrowed2D(fib, w, 2*l, col1, l, col2);
                         //drawFiberWide(fib, w);
                     }
                     else
