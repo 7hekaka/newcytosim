@@ -2237,7 +2237,7 @@ void Display::drawBead(Bead const& obj)
     if (( disp->style & 4 ) && obj.radius() > pixelSize )
     {
         gym::disableLighting();
-        gym::color(bodyColorF(obj));
+        gym::color(col);
         gym::transScale(obj.position(), obj.radius());
         gle::circle1(disp->width);
     }
