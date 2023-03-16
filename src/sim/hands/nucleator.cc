@@ -24,7 +24,6 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 
 ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Glossary& opt)
 {
-    ObjectMark mk = RNG.pint32();
     // determine direction of nucleation:
     Vector dir;
     Hand const* h = otherHand();
@@ -79,7 +78,10 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
 #endif
 
     // mark fiber to highlight mode of nucleation:
-    opt.set(mk, "mark");
+    ObjectMark mk = 0;
+    if ( opt.value("mark") == "random" )
+        mk = RNG.pint32();
+    else opt.set(mk, "mark");
     fib->mark(mk);
 
     ObjectSet::rotateObjects(objs, rot);
