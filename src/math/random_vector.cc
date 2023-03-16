@@ -371,8 +371,8 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t max_trials)
 
 /**
  Generate a random distribution of points over a portion of the unit sphere,
- defined by the thickness 'cap' of the cap.
- with the distance between two points never below `sep`.
+ near (1,0,0) and symmetric around the X-axis, defined by a thickness 'cap'.
+ No two points should be closer than `sep`.
  @return number of points stored in 'pts[]'
  */
 size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_trials)

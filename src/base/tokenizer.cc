@@ -144,6 +144,10 @@ std::string Tokenizer::split_symbol(std::string& arg)
         ++end;
     
     std::string res = arg.substr(0, end-str);
+
+    while ( isspace(*end) )
+        ++end;
+
     // remove extracted part:
     arg.erase(0, (size_t)(end-str));
     return res;

@@ -501,11 +501,31 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             size_t num = 1;
             Tokenizer::split_integer(num, str);
             std::string nam = Tokenizer::split_symbol(str);
-            //std::clog << num << " [" << nam << "]\n";
+            //std::clog << num << " [" << nam << "] |" << str << "|\n";
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+str+"'");
             SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
-            if ( str.size() )
+            if ( str == "cap" )
+            {
+                real cap = 0.2;
+                // distribute points randomly over a portion of the unit sphere:
+                std::vector<Vector> pts(num, Vector(0,0,0));
+                size_t cnt = 0, ouf = 0, max_trials = 1024;
+                real sep0 = std::sqrt( 2 * M_PI * cap / num );
+                do {
+                    // we decrease gradually the separation, to reach a good solution...
+                    sep = 512 * sep0 / real(ouf+512);
+                    cnt = tossPointsCap(pts, cap, sep, 1024);
+                    //std::clog << "tossCap(" << num << ") placed " << cnt << " with sep = " << sep << "\n";
+                } while ( cnt < num && ++ouf < max_trials );
+                Rotation rot = -Rotation::align111().transposed();
+                for ( size_t i = 0; i < cnt; ++i )
+                {
+                    Wrist * w = sip->newWrist(this, ref, rot*pts[i]);
+                    objs.push_back(w);
+                }
+            }
+            else if ( str.size() )
                 addWrists(objs, num, sip, ref, str);
             else
             {
