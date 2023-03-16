@@ -79,7 +79,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
 
     // mark fiber to highlight mode of nucleation:
     ObjectMark mk = 0;
-    if ( opt.value("mark") == "random" )
+    if ( opt.value_is("mark", 0, "random") )
         mk = RNG.pint32();
     else opt.set(mk, "mark");
     fib->mark(mk);
@@ -106,7 +106,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     ObjectSet::translateObjects(objs, pos);
     //std::clog << "nucleated fiber in direction " << fib->dirEndM() << "\n";
 
-    opt.print_warnings(std::cerr, 1, "nucleator:spec\n");
+    opt.print_warnings(std::cerr, 1, " in nucleator:spec\n");
     assert_true(fib->valid());
     return objs;
 }

@@ -438,7 +438,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
 
     // optionally mark the objects:
     ObjectMark mk = 0;
-    if ( opt.value("mark") == "random" )
+    if ( opt.value_is("mark", 0, "random") )
         mk = RNG.pint32();
     if ( mk || opt.set(mk, "mark") )
     {
