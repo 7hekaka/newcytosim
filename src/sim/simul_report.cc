@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2019-2020
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2023
 
 #include <iostream>
 #include <numeric>
@@ -498,11 +498,11 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "spindle" )
     {
         if ( what == "indice" )
-            return reportIndices(out);
+            return reportSpindleIndices(out);
         if ( what == "profile" )
-            return reportProfile(out);
+            return reportSpindleProfile(out);
         if ( what == "fitnes" )
-            return reportSpindleFitness(out);
+            return reportSpindleFitness(out, opt);
         throw InvalidSyntax("I can only report spindle: indices, profile, fitness\n");
     }
     if ( who == "network" )
@@ -2892,7 +2892,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Ring
+#pragma mark - Platelet's Microtubule Ring
 
 /**
  Evaluates if the Fiber distribution makes a connected ring around the Z-axis
@@ -3111,12 +3111,12 @@ void Simul::reportPlatelet(std::ostream& out) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Misc
+#pragma mark - Mitotic Spindle
 
 /**
  Export indices calculated by FiberSet::infoSpindle
  */
-void Simul::reportIndices(std::ostream& out) const
+void Simul::reportSpindleIndices(std::ostream& out) const
 {
     out << COM << "amount" << SEP << "radial" << SEP << "polar";
     real ixa, ixp;
@@ -3132,7 +3132,7 @@ void Simul::reportIndices(std::ostream& out) const
  that intersect a plane parallel to YZ.
  The planes are distributed regularly every 0.5 um along the X-axis.
  */
-void Simul::reportProfile(std::ostream& out) const
+void Simul::reportSpindleProfile(std::ostream& out) const
 {
     out << COM << "position" << SEP << "leftward" << SEP << "rightward" << SEP << "right-left";
     Vector n(1,0,0);
@@ -3148,6 +3148,56 @@ void Simul::reportProfile(std::ostream& out) const
     }
 }
 
+
+/// print some coefficients calculated from the distribution of fibers
+void Simul::reportSpindleFitness(std::ostream& out, Glossary& opt) const
+{
+    size_t cnt = 0, left = 0;
+    real std = 0, dev = 0;
+    out << COM << "kin_left" << SEP << "kin_right" << SEP << "kin_devX" << SEP << "kin_devYZ";
+    out << SEP << "bead_left" << SEP << "bead_right" << SEP << "bead_dev";
+    real half_length = 4.0;
+    opt.set(half_length, "half_length");
+    /// check positions of kinetochores (Solid):
+    SolidProp * sop = findProperty<SolidProp>("solid", "kinetochore");
+    if ( sop )
+    {
+        ObjectList list = solids.collect(sop);
+        for ( Object const* i : list )
+        {
+            ++cnt;
+            Solid const* sol = Solid::toSolid(i);
+            Vector pos = sol->posPoint(0);
+            left += ( pos.XX < 0 );
+            std += square(pos.XX);
+            dev += pos.normYZSqr();
+        }
+        std /= cnt;
+        dev /= cnt;
+        out << LIN << left << SEP << cnt-left << SEP << std << SEP << dev;
+    }
+    
+    /// check position of condensate (Bead):
+    cnt = 0; left = 0;
+    BeadProp * bip = findProperty<BeadProp>("bead", "condensate");
+    if ( bip )
+    {
+        ObjectList list = beads.collect(bip);
+        for ( Object const* i : list )
+        {
+            ++cnt;
+            Vector pos = i->position();
+            left += ( pos.XX < 0 );
+            std += square(abs_real(pos.XX) - half_length) + pos.normYZSqr();
+        }
+        std /= cnt;
+        out << SEP << left << SEP << cnt-left << SEP << std;
+    }
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Misc
 
 /**
  l'angle entre un vecteur 1 (centre du noyau --> SPB)
@@ -3290,49 +3340,6 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         ang = 777;
         dis = INFINITY;
         cat = 'U';
-    }
-}
-
-
-/// print some coefficients calculated from the distribution of fibers
-void Simul::reportSpindleFitness(std::ostream& out) const
-{
-    size_t cnt = 0, left = 0;
-    real std = 0;
-    out << COM << "spindle fitness parameters";
-    real half_length = 4.0;
-    /// check positions of kinetochores (Solid):
-    SolidProp * sop = findProperty<SolidProp>("solid", "kinetochore");
-    if ( sop )
-    {
-        ObjectList list = solids.collect(sop);
-        for ( Object const* i : list )
-        {
-            ++cnt;
-            Solid const* sol = Solid::toSolid(i);
-            Vector pos = sol->posPoint(0);
-            left += ( pos.XX < 0 );
-            std += square(pos.XX);
-        }
-        std /= cnt;
-        out << LIN << left << SEP << cnt - left << SEP << std;
-    }
-    
-    /// check position of condensate (Bead):
-    cnt = 0; left = 0;
-    BeadProp * bip = findProperty<BeadProp>("bead", "condensate");
-    if ( bip )
-    {
-        ObjectList list = beads.collect(bip);
-        for ( Object const* i : list )
-        {
-            ++cnt;
-            Vector pos = i->position();
-            left += ( pos.XX < 0 );
-            std += square(abs_real(pos.XX) - half_length) + pos.normYZSqr();
-        }
-        std /= cnt;
-        out << SEP << left << SEP << cnt - left << SEP << std;
     }
 }
 

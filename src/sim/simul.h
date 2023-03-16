@@ -643,19 +643,19 @@ public:
     void reportPlatelet(std::ostream&) const;
     
     /// print Aster & Spindle indices
-    void reportIndices(std::ostream&) const;
+    void reportSpindleIndices(std::ostream&) const;
 
     /// print number of Fibers pointing left and right that intersect plane YZ at different X positions
-    void reportProfile(std::ostream&) const;
+    void reportSpindleProfile(std::ostream&) const;
+
+    /// print some coefficients calculated from the distribution of fibers
+    void reportSpindleFitness(std::ostream&, Glossary&) const;
 
     /// a special print for Romain Gibeaux
     void reportAshbya(std::ostream&) const;
     
     /// analysis of MT collisions in the plant cortex
     void reportFiberCollision(std::ostream&, Property const*, Glossary&) const;
-
-    /// print some coefficients calculated from the distribution of fibers
-    void reportSpindleFitness(std::ostream&) const;
 
     /// print something
     void reportSomething(std::ostream&) const;
