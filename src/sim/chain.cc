@@ -1943,11 +1943,8 @@ Interpolation Chain::interpolateCenter() const
 Interpolation Chain::interpolateM(const real ab) const
 {
     real a = std::max(ab*iCut, real(0));
-    // beyond the last point, we interpolate the plus end
-    real s = std::min(std::floor(a), real(nPoints-2));
-    unsigned i = static_cast<unsigned>(s);
-    assert_true( std::abs(i-s) < 1 );
-    return Interpolation(this, std::min(a-s, real(1)), i);
+    unsigned i = std::min((unsigned)a, (unsigned)nPoints-2);
+    return Interpolation(this, std::min(a-i, real(1)), i);
 }
 
 

@@ -106,9 +106,16 @@ public:
     
     /// set Interpolation to argument
     void reinterpolate(Interpolation const& i) const { assert_true(i.mecable()==hFiber); inter_=i.coef1(); segix_=i.point1(); }
+    
+    /// adjust Interpolation without changing Fiber
+    void reinterpolate(real a, unsigned i) const { inter_=a; segix_=i; }
 
     /// update the Interpolation
-    void reinterpolate() const { reinterpolate(hFiber->interpolate(hAbs)); }
+    void reinterpolate() const { //reinterpolate(hFiber->interpolate(hAbs)); }
+        real a = std::max(hFiber->segmentationInv()*(hAbs-hFiber->abscissaM()), real(0));
+        segix_ = std::min((unsigned)a, (unsigned)hFiber->lastSegment());
+        inter_ = std::min(a-segix_, real(1));
+    }
 
     /// move to a different abscissa on the current fiber
     void moveTo(real a) { hAbs = a; reinterpolate(); }

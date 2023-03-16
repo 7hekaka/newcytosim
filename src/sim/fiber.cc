@@ -1274,14 +1274,19 @@ void Fiber::updateRange(Field* field)
 
 /**
  Update all bound Hands, allowing them to detach if they are out of range
+ // this is equivalent to calling `h->reinterpolate()` for all Hands
  */
 void Fiber::updateHands() const
 {
-    const real M = abscissaM();
+    const real iS = segmentationInv();
+    const real SM = iS * abscissaM();
+    const unsigned L = lastSegment();
+    #pragma ivdep
     for ( Hand * h = fHands.front(); h; h = h->next() )
     {
-        // this is equivalent to h->reinterpolate():
-        h->reinterpolate(interpolateM(h->abscissa() - M));
+        real a = std::max(iS*h->abscissa()-SM, real(0));
+        unsigned i = std::min((unsigned)a, L);
+        h->reinterpolate(std::min(a-i, real(1)), i);
     }
 }
 
@@ -1302,8 +1307,11 @@ void Fiber::updateFiber()
     
     updateRange(prop->field_ptr);
     
+    const real iS = segmentationInv();
     const real M = abscissaM();
     const real P = abscissaP();
+    const real SM = iS * M;
+    const unsigned L = lastSegment();
     // Update all bound Hands, allowing them to detach if they are out of range
     Hand * h = fHands.front();
     while ( h )
@@ -1311,7 +1319,9 @@ void Fiber::updateFiber()
         Hand * x = h->next();
         assert_true(h->fiber()==this);
         // this is equivalent to h->reinterpolate():
-        h->reinterpolate(interpolateM(h->abscissa() - M));
+        real a = std::max(iS*h->abscissa()-SM, real(0));
+        unsigned i = std::min((unsigned)a, L);
+        h->reinterpolate(std::min(a-i, real(1)), i);
         // must iterate ahead, because `checkFiberRange` may lead to detachment:
         h->checkFiberRange(M, P);
         h = x;
