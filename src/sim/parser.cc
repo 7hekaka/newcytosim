@@ -677,6 +677,7 @@ void Parser::parse_cut(std::istream& is)
     else if ( str == "fiber" )
     {
         str = Tokenizer::get_symbol(is);
+        if ( str.empty() ) str = "fiber";
     }
 #endif
     

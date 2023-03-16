@@ -4,7 +4,7 @@
 set simul system
 {
     time_step = 0.01
-    viscosity = 0.02
+    viscosity = 0.1
 }
 
 set space cell
@@ -52,14 +52,11 @@ run system
 
 % make a red flash!
 change system display { back_color=red }
-
 cut glucan
 {
-    plane = 1 0 0, 0
+    plane = 0 1 0, 1
 }
-
 run 10 system
-
 change system display { back_color=black }
 
 
@@ -69,17 +66,26 @@ run 100 system
 }
 
 % make a blue flash!
-change system display { back_color=blue }
-
+change system display { back_color=green }
 cut microtubule
 {
-    plane = 0 1 0, -2
+    plane = 0 1 0, -1
 }
-
-run 10 system 
-
+run 10 system
 change system display { back_color=black }
 
+run 100 system
+{
+    nb_frames = 2
+}
+
+change system display { back_color=blue }
+cut fiber
+{
+    plane = 1 0 0, 0
+}
+run 10 system
+change system display { back_color=black }
 
 run system
 {

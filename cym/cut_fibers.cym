@@ -73,9 +73,8 @@ cut microtubule
     plane = 1 0 0, -3
 }
 
-run system
+run 1000 system
 {
-    nb_steps = 1000
     nb_frames = 1
 }
 

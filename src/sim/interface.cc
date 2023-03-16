@@ -870,17 +870,23 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
         set = sim_->findSet(pp->category());
     else
         set = sim_->findSet(name);
+    
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
-
     if ( set != &sim_->fibers )
         throw InvalidSyntax("only `cut fiber' is supported");
-
-    Filter filter(sim_, pp, opt);
-    ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
-    VLOG("-CUT " << objs.size() << " fibers PLANE (" << n << ").x = " << -a);
-    sim_->fibers.planarCut(objs, n, a, stateP, stateM);
+    if ( pp )
+    {
+        ObjectList objs = set->collect(match_property, pp, cnt);
+        VLOG("-CUT " << objs.size() << " " << name " PLANE (" << n << ").x = " << -a);
+        sim_->fibers.planarCut(objs, n, a, stateP, stateM);
+    }
+    else
+    {
+        VLOG("-CUT all fibers PLANE (" << n << ").x = " << -a);
+        sim_->fibers.planarCut(n, a, stateP, stateM);
+    }
 }
 
 
