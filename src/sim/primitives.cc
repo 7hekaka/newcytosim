@@ -608,13 +608,13 @@ Vector Cytosim::readPosition(std::string const& arg, Space const* spc)
 
 
 /// convert string to a position
-Vector Cytosim::readPosition(std::string const& arg)
+Vector Cytosim::findPosition(std::string const& arg, Space const* spc)
 {
     long max_trials = 1 << 14;
     while ( --max_trials >= 0 )
     {
         std::istringstream iss(arg);
-        Vector vec = Cytosim::readPosition(iss, nullptr);
+        Vector vec = Cytosim::readPosition(iss, spc);
         if ( vec.valid() )
             return vec;
     }

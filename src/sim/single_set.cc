@@ -526,6 +526,19 @@ SingleList SingleSet::collectWrists(Object const* arg) const
 }
 
 
+void SingleSet::detachWrists(Object const* arg)
+{
+    Single * obj = firstA();
+    while ( obj )
+    {
+        Single * nxt = obj->next();
+        if ( obj->base() == arg )
+            obj->detach();
+        obj = nxt;
+    }
+}
+
+
 void SingleSet::deleteWrists(Object const* arg)
 {
     Single *nxt, *obj;

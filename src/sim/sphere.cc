@@ -170,7 +170,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
                     vec = Vector::randU(radius());
                 else
                 {
-                    vec = Cytosim::readPosition(str);
+                    vec = Cytosim::findPosition(str, nullptr);
                     if ( 8 * vec.norm() < spRadius )
                         throw InvalidParameter(var+" cannot be brought to the Sphere surface");
                 }

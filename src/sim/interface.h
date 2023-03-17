@@ -74,6 +74,9 @@ public:
     
     /// test if 'name' is a category
     bool isCategory(std::string const& name) const;
+    
+    /// determine Property and find set corresponding to object class `name`
+    ObjectSet* findClass(std::string const& name, Property*&);
 
     //-------------------------------------------------------------------------------
 

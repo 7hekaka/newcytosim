@@ -169,7 +169,10 @@ public:
     /// return all Wrists anchored on `obj`
     SingleList collectWrists(Object const*) const;
     
-    /// remove all Wrists anchored on `obj`
+    /// detach all Wrists anchored on `obj`
+    void detachWrists(Object const*);
+
+    /// delete all Wrists anchored on `obj`
     void deleteWrists(Object const*);
     
     /// create Single attached to the beads

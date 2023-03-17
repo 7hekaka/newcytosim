@@ -23,8 +23,8 @@ namespace Cytosim
     /// convert string to a position
     Vector readPosition(std::string const&, Space const*);
     
-    /// read a position in string
-    Vector readPosition(std::string const&);
+    /// attempt to read a position in string, multiple times
+    Vector findPosition(std::string const&, Space const*);
     
     /// read an orientation, and return a normalized vector
     Vector readDirection(std::istream&, Vector const&, Space const*);

@@ -257,7 +257,7 @@ void Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, S
         // add 'nbp' points:
         for ( size_t n = 0; n < nbp; ++n )
         {
-            Vector vec = Cytosim::readPosition(str);
+            Vector vec = Cytosim::findPosition(str, nullptr);
             addSphere(vec, rad);
         }
         
@@ -316,7 +316,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
     {
         Vector vec(0,0,0);
         try {
-            vec = Cytosim::readPosition(str);
+            vec = Cytosim::findPosition(str, nullptr);
         } catch( Exception& e ) {
             print_magenta(std::cerr, e.brief());
             std::cerr << e.info() << " in `" << str << "'\n";
@@ -346,11 +346,12 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
         throw InvalidParameter("radius of solid:ball must be > 0");
 
     // get position of center:
-    Vector cen = Cytosim::readPosition(opt.value(var, 0));
+    Vector cen = Cytosim::findPosition(opt.value(var, 0), nullptr);
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, rad);
+    size_t ref = addSphere(cen, std::fabs(rad));
     addTriad(rad);
-    
+    rad = std::fabs(rad);
+
 #if ( DIM > 2 )
     real sep = 1.0;
     if ( opt.set(sep, "separation") )
@@ -432,7 +433,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
         throw InvalidParameter("radius of solid:sphere must be > 0");
 
     // get position of center:
-    Vector cen = Cytosim::readPosition(opt.value(var, 0));
+    Vector cen = Cytosim::findPosition(opt.value(var, 0), nullptr);
     // add a bead with a local coordinate system
     size_t ref = addSphere(cen, std::fabs(rad));
     addTriad(rad);
@@ -505,6 +506,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+str+"'");
             SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
+#if ( DIM > 2 )
             if ( str == "cap" )
             {
                 real cap = 0.2;
@@ -525,7 +527,9 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
                     objs.push_back(w);
                 }
             }
-            else if ( str.size() )
+            else
+#endif
+                if ( str.size() )
                 addWrists(objs, num, sip, ref, str);
             else
             {

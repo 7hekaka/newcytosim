@@ -31,7 +31,6 @@ Interface::Interface(Simul* s)
 }
 
 
-
 SimulProp const& Interface::simulProp() const
 {
     return sim_->prop;
@@ -47,6 +46,19 @@ void Interface::eraseSimul(bool arg) const
     if ( arg )
         sim_->eraseProperties();
     sim_->eraseObjects();
+}
+
+ObjectSet* Interface::findClass(std::string const& name, Property*& pp)
+{
+    pp = sim_->properties.find(name);
+    ObjectSet * set = nullptr;
+    if ( pp )
+        set = sim_->findSet(pp->category());
+    else
+        set = sim_->findSet(name);
+    if ( !set )
+        throw InvalidSyntax("could not determine the class of `"+name+"'");
+    return set;
 }
 
 //------------------------------------------------------------------------------
@@ -758,21 +770,10 @@ bool pass_filter(Object const* obj, void const* val)
 
 void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cnt)
 {
-    Property * pp = sim_->properties.find(name);
-    ObjectSet * set = nullptr;
-    if ( pp )
-        set = sim_->findSet(pp->category());
-    else
-        set = sim_->findSet(name);
-    if ( !set )
-    {
-        if ( name == "objects" )
-        {
-            sim_->eraseObjects();
-            return;
-        }
-        throw InvalidSyntax("could not determine the class of `"+name+"'");
-    }
+    if ( name == "objects" )
+        return sim_->eraseObjects();
+    Property * pp = nullptr;
+    ObjectSet * set = findClass(name, pp);
     
     Filter filter(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter, cnt);
@@ -785,32 +786,36 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
 
 
 /**
- This moves objects to position `pos`
+ This moves objects to a new position, or translates them by given vector
  */
 void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
 {
-    Property * pp = sim_->properties.find(name);
-    ObjectSet * set = nullptr;
-    if ( pp )
-        set = sim_->findSet(pp->category());
-    else
-        set = sim_->findSet(name);
-    if ( !set )
-        throw InvalidSyntax("could not determine the class of `"+name+"'");
+    Property * pp = nullptr;
+    ObjectSet * set = findClass(name, pp);
+    Space const* spc = sim_->spaces.master();
+    
+    bool detach = false;
+    opt.set(detach, "detach");
     
     Filter filter(sim_, pp, opt);
     ObjectList objs = set->collect(pass_filter, &filter, cnt);
     
-    Vector pos;
-    if ( opt.set(pos, "position") )
+    Vector vec;
+    std::string str;
+    for ( Object * obj : objs )
     {
-        for ( Object * obj : objs )
-            obj->setPosition(pos);
-    }
-    else if ( opt.set(pos, "translation") )
-    {
-        for ( Object * obj : objs )
-            obj->translate(pos);
+        if ( detach )
+            sim_->singles.detachWrists(obj);
+        if ( opt.set_from_least_used_value(str, "position") )
+        {
+            vec = Cytosim::findPosition(str, spc);
+            obj->setPosition(vec);
+        }
+        else if ( opt.set_from_least_used_value(str, "translation") )
+        {
+            vec = Cytosim::findPosition(str, spc);
+            obj->translate(vec);
+        }
     }
 }
 
@@ -820,14 +825,8 @@ void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
  */
 void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
 {
-    Property * pp = sim_->properties.find(name);
-    ObjectSet * set = nullptr;
-    if ( pp )
-        set = sim_->findSet(pp->category());
-    else
-        set = sim_->findSet(name);
-    if ( !set )
-        throw InvalidSyntax("could not determine the class of `"+name+"'");
+    Property * pp = nullptr;
+    ObjectSet * set = findClass(name, pp);
 
     ObjectMark mk = 0;
     if ( ! opt.set(mk, "mark") )
@@ -864,15 +863,8 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     opt.set(stateP, "new_end_state", 0, keys);
     opt.set(stateM, "new_end_state", 1, keys);
     
-    Property * pp = sim_->properties.find(name);
-    ObjectSet * set = nullptr;
-    if ( pp )
-        set = sim_->findSet(pp->category());
-    else
-        set = sim_->findSet(name);
-    
-    if ( !set )
-        throw InvalidSyntax("could not determine the class of `"+name+"'");
+    Property * pp = nullptr;
+    ObjectSet * set = findClass(name, pp);
     if ( set != &sim_->fibers )
         throw InvalidSyntax("only `cut fiber' is supported");
     
