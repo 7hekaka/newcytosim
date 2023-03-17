@@ -71,26 +71,6 @@ void Display::drawText(Vector const& vec, const char str[]) const
     fgStrokeString(0, 0, pixelSize, 1, str, 1);
 }
 
-//------------------------------------------------------------------------------
-#pragma mark - Couple::disp()
-
-PointDisp const* Couple::disp12() const
-{
-    if ( disp1()->visible )
-        return disp1();
-    else
-        return disp2();
-}
-
-
-PointDisp const* Couple::disp21() const
-{
-    if ( disp2()->visible )
-        return disp2();
-    else
-        return disp1();
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark - drawObject
@@ -1817,6 +1797,10 @@ void Display::drawMicrotubule(Fiber const& fib, gym_color colA, gym_color colB, 
 }
 
 
+//------------------------------------------------------------------------------
+#pragma mark - Draw Fiber
+
+
 int Display::drawFiberLattice(Fiber const& fib, int style, float rad) const
 {
     VisibleLattice const* lat = fib.visibleLattice();
@@ -1867,11 +1851,11 @@ void Display::drawFiber(Fiber const& fib)
                     {
                         float w = pixscale(disp->line_width);
                         float l = std::max(w, 0.008f);
-                        drawFiberArrowed2D(fib, w, 2*l, col1, l, col2);
+                        drawFiberArrowed2D(fib, w, 3*l, col1, l, col2);
                         //drawFiberWide(fib, w);
                     }
                     else
-                        drawFiberStriped(fib, pixscale(disp->line_width), 0.004, col1, 0.012, col2);
+                        drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
                         break;
                 case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
                 case 4: drawActin(fib, col1, col2, colE); break;
@@ -1978,6 +1962,24 @@ void Display::drawFibers(FiberSet const& set)
 
 //------------------------------------------------------------------------------
 #pragma mark - Couples
+
+
+PointDisp const* Couple::disp12() const
+{
+    if ( disp1()->visible )
+        return disp1();
+    else
+        return disp2();
+}
+
+
+PointDisp const* Couple::disp21() const
+{
+    if ( disp2()->visible )
+        return disp2();
+    else
+        return disp1();
+}
 
 
 void Display::drawCouplesB(CoupleSet const& set) const
