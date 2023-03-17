@@ -118,9 +118,9 @@ void Fiber::growStep(real addM, real addP, bool split)
     {
         const real sup = prop->max_chewing_speed_dt;
         addM -= sup * std::tanh(fChew[1]/sup);
-        fChew[1] = 0;
         addP -= sup * std::tanh(fChew[0]/sup);
         fChew[0] = 0;
+        fChew[1] = 0;
     }
 #endif
     
