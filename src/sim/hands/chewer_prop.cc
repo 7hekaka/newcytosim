@@ -4,9 +4,9 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "simul_prop.h"
+#include "simul_part.h"
 #include "chewer_prop.h"
 #include "chewer.h"
-#include "simul_part.h"
 
 
 Hand * ChewerProp::newHand(HandMonitor* m) const
@@ -58,7 +58,8 @@ void ChewerProp::complete(Simul const& sim)
     real mobility = diffusion / boltzmann(sim);
     mobility_dt = mobility * time_step(sim);
     
-    std::clog << " Chewer `" << name() << "' has mobility = " << mobility << "\n";
+    if ( primed(sim) )
+        std::clog << " Chewer `" << name() << "' has mobility = " << mobility << "\n";
 }
 
 
