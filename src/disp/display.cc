@@ -2232,16 +2232,26 @@ void Display::drawBead(Bead const& obj)
         drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
     }
     
-#if ( DIM == 2 )
-    // display outline:
-    if (( disp->style & 4 ) && obj.radius() > pixelSize )
+    if ( disp->style & 4 )
     {
-        gym::disableLighting();
-        gym::color(col);
-        gym::transScale(obj.position(), obj.radius());
-        gle::circle1(disp->width);
-    }
+#if ( DIM <= 2 )
+        // display outline:
+        if ( obj.radius() > pixelSize )
+        {
+            gym::disableLighting();
+            gym::color(col);
+            gym::transScale(obj.position(), obj.radius());
+            gle::circle1(disp->width);
+        }
+#else
+        if ( obj.mark() )
+        {
+            col = gym::nice_color(obj.mark());
+            gym::color_both(col);
+            drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
+        }
 #endif
+    }
 }
 
 
