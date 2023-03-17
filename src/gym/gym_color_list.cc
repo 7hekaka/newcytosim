@@ -23,8 +23,8 @@ namespace gym
     static gym_color nice_colors[] = {
         0xFFFFFFFF,
         0xFFA500FF,
-        0x00BB00FF,
         0x3366FFFF,
+        0x00BB00FF,
         0x7D7D7DFF,
         0x3366FFFF,
         0xFF4500FF,
@@ -47,7 +47,13 @@ namespace gym
         0x3A90FFFF,
         0x00FFFFFF,
         0xF6F675FF,
-        0xFC9CAAFF};
+        0xFC9CAAFF,
+        0x990000FF,
+        0xF6F675FF,
+        0xF76541FF,
+        0x808000FF,
+        0x4B0082FF
+    };
     
     /// Francois's list of named colors
     gym::named_color std_colors[] = {
