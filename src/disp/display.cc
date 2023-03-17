@@ -1530,7 +1530,8 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
 
 
 /**
-Draw segments of length 'inc, onc' of alternating colors, in register with Fiber's abscissa
+ Draw segments of length 'inc, onc' of alternating colors, in register with Fiber's abscissa
+ Every 8 stripe has a black section indicating ~256 nm
 */
 void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
                                gym_color col, real onc, gym_color lor) const
@@ -1543,14 +1544,14 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
     // abs in [0, uni] is now relative to minus end
     if ( abs > onc )
     {
-        cnt = 1; // drawing first slice of size `inc`
+        cnt = 2*cnt - 1; // drawing first slice of size `inc`
         pos = fib.displayPosM(abs-onc);
         nxt = fib.displayPosM(abs);
         gym::color_load(col);
     }
     else
     {
-        cnt = 0; // drawing second slice of size `onc`
+        cnt = 2*cnt; // drawing second slice of size `onc`
         pos = fib.displayPosM(abs);
         nxt = fib.displayPosM(abs+inc);
         gym::color_load(lor);
@@ -1581,6 +1582,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
         dir = normalize(nxt-old);
         // alternate different tones:
         gym::color_load((++cnt&1)?col:lor);
+        if (( cnt & 15 )==1) gym::color_load(gym_color(0,0,0,1));
         gym::setClipPlane(5, -dir, pos);
         gym::transAlignZ(old, rad, pos-old);
         gle::centralTube();
@@ -1851,7 +1853,7 @@ void Display::drawFiber(Fiber const& fib)
                     {
                         float w = pixscale(disp->line_width);
                         float l = std::max(w, 0.008f);
-                        drawFiberArrowed2D(fib, w, 3*l, col1, l, col2);
+                        drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
                         //drawFiberWide(fib, w);
                     }
                     else
