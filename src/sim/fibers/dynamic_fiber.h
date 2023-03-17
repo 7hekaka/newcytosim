@@ -104,7 +104,16 @@ private:
     
     /// calculate dynamic state from unit states near minus end
     state_t calculateStateM() const;
-   
+    
+    // convert chewing speed to a unit off rate
+    real chewingUnits(int end);
+    
+    // remove last unit at minus end
+    void removeUnitM();
+    
+    // remove last unit at plus end
+    void removeUnitP();
+
 public:
   
     /// constructor

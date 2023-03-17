@@ -360,7 +360,7 @@ void FiberProp::clear()
     colinear_force = 0;
 #endif
 #if NEW_FIBER_END_CHEW
-    max_chewing_speed = 0;
+    max_chewing_speed = 1.0;
 #endif
 #if NEW_FIBER_LOOP
     loop = 0;

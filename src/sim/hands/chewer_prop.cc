@@ -43,8 +43,8 @@ void ChewerProp::complete(Simul const& sim)
 
     chewing_speed_dt = chewing_speed * time_step(sim);
     
-    if ( diffusion < 0 )
-        throw InvalidParameter("chewer:diffusion must be >= 0");
+    if ( diffusion <= 0 )
+        throw InvalidParameter("chewer:diffusion must be > 0");
 
     /*
      This is for unidimensional diffusion along the filaments, and we want:
@@ -55,9 +55,10 @@ void ChewerProp::complete(Simul const& sim)
     diffusion_dt = std::sqrt(6.0 * diffusion * time_step(sim));
     
     // use Einstein's relation to get a mobility:
-    mobility_dt = diffusion * time_step(sim) / boltzmann(sim);
+    real mobility = diffusion / boltzmann(sim);
+    mobility_dt = mobility * time_step(sim);
     
-    std::clog << " Chewer `" << name() << "' has mobility = " << diffusion / boltzmann(sim) << "\n";
+    std::clog << " Chewer `" << name() << "' has mobility = " << mobility << "\n";
 }
 
 

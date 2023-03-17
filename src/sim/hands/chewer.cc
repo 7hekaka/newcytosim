@@ -30,7 +30,7 @@ void Chewer::stepUnloaded()
     if ( engaged != NO_END )
     {
 #if NEW_FIBER_END_CHEW
-        hFiber->chew(prop()->chewing_speed_dt, engaged);
+        hFiber->chew(engaged, prop()->chewing_speed_dt);
         moveToEnd(engaged);
 #else
         throw InvalidParameter("fiber:chew is not enabled");
@@ -40,15 +40,18 @@ void Chewer::stepUnloaded()
 
     real a = hAbs + prop()->diffusion_dt * RNG.sreal();
     
-    if ( a <= hFiber->abscissaM() )
+    const real M = hFiber->abscissaM();
+    const real P = hFiber->abscissaP();
+    
+    if ( a <= M )
     {
-        a = hFiber->abscissaM();
+        a = M;
         engaged = MINUS_END;
     }
     
-    if ( a >= hFiber->abscissaP() )
+    if ( a >= P )
     {
-        a = hFiber->abscissaP();
+        a = P;
         engaged = PLUS_END;
     }
     
@@ -66,7 +69,7 @@ void Chewer::stepLoaded(Vector const& force)
     if ( engaged != NO_END )
     {
 #if NEW_FIBER_END_CHEW
-        hFiber->chew(prop()->chewing_speed_dt, engaged);
+        hFiber->chew(engaged, prop()->chewing_speed_dt);
         moveToEnd(engaged);
 #else
         throw InvalidParameter("fiber:chew is not enabled");
@@ -78,18 +81,18 @@ void Chewer::stepLoaded(Vector const& force)
     real load = dot(force, dirFiber());
     real a = hAbs + prop()->diffusion_dt * RNG.sreal() + prop()->mobility_dt * load;
     
-    const real m = hFiber->abscissaM();
-    const real p = hFiber->abscissaP();
+    const real M = hFiber->abscissaM();
+    const real P = hFiber->abscissaP();
     
-    if ( a <= m )
+    if ( a <= M )
     {
-        a = m;
+        a = M;
         engaged = MINUS_END;
     }
     
-    if ( a >= p )
+    if ( a >= P )
     {
-        a = p;
+        a = P;
         engaged = PLUS_END;
     }
     

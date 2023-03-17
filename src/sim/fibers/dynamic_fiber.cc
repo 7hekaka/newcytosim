@@ -7,6 +7,8 @@
 #include "dynamic_fiber_prop.h"
 #include "exceptions.h"
 #include "iowrapper.h"
+//#include "object_set.h"
+//#include "simul_part.h"
 #include "space.h"
 
 
@@ -24,6 +26,19 @@ DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p)
 
 DynamicFiber::~DynamicFiber()
 {
+}
+
+
+real DynamicFiber::chewingUnits(int end)
+{
+#if NEW_FIBER_END_CHEW
+    const real sup = prop()->max_chewing_speed_dt;
+    real res = sup * std::tanh(fChew[end]/sup) / prop()->unit_length;
+    fChew[end] = 0;
+    return res;
+#else
+    return 0;
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -74,6 +89,17 @@ void DynamicFiber::setEndStateM(state_t s)
 }
 
 
+// remove last unit, while penultimate position can be a GTP survivor
+void DynamicFiber::removeUnitM()
+{
+    unitM[0] = unitM[1];
+    unitM[1] = RNG.test(prop()->unhydrolyzed_prob[1]);
+    nextShrinkM += RNG.exponential();
+    mStateM = calculateStateM();
+    //std::cout << reference() << "mStateM = " << mStateM << '\n';
+}
+
+
 /**
  Minus end can only shrink, and so far the state vector unitM[] is ignored
  */
@@ -83,11 +109,12 @@ int DynamicFiber::stepMinusEnd()
 	int res = 0;
     
 #if NEW_FIBER_END_CHEW
-    ///@todo implement smooth saturation using logistic function
-    // convert chewing rate to stochastic off rate:
-    real chewed = std::min(fChew[1], prop()->max_chewing_speed_dt) / prop()->unit_length;
-    //std::clog << " chewing rate M " << chewed / prop()->time_step << '\n';
-    fChew[1] = 0;
+    real chewed = 0;
+    if ( fChew[M] > 0 )
+    {
+        chewed = chewingUnits(M);
+        //std::clog << reference() << " chew M " << chewed/time_step(simul()) << " unit/s\n";
+    }
 #else
     constexpr real chewed = 0;
 #endif
@@ -96,13 +123,9 @@ int DynamicFiber::stepMinusEnd()
 	{
 		nextShrinkM -= prop()->shrinking_rate_dt[M] + chewed;
 		while ( nextShrinkM <= 0 )
-		{
-            // remove last unit, while penultimate position can be a GTP survivor
-			unitM[0] = unitM[1];
-			unitM[1] = RNG.test(prop()->unhydrolyzed_prob[M]);
+        {
+            removeUnitM();
 			--res;
-			nextShrinkM += RNG.exponential();
-			mStateM = calculateStateM();
 		}
 	}
     else if ( mStateM > STATE_WHITE )
@@ -166,12 +189,10 @@ int DynamicFiber::stepMinusEnd()
 					break;
 
 				case 2:
-					// remove last unit, while penultimate position can be a GTP survivor
-					unitM[0] = unitM[1];
-					unitM[1] = RNG.test(prop()->unhydrolyzed_prob[M]);
-					--res;
+                    // remove last unit, while penultimate position can be a GTP survivor
+                    removeUnitM();
                     assert_true(nextShrinkM < 0);
-					nextShrinkM += RNG.exponential();
+					--res;
 					break;
 
 			}
@@ -236,6 +257,17 @@ void DynamicFiber::setEndStateP(state_t s)
 }
 
 
+// remove last unit, while penultimate position can be a GTP survivor
+void DynamicFiber::removeUnitP()
+{
+    unitP[0] = unitP[1];
+    unitP[1] = RNG.test(prop()->unhydrolyzed_prob[0]);
+    nextShrinkP += RNG.exponential();
+    mStateP = calculateStateP();
+    //std::cout << reference() << "mStateP = " << mStateP << '\n';
+}
+
+
 /**
  Using a modified Gillespie scheme with a variable rate.
  
@@ -247,11 +279,12 @@ int DynamicFiber::stepPlusEnd()
     int res = 0;
     
 #if NEW_FIBER_END_CHEW
-    ///@todo implement smooth saturation using logistic function
-    // convert chewing rate to stochastic off rate:
-    real chewed = std::min(fChew[0], prop()->max_chewing_speed_dt) / prop()->unit_length;
-    //std::clog << " chewing rate P " << chewed / prop()->time_step << '\n';
-    fChew[0] = 0;
+    real chewed = 0;
+    if ( fChew[P] > 0 )
+    {
+        chewed = chewingUnits(P);
+        //std::clog << reference() << " chew P " << chewed/time_step(simul()) << " unit/s\n";
+    }
 #else
     constexpr real chewed = 0;
 #endif
@@ -261,13 +294,8 @@ int DynamicFiber::stepPlusEnd()
         nextShrinkP -= prop()->shrinking_rate_dt[P] + chewed;
         while ( nextShrinkP <= 0 )
         {
-            // remove last unit, while penultimate position can be a GTP survivor
-			unitP[0] = unitP[1];
-            unitP[1] = RNG.test(prop()->unhydrolyzed_prob[P]);
+            removeUnitP();
 			--res;
-            nextShrinkP += RNG.exponential();
-            mStateP = calculateStateP();
-            //std::cout << "mStateP = " << mStateP << '\n';
         }
     }
     else
@@ -332,11 +360,8 @@ int DynamicFiber::stepPlusEnd()
 
                 case 2:
                     // remove last unit, while penultimate position can be a GTP survivor
-                    unitP[0] = unitP[1];
-                    unitP[1] = RNG.test(prop()->unhydrolyzed_prob[P]);
+                    removeUnitP();
                     --res;
-                    assert_true(nextShrinkP < 0);
-                    nextShrinkP += RNG.exponential();
                     break;
             }
             mStateP = calculateStateP();
@@ -360,6 +385,14 @@ void DynamicFiber::step()
     }
     else if ( mStateM == STATE_WHITE )
     {
+#if NEW_FIBER_END_CHEW
+        if ( fChew[M] > 0 )
+        {
+            nextShrinkM -= chewingUnits(M);
+            while ( nextShrinkM <= 0 )
+                removeUnitM();
+        }
+#endif
         // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
         if ( RNG.test(prop()->rebirth_prob[M]) )
             setEndStateM(STATE_GREEN);
@@ -386,6 +419,14 @@ void DynamicFiber::step()
     }
     else if ( mStateP == STATE_WHITE )
     {
+#if NEW_FIBER_END_CHEW
+        if ( fChew[P] > 0 )
+        {
+            nextShrinkP -= chewingUnits(P);
+            while ( nextShrinkP <= 0 )
+                removeUnitP();
+        }
+#endif
         // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
         if ( RNG.test(prop()->rebirth_prob[P]) )
             setEndStateP(STATE_GREEN);

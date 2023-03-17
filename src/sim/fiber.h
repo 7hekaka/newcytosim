@@ -310,8 +310,8 @@ public:
     //--------------------------------------------------------------------------
 
 #if NEW_FIBER_END_CHEW
-    /// register a chewing quantity
-    void chew(const real x, FiberEnd e) { assert_true(e>0); fChew[e-1] += x; }
+    /// register a chewing effect of magnitude 'x'
+    void chew(FiberEnd e, const real x) { assert_true(e>0); fChew[e-1] += x; }
 #endif
 #if NEW_FIBER_SILHOUETTE
     real chiasma_;
