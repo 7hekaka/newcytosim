@@ -95,9 +95,9 @@ public:
     /// The mobility of a model vertex ( speed = mobility * point_force )
     real pointMobility() const { return 1 / paDrag; }
 
-    /// the mobility is already set in resize()
-    void prepareMecable() { }
-    
+    /// the mobility is already set in resize(), but in case viscosity is changed
+    void prepareMecable() { setDragCoefficient(); }
+
     /// calculates the speed of points in Y, for the forces given in X
     void projectForces(const real* X, real* Y) const;
     
