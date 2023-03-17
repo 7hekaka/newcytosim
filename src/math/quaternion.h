@@ -610,7 +610,7 @@ public:
     {
         /** for small angles, we assume here angle ~ v.norm() */
         REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
-        setFromAxis(v, std::cos(n*0.5), std::sin(n*0.5)/n);
+        setFromAxis(v, std::cos(n*0.5), (n>0)?std::sin(n*0.5)/n:0);
     }
     
     /// set from rotation of axis v, and angle 'angle' in radian around this axis
