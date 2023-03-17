@@ -108,9 +108,15 @@ private:
     // convert chewing speed to a unit off rate
     real chewingUnits(int end);
     
+    // add unit
+    void addUnitM();
+
     // remove last unit at minus end
     void removeUnitM();
     
+    // add unit
+    void addUnitP();
+
     // remove last unit at plus end
     void removeUnitP();
 

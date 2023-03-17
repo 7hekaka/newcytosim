@@ -89,6 +89,14 @@ void DynamicFiber::setEndStateM(state_t s)
 }
 
 
+void DynamicFiber::addUnitM()
+{
+    unitM[1] = unitM[0];
+    unitM[0] = 1;
+    nextGrowthM += RNG.exponential();
+}
+
+
 // remove last unit, while penultimate position can be a GTP survivor
 void DynamicFiber::removeUnitM()
 {
@@ -173,25 +181,23 @@ int DynamicFiber::stepMinusEnd()
 			switch ( ii )
 			{
 				case 0:
-					// add fresh unit, shifting old terminal to penultimate position
-					unitM[1] = unitM[0];
-					unitM[0] = 1;
-					++res;
                     assert_true(nextGrowthM < 0);
-					nextGrowthM += RNG.exponential();
+					// add fresh unit, shifting old terminal to penultimate position
+                    addUnitM();
+					++res;
 					break;
 
 				case 1:
+                    assert_true(nextHydrolM < 0);
 					// hydrolyze one of the unit with equal chance:
 					unitM[RNG.flip()] = 0;
-                    assert_true(nextHydrolM < 0);
 					nextHydrolM += RNG.exponential();
 					break;
 
 				case 2:
+                    assert_true(nextShrinkM < 0);
                     // remove last unit, while penultimate position can be a GTP survivor
                     removeUnitM();
-                    assert_true(nextShrinkM < 0);
 					--res;
 					break;
 
@@ -254,6 +260,16 @@ void DynamicFiber::setEndStateP(state_t s)
         }
         assert_true( mStateP == calculateStateP() );
     }
+}
+
+
+// add unit
+void DynamicFiber::addUnitP()
+{
+    unitP[1] = unitP[0];
+    unitP[0] = 1;
+    mStateP = calculateStateP();
+    nextGrowthP += RNG.exponential();
 }
 
 
@@ -343,22 +359,21 @@ int DynamicFiber::stepPlusEnd()
             switch ( ii )
             {
                 case 0:
-                    // add fresh unit, shifting old terminal to penultimate position
-                    unitP[1] = unitP[0];
-                    unitP[0] = 1;
-                    ++res;
                     assert_true(nextGrowthP < 0);
-                    nextGrowthP += RNG.exponential();
+                    // add fresh unit, shifting old terminal to penultimate position
+                    addUnitP();
+                    ++res;
                     break;
                     
                 case 1:
+                    assert_true(nextHydrolP < 0);
                     // hydrolyze one of the unit with equal chance:
                     unitP[RNG.flip()] = 0;
-                    assert_true(nextHydrolP < 0);
                     nextHydrolP += RNG.exponential();
                     break;
 
                 case 2:
+                    assert_true(nextShrinkP < 0);
                     // remove last unit, while penultimate position can be a GTP survivor
                     removeUnitP();
                     --res;
@@ -390,7 +405,10 @@ void DynamicFiber::step()
         {
             nextShrinkM -= chewingUnits(M);
             while ( nextShrinkM <= 0 )
+            {
                 removeUnitM();
+                --addM;
+            }
         }
 #endif
         // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
@@ -398,7 +416,7 @@ void DynamicFiber::step()
             setEndStateM(STATE_GREEN);
     }
     else
-        addM = stepMinusEnd() * prop()->unit_length;
+        addM = stepMinusEnd();
     
     real addP = 0;
     constexpr size_t P = 0;
@@ -409,11 +427,8 @@ void DynamicFiber::step()
         nextGrowthP -= growth / stabilized_[P];
         while ( nextGrowthP < 0 )
         {
-            unitP[1] = unitP[0];
-            unitP[0] = 1;
-            mStateP = calculateStateP();
-            addP += prop()->unit_length;
-            nextGrowthP += RNG.exponential();
+            addUnitP();
+            ++addP;
         }
         stabilized_[P] = 0;
     }
@@ -424,7 +439,10 @@ void DynamicFiber::step()
         {
             nextShrinkP -= chewingUnits(P);
             while ( nextShrinkP <= 0 )
+            {
                 removeUnitP();
+                --addP;
+            }
         }
 #endif
         // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
@@ -432,8 +450,11 @@ void DynamicFiber::step()
             setEndStateP(STATE_GREEN);
     }
     else
-        addP = stepPlusEnd() * prop()->unit_length;
+        addP = stepPlusEnd();
 
+    addM *= prop()->unit_length;
+    addP *= prop()->unit_length;
+    
     Fiber::growStep(addM, addP, false);
 }
 
