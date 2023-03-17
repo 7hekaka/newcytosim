@@ -1,4 +1,4 @@
-% A test of beads with chewing and nucleating activities
+% A test of beads with cutting and nucleating activities
 % F. Nedelec, Strasbourg 17.3.2023
 
 set simul system
@@ -29,7 +29,7 @@ set space ball
 
 new ball
 {
-    radius = 0.25
+    radius = 0.5
 }
 
 % ------------------------ MICROTUBULE -------------------------
@@ -49,23 +49,22 @@ set fiber microtubule
     display = ( color=white; line_width=2.5; end_size=8, 10; coloring=2; )
 }
 
-% --------------------------- CHEWER ---------------------------
+% -------------------------- KATANIN ---------------------------
 
-set hand chewer
+set hand katanin
 {
     binding = 50, 0.050
     unbinding = 5, 3
-    activity = chew
-    hold_growing_end = 1
-    hold_shrinking_end = 1
-    chewing_speed = 0.010
-    diffusion = 0.025
+    activity = cut
+    cutting_rate = 1
+    cutting_range = 0.100   % this will limit cutting near the minus end
+    new_end_state = shrink, shrink
     display = ( size=7; color=red; )
 }
 
 set single cutter
 {
-    hand = chewer
+    hand = katanin
     stiffness = 1
 }
 
@@ -80,7 +79,6 @@ set bead condensate
 set hand bead_nucleator
 {
     unbinding = 0, inf
-    hold_shrinking_end = 1
     activity = nucleate
     nucleate = 0.1, microtubule, ( length=0.032; end_state=grow,static; mark=2; )
     display = ( color=yellow; size=2; width=3; )
@@ -110,14 +108,14 @@ set single puller
 
 % -------------------------- SYSTEM! ---------------------------
 
-new 100 condensate
+new 1000 condensate
 {
     radius = 0.060
-    position = ball 0.25
+    position = ball 0.5
 }
 
-new 100 maker { multi_base = condensate; }
-new 100 cutter { multi_base = condensate; }
+new 200 maker { multi_base = condensate; }
+new 1000 cutter { multi_base = condensate; }
 
 run 200000 system
 {
