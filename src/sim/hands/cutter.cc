@@ -26,10 +26,13 @@ void Cutter::cut()
      and this becomes a problem if the Cutter is part of a Couple,
      because calls for attachments and actions are intermingled.
      
-     This is why the call sever() here only register the position of the cut,
-     that will be performed later.
+     This is why sever() below will register the position of the cut,
+     but his cut will be performed later in Fiber::step()
      */
     fiber()->sever(abscissa(), prop()->new_end_state[0], prop()->new_end_state[1]);
+    //std::clog << "cut " << fiber()->reference() << " @ " << abscissaFromM() << "\n";
+    
+    // simplest is to detach since the location will be at the tip of new fiber
     detach();
 }
 
@@ -44,7 +47,8 @@ void Cutter::stepUnloaded()
     if ( nextAct < 0 )
     {
         nextAct = RNG.exponential();
-        return cut();
+        if ( abscissaFromM() < prop()->cutting_range )
+            return cut();
     }
 }
 
@@ -58,7 +62,8 @@ void Cutter::stepLoaded(Vector const& force)
     if ( nextAct < 0 )
     {
         nextAct = RNG.exponential();
-        return cut();
+        if ( abscissaFromM() < prop()->cutting_range )
+            return cut();
     }
 }
 

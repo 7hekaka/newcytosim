@@ -26,6 +26,8 @@ public:
     /// rate of cutting event
     real cutting_rate;
     
+    /// max distance from the minus end for cutting
+    real cutting_range;
     
     /// dynamic state of newly created Fiber ends
     /**

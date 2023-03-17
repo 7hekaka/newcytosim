@@ -554,9 +554,8 @@ Fiber* Fiber::severNow(const real abs)
 void Fiber::severNow()
 {
     /**
-     The std::set keeps its objects always in order of descending abscissa,
-     which is essential here to avoid data loss:
-     cut from high to low abscissa
+     The std::set keeps its objects always in order of descending abscissa, and
+     it is essential here to avoid data loss: cutting from high to low abscissa
      */
     for ( CutFacts const& cut : pendingCuts )
     {

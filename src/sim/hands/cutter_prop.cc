@@ -19,6 +19,8 @@ void CutterProp::clear()
     HandProp::clear();
 
     cutting_rate = 0;
+    cutting_range = INFINITY;
+    
     new_end_state[0] = STATE_WHITE;
     new_end_state[1] = STATE_WHITE;
 }
@@ -29,6 +31,7 @@ void CutterProp::read(Glossary& glos)
     HandProp::read(glos);
     
     glos.set(cutting_rate,  "cutting_rate");
+    glos.set(cutting_range, "cutting_range");
     
     // possible dynamic states of the ends
     Glossary::dict_type<state_t> keys{{"white",     STATE_WHITE},
@@ -55,6 +58,9 @@ void CutterProp::complete(Simul const& sim)
     if ( cutting_rate < 0 )
         throw InvalidParameter("cutter:cutting_rate must be >= 0");
 
+    if ( cutting_range < 0 )
+        throw InvalidParameter("cutter:cutting_range must be >= 0");
+    
     cutting_rate_dt = cutting_rate * time_step(sim);
     
     if ( new_end_state[0] == STATE_BLACK )
@@ -66,6 +72,7 @@ void CutterProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);
     write_value(os, "cutting_rate",  cutting_rate);
+    write_value(os, "cutting_range", cutting_range);
     write_value(os, "new_end_state", new_end_state, 2);
 }
 
