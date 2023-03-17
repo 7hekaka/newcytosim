@@ -2248,7 +2248,7 @@ void Display::drawBead(Bead const& obj)
         {
             col = gym::nice_color(obj.mark());
             gym::color_both(col);
-            drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
+            drawObject(obj.position(), pixscale(disp->size), gle::cube);
         }
 #endif
     }
