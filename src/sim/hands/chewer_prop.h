@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 
 #ifndef CHEWER_PROP_H
 #define CHEWER_PROP_H
