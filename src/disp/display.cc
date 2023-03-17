@@ -2228,7 +2228,7 @@ void Display::drawBead(Bead const& obj)
     // display center:
     if ( disp->style & 2 )
     {
-        gym::color_both(col);
+        gym::color_both(col, 1);
         drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
     }
     
