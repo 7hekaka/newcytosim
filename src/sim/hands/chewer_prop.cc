@@ -55,11 +55,11 @@ void ChewerProp::complete(Simul const& sim)
     diffusion_dt = std::sqrt(6.0 * diffusion * time_step(sim));
     
     // use Einstein's relation to get a mobility:
-    real mobility = diffusion / boltzmann(sim);
-    mobility_dt = mobility * time_step(sim);
+    real movability = diffusion / boltzmann(sim);
+    movability_dt = movability * time_step(sim);
     
     if ( primed(sim) )
-        std::clog << " Chewer `" << name() << "' has mobility = " << mobility << "\n";
+        std::clog << " Chewer `" << name() << "' has mobility = " << movability << " um/s\n";
 }
 
 
@@ -70,7 +70,7 @@ void ChewerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     /*
      Compare mobility with stiffness: this can induce instability
      */
-    real a = mobility_dt * stiff * mul;
+    real a = movability_dt * stiff * mul;
     if ( a > 1.0 )
     {
         InvalidParameter e("unstable chewer");

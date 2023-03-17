@@ -35,7 +35,7 @@ private:
     
     real chewing_speed_dt;
 
-    real diffusion_dt, mobility_dt;
+    real diffusion_dt, movability_dt;
     
 public:
     
