@@ -19,6 +19,8 @@ size_t tossPointsBall(std::vector<Vector3>& pts, real sep, size_t max_trials);
 /// Distribute points on the unit disc, at distance never below `sep`.
 size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t limit_trials);
 
+/// Distribute points on the unit circle, over an arc of thickness `cap`.
+size_t tossPointsCap(std::vector<Vector2>& pts, real cap, real sep, size_t limit_trials);
 
 /// Distribute points on the unit disc, over a spherical cap of thickness `cap`.
 size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t limit_trials);
@@ -59,6 +61,25 @@ size_t tossPointsSphere(std::vector<VECTOR>& pts, real sep, size_t max_trials)
         ++n;
     }
     return n;
+}
+
+template <typename VECTOR>
+size_t tossPointsCap(std::vector<VECTOR>& pts, real cap, size_t max_trials)
+{
+    size_t num = pts.size();
+    size_t cnt = 0, ouf = 0;
+    real sep, sup = std::sqrt( 2 * M_PI * cap / num );
+    if ( VECTOR::dimensionality() == 2 )
+        sup = M_SQRT2 * std::acos(1-cap) / num;
+    do {
+        // we decrease gradually the separation, to reach a good solution...
+        sep = 512 * sup / real(ouf+512);
+        cnt = tossPointsCap(pts, cap, sep, 1024);
+        //std::clog << "tossCap(" << num << ") placed " << cnt << " with sep = " << sep << "\n";
+        if ( ++ouf >= max_trials )
+            break;
+    } while ( cnt < num );
+    return cnt;
 }
 
 #endif

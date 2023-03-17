@@ -506,20 +506,13 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+str+"'");
             SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
-#if ( DIM > 2 )
+#if ( DIM > 1 )
             if ( str == "cap" )
             {
                 real cap = 0.2;
                 // distribute points randomly over a portion of the unit sphere:
                 std::vector<Vector> pts(num, Vector(0,0,0));
-                size_t cnt = 0, ouf = 0, max_trials = 1024;
-                real sep0 = std::sqrt( 2 * M_PI * cap / num );
-                do {
-                    // we decrease gradually the separation, to reach a good solution...
-                    sep = 512 * sep0 / real(ouf+512);
-                    cnt = tossPointsCap(pts, cap, sep, 1024);
-                    //std::clog << "tossCap(" << num << ") placed " << cnt << " with sep = " << sep << "\n";
-                } while ( cnt < num && ++ouf < max_trials );
+                size_t cnt = tossPointsCap(pts, cap, 1024);
                 Rotation rot = -Rotation::align111().transposed();
                 for ( size_t i = 0; i < cnt; ++i )
                 {

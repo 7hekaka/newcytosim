@@ -434,25 +434,9 @@ void Aster::build3(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
     // No effect of angle in 1D:
     for ( size_t i = 0; i < nbf; ++i )
         pts[i] = Vector1(2*(i&2)-1);
-#elif ( DIM == 2 )
-    real delta = 2 * angle / real(nbf);
-    // points are evenly distributed in [-aster_angle, aster_angle]
-    real ang = -angle;
-    for ( size_t i = 0; i < nbf; ++i )
-    {
-        pts[i] = Vector(std::cos(ang), std::sin(ang));
-        ang += delta;
-    }
 #else
     // distribute points randomly over a portion of the unit sphere:
-    size_t ouf = 0, max_trials = 1024;
-    real sep, sep0 = std::sqrt( 2 * M_PI * cap / nbf );
-    do {
-        // we decrease gradually the separation, to reach a good solution...
-        sep = 512 * sep0 / real(ouf+512);
-        cnt = tossPointsCap(pts, cap, sep, 1024);
-        //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";
-    } while ( cnt < nbf && ++ouf < max_trials );
+    cnt = tossPointsCap(pts, cap, 1024);
     if ( cnt < nbf )
         std::clog << "warning: aster could only fit " << cnt << " seeds\n";
     //std::clog << "tossCap(" << nbf << ") placed " << cnt << " with sep = " << sep << "\n";

@@ -369,6 +369,34 @@ size_t tossPointsDisc(std::vector<Vector2>& pts, real sep, size_t max_trials)
 }
 
 
+size_t tossPointsCap(std::vector<Vector2>& pts, real cap, real sep, size_t max_trials)
+{
+    assert_true( cap < 2.0 );
+    const real ss = sep * sep;
+    size_t ouf = 0;
+    size_t n = 0;
+    real angle = std::acos(1.0-cap);
+    for ( Vector2& vec : pts )
+    {
+    toss:
+        if ( ++ouf > max_trials )
+            break;
+        
+        real a = angle * RNG.sreal();
+
+        for ( size_t i = 0; i < n; ++i )
+            if ( abs_real(a-pts[i].XX) < ss )
+                goto toss;
+        
+        vec.XX = a;
+        ouf = 0;
+        ++n;
+    }
+    for ( Vector2& vec : pts )
+        vec.set(std::cos(vec.XX), std::sin(vec.XX));
+    return n;
+}
+
 /**
  Generate a random distribution of points over a portion of the unit sphere,
  near (1,0,0) and symmetric around the X-axis, defined by a thickness 'cap'.
