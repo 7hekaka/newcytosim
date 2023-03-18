@@ -457,6 +457,7 @@ void FiberProp::read(Glossary& glos)
 #if NEW_CONFINE_RANGE
                                   {"range",     CONFINE_RANGE},
 #endif
+                                  {"minus_out", CONFINE_MINUS_OUT},
                                   {"plus_out",  CONFINE_PLUS_OUT}});
     
     if ( glos.set(confine_stiff[0], "confine", 1) )

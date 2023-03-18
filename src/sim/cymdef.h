@@ -72,7 +72,8 @@ enum Confinement
     CONFINE_PLUS_END      = 16,  ///< confine plus end of fibers to the surface of the Space
     CONFINE_MINUS_END     = 17,  ///< confine minus end of fibers to the surface of the Space
     CONFINE_BOTH_ENDS     = 18,  ///< confine both ends of fibers to the surface of the Space
-    CONFINE_PLUS_OUT      = 19,  ///< confine the plus end outside the Space
+    CONFINE_MINUS_OUT     = 19,  ///< confine the plus end outside the Space
+    CONFINE_PLUS_OUT      = 20,  ///< confine the plus end outside the Space
     CONFINE_POINT         = 24,  ///< confine first vertex of a Solid to the surface of the Space
     CONFINE_POINT_INSIDE  = 25,  ///< confine first vertex of a Solid, inside the Space
     CONFINE_RANGE         = 26   ///< confine vertices within a range of abscissa to the surface

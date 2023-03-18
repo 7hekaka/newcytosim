@@ -1381,6 +1381,7 @@ static bool confinementApplies(Confinement mode, Space const* spc, Vector const&
         case CONFINE_PLUS_END: return true;
         case CONFINE_MINUS_END: return true;
         case CONFINE_BOTH_ENDS: return true;
+        case CONFINE_MINUS_OUT: return spc->inside(pos);
         case CONFINE_PLUS_OUT: return spc->inside(pos);
         default: return true;
     }
@@ -1399,6 +1400,7 @@ static bool vertexIsConfined(Confinement mode, Fiber const* fib, size_t inx)
         case CONFINE_PLUS_END: return ( inx == fib->lastPoint() );
         case CONFINE_MINUS_END: return ( inx == 0 );
         case CONFINE_BOTH_ENDS: return ( inx == 0 || inx == fib->lastPoint() );
+        case CONFINE_MINUS_OUT: return ( inx == 0 );
         case CONFINE_PLUS_OUT: return ( inx == fib->lastPoint() );
         default: return true;
     }
