@@ -38,6 +38,7 @@ void SolidProp::clear()
 #if NEW_SOLID_HAS_TWIN
     twin_stiffness = 0;
     twin_metastiff = 0;
+    twin_separation = 0;
 #endif
     display = "";
     display_fresh = false;
@@ -99,6 +100,7 @@ void SolidProp::read(Glossary& glos)
 #if NEW_SOLID_HAS_TWIN
     glos.set(twin_stiffness, "twin_stiffness");
     glos.set(twin_metastiff, "twin_metastiff");
+    glos.set(twin_separation, "twin_separation");
 #endif
 
     if ( glos.set(display, "display") )
@@ -148,6 +150,8 @@ void SolidProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":twin_stiffness must be >= 0");
     if ( twin_metastiff < 0 )
         throw InvalidParameter(name()+":twin_metastiff must be >= 0");
+    if ( twin_separation < 0 )
+        throw InvalidParameter(name()+":twin_separation must be >= 0");
 #endif
 }
 
@@ -171,6 +175,7 @@ void SolidProp::write_values(std::ostream& os) const
 #if NEW_SOLID_HAS_TWIN
     write_value(os, "twin_stiffness", twin_stiffness);
     write_value(os, "twin_metastiff", twin_metastiff);
+    write_value(os, "twin_separation", twin_separation);
 #endif
     write_value(os, "display",   "("+display+")");
 }

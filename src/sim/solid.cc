@@ -56,16 +56,36 @@ void Solid::setInteractions(Meca& meca) const
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin )
     {
+        real R0 = radius(0);
+        const real sep = std::max(R0, 0.5*prop->twin_separation);
         const real stiff = prop->twin_stiffness;
-        for ( int i = 1; i <= DIM; ++i )
-            meca.addLink(Mecapoint(this,i), Mecapoint(soTwin, i), stiff);
+        if ( stiff > 0 )
+        {
+            size_t off = matIndex();
+            real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
+            // X = 1 contributes to a distance R*sqrt(DIM) along the X-axis
+            real X = 2 * Q * ( sep/R0 - (1+Q) );
+            for ( int i = 1; i <= DIM; ++i )
+            {
+                real alp[4] = { -DIM*X, X, X, X };
+                alp[i] += 1;
+#if ( DIM == 3 )
+                meca.addLink4(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], alp[3], stiff);
+#elif ( DIM == 2 )
+                meca.addLink3(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], stiff);
+#endif
+            }
+            //meca.addLink(Mecapoint(this,i), Mecapoint(soTwin, i), stiff);
+        }
+        // add clamp to the plane X = 0:
         const real meta = prop->twin_metastiff;
         if ( meta > 0 )
         for ( int i = 1; i <= DIM; ++i )
         {
+            real X = copysign(0.5*prop->twin_separation-R0, *addrPoint(i));
             // this adds an link with the midplane at X = 0
-            meca.addPointClampX(Mecapoint(this,i), 0, meta);
-            meca.addPointClampX(Mecapoint(soTwin, i), 0, meta);
+            meca.addPointClampX(Mecapoint(this, i), X, meta);
+            meca.addPointClampX(Mecapoint(soTwin, i), -X, meta);
         }
     }
 #endif
@@ -752,15 +772,16 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 
     objs.push_back(this);
 
-#if NEW_SOLID_HAS_TWIN
     if ( opt.set(str, "twin") )
     {
-        real R0 = radius(0);
+#if NEW_SOLID_HAS_TWIN
+        real rad = radius(0);
+        real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
+        real sep = std::max(rad*Q, 0.5*prop->twin_separation-rad);
         if ( str == "mirror" )
         {
             // align (1,1,1) with the X axis, translate to bring plate to origin:
-            real X = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-            Isometry iso(Rotation::align111(), Vector(-X*R0, 0, 0));
+            Isometry iso(Rotation::align111(), Vector(-sep, 0, 0));
             ObjectSet::moveObjects(objs, iso);
             if ( !soTwin )
             {
@@ -778,18 +799,23 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             else if ( S->nbPoints() <= DIM )
                 throw InvalidParameter("Solid's twin lacks sufficient points");
         }
-        /* 01.2023: Michelin's chromosomes: create overlapping spheres to outline a silhouette */
-        real len = 2, chi = 0.5;
+        /* 01.2023: Michelin's chromosomes: overlapping spheres outline a silhouette */
+        real len = 2, chi = 0.5; // length, relative position of chiasma
         if ( opt.set(len, "chromosome") )
         {
+            real RAD = 0.200; // upper radius limit reached away from chiasma
+            // chiasma set as second argument
             opt.set(chi, "chromosome", 1);
-            for ( int i = 0; i < 16; ++i )
+            opt.set(RAD, "chromosome", 2);
+            for ( int i = 0; i < 18; ++i )
             {
-                real y = ( i / 15.0 ) * len - chi; // in [-chi, len-chi]
-                if ( abs_real(y) > M_SQRT2*R0 )
+                real y = ( i / 17.0 ) * len - chi; // in [-chi, len-chi]
+                if ( abs_real(y) > rad )
                 {
-                    real R = R0 * ( 2.0 + std::tanh(5.0 * abs_real(y) - M_SQRT2) ); // in [1, 3]
-                    addSphere(Vector(-R, y, 0), R);
+                    real T = 0.5 * std::tanh(5.0*abs_real(y)-M_SQRT2) + 0.5; // in [0, 1]
+                    real R = rad + ( RAD - rad ) * T; // in [R0, R1]
+                    real X = sep + ( RAD - sep ) * T; // in [sep, R1];
+                    addSphere(Vector(-std::max(X,R), y, 0), R);
                     /* Could add chromokinesins here */
                     //addTriad(R);
                 }
@@ -800,8 +826,10 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             // flip 'S' (X -> -X) resulting in the twins being mirror-images
             ObjectSet::rotateObjects(objs, Rotation::flipX());
         }
-    }
+#else
+        throw InvalidParameter("Solid's twin code is not enabled");
 #endif
+    }
     fixShape();
     return objs;
 }
