@@ -7,6 +7,11 @@
 #include <cctype>
 #include <algorithm>
 
+/**
+ The alignment of the vertical bar should match the one in `PREF`
+ */
+static const int INDENT = 10;
+
 void StreamFunc::clean_stream(std::ostream& os, std::istream& is)
 {
     char c = 0;
@@ -132,25 +137,25 @@ void StreamFunc::prefix_lines(std::ostream& os, std::istream& is, const char pre
 }
 
 
-/**
- The alignment of the vertical bar should match the one in PREF
- */
 static void print_first_line(std::ostream& os, size_t num, std::string const& line)
 {
-    os << " in" << std::setw(6) << num << " | " << line << '\n';
+    os << " in" << std::setw(INDENT-4) << num << " | " << line << '\n';
 }
 
-/**
- The alignment of the vertical bar should match the one in PREF
- */
+
 static void print_other_line(std::ostream& os, size_t num, std::string const& line)
 {
-    os << std::setw(9) << num << " | " << line << '\n';
+    os << std::setw(INDENT-1) << num << " | " << line << '\n';
 }
 
-/**
- The alignment of the vertical bar should match the one in PREF
- */
+
+static void print_last_line(std::ostream& os, size_t num, std::string const& line)
+{
+    os << std::setw(INDENT+6) << "...\n";
+    os << std::setw(INDENT-1) << num << " | " << line << '\n';
+}
+
+
 static void print_other_line(std::ostream& os, const char prefix[], std::string const& line)
 {
     if ( prefix && *prefix )
@@ -213,7 +218,7 @@ std::string StreamFunc::marked_line(std::istream& is, std::streampos pos, const 
  Each line is printed in full and preceded with a line number
  */
 void StreamFunc::print_lines(std::ostream& os, std::istream& is,
-                             std::streampos start, std::streampos end)
+                             std::streampos start, std::streampos end, bool all)
 {
     if ( !is.good() )
         is.clear();
@@ -234,10 +239,12 @@ void StreamFunc::print_lines(std::ostream& os, std::istream& is,
     {
         std::getline(is, line);
         ++cnt;
-        if ( !std::all_of(line.begin(),line.end(),isspace) )
+        bool print = all && !std::all_of(line.begin(), line.end(), isspace);
+        if ( print )
             print_other_line(os, cnt, line);
     }
-
+    if ( !all )
+        print_last_line(os, cnt, line);
     is.clear();
     is.seekg(isp);
 }
@@ -246,9 +253,18 @@ void StreamFunc::print_lines(std::ostream& os, std::istream& is,
 std::string StreamFunc::extract_lines(std::istream& is, std::streampos s, std::streampos e)
 {
     std::ostringstream oss;
-    print_lines(oss, is, s, e);
+    print_lines(oss, is, s, e, true);
     return oss.str();
 }
+
+
+std::string StreamFunc::indicate_lines(std::istream& is, std::streampos s, std::streampos e)
+{
+    std::ostringstream oss;
+    print_lines(oss, is, s, e, false);
+    return oss.str();
+}
+
 
 
 std::string StreamFunc::extract_line(std::istream& is, std::streampos pos, size_t& cnt)
@@ -284,7 +300,7 @@ void StreamFunc::print_line(std::ostream& os, std::istream& is, std::streampos p
 {
     size_t cnt;
     std::string line = extract_line(is, pos, cnt);
-    os << "line" << std::setw(6) << cnt << " | " << line << '\n';
+    os << "line" << std::setw(INDENT-5) << cnt << " | " << line << '\n';
 }
 
 

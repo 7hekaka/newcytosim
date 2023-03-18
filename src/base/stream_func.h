@@ -39,10 +39,13 @@ namespace StreamFunc
     void print_line(std::ostream&, std::istream&, std::streampos pos);
     
     /// extract the lines located between `start` and `end`, with line numbers
-    void print_lines(std::ostream&, std::istream&, std::streampos start, std::streampos end);
+    void print_lines(std::ostream&, std::istream&, std::streampos start, std::streampos end, bool all);
     
     /// same as print_lines(), but output is returned as a string
     std::string extract_lines(std::istream&, std::streampos start, std::streampos end);
+    
+    /// indicate line number and first line
+    std::string indicate_lines(std::istream&, std::streampos start, std::streampos end);
     
     /// return number of lines in stream
     size_t number_lines(std::istream&);

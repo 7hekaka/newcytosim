@@ -54,6 +54,12 @@ public:
             return "Error in `" + file_ + "' : " + msg_;
     }
     
+    /// return size of supplementary message
+    size_t has_info() const
+    {
+        return info_.size();
+    }
+    
     /// return supplementary message
     std::string info() const
     {
@@ -116,8 +122,8 @@ public:
         msg_ = oss.str();
     }
     
-    /// append string to info
-    void file(const std::string& f)
+    /// define file
+    void set_file(const std::string& f)
     {
         file_ = f;
     }

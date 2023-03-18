@@ -50,7 +50,7 @@ void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t
             // also report to standard error:
             print_yellow(std::cerr, war);
             std::cerr << '\n';
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg());
+            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg(), true);
         }
     }
 }
@@ -1385,8 +1385,11 @@ void Parser::readConfig(std::istream& is, std::string const& filename)
     }
     catch( Exception & e )
     {
-        e.file(filename);
-        e << "\n" + StreamFunc::extract_lines(is, ipos, is.tellg());
+        e.set_file(filename);
+        if ( e.has_info() )
+            e << "\n" + StreamFunc::indicate_lines(is, ipos, is.tellg());
+        else
+            e << "\n" + StreamFunc::extract_lines(is, ipos, is.tellg());
         throw;
     }
     sim_->parser(back);
