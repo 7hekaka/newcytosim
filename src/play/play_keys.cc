@@ -42,7 +42,7 @@ static void changeStyle(PointDisp * p, int)
 
 static void changeColoring(PointDisp* p, int)
 {
-    p->coloring = ( p->coloring + 1 ) % 3;
+    p->coloring = ( p->coloring + 1 ) % 4;
     flashText("%s:coloring = %i", p->name_str(), p->coloring);
 }
 
