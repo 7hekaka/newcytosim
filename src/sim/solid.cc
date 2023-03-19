@@ -57,14 +57,14 @@ void Solid::setInteractions(Meca& meca) const
     if ( soTwin )
     {
         real R0 = radius(0);
-        const real sep = std::max(R0, 0.5*prop->twin_separation);
+        constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
+        const real sep = std::max(real(0), 0.5*prop->twin_separation-R0*(1+Q));
         const real stiff = prop->twin_stiffness;
         if ( stiff > 0 )
         {
             size_t off = matIndex();
-            real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
             // X = 1 contributes to a distance R*sqrt(DIM) along the X-axis
-            real X = 2 * Q * ( sep/R0 - (1+Q) );
+            real X = 2 * Q * sep / R0;
             for ( int i = 1; i <= DIM; ++i )
             {
                 real alp[4] = { -DIM*X, X, X, X };
@@ -82,7 +82,7 @@ void Solid::setInteractions(Meca& meca) const
         if ( meta > 0 )
         for ( int i = 1; i <= DIM; ++i )
         {
-            real X = copysign(0.5*prop->twin_separation-R0, *addrPoint(i));
+            real X = copysign(sep, *addrPoint(i));
             // this adds an link with the midplane at X = 0
             meca.addPointClampX(Mecapoint(this, i), X, meta);
             meca.addPointClampX(Mecapoint(soTwin, i), -X, meta);
@@ -776,7 +776,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     {
 #if NEW_SOLID_HAS_TWIN
         real rad = radius(0);
-        real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
+        constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
         real sep = std::max(rad*Q, 0.5*prop->twin_separation-rad);
         if ( str == "mirror" )
         {
