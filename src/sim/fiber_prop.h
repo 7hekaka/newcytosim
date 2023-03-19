@@ -21,7 +21,7 @@ class Space;
 #define OLD_DYNAMIC_ZONE     0
 #define OLD_SQUEEZE_FORCE    0
 #define NEW_COLINEAR_FORCE   0
-#define NEW_FIBER_END_CHEW   0
+#define NEW_FIBER_END_CHEW   1
 #define NEW_FIBER_CONFINE2   0
 #define NEW_CONFINE_RANGE    0
 #define NEW_FIBER_END_FORCE  0
@@ -332,10 +332,10 @@ public:
 #endif
     
 #if NEW_FIBER_END_FORCE
-    /// the force vector added to an end of the fiber
-    Vector end_force;
     /// the fiber end to which a force is added (set as end_force[1])
     FiberEnd end_force_mode;
+    /// the force vector added to an end of the fiber
+    Vector end_force;
 #endif
     
 #if NEW_FIBER_LOOP

@@ -19,7 +19,7 @@ set space cell
 
 new cell
 {
-    length = 10
+    length = 7
     diameter = 5
 }
 
@@ -27,7 +27,7 @@ new cell
 
 set fiber microtubule
 {
-    rigidity = 20
+    rigidity = 100
     segmentation = 0.5
     display = ( color=white; line_width=1; )
 }
@@ -40,7 +40,7 @@ set hand ndc80
     unbinding = 0, inf  % force is high on kinetochore-MTs
     track_end = plus_end
     activity = nucleate
-    nucleate = 33, microtubule, ( length=1.41; )
+    nucleate = 33, microtubule, ( length=3; )
     display = ( color=white; size=4; )
 }
 
@@ -121,20 +121,9 @@ run 100 system
 
 % -------------------------- ANCHORS -----------------------------
 
-set space rail
-{
-    shape = square
-    display = ( color = red )
-}
-
-new rail
-{
-    length = 4, 0
-}
-
 change microtubule
 {
-    confine = minus_end, 1000, rail
+    end_force = both_ends, 3 0 0
 }
 
 run 1000000 system
