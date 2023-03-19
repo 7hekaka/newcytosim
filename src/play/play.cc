@@ -172,6 +172,8 @@ int main(int argc, char* argv[])
     int mode = STANDARD;
     int fullscreen = 0;
     Glossary arg;
+    std::string name = "Cytosim     ";
+    name += FilePath::get_cwd();
     
     Cytosim::out.silent();
     Cytosim::log.silent();
@@ -224,7 +226,10 @@ int main(int argc, char* argv[])
     }
     
     if ( arg.use_key("live") || arg.has_key(".cym") )
+    {
+        arg.peek(name, ".cym");
         player.goLive = true;
+    }
     
     if ( arg.has_key(".cmi") )
         simul.prop.system_file = arg.value(".cmi");
@@ -279,6 +284,7 @@ int main(int argc, char* argv[])
     // change working directory if specified:
     if ( arg.has_key("directory") )
     {
+        arg.peek(name, "directory");
         FilePath::change_dir(arg.value("directory"));
         //std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
     }
@@ -441,7 +447,7 @@ int main(int argc, char* argv[])
     glApp::actionFunc(processMouseClick);
     glApp::actionFunc(processMouseDrag);
     glApp::normalKeyFunc(processNormalKey);
-    glApp::newWindow(drawLive, drawMag);
+    glApp::newWindow(name.c_str(), drawLive, drawMag);
 
     if ( mode & SAVE_MOVIE )
     {

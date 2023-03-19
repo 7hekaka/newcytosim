@@ -3,7 +3,6 @@
 
 #include "glut.h"
 #include "glapp.h"
-#include <unistd.h>
 #include "exceptions.h"
 #include "glossary.h"
 #include "time_date.h"
@@ -177,7 +176,7 @@ void glApp::maximizeWindow()
  @todo: share OpenGL context between new window and main one,
  which is possible with GLFW
  */
-int glApp::newWindow()
+int glApp::newWindow(const char name[])
 {
     View & view = views[0];
     
@@ -201,12 +200,7 @@ int glApp::newWindow()
     glutInitWindowPosition(view.window_position[0], view.window_position[1]);
     
     // create window with title containing current working directory:
-    int win = 0;
-    char str[256] = "Cytosim     ";
-    if ( getcwd(str+10, 246) )
-        win = glutCreateWindow(str);
-    else
-        win = glutCreateWindow("Cytosim");
+    int win = glutCreateWindow(name);
     assert_true( win > 0 );
     //std::clog << "new window " << win << '\n';
 
@@ -236,16 +230,16 @@ int glApp::newWindow()
     return win;
 }
 
-int glApp::newWindow(int (*func)(View&))
+int glApp::newWindow(const char name[], int (*func)(View&))
 {
-    int win = newWindow();
+    int win = newWindow(name);
     views[win].setDisplayFunc(func);
     return win;
 }
 
-int glApp::newWindow(int (*func)(View&), void (*mag)(View&))
+int glApp::newWindow(const char name[], int (*func)(View&), void (*mag)(View&))
 {
-    int win = newWindow();
+    int win = newWindow(name);
     views[win].setDisplayFunc(func);
     views[win].setDrawMagFunc(mag);
     return win;

@@ -23,13 +23,16 @@ namespace glApp
     void setDimensionality(int d);
     
     /// create new window
-    int newWindow();
+    int newWindow(const char name[]);
+
+    /// create new window with display functions `func` and `mag`
+    int newWindow(const char name[], int (*func)(View&), void (*mag)(View&));
 
     /// create new window with display function `func`
-    int newWindow(int (*func)(View&));
-    
-    /// create new window with display functions `func` and `mag`
-    int newWindow(int (*func)(View&), void (*mag)(View&));
+    int newWindow(const char name[], int (*func)(View&));
+
+    /// create new window with display function `func`
+    inline int newWindow(int (*func)(View&)) { return newWindow("Cytosim", func); }
 
     /// destroy window
     void deleteWindow(int win);
