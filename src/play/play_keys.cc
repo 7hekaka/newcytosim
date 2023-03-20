@@ -764,6 +764,7 @@ void processKey(unsigned char key, int modifiers = 0)
     View & view = glApp::currentView();
     
     const bool altKeyDown = modifiers & GLUT_ACTIVE_ALT;
+    const bool shiftKeyDown = modifiers & GLUT_ACTIVE_SHIFT;
     /*
      In the switch below:
      - use break if the display need to be refreshed,
@@ -1055,7 +1056,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
 
         case '1':
-            if ( altKeyDown )
+            if ( altKeyDown || shiftKeyDown )
                 setFiberDisp(player.allVisibleFiberDisp(), changePointStyle, 5);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeLineStyle, 1);
@@ -1066,7 +1067,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case '2':
-            if ( altKeyDown)
+            if ( altKeyDown || shiftKeyDown )
                 setFiberDisp(player.allVisibleFiberDisp(), changePointSize, -1);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, -1);
@@ -1077,7 +1078,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
 
         case '3':
-            if ( altKeyDown)
+            if ( altKeyDown || shiftKeyDown )
                 setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 1);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, 1);
@@ -1102,7 +1103,7 @@ void processKey(unsigned char key, int modifiers = 0)
         //------------------------ Solid, Bead & Sphere ------------------------
   
         case '5':
-            if ( altKeyDown )
+            if ( altKeyDown || shiftKeyDown )
                 shufflePointDispVisible(player.allSphereDisp(), 1);
             else
                 setPointDisp(player.allVisibleSphereDisp(), changeStyle, 0);
@@ -1137,7 +1138,10 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case '8':
-            changePointDispSize(player.allVisibleHandDisp(), -1, 1, 1);
+            if ( shiftKeyDown )
+                changePointDispSize(player.allVisibleHandDisp(), -1, 0, 1);
+            else
+                changePointDispSize(player.allVisibleHandDisp(), -1, 1, 1);
             break;
             
         case '*':
@@ -1145,7 +1149,10 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case '9':
-            changePointDispSize(player.allVisibleHandDisp(), +1, 1, 1);
+            if ( shiftKeyDown )
+                changePointDispSize(player.allVisibleHandDisp(), +1, 0, 1);
+            else
+                changePointDispSize(player.allVisibleHandDisp(), +1, 1, 1);
             break;
 
         case '(':
@@ -1153,7 +1160,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
 
         case '0':
-            if ( altKeyDown )
+            if ( altKeyDown || shiftKeyDown )
                 setPointDispVisible(player.allHandDisp(), 1);
             else
                 shufflePointDispVisible(player.allHandDisp(), 1);
