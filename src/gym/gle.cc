@@ -28,7 +28,7 @@ namespace gle
     GLuint buf_[4] = { 0 };
 
     /// offset for objects data stored in buffers
-    size_t tubes_[24] = { 0 };
+    size_t tubes_[26] = { 0 };
 
     /// offset for objects data stored in buffers
     size_t cubes_[12] = { 0 };
@@ -1290,7 +1290,7 @@ namespace gle
         flu[i++] = { 1, 0, Z, 0, 0, N };
         for( size_t n = inc; n < pi_once; n += inc )
         {
-            float S = std::copysign(sin_(n), N), C = cos_(n);
+            float S = N * sin_(n), C = cos_(n);
             flu[i++] = { C,  S, Z, 0, 0, N };
             flu[i++] = { C, -S, Z, 0, 0, N };
         }
@@ -1298,9 +1298,26 @@ namespace gle
         return i;
     }
     
+    /// set triangle strip for a hollow disc at Z, with radius [ 1, R ] assuming R > 1
+    size_t setRing(flute6* flu, size_t inc, float R, float Z, float N)
+    {
+        size_t i = 0;
+        flu[i++] = { 1, 0, Z, 0, 0, N };
+        flu[i++] = { R, 0, Z, 0, 0, N };
+        for( size_t n = inc; n < pi_twice; n += inc )
+        {
+            float S = sin_(n), C = cos_(n);
+            flu[i++] = { C, S, Z, 0, 0, N };
+            flu[i++] = { R*C, R*S, Z, 0, 0, N };
+        }
+        flu[i++] = { 1, 0, Z, 0, 0, N };
+        flu[i++] = { R, 0, Z, 0, 0, N };
+        return i;
+    }
+
     static size_t sizeTubeBuffers()
     {
-        return 26 * pi_twice;  // this is empirical!
+        return 2 + 27 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)
@@ -1337,6 +1354,7 @@ namespace gle
         tubes_[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
         tubes_[22] = i+s; i += setDisc(ptr+i, 2, 0, -1);
         tubes_[23] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
+        tubes_[24] = i+s; i += setRing(ptr+i, 2, M_SQRT2, 0, 1);
         assert_true( i <= sizeTubeBuffers() );
         return i;
     }
@@ -1384,6 +1402,7 @@ namespace gle
     void discBottom1()   { doTubeStrip(tubes_[21], pi_twice); }
     void discBottom2()   { doTubeStrip(tubes_[22], pi_twice/2); }
     void discMid2()      { doTubeStrip(tubes_[23], pi_twice/2); }
+    void ring()          { doTubeStrip(tubes_[24], 2+pi_twice); }
 
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
     void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }

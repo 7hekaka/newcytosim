@@ -70,7 +70,7 @@ private:
     std::string mKind;
     
     /// draw outline of shape
-    void strokeShape(float w) const { gle::circle1(w); /*gym::zoo_stroke(shape);*/ }
+    void strokeShape(float w) const { gle::ring(); /*gym::zoo_stroke(shape);*/ }
     
     /// draw surface of shape
     void paintShape() const { gle::disc(); /*gym::zoo_paint(shape);*/ }

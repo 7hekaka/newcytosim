@@ -87,7 +87,9 @@ namespace gle
     void discBottom2();
     /// draw 2D disc of radius 1 in XY plane, at Z = 0.5
     void discMid2();
-    
+    /// draw 2D disc covering radius [1, 1.2] in XY plane, at Z = 0
+    void ring();
+
     /// draw nice 2D disc of radius 1 in XY plane, with +Z as normal
     inline void disc() { disc1(); }
 

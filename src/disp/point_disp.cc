@@ -119,7 +119,7 @@ void PointDisp::strokeA(float w) const
             const float X = -52.35 * G;
             const float Y = ( islower(symbol) ? -35 : -50 ) * G;
             gym::color(colorS);
-            fgStrokeCharacter(X, Y, G, 1, symbol, w, w);
+            fgStrokeCharacter(X, Y, G, 1, symbol, 3, 3);
         }
     }
 }
