@@ -58,7 +58,7 @@ void Solid::setInteractions(Meca& meca) const
     {
         real R0 = radius(0);
         constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-        const real sep = std::max(real(0), 0.5*prop->twin_separation-R0*(1+Q));
+        const real sep = std::max(real(0), prop->twin_separation/2-R0*(1+Q));
         const real stiff = prop->twin_stiffness;
         if ( stiff > 0 )
         {
@@ -777,7 +777,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 #if NEW_SOLID_HAS_TWIN
         real rad = radius(0);
         constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-        real sep = std::max(rad*Q, 0.5*prop->twin_separation-rad);
+        real sep = std::max(rad*Q, prop->twin_separation/2-rad);
         if ( str == "mirror" )
         {
             // align (1,1,1) with the X axis, translate to bring plate to origin:
