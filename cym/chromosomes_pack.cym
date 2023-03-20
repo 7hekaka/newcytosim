@@ -6,7 +6,7 @@
 set simul system
 {
     viscosity = 0.1
-    time_step = 0.005
+    time_step = 0.01
     steric = 1, 555, 222
     display = ( size=1024,1024; point_value=0.01; style=3; )
 }
@@ -22,8 +22,6 @@ new cell
     length = 7
     diameter = 5
 }
-
-% ------------------------ MICROTUBULE -------------------------
 
 set fiber microtubule
 {
@@ -47,8 +45,8 @@ set hand ndc80
 set single core
 {
     hand = ndc80
-    stiffness = 777
-    anchor_stiffness = 444
+    stiffness = 7777
+    anchor_stiffness = 333
     diffusion = 10
 }
 
@@ -56,20 +54,12 @@ set solid kinetochore
 {
     steric = 1
     source = 5, augmin
-    twin_stiffness = 444
-    twin_separation = 0.6
-    display = ( coloring=1; color=0x00FFFF44; size=2; style=1; )
+    twin_stiffness = 999
+    twin_separation = 0.5
+    display = ( coloring=1; color=0x00FFFF44; size=2; style=3; )
 }
 
 % ---------------------- CHROMOSOMES ------------------------
-
-new 0 kinetochore
-{
-    sphere1 = 0 0 0, 0.100, core -0.58 -0.58 -0.58
-    position = cylinder 0.5 2.0
-    direction = X blur 0.5
-    twin = mirror
-}
 
 repeat 2 {
 new kinetochore
@@ -126,8 +116,8 @@ change microtubule
     end_force = both_ends, 3 0 0
 }
 
-run 1000000 system
+run 10000 system
 {
-    nb_frames = 1000
+    nb_frames = 100
 }
 

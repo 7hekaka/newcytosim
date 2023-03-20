@@ -4,10 +4,10 @@
 set simul system
 {
     kT = 0.0042
-    viscosity = 0.5
+    viscosity = 1.0
     time_step = 0.005
     steric = 1, 555, 222
-    display = ( size=2048,1280; point_value=0.01; )
+    display = ( size=1280, 512; point_value=0.01; style=3; zoom=3; )
 }
 
 set space cell
@@ -18,16 +18,16 @@ set space cell
 
 new cell
 {
-    length = 4
+    length = 8
     radius = 1
 }
 
 set fiber microtubule
 {
     rigidity = 20
-    segmentation = 0.5
+    segmentation = 0.25
     steric = 1, 0.025, 0.020
-    display = ( color=white; line_width=1; coloring=2; )
+    display = ( color=white; line_width=2.5; coloring=2; style=stripe; )
 }
 
 % ------------------------- KINESIN-5 --------------------------
@@ -40,7 +40,7 @@ set hand para_kinesin
     activity = mighty
     unloaded_speed = 0.060
     stall_force = 5
-    display = ( color=blue; size=1.5; )
+    display = ( color=blue; size=2; )
 }
 
 set couple parakin
@@ -63,7 +63,7 @@ set hand anti_kinesin
     unloaded_speed = 0.060
     stall_force = 5
     rescue_chance = 0.0125
-    display = ( color=orange; size=1.5; )
+    display = ( color=orange; size=2; )
 }
 
 set couple antikin
@@ -86,7 +86,7 @@ set hand minus_kinesin
     activity = move
     unloaded_speed = -0.360
     stall_force = 5
-    display = ( color=green; size=0.5; )
+    display = ( color=green; size=2; )
 }
 
 set hand slider
@@ -97,7 +97,7 @@ set hand slider
     hold_growing_end = 1
     hold_shrinking_end = 1
     mobility = 1
-    display = ( color=white; size=0.5; )
+    display = ( color=white; size=2; )
 }
 
 set couple NCD
@@ -112,15 +112,18 @@ set couple NCD
 
 % -------------------------- SYSTEM! ---------------------------
 
-new 100 parakin
-new 800 antikin
-new 360 NCD
+new 500 parakin
+new 2000 antikin
+new 1000 NCD
 
-new 2 microtubule
+repeat 12 {
+new microtubule
 {
-    length = 2
-    position = ball 0.1
-    direction = 1 0 0, 1 0 0
+    length = 3, 2
+    position = 0 0 0
+    direction = X
+}
+run 10 system
 }
 
 run 200000 system
