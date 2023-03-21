@@ -26,6 +26,7 @@ DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p)
 
 DynamicFiber::~DynamicFiber()
 {
+    //std::clog << "chewed " << abscissaM() << "\n";
 }
 
 
@@ -33,7 +34,7 @@ real DynamicFiber::chewingUnits(int end)
 {
 #if NEW_FIBER_END_CHEW
     const real sup = prop()->max_chewing_speed_dt;
-    real res = sup * std::tanh(fChew[end]/sup) / prop()->unit_length;
+    real res = std::tanh(fChew[end]/sup) * (sup/prop()->unit_length);
     fChew[end] = 0;
     return res;
 #else
@@ -58,7 +59,7 @@ void DynamicFiber::initM()
 
 
 state_t DynamicFiber::calculateStateM() const
-{ 
+{
     return 4 - unitM[0] - 2 * unitM[1];
 }
 
@@ -113,10 +114,10 @@ void DynamicFiber::removeUnitM()
  */
 int DynamicFiber::stepMinusEnd()
 {
-	constexpr size_t M = 1;
-	int res = 0;
+    constexpr size_t M = 1;
+    int res = 0;
     
-#if NEW_FIBER_END_CHEW
+#if NEW_FIBER_END_CHEW & 2
     real chewed = 0;
     if ( fChew[M] > 0 )
     {
@@ -128,27 +129,27 @@ int DynamicFiber::stepMinusEnd()
 #endif
     
     if ( mStateM == STATE_RED )
-	{
-		nextShrinkM -= prop()->shrinking_rate_dt[M] + chewed;
-		while ( nextShrinkM <= 0 )
+    {
+        nextShrinkM -= prop()->shrinking_rate_dt[M] + chewed;
+        while ( nextShrinkM <= 0 )
         {
             removeUnitM();
-			--res;
-		}
-	}
+            --res;
+        }
+    }
     else if ( mStateM > STATE_WHITE )
-	{
-		// calculate the force acting on the point at the end:
-		real forceM = projectedForceEndM();
+    {
+        // calculate the force acting on the point at the end:
+        real forceM = projectedForceEndM();
 
-		// growth is reduced if free monomers are scarce:
-		real growth = prop()->growing_rate_dt[M] * prop()->free_polymer;
+        // growth is reduced if free monomers are scarce:
+        real growth = prop()->growing_rate_dt[M] * prop()->free_polymer;
 
-		// antagonistic force (< 0) decreases assembly rate exponentially
-		if (( forceM < 0 ) & ( growth > 0 ))
-			growth *= std::exp(forceM*prop()->growing_force_inv[M]);
+        // antagonistic force (< 0) decreases assembly rate exponentially
+        if (( forceM < 0 ) & ( growth > 0 ))
+            growth *= std::exp(forceM*prop()->growing_force_inv[M]);
 
-		real hydrol = prop()->hydrolysis_rate_2dt[M];
+        real hydrol = prop()->hydrolysis_rate_2dt[M];
 
 #if OLD_DYNAMIC_ZONE
         // change Hydrolysis rate if plus end is far from origin:
@@ -159,12 +160,12 @@ int DynamicFiber::stepMinusEnd()
             hydrol = prop()->zone_hydrolysis_rate_2dt[M];
 #endif
 
-		// @todo detach_rate should depend on the state of the subunit
-		real shrink = prop()->growing_off_rate_dt[M] + chewed;
+        // @todo detach_rate should depend on the state of the subunit
+        real shrink = prop()->growing_off_rate_dt[M] + chewed;
 
-		nextGrowthM -= growth;
-		nextShrinkM -= shrink;
-		nextHydrolM -= hydrol;
+        nextGrowthM -= growth;
+        nextShrinkM -= shrink;
+        nextHydrolM -= hydrol;
         
         while (( nextGrowthM < 0 ) | ( nextShrinkM < 0 ) | ( nextHydrolM < 0 ))
         {
@@ -178,33 +179,33 @@ int DynamicFiber::stepMinusEnd()
                     ii = 2;
             }
             //printf("%s %6.2f %6.2f %6.2f: %i\n", reference().c_str(), nextGrowthM, nextHydrolM, nextShrinkM, ii);
-			switch ( ii )
-			{
-				case 0:
+            switch ( ii )
+            {
+                case 0:
                     assert_true(nextGrowthM < 0);
-					// add fresh unit, shifting old terminal to penultimate position
+                    // add fresh unit, shifting old terminal to penultimate position
                     addUnitM();
-					++res;
-					break;
+                    ++res;
+                    break;
 
-				case 1:
+                case 1:
                     assert_true(nextHydrolM < 0);
-					// hydrolyze one of the unit with equal chance:
-					unitM[RNG.flip()] = 0;
-					nextHydrolM += RNG.exponential();
-					break;
+                    // hydrolyze one of the unit with equal chance:
+                    unitM[RNG.flip()] = 0;
+                    nextHydrolM += RNG.exponential();
+                    break;
 
-				case 2:
+                case 2:
                     assert_true(nextShrinkM < 0);
                     // remove last unit, while penultimate position can be a GTP survivor
                     removeUnitM();
-					--res;
-					break;
+                    --res;
+                    break;
 
-			}
-			mStateM = calculateStateM();
-		}
-	}
+            }
+            mStateM = calculateStateM();
+        }
+    }
     return res;
 }
 
@@ -294,7 +295,7 @@ int DynamicFiber::stepPlusEnd()
     constexpr size_t P = 0;
     int res = 0;
     
-#if NEW_FIBER_END_CHEW
+#if NEW_FIBER_END_CHEW & 1
     real chewed = 0;
     if ( fChew[P] > 0 )
     {
@@ -311,7 +312,7 @@ int DynamicFiber::stepPlusEnd()
         while ( nextShrinkP <= 0 )
         {
             removeUnitP();
-			--res;
+            --res;
         }
     }
     else
@@ -400,7 +401,7 @@ void DynamicFiber::step()
     }
     else if ( mStateM == STATE_WHITE )
     {
-#if NEW_FIBER_END_CHEW
+#if NEW_FIBER_END_CHEW & 2
         if ( fChew[M] > 0 )
         {
             nextShrinkM -= chewingUnits(M);
@@ -434,7 +435,7 @@ void DynamicFiber::step()
     }
     else if ( mStateP == STATE_WHITE )
     {
-#if NEW_FIBER_END_CHEW
+#if NEW_FIBER_END_CHEW & 1
         if ( fChew[P] > 0 )
         {
             nextShrinkP -= chewingUnits(P);
