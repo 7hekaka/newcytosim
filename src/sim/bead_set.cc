@@ -7,6 +7,29 @@
 #include "simul.h"
 
 
+void BeadSet::step()
+{
+#if ( 0 )
+    for ( Bead * B = first(); B; B=B->next() )
+        B->step();
+#endif
+#if NEW_SOLID_MAKE_COUPLE
+    static float nextCreation = RNG.exponential();
+    for ( Bead * B = first(); B; B=B->next() )
+    {
+        nextCreation -= B->prop->source_rate_dt;
+        while ( nextCreation <= 0 )
+        {
+            nextCreation += RNG.exponential();
+            Single * S = B->prop->source_single->newSingle();
+            S->setPosition(B->position());
+            simul_.couples.add(S);
+        }
+    }
+#endif
+}
+
+
 Property* BeadSet::newProperty(const std::string& cat, const std::string& nom, Glossary&) const
 {
     if ( cat == "bead" )

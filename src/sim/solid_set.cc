@@ -20,7 +20,7 @@ void SolidSet::step()
         while ( nextCreation <= 0 )
         {
             nextCreation += RNG.exponential();
-            Couple * C = S->prop->source_prop->newCouple();
+            Couple * C = S->prop->source_couple->newCouple();
             size_t p = RNG.pint32(S->nbPoints());
             C->setPosition(S->posPoint(p));
             C->activate();

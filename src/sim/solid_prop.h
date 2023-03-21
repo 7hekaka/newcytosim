@@ -8,6 +8,7 @@
 #include "property.h"
 #include "vector.h"
 
+class SingleProp;
 class CoupleProp;
 class PointDisp;
 class Space;
@@ -130,7 +131,9 @@ public:
     real source_rate_dt;
     
     /// type
-    CoupleProp * source_prop;
+    CoupleProp * source_couple;
+    /// type
+    SingleProp * source_single;
 #endif
 
 private:

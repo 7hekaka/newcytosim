@@ -32,7 +32,8 @@ void SolidProp::clear()
 #if NEW_SOLID_MAKE_COUPLE
     source_rate = 0;
     source_type = "none";
-    source_prop = nullptr;
+    source_couple = nullptr;
+    source_single = nullptr;
     source_rate_dt = 0;
 #endif
 #if NEW_SOLID_HAS_TWIN
@@ -140,9 +141,14 @@ void SolidProp::complete(Simul const& sim)
     
 #if NEW_SOLID_MAKE_COUPLE
     if ( source_type == "none" )
-        source_prop = nullptr;
-    else
-        source_prop = sim.findProperty<CoupleProp>("couple", source_type);
+    {
+        source_couple = nullptr;
+        source_single = nullptr;
+    }
+    else {
+        source_couple = sim.findProperty<CoupleProp>("couple", source_type);
+        source_single = sim.findProperty<SingleProp>("single", source_type);
+    }
     source_rate_dt = source_rate * time_step(sim);
 #endif
 #if NEW_SOLID_HAS_TWIN
