@@ -1146,9 +1146,9 @@ void Fiber::makeAttachedHands(ObjectList& objs, std::string const& name, size_t 
     SingleProp * sip = static_cast<SingleProp*>(sim.properties.find("single", name));
     CoupleProp * cop = static_cast<CoupleProp*>(sim.properties.find("couple", name));
     if ( sip && cop )
-        throw InvalidParameter("ambiguous fiber:attach single/couple `"+name+"'");
+        throw InvalidParameter("ambiguous single/couple `"+name+"' specified in fiber:attach");
     if ( !sip && !cop )
-        throw InvalidParameter("could not find single/couple specified in fiber:attach `"+name+"'");
+        throw InvalidParameter("could not find single/couple `"+name+"' specified in fiber:attach");
     
     // variables defining an abscissa:
     int mod = 7;

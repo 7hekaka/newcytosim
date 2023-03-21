@@ -146,8 +146,10 @@ void SolidProp::complete(Simul const& sim)
         source_single = nullptr;
     }
     else {
-        source_couple = sim.findProperty<CoupleProp>("couple", source_type);
-        source_single = sim.findProperty<SingleProp>("single", source_type);
+        source_single = static_cast<SingleProp*>(sim.properties.find("single", source_type));
+        source_couple = static_cast<CoupleProp*>(sim.properties.find("couple", source_type));
+        if ( !source_single && !source_couple )
+            throw InvalidParameter("could not find single/couple `"+source_type+"' specified as source[1]");
     }
     source_rate_dt = source_rate * time_step(sim);
 #endif
