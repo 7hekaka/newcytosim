@@ -575,51 +575,41 @@ void View::loadView() const
  */
 void View::sliceView(int mode) const
 {
+    if ( 0 == ( mode & 7 ))
+        return;
     real off = 0.5;
+    gym::ref_view();
+    Vector3 V = depthAxis();
     switch ( mode )
     {
-        case 1: {
-            gym::ref_view();
-            Vector3 V = depthAxis();
+        case 1:
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, off);
-        } break;
-        case 2: {
-            gym::ref_view();
-            Vector3 V = -depthAxis();
-            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, off);
+        break;
+        case 2:
+            gym::enableClipPlane(2,-V.XX,-V.YY,-V.ZZ,-off);
             setFog(1, 1, fog_color);
-        } break;
-        case 3: {
-            gym::ref_view();
-            Vector3 V = depthAxis();
+        break;
+        case 3:
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, off);
             if ( !depth_clamp )
                 setFog(3, 2, fog_color);
-        } break;
+        break;
         case 4: {
             real thk = view_scale * 0.1;
-            gym::ref_view();
-            Vector3 V = -depthAxis();
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk);
             gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk);
         } break;
         case 5: {
             real thk = view_scale * 0.02;
-            gym::ref_view();
-            Vector3 V = -depthAxis();
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk);
             gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk);
         } break;
-        case 6: {  // this is equivalent to mode 1
-            gym::ref_view();
-            Vector3 V = depthAxis();
+        case 6:
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
-        } break;
-        case 7: {
-            gym::ref_view();
-            Vector3 V = -depthAxis();
-            gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);
-        } break;
+        break;
+        case 7:
+            gym::enableClipPlane(2,-V.XX,-V.YY,-V.ZZ, 0);
+        break;
     }
 }
 
