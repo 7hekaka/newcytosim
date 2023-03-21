@@ -293,10 +293,10 @@ public:
     Hand * firstHand() const { return fHands.front(); }
    
     /// number of attached Hands
-    size_t nbBoundHands() const { return fHands.count(); }
+    size_t nbAttachedHands() const { return fHands.count(); }
     
-    /// a function to count Hands using a custom criteria
-    size_t nbBoundHands(int (*func)(Hand const*)) const { return fHands.count(func); }
+    /// count attached Hands fitting a given criteria
+    size_t nbAttachedHands(int (*func)(Hand const*)) const { return fHands.count(func); }
 
     /// number of Hands attached within a range of abscissa
     size_t nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;

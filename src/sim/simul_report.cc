@@ -1490,7 +1490,7 @@ void Simul::reportFiberHands(std::ostream& out) const
     out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs";
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( fib->nbBoundHands() > 0 )
+        if ( fib->nbAttachedHands() > 0 )
         {
             out << COM << "on fiber " << fib->reference();
             fib->sortHands();
@@ -1511,7 +1511,7 @@ void Simul::reportFiberLinks(std::ostream& out) const
     out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs" << SEP << "position";
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        if ( fib->nbBoundHands() > 0 )
+        if ( fib->nbAttachedHands() > 0 )
         {
             out << COM << "on fiber " << fib->reference();
             fib->sortHands();
