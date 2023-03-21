@@ -91,41 +91,44 @@
  */
 Space * SpaceProp::newSpace() const
 {
-    const std::string& s = shape;
+    std::string s = shape;
 
     if ( s=="circle" )
         Cytosim::log << "Please use shape = 'sphere' instead of 'circle'\n";
+    if ( s=="rectangle" ) s = "square";
+    if ( s=="spherocylinder" ) s = "capsule";
+    if ( s=="semi_periodic" ) s = "strip";
 
-    if ( s=="rectangle" || s=="square" )       return new SpaceSquare(this);
-    if ( s=="circle" || s=="sphere" )          return new SpaceSphere(this);
-    if ( s=="polygon" )                        return new SpacePolygon(this);
-    if ( s=="polygonZ" )                       return new SpacePolygonZ(this);
-    if ( s=="capsule" || s=="spherocylinder" ) return new SpaceCapsule(this);
-    if ( s=="banana" )                         return new SpaceBanana(this);
-    if ( s=="torus" )                          return new SpaceTorus(this);
-    if ( s=="dice" )                           return new SpaceDice(this);
-    if ( s=="strip" || s=="semi_periodic" )    return new SpaceStrip(this);
-    if ( s=="periodic" )                       return new SpacePeriodic(this);
-    if ( s=="ellipse" || s=="ellipsoid" )      return new SpaceEllipse(this);
+    if ( s=="square" )     return new SpaceSquare(this);
+    if ( s=="sphere" )     return new SpaceSphere(this);
+    if ( s=="polygon" )    return new SpacePolygon(this);
+    if ( s=="polygonZ" )   return new SpacePolygonZ(this);
+    if ( s=="capsule" )    return new SpaceCapsule(this);
+    if ( s=="banana" )     return new SpaceBanana(this);
+    if ( s=="torus" )      return new SpaceTorus(this);
+    if ( s=="dice" )       return new SpaceDice(this);
+    if ( s=="strip" )      return new SpaceStrip(this);
+    if ( s=="periodic" )   return new SpacePeriodic(this);
+    if ( s=="ellipse" )    return new SpaceEllipse(this);
 #if ( DIM >= 3 )
-    if ( s=="disc" )                           return new SpaceDisc(this);
-    if ( s=="cubic" )                          return new SpaceSquare(this);
-    if ( s=="cylinder" )                       return new SpaceCylinder(this);
-    if ( s=="cylinderZ" )                      return new SpaceCylinderZ(this);
-    if ( s=="cylinderP" )                      return new SpaceCylinderP(this);
-    if ( s=="bicylinder" )                     return new SpaceBicylinder(this);
+    if ( s=="disc" )       return new SpaceDisc(this);
+    if ( s=="cubic" )      return new SpaceSquare(this);
+    if ( s=="cylinder" )   return new SpaceCylinder(this);
+    if ( s=="cylinderZ" )  return new SpaceCylinderZ(this);
+    if ( s=="cylinderP" )  return new SpaceCylinderP(this);
+    if ( s=="bicylinder" ) return new SpaceBicylinder(this);
 #elif ( DIM == 2 )
-    if ( s=="cylinder" )                       return new SpaceSquare(this);
-    if ( s=="cylinderP" )                      return new SpaceStrip(this);
+    if ( s=="cylinder" )   return new SpaceSquare(this);
+    if ( s=="cylinderP" )  return new SpaceStrip(this);
 #else
-    if ( s=="cylinder" )                       return new SpaceSquare(this);
-    if ( s=="cylinderP" )                      return new SpacePeriodic(this);
+    if ( s=="cylinder" )   return new SpaceSquare(this);
+    if ( s=="cylinderP" )  return new SpacePeriodic(this);
 #endif
-    if ( s=="ring" )                           return new SpaceRing(this);
-    if ( s=="tee" )                            return new SpaceTee(this);
+    if ( s=="ring" )       return new SpaceRing(this);
+    if ( s=="tee" )        return new SpaceTee(this);
 #if NEW_SPACES
-    if ( s=="mesh" )                           return new SpaceMesh(this);
-    if ( s=="force" )                          return new SpaceForce(this);
+    if ( s=="mesh" )       return new SpaceMesh(this);
+    if ( s=="force" )      return new SpaceForce(this);
 #endif
     
     //std::cerr << "Warning: unknown Space shape `"+s+"'\n";
