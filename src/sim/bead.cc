@@ -43,7 +43,7 @@ void Bead::allocateMecable(const size_t nbp)
      for each Bead in the system.
      This will work as long as Vector can directly match a real[]
      */
-    pPos = paCen.data();
+    pPos = paCenter.data();
 }
 
 //------------------------------------------------------------------------------
@@ -64,26 +64,26 @@ void Bead::setInteractions(Meca& meca) const
             case CONFINE_INSIDE:
             {
                 // Confine only the center
-                if ( ! spc->inside(paCen) )
-                    spc->setConfinement(paCen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                if ( ! spc->inside(paCenter) )
+                    spc->setConfinement(paCenter, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_OUTSIDE:
             {
                 // confine the center outside
-                if ( spc->inside(paCen) )
-                    spc->setConfinement(paCen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                if ( spc->inside(paCenter) )
+                    spc->setConfinement(paCenter, Mecapoint(this, 0), meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_ALL_INSIDE:
             {
                 // Confine the entire bead
-                if ( ! spc->allInside(paCen, paRadius) )
-                    spc->setConfinement(paCen, Mecapoint(this, 0), paRadius, meca, prop->confine_stiffness);
+                if ( ! spc->allInside(paCenter, paRadius) )
+                    spc->setConfinement(paCenter, Mecapoint(this, 0), paRadius, meca, prop->confine_stiffness);
             } break;
                 
             case CONFINE_ON:
-                spc->setConfinement(paCen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(paCenter, Mecapoint(this, 0), meca, prop->confine_stiffness);
                 break;
                 
             default:
@@ -149,7 +149,7 @@ void Bead::projectForces(const real* X, real* Y) const
 void Bead::write(Outputter& out) const
 {
     writeMarker(out, TAG);
-    out.writeFloats(paCen, DIM, '\n');
+    out.writeFloats(paCenter, DIM, '\n');
     out.writeSoftSpace();
     out.writeFloat(paRadius);
 }

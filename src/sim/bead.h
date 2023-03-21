@@ -31,7 +31,7 @@ class Bead : public Mecable
 private:
     
     /// position of center
-    Vector paCen;
+    Vector paCenter;
     
     /// radius
     real paRadius;
@@ -56,16 +56,16 @@ public:
     int mobile() const { return 1; }
 
     /// return the position in space of the object
-    Vector pos() const { return paCen; }
+    Vector pos() const { return paCenter; }
 
     /// return the position in space of the object (virtual function)
-    Vector position() const { return paCen; }
+    Vector position() const { return paCenter; }
     
     /// move the object position ( position += given vector )
-    void translate(Vector const& x) { paCen += x; }
+    void translate(Vector const& x) { paCenter += x; }
     
     /// set the object position ( position = given vector )
-    void setPosition(Vector const& x) { paCen = x; }
+    void setPosition(Vector const& x) { paCenter = x; }
 
     //--------------------------------------------------------------------------
         
