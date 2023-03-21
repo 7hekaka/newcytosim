@@ -155,7 +155,7 @@ static PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
 static void shufflePointDispVisible(const PropertyList& plist, int val)
 {
     if ( plist.empty() )
-        flashText("no relevant object");
+        return flashText("no relevant object");
 
     if ( plist.size() == 1 )
     {
@@ -168,7 +168,7 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
         if ( cnt == 0 )
         {
             setPointDispVisible(plist, 1);
-            flashText("All hands visible");
+            flashText("All "+plist.front()->category()+" visible");
         }
         else
         {
@@ -181,7 +181,7 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
                 flashText("Only `%s' is visible", p->name_str());
             }
             else
-                flashText("No hand visible");
+                flashText("No "+plist.front()->category()+" visible");
         }
     }
 }
