@@ -330,6 +330,7 @@ namespace gle
     void strokeCuboid(Vector3 const& A, Vector3 const& B, float width);
     void paintCuboid(Vector3 const& A, Vector3 const& B, float rad);
     void paintTetrahedron(Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&);
+    void paintPrism(Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&);
 }
 
 

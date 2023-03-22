@@ -1760,12 +1760,12 @@ namespace gle
         if ( n > 0 )
         {
             gym::ref_view();
-            rad /= n;
+            d *= rad / n;
             flute2 * pts = gym::mapBufferV2(4);
-            pts[0] = A+rad*d;
-            pts[2] = A-rad*d;
-            pts[4] = B+rad*d;
-            pts[7] = B-rad*d;
+            pts[0] = A + d;
+            pts[2] = A - d;
+            pts[4] = B + d;
+            pts[7] = B - d;
             gym::unmapBufferV2();
             gym::drawTriangleStrip(0, 4);
         }
@@ -2245,6 +2245,30 @@ namespace gle
         flu[5] = { P + Y };
         gym::unmapBufferV3();
         gym::drawTriangleStrip(0, 6);
+    }
+
+    /// draw triangular prism extending over [P3,Q3] with directions XYZ and ABC
+    void paintPrism(Vector3 const& X3, Vector3 const& Y3, Vector3 const& Z3, Vector3 const& P3,
+                    Vector3 const& A3, Vector3 const& B3, Vector3 const& C3, Vector3 const& Q3)
+    {
+        flute3 X(X3), Y(Y3), Z(Z3), P(P3);
+        flute3 A(A3), B(B3), C(C3), Q(Q3);
+        // translate to place center of base at P
+        P = P - ( X + Y + Z ) * 0.33333333f;
+        Q = Q - ( A + B + C ) * 0.33333333f;
+        flute3 * flu = gym::mapBufferV3(10);
+        flu[0] = { P + X };
+        flu[1] = { P + Y };
+        flu[2] = { Q + A };
+        flu[3] = { Q + B };
+        flu[4] = { Q + C };
+        flu[5] = { P + Y };
+        flu[6] = { P + Z };
+        flu[7] = { P + X };
+        flu[8] = { Q + C };
+        flu[9] = { Q + A };
+        gym::unmapBufferV3();
+        gym::drawTriangleStrip(0, 10);
     }
 
 }

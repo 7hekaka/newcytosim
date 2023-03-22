@@ -2052,11 +2052,12 @@ void Display::drawSolid(Solid const& obj)
 #if ( DIM >= 3 )
             real R = 3 * pixscale(disp->size) / obj.radius(inx);
             Vector3 C(obj.posPoint(inx+3));
-            Vector3 dA = R*(B-S), dB = R*(A-S), dC = R*(C-S);
+            Vector3 dA = R*(A-S), dB = R*(B-S), dC = R*(C-S);
             gym::ref_view();
-            gle::paintTetrahedron(dA, dB, dC, A);
-            gle::paintTetrahedron(dA, dB, dC, B);
-            gle::paintTetrahedron(dA, dB, dC, C);
+            // A and B are swapped since the triad is inverted
+            gle::paintTetrahedron(dB, dA, dC, A);
+            gle::paintTetrahedron(dB, dA, dC, B);
+            gle::paintTetrahedron(dB, dA, dC, C);
 #else
             Vector3 N = 2 * S - ( A + B );
             gym::transAlignZ(A, rad, N); gle::pyramid();
@@ -2079,13 +2080,15 @@ void Display::drawSolid(Solid const& obj)
 #endif
             if ( obj.prop->twin_stiffness > 0 )
             {
-                /// draw links:
                 gym::ref_view();
                 gym::color_both(col.mix(lor), 1);
-                gle::paintCuboid(A, X, rad);
-                gle::paintCuboid(B, Y, rad);
 #if ( DIM >= 3 )
-                gle::paintCuboid(C, Z, rad);
+                gle::paintPrism(dX, dY, dZ, X, dA, dB, dC, A);
+                gle::paintPrism(dX, dY, dZ, Y, dA, dB, dC, B);
+                gle::paintPrism(dX, dY, dZ, Z, dA, dB, dC, C);
+#elif ( DIM == 2 )
+                gle::drawBand(Vector2(A), Vector2(X), rad);
+                gle::drawBand(Vector2(B), Vector2(Y), rad);
 #endif
             }
         }
