@@ -2047,35 +2047,39 @@ void Display::drawSolid(Solid const& obj)
             gym::color_both(col, 1);
             //gle::drawTipi(obj.addrPoint(inx), 1, 0.128);
             Vector3 S(obj.posPoint(inx));
-            Vector3 A(obj.posP(inx+1));
-            Vector3 B(obj.posP(inx+2));
+            Vector3 A(obj.posPoint(inx+1));
+            Vector3 B(obj.posPoint(inx+2));
 #if ( DIM >= 3 )
-            Vector3 C(obj.posP(inx+3));
-            Vector3 N = ( 3 * S - A ) - ( B + C );
-            gym::transAlignZ(C, rad, N); gle::pyramid();
+            real R = 3 * pixscale(disp->size) / obj.radius(inx);
+            Vector3 C(obj.posPoint(inx+3));
+            Vector3 dA = R*(B-S), dB = R*(A-S), dC = R*(C-S);
+            gym::ref_view();
+            gle::paintTetrahedron(dA, dB, dC, A);
+            gle::paintTetrahedron(dA, dB, dC, B);
+            gle::paintTetrahedron(dA, dB, dC, C);
 #else
             Vector3 N = 2 * S - ( A + B );
-#endif
             gym::transAlignZ(A, rad, N); gle::pyramid();
             gym::transAlignZ(B, rad, N); gle::pyramid();
-            
+#endif
             gym::color_both(lor, 1);
             Vector3 T(twi->posPoint(inx));
-            Vector3 X(twi->posP(inx+1));
-            Vector3 Y(twi->posP(inx+2));
+            Vector3 X(twi->posPoint(inx+1));
+            Vector3 Y(twi->posPoint(inx+2));
 #if ( DIM >= 3 )
-            Vector3 Z(twi->posP(inx+3));
-            Vector3 D = ( 3 * T - X ) - ( Y + Z );
-            gym::transAlignZ(Z, rad, D); gle::pyramid();
+            Vector3 Z(twi->posPoint(inx+3));
+            Vector3 dX = R*(X-T), dY = R*(Y-T), dZ = R*(Z-T);
+            gle::paintTetrahedron(dX, dY, dZ, X);
+            gle::paintTetrahedron(dX, dY, dZ, Y);
+            gle::paintTetrahedron(dX, dY, dZ, Z);
 #else
             Vector3 D = 2 * T - ( A + B );
-#endif
             gym::transAlignZ(X, rad, D); gle::pyramid();
             gym::transAlignZ(Y, rad, D); gle::pyramid();
+#endif
             if ( obj.prop->twin_stiffness > 0 )
             {
                 /// draw links:
-                rad *= M_SQRT1_2;
                 gym::ref_view();
                 gym::color_both(col.mix(lor), 1);
                 gle::paintCuboid(A, X, rad);

@@ -2230,31 +2230,21 @@ namespace gle
     }
 
     /// draw faces of cuboid of axis [A,B] and size `rad`
-    void paintTrapezoid(Vector3 const& A3, Vector3 const& B3, float rad)
+    void paintTetrahedron(Vector3 const& X3, Vector3 const& Y3, Vector3 const& Z3,
+                          Vector3 const& P3)
     {
-        flute3 A(A3), B(B3);
-        flute3 X(rad, 0, 0), Y(0, rad, 0);
-        flute3 * flu = gym::mapBufferV3(16);
-        flu[0] = { A + X - Y };
-        flu[1] = { A + X + Y };
-        flu[2] = { B + X - Y };
-        flu[3] = { B + X + Y };
-        flu[4] = { B - X - Y };
-        flu[5] = { B - X + Y };
-        flu[6] = { A - X - Y };
-        flu[7] = { A - X + Y };
-        
-        flu[ 8] = { B - X + Y };
-        flu[ 9] = { B + X + Y };
-        flu[10] = { A - X + Y };
-        flu[11] = { A + X + Y };
-        flu[12] = { A - X - Y };
-        flu[13] = { A + X - Y };
-        flu[14] = { B - X - Y };
-        flu[15] = { B + X - Y };
+        flute3 X(X3), Y(Y3), Z(Z3), P(P3);
+        // translate to place center of base at P
+        P = P - ( X + Y + Z ) * 0.33333333f;
+        flute3 * flu = gym::mapBufferV3(8);
+        flu[0] = { P + X };
+        flu[1] = { P + Y };
+        flu[2] = { P + Z };
+        flu[3] = { P };
+        flu[4] = { P + X };
+        flu[5] = { P + Y };
         gym::unmapBufferV3();
-        gym::drawTriangleStrip(0, 8);
-        gym::drawTriangleStrip(8, 8);
+        gym::drawTriangleStrip(0, 6);
     }
 
 }

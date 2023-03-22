@@ -67,6 +67,7 @@ struct flute3
     friend flute3 operator -(flute3 const& a, flute3 const& b) { return flute3{a[0]-b[0], a[1]-b[1], a[2]-b[2]}; }
     friend flute3 operator -(flute3 const& a) { return flute3{-a[0], -a[1], -a[2]}; }
     friend flute3 operator *(float const& a, flute3 const& b) { return flute3{a*b[0], a*b[1], a*b[2]}; }
+    void operator *=(float const& a) { xyz[0]*=a; xyz[1]*=a; xyz[2]*=a; }
     friend flute3 operator *(flute3 const& b, float const& a) { return flute3{a*b[0], a*b[1], a*b[2]}; }
     friend float normSqr(flute3 const& b) { return b[0]*b[0] + b[1]*b[1] + b[2]*b[2]; }
     friend float norm(flute3 const& b) { return std::sqrt(normSqr(b)); }

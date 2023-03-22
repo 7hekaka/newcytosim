@@ -47,16 +47,15 @@ public:
     /// default width of lines
     float line_width;
     
-    /// if set > 0, this defines the unit size used for `point_size` and `line_width` 
+    /// if set > 0, this defines the unit scale used for `point_size` and `line_width`
     /**
-     Set this parameter to specify the fiber radius and point size in simulation units.
+     Set this parameter to specify the fiber radius and point size in length units.
 
-     `point_size` and `line_width` are usually set in pixels, but if `point_value` is set,
-     these specifications are interpreted as multiples of `point_value`,
-     which itself is given in simulation unit (i.e. real distance).
+     `point_size` and `line_width` are usually specified in pixels, but if `point_value` is set,
+     they are interpreted as multiples of `point_value`, which itself is given in length unit.
      
-     For example, if you set `line_width=5` and `point_value=0.01`,
-     the fibers will be displayed with a diameter of 0.050 (i.e. 50 nanometers).
+     For example, by setting `line_width=25` and `point_value=0.001`,
+     the fibers will be displayed with a diameter of 0.025 (i.e. 25 nanometers).
      
      <em> default = 0 </em>
      */
