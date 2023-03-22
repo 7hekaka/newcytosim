@@ -137,17 +137,20 @@ static void setPointDispVisible(PropertyList const& plist, int val)
 }
 
 
+/* this set `cnt` number of PointDisp for which visible != 0. */
 static PointDisp * nextVisiblePointDisp(PropertyList const& plist, size_t& cnt)
 {
-    PointDisp* pick = nullptr;
     cnt = 0;
+    PointDisp * pick = nullptr;
     for ( Property * i : plist )
     {
         PointDisp * d = toPointDisp(i);
+        //std::clog << i->name() << ".visible=" << d->visible << " (" << cnt << ")\n";
         if ( cnt == 1 && !pick )
             pick = d;
-        cnt += ( d->visible );
+        cnt += ( 0 != d->visible );
     }
+    //std::clog << " --> pick " << (pick?pick->name():"null") << "\n";
     return pick;
 }
 
@@ -164,11 +167,15 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
     else
     {
         size_t cnt = 0;
+        std::string cat = plist.front()->category();
         PointDisp * p = nextVisiblePointDisp(plist, cnt);
         if ( cnt == 0 )
         {
-            setPointDispVisible(plist, 1);
-            flashText("All "+plist.front()->category()+" visible");
+            setPointDispVisible(plist, val);
+            if ( val )
+                flashText("All "+cat+" visible");
+            else
+                flashText("No "+cat+" visible");
         }
         else
         {
@@ -181,7 +188,7 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
                 flashText("Only `%s' is visible", p->name_str());
             }
             else
-                flashText("No "+plist.front()->category()+" visible");
+                flashText("No "+cat+" visible");
         }
     }
 }
@@ -1104,7 +1111,7 @@ void processKey(unsigned char key, int modifiers = 0)
   
         case '5':
             if ( altKeyDown || shiftKeyDown )
-                shufflePointDispVisible(player.allSphereDisp(), 1);
+                shufflePointDispVisible(player.allSphereDisp(), 7);
             else
                 setPointDisp(player.allVisibleSphereDisp(), changeStyle, 0);
             break;
