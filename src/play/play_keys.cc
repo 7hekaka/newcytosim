@@ -197,7 +197,7 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
 #pragma mark - Single Couple
 
 
-static void changeSingleSelect()
+static void shuffleSingleSelect()
 {
     unsigned int & select = disp.single_select;
     switch( select )
@@ -210,20 +210,20 @@ static void changeSingleSelect()
 }
 
 
-static void changeCoupleSelect()
+static void shuffleCoupleSelect()
 {
     unsigned int & select = disp.couple_select;
     switch( select )
     {
         case 7:  select = 0; flashText("couple:select=0: hidden");        break;
-        case 0:  select = 2; flashText("couple:select=2: bound only");    break;
-        case 2:  select = 4; flashText("couple:select=4: bridging only"); break;
-        case 4:  select = 1; flashText("couple:select=1: free only");     break;
+        case 0:  select = 4; flashText("couple:select=4: bridging only"); break;
+        case 4:  select = 2; flashText("couple:select=2: bound only");    break;
+        case 2:  select = 1; flashText("couple:select=1: free only");     break;
         default: select = 7; flashText("couple:select=7: all");           break;
     }
 }
 
-static void changeCoupleSelect2()
+static void shuffleCoupleSelect2()
 {
     unsigned int & select = disp.couple_select;
     if ( select & 8 )
@@ -1123,7 +1123,7 @@ void processKey(unsigned char key, int modifiers = 0)
         //------------------------ Single/Couple + Hands -----------------------
            
         case '6':
-            changeSingleSelect();
+            shuffleSingleSelect();
             break;
             
         case 'u':
@@ -1139,9 +1139,9 @@ void processKey(unsigned char key, int modifiers = 0)
 
         case '7':
             if ( altKeyDown )
-                changeCoupleSelect2();
+                shuffleCoupleSelect2();
             else
-                changeCoupleSelect();
+                shuffleCoupleSelect();
             break;
             
         case '8':
