@@ -664,17 +664,17 @@ static void shuffleVisible(FiberDisp* p, int val)
 
 static FiberDisp * nextVisibleFiberDisp(PropertyList const& plist, size_t& cnt)
 {
-    FiberDisp* pick = nullptr;
     cnt = 0;
+    FiberDisp* pick = nullptr;
     for ( Property * i : plist )
     {
         FiberDisp * d = toFiberDisp(i);
-        //std::clog << "     " << d->visible << " " << d->name_str() <<"\n";
+        //std::clog << i->name() << ".visible=" << d->visible << " (" << cnt << ")\n";
         if ( cnt == 1 && !pick )
             pick = d;
-        cnt += ( d->visible );
+        cnt += ( 0 != d->visible );
     }
-    //std::clog << cnt << " " << (pick?pick->name_str():"none") << "\n";
+    //std::clog << " --> pick " << (pick?pick->name():"null") << "\n";
     return pick;
 }
 
@@ -692,8 +692,11 @@ static void shuffleFiberDispVisible(const PropertyList& plist, int val)
         FiberDisp * p = nextVisibleFiberDisp(plist, cnt);
         if ( cnt == 0 )
         {
-            setFiberDispVisible(plist, 1);
-            flashText("All fibers visible");
+            setFiberDispVisible(plist, val);
+            if ( val )
+                flashText("All fibers visible");
+            else
+                flashText("No fiber visible");
         }
         else
         {
