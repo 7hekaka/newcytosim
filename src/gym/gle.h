@@ -274,7 +274,7 @@ namespace gle
     
     /// draw a band from A to B, with specified radius
     void drawBand(Vector2 const& A, Vector2 const& B, real);
-    void drawBand(Vector3 const& A, Vector3 const& B, real);
+    void drawSpikyBand(Vector2 const& A, Vector2 const& B, real);
 
     /// draw a band from A to B, with specified radius in A and B
     void drawBand(Vector1 const& a, float, Vector1 const& b, float);
@@ -331,6 +331,7 @@ namespace gle
     void paintCuboid(Vector3 const& A, Vector3 const& B, float rad);
     void paintTetrahedron(Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&);
     void paintPrism(Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&);
+    void paintSpikyPrism(Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&, Vector3 const&);
 }
 
 

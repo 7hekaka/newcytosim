@@ -1763,14 +1763,36 @@ namespace gle
             d *= rad / n;
             flute2 * pts = gym::mapBufferV2(4);
             pts[0] = A + d;
-            pts[2] = A - d;
-            pts[4] = B + d;
-            pts[7] = B - d;
+            pts[1] = A - d;
+            pts[2] = B + d;
+            pts[3] = B - d;
             gym::unmapBufferV2();
             gym::drawTriangleStrip(0, 4);
         }
     }
     
+    void drawSpikyBand(Vector2 const& A, Vector2 const& B, real rad)
+    {
+        Vector2 t = B - A;
+        Vector2 d = t.orthogonal();
+        real n = t.norm();
+        if ( n > 0 )
+        {
+            gym::ref_view();
+            d *= rad / n;
+            t *= rad / n;
+            flute2 * pts = gym::mapBufferV2(6);
+            pts[0] = A - t;
+            pts[1] = A - d;
+            pts[2] = A + d;
+            pts[3] = B - d;
+            pts[4] = B + d;
+            pts[5] = B + t;
+            gym::unmapBufferV2();
+            gym::drawTriangleStrip(0, 6);
+        }
+    }
+
     
     void drawBand(Vector1 const& A, float rA,
                   Vector1 const& B, float rB)
@@ -1780,9 +1802,9 @@ namespace gle
         float BX(B.XX);
         flute2 * pts = gym::mapBufferV2(4);
         pts[0] = { AX, rA };
-        pts[2] = { AX,-rA };
-        pts[4] = { BX, rB };
-        pts[7] = { BX,-rB };
+        pts[1] = { AX,-rA };
+        pts[2] = { BX, rB };
+        pts[3] = { BX,-rB };
         gym::unmapBufferV2();
         gym::drawTriangleStrip(0, 4);
     }
@@ -2269,6 +2291,34 @@ namespace gle
         flu[9] = { Q + A };
         gym::unmapBufferV3();
         gym::drawTriangleStrip(0, 10);
+    }
+
+    /// draw triangular prism extending over [P3,Q3] with directions XYZ and ABC
+    void paintSpikyPrism(Vector3 const& X3, Vector3 const& Y3, Vector3 const& Z3, Vector3 const& P3,
+                         Vector3 const& A3, Vector3 const& B3, Vector3 const& C3, Vector3 const& Q3)
+    {
+        flute3 X(X3), Y(Y3), Z(Z3), P(P3);
+        flute3 A(A3), B(B3), C(C3), Q(Q3);
+        // translate to place center of base at P
+        P = P - ( X + Y + Z ) * 0.33333333f;
+        Q = Q - ( A + B + C ) * 0.33333333f;
+        flute3 * flu = gym::mapBufferV3(14);
+        flu[0] = { P + X };
+        flu[1] = { P + Y };
+        flu[2] = { Q + A };
+        flu[3] = { Q + B };
+        flu[4] = { Q };
+        flu[5] = { Q + C };
+        flu[6] = { Q + A };
+        flu[7] = { P + Z };
+        flu[8] = { P + X };
+        flu[9] = { P };
+        flu[10] = { P + Y };
+        flu[11] = { P + Z };
+        flu[12] = { Q + B };
+        flu[13] = { Q + C };
+        gym::unmapBufferV3();
+        gym::drawTriangleStrip(0, 14);
     }
 
 }
