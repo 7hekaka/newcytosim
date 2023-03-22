@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 
 #include "dim.h"
+#include "messages.h"
 #include "exceptions.h"
 #include "glossary.h"
 #include "simul_prop.h"
@@ -59,7 +60,7 @@ void ChewerProp::complete(Simul const& sim)
     movability_dt = movability * time_step(sim);
     
     if ( primed(sim) )
-        std::clog << " Chewer `" << name() << "' has mobility = " << movability << " um/s\n";
+        Cytosim::log << " Chewer `" << name() << "' has mobility = " << movability << " um/s\n";
 }
 
 
