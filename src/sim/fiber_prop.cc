@@ -691,6 +691,8 @@ void FiberProp::complete(Simul const& sim)
         source_prop = nullptr;
     else
         source_prop = sim.findProperty<CoupleProp>("couple", source_type);
+    if ( source_rate < 0 )
+        throw InvalidParameter(name()+":source_rate must be >= 0");
     source_rate_dt = source_rate * time_step(sim);
 #endif
 #if NEW_FIBER_END_CHEW

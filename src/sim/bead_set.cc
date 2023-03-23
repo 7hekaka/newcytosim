@@ -10,29 +10,29 @@
 void BeadSet::step()
 {
 #if ( 0 )
-    for ( Bead * B = first(); B; B=B->next() )
+    for ( Bead * B = first(); B; B = B->next() )
         B->step();
 #endif
 #if NEW_SOLID_MAKE_COUPLE
     static float nextCreation = RNG.exponential();
-    for ( Bead * B = first(); B; B=B->next() )
+    for ( Bead * B = first(); B; B = B->next() )
     {
         nextCreation -= B->prop->source_rate_dt;
         while ( nextCreation <= 0 )
         {
             nextCreation += RNG.exponential();
-            if ( B->prop->source_single )
-            {
-                Single * S = B->prop->source_single->newSingle();
-                S->setPosition(B->position());
-                simul_.singles.add(S);
-            }
-            else
+            if ( B->prop->source_couple )
             {
                 Couple * C = B->prop->source_couple->newCouple();
                 C->setPosition(B->position());
                 C->activate();
                 simul_.couples.add(C);
+            }
+            else
+            {
+                Single * S = B->prop->source_single->newSingle();
+                S->setPosition(B->position());
+                simul_.singles.add(S);
             }
         }
     }

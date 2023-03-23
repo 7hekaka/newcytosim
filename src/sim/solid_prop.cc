@@ -151,6 +151,8 @@ void SolidProp::complete(Simul const& sim)
         if ( !source_single && !source_couple )
             throw InvalidParameter("could not find single/couple `"+source_type+"' specified as source[1]");
     }
+    if ( source_rate < 0 )
+        throw InvalidParameter(name()+":source_rate must be >= 0");
     source_rate_dt = source_rate * time_step(sim);
 #endif
 #if NEW_SOLID_HAS_TWIN
