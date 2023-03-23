@@ -61,7 +61,8 @@ Vector SpaceRing::place() const
 bool SpaceRing::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
-    return ( W.normYZSqr() <= square(radius_) );
+    const real RT = W.normYZSqr();
+    return ( abs_real(W.XX) <= half_  &&  RT <= square(radius_) );
 #else
     return false;
 #endif
@@ -72,7 +73,8 @@ bool SpaceRing::allInside(Vector const& W, const real rad ) const
     assert_true( rad >= 0 );
 
 #if ( DIM > 2 )
-    return ( W.normYZSqr() <= square(radius_-rad) );
+    const real RT = W.normYZSqr();
+    return ( abs_real(W.XX) + rad <= half_  &&  RT <= square(radius_-rad) );
 #else
     return false;
 #endif
@@ -113,6 +115,9 @@ Vector SpaceRing::project(Vector const& W) const
 void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
                                Meca& meca, real stiff) const
 {
+    if ( abs_real(pos.XX) > half_ )
+        meca.addPlaneClampX(mp, std::copysign(half_, pos.XX), stiff);
+    
     meca.addCylinderClampX(mp, radius_, stiff);
 }
 
@@ -123,8 +128,15 @@ void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
                                real rad, Meca& meca, real stiff) const
 {
     if ( radius_ > rad )
+    {
+        real len = max_real(half_-rad, real(0));
+        if ( abs_real(pos.XX) > len )
+            meca.addPlaneClampX(mp, std::copysign(len, pos.XX), stiff);
+        
         meca.addCylinderClampX(mp, radius_-rad, stiff);
-    else {
+    }
+    else
+    {
         meca.addLineClamp(mp, Vector(pos.XX,0,0), Vector(1,0,0), stiff);
         std::cerr << "object is too big to fit in SpaceRing\n";
     }

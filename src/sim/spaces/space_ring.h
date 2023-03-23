@@ -6,9 +6,8 @@
 
 /// a cylinder of axis X, but without caps
 /**
- Space `ring` is radial symmetric along the X-axis.
- The cross section in the YZ plane is a disc.
- The end discs are not part of the surface.
+ Space `ring` is radial symmetric around the X-axis.
+ It is like a cylinder except that the two end discs are not part of the surface.
  project() will always project on the curvy surface of the cylinder.
 
  Parameters:
