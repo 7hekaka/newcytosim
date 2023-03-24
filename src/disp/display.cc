@@ -1474,6 +1474,7 @@ Draw segments of length 'inc' and 'onc' of alternating colors, in register with 
 void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
                                  gym_color col, real onc, gym_color lor) const
 {
+    const gym_color black(0,0,0,1);
     const real uni = inc + onc;
     const real sup = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
@@ -1481,15 +1482,16 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     // abs in [0, uni] is now relative to minus end
     if ( abs > onc )
     {
-        // drawing first slice of size `inc`
+        cnt = 2*cnt - 1; // drawing first slice of size `inc`
         abs -= onc;
+        std::swap(inc, onc);
     }
     else
     {
-        // drawing second slice of size `onc`
-        std::swap(inc, onc);
+        cnt = 2*cnt; // drawing second slice of size `onc`
         std::swap(col, lor);
     }
+    gym_color clr = col;
     // draw segments
     size_t top = 8 * fib.length() / uni + 8;
     flute4D* flu = gym::mapBufferC4VD(top);
@@ -1497,8 +1499,8 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     Vector pos = fib.posEndM();
     Vector dir = fib.dirEndM();
     Vector off = inViewPlane(dir, rad);
-    ptr[0] = { col, pos - off };
-    ptr[1] = { col, pos + off };
+    ptr[0] = { clr, pos - off };
+    ptr[1] = { clr, pos + off };
     ptr += 2;
 
     while ( abs < sup )
@@ -1508,17 +1510,18 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
         abs += inc;
         off = inViewPlane(dir, rad);
         // alternate different tones:
-        ptr[0] = { col, pos - off };
-        ptr[1] = { col, pos + off };
+        ptr[0] = { clr, pos - off };
+        ptr[1] = { clr, pos + off };
         std::swap(col, lor);
         std::swap(inc, onc);
-        ptr[2] = { col, pos - off };
-        ptr[3] = { col, pos + off };
+        if (( ++cnt & 15 )==1) clr = black; else clr = col;
+        ptr[2] = { clr, pos - off };
+        ptr[3] = { clr, pos + off };
         ptr += 4;
     }
     pos = fib.posEndP();
-    ptr[0] = { col, pos - off };
-    ptr[1] = { col, pos + off };
+    ptr[0] = { clr, pos - off };
+    ptr[1] = { clr, pos + off };
     ptr += 2;
     assert_true(ptr-flu <= top);
 
@@ -1536,6 +1539,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
 void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
                                gym_color col, real onc, gym_color lor) const
 {
+    const gym_color black(0,0,0,1);
     const real uni = inc + onc;
     Vector pos, nxt, old = fib.posEndM();
     const real sup = fib.length();
@@ -1582,7 +1586,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
         dir = normalize(nxt-old);
         // alternate different tones:
         gym::color_load((++cnt&1)?col:lor);
-        if (( cnt & 15 )==1) gym::color_load(gym_color(0,0,0,1));
+        if (( cnt & 15 )==1) gym::color_load(black);
         gym::setClipPlane(5, -dir, pos);
         gym::transAlignZ(old, rad, pos-old);
         gle::centralTube();
@@ -1856,9 +1860,11 @@ void Display::drawFiber(Fiber const& fib)
                         drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
                         //drawFiberWide(fib, w);
                     }
+                    else if ( prop->style == 2 )
+                        drawFiberStriped2D(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
                     else
                         drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
-                        break;
+                    break;
                 case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
                 case 4: drawActin(fib, col1, col2, colE); break;
                 case 5: drawMicrotubule(fib, col1, col2, colE); break;
