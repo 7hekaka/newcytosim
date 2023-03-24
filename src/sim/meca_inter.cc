@@ -1171,13 +1171,16 @@ void Meca::addTorque3Long(Mecapoint const& ptA,
 
 
 /**
- Add Torque between 4 points to align AB with CD:
+ Add Torque between 4 points to align AB with CD, assuming |AB| = |CD|:
+     
+     F = weight * [ ( B - A ) - ( D - C ) ]
+     
+     F_A =  F
+     F_B = -F
+     F_C = -F
+     F_D =  F
  
- F_A = k * ( -A + B + C - D )
- F_B = -F_A
- F_C = -F_A
- F_D =  F_A
- 
+ with ptA = { A, B } and ptC = { C, D }
  FJN, 11.05.2021
  */
 void Meca::addTorque4(Mecapoint const& ptA, Mecapoint const& ptC, const real weight)

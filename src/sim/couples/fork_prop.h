@@ -3,6 +3,7 @@
 #ifndef FORK_PROP_H
 #define FORK_PROP_H
 
+#include "vector2.h"
 #include "couple_prop.h"
 
 
@@ -24,7 +25,7 @@ public:
      */
     
     /// Resting angle in radian (set as `torque[0]`
-    real angle;
+    real rest_angle;
     
     /// Stiffness of the angular link, in Torque per radians (pN.um/radian) (set as `torque[1]`)
     real angular_stiffness;
@@ -34,8 +35,8 @@ public:
     
     /// @}
     
-    /// derived variable: [cos(angle), sin(angle)]
-    Vector2 angle_dir;
+    /// derived variable: [cos(rest_angle), sin(rest_angle)]
+    Vector2 rest_dir;
 
 public:
     

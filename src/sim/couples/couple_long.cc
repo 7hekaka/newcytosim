@@ -94,7 +94,7 @@ void CoupleLong::setInteractions(Meca& meca) const
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
     
-    //meca.addSideSideLink(pt1, pt2, prop->length, prop->stiffness);
+    //meca.addSideSideLink(pt1, pt2, prop()->length, prop()->stiffness);
     
     /*
      The 'arm' is recalculated each time, but in 2D at least,
@@ -112,7 +112,6 @@ void CoupleLong::setInteractions(Meca& meca) const
     meca.addSideLink3D(pt1, pt2, mArm, prop->stiffness);
     
 #endif
-    
 }
 
 

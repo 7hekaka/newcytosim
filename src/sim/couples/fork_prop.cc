@@ -18,10 +18,10 @@ Couple * ForkProp::newCouple(Glossary*) const
 void ForkProp::clear()
 {
     CoupleProp::clear();
-    angle = 0;
-    angle_dir.set(1, 0);
+    rest_angle = 0;
+    rest_dir.set(1, 0);
     angular_stiffness = 0;
-    flip    = true;
+    flip = true;
 }
 
 
@@ -29,10 +29,16 @@ void ForkProp::read(Glossary& glos)
 {
     CoupleProp::read(glos);
     
-    // compact syntax
-    glos.set(angular_stiffness, "torque", "angular_stiffness");
-    glos.set(angle, "torque", 1, "angle", 0);
-    
+    if ( glos.has_key("torque") )
+    {
+        glos.set(angular_stiffness, "torque");
+        glos.set(rest_angle, "torque", 1);
+    }
+    else
+    {
+        glos.set(angular_stiffness, "angular_stiffness");
+        glos.set(rest_angle, "angle");
+    }
     glos.set(flip, "flip");
 }
 
@@ -41,26 +47,23 @@ void ForkProp::complete(Simul const& sim)
 {
     CoupleProp::complete(sim);
     
-    angle_dir.XX = std::cos(angle);
-#if ( DIM == 3 )
-    angle_dir.YY = abs_real(std::sin(angle));
-#else
-    angle_dir.YY = std::sin(angle);
-#endif
+    rest_dir.XX = std::cos(rest_angle);
+    rest_dir.YY = std::sin(rest_angle);
+    if ( DIM == 3 ) rest_dir.YY = abs_real(rest_dir.YY);
 #if ( 0 )
-    if ( angle < 0 || angle_dir.YY < 0 )
+    if ( rest_angle < 0 || rest_dir.YY < 0 )
         throw InvalidParameter("The equilibrium angle should be defined in [0, pi]");
 #endif
 
     if ( angular_stiffness < 0 )
-        throw InvalidParameter("The angular stiffness, fork:torque[0] should be set and >= 0");
+        throw InvalidParameter("The angular stiffness, torque[0] should be >= 0");
 }
 
 
 void ForkProp::write_values(std::ostream& os) const
 {
     CoupleProp::write_values(os);
-    write_value(os, "torque", angular_stiffness, angle);
+    write_value(os, "torque", angular_stiffness, rest_angle);
     write_value(os, "flip", flip);
 }
 
