@@ -926,9 +926,11 @@ void Meca::addTorque(Interpolation const& pt1,
         axis /= n;
     else
         axis = Vector::randU();
-    addTorque(pt1, pt2, MatrixBlock::rotationAroundAxis(axis, ang.XX, ang.YY), weight);
+    MatrixBlock rot = MatrixBlock::rotationAroundAxis(axis, ang.XX, ang.YY);
+    addTorque(pt1, pt2, rot, weight);
 #elif ( DIM == 2 )
-    addTorque(pt1, pt2, MatrixBlock(ang.XX, ang.YY, -ang.YY, ang.XX), weight);
+    MatrixBlock rot(ang.XX, ang.YY, -ang.YY, ang.XX);
+    addTorque(pt1, pt2, rot, weight);
 #endif
 }
 
