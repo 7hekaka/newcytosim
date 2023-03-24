@@ -7,12 +7,14 @@
 #include "modulo.h"
 #include "space.h"
 #include "cymdef.h"
+#include "meca.h"
 
 //------------------------------------------------------------------------------
 
 Duo::Duo(DuoProp const* p, Vector const& w)
 : Couple(p, w), active_(0)
 {
+    countdown_ = 0;
 }
 
 Duo::~Duo()
@@ -48,6 +50,7 @@ void Duo::stepFF()
     // activity
     if ( active_ )
     {
+        assert_true(countdown_ > 0);
         // spontaneous de-activation:
         countdown_ -= prop()->deactivation_rate_dt;
         if ( countdown_ <= 0 )
@@ -64,7 +67,7 @@ void Duo::stepFF()
         else
             cHand2->stepUnattached(simul(), cPos);
     }
-    else if ( prop()->deactivation_type )
+    else if ( prop()->deactivation_mode )
     {
         delete(this);
         return;
@@ -150,6 +153,34 @@ void Duo::stepAA()
         cHand2->stepLoaded(-f);
 }
 
+
+#if NEW_DUO_HAS_TORQUE
+void Duo::setInteractions(Meca& meca) const
+{
+    Interpolation const& pt1 = cHand1->interpolation();
+    Interpolation const& pt2 = cHand2->interpolation();
+    
+    meca.addLink(pt1, pt2, prop()->stiffness);
+    
+#if ( DIM == 2 )
+    if ( prop()->flip )
+    {
+        Vector2 dir = prop()->rest_dir;
+        // flip the angle to match the current configuration of the bond
+        sine = std::copysign(dir.YY, cross(pt1.diff(), pt2.diff()));
+        dir.YY = sine;
+        meca.addTorque(pt1, pt2, dir, prop()->angular_stiffness);
+    }
+    else
+    {
+        meca.addTorque(pt1, pt2, prop()->rest_dir, prop()->angular_stiffness);
+    }
+    //meca.addTorquePoliti(pt1, pt2, dir, prop()->angular_stiffness);
+#elif ( DIM == 3 )
+    meca.addTorque(pt1, pt2, prop()->rest_dir, prop()->angular_stiffness);
+#endif
+}
+#endif
 
 //------------------------------------------------------------------------------
 

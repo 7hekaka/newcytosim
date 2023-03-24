@@ -3,9 +3,12 @@
 #ifndef DUO_PROP_H
 #define DUO_PROP_H
 
+#include "vector2.h"
 #include "couple_prop.h"
 class Space;
 
+// if enabled, a Duo can exert torque
+#define NEW_DUO_HAS_TORQUE 0
 
 /// Additional Property for Duo and DuoLong
 /**
@@ -26,16 +29,27 @@ public:
      */
     
     /// name of the Space inside which the Duo is activated
-    std::string  activation;
+    std::string activation;
 
     /// rate of deactivation
     real deactivation_rate;
     
     /// type of deactivation: can lead to object deletion
-    int deactivation_type;
+    int deactivation_mode;
     
     /// if true, the deactivation clock runs at all time
     bool vulnerable;
+    
+#if NEW_DUO_HAS_TORQUE
+    /// Resting angle in radian (set as `torque[0]`
+    real rest_angle;
+    
+    /// Stiffness of the angular link, in Torque per radians (pN.um/radian) (set as `torque[1]`)
+    real angular_stiffness;
+    
+    /// Allow the angle to flip in 2D
+    bool flip;
+#endif
     
     /// @}
 
@@ -47,6 +61,11 @@ public:
     
     // Space inside which the Duo is activated
     Space const* activation_space;
+    
+#if NEW_DUO_HAS_TORQUE
+    /// derived variable: [cos(rest_angle), sin(rest_angle)]
+    Vector2 rest_dir;
+#endif
 
 public:
     

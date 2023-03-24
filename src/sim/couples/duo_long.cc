@@ -86,14 +86,15 @@ Vector DuoLong::force() const
 /**
  This uses addSideLink2D() or addSideLink3D().
  
- Another possibility would be SideSideLink, which is fully symmetric.
+ Another possibility would be addSideSideLink, which is fully symmetric.
  */
 void DuoLong::setInteractions(Meca& meca) const
 {
     Interpolation const& pt1 = cHand1->interpolation();
     Interpolation const& pt2 = cHand2->interpolation();
     
-    /* 
+    //meca.addSideSideLink(pt1, pt2, prop()->length, prop()->stiffness);
+    /*
      The 'arm' is recalculated each time, but in 2D at least,
      this maybe not necessary, as switching should be rare.
      */
@@ -104,12 +105,30 @@ void DuoLong::setInteractions(Meca& meca) const
     meca.addSideLink2D(pt1, pt2, mArm, prop()->stiffness);
     
 #elif ( DIM >= 3 )
-
+    
     mArm = calcArm(pt1, pt2.pos(), prop()->length);
     meca.addSideLink3D(pt1, pt2, mArm, prop()->stiffness);
     
 #endif
     
-    //meca.addSideSideLink(cHand1->interpolation(), cHand2->interpolation(), prop()->length, prop()->stiffness);
+#if NEW_DUO_HAS_TORQUE
+#if ( DIM == 2 )
+    if ( prop()->flip )
+    {
+        Vector2 dir = prop()->rest_dir;
+        // flip the angle to match the current configuration of the bond
+        sine = std::copysign(dir.YY, cross(pt1.diff(), pt2.diff()));
+        dir.YY = sine;
+        meca.addTorque(pt1, pt2, dir, prop()->angular_stiffness);
+    }
+    else
+    {
+        meca.addTorque(pt1, pt2, prop()->rest_dir, prop()->angular_stiffness);
+    }
+    //meca.addTorquePoliti(pt1, pt2, dir, prop()->angular_stiffness);
+#elif ( DIM == 3 )
+    meca.addTorque(pt1, pt2, prop()->rest_dir, prop()->angular_stiffness);
+#endif
+#endif
 }
 
