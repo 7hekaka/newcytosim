@@ -238,16 +238,19 @@ void Simul::solve_auto()
     float cpu = sMeca.cycles_;
     
     sMeca.apply();
-
-    // Automatic selection of preconditionning method:
-    constexpr size_t N_METHODS = 4;
-    constexpr size_t N_TESTS = 8;
-    constexpr size_t PERIOD = 32;
+    
+    // list of preconditionning method to be tried:
+    std::initializer_list<unsigned> methods { 0, 1, 6 };
+    
+    // how many timestep accumulated to test a method:
+    constexpr size_t N_TESTS = 16;
+    // number of timestep for next trial series:
+    constexpr size_t PERIOD = 128;
     
     //automatically select the preconditionning mode:
     //by trying each methods N_STEP steps, adding CPU time and use fastest.
     
-    if ( ++autoCounter <= N_TESTS*N_METHODS )
+    if ( ++autoCounter <= N_TESTS * methods.size() )
     {
         assert_true(autoPrecond < 8);
         autoCPU[autoPrecond] += cpu;
@@ -255,10 +258,10 @@ void Simul::solve_auto()
 
         //std::clog << " precond " << autoPrecond << " cnt " << cnt << " CPU " << cpu << "\n";
         
-        if ( autoCounter == N_TESTS*N_METHODS )
+        if ( autoCounter == N_TESTS * methods.size() )
         {
             autoPrecond = 0;
-            for ( unsigned m : { 0, 1, 4, 6 } )
+            for ( unsigned m : methods )
             {
                 /*
                  Compare the performance of some methods, and select the fastest.
@@ -273,8 +276,12 @@ void Simul::solve_auto()
                 char str[256], *ptr = str;
                 char*const end = str+sizeof(str);
                 ptr += snprintf(ptr, end-ptr, " precond selection %lu | method count cpu", N_TESTS);
-                for ( size_t u : { 0, 1, 4, 6 } )
-                    ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, (real)autoCNT[u]/N_TESTS, autoCPU[u]/N_TESTS);
+                for ( size_t u : methods )
+                {
+                    real N = (real)autoCNT[u] / N_TESTS;
+                    real T = autoCPU[u] / N_TESTS;
+                    ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, N, T);
+                }
                 snprintf(ptr, end-ptr, " |  -----> %i", autoPrecond);
                 Cytosim::log << str << '\n';
             }
@@ -286,8 +293,11 @@ void Simul::solve_auto()
         }
         else
         {
-            //rotate betwen { 0, 1, 4, 6 }
-            autoPrecond = ( 1 + autoPrecond + 2*(autoPrecond==1) + (autoPrecond==4) ) % 7;
+            // rotate betwen methods
+            auto i = std::find(methods.begin(), methods.end(), autoPrecond);
+            if ( i == methods.end() || ++i == methods.end() )
+                i = methods.begin();
+            autoPrecond = *i;
         }
     }
     else

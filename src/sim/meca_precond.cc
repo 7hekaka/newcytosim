@@ -866,7 +866,9 @@ void Meca::computePreconditionner()
         case 1:
             for ( Mecable * mec : mecables )
             {
-                if ( mec->tag() == Solid::TAG || mec->tag() == Bead::TAG )
+                if ( mec->tag() == Solid::TAG )
+                    computePrecondFull(mec);
+                else if ( mec->tag() == Bead::TAG )
                     mec->blockType(0);
                 else
                     computePrecondIsoB(mec);
