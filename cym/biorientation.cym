@@ -163,6 +163,7 @@ set single corona
 
 set solid kinetochore
 {
+    viscosity = 0.5
     steric = 1
     source = 1, augmin
     twin_stiffness = 400
@@ -194,7 +195,6 @@ new 0 katanin
 
 new kinetochore
 {
-    viscosity = 1
     sphere1 = 0 0 0, 0.100, corona -0.8 -0.5 -0.5, corona -0.5 -0.8 -0.5, corona -0.5 -0.5 -0.8
     position = 0 0 0
     direction = 1 0 0
