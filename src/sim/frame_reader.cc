@@ -191,24 +191,26 @@ int FrameReader::seekFrame(size_t frm)
     {
         fpos_t pos;
         bool has_pos = false;
-        std::string line;
+        size_t len = 1024;
+        char * line = (char*)malloc(len);
 
         do {
             has_pos = !inputter.get_pos(pos);
-            line = inputter.get_line();
-            
+            getline(&line, &len, inputter.file());
+
             if ( inputter.eof() )
                 return END_OF_FILE;
             
 #if 1 // backward compatibility code with format 42 before 2012
-            if ( 0 == line.compare(0, 7, "#frame ") )
+            if ( 0 == memcmp(line, "#frame ", 7) )
                 break;
 #endif
             
-        } while ( line.compare(0, 9, "#Cytosim ") );
+        } while ( memcmp(line, "#Cytosim ", 9) );
         
         //std::clog << "******\n";
         VLOG("           : " << line << '\n');
+        free(line);
 
         if ( ! inputter.eof() )
         {

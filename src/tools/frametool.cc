@@ -430,7 +430,7 @@ int main(int argc, char* argv[])
             }
             strncpy(filename, arg, sizeof(filename));
         }
-        else if ( dot && 0==strcmp(dot, ".cmo" ) )
+        else if ( dot && 0==memcmp(dot, ".cmo", 5) )
         {
             if ( outputname[0] )
             {

@@ -52,7 +52,7 @@ int main(int argc, char* argv[])
     char const* ext = strrchr(argv[2], '.');
     if ( ext )
     {
-        if ( 0 == strncmp(ext, ".txt", 4) )
+        if ( 0 == memcmp(ext, ".txt", 4) )
             binary = 0;
     }
     

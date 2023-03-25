@@ -187,7 +187,7 @@ std::string FileWrapper::get_word()
  */
 void FileWrapper::skip_until(const char * str)
 {
-    const size_t CHK = 64;
+    const size_t CHK = 1024;
     char buf[CHK+2];
 
     fpos_t pos, match;
