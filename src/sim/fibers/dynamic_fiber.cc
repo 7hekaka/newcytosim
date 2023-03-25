@@ -117,7 +117,7 @@ int DynamicFiber::stepMinusEnd()
     constexpr size_t M = 1;
     int res = 0;
     
-#if NEW_FIBER_END_CHEW & 2
+#if ( NEW_FIBER_END_CHEW & 2 )
     real chewed = 0;
     if ( fChew[M] > 0 )
     {
@@ -295,7 +295,7 @@ int DynamicFiber::stepPlusEnd()
     constexpr size_t P = 0;
     int res = 0;
     
-#if NEW_FIBER_END_CHEW & 1
+#if ( NEW_FIBER_END_CHEW & 1 )
     real chewed = 0;
     if ( fChew[P] > 0 )
     {
@@ -401,7 +401,7 @@ void DynamicFiber::step()
     }
     else if ( mStateM == STATE_WHITE )
     {
-#if NEW_FIBER_END_CHEW & 2
+#if ( NEW_FIBER_END_CHEW & 2 )
         if ( fChew[M] > 0 )
         {
             nextShrinkM -= chewingUnits(M);
@@ -435,7 +435,7 @@ void DynamicFiber::step()
     }
     else if ( mStateP == STATE_WHITE )
     {
-#if NEW_FIBER_END_CHEW & 1
+#if ( NEW_FIBER_END_CHEW & 1 )
         if ( fChew[P] > 0 )
         {
             nextShrinkP -= chewingUnits(P);

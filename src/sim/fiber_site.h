@@ -78,7 +78,7 @@ public:
     
 #if FIBER_HAS_LATTICE
     
-    /// return Lattice if engaged
+    /// return associated FiberLattice if enabled
     FiberLattice* lattice() const { return hLattice; }
     
     /// index of Lattice's site
@@ -96,6 +96,7 @@ public:
 
 #else
     
+    /// return nullptr since FiberLattice if disabled
     FiberLattice* lattice() const { return nullptr; }
 
 #endif

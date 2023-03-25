@@ -27,16 +27,22 @@ void Chewer::stepUnloaded()
 {
     assert_true( attached() );
     
-    if ( engaged != NO_END )
+#if ( NEW_FIBER_END_CHEW & 1 )
+    if ( engaged == PLUS_END )
     {
-#if NEW_FIBER_END_CHEW
         hFiber->chew(engaged, prop()->chewing_speed_dt);
         moveToEnd(engaged);
-#else
-        throw InvalidParameter("fiber:chew is not enabled");
-#endif
         return;
     }
+#endif
+#if ( NEW_FIBER_END_CHEW & 2 )
+    if ( engaged == MINUS_END )
+    {
+        hFiber->chew(engaged, prop()->chewing_speed_dt);
+        moveToEnd(engaged);
+        return;
+    }
+#endif
 
     real a = hAbs + prop()->diffusion_dt * RNG.sreal();
     
@@ -66,17 +72,23 @@ void Chewer::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
-    if ( engaged != NO_END )
+#if ( NEW_FIBER_END_CHEW & 1 )
+    if ( engaged == PLUS_END )
     {
-#if NEW_FIBER_END_CHEW
         hFiber->chew(engaged, prop()->chewing_speed_dt);
         moveToEnd(engaged);
-#else
-        throw InvalidParameter("fiber:chew is not enabled");
-#endif
         return;
     }
-    
+#endif
+#if ( NEW_FIBER_END_CHEW & 2 )
+    if ( engaged == MINUS_END )
+    {
+        hFiber->chew(engaged, prop()->chewing_speed_dt);
+        moveToEnd(engaged);
+        return;
+    }
+#endif
+
     // the load is the projection of the force on the local direction of Fiber
     real load = dot(force, dirFiber());
     real a = hAbs + prop()->diffusion_dt * RNG.sreal() + prop()->movability_dt * load;
