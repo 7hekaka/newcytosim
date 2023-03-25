@@ -49,7 +49,7 @@ Mecafil::Mecafil(Mecafil const&)
 }
 
 
-Mecafil& Mecafil::operator=(Mecafil const&)
+Mecafil& Mecafil::operator = (Mecafil const&)
 {
     ABORT_NOW("unfinished: cannot copy a Mecafil");
 }

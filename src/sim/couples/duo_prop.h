@@ -8,7 +8,7 @@
 class Space;
 
 // if enabled, a Duo can exert torque
-#define NEW_DUO_HAS_TORQUE 0
+#define NEW_DUO_HAS_TORQUE 1
 
 /// Additional Property for Duo and DuoLong
 /**

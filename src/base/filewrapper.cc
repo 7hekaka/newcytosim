@@ -37,7 +37,7 @@ FileWrapper::~FileWrapper()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void FileWrapper::operator =(FILE * f)
+void FileWrapper::operator = (FILE * f)
 {
     close();
     mFile = f;

@@ -46,7 +46,7 @@ public:
     virtual ~FileWrapper();
     
     /// constructor from an already opened file
-    void operator =(FILE *);
+    void operator = (FILE *);
     
     /// automatic conversion to a FILE *
     //operator FILE*() { return mFile; }

@@ -121,7 +121,7 @@ public:
     Mecafil(Mecafil const&);
     
     /// copy assignment
-    Mecafil& operator=(Mecafil const&);
+    Mecafil& operator = (Mecafil const&);
     
     /// Destructor
     virtual ~Mecafil();

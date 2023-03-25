@@ -162,7 +162,7 @@ public:
     PointDisp(PointDisp const&);
     
     /// copy assignment
-    PointDisp& operator =(PointDisp const&);
+    PointDisp& operator = (PointDisp const&);
 
     /// destructor
     ~PointDisp();

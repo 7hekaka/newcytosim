@@ -103,7 +103,7 @@ public:
     Map<ORD>(Map<ORD> const&);
     
     /// Disabled copy assignment
-    Map<ORD>& operator=(Map<ORD> const&);
+    Map<ORD>& operator = (Map<ORD> const&);
 
 protected:
    

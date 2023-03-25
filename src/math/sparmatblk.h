@@ -81,7 +81,7 @@ public:
         Line() { rlen_=0; allo_=0; inx_=nullptr; blk_=nullptr; sbk_=nullptr; }
         
         /// the assignment operator will transfer memory
-        void operator =(Line&);
+        void operator = (Line&);
         
         /// destructor
         ~Line() { deallocate(); }

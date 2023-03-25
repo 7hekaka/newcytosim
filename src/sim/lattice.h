@@ -181,7 +181,7 @@ public:
     }
     
     /// assignment operator
-    Lattice & operator =(const Lattice & lat)
+    Lattice & operator = (const Lattice & lat)
     {
         laUnit = lat.laUnit;
 

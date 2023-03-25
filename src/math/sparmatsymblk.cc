@@ -145,7 +145,7 @@ void SparMatSymBlk::Column::deallocate()
 }
 
 
-void SparMatSymBlk::Column::operator =(SparMatSymBlk::Column & col)
+void SparMatSymBlk::Column::operator = (SparMatSymBlk::Column & col)
 {
     //if ( inx_ ) fprintf(stderr, "SMSB transfers column %u\n", inx_[0]);
     free(inx_);

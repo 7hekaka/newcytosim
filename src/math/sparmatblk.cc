@@ -119,7 +119,7 @@ void SparMatBlk::Line::deallocate()
 }
 
 
-void SparMatBlk::Line::operator =(SparMatBlk::Line & row)
+void SparMatBlk::Line::operator = (SparMatBlk::Line & row)
 {
     //if ( inx_ ) fprintf(stderr, "SMB transfers line %u\n", inx_[0]);
     free(inx_);

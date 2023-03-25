@@ -71,7 +71,7 @@ public:
         Column();
         
         /// the assignment operator will transfer memory
-        void operator =(Column&);
+        void operator = (Column&);
         
         /// destructor
         ~Column() { deallocate(); }

@@ -44,7 +44,7 @@ private:
     ObjectPool(ObjectPool const&);
     
     /// Disabled copy assignment
-    ObjectPool& operator=(ObjectPool const&);
+    ObjectPool& operator = (ObjectPool const&);
     
 public:
     

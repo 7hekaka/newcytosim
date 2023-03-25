@@ -89,7 +89,7 @@ public:
     virtual ~Couple();
 
     /// copy operator
-    Couple & operator=(Couple const&);
+    Couple & operator = (Couple const&);
     
     //--------------------------------------------------------------------------
     

@@ -102,7 +102,7 @@ public:
     Mecable(Mecable const&);
     
     /// Copy assignment
-    Mecable& operator=(Mecable const&);
+    Mecable& operator = (Mecable const&);
     
     //--------------------------------------------------------------------------
     

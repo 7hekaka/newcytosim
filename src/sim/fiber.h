@@ -84,7 +84,7 @@ private:
     Fiber(Fiber const&);
     
     /// disabled assignment operator
-    Fiber& operator =(const Fiber&);
+    Fiber& operator = (const Fiber&);
 
     /// Stores the information needed to sever a Fiber
     class CutFacts

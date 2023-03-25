@@ -21,7 +21,7 @@ private:
     Matrix(Matrix const&);
     
     /// Disabled copy assignment (@todo: write copy assignement)
-    Matrix& operator=(Matrix const&);
+    Matrix& operator = (Matrix const&);
 
 protected:
 

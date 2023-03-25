@@ -95,7 +95,7 @@ public:
     Object(Object const& o) : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(o.mark_), flag_(o.flag_) {}
     
     /// assignment operator
-    Object& operator =(const Object& o) { nextO=nullptr; prevO=nullptr; set_=nullptr; mark_=o.mark_; flag_=o.flag_; return *this; }
+    Object& operator = (const Object& o) { nextO=nullptr; prevO=nullptr; set_=nullptr; mark_=o.mark_; flag_=o.flag_; return *this; }
     
     /// destructor
     virtual ~Object();

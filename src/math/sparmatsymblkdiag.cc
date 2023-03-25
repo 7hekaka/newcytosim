@@ -147,7 +147,7 @@ void SparMatSymBlkDiag::Pilar::deallocate()
 }
 
 
-void SparMatSymBlkDiag::Pilar::operator =(SparMatSymBlkDiag::Pilar & col)
+void SparMatSymBlkDiag::Pilar::operator = (SparMatSymBlkDiag::Pilar & col)
 {
     //if ( inx_ ) fprintf(stderr, "SMSBD transfers column %u\n", inx_[0]);
     free(inx_);

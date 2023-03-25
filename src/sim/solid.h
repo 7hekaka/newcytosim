@@ -120,7 +120,7 @@ public:
     Solid(const Solid&);
     
     /// Assignement operator
-    Solid& operator =(const Solid&);
+    Solid& operator = (const Solid&);
 
     /// destructor
     virtual ~Solid();

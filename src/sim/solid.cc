@@ -204,12 +204,12 @@ Solid::Solid(const Solid & o)
 }
 
 
-Solid & Solid::operator =(const Solid & o)
+Solid & Solid::operator = (const Solid & o)
 {
     reset();
     prop = o.prop;
     allocateMecable(o.nPoints);
-    Mecable::operator=(o);
+    Mecable::operator = (o);
     for ( size_t p = 0; p < nPoints; ++p )
         soRadius[p] = o.soRadius[p];
     fixShape();

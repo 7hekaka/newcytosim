@@ -23,7 +23,7 @@ class Grid : public Map<ORD>
     Grid<CELL, ORD>(Grid<CELL, ORD> const&);
     
     /// Disabled copy assignment
-    Grid<CELL, ORD>& operator=(Grid<CELL, ORD> const&);
+    Grid<CELL, ORD>& operator = (Grid<CELL, ORD> const&);
 
 protected:
     

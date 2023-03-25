@@ -69,7 +69,7 @@ public:
     Sphere(const Sphere&);
     
     /// Assignement operator
-    Sphere& operator =(const Sphere&);
+    Sphere& operator = (const Sphere&);
 
     /// destructor
     virtual ~Sphere();

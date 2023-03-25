@@ -154,7 +154,7 @@ public:
     }
     
     /// Copy assignment operator
-    Array& operator =(Array<VAL> const & o)
+    Array& operator = (Array<VAL> const & o)
     {
         if ( o.nbo_ > alc_ )
         {
@@ -168,7 +168,7 @@ public:
     }
     
     /// Move assignment operator
-    Array& operator =(Array<VAL> && o)
+    Array& operator = (Array<VAL> && o)
     {
         //printf("Array %p <---move--- %p\n", this, o);
         delete[] val_;

@@ -20,7 +20,7 @@ class Tesselator
     Tesselator(Tesselator const&);
     
     /// disabled assignment operator
-    Tesselator& operator =(const Tesselator&);
+    Tesselator& operator = (const Tesselator&);
 
 public:
     

@@ -47,7 +47,7 @@ private:
     Inventory(Inventory const&);
     
     /// Disabled copy assignment
-    Inventory& operator=(Inventory const&);
+    Inventory& operator = (Inventory const&);
     
 public:
         

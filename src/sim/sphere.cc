@@ -64,7 +64,7 @@ Sphere::Sphere(const Sphere & o)
 }
 
 
-Sphere & Sphere::operator =(const Sphere & o)
+Sphere & Sphere::operator = (const Sphere & o)
 {
     prop     = o.prop;
     spRadius = o.spRadius;

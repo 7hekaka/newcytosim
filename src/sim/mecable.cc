@@ -49,7 +49,7 @@ Mecable::Mecable(const Mecable & o) : Mecable()
 }
 
 
-Mecable& Mecable::operator =(const Mecable& o)
+Mecable& Mecable::operator = (const Mecable& o)
 {
     setNbPoints(o.nPoints);
     copy_real(DIM*nPoints, o.pPos, pPos);

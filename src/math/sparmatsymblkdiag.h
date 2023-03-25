@@ -72,7 +72,7 @@ public:
         Pilar();
         
         /// the assignment operator will transfer memory ownership
-        void operator =(Pilar&);
+        void operator = (Pilar&);
         
         /// destructor
         ~Pilar() { deallocate(); }
