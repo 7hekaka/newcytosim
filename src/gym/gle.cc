@@ -182,22 +182,32 @@ namespace gle
         constexpr float S = 0.5f;
         const float R = rad * 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
         const float Y = R * C, X = R * S;
-        
-        flu[0] = { R, 0, T, 1, 0, 0};
-        flu[1] = { R, 0, B, 1, 0, 0};
-        flu[2] = { X, Y, T, S, C, 0};
-        flu[3] = { X, Y, B, S, C, 0};
-        flu[4] = {-X, Y, T,-S, C, 0};
-        flu[5] = {-X, Y, B,-S, C, 0};
-        flu[6] = {-R, 0, T,-1, 0, 0};
-        flu[7] = {-R, 0, B,-1, 0, 0};
-        flu[8] = {-X,-Y, T,-S, -C, 0};
-        flu[9] = {-X,-Y, B,-S, -C, 0};
-        flu[10] = { X,-Y, T, S,-C, 0};
-        flu[11] = { X,-Y, B, S,-C, 0};
-        flu[12] = { R, 0, T, 1, 0, 0};
-        flu[13] = { R, 0, B, 1, 0, 0};
-        return 14;
+        // top hexagon
+        flu[0] = {-R, 0, T, 0, 0, 1};
+        flu[1] = {-X,-Y, T, 0, 0, 1};
+        flu[2] = {-X, Y, T, 0, 0, 1};
+        flu[3] = { X,-Y, T, 0, 0, 1};
+        flu[4] = { X, Y, T, S, C, 0};
+        // 6 sides
+        flu[5] = { R, 0, T, 1, 0, 0};
+        flu[6] = { R, 0, B, 1, 0, 0};
+        flu[7] = { X,-Y, T, S,-C, 0};
+        flu[8] = { X,-Y, B, S,-C, 0};
+        flu[9] = {-X,-Y, T,-S,-C, 0};
+        flu[10] = {-X,-Y, B,-S,-C, 0};
+        flu[11] = {-R, 0, T,-1, 0, 0};
+        flu[12] = {-R, 0, B,-1, 0, 0};
+        flu[13] = {-X, Y, T,-S, C, 0};
+        flu[14] = {-X, Y, B,-S, C, 0};
+        flu[15] = { X, Y, T, S, C, 0};
+        flu[16] = { X, Y, B, S, C, 0};
+        // bottom hexagon
+        flu[17] = { R, 0, B, 1, 0, 0};
+        flu[18] = {-X, Y, B, 0, 0,-1};
+        flu[19] = { X,-Y, B, 0, 0,-1};
+        flu[20] = {-R, 0, B, 0, 0,-1};
+        flu[21] = {-X,-Y, B, 0, 0,-1};
+        return 22;
     }
 
     /// Tetrahedron is made of 4 triangles and 12 vertices
@@ -874,7 +884,7 @@ namespace gle
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12 + 12 + 36 + 60 + 45 + 36 + 3 * 14 + 16 + 12*8 );
+        return ( 12 + 12 + 36 + 60 + 45 + 36 + 3 * 22 + 16 + 12*8 );
     }
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori)
@@ -961,9 +971,9 @@ namespace gle
     void cube()      { doVNTriangles(cubes_[5], 36); }
     void star()      { doVNTriangles(cubes_[0], 24); } // union of 2 tetrahedrons
     
-    void hexTube()      { doVNTriangleStrip(cubes_[6], 14); }
-    void thinTube()     { doVNTriangleStrip(cubes_[7], 14); }
-    void thinLongTube() { doVNTriangleStrip(cubes_[8], 14); }
+    void hexTube()      { doVNTriangleStrip(cubes_[6], 22); }
+    void thinTube()     { doVNTriangleStrip(cubes_[7], 22); }
+    void thinLongTube() { doVNTriangleStrip(cubes_[8], 22); }
 
     void blob()   { doTriangleStrip(blobs_[0], 54); }
     void needle() { doTriangleStrip(blobs_[1], 54); }

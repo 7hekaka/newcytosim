@@ -171,11 +171,11 @@ namespace gle
     void halfTube2();
     /// draw a nicer tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube4();
-    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 1]
+    /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void hexTube();
-    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 1]
+    /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void thinTube();
-    /// draw a cylinder along Z, of hexagonal crosssection with Z=[0, 256]
+    /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 256]
     void thinLongTube();
     /// display a super nice cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone1();
