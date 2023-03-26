@@ -93,8 +93,7 @@ Space * SpaceProp::newSpace() const
 {
     std::string s = shape;
 
-    if ( s=="circle" )
-        Cytosim::log << "Please use shape = 'sphere' instead of 'circle'\n";
+    if ( s=="circle" ) s = "sphere";
     if ( s=="rectangle" ) s = "square";
     if ( s=="spherocylinder" ) s = "capsule";
     if ( s=="semi_periodic" ) s = "strip";
