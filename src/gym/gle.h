@@ -165,12 +165,14 @@ namespace gle
     void longTube2();
     /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube4();
-    /// draw a tube along Z, of diameter 1 with Z=[-256, 0]
+    /// draw a nice tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube1();
-    /// draw a nicer tube along Z, of diameter 1 with Z=[-256, 0]
+    /// draw a tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube2();
-    /// draw a nicer tube along Z, of diameter 1 with Z=[-256, 0]
+    /// draw a rough tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube4();
+    /// draw a rough tube along Z, of diameter 1 with Z=[-256, 0], closed at Z=0
+    void endedTube4();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void hexTube();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
@@ -267,7 +269,7 @@ namespace gle
     inline void capedTube() { halfTube4(); hemisphereF(); }
     //inline void capedTube() { halfTube2(); discBottom2(); }
     /// primitive used to draw the PLUS ends of fibers
-    inline void endedTube() { halfTube4(); discBottom2(); }
+    inline void endedTube() { endedTube4(); }
 
     //------------------------------------------------------------------------------
     #pragma mark -

@@ -1239,6 +1239,46 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Tubes
 
+    inline size_t nbTrianglesTubeClosed(size_t inc)
+    {
+        return 4 + 2 * (( pi_once + pi_twice ) / inc);
+    }
+
+    /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
+    size_t setTubeClosed(flute6* flu, size_t inc, float B, float T)
+    {
+        assert_true( B <= T );
+        size_t i = 0;
+        size_t p = pi_twice;
+        flu[i++] = { 1, 0, B, 0, 0,-1 };
+        while ( p >= pi_once + inc )
+        {
+            float C = cos_(p), S = sin_(p);
+            flu[i++] = { C, S, B, 0, 0,-1 };
+            flu[i++] = { C,-S, B, 0, 0,-1 };
+            p -= inc;
+        }
+        flu[i++] = {-1, 0, B, -1, 0, 0 };
+        while ( p <= pi_once * 3 - inc )
+        {
+            float C = cos_(p), S = sin_(p);
+            flu[i++] = { C,-S, B, C,-S, 0 };
+            flu[i++] = { C,-S, T, C,-S, 0 };
+            p += inc;
+        }
+        flu[i++] = {-1, 0, B,-1, 0, 0 };
+        flu[i++] = {-1, 0, T,-1, 0, 0 };
+        size_t j = nbTrianglesTubeClosed(inc);
+        assert_true( i <= j );
+        return i;
+    }
+
+    /// return essentially finesse * 24 / inc
+    inline size_t nbTrianglesTube(size_t inc)
+    {
+        return 2 + 2 * ( pi_twice / inc );
+    }
+
     /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
     size_t setTube(flute6* flu, size_t inc, float B, float T)
     {
@@ -1250,6 +1290,8 @@ namespace gle
             flu[i++] = { C, S, T, C, S, 0 };
             flu[i++] = { C, S, B, C, S, 0 };
         }
+        size_t j = nbTrianglesTube(inc);
+        assert_true( i <= j );
         return i;
     }
     
@@ -1327,7 +1369,7 @@ namespace gle
 
     static size_t sizeTubeBuffers()
     {
-        return 2 + 27 * pi_twice;  // this is empirical!
+        return 2 + 26 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)
@@ -1351,28 +1393,24 @@ namespace gle
         tubes_[10] = i+s; i += setTube(ptr+i, 1, 0, T);
         tubes_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
         tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
-        
-        tubes_[13] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0); // cone1
-        tubes_[14] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone2
-        tubes_[15] = i+s; i += setCone(ptr+i, 4, 0, 1, 1, 0); // cone3
-        tubes_[16] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
-        
-        tubes_[17] = i+s; i += setDisc(ptr+i, 1, 0, 1);
-        tubes_[18] = i+s; i += setDisc(ptr+i, 2, 0, 1);
-        tubes_[19] = i+s; i += setDisc(ptr+i, 1, 1, 1);
-        tubes_[20] = i+s; i += setDisc(ptr+i, 2, 1, 1);
-        tubes_[21] = i+s; i += setDisc(ptr+i, 1, 0, -1);
-        tubes_[22] = i+s; i += setDisc(ptr+i, 2, 0, -1);
-        tubes_[23] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
-        tubes_[24] = i+s; i += setRing(ptr+i, 2, M_SQRT2, 0, 1);
-        assert_true( i <= sizeTubeBuffers() );
-        return i;
-    }
+        tubes_[13] = i+s; i += setTubeClosed(ptr+i, 4, 0, T);
 
-    /// return essentially finesse * 24 / inc
-    inline size_t nbTrianglesTube(size_t inc)
-    {
-        return 2 * ( 1 + pi_twice / inc );
+        tubes_[14] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0); // cone1
+        tubes_[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone2
+        tubes_[16] = i+s; i += setCone(ptr+i, 4, 0, 1, 1, 0); // cone3
+        tubes_[17] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
+        
+        tubes_[18] = i+s; i += setDisc(ptr+i, 1, 0, 1);
+        tubes_[19] = i+s; i += setDisc(ptr+i, 2, 0, 1);
+        tubes_[20] = i+s; i += setDisc(ptr+i, 1, 1, 1);
+        tubes_[21] = i+s; i += setDisc(ptr+i, 2, 1, 1);
+        tubes_[22] = i+s; i += setDisc(ptr+i, 1, 0, -1);
+        tubes_[23] = i+s; i += setDisc(ptr+i, 2, 0, -1);
+        tubes_[24] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
+        tubes_[25] = i+s; i += setRing(ptr+i, 2, M_SQRT2, 0, 1);
+        size_t j = sizeTubeBuffers();
+        assert_true( i <= j );
+        return i;
     }
 
     inline void doTubeStrip(size_t start, size_t cnt)
@@ -1399,20 +1437,21 @@ namespace gle
     void halfTube1()     { doTubeStrip(tubes_[10], nbTrianglesTube(1)); }
     void halfTube2()     { doTubeStrip(tubes_[11], nbTrianglesTube(2)); }
     void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
+    void endedTube4()    { doTubeStrip(tubes_[13], nbTrianglesTubeClosed(4)); }
+
+    void cone1()         { doTubeStrip(tubes_[14], nbTrianglesTube(1)); }
+    void cone2()         { doTubeStrip(tubes_[15], nbTrianglesTube(2)); }
+    void cone3()         { doTubeStrip(tubes_[16], nbTrianglesTube(4)); }
+    void truncatedCone() { doTubeStrip(tubes_[17], nbTrianglesTube(2)); }
     
-    void cone1()         { doTubeStrip(tubes_[13], nbTrianglesTube(1)); }
-    void cone2()         { doTubeStrip(tubes_[14], nbTrianglesTube(2)); }
-    void cone3()         { doTubeStrip(tubes_[15], nbTrianglesTube(4)); }
-    void truncatedCone() { doTubeStrip(tubes_[16], nbTrianglesTube(2)); }
-    
-    void disc1()         { doTubeStrip(tubes_[17], pi_twice); }
-    void disc2()         { doTubeStrip(tubes_[18], pi_twice/2); }
-    void discTop1()      { doTubeStrip(tubes_[19], pi_twice); }
-    void discTop2()      { doTubeStrip(tubes_[20], pi_twice/2); }
-    void discBottom1()   { doTubeStrip(tubes_[21], pi_twice); }
-    void discBottom2()   { doTubeStrip(tubes_[22], pi_twice/2); }
-    void discMid2()      { doTubeStrip(tubes_[23], pi_twice/2); }
-    void ring()          { doTubeStrip(tubes_[24], 2+pi_twice); }
+    void disc1()         { doTubeStrip(tubes_[18], pi_twice); }
+    void disc2()         { doTubeStrip(tubes_[19], pi_twice/2); }
+    void discTop1()      { doTubeStrip(tubes_[20], pi_twice); }
+    void discTop2()      { doTubeStrip(tubes_[21], pi_twice/2); }
+    void discBottom1()   { doTubeStrip(tubes_[22], pi_twice); }
+    void discBottom2()   { doTubeStrip(tubes_[23], pi_twice/2); }
+    void discMid2()      { doTubeStrip(tubes_[24], pi_twice/2); }
+    void ring()          { doTubeStrip(tubes_[25], 2+pi_twice); }
 
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
     void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
