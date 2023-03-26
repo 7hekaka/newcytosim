@@ -800,6 +800,8 @@
 		BBA2954B11A1C16600FDCD2E /* bead.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA2954911A1C16600FDCD2E /* bead.h */; };
 		BBA295CE11A1CDEB00FDCD2E /* bead_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA295CC11A1CDEB00FDCD2E /* bead_set.cc */; };
 		BBA295CF11A1CDEB00FDCD2E /* bead_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA295CD11A1CDEB00FDCD2E /* bead_set.h */; };
+		BBA4943E29D05F340081CA9D /* gym_menu.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB08644C281D4CE8005A6D72 /* gym_menu.cc */; };
+		BBA4943F29D05F8F0081CA9D /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BBA49EFB12FF5331008A7D33 /* dynamic_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA49EF912FF5331008A7D33 /* dynamic_fiber.cc */; };
 		BBA49EFC12FF5331008A7D33 /* dynamic_fiber.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA49EFA12FF5331008A7D33 /* dynamic_fiber.h */; };
 		BBA49F1E12FF5589008A7D33 /* dynamic_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBA49F1C12FF5589008A7D33 /* dynamic_fiber_prop.cc */; };
@@ -5319,6 +5321,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBA4943F29D05F8F0081CA9D /* glapp.cc in Sources */,
+				BBA4943E29D05F340081CA9D /* gym_menu.cc in Sources */,
 				BB31698624A0F3F4008DFDB3 /* operator_new.cc in Sources */,
 				BB51BC2805FA539B00D4869F /* test_glapp.cc in Sources */,
 			);

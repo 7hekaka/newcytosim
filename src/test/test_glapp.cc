@@ -17,6 +17,19 @@
 
 Vector3 origin(0,0,0), position(0,0,0);
 
+void drawObject()
+{
+    glLineWidth(1);
+    glPointSize(10);
+    glColor4f(0, 1, 1, 0.5f);
+    glDisable(GL_LIGHTING);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    //gle::sphere1();
+    //gle::needle();
+    gle::tube4();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+    glEnable(GL_LIGHTING);
+}
 
 int display(View& view)
 {
@@ -25,25 +38,14 @@ int display(View& view)
     gym::enableLighting();
     gym::openDepthMask();
 
-    if ( 1 )
+    drawObject();
+    if ( 0 )
     {
         // icosahedron:
         gym::color_front(1, 0, 1, 0.5);
         gym::color_back(0, 0, 0.1, 0.5);
         gle::icosahedron();
         //gle::ICOSAHEDRON();
-        //gle::icoid();
-        //gle::blob();
-    }
-    if ( 0 )
-    {
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        gym::color_both(1, 1, 1, 1);
-        glDisable(GL_DEPTH_TEST);
-        glLineWidth(0.5);
-        gle::icoid();
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-        glEnable(GL_DEPTH_TEST);
     }
     if ( 0 )
     {

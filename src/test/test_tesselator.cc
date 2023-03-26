@@ -224,12 +224,13 @@ void drawObject()
 {
     glLineWidth(1);
     glPointSize(10);
-    //glPolygonMode(GL_FRONT, GL_LINE);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glColor4f(0, 1, 1, 0.5f);
     glEnable(GL_LIGHTING);
     //gle::sphere1();
     //gle::needle();
     gle::football();
+    glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
     glDisable(GL_LIGHTING);
 }
 
