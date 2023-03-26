@@ -321,21 +321,21 @@ inline void Meca::sub_iso_diag(size_t i, real val)
 
 
 /// add `vec` to the base
-inline void Meca::add_base(size_t const& i, Vector const& vec) const
+inline void Meca::add_base(const size_t i, Vector const& vec) const
 {
     CHECK_INDEX(i);
     vec.add_to(vBAS+DIM*i);
 }
 
 /// add `alpha * vec` to the base
-inline void Meca::add_base(size_t const& i, Vector const& vec, real alpha) const
+inline void Meca::add_base(const size_t i, Vector const& vec, real alpha) const
 {
     CHECK_INDEX(i);
     vec.add_to(alpha, vBAS+DIM*i);
 }
 
 /// add `-vec` to the base
-inline void Meca::sub_base(size_t const& i, Vector const& vec) const
+inline void Meca::sub_base(const size_t i, Vector const& vec) const
 {
     CHECK_INDEX(i);
     vec.sub_to(vBAS+DIM*i);
@@ -1185,16 +1185,10 @@ void Meca::addTorque3Long(Mecapoint const& ptA,
  with ptA = { A, B } and ptC = { C, D }
  FJN, 11.05.2021
  */
-void Meca::addTorque4(Mecapoint const& ptA, Mecapoint const& ptC, const real weight)
+void Meca::addTorque4(size_t iiA, size_t iiB, size_t iiC, size_t iiD, const real weight)
 {
     assert_true( weight >= 0 );
-
 #if USE_ISO_MATRIX
-    const size_t iiA = ptA.matIndex0();
-    const size_t iiB = 1 + iiA;
-    const size_t iiC = ptC.matIndex0();
-    const size_t iiD = 1 + iiC;
-
     sub_iso_diag(iiA, weight);
     sub_iso_diag(iiB, weight);
     sub_iso_diag(iiC, weight);
@@ -1218,11 +1212,6 @@ void Meca::addTorque4(Mecapoint const& ptA, Mecapoint const& ptC, const real wei
         add_iso(iiB, iiD, weight);
     }
 #else
-    const size_t iiA = ptA.matIndex0();
-    const size_t iiB = iiA + 1;
-    const size_t iiC = ptC.matIndex0();
-    const size_t iiD = iiC + 1;
-
     const MatrixBlock W(0, weight);
 
     sub_block_diag(iiA, W);
@@ -1249,6 +1238,13 @@ void Meca::addTorque4(Mecapoint const& ptA, Mecapoint const& ptC, const real wei
 #endif
 }
 
+
+void Meca::addTorque4(Mecapoint const& ptA, Mecapoint const& ptC, const real weight)
+{
+    const size_t iiA = ptA.matIndex0();
+    const size_t iiC = ptC.matIndex0();
+    addTorque4(iiA, 1+iiA, iiC, 1+iiC, weight);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Isotropic links between Mecables

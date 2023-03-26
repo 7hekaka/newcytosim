@@ -282,13 +282,13 @@ private:
     void sub_iso_diag(size_t i, real val);
 
     /// add vector to vBAS at index `i`
-    void add_base(size_t const&, Vector const&) const;
+    void add_base(size_t, Vector const&) const;
 
     /// add scaled vector to vBAS at index `i`
-    void add_base(size_t const&, Vector const&, real) const;
+    void add_base(size_t, Vector const&, real) const;
 
     /// sub vector to vBAS at index `i`
-    void sub_base(size_t const&, Vector const&) const;
+    void sub_base(size_t, Vector const&) const;
 
 private:
     
@@ -461,6 +461,9 @@ public:
 
     /// Add a torque on 3 points with equilibrium angle defined by ang = (cosine, sine), add LongLink on two points
     void addTorque3Long(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
+    
+    /// Add a torque on 4 points to align AB with CD
+    void addTorque4(size_t indexA, size_t indexB, size_t indexC, size_t indexD, real weight);
     
     /// Add a torque on 4 points to align AB with CD
     void addTorque4(Mecapoint const&, Mecapoint const&, real weight);
