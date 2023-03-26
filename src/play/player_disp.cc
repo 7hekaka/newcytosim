@@ -191,12 +191,14 @@ void Player::autoFocus(Simul const& sim, View& view) const
     if ( mode & 8 )
     {
         // track position of Solid (kinetochores)
-        Vector pos(0,0,0);
-        for ( Solid const* B=sim.solids.first(); B; B=B->next() )
-            pos += B->position();
         size_t cnt = sim.solids.size();
         if ( cnt )
+        {
+            Vector pos(0,0,0);
+            for ( Solid const* B=sim.solids.first(); B; B=B->next() )
+                pos += B->posPoint(0);
             view.move_shift(Vector3(pos)*(1.0/cnt));
+        }
     }
 }
 

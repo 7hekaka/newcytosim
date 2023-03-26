@@ -328,6 +328,20 @@ static void flashExclude(FiberDisp const* p)
     }
 }
 
+static void flashTracking(unsigned mode)
+{
+    switch ( mode )
+    {
+        case 0: flashText("no tracking"); break;
+        case 1: flashText("tracking fiber position"); break;
+        case 2: flashText("tracking fiber nematic direction"); break;
+        case 3: flashText("tracking fiber position & nematic"); break;
+        case 4: flashText("tracking fiber position spread"); break;
+        case 5: flashText("tracking fiber position & spread"); break;
+        case 8: flashText("tracking solids position"); break;
+    }
+}
+
 //---------------------------------------------------------------------
 #pragma mark - Fibers
 
@@ -993,12 +1007,12 @@ void processKey(unsigned char key, int modifiers = 0)
                 view.track_fibers ^= 8;
             else
                 view.track_fibers ^= 1;
-            flashText("view.track_fibers = %i (translation)", view.track_fibers);
+            flashTracking(view.track_fibers);
             break;
             
         case 'T':
             view.track_fibers ^= 3;
-            flashText("view.track_fibers = %i (rotation)", view.track_fibers);
+            flashTracking(view.track_fibers);
             break;
             
         case 'd':
