@@ -32,6 +32,30 @@ void Solid::step()
 }
 
 
+#if NEW_SOLID_HAS_TWIN
+/** Old way of linking Twins before 25.03.2023*/
+void Solid::oldLinkTwins(Meca& meca, real stiff) const
+{
+    real R0 = radius(0);
+    constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
+    const real sep = std::max(real(0), prop->twin_separation/2-R0*(1+Q));
+    // Linking the 3 points forming the first triad
+    size_t off = matIndex();
+    // X = 1 contributes to a distance R*sqrt(DIM) along the X-axis
+    real X = 2 * Q * sep / R0;
+    for ( int i = 1; i <= DIM; ++i )
+    {
+        real alp[4] = { -DIM*X, X, X, X };
+        alp[i] += 1;
+#if ( DIM == 3 )
+        meca.addLink4(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], alp[3], stiff);
+#elif ( DIM == 2 )
+        meca.addLink3(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], stiff);
+#endif
+    }
+}
+#endif
+
 void Solid::setInteractions(Meca& meca) const
 {
 #if NEW_RADIAL_FLOW
@@ -56,36 +80,33 @@ void Solid::setInteractions(Meca& meca) const
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin )
     {
-        real R0 = radius(0);
-        constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-        const real sep = std::max(real(0), prop->twin_separation/2-R0*(1+Q));
-        const real stiff = prop->twin_stiffness;
+        constexpr unsigned POLE = DIM+1; // index of 4th point
+        real stiff = prop->twin_stiffness;
         if ( stiff > 0 )
         {
-            size_t off = matIndex();
-            // X = 1 contributes to a distance R*sqrt(DIM) along the X-axis
-            real X = 2 * Q * sep / R0;
+            meca.addLink(Mecapoint(this, POLE), Mecapoint(soTwin, POLE), stiff);
+            //oldLinkTwins(meca, prop->twin_stiffness);
+        }
+        stiff = prop->twin_torque_stiffness;
+        if ( stiff > 0 )
+        {
+            size_t ii = matIndex(), jj = soTwin->matIndex();
+            meca.addTorque4(ii, ii+POLE, jj+POLE, jj, stiff);
+        }
+        // add clamp to the plane X = +/- sep:
+        stiff = prop->twin_metastiff;
+        if ( stiff > 0 )
+        {
+            real R0 = radius(0);
+            constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
+            const real sep = std::max(real(0), prop->twin_separation/2-R0*(1+Q));
             for ( int i = 1; i <= DIM; ++i )
             {
-                real alp[4] = { -DIM*X, X, X, X };
-                alp[i] += 1;
-#if ( DIM == 3 )
-                meca.addLink4(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], alp[3], stiff);
-#elif ( DIM == 2 )
-                meca.addLink3(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], stiff);
-#endif
+                real X = copysign(sep, *addrPoint(i));
+                // this adds an link with the midplane at X = 0
+                meca.addPointClampX(Mecapoint(this, i), X, stiff);
+                meca.addPointClampX(Mecapoint(soTwin, i), -X, stiff);
             }
-            //meca.addLink(Mecapoint(this,i), Mecapoint(soTwin, i), stiff);
-        }
-        // add clamp to the plane X = 0:
-        const real meta = prop->twin_metastiff;
-        if ( meta > 0 )
-        for ( int i = 1; i <= DIM; ++i )
-        {
-            real X = copysign(sep, *addrPoint(i));
-            // this adds an link with the midplane at X = 0
-            meca.addPointClampX(Mecapoint(this, i), X, meta);
-            meca.addPointClampX(Mecapoint(soTwin, i), -X, meta);
         }
     }
 #endif
@@ -529,7 +550,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
 #if ( DIM > 1 )
             if ( str == "cap" )
             {
-                real cap = 0.2;
+                real cap = 0.25;
                 // distribute points randomly over a portion of the unit sphere:
                 std::vector<Vector> pts(num, Vector(0,0,0));
                 size_t cnt = tossPointsCap(pts, cap, 1024);
@@ -778,6 +799,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         real rad = radius(0);
         constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
         real sep = std::max(rad*Q, prop->twin_separation/2-rad);
+        addPoint(Vector(sep*Q,sep*Q,sep*Q));
         if ( str == "mirror" )
         {
             // align (1,1,1) with the X axis, translate to bring plate to origin:

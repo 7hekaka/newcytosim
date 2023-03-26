@@ -1,16 +1,15 @@
 % Arabidopsis taliana spindle
 % Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
 % F. Nedelec, Cambridge 12.11.2022, Sunny. 25.11.2022, Rainy; Fat Chromosomes: 31.12.2022
+% FJN, Strasbourg 26.03.2023: new linkage of Twin Solids
 % This relies on: NEW_SOLID_HAS_TWIN, NEW_SOLID_MAKE_COUPLE, NEW_ANCHOR_NORMAL
 
 set simul system
 {
     viscosity = 0.1
-    time_step = 0.002
+    time_step = 0.005
     steric = 1, 1111, 222
-    display = ( size=2560,768; point_value=0.01; point_size=0.5; line_width=1; zoom=2; style=3;)
-    skip_free_couple = 1
-    verbose = 7
+    verbose = 0
 }
 
 set system display
@@ -27,7 +26,7 @@ set system display
 
 set space cell
 {
-    shape = ring
+    shape = capsule
     display = ( color=0xFFFFFF04; visible=1 )
 }
 
@@ -36,7 +35,6 @@ new cell
     length = 10
     radius = 2
 }
-
 
 % ---------------------- MICROTUBULES ------------------------
 
@@ -166,8 +164,9 @@ set solid kinetochore
     viscosity = 0.5
     steric = 1
     source = 1, augmin
-    twin_stiffness = 400
+    twin_stiffness = 100, 10
     twin_metastiff = 0
+    twin_separation = 0.5
     display = ( coloring=1; color=0x00FFFF44; size=2; style=5; )
 }
 
@@ -203,6 +202,6 @@ new kinetochore
 
 run 5000000 system
 {
-    nb_frames = 10
+    nb_frames = 100
 }
 

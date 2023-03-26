@@ -38,6 +38,7 @@ void SolidProp::clear()
 #endif
 #if NEW_SOLID_HAS_TWIN
     twin_stiffness = 0;
+    twin_torque_stiffness = 0;
     twin_metastiff = 0;
     twin_separation = 0;
 #endif
@@ -100,6 +101,7 @@ void SolidProp::read(Glossary& glos)
 #endif
 #if NEW_SOLID_HAS_TWIN
     glos.set(twin_stiffness, "twin_stiffness");
+    glos.set(twin_torque_stiffness, "twin_stiffness", 1);
     glos.set(twin_metastiff, "twin_metastiff");
     glos.set(twin_separation, "twin_separation");
 #endif
@@ -158,6 +160,8 @@ void SolidProp::complete(Simul const& sim)
 #if NEW_SOLID_HAS_TWIN
     if ( twin_stiffness < 0 )
         throw InvalidParameter(name()+":twin_stiffness must be >= 0");
+    if ( twin_torque_stiffness < 0 )
+        throw InvalidParameter(name()+":twin_torque_stiffness must be >= 0");
     if ( twin_metastiff < 0 )
         throw InvalidParameter(name()+":twin_metastiff must be >= 0");
     if ( twin_separation < 0 )
@@ -183,7 +187,7 @@ void SolidProp::write_values(std::ostream& os) const
     write_value(os, "source", source_rate, source_type);
 #endif
 #if NEW_SOLID_HAS_TWIN
-    write_value(os, "twin_stiffness", twin_stiffness);
+    write_value(os, "twin_stiffness", twin_stiffness, twin_torque_stiffness);
     write_value(os, "twin_metastiff", twin_metastiff);
     write_value(os, "twin_separation", twin_separation);
 #endif

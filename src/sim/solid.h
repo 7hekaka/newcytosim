@@ -79,6 +79,9 @@ private:
 #if NEW_SOLID_HAS_TWIN
     /// another Solid mechanically linked to this one
     Solid * soTwin;
+    
+    /// former way of linking Twins (25.03.2023)
+    void oldLinkTwins(Meca&, real) const;
 #endif
     
     /// the number of points when fixShape() was last called, used for verifications.
@@ -226,7 +229,7 @@ public:
     Solid const* twin() const { return soTwin; }
     
     /// sum distance squared of links between twins
-    real twinTensionSqr() const
+    real oldTwinTensionSqr() const
     {
         real res = 0;
         for ( size_t i = 1; i <= DIM; ++i )
@@ -234,6 +237,13 @@ public:
         return res;
     }
     
+    /// sum distance squared of links between twins
+    real twinTensionSqr() const
+    {
+        size_t i = 1+DIM;
+        return distanceSqr(posPoint(i), soTwin->posPoint(i));
+    }
+
     /// save info to file
     void writeTwin(Outputter&) const;
 #endif

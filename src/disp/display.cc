@@ -2057,6 +2057,8 @@ void Display::drawSolid(Solid const& obj)
             Vector T(twi->posPoint(inx));
             Vector X(twi->posPoint(inx+1));
             Vector Y(twi->posPoint(inx+2));
+            Vector S3(obj.posPoint(inx+DIM+1));
+            Vector T3(twi->posPoint(inx+DIM+1));
 #if ( DIM >= 3 )
             real R = 3 * pixscale(disp->size) / obj.radius(inx);
             Vector C(obj.posPoint(inx+3));
@@ -2068,7 +2070,9 @@ void Display::drawSolid(Solid const& obj)
             if ( obj.prop->twin_stiffness > 0 )
             {
                 gym::color_both(col.mix(lor), 1);
-#if ( DIM >= 3 )
+                gym::stretchAlignZ(S3, T3, rad);
+                gle::hexTube();
+#if ( DIM >= 4 )
                 gle::paintSpikyPrism(dX, dY, dZ, X, dA, dB, dC, A);
                 gle::paintSpikyPrism(dX, dY, dZ, Y, dA, dB, dC, B);
                 gle::paintSpikyPrism(dX, dY, dZ, Z, dA, dB, dC, C);

@@ -357,7 +357,8 @@ void PointGrid::checkLL(FatLocus const& aa, FatLocus const& bb) const
 /// excluding two spheres when they are from the same Solid
 static inline bool not_adjacentPP(FatPoint const* a, FatPoint const* b)
 {
-#if NEW_SOLID_HAS_TWIN
+#if NEW_SOLID_HAS_TWIN && 0
+    // excluding twins from steric is not necessary as of 15.03.2023
     Solid const* A = Solid::toSolid(a->pnt_.mecable());
     Solid const* B = Solid::toSolid(b->pnt_.mecable());
     if (( A && B ) && (( A->twin() == B || B->twin() == A )
