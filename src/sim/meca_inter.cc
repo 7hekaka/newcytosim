@@ -1195,7 +1195,10 @@ void Meca::addTorque4(size_t iiA, size_t iiB, size_t iiC, size_t iiD, const real
     sub_iso_diag(iiD, weight);
 
     add_iso(iiB, iiA, weight);
-    add_iso(iiD, iiC, weight);
+    if ( iiD > iiC )
+        add_iso(iiD, iiC, weight);
+    else
+        add_iso(iiC, iiD, weight);
 
     if ( iiC > iiA )
     {
@@ -1218,7 +1221,10 @@ void Meca::addTorque4(size_t iiA, size_t iiB, size_t iiC, size_t iiD, const real
     add_block(iiB, iiA, W);
     sub_block_diag(iiB, W);
     sub_block_diag(iiC, W);
-    add_block(iiD, iiC, W);
+    if ( iiD > iiC )
+        add_block(iiD, iiC, W);
+    else
+        add_block(iiC, iiD, W);
     sub_block_diag(iiD, W);
 
     if ( iiC > iiA )
