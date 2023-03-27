@@ -82,11 +82,11 @@ void CoupleSet::uniStepCollect(Couple * obj)
  */
 void CoupleSet::step()
 {
-    if ( inventory_.highest() > 2 * ( size() + uniCounts() ) )
+    ObjectID h = inventory_.highest();
+    if ( h > 4096 && h > 2 * ( size() + uniCounts() ) )
     {
-        ObjectID i = inventory_.highest();
         inventory_.reassign();
-        std::clog << "Couple::reassign(" << i << " ---> " << inventory_.highest() << ")\n";
+        std::clog << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
     }
 
     /*
