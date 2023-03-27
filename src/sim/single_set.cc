@@ -80,6 +80,12 @@ was first before any transfer could occur, we process each Couple only once.
 */
 void SingleSet::step()
 {
+    if ( inventory_.highest() > 2 * ( size() + uniCounts() ) )
+    {
+        ObjectID i = inventory_.highest();
+        inventory_.reassign();
+        std::clog << "Single::reassign(" << i << " ---> " << inventory_.highest() << ")\n";
+    }
     //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
     
     Single *const fHead = firstF();
@@ -594,6 +600,15 @@ void SingleSet::deleteInvalidWrists()
 
 //------------------------------------------------------------------------------
 #pragma mark - Fast Diffusion
+
+
+size_t SingleSet::uniCounts() const
+{
+    size_t res = 0;
+    for ( SingleReserve const& can : uniReserves )
+        res += can.size();
+    return res;
+}
 
 
 void SingleSet::uniRefill(SingleReserve& can, size_t cnt, SingleProp const* sip)

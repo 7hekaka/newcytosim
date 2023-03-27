@@ -33,7 +33,7 @@ public:
     SingleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
     
     /// number of objects stored
-    size_t size() { return count_; }
+    size_t size() const { return count_; }
     
     /// return property
     SingleProp const* property() { return property_; }
@@ -42,7 +42,7 @@ public:
     void property(SingleProp const* p) { property_ = p; }
     
     /// first object
-    Single * head() { return head_; }
+    Single * head() const { return head_; }
     
     /// add object
     void push(Single* arg) { arg->Object::next(head_); head_ = arg; ++count_; }
@@ -112,6 +112,9 @@ private:
     /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
     void uniAttach(FiberSet const&);
     
+    /// total count in reserves
+    size_t uniCounts() const;
+
     /// release Single from reserve lists
     void uniRelax();
 

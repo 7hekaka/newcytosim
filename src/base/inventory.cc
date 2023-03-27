@@ -135,18 +135,21 @@ void Inventory::reassign()
     ObjectID sup = highest_;
     assert_true(!record_[inf]);
     
-    while ( inf <= sup )
+    assert_true(record_[sup]);
+    while ( inf < sup )
     {
-        assert_true(record_[sup]);
-        while ( !record_[inf] )
-            ++inf;
-        //swap:
-        assert_true(!record_[nxt]);
-        record_[nxt] = record_[inf];
-        record_[nxt]->setIdentity(nxt);
-        record_[inf] = nullptr;
-        ++nxt;
         ++inf;
+        if ( record_[inf] )
+        {
+            while ( record_[nxt] )
+                ++nxt;
+            assert_true( nxt < alloca_ );
+            // move record from `inf` to `nxt`:
+            record_[nxt] = record_[inf];
+            record_[nxt]->setIdentity(nxt);
+            record_[inf] = nullptr;
+            ++nxt;
+        }
     }
     
     lowest_ = 1;

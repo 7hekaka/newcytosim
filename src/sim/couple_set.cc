@@ -82,6 +82,13 @@ void CoupleSet::uniStepCollect(Couple * obj)
  */
 void CoupleSet::step()
 {
+    if ( inventory_.highest() > 2 * ( size() + uniCounts() ) )
+    {
+        ObjectID i = inventory_.highest();
+        inventory_.reassign();
+        std::clog << "Couple::reassign(" << i << " ---> " << inventory_.highest() << ")\n";
+    }
+
     /*
     Cytosim::log("CoupleSet::step : FF %5i AF %5i FA %5i AA %5i\n",
                  ffList.size(), afList.size(), faList.size(), aaList.size());
@@ -686,6 +693,14 @@ int CoupleSet::bad() const
 
 //------------------------------------------------------------------------------
 #pragma mark - Fast Diffusion
+
+size_t CoupleSet::uniCounts() const
+{
+    size_t res = 0;
+    for ( CoupleReserve const& can : uniReserves )
+        res += can.size();
+    return res;
+}
 
 
 void CoupleSet::uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const* cop)
