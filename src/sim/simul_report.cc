@@ -2809,6 +2809,13 @@ void Simul::flagLargestCluster(ObjectFlag f) const
     }
 }
 
+
+/// to sort fibers in order of identity
+bool comp_fibers(Fiber const* i, Fiber const* j)
+{
+    return ( i->identity() < j->identity() );
+}
+
 /**
 Order Clusters from 1 to max, in order of decreasing size,
 and set fiber:flag() to the corresponding cluster index.
@@ -2855,13 +2862,14 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
     for ( set_t::value_type const& c : clusters )
     {
         ++idx;
-        list_t const& list = map[c.flg];
+        list_t & list = map[c.flg];
         
         for ( Fiber * i : list )
             i->flag(idx);
 
         if ( details > 0 )
         {
+            std::sort(list.begin(), list.end(), comp_fibers);
             out << LIN << c.flg << SEP << c.cnt << ":";
             size_t cnt = std::min(list.size(), details);
             for ( size_t i = 0; i < cnt; ++i )
