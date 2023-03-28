@@ -12,14 +12,14 @@ set simul system
 
 set space cell
 {
-    shape = cylinder
+    shape = capsule
     display = ( color=black; visible=0; )
 }
 
 new cell
 {
-    length = 8
-    radius = 1
+    length = 6
+    radius = 0.5
 }
 
 set fiber microtubule
@@ -27,6 +27,14 @@ set fiber microtubule
     rigidity = 20
     segmentation = 0.25
     steric = 1, 0.025, 0.020
+
+    activity = dynamic
+    min_length = 0.024
+    growing_speed = 0.210  % 210 nm/s is observed
+    shrinking_speed = -0.420, -0.010
+    hydrolysis_rate = 1.2
+    growing_force = 5
+
     display = ( color=white; line_width=2.5; coloring=2; style=stripe; )
 }
 
@@ -49,7 +57,7 @@ set couple parakin
     hand1 = para_kinesin
     hand2 = para_kinesin
     stiffness = 200
-    length = 0.040
+    length = 0.045
     diffusion = 5
     fast_diffusion = 1
 }
@@ -82,9 +90,9 @@ set couple antikin
 set hand minus_kinesin
 {
     binding = 8, 0.055
-    unbinding = 0.1, 3
+    unbinding = 0.1, 4
     activity = move
-    unloaded_speed = -0.360
+    unloaded_speed = -0.100
     stall_force = 5
     display = ( color=green; size=2; )
 }
@@ -92,10 +100,10 @@ set hand minus_kinesin
 set hand slider
 {
     binding = 8, 0.040
-    unbinding = 0.1, 3
+    unbinding = 0.1, 4
     activity = slide
     hold_growing_end = 1
-    hold_shrinking_end = 1
+    hold_shrinking_end = 0
     mobility = 1
     display = ( color=white; size=2; )
 }
@@ -116,14 +124,9 @@ new 500 parakin
 new 2000 antikin
 new 1000 NCD
 
-repeat 12 {
-new microtubule
-{
-    length = 3, 2
-    position = 0 0 0
-    direction = X
-}
-run 10 system
+new event {
+    code = ( new microtubule { length=0.3, 0.2; position=0 0 0; direction=X; plus_end=grow; } )
+    rate = 1;
 }
 
 run 200000 system
