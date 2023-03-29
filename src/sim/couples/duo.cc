@@ -97,13 +97,22 @@ void Duo::stepAF()
     if ( active_ && prop()->vulnerable )
         tryDeactivate();
     
-    //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
-    cHand2->stepUnattached(simul(), cHand1->outerPos());
-
-    if ( cHand1->checkDetachment() )
-        cHand1->detach();
+    if ( active_ )
+    {
+        //we use cHand1->pos() first, because stepUnloaded() may detach cHand1
+        cHand2->stepUnattached(simul(), cHand1->outerPos());
+        
+        if ( cHand1->checkDetachment() )
+            cHand1->detach();
+        else
+            cHand1->stepUnloaded();
+    }
     else
-        cHand1->stepUnloaded();
+    {
+        cHand1->detach();
+        if ( prop()->deactivation_mode )
+            delete(this);
+    }
 }
 
 
@@ -118,13 +127,23 @@ void Duo::stepFA()
     if ( active_ && prop()->vulnerable )
         tryDeactivate();
     
-    //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
-    cHand1->stepUnattached(simul(), cHand2->outerPos());
-
-    if ( cHand2->checkDetachment() )
-        cHand2->detach();
+    if ( active_ )
+    {
+        //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
+        cHand1->stepUnattached(simul(), cHand2->outerPos());
+        
+        if ( cHand2->checkDetachment() )
+            cHand2->detach();
+        else
+            cHand2->stepUnloaded();
+    }
     else
-        cHand2->stepUnloaded();
+    {
+        cHand2->detach();
+        if ( prop()->deactivation_mode )
+            delete(this);
+        return;
+    }
 }
 
 
@@ -139,18 +158,29 @@ void Duo::stepAA()
     if ( active_ && prop()->vulnerable )
         tryDeactivate();
 
-    Vector f = Couple::force();
-    real mag = f.norm();
-    
-    if ( cHand1->checkKramersDetachment(mag) )
+    if ( active_ )
+    {
+        Vector f = Couple::force();
+        real mag = f.norm();
+        
+        if ( cHand1->checkKramersDetachment(mag) )
+            cHand1->detach();
+        else
+            cHand1->stepLoaded( f);
+        
+        if ( cHand2->checkKramersDetachment(mag) )
+            cHand2->detach();
+        else
+            cHand2->stepLoaded(-f);
+    }
+    else
+    {
         cHand1->detach();
-    else
-        cHand1->stepLoaded( f);
-    
-    if ( cHand2->checkKramersDetachment(mag) )
         cHand2->detach();
-    else
-        cHand2->stepLoaded(-f);
+        if ( prop()->deactivation_mode )
+            delete(this);
+        return;
+    }
 }
 
 

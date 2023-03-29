@@ -20,18 +20,32 @@ DuoLong::~DuoLong()
 
 void DuoLong::stepAA()
 {
-    Vector f = DuoLong::force();
-    real mag = f.norm();
-    
-    if ( cHand1->checkKramersDetachment(mag) )
+    if ( active_ && prop()->vulnerable )
+        tryDeactivate();
+
+    if ( active_ )
+    {
+        Vector f = DuoLong::force();
+        real mag = f.norm();
+
+        if ( cHand1->checkKramersDetachment(mag) )
+            cHand1->detach();
+        else
+            cHand1->stepLoaded( f);
+        
+        if ( cHand2->checkKramersDetachment(mag) )
+            cHand2->detach();
+        else
+            cHand2->stepLoaded(-f);
+    }
+    else
+    {
         cHand1->detach();
-    else
-        cHand1->stepLoaded( f);
-    
-    if ( cHand2->checkKramersDetachment(mag) )
         cHand2->detach();
-    else
-        cHand2->stepLoaded(-f);
+        if ( prop()->deactivation_mode )
+            delete(this);
+        return;
+    }
 }
 
 //------------------------------------------------------------------------------
