@@ -57,7 +57,7 @@ set couple parakin
     hand1 = para_kinesin
     hand2 = para_kinesin
     stiffness = 200
-    length = 0.045
+    length = 0.050
     diffusion = 5
     fast_diffusion = 1
 }
@@ -99,7 +99,7 @@ set hand minus_kinesin
 
 set hand slider
 {
-    binding = 8, 0.040
+    binding = 8, 0.055
     unbinding = 0.1, 4
     activity = slide
     hold_growing_end = 1
