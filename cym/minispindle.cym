@@ -1,0 +1,142 @@
+% Competition between Kinesin-5 and Kinesin-14
+% F. Nedelec, Cambridge 30.03.2023
+
+set simul system
+{
+    kT = 0.0042
+    viscosity = 1.0
+    time_step = 0.0025
+    steric = 1, 555, 222
+    display = ( size=1280, 384; point_value=0.01; style=3; zoom=8; )
+}
+
+set space cell
+{
+    shape = capsule
+    display = ( color=black; visible=0; )
+}
+
+new cell
+{
+    length = 20
+    radius = 0.5
+}
+
+set fiber microtubule
+{
+    rigidity = 20
+    segmentation = 0.5
+    steric = 1, 0.025, 0.010
+    confine = inside, 10
+
+    activity = dynamic
+    min_length = 0.024
+    growing_speed = 0.210  % 210 nm/s is observed
+    shrinking_speed = -0.420, -0.010
+    hydrolysis_rate = 1.0
+    growing_force = 5
+
+    display = ( color=white; line_width=2.5; coloring=2; style=stripe; minus_end=4; )
+}
+
+% ------------------------- KINESIN-5 --------------------------
+
+set hand para_kinesin
+{
+    binding = 8, 0.065
+    unbinding = 1, 4
+    
+    activity = mighty
+    unloaded_speed = 0.050
+    stall_force = 5
+    display = ( color=blue; size=2; )
+}
+
+set couple parakin
+{
+    specificity = parallel
+    hand1 = para_kinesin
+    hand2 = para_kinesin
+    stiffness = 10
+    length = 0.050
+    diffusion = 5
+    fast_diffusion = 1
+}
+
+set hand anti_kinesin
+{
+    binding = 8, 0.065
+    unbinding = 1, 4
+    
+    activity = mighty
+    unloaded_speed = 0.050
+    stall_force = 5
+    rescue_chance = 0.0125
+    display = ( color=orange; size=2; )
+}
+
+set couple antikin
+{
+    specificity = antiparallel
+    hand1 = anti_kinesin
+    hand2 = anti_kinesin
+    stiffness = 200
+    length = 0.060
+    diffusion = 5
+    fast_diffusion = 1
+}
+
+% ---------------------- NCD KINESIN-14 ------------------------
+
+set hand minus_kinesin
+{
+    binding = 8, 0.054
+    unbinding = 0.1, 5
+    activity = move
+    unloaded_speed = -0.110
+    stall_force = 5
+    display = ( color=fuscia; size=2; )
+}
+
+set hand slider
+{
+    binding = 8, 0.050
+    unbinding = 0.02, 8
+    activity = slide
+    hold_growing_end = 1
+    hold_shrinking_end = 0
+    mobility = 1
+    display = ( color=white; size=2; )
+}
+
+set couple NCD
+{
+    activity = bridge
+    hand1 = slider
+    hand2 = minus_kinesin
+    stiffness = 400
+    diffusion = 10
+    length = 0.050
+    fast_diffusion = 1
+}
+
+% -------------------------- SYSTEM! ---------------------------
+
+new 200 parakin
+new 1000 antikin
+new 1000 NCD
+
+new 1 microtubule { length=2.0; position=0 +0.000 0; direction=1 0 0; plus_end=grow; }
+new 1 microtubule { length=1.0; position=0 -0.050 0; direction=1 0 0; plus_end=grow; }
+new 1 microtubule { length=1.0; position=0 +0.060 0; direction=-1 0 0; plus_end=grow; }
+
+new event {
+    code = ( new microtubule { length=0.032; position=center; direction=X; plus_end=grow; } )
+    rate = 0.5
+}
+
+run 200000 system
+{
+    nb_frames = 200
+}
+
