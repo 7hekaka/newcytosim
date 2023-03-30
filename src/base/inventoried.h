@@ -44,7 +44,7 @@ public:
     void setIdentity(ObjectID n) { ID_ = n; }
     
     /// returns identity (strictly positive integer, unique within each class)
-    ObjectID  identity() const { return ID_; }
+    ObjectID identity() const { return ID_; }
     
     /// returns modifiable identity
     ObjectID& identity() { return ID_; }
