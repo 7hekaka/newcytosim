@@ -532,6 +532,10 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
  */
 void Simul::reportFiberAge(std::ostream& out) const
 {
+#if !FIBER_HAS_BIRTHTIME
+    out << SEP << "birthtime information disabled at compile time";
+    return;
+#endif
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
     out << SEP << "var_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
     
