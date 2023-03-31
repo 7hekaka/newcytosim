@@ -25,7 +25,7 @@ new cell
 set fiber microtubule
 {
     rigidity = 20
-    segmentation = 0.5
+    segmentation = 0.25
     steric = 1, 0.025, 0.010
     confine = inside, 10
 
@@ -33,7 +33,7 @@ set fiber microtubule
     min_length = 0.024
     growing_speed = 0.210  % 210 nm/s is observed
     shrinking_speed = -0.420, -0.010
-    hydrolysis_rate = 1.0
+    hydrolysis_rate = 1.2
     growing_force = 5
 
     display = ( color=white; line_width=2.5; coloring=2; style=stripe; minus_end=4; )
@@ -46,7 +46,7 @@ set hand para_kinesin
     binding = 8, 0.065
     unbinding = 1, 4
     
-    activity = mighty
+    activity = motor
     unloaded_speed = 0.050
     stall_force = 5
     display = ( color=blue; size=2; )
@@ -57,7 +57,7 @@ set couple parakin
     specificity = parallel
     hand1 = para_kinesin
     hand2 = para_kinesin
-    stiffness = 10
+    stiffness = 1
     length = 0.050
     diffusion = 5
     fast_diffusion = 1
@@ -68,10 +68,9 @@ set hand anti_kinesin
     binding = 8, 0.065
     unbinding = 1, 4
     
-    activity = mighty
+    activity = motor
     unloaded_speed = 0.050
     stall_force = 5
-    rescue_chance = 0.0125
     display = ( color=orange; size=2; )
 }
 
@@ -90,7 +89,7 @@ set couple antikin
 
 set hand minus_kinesin
 {
-    binding = 8, 0.054
+    binding = 16, 0.054
     unbinding = 0.1, 5
     activity = move
     unloaded_speed = -0.110
@@ -100,7 +99,7 @@ set hand minus_kinesin
 
 set hand slider
 {
-    binding = 8, 0.050
+    binding = 16, 0.050
     unbinding = 0.02, 8
     activity = slide
     hold_growing_end = 1
@@ -122,17 +121,17 @@ set couple NCD
 
 % -------------------------- SYSTEM! ---------------------------
 
-new 200 parakin
-new 1000 antikin
-new 1000 NCD
+new 1000 parakin
+new 4000 antikin
+new 4000 NCD
 
 new 1 microtubule { length=2.0; position=0 +0.000 0; direction=1 0 0; plus_end=grow; }
 new 1 microtubule { length=1.0; position=0 -0.050 0; direction=1 0 0; plus_end=grow; }
 new 1 microtubule { length=1.0; position=0 +0.060 0; direction=-1 0 0; plus_end=grow; }
 
 new event {
-    code = ( new microtubule { length=0.032; position=center; direction=X; plus_end=grow; } )
-    rate = 0.5
+    code = ( new microtubule { length=0.064; position=center; direction=X; plus_end=grow; } )
+    rate = 1.5
 }
 
 run 200000 system

@@ -45,7 +45,7 @@ set hand para_kinesin
     binding = 8, 0.065
     unbinding = 1, 4
     
-    activity = mighty
+    activity = motor
     unloaded_speed = 0.060
     stall_force = 5
     display = ( color=blue; size=2; )
@@ -67,10 +67,9 @@ set hand anti_kinesin
     binding = 8, 0.065
     unbinding = 1, 4
     
-    activity = mighty
+    activity = motor
     unloaded_speed = 0.060
     stall_force = 5
-    rescue_chance = 0.0125
     display = ( color=orange; size=2; )
 }
 
