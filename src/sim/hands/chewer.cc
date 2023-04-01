@@ -91,7 +91,8 @@ void Chewer::stepLoaded(Vector const& force)
 
     // the load is the projection of the force on the local direction of Fiber
     real load = dot(force, dirFiber());
-    real a = hAbs + prop()->line_diffusion_dt * RNG.sreal() + prop()->movability_dt * load;
+    real diff = prop()->line_diffusion_dt * RNG.sreal();
+    real a = hAbs + diff + prop()->movability_dt * load;
     
     const real M = hFiber->abscissaM();
     const real P = hFiber->abscissaP();

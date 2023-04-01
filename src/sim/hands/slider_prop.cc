@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 #include "dim.h"
 #include "slider_prop.h"
 #include "exceptions.h"
@@ -20,8 +20,9 @@ void SliderProp::clear()
 {
     HandProp::clear();
 
-    mobility = 0;
+    movability = 0;
     stiffness = -1;
+    line_diffusion = 0;
 }
 
 
@@ -29,8 +30,9 @@ void SliderProp::read(Glossary& glos)
 {
     HandProp::read(glos);
     
-    glos.set(mobility,    "mobility");
-    glos.set(stiffness,   "stiffness");
+    glos.set(movability, "mobility");
+    glos.set(stiffness, "stiffness");
+    glos.set(line_diffusion, "diffusion");
 }
 
 
@@ -38,17 +40,35 @@ void SliderProp::complete(Simul const& sim)
 {
     HandProp::complete(sim);
 
-    if ( mobility < 0 )
+    if ( movability < 0 )
         throw InvalidParameter("slider:mobility must be >= 0");
     
-    if ( primed(sim) && mobility <= 0 )
+    if ( primed(sim) && movability <= 0 )
         std::clog << "WARNING: slider `" << name() << "' will not slide because mobility=0\n";
+
+    if ( line_diffusion < 0 )
+        throw InvalidParameter("slider:line_diffusion must be >= 0");
+    
+    // use Einstein's relation to get a mobility:
+    if ( line_diffusion == 0 )
+    {
+        line_diffusion = movability * boltzmann(sim);
+        std::clog << "         slider:line_diffusion <--- " << line_diffusion << "\n";
+    }
+    
+    /*
+     This is for unidimensional diffusion along the filaments, and we want:
+     var(dx) = 2 D time_step, given that we use dx = diffusion_dt * RNG.sreal()
+     Since `sreal()` is uniformly distributed in [-1, 1], its variance is 1/3,
+     and we need `diffusion_dt^2 = 6 D time_step`
+     */
+    line_diffusion_dt = std::sqrt(6.0 * line_diffusion * time_step(sim));
 
     /*
      Explicit
      */
     
-    mobility_dt = time_step(sim) * mobility;
+    movability_dt = time_step(sim) * movability;
     
     if ( stiffness > 0 )
     {
@@ -62,9 +82,9 @@ void SliderProp::complete(Simul const& sim)
          J. Ward found that in this case, the numerical precision is not improved compared to
          the explicit integration above.
          */
-        std::clog << "         slider:mobility explicit = " << mobility_dt;
-        mobility_dt = -std::expm1( - mobility_dt * stiffness ) / stiffness;
-        std::clog << "   implicit = " << mobility_dt << '\n';
+        std::clog << "         slider:mobility explicit = " << movability_dt;
+        movability_dt = -std::expm1( - movability_dt * stiffness ) / stiffness;
+        std::clog << "   implicit = " << movability_dt << '\n';
     }
 }
 
@@ -76,7 +96,7 @@ void SliderProp::checkStiffness(real stiff, real len, real mul, real kT) const
     /*
      Estimate numerical stability from mobility and stiffness
      */
-    real e = mobility_dt * stiff * mul;
+    real e = movability_dt * stiff * mul;
     if ( e > 2.0 )
     {
         std::ostringstream oss;
@@ -94,7 +114,8 @@ void SliderProp::checkStiffness(real stiff, real len, real mul, real kT) const
 void SliderProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);
-    write_value(os, "mobility",  mobility);
+    write_value(os, "mobility",  movability);
     write_value(os, "stiffness", stiffness);
+    write_value(os, "line_diffusion", line_diffusion);
 }
 

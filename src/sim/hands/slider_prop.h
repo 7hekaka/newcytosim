@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 #ifndef SLIDER_PROP_H
 #define SLIDER_PROP_H
 
@@ -37,9 +37,11 @@ public:
      So measuring the 1D diffusion constant of the molecules bound to a filament
      may provide an estimate of the mobility.
      */
-    real mobility;
+    real movability;
     
-    
+    /// unidimensional diffusion coefficient while bound to a Fiber
+    real line_diffusion;
+
     /// stiffness used to calculate the mobility associated with passive movements
     /**
      If this parameter is set, `mobility` is calculated as:
@@ -66,7 +68,7 @@ public:
 private:
     
     /// derived variable:
-    real mobility_dt;
+    real line_diffusion_dt, movability_dt;
 
 public:
     

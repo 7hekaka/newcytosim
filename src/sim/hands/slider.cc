@@ -18,7 +18,26 @@ void Slider::stepUnloaded()
 {
     assert_true( attached() );
     
-    /// diffusion?
+    real a = hAbs + prop()->line_diffusion_dt * RNG.sreal();
+    
+    const real M = hFiber->abscissaM();
+    const real P = hFiber->abscissaP();
+    
+    if ( a <= M )
+    {
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
+        a = M;
+    }
+    
+    if ( a >= P )
+    {
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
+        a = P;
+    }
+
+    moveTo(a);
 }
 
 
@@ -26,20 +45,25 @@ void Slider::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
     
-    real a = hAbs + dot(force, dirFiber()) * prop()->mobility_dt;
+    real load = dot(force, dirFiber());
+    real diff = prop()->line_diffusion_dt * RNG.sreal();
+    real a = hAbs + diff + prop()->movability_dt * load;
     
-    if ( a < hFiber->abscissaM() )
+    const real M = hFiber->abscissaM();
+    const real P = hFiber->abscissaP();
+    
+    if ( a <= M )
     {
         if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
-        a = hFiber->abscissaM();
+        a = M;
     }
     
-    if ( a > hFiber->abscissaP() )
+    if ( a >= P )
     {
         if ( RNG.test_not(prop()->hold_growing_end) )
             return detach();
-        a = hFiber->abscissaP();
+        a = P;
     }
 
     moveTo(a);
