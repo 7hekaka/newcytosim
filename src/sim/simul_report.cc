@@ -2501,13 +2501,14 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
         }
     }
         
-    out << COM << ljust("couple", 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
+    out << COM << ljust("couple", 2) << SEP << "count" << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
     for ( size_t i = 0; i < MAX; ++i )
     {
         if ( cnt[i] > 0 )
         {
             Property const* p = properties.find_or_die("couple", i);
             out << LIN << ljust(p->name(), 2);
+            out << SEP << (int)cnt[i];
             out << SEP << avg[i] / cnt[i];
             out << SEP << sup[i];
             out << SEP << len[i];
