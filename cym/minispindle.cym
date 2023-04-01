@@ -36,7 +36,7 @@ set fiber microtubule
     hydrolysis_rate = 1.2
     growing_force = 5
 
-    display = ( color=white; line_width=2.5; coloring=2; style=stripe; minus_end=4; )
+    display = ( color=white; line_width=2.5; coloring=2; style=stripe; minus_end=3; )
 }
 
 % ------------------------- KINESIN-5 --------------------------
@@ -58,7 +58,7 @@ set couple parakin
     hand1 = para_kinesin
     hand2 = para_kinesin
     stiffness = 1
-    length = 0.050
+    length = 0.048
     diffusion = 5
     fast_diffusion = 1
 }
@@ -79,8 +79,8 @@ set couple antikin
     specificity = antiparallel
     hand1 = anti_kinesin
     hand2 = anti_kinesin
-    stiffness = 200
-    length = 0.060
+    stiffness = 100
+    length = 0.062
     diffusion = 5
     fast_diffusion = 1
 }
@@ -89,8 +89,8 @@ set couple antikin
 
 set hand minus_kinesin
 {
-    binding = 16, 0.054
-    unbinding = 0.1, 5
+    binding = 4, 0.050
+    unbinding = 0.03, 5
     activity = move
     unloaded_speed = -0.110
     stall_force = 5
@@ -99,8 +99,8 @@ set hand minus_kinesin
 
 set hand slider
 {
-    binding = 16, 0.050
-    unbinding = 0.02, 8
+    binding = 4, 0.040
+    unbinding = 0.03, 8
     activity = slide
     hold_growing_end = 1
     hold_shrinking_end = 0
@@ -110,12 +110,11 @@ set hand slider
 
 set couple NCD
 {
-    activity = bridge
     hand1 = slider
     hand2 = minus_kinesin
     stiffness = 400
     diffusion = 10
-    length = 0.050
+    length = 0.048
     fast_diffusion = 1
 }
 
@@ -126,12 +125,12 @@ new 4000 antikin
 new 4000 NCD
 
 new 1 microtubule { length=2.0; position=0 +0.000 0; direction=1 0 0; plus_end=grow; }
-new 1 microtubule { length=1.0; position=0 -0.050 0; direction=1 0 0; plus_end=grow; }
-new 1 microtubule { length=1.0; position=0 +0.060 0; direction=-1 0 0; plus_end=grow; }
+new 1 microtubule { length=1.0; position=0 -0.048 0; direction=1 0 0; plus_end=grow; }
+new 1 microtubule { length=1.0; position=0 +0.062 0; direction=-1 0 0; plus_end=grow; }
 
 new event {
-    code = ( new microtubule { length=0.064; position=center; direction=X; plus_end=grow; } )
-    rate = 1.5
+    code = ( new microtubule { length=0.064; position=rectangle 1 0; direction=X; plus_end=grow; } )
+    rate = 1.0
 }
 
 run 200000 system
