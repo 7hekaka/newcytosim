@@ -41,6 +41,16 @@ Torque PicketLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 }
 
 
+void PicketLong::afterAttachment(Hand const* ha)
+{
+    Single::afterAttachment(ha);
+
+#if ( DIM > 1 )
+    Interpolation const& ipt = sHand->interpolation();
+    mArm = calcArm(ipt, sPos, prop->length);
+#endif
+}
+
 /*
  Note that, since `mArm` is calculated by setInteractions(),
  the result will be incorrect if 'solve=0'
@@ -85,19 +95,19 @@ void PicketLong::setInteractions(Meca& meca) const
 #if ( DIM == 1 )
     meca.addPointClamp(sHand->interpolation(), sPos, prop->stiffness);
 #else
-    Interpolation const& pt = sHand->interpolation();
+    Interpolation const& ipt = sHand->interpolation();
     
     /* 
      The 'arm' is recalculated every time, but in 2D at least,
      this may not be necessary, as flipping should occur rarely.
      */
     
-    mArm = calcArm(pt, sPos, prop->length);
+    mArm = calcArm(ipt, sPos, prop->length);
     
 #if ( DIM == 2 )
-    meca.addSidePointClamp2D(pt, sPos, mArm, prop->stiffness);
+    meca.addSidePointClamp2D(ipt, sPos, mArm, prop->stiffness);
 #elif ( DIM >= 3 )
-    meca.addSidePointClamp3D(pt, sPos, mArm, prop->stiffness);
+    meca.addSidePointClamp3D(ipt, sPos, mArm, prop->stiffness);
 #endif
 
 #endif

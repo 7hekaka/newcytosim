@@ -50,10 +50,6 @@ class Single : public Object, public HandMonitor
 private:
     
     /// specialization of HandMonitor
-    void afterAttachment(Hand const*);
-    /// specialization of HandMonitor
-    void beforeDetachment(Hand const*);
-    /// specialization of HandMonitor
     Vector linkFoot(Hand const*) const { return posFoot(); }
     /// specialization of HandMonitor
     Vector linkDir(Hand const*) const { return dirFoot(); }
@@ -64,6 +60,11 @@ private:
 
 protected:
     
+    /// specialization of HandMonitor
+    void afterAttachment(Hand const*);
+    /// specialization of HandMonitor
+    void beforeDetachment(Hand const*);
+
     /// the position of the foot
     Vector sPos;
     

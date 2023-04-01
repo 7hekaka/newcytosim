@@ -42,6 +42,9 @@ public:
     ~WristLong();
 
     //--------------------------------------------------------------------------
+    
+    /// recalculates `mArm` when making a bridge
+    void afterAttachment(Hand const*);
 
     /// position on the side of fiber used for sideInteractions
     Vector sidePos() const;

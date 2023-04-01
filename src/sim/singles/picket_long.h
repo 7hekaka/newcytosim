@@ -28,7 +28,10 @@ public:
 
     /// destructor
     ~PicketLong();
-        
+    
+    /// recalculates `mArm` when making a bridge
+    void afterAttachment(Hand const*);
+
     /// position on the side of fiber used in setInteractions()
     Vector sidePos() const;
     

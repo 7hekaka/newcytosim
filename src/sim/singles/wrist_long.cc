@@ -56,6 +56,18 @@ Vector WristLong::calcArm(Interpolation const& itp, Vector const& pos, real len)
     return off.normalized(len);
 }
 
+
+void WristLong::afterAttachment(Hand const* ha)
+{
+    Single::afterAttachment(ha);
+
+#if ( DIM > 1 )
+    Interpolation const& ipt = sHand->interpolation();
+    mArm = calcArm(ipt, posFoot(), prop->length);
+#endif
+}
+
+
 Vector WristLong::sidePos() const
 {
     return sHand->pos() + mArm;

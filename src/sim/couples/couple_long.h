@@ -29,6 +29,9 @@ public:
     /// destructor
     virtual ~CoupleLong();
     
+    /// recalculates `mArm` when making a bridge
+    void afterAttachment(Hand const*);
+
     /// position on the side of fiber1 to which the link is made
     Vector sidePos1() const;
 

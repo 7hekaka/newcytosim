@@ -68,6 +68,22 @@ Torque DuoLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
 }
 
 
+
+void DuoLong::afterAttachment(Hand const* ha)
+{
+    Couple::afterAttachment(ha);
+
+#if ( DIM > 1 )
+    if ( cHand1->attached() && cHand2->attached() )
+    {
+        Interpolation const& pt1 = cHand1->interpolation();
+        Interpolation const& pt2 = cHand2->interpolation();
+        mArm = calcArm(pt1, pt2.pos(), prop()->length);
+    }
+#endif
+}
+
+
 /*
  Note that, since `mArm` is calculated by setInteractions(),
  the result will be incorrect if 'solve=0'
