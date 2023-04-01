@@ -211,6 +211,9 @@ public:
     
     real mesh_aging_rate;
     
+    /// set mesh to evolve from 0 towards equilibrium at 1, with given rate
+    real mesh_aging_limit;
+
     /// flag controlling the forces exerted by Space on fiber points
     /**
      Possible values:

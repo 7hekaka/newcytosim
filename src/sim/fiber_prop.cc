@@ -320,6 +320,7 @@ void FiberProp::clear()
     mesh_binding_rate   = 0;
     mesh_unbinding_rate = 0;
     mesh_aging_rate     = 0;
+    mesh_aging_limit    = 1;
 
     confine = CONFINE_OFF;
     confine_stiff[0] = 0;
@@ -441,6 +442,9 @@ void FiberProp::read(Glossary& glos)
     glos.set(mesh_binding_rate, "mesh_binding_rate");
     glos.set(mesh_unbinding_rate, "mesh_unbinding_rate");
     glos.set(mesh_aging_rate, "mesh_aging_rate");
+    glos.set(mesh_aging_limit, "mesh_aging_limit");
+    glos.set(mesh_aging_rate, "mesh_aging");
+    glos.set(mesh_aging_limit, "mesh_aging", 1);
 #  endif
 #endif
 
@@ -655,6 +659,10 @@ void FiberProp::complete(Simul const& sim)
         
         if ( mesh_aging_rate < 0 )
             throw InvalidParameter("fiber:mesh_aging_rate must be >= 0");
+        if ( mesh_aging_limit < 0 )
+            throw InvalidParameter("fiber:mesh_aging_limit must be >= 0");
+        if ( mesh_aging_rate * time_step(sim) > 1 )
+            throw InvalidParameter("fiber:mesh_aging_rate is too high (unstable)");
 #else
         throw InvalidParameter("Cytosim cannot handle fiber:mesh. Please recompile after setting FIBER_HAS_MESH to 1");
 #endif
@@ -750,7 +758,7 @@ void FiberProp::write_values(std::ostream& os) const
     write_value(os, "mesh_flux_speed",     mesh_flux_speed);
     write_value(os, "mesh_binding_rate",   mesh_binding_rate);
     write_value(os, "mesh_unbinding_rate", mesh_unbinding_rate);
-    write_value(os, "mesh_aging_rate",     mesh_aging_rate);
+    write_value(os, "mesh_aging", mesh_aging_rate, mesh_aging_limit);
 #endif
     write_value(os, "confine", confine, confine_stiff[0], confine_stiff[1], confine_space);
 #if NEW_FIBER_CONFINE2
