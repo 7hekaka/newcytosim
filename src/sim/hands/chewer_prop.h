@@ -27,7 +27,7 @@ public:
     real chewing_speed;
     
     /// unidimensional diffusion coefficient while bound to a Fiber
-    real diffusion;
+    real line_diffusion;
     
     /// @}
     
@@ -35,7 +35,7 @@ private:
     
     real chewing_speed_dt;
 
-    real diffusion_dt, movability_dt;
+    real line_diffusion_dt, movability_dt;
     
 public:
     
