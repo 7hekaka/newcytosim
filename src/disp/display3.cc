@@ -251,7 +251,7 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
 /**
 This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is relative to the minus end.
-The function `set_color` is called to set the color of the segments.
+The function `select_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
                                      long inx, const long last,
@@ -264,17 +264,21 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
     Vector nxt = fib.displayPosM(abs+inc*2);
     Vector dir = normalize(nxt-pos);
     
-    gym::color_front(select_color(fib, inx++, facM));
+    gym_color col = select_color(fib, inx++, facM);
     gym::enableClipPlane(4);
-    gym::setClipPlane(4, -dir, pos);
-    gym::transAlignZ(old, rad, pos-old);
-    if ( abs <= 0 )
-        gle::capedTube();
-    else
-        gle::halfTube2();
+    if ( col.visible() )
+    {
+        gym::color_front(col);
+        gym::setClipPlane(4, -dir, pos);
+        gym::transAlignZ(old, rad, pos-old);
+        if ( abs <= 0 )
+            gle::capedTube();
+        else
+            gle::halfTube2();
+    }
     gym::setClipPlane(4, dir, pos);
     
-    // keep abs to match to the end of the section already drawn
+    // keep abs to match to the end of the section to be drawn
     abs += 2 * inc;
 
     gym::enableClipPlane(5);
@@ -286,25 +290,33 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
         pos = nxt;
         nxt = fib.displayPosM(abs);
         dir = normalize(nxt-old);
-        gym::color_front(select_color(fib, inx++, fac));
         gym::setClipPlane(5, -dir, pos);
-        gym::transAlignZ(old, rad, pos-old);
-        gle::centralTube();
+        col = select_color(fib, inx++, fac);
+        if ( col.visible() )
+        {
+            gym::color_front(col);
+            gym::transAlignZ(old, rad, pos-old);
+            gle::centralTube();
+        }
         gym::setClipPlane(4, dir, pos);
     }
     gym::disableClipPlane(5);
-
+    
     // draw last segment, which may be truncated:
-    gym::color_front(select_color(fib, last, facP));
-    if ( abs >= fib.length() )
+    col = select_color(fib, last, facP);
+    if ( col.visible() )
     {
-        gym::stretchAlignZ1(nxt, -rad, fib.dirEndP(), -rad);
-        gle::endedTube();
-    }
-    else
-    {
-        gym::transAlignZ(nxt, rad, pos-nxt);
-        gle::halfTube2();
+        gym::color_front(col);
+        if ( abs + REAL_EPSILON > fib.length() )
+        {
+            gym::stretchAlignZ1(nxt, -rad, fib.dirEndP(), -rad);
+            gle::endedTube();
+        }
+        else
+        {
+            gym::transAlignZ(nxt, rad, pos-nxt);
+            gle::halfTube2();
+        }
     }
     gym::disableClipPlane(4);
 }
@@ -355,7 +367,7 @@ void Display3::drawFiberSegmentsJoin(Fiber const& fib, float rad,
 /**
 This draws segments of length 'len' which may not correspond to the vertices
 used to model the Fiber. All abscissa is relative to the minus end.
-The function `set_color` is called to set the color of the segments.
+The function `select_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
                                      long inx, const long last,
@@ -366,26 +378,29 @@ void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
     Vector pos = fib.displayPosM(abs);
     Vector nxt = fib.displayPosM(abs+inc);
     
-    gym::color_front(select_color(fib, inx++, facM));
-    if ( abs <= 0 )
+    gym_color col = select_color(fib, inx++, facM);
+    if ( col.visible() )
     {
-        real len = (nxt-pos).norm();
-        gym::stretchAlignZ1(pos, rad, (nxt-pos)/len, 0.75*rad);
-        gle::hemisphere4();
-        gym::scale(1, 1, len/(0.75*rad));
+        gym::color_front(col);
+        if ( abs <= 0 )
+        {
+            real len = (nxt-pos).norm();
+            gym::stretchAlignZ1(pos, rad, (nxt-pos)/len, 0.75*rad);
+            gle::hemisphere4();
+            gym::scale(1, 1, len/(0.75*rad));
+        }
+        else
+        {
+            gym::stretchAlignZ(pos, nxt, rad);
+        }
+        if ( last == inx )
+        {
+            gle::tube4();
+            gle::discTop2();
+            return;
+        }
+        gle::tubeS();
     }
-    else
-    {
-        gym::stretchAlignZ(pos, nxt, rad);
-    }
-    if ( last == inx )
-    {
-        gle::tube4();
-        gle::discTop2();
-        return;
-    }
-    gle::tubeS();
-
     // keep abs to match to the end of the section already drawn
     abs += inc;
     
@@ -394,22 +409,30 @@ void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
         abs += inc;
         pos = nxt;
         nxt = fib.displayPosM(abs);
-        gym::color_front(select_color(fib, inx++, fac));
-        gym::stretchAlignZ(pos, nxt, rad);
-        gle::tubeM();
+        col = select_color(fib, inx++, fac);
+        if ( col.visible() )
+        {
+            gym::color_front(col);
+            gym::stretchAlignZ(pos, nxt, rad);
+            gle::tubeM();
+        }
     }
     // draw last segment, which may be truncated:
-    gym::color_front(select_color(fib, last, facP));
-    if ( abs+inc >= fib.length() )
+    col = select_color(fib, last, facP);
+    if ( col.visible() )
     {
-        gym::stretchAlignZ1(nxt, rad, fib.dirEndP(), fib.length()-abs);
-        gle::discTop2();
+        gym::color_front(col);
+        if ( abs+inc >= fib.length() )
+        {
+            gym::stretchAlignZ1(nxt, rad, fib.dirEndP(), fib.length()-abs);
+            gle::discTop2();
+        }
+        else
+        {
+            gym::stretchAlignZ(nxt, fib.displayPosM(abs+inc), rad);
+        }
+        gle::tubeE();
     }
-    else
-    {
-        gym::stretchAlignZ(nxt, fib.displayPosM(abs+inc), rad);
-    }
-    gle::tubeE();
 }
 
 //------------------------------------------------------------------------------
@@ -648,6 +671,12 @@ void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, fl
 
 void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
+#if 0
+    gym_color col = fib.disp->color;
+    gym_color lor = col.darken(0.75);
+    const real uni = lat.unit();
+    drawFiberStriped(fib, pixscale(rad), uni, col, uni, lor);
+#endif
     drawFiberLattice(fib, lat, pixscale(rad), color_alternate);
 }
 

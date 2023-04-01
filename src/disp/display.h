@@ -196,9 +196,6 @@ public:
 
     /// draw thin lines joining the Fiber vertices
     void drawFiberBackbone(Fiber const&) const;
-    
-    /// draw fiber Lattice
-    int drawFiberLattice(Fiber const& fib, int style, float size) const;
 
     /// draw Fiber minus end
     virtual void drawFiberMinusEnd(Fiber const&, int style, float size) const;
@@ -245,7 +242,7 @@ public:
     /// display lattice subtance using color
     virtual void drawFiberLattice2(Fiber const&, VisibleLattice const&, float rad) const;
    
-    /// display lattice cell edges
+    /// display lattice cell substance and edges
     virtual void drawFiberLattice3(Fiber const&, VisibleLattice const&, float rad) const;
 
     /// display lattice cell edges

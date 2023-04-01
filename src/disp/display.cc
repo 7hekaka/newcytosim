@@ -1807,28 +1807,6 @@ void Display::drawMicrotubule(Fiber const& fib, gym_color colA, gym_color colB, 
 #pragma mark - Draw Fiber
 
 
-int Display::drawFiberLattice(Fiber const& fib, int style, float rad) const
-{
-    VisibleLattice const* lat = fib.visibleLattice();
-    if ( lat ) switch ( style )
-    {
-        case 1:
-            drawFiberLattice1(fib, *lat, rad);
-            return 1;
-        case 2:
-            drawFiberLattice2(fib, *lat, rad);
-            return 1;
-        case 3:
-            drawFiberLattice3(fib, *lat, rad);
-            return 1;
-        case 4:
-            drawFiberLatticeEdges(fib, *lat, rad);
-            return 0;
-    }
-    return 0;
-}
-
-
 void Display::drawFiber(Fiber const& fib)
 {
     FiberDisp const*const disp = fib.prop->disp;
@@ -1837,8 +1815,25 @@ void Display::drawFiber(Fiber const& fib)
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
     if ( disp->lattice_style )
     {
-        if ( drawFiberLattice(fib, disp->lattice_style, disp->line_width) )
+        VisibleLattice const* lat = fib.visibleLattice();
+        if ( lat )
+        {
+            float rad = disp->line_width;
+            switch ( disp->lattice_style )
+            {
+                case 1:
+                    return drawFiberLattice1(fib, *lat, rad);
+                case 2:
+                    return drawFiberLattice2(fib, *lat, rad);
+                case 3:
+                    return drawFiberLattice3(fib, *lat, rad);
+                case 4:
+                    return drawFiberLatticeEdges(fib, *lat, rad);
+                default:
+                    std::clog << "Unexpected value of fiber:lattice_style\n";
+            }
             style = 0;
+        }
     }
 #endif
 

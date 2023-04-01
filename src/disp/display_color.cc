@@ -41,9 +41,9 @@ namespace {
     gym_color color_alternate(Fiber const& fib, size_t seg)
     {
         if ( seg & 1 )
-            return fib.disp->color;
-        else
             return fib.disp->color.darken(0.75);
+        else
+            return fib.disp->color;
     }
     
     gym_color color_by_tension(Fiber const& fib, size_t seg)
@@ -143,9 +143,9 @@ namespace {
     gym_color color_alternate(Fiber const& fib, long ix, real)
     {
         if ( ix & 1 )
-            return fib.disp->color;
-        else
             return fib.disp->color.darken(0.75);
+        else
+            return fib.disp->color;
     }
     
     gym_color color_by_lattice(Fiber const& fib, long ix, real beta)
