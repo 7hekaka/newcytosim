@@ -43,9 +43,9 @@ bool Interface::isCategory(std::string const& name) const
 
 void Interface::eraseSimul(bool arg) const
 {
+    sim_->eraseObjects();
     if ( arg )
         sim_->eraseProperties();
-    sim_->eraseObjects();
 }
 
 ObjectSet* Interface::findClass(std::string const& name, Property*& pp)
