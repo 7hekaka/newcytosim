@@ -442,10 +442,10 @@ void FiberProp::read(Glossary& glos)
     glos.set(mesh_binding_rate, "mesh_binding_rate");
     glos.set(mesh_unbinding_rate, "mesh_unbinding_rate");
     glos.set(mesh_aging_rate, "mesh_aging_rate");
-    glos.set(mesh_aging_limit, "mesh_aging_limit");
+#  endif
     glos.set(mesh_aging_rate, "mesh_aging");
     glos.set(mesh_aging_limit, "mesh_aging", 1);
-#  endif
+    glos.set(mesh_aging_limit, "mesh_aging_limit");
 #endif
 
     glos.set(confine, "confine", {{"off",       CONFINE_OFF},
