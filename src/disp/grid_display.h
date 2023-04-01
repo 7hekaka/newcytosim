@@ -26,9 +26,8 @@ void drawBoundaries(Map<3> const&, float);
 
 /// display the values stored in the cells of a 1D grid using OpenGL
 /**
- OpenGL color is to be specified by the provided function:
- bool set_color(void*, CELL const&, Vector2 const&);
- Each particular cell is displayed only if `set_color' returns true.
+ OpenGL color is to be specified by the argument function pointer:
+ gym_color color(TYPE, CELL const&, Vector1 const&)
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 1> const& grid,
@@ -59,9 +58,8 @@ void drawValues(Grid<CELL, 1> const& grid,
 
 /// display the values stored in the cells of a 2D grid using OpenGL
 /**
- OpenGL color is to be specified by the provided function:
- bool set_color(void*, CELL const&, Vector2 const&);
- Each particular cell is displayed only if `set_color' returns true.
+ OpenGL color is to be specified by the argument function pointer:
+ gym_color color(TYPE, CELL const&, Vector1 const&)
 */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 2> const& grid,
@@ -96,8 +94,8 @@ void drawValues(Grid<CELL, 2> const& grid,
 
 /// display the slice of a 3D grid in a plane parallel to XY at `Z = zzz`
 /**
- a Cell color is specified by `bool set_color(TYPE, CELL const&, Vector2 const&)`
- Each particular cell is displayed only if `set_color' returns true.
+ OpenGL color is to be specified by the argument function pointer:
+ gym_color color(TYPE, CELL const&, Vector1 const&)
  */
 template <typename CELL, typename TYPE>
 void drawValues(Grid<CELL, 3> const& grid,
@@ -136,9 +134,8 @@ void drawValues(Grid<CELL, 3> const& grid,
 
 /// display the slice of a 3D grid in a plane parallel to Y: `Y=pos`
 /**
- OpenGL color is to be specified by the provided function:
- bool set_color(void*, CELL const&, Vector2 const&);
- Each particular cell is displayed only if `set_color' returns true.
+ OpenGL color is to be specified by the argument function pointer:
+ gym_color color(TYPE, CELL const&, Vector1 const&)
 */
 template <typename CELL, typename TYPE>
 void drawValuesXZ(Grid<CELL, 3> const& grid,
@@ -176,9 +173,8 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
 
 // display the slice of a 3D grid in a plane parallel to X: `X=pos`
 /**
- OpenGL color is to be specified by the provided function:
- bool set_color(void*, CELL const&, Vector2 const&);
- Each particular cell is displayed only if `set_color' returns true.
+ OpenGL color is to be specified by the argument function pointer:
+ gym_color color(TYPE, CELL const&, Vector1 const&)
  */
 template <typename CELL, typename TYPE>
 void drawValuesYZ(Grid<CELL, 3> const& grid,
