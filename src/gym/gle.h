@@ -270,6 +270,7 @@ namespace gle
     //inline void capedTube() { halfTube2(); discBottom2(); }
     /// primitive used to draw the PLUS ends of fibers
     inline void endedTube() { endedTube4(); }
+    //inline void endedTube() { halfTube4(); discBottom2(); }
 
     //------------------------------------------------------------------------------
     #pragma mark -

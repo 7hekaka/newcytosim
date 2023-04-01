@@ -298,7 +298,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
     gym::color_front(select_color(fib, last, facP));
     if ( abs >= fib.length() )
     {
-        gym::stretchAlignZ1(nxt, rad, fib.dirEndP(), -rad);
+        gym::stretchAlignZ1(nxt, -rad, fib.dirEndP(), -rad);
         gle::endedTube();
     }
     else

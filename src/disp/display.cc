@@ -1834,53 +1834,51 @@ void Display::drawFiber(Fiber const& fib)
     FiberDisp const*const disp = fib.prop->disp;
     int style = disp->line_style;
     
-    if ( disp->style )
-    {
-        if ( disp->style == 1 )
-            drawFiberBackbone(fib);
-        else
-        {
-            gym_color col1 = fib.disp->color.alpha(1.0);
-            gym_color col2 = col1.darken(0.75);
-            gym_color colE = fib.disp->end_color[0];
-            
-            // load backface color:
-            if ( fib.prop->disp->coloring )
-                gym::color_back(col1);
-            else
-                gym::color_back(disp->back_color);
-            
-            switch( disp->style )
-            {
-                case 2:
-                    if ( prop->style == 1 )
-                    {
-                        float w = pixscale(disp->line_width);
-                        float l = std::max(w, 0.008f);
-                        drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
-                        //drawFiberWide(fib, w);
-                    }
-                    else if ( prop->style == 2 )
-                        drawFiberStriped2D(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
-                    else
-                        drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
-                    break;
-                case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
-                case 4: drawActin(fib, col1, col2, colE); break;
-                case 5: drawMicrotubule(fib, col1, col2, colE); break;
-            }
-        }
-        style = 0;
-    }
-
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
     if ( disp->lattice_style )
     {
-        // if the Lattice is displayed, do not draw backbone:
         if ( drawFiberLattice(fib, disp->lattice_style, disp->line_width) )
             style = 0;
     }
 #endif
+
+    // if the Lattice was displayed, do not draw backbone:
+    if ( disp->style == 1 )
+        drawFiberBackbone(fib);
+    else if ( style && disp->style )
+    {
+        gym_color col1 = fib.disp->color.alpha(1.0);
+        gym_color col2 = col1.darken(0.75);
+        gym_color colE = fib.disp->end_color[0];
+        
+        // load backface color:
+        if ( fib.prop->disp->coloring )
+            gym::color_back(col1);
+        else
+            gym::color_back(disp->back_color);
+        
+        switch( disp->style )
+        {
+            case 2:
+                if ( prop->style == 1 )
+                {
+                    float w = pixscale(disp->line_width);
+                    float l = std::max(w, 0.008f);
+                    drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
+                    //drawFiberWide(fib, w);
+                }
+                else if ( prop->style == 2 )
+                    drawFiberStriped2D(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
+                else
+                    drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
+                break;
+            case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
+            case 4: drawActin(fib, col1, col2, colE); break;
+            case 5: drawMicrotubule(fib, col1, col2, colE); break;
+        }
+        style = 0;
+    }
+
 #if ( DIM >= 3 )
     /*
      Handle styles in 3D that are using transparency to draw fiber's segments
