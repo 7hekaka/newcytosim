@@ -992,7 +992,7 @@ inline void Interface::step_simul()
 void Interface::execute_run(real sec, Glossary& opt, bool do_write)
 {
     int solve = 1;
-    int frames = 0;
+    long frames = 0;
     bool prune = true;
     bool binary = true;
     
@@ -1035,7 +1035,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     VLOG("+RUN START " << sec);
     double tau = sim_->time_step();
     // limit to one frame per time_step:
-    int max = std::max(std::min(frames, (int)std::round(sec/tau)), 1);
+    long max = std::max(std::min(frames, std::lround(sec/tau)), 1L);
     // subtract half a time_step, to ensure we finish exactly on time!
     double start = sim_->time() - 0.5 * tau;
     double delta = sec / double(max);
