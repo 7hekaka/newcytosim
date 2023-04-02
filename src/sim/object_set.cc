@@ -469,18 +469,19 @@ void ObjectSet::thaw()
     }
 }
 
+// record number of objects:
+void ObjectSet::writeRecords(Outputter& out, size_t tot, size_t sup) const
+{
+    out.write("\n#record "+std::to_string(tot)+" "+std::to_string(sup));
+    if ( out.binary() ) out.put_char('\n');
+}
 
 /**
  Write Reference and Object's data, for all Objects in `list`
  */
 void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list) const
 {
-    // record number of objects:
-    size_t tot = list.size();
-    size_t sup = inventory_.highest();
-    out.write("\n#record "+std::to_string(tot)+" "+std::to_string(sup));
-    if ( out.binary() ) out.put_char('\n');
-    
+    writeRecords(out, list.size(), inventory_.highest());
     // record objects:
     for ( Object const* n=list.front(); n; n=n->next() )
     {

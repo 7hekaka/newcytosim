@@ -64,6 +64,9 @@ protected:
 
     /// collect objects from ObjectPool for which func(obj, val) == true
     static ObjectList collect(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
+    
+    /// record number of objects
+    void writeRecords(Outputter&, size_t tot, size_t sup) const;
 
     /// write Object in ObjectPool to file
     void writeObjects(Outputter&, ObjectPool const&) const;

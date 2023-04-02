@@ -406,13 +406,9 @@ void SingleSet::writeF_skip(Outputter& out) const
 {
     const size_t TOP = 16;
     size_t cnt[TOP] = { 0 };
-    // record number of objects:
-    size_t tot = fList.size();
-    size_t sup = inventory_.highest();
-    out.write("\n#record "+std::to_string(tot)+" "+std::to_string(sup));
-    if ( out.binary() ) out.put_char('\n');
+    writeRecords(out, fList.size(), inventory_.highest());
     
-    sup = std::min(TOP, uniReserves.size());
+    size_t sup = std::min(TOP, uniReserves.size());
     for ( size_t i = 0; i < sup; ++i )
         cnt[i] += uniReserves[i].size();
     
