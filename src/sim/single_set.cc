@@ -382,12 +382,16 @@ void SingleSet::reheat(size_t cnt[], size_t n_cnt)
             PropertyID id = o->prop->number();
             if ( id < n_cnt && 0 < cnt[id] )
             {
-                o->randomizePosition();
                 --cnt[id];
+                o->randomizePosition();
                 linkF(o);
             }
             else
+            {
+                inventory_.unassign(o);
+                o->objset(nullptr);
                 delete(o);
+            }
         }
     }
 }
