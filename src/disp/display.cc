@@ -1476,7 +1476,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
 {
     const gym_color black(0,0,0,1);
     const real uni = inc + onc;
-    const real sup = fib.length();
+    const real len = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
     real abs = uni * cnt - fib.abscissaM();
     // abs in [0, uni] is now relative to minus end
@@ -1503,7 +1503,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     ptr[1] = { clr, pos + off };
     ptr += 2;
 
-    while ( abs < sup )
+    while ( abs < len )
     {
         dir = fib.dir(abs);
         pos = fib.displayPosM(abs);
@@ -1542,7 +1542,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
     const gym_color black(0,0,0,1);
     const real uni = inc + onc;
     Vector pos, nxt, old = fib.posEndM();
-    const real sup = fib.length();
+    const real len = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
     real abs = uni * cnt - fib.abscissaM();
     // abs in [0, uni] is now relative to minus end
@@ -1577,7 +1577,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
 #endif
     gym::enableClipPlane(5);
     // draw segments
-    while ( abs < sup )
+    while ( abs < len )
     {
         abs += (cnt&1)?inc:onc;
         old = pos;
