@@ -97,7 +97,7 @@ void SliderProp::checkStiffness(real stiff, real len, real mul, real kT) const
      Estimate numerical stability from mobility and stiffness
      */
     real e = movability_dt * stiff * mul;
-    if ( e > 2.0 )
+    if ( e > 2.0 + REAL_EPSILON )
     {
         std::ostringstream oss;
         oss << "Slider `" << name() << "' is unstable since:\n";

@@ -462,6 +462,7 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
             else
                 lock.thaw_all();
             // renew pointers to objects, particularly 'confine_space'
+            primed_ = 0;
             prop.complete(*this);
         }
         assert_false(couples.bad());
