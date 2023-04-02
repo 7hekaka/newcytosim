@@ -179,27 +179,22 @@ namespace gle
     void thinTube();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 256]
     void thinLongTube();
+    
     /// display a super nice cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone1();
     /// display a nicer cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone2();
     /// display a rough cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone3();
+    /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
+    void longCone();
+    /// display an open cone directed along Z, of radius 1 at Z=0
+    void truncatedCone();
 
     /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
     inline void cylinder1() { tube2(); discBottom2(); discTop2(); }
     /// display a cylinder of axis Z, radius 1 in Z=[-0.5, 0.5]
     void cylinderT();
-
-    /// display a cone of axis Z, radius 1 at Z=0, summit at Z=1
-    inline void cone() { cone2(); discBottom2(); }
-
-    /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
-    void longCone();
-    /// display a closed cone directed along Z, of radius 1.5 in Z=[0.7, +1.4]
-    void shortCone();
-    /// display an open cone directed along Z, of radius 1 at Z=0
-    void truncatedCone();
     /// draw a 3-portion cylinder with a larger central section
     void barrel();
     /// draw a 3-portion cylinder with a larger central section

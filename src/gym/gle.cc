@@ -1395,9 +1395,9 @@ namespace gle
         tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
         tubes_[13] = i+s; i += setTubeClosed(ptr+i, 4, 0, T, 1);
 
-        tubes_[14] = i+s; i += setCone(ptr+i, 1, 0, 1, 1, 0); // cone1
-        tubes_[15] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0); // cone2
-        tubes_[16] = i+s; i += setCone(ptr+i, 4, 0, 1, 1, 0); // cone3
+        tubes_[14] = i+s; i += setTubeClosed(ptr+i, 1, 0, 1, 0); // cone1
+        tubes_[15] = i+s; i += setTubeClosed(ptr+i, 2, 0, 1, 0); // cone2
+        tubes_[16] = i+s; i += setTubeClosed(ptr+i, 4, 0, 1, 0); // cone3
         tubes_[17] = i+s; i += setTubeClosed(ptr+i, 2, -1, 2, 0); // longCone
         tubes_[18] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
 
@@ -1440,9 +1440,9 @@ namespace gle
     void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
     void endedTube4()    { doTubeStrip(tubes_[13], nbTrianglesTubeClosed(4)); }
 
-    void cone1()         { doTubeStrip(tubes_[14], nbTrianglesTube(1)); }
-    void cone2()         { doTubeStrip(tubes_[15], nbTrianglesTube(2)); }
-    void cone3()         { doTubeStrip(tubes_[16], nbTrianglesTube(4)); }
+    void cone1()         { doTubeStrip(tubes_[14], nbTrianglesTubeClosed(1)); }
+    void cone2()         { doTubeStrip(tubes_[15], nbTrianglesTubeClosed(2)); }
+    void cone3()         { doTubeStrip(tubes_[16], nbTrianglesTubeClosed(4)); }
     void longCone()      { doTubeStrip(tubes_[17], nbTrianglesTubeClosed(2)); }
     void truncatedCone() { doTubeStrip(tubes_[18], nbTrianglesTube(2)); }
 
@@ -1467,8 +1467,6 @@ namespace gle
     
     // these primitices do not preserve the modelview transformation
     void cylinderT() { gym::translate(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }
-    //void longCone() { gym::translate(0,0,-1); gym::scale(1,1,3); cone2(); discBottom2(); }
-    void shortCone() { gym::translate(0,0,-0.333f); gym::scale(1,1,0.5); cone2(); discBottom2(); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres made from refined Icosahedrons
@@ -2091,7 +2089,6 @@ namespace gle
         gym::translate(0,0,-1);
         gym::scale(1,1,3);
         cone3();
-        discBottom2();
     }
     
     //-----------------------------------------------------------------------
@@ -2183,7 +2180,6 @@ namespace gle
         gym::translate(0, 0, 1-3*R);
         gym::scale(3.0, 3.0, 6*R);
         cone2();
-        discBottom2();
     }
     
     void drawArrow(Vector2 const& A, Vector2 const& B, float R)
@@ -2193,7 +2189,6 @@ namespace gle
         gym::translate(0, 0, 1-3*R);
         gym::scale(3.0, 3.0, 6*R);
         cone2();
-        discBottom2();
     }
     
     void drawArrow(Vector3 const& A, Vector3 const& B, float R)
@@ -2203,7 +2198,6 @@ namespace gle
         gym::transAlignZ(B, 2*R, B-A);
         gym::scale(1.0, 1.0, 2.0);
         cone2();
-        discBottom2();
     }
     
     //-----------------------------------------------------------------------
@@ -2240,7 +2234,6 @@ namespace gle
             gym::translate(0, 0, 8*R);
             gym::scale(1.5*R, 1.5*R, 3*R);
             cone2();
-            discBottom2();
             gym::translate(0, 0, -2.4);
             gym::scale(0.26, 0.26, 2.4);
             tube1();
