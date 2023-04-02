@@ -81,7 +81,7 @@ was first before any transfer could occur, we process each Couple only once.
 void SingleSet::step()
 {
     ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + uniCounts() ) )
+    if ( h > 4096 && h > 2 * ( size() + reserved() ) )
     {
         inventory_.reassign();
         std::clog << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
@@ -336,7 +336,8 @@ void SingleSet::freeze()
 }
 
 
-void SingleSet::reheat()
+/** cnt[i] is the number of Singles of type `i` to be released */
+void SingleSet::reheat(size_t cnt[], size_t n_cnt)
 {
     //std::clog << "Single::reheat " << ice_.size() << "\n";
     Object * i = ice_.front();
@@ -349,27 +350,54 @@ void SingleSet::reheat()
             ice_.pop(o);
             // we want to skip the 'beforeDetachment' here:
             o->hand()->detachHand();
-            o->randomizePosition();
-            linkF(o);
+            PropertyID id = o->prop->number();
+            if ( id < n_cnt && 0 < cnt[id] )
+            {
+                o->randomizePosition();
+                --cnt[id];
+                linkF(o);
+            }
+            else
+                delete(o);
         }
     }
 }
 
 
+void SingleSet::reheat()
+{
+    size_t sup = reserved();
+    size_t cnt[16] = { 0 };
+    for ( int i = 0; i < 16; ++i ) cnt[i] = sup;
+    reheat(cnt, 16);
+}
+
+
 void SingleSet::writeF_skip(Outputter& out) const
 {
+    const size_t TOP = 16;
+    size_t cnt[TOP] = { 0 };
     // record number of objects:
-    size_t cnt = fList.size();
+    size_t tot = fList.size();
     size_t sup = inventory_.highest();
-    out.write("\n#record "+std::to_string(cnt)+" "+std::to_string(sup));
+    out.write("\n#record "+std::to_string(tot)+" "+std::to_string(sup));
     if ( out.binary() ) out.put_char('\n');
+    
+    sup = std::min(TOP, uniReserves.size());
+    for ( size_t i = 0; i < sup; ++i )
+        cnt[i] += uniReserves[i].size();
     
     for ( Single const* n=firstF(); n; n=n->next() )
     {
+        PropertyID i = n->property()->number();
         if ( ! n->prop->fast_diffusion )
             n->write(out);
+        else if ( i < TOP )
+            ++cnt[i];
     }
     out.write("\n#section single reheat");
+    for ( size_t i = 0; i < sup; ++i )
+        out.writeInt(cnt[i], ' ');
 }
 
 
@@ -602,7 +630,7 @@ void SingleSet::deleteInvalidWrists()
 #pragma mark - Fast Diffusion
 
 
-size_t SingleSet::uniCounts() const
+size_t SingleSet::reserved() const
 {
     size_t res = 0;
     for ( SingleReserve const& can : uniReserves )

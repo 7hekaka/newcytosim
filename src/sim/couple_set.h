@@ -136,15 +136,15 @@ private:
 
     /// `fast_diffusion` attachment assuming that free Couples are uniformly distributed
     void uniAttach(FiberSet const&);
-    
-    /// total count in reserves
-    size_t uniCounts() const;
 
     /// release Couples from reserve lists
     void uniRelax();
 
 public:
-        
+    
+    /// total count in reserves
+    size_t reserved() const;
+
     /// flags to skip unattached Couple in trajectory file
     mutable int skip_now;
 
@@ -307,6 +307,9 @@ public:
 
     /// unlink all objects before import
     void freeze();
+    
+    /// detach objects that were not updated during import
+    void reheat(size_t cnt[], size_t n_cnt);
     
     /// detach objects that were not updated during import
     void reheat();

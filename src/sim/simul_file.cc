@@ -523,40 +523,58 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
             return 0;
         else if ( section == "single" )
         {
-            int mod = 0;
-            iss >> tok >> mod;
+            iss >> tok;
             if ( tok == "F" )
             {
                 // may skip unattached Singles
                 if ( prop.skip_free_single > 1 )
                     in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
+                int mod = 0;
+                iss >> mod;
                 if ( iss.good() && mod == 1 )
                     singles.reheat();
 #endif
             }
             else if ( tok == "reheat" )
             {
-                singles.reheat();
+                size_t i = 0, cnt[16] = { 0 };
+                while ( i < 16 && iss >> cnt[i] )
+                    ++i;
+#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
+                if ( i == 0 )
+                    singles.reheat();
+                else
+#endif
+                    singles.reheat(cnt, 16);
             }
         }
         else if ( section == "couple" )
         {
-            int mod = 0;
-            iss >> tok >> mod;
+            iss >> tok;
             if ( tok == "FF" )
             {
                 // may skip unattached Couples
                 if ( prop.skip_free_couple > 1 )
                     in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
+                int mod = 0;
+                iss >> mod;
                 if ( iss.good() && mod == 1 )
                     couples.reheat();
 #endif
             }
             else if ( tok == "reheat" )
             {
-                couples.reheat();
+                size_t i = 0, cnt[16] = { 0 };
+                while ( i < 16 && iss >> cnt[i] )
+                    ++i;
+#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
+                if ( i == 0 )
+                    couples.reheat();
+                else
+#endif
+                    couples.reheat(cnt, 16);
             }
         }
         objset = findSet(section);

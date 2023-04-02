@@ -83,7 +83,7 @@ void CoupleSet::uniStepCollect(Couple * obj)
 void CoupleSet::step()
 {
     ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + uniCounts() ) )
+    if ( h > 4096 && h > 2 * ( size() + reserved() ) )
     {
         inventory_.reassign();
         std::clog << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
@@ -468,7 +468,8 @@ void CoupleSet::freeze()
 }
 
 
-void CoupleSet::reheat()
+/** cnt[i] is the number of Couples of type `i` to be released */
+void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
 {
     //std::clog << "Couple::reheat " << ice_.size() << "\n";
     Object * i = ice_.front();
@@ -482,10 +483,32 @@ void CoupleSet::reheat()
             // we want to skip the 'beforeDetachment' here:
             o->hand1()->detachHand();
             o->hand2()->detachHand();
-            o->randomizePosition();
-            linkFF(o);
+            PropertyID id = o->prop->number();
+            if ( id < n_cnt && 0 < cnt[id] )
+            {
+                o->randomizePosition();
+                --cnt[id];
+                linkFF(o);
+            }
+            else
+                delete(o);
         }
     }
+#if 0
+    std::clog << "Couple::reheat";
+    for ( size_t n = 0; n < n_cnt; ++n )
+        std::clog << " " << cnt[n];
+    std::clog << "\n";
+#endif
+}
+
+
+void CoupleSet::reheat()
+{
+    size_t sup = reserved();
+    size_t cnt[16] = { 0 };
+    for ( int i = 0; i < 16; ++i ) cnt[i] = sup;
+    reheat(cnt, 16);
 }
 
 
@@ -519,19 +542,30 @@ void CoupleSet::writeFF(Outputter& out) const
 
 void CoupleSet::writeFF_skip(Outputter& out) const
 {
+    const size_t TOP = 16;
+    size_t cnt[TOP] = { 0 };
     out.write("\n#section couple FF");
     // record number of objects:
-    size_t cnt = ffList.size();
+    size_t tot = ffList.size();
     size_t sup = inventory_.highest();
-    out.write("\n#record "+std::to_string(cnt)+" "+std::to_string(sup));
+    out.write("\n#record "+std::to_string(tot)+" "+std::to_string(sup));
     if ( out.binary() ) out.put_char('\n');
-    
+   
+    sup = std::min(TOP, uniReserves.size());
+    for ( size_t i = 0; i < sup; ++i )
+        cnt[i] += uniReserves[i].size();
+
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
+        PropertyID i = n->property()->number();
         if ( ! n->prop->fast_diffusion )
             n->write(out);
+        else if ( i < TOP )
+            ++cnt[i];
     }
     out.write("\n#section couple reheat");
+    for ( size_t i = 0; i < sup; ++i )
+        out.writeInt(cnt[i], ' ');
 }
 
 void CoupleSet::writeSet(Outputter& out) const
@@ -694,7 +728,7 @@ int CoupleSet::bad() const
 //------------------------------------------------------------------------------
 #pragma mark - Fast Diffusion
 
-size_t CoupleSet::uniCounts() const
+size_t CoupleSet::reserved() const
 {
     size_t res = 0;
     for ( CoupleReserve const& can : uniReserves )
