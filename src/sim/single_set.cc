@@ -335,12 +335,14 @@ void SingleSet::makeSingles(size_t cnt[], size_t n_cnt)
         if ( P )
         {
             SingleProp * SP = static_cast<SingleProp*>(P);
+            // renew pointers to 'confine_space'
+            SP->complete(simul_);
             while ( cnt[id] > 0 )
             {
                 --cnt[id];
-                Single* o = SP->newSingle();
-                o->randomizePosition();
-                linkF(o);
+                Single * S = SP->newSingle();
+                S->randomizePosition();
+                linkF(S);
             }
         }
     }
@@ -438,13 +440,10 @@ void SingleSet::writeSet(Outputter& out) const
     if ( sizeF() > 0 )
     {
         out.write("\n#section single F");
-        if ( simul_.prop.skip_free_single && skip_now )
+        if ( simul_.prop.skip_free_single )
             writeF_skip(out);
         else
-        {
             writeObjects(out, fList);
-            skip_now = 1;
-        }
     }
 }
 

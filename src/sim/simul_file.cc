@@ -541,12 +541,15 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                 size_t i = 0, cnt[16] = { 0 };
                 while ( i < 16 && iss >> cnt[i] )
                     ++i;
-#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                if ( i == 0 )
-                    singles.reheat();
-                else
-#endif
+                if ( i > 0 )
+                {
                     singles.reheat(cnt, 16);
+                    singles.makeSingles(cnt, 16);
+                }
+#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
+                else
+                    singles.reheat();
+#endif
             }
         }
         else if ( section == "couple" )
@@ -569,12 +572,15 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                 size_t i = 0, cnt[16] = { 0 };
                 while ( i < 16 && iss >> cnt[i] )
                     ++i;
-#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                if ( i == 0 )
-                    couples.reheat();
-                else
-#endif
+                if ( i > 0 )
+                {
                     couples.reheat(cnt, 16);
+                    couples.makeCouples(cnt, 16);
+                }
+#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
+                else
+                    couples.reheat();
+#endif
             }
         }
         objset = findSet(section);

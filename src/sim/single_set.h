@@ -125,12 +125,9 @@ public:
     
     /// total count in reserves
     size_t reserved(size_t i) const { return uniReserves[i].size(); }
-
-    /// flags to skip unattached Single in trajectory file
-    mutable int skip_now;
     
     /// creator
-    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(0), skip_now(0) {}
+    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(0) {}
     
     //--------------------------
 

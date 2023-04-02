@@ -145,11 +145,8 @@ public:
     /// total count in reserves
     size_t reserved() const;
 
-    /// flags to skip unattached Couple in trajectory file
-    mutable int skip_now;
-
     ///creator
-    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(0), skip_now(0) {}
+    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(0) {}
     
     //--------------------------
     

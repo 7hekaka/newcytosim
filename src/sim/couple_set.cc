@@ -459,12 +459,14 @@ void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
         if ( P )
         {
             CoupleProp * CP = static_cast<CoupleProp*>(P);
+            // renew pointers to 'confine_space'
+            CP->complete(simul_);
             while ( cnt[id] > 0 )
             {
                 --cnt[id];
-                Couple* o = CP->newCouple();
-                o->randomizePosition();
-                linkFF(o);
+                Couple * C = CP->newCouple();
+                C->randomizePosition();
+                linkFF(C);
             }
         }
     }
@@ -601,13 +603,10 @@ void CoupleSet::writeSet(Outputter& out) const
         writeFA(out);
     if ( sizeFF() > 0 )
     {
-        if ( simul_.prop.skip_free_couple && skip_now )
+        if ( simul_.prop.skip_free_couple )
             writeFF_skip(out);
         else
-        {
             writeFF(out);
-            skip_now = 1;
-        }
     }
 }
 
