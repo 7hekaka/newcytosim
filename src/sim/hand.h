@@ -187,7 +187,7 @@ public:
     ObjectID readHand(Inputter&, Simul&);
     
     /// write to file
-    void writeHand(Outputter&) const;
+    void writeHand(Outputter& out) const { FiberSite::writeFiberSite(out); }
     
     /// reset Gillespie's counters
     void resetTimers();

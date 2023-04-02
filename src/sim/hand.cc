@@ -334,16 +334,6 @@ void Hand::stepLoaded(Vector const& force)
 #pragma mark - I/O
 
 
-void Hand::writeHand(Outputter& out) const
-{
-    /*
-     it is not necessary to write the property number here,
-     since it is set when the Hand is created in class Single or Couple.
-     */
-    writeFiberSite(out);
-}
-
-
 ObjectID Hand::readHand(Inputter& in, Simul& sim)
 {
     Fiber * fib = hFiber;
