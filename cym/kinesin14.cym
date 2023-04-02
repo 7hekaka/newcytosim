@@ -1,11 +1,11 @@
-% NCD - Kinesin14
-% FJN, Strasbourg 13.03.2023
+% NCD/HSET - Kinesin14
+% FJN, Strasbourg 13.03.2023, Cambridge 2.04.2023
 
 set simul system
 {
     kT = 0.0042
     viscosity = 1
-    time_step = 0.002
+    time_step = 0.001
     display = ( size=2048,1024; point_value=0.01; style=3; )
 }
 
@@ -35,9 +35,9 @@ set hand minus_kinesin
     binding = 16, 0.050
     unbinding = 0.1, 6
     activity = move
-    unloaded_speed = -0.3
+    unloaded_speed = -0.120
     stall_force = 5
-    display = ( color=green; size=0.5; )
+    display = ( color=green; size=3; )
 }
 
 set hand slider
@@ -46,17 +46,32 @@ set hand slider
     unbinding = 0.1, 6
     activity = slide
     hold_growing_end = 1
-    mobility = 2.5
-    display = ( color=white; size=0.5; )
+    mobility = 10
+    display = ( color=white; size=3; )
 }
 
 set couple NCD
 {
     hand1 = slider
     hand2 = minus_kinesin
-    stiffness = 200
+    stiffness = 100
     diffusion = 5
     fast_diffusion = 1
+}
+
+% -------------------- FIXER --------------------
+
+set hand holder
+{
+    unbinding = 0, inf
+    display = ( color=white; size=3; )
+}
+
+set single fixer
+{
+    hand = holder
+    stiffness = 1000
+    activity = fixed
 }
 
 % ---------------------- SYSTEM! ------------------------
@@ -64,15 +79,17 @@ set couple NCD
 new microtubule
 {
     length = 4
-    position = -0.3 0.21 0
-    direction = 3 -1 0
+    position = 0 0 0
+    direction = random if (X > 0.8)
+    attach1 = fixer, 0, plus_end
 }
 
 new microtubule
 {
     length = 2
-    position = 0.3 -0.21 0
-    direction = 3 1 0
+    position = 0 0 0
+    direction = random if (Y > 0.8)
+    attach1 = fixer, 0, minus_end
 }
 
 new 100 NCD
