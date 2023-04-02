@@ -202,6 +202,9 @@ public:
     
     /// draw Fiber plus end
     virtual void drawFiberPlusEnd(Fiber const&, int style, float size) const;
+    
+    /// draw Fiber plus end
+    void drawFiberGrowth(Fiber const&, float size) const;
 
     /// draw Fiber linear features
     virtual void drawFiberLines(Fiber const&, int style) const;

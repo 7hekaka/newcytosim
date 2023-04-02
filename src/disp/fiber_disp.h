@@ -174,7 +174,9 @@ public:
      */
     gym_color end_colors[6];
     
-    
+    /// draw fresh polymer assembly
+    int growth_style;
+
     /// if true, specify the style for displaying lattice content (also known as `lattice[0]`)
     int lattice_style;
     

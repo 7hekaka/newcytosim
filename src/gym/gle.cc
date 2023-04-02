@@ -1455,9 +1455,10 @@ namespace gle
     void discMid2()      { doTubeStrip(tubes_[26], pi_twice/2); }
     void ring()          { doTubeStrip(tubes_[27], 2+pi_twice); }
 
+    void stripedTube(float w) { gym::bindBufferV3N3(buf_[0]); gym::cleanup(1); gym::drawLines(w, tubes_[2], nbTrianglesTube(4)); }
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
     void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
-    void circle_dotted(float w) { gym::bindBufferV2(buf_[0]); gym::drawLines(w, discs_[0], 1+pi_twice); }
+    void dottedCircle(float w) { gym::bindBufferV2(buf_[0]); gym::drawPoints(w, discs_[1], 1+pi_twice/2); }
     void circle(float R, float w) { gym::scale(R); circle1(w); gym::pull_ref(); }
 
     void stroke_capsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }

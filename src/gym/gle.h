@@ -60,7 +60,7 @@ namespace gle
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, fewer points
     void circle2(float stroke_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, dotted
-    void circle_dotted(float stroke_width);
+    void dottedCircle(float point_size);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void circle(float radius, float stroke_width);
 
@@ -258,6 +258,7 @@ namespace gle
     /// draw a yellow tennisball
     void tennisball();
     
+    void stripedTube(float width);
     /// primitive used to draw the central segments of fibers
     inline void innerTube() { longTube4(); }
     /// primitive used to draw the MINUS ends of fibers

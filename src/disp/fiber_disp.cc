@@ -28,9 +28,9 @@ void FiberDisp::clear()
 
     end_style[0] = 0;
     end_style[1] = 0;
-
     end_size[0] = 6;
     end_size[1] = 6;
+    growth_style = 0;
     
     end_colors[0] = 0xFFFFFFFF;  // white
     end_colors[1] = 0x00FF00FF;  // green
@@ -113,6 +113,8 @@ void FiberDisp::read(Glossary& glos)
     glos.set(end_style, 2, "end_style");
     glos.set(end_colors, 5, "end_color");
     
+    glos.set(growth_style, "growth");
+    
 #if BACKWARD_COMPATIBLE
     glos.set(lattice_style, "draw_lattice");
     glos.set(lattice_scale, "lattice_max");
@@ -182,7 +184,8 @@ void FiberDisp::write_values(std::ostream& os) const
     write_value(os, "plus_end",     end_size[0], end_style[0]);
     write_value(os, "minus_end",    end_size[1], end_style[1]);
     write_value(os, "end_color",    end_colors, 6);
- 
+    write_value(os, "growth",       growth_style);
+    
     write_value(os, "lattice",      lattice_style, lattice_scale, lattice_rescale);
     write_value(os, "labels",       label_style);
     write_value(os, "speckles",     speckle_size, speckle_style, speckle_gap);
