@@ -1589,7 +1589,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
         if (( cnt & 15 )==1) gym::color_load(black);
         gym::setClipPlane(5, -dir, pos);
         gym::transAlignZ(old, rad, pos-old);
-        gle::centralTube();
+        gle::innerTube();
         gym::setClipPlane(4, dir, pos);
     }
     gym::disableClipPlane(5);

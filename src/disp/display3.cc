@@ -223,7 +223,7 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
             if ( fib.chiasma() > -1 ) rad = fib.silhouette(i);
 #endif
             gym::transAlignZ(old, rad, pos-old);
-            gle::centralTube();
+            gle::innerTube();
             gym::setClipPlane(4,  dir, pos);
         }
         gym::disableClipPlane(5);
@@ -296,7 +296,7 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
         {
             gym::color_front(col);
             gym::transAlignZ(old, rad, pos-old);
-            gle::centralTube();
+            gle::innerTube();
         }
         gym::setClipPlane(4, dir, pos);
     }
@@ -595,7 +595,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     gym::enableClipPlane(5);
     gym::enableClipPlane(4);
     gym::transAlignZ(A, rad, B-A);
-    gle::centralTube();
+    gle::innerTube();
     gym::disableClipPlane(4);
     gym::disableClipPlane(5);
 #else

@@ -259,7 +259,7 @@ namespace gle
     void tennisball();
     
     /// primitive used to draw the central segments of fibers
-    inline void centralTube() { longTube4(); }
+    inline void innerTube() { longTube4(); }
     /// primitive used to draw the MINUS ends of fibers
     inline void capedTube() { halfTube4(); hemisphereF(); }
     //inline void capedTube() { halfTube2(); discBottom2(); }
