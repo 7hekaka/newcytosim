@@ -2140,11 +2140,11 @@ void Chain::write(Outputter& out) const
 /**
  The fiber will be re-segmented if its current desired segmentation 
  does not match the one stored in the file.
+ This saves the extension since last frame in cDeltaM, cDeltaP
  */
 void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     //Cytosim::log << "  reading Chain at " << in.pos() << '\n';
-    
     ObjectSignature s = in.readUInt32();
     if ( s ) signature(s);
     
@@ -2174,8 +2174,15 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
+    cDeltaM = +fnAbscissaM;
+    cDeltaP = -fnAbscissaP;
+
     fnAbscissaM = abs;
     fnAbscissaP = abs + len;
+    
+    cDeltaM -= fnAbscissaM;
+    cDeltaP += fnAbscissaP;
+
     setSegmentation(len/nbSegments());  // set segments' length
     //Mecable::write(std::cerr);
     

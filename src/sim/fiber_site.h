@@ -198,7 +198,7 @@ public:
     
     //---------------------------------------------------------------------
     
-    /// check that hAbs is within Fiber::abscissaM() and Fiber::abscissaP()
+    /// check that hAbs is within Chain::abscissaM() and Chain::abscissaP()
     int checkAbscissa() const;
     
     /// check validity of the interpolation (debuging purposes)

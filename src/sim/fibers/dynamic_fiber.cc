@@ -468,14 +468,16 @@ void DynamicFiber::write(Outputter& out) const
 {
     Fiber::write(out);
     
+    long addM = std::lround(cDeltaM/prop()->unit_length);
+    long addP = std::lround(cDeltaP/prop()->unit_length);
     // write variables describing the dynamic state of the ends:
     writeMarker(out, TAG_DYNAMIC);
     out.writeUInt8(unitM[0]);
     out.writeUInt8(unitM[1]);
-    out.writeUInt16(0);
+    out.writeInt16(addM);
     out.writeUInt8(unitP[0]);
     out.writeUInt8(unitP[1]);
-    out.writeUInt16(0);
+    out.writeInt16(addP);
 }
 
 
@@ -494,10 +496,10 @@ void DynamicFiber::readEndStates(Inputter& in)
     {
         unitM[0] = in.readUInt8();
         unitM[1] = in.readUInt8();
-        in.readUInt16();
+        in.readUInt16(); //cDeltaM = in.readInt16() * prop()->unit_length;
         unitP[0] = in.readUInt8();
         unitP[1] = in.readUInt8();
-        in.readUInt16();
+        in.readUInt16(); //cDeltaP = in.readInt16() * prop()->unit_length;
     }
     mStateM = calculateStateM();
     mStateP = calculateStateP();
