@@ -240,6 +240,9 @@ public:
 
     //--------------------------
     
+    /// create unattached Singles
+    void makeSingles(size_t cnt[], size_t n_cnt);
+
     /// unlink all objects before import
     void freeze();
     

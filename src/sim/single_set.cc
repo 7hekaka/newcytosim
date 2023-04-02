@@ -296,6 +296,9 @@ void SingleSet::unlink(Object * obj)
     }
 }
 
+//------------------------------------------------------------------------------
+#pragma mark -
+
 
 void SingleSet::foldPositions(Modulo const* m) const
 {
@@ -321,6 +324,30 @@ void SingleSet::erase()
     ObjectSet::erasePool(aList);
     inventory_.clear();
 }
+
+
+void SingleSet::makeSingles(size_t cnt[], size_t n_cnt)
+{
+    // note that id=0 is invalid
+    for ( size_t id = 1; id < n_cnt; ++id )
+    {
+        Property * P = simul_.properties.find("single", id);
+        if ( P )
+        {
+            SingleProp * SP = static_cast<SingleProp*>(P);
+            while ( cnt[id] > 0 )
+            {
+                --cnt[id];
+                Single* o = SP->newSingle();
+                o->randomizePosition();
+                linkF(o);
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 
 void SingleSet::freeze()

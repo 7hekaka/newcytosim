@@ -304,6 +304,9 @@ public:
     void foldPositions(Modulo const*) const;
 
     //--------------------------
+    
+    /// create unattached Couples
+    void makeCouples(size_t cnt[], size_t n_cnt);
 
     /// unlink all objects before import
     void freeze();

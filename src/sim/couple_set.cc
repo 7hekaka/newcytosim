@@ -451,6 +451,29 @@ void CoupleSet::erase()
 }
 
 
+void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
+{
+    for ( size_t id = 1; id < n_cnt; ++id )
+    {
+        Property * P = simul_.properties.find("couple", id);
+        if ( P )
+        {
+            CoupleProp * CP = static_cast<CoupleProp*>(P);
+            while ( cnt[id] > 0 )
+            {
+                --cnt[id];
+                Couple* o = CP->newCouple();
+                o->randomizePosition();
+                linkFF(o);
+            }
+        }
+    }
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
+
 void CoupleSet::freeze()
 {
     relax();
