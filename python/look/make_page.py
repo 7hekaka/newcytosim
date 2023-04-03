@@ -27,7 +27,6 @@ Modified 3.2010, 5.2012, 11.2012, 7.2013, 11.2013, 4.2015, 7.3.2022, 11.3.2023
 """
 
 import sys, os, subprocess
-import struct, imghdr
 
 out  = 0
 indx = 1
@@ -67,41 +66,6 @@ def writeFooter():
     global out;
     out.write('</body>\n')
     out.write('</html>\n')
-
-
-def getImageSize(filename):
-    '''Determine the image type and return its size. from draco'''
-    with open(filename, 'rb') as file:
-        head = file.read(24)
-        if len(head) != 24:
-            return
-        if imghdr.what(filename) == 'png':
-            check = struct.unpack('>i', head[4:8])[0]
-            if check != 0x0d0a1a0a:
-                return
-            W, H = struct.unpack('>ii', head[16:24])
-        elif imghdr.what(filename) == 'gif':
-            W, H = struct.unpack('<HH', head[6:10])
-        elif imghdr.what(filename) == 'jpeg':
-            try:
-                file.seek(0) # Read 0xff next
-                size = 2
-                ftype = 0
-                while not 0xc0 <= ftype <= 0xcf:
-                    file.seek(size, 1)
-                    byte = file.read(1)
-                    while ord(byte) == 0xff:
-                        byte = file.read(1)
-                    ftype = ord(byte)
-                    size = struct.unpack('>H', file.read(2))[0] - 2
-                # We are at a SOFn block
-                file.seek(1, 1)  # Skip `precision' byte.
-                H, W = struct.unpack('>HH', file.read(4))
-            except Exception: #IGNORE:W0703
-                return
-        else:
-            return
-        return W, H
 
 
 def getMovieSize(file):
@@ -208,6 +172,7 @@ def process_dir(dirpath):
             subdir.append(f)
         else:
             [name, ext] = os.path.splitext(f)
+            ext = ext.lower()
             if name in excluded:
                 pass
             elif ext in ['.png', '.jpg', '.gif', '.tif', '.svg']:
