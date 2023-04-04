@@ -82,13 +82,14 @@ void CoupleSet::uniStepCollect(Couple * obj)
  */
 void CoupleSet::step()
 {
+#if 1
     ObjectID h = inventory_.highest();
     if ( h > 4096 && h > 2 * ( size() + reserved() ) )
     {
         inventory_.reassign();
-        std::clog << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+        //Cytosim::log << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
     }
-
+#endif
     /*
     Cytosim::log("CoupleSet::step : FF %5i AF %5i FA %5i AA %5i\n",
                  ffList.size(), afList.size(), faList.size(), aaList.size());

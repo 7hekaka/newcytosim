@@ -80,12 +80,14 @@ was first before any transfer could occur, we process each Couple only once.
 */
 void SingleSet::step()
 {
+#if 1
     ObjectID h = inventory_.highest();
     if ( h > 4096 && h > 2 * ( size() + reserved() ) )
     {
         inventory_.reassign();
-        std::clog << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+        //Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
     }
+#endif
     //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
     
     Single *const fHead = firstF();

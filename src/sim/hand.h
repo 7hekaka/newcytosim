@@ -26,8 +26,8 @@ class Simul;
  which is either the projection of the current position on the fiber axis, 
  or one of the fiber end.
  
- You can restrict binding to happen only near the ends by setting `bind_only_end`,
- and the associated cutoff distance `bind_end_range`.
+ You can restrict binding to occur only near the ends by setting `bind_only_end`,
+ specifying which end, and the associated cutoff distance `bind_end_range`.
 
  Detachment increases exponentially with force:
 
