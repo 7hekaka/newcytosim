@@ -650,7 +650,10 @@ size_t Fiber::hasKink(const real max_cosine) const
     return 0;
 }
 
-
+/**
+ If `stateM=STATE_BLACK`, the minus end portion of the cut fiber is deleted
+ If `stateP=STATE_BLACK`, the plus end portion of the cut fiber is deleted
+ */
 size_t Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t stateM)
 {
     Array<real> cuts;
@@ -658,7 +661,7 @@ size_t Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t s
      The cuts should be processed in order of decreasing abscissa,
      hence we check intersections from plus end to minus end
     */
-    for ( size_t s = nbSegments(); s >0 ; --s )
+    for ( size_t s = nbSegments(); s > 0 ; --s )
     {
         real abs = planarIntersect(s-1, n, a);
         if ( 0 <= abs  &&  abs < 1 )
@@ -667,15 +670,23 @@ size_t Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t s
     
     for ( real abs : cuts )
     {
-        Fiber * fib = severNow(abs);
-        if ( fib )
+        Fiber * frag = severNow(abs);
+        if ( frag )
         {
-            // old plus end converves its state:
-            fib->setEndStateP(endStateP());
-            // dynamic of new ends are set as usual:
-            setEndStateP(stateP);
-            fib->setEndStateM(stateM);
-            objset()->add(fib);
+            if ( stateP == STATE_BLACK )
+                delete(this);
+            else
+                setEndStateP(stateP);
+            // dynamic of new ends are set as desired:
+            if ( stateM == STATE_BLACK )
+                delete(frag);
+            else
+            {
+                // old plus end converves its state:
+                frag->setEndStateP(endStateP());
+                frag->setEndStateM(stateM);
+                objset()->add(frag);
+            }
         }
     }
     return cuts.size();
