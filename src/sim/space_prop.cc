@@ -97,6 +97,15 @@ Space * SpaceProp::newSpace() const
     if ( s=="rectangle" ) s = "square";
     if ( s=="spherocylinder" ) s = "capsule";
     if ( s=="semi_periodic" ) s = "strip";
+    if ( s=="cube" ) s = "square";
+#if ( DIM == 2 )
+    if ( s=="cylinder" ) s = "square";
+    if ( s=="cylinderP" ) s = "strip";
+#elif ( DIM == 1 )
+    if ( s=="cylinder" ) s = "square";
+    if ( s=="cylinderP" ) s = "periodic";
+    if ( s=="capsule" ) s = "square";
+#endif
 
     if ( s=="square" )     return new SpaceSquare(this);
     if ( s=="sphere" )     return new SpaceSphere(this);
@@ -111,17 +120,10 @@ Space * SpaceProp::newSpace() const
     if ( s=="ellipse" )    return new SpaceEllipse(this);
 #if ( DIM >= 3 )
     if ( s=="disc" )       return new SpaceDisc(this);
-    if ( s=="cubic" )      return new SpaceSquare(this);
     if ( s=="cylinder" )   return new SpaceCylinder(this);
     if ( s=="cylinderZ" )  return new SpaceCylinderZ(this);
     if ( s=="cylinderP" )  return new SpaceCylinderP(this);
     if ( s=="bicylinder" ) return new SpaceBicylinder(this);
-#elif ( DIM == 2 )
-    if ( s=="cylinder" )   return new SpaceSquare(this);
-    if ( s=="cylinderP" )  return new SpaceStrip(this);
-#else
-    if ( s=="cylinder" )   return new SpaceSquare(this);
-    if ( s=="cylinderP" )  return new SpacePeriodic(this);
 #endif
     if ( s=="ring" )       return new SpaceRing(this);
     if ( s=="tee" )        return new SpaceTee(this);
