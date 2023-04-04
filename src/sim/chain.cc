@@ -981,9 +981,11 @@ void Chain::getPoints(real const* ptr)
     {
         std::string doc = document(ptr);
         reshape_global(nbSegments(), ptr, pPos, fnCut);
+#if ( DIM > 1 )
         Cytosim::warn << "crude motion was applied to " << doc << '\n';
         //copy_real(DIM*nbPoints(), ptr, pPos);
         //Cytosim::warn << document(pPos) << '\n';
+#endif
     }
     
     //printf("\n %u  >pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
