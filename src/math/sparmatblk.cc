@@ -391,8 +391,7 @@ void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t st
         Line & row = row_[jj];
         if ( row.notEmpty() )
             os << "% line " << jj << "\n";
-        size_t d = 1;
-        for ( size_t n = 0 ; n < row.rlen_ ; ++n, d = 0 )
+        for ( size_t n = 0 ; n < row.rlen_ ; ++n )
             printSparseBlock(os, inf, row.blk_[n], row.inx_[n], jj);
     }
     os.precision(p);
