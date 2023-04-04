@@ -105,6 +105,7 @@ static std::string standardReport(unsigned inx)
         case 13: return "fiber:cluster{couple=1}";
         case 14: return "fiber:age";
         case 15: return "fiber:distribution";
+        case 16: return "fiber:distribution{interval=0.25}";
     }
     return "";
 }

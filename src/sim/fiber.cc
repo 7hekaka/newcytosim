@@ -651,10 +651,9 @@ size_t Fiber::hasKink(const real max_cosine) const
 }
 
 
-void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t stateM)
+size_t Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t stateM)
 {
     Array<real> cuts;
-    
     /*
      The cuts should be processed in order of decreasing abscissa,
      hence we check intersections from plus end to minus end
@@ -679,6 +678,7 @@ void Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t sta
             objset()->add(fib);
         }
     }
+    return cuts.size();
 }
 
 
