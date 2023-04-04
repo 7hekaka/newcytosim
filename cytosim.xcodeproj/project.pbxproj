@@ -287,6 +287,7 @@
 		BB584FDD28F9F53C006D6349 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
 		BB585419295C716600F103AB /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BB5A0CB021C38BF7000DBC0E /* interpolation4.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD89B2F214FEABB00DB4ECA /* interpolation4.cc */; };
+		BB5BE48029DC25C900A32BBE /* heapsort.h in Headers */ = {isa = PBXBuildFile; fileRef = BB5BE47F29DC25C900A32BBE /* heapsort.h */; };
 		BB5CD2D028D8C91D004F34D5 /* glapp.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB086456281D4CE8005A6D72 /* glapp.cc */; };
 		BB5CD2DD28D8C94E004F34D5 /* (null) in Headers */ = {isa = PBXBuildFile; };
 		BB5CD2DE28D8C94E004F34D5 /* frame_reader.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7662C410E923A200C93DF6 /* frame_reader.h */; };
@@ -1850,6 +1851,7 @@
 		BB5783DB23EB3A250022878E /* test_size.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_size.cc; sourceTree = "<group>"; };
 		BB584FDA28F9F45B006D6349 /* test_random */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_random; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB5921D2112612EF00E0DDA0 /* simul_custom.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = simul_custom.cc; path = src/sim/simul_custom.cc; sourceTree = SOURCE_ROOT; };
+		BB5BE47F29DC25C900A32BBE /* heapsort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = heapsort.h; sourceTree = "<group>"; };
 		BB5CD2F828D8C94E004F34D5 /* monoplay */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = monoplay; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB5CF1F716DD2D5A00EF0FE3 /* space_force.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_force.cc; path = src/sim/spaces/space_force.cc; sourceTree = SOURCE_ROOT; };
 		BB5CF1F816DD2D5A00EF0FE3 /* space_force.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_force.h; path = src/sim/spaces/space_force.h; sourceTree = SOURCE_ROOT; };
@@ -3084,6 +3086,7 @@
 		BB614DA105BE90330048FA70 /* misc */ = {
 			isa = PBXGroup;
 			children = (
+				BB5BE47F29DC25C900A32BBE /* heapsort.h */,
 				BB99CAEA2979EC9300172211 /* blinksort.h */,
 				BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */,
 				BB7358A505B98DA3006956D5 /* smath.h */,
@@ -4381,6 +4384,7 @@
 				BB6E5EF5245C27E000CEE184 /* xtbsv.h in Headers */,
 				BB6485F02057FDD5005F2CD1 /* monitor.h in Headers */,
 				BB158A8528A65244008AFB22 /* simd_avx.h in Headers */,
+				BB5BE48029DC25C900A32BBE /* heapsort.h in Headers */,
 				BBBD34E01AABA5BE00819326 /* map.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
