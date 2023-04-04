@@ -1368,7 +1368,7 @@ namespace gle
 
     static size_t sizeTubeBuffers()
     {
-        return 2 + 26 * pi_twice;  // this is empirical!
+        return 2 + 28 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)

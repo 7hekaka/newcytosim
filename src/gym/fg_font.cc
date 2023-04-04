@@ -126,14 +126,14 @@ void fgBitmapCharacter(float x, float y, float S, int fontID, const float color[
 
 void fgBitmapString(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
 {
+    SFG_Font const* font = fghFont( fontID );
+    if ( !font )
+        return;
+
     float gray[4] = { 0.5, 0.5, 0.5, 1 };
     const float* col = color;
     char * str = strdup(string);
     char * token = NULL;
-    
-    SFG_Font const* font = fghFont( fontID );
-    if ( !font )
-        return;
     
     if ( vshift == 0 )
         vshift = font->Height;
