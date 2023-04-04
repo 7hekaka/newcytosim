@@ -108,6 +108,9 @@ void Display1::drawFibers(FiberSet const& set)
             drawFiber(*fib);
         }
     }
+#if ENABLE_EXPLODED_DISPLAY
+    gym::set_view(ref);
+#endif
 }
 
 //------------------------------------------------------------------------------
@@ -244,7 +247,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         }
     }
     assert_true( ptr-flu <= cnt );
-    gym::unmapBufferC4VD();
+    gym::unmapBufferC4VD(0);
     gym::drawPoints(pointSize, 0, ptr-flu);
     // display inactive Couples with square dots:
     gym::drawSquarePoints(0.25*pointSize, end-flu, cnt-(end-flu));
@@ -283,7 +286,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
             *ptr++ = { nxt->disp12()->color2, makeVertex(nxt->posFree(), nxt) };
     }
     assert_true( ptr-flu <= cnt );
-    gym::unmapBufferC4VD();
+    gym::unmapBufferC4VD(0);
     gym::drawPoints(pointSize, 0, ptr-flu);
     gym::cleanup();
 }
@@ -310,7 +313,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
                 *ptr++ = { obj->disp2()->color2, makeVertex(obj->posHand2(), fib) };
         }
         assert_true( ptr-flu <= cnt );
-        gym::unmapBufferC4VD();
+        gym::unmapBufferC4VD(0);
         gym::drawPoints(pointSize, 0, ptr-flu);
         gym::cleanup();
     }
@@ -359,7 +362,7 @@ void Display1::drawCouplesB1(CoupleSet const& set) const
 #endif
     }
     assert_true( ptr-flu <= cnt );
-    gym::unmapBufferC4VD();
+    gym::unmapBufferC4VD(0);
     
     if ( prop->link_width > 0 )
     {

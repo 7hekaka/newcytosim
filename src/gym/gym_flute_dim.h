@@ -22,7 +22,6 @@ typedef flute6 flute4D;
 
 namespace gym
 {
-    
     /// load points of dimension 'dim' into mapped buffer
     void loadPoints(size_t, const float pts[]);
     
@@ -34,9 +33,16 @@ namespace gym
     inline void  unmapBufferVD() { unmap(); setBufferV((DIM>2?3:2)); }
     inline void rebindBufferVD(size_t gap) { rebind(); setBufferV((DIM>2?3:2), gap); }
 
+#if DIM == 1
+    /// map / unmap GPU buffer for color data + vertex
+    flute4D* mapBufferC4VD(size_t n);
+    void unmapBufferC4VD(bool = 1);
+#else
     /// map / unmap GPU buffer for color data + vertex
     inline flute4D* mapBufferC4VD(size_t n) { return (flute4D*)mapFloatBuffer((DIM>2?8:6)*n); }
-    inline void   unmapBufferC4VD() { unmap(); setBufferCV(4, (DIM>2?4:2)); }
+    inline void   unmapBufferC4VD(bool) { unmap(); setBufferCV(4, (DIM>2?4:2)); }
+#endif
+    
     inline void  rebindBufferC4VD(size_t gap) { rebind(); setBufferCV(4, (DIM>2?4:2), gap); }
 };
 

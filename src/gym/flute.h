@@ -89,7 +89,7 @@ struct flute4
 };
 
 
-/// accessory class to pack vertex and color data together
+/// accessory class to pack 2D vertex and color data together
 struct flute6
 {
     float xyz[6];
@@ -109,10 +109,11 @@ struct flute6
     flute6(const float c[4], Vector2 const& v) : xyz{c[0], c[1], c[2], c[3], float(v.XX), float(v.YY)} {}
     flute6(Vector3 const& v, Vector3 const& w) : xyz{float(v.XX), float(v.YY), float(v.ZZ), float(w.XX), float(w.YY), float(w.ZZ)} {}
 #endif
+    void setY(float y) { xyz[5] = y; }
 };
 
 
-/// accessory class to pack vertex and color data together
+/// accessory class to pack 3D vertex and color data together
 struct flute8
 {
     float xyz[8];

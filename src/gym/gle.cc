@@ -2058,7 +2058,7 @@ namespace gle
     void drawCone(Vector1 const& pos, Vector1 const& dir, const float rad)
     {
         gym::ref_view();
-        float dx = rad*dir.XX, cx = pos.XX;
+        float dx = rad * dir.XX, cx = pos.XX;
         flute2 * pts = gym::mapBufferV2(4);
         pts[0] = {cx-dx, dx};
         pts[1] = {cx-dx/2, 0};
