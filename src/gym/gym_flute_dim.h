@@ -40,7 +40,7 @@ namespace gym
 #else
     /// map / unmap GPU buffer for color data + vertex
     inline flute4D* mapBufferC4VD(size_t n) { return (flute4D*)mapFloatBuffer((DIM>2?8:6)*n); }
-    inline void   unmapBufferC4VD(bool) { unmap(); setBufferCV(4, (DIM>2?4:2)); }
+    inline void   unmapBufferC4VD(bool = 1) { unmap(); setBufferCV(4, (DIM>2?4:2)); }
 #endif
     
     inline void  rebindBufferC4VD(size_t gap) { rebind(); setBufferCV(4, (DIM>2?4:2), gap); }

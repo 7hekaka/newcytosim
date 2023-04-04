@@ -162,7 +162,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
                 *ptr++ = {obj->disp()->color2, makeVertex(obj->posFoot(), obj)};
         }
         assert_true( ptr-flu <= cnt );
-        gym::unmapBufferC4VD();
+        gym::unmapBufferC4VD(0);
         gym::drawPoints(pointSize, 0, ptr-flu);
     }
     gym::cleanup();
@@ -197,7 +197,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
         }
     }
     assert_true( ptr-flu <= cnt );
-    gym::unmapBufferC4VD();
+    gym::unmapBufferC4VD(0);
 
     if ( prop->link_width > 0 )
     {
@@ -398,7 +398,7 @@ void Display1::drawCouplesB0(CoupleSet const& set) const
         ptr += 2;
     }
     assert_true( ptr-flu <= cnt );
-    gym::unmapBufferC4VD();
+    gym::unmapBufferC4VD(1);
     if ( prop->link_width > 0 )
         gym::drawLines(linkWidth, 0, ptr-flu);
     if ( prop->point_size > 0 )
