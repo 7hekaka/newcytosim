@@ -22,6 +22,7 @@ namespace gle
     constexpr size_t finesse = 4;
     
     /// number of circle points stored in buffer
+    /** We use multiples of 5 to match circles and the icosahedron */
     constexpr size_t pi_5half = finesse * 25;
     constexpr size_t pi_twice = finesse * 20;
     constexpr size_t pi_3half = finesse * 15;
@@ -179,13 +180,15 @@ namespace gle
     void thinTube();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 256]
     void thinLongTube();
-    
+    /// draw tube with grooves
+    void flutedTube();
+
     /// display a super nice cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone1();
     /// display a nicer cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone2();
     /// display a rough cone of axis Z, radius 1 at Z=0, summit at Z=1
-    void cone3();
+    void cone4();
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
     void longCone();
     /// display an open cone directed along Z, of radius 1 at Z=0
@@ -258,6 +261,7 @@ namespace gle
     /// draw a yellow tennisball
     void tennisball();
     
+    /// draw lines on the surface of a tube
     void stripedTube(float width);
     /// primitive used to draw the central segments of fibers
     inline void innerTube() { longTube4(); }

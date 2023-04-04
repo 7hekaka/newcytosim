@@ -1244,30 +1244,37 @@ namespace gle
         return 4 + 2 * (( pi_once + pi_twice ) / inc);
     }
 
-    /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
+    /// set triangle strip for a tube of radius 1 at Z=B, and R at Z=T
+    /** Note that if T < B, the triangles will be given clockwise */
     size_t setTubeClosed(flute6* flu, size_t inc, float B, float T, float R)
     {
-        assert_true( B <= T );
+        const float H(T-B), W(R-1);
+        const float z = std::copysign(1.f, H);
+        const float tg(z/sqrtf(H*H+W*W));
+        const float x(tg*H);
+        const float y(tg*R);
         size_t i = 0;
-        size_t p = pi_twice;
-        flu[i++] = { 1, 0, B, 0, 0,-1 };
-        while ( p >= pi_once + inc )
+        size_t p = pi_once;
+        // bottom plate, from PI to 2*PI:
+        flu[i++] = { -1, 0, B, 0, 0, -z };
+        while ( p <= pi_twice - inc )
         {
             float C = cos_(p), S = sin_(p);
-            flu[i++] = { C, S, B, 0, 0,-1 };
-            flu[i++] = { C,-S, B, 0, 0,-1 };
-            p -= inc;
-        }
-        flu[i++] = {-1, 0, B, -1, 0, 0 };
-        while ( p <= pi_once * 3 - inc )
-        {
-            float C = cos_(p), S = sin_(p);
-            flu[i++] = { C,  -S,   B, C,-S, 0 };
-            flu[i++] = { C*R,-S*R, T, C,-S, 0 };
+            flu[i++] = { C,-S, B, 0, 0, -z };
+            flu[i++] = { C, S, B, 0, 0, -z };
             p += inc;
         }
-        flu[i++] = {-1, 0, B,-1, 0, 0 };
-        flu[i++] = {-R, 0, T,-1, 0, 0 };
+        // sides, from 2*PI to 0:
+        flu[i++] = { 1, 0, B, x, 0, y };
+        while ( p >= inc )
+        {
+            float C = cos_(p), S = sin_(p);
+            flu[i++] = { C,   S,   B, x*C, x*S, y };
+            flu[i++] = { C*R, S*R, T, x*C, x*S, y };
+            p -= inc;
+        }
+        flu[i++] = { 1, 0, B, x, 0, y };
+        flu[i++] = { R, 0, T, x, 0, y };
         size_t j = nbTrianglesTubeClosed(inc);
         assert_true( i == j );
         return i;
@@ -1309,28 +1316,20 @@ namespace gle
         return i;
     }
     
-    /// set triangle strip for a double-walled tube of inner radius R with Z in [B, T]
-    size_t setDoubleTube(flute6* flu, size_t inc, float B, float T, float R)
-    {
-        size_t i = setTube(flu, inc, B, T);
-        i += setTube(flu+i, inc, B, T, R);
-        return i;
-    }
-
     /// set triangle strip for a cone of radius rB at Z=B, and rT at Z=T
     size_t setCone(flute6* flu, size_t inc, float B, float rB, float T, float rT)
     {
         assert_true( B <= T );
-        const float H(T-B), R(rT-rB);
-        const float k(std::copysign(1.f,H)/sqrtf(H*H+R*R));
-        const float tC(k*H);
-        const float tS(k*R);
+        const float H(T-B), W(rT-rB);
+        const float t(std::copysign(1.f,H)/sqrtf(H*H+W*W));
+        const float x(t*H);
+        const float y(t*W);
         size_t i = 0;
         for( size_t n = 0; n <= pi_twice; n += inc )
         {
             float S = sin_(n), C = cos_(n);
-            flu[i++] = { rT*C, rT*S, T, tC*C, tC*S, tS };
-            flu[i++] = { rB*C, rB*S, B, tC*C, tC*S, tS };
+            flu[i++] = { rT*C, rT*S, T, x*C, x*S, y };
+            flu[i++] = { rB*C, rB*S, B, x*C, x*S, y };
         }
         return i;
     }
@@ -1397,7 +1396,7 @@ namespace gle
 
         tubes_[14] = i+s; i += setTubeClosed(ptr+i, 1, 0, 1, 0); // cone1
         tubes_[15] = i+s; i += setTubeClosed(ptr+i, 2, 0, 1, 0); // cone2
-        tubes_[16] = i+s; i += setTubeClosed(ptr+i, 4, 0, 1, 0); // cone3
+        tubes_[16] = i+s; i += setTubeClosed(ptr+i, 4, 0, 1, 0); // cone4
         tubes_[17] = i+s; i += setTubeClosed(ptr+i, 2, -1, 2, 0); // longCone
         tubes_[18] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
 
@@ -1442,7 +1441,7 @@ namespace gle
 
     void cone1()         { doTubeStrip(tubes_[14], nbTrianglesTubeClosed(1)); }
     void cone2()         { doTubeStrip(tubes_[15], nbTrianglesTubeClosed(2)); }
-    void cone3()         { doTubeStrip(tubes_[16], nbTrianglesTubeClosed(4)); }
+    void cone4()         { doTubeStrip(tubes_[16], nbTrianglesTubeClosed(4)); }
     void longCone()      { doTubeStrip(tubes_[17], nbTrianglesTubeClosed(2)); }
     void truncatedCone() { doTubeStrip(tubes_[18], nbTrianglesTube(2)); }
 
@@ -2087,9 +2086,7 @@ namespace gle
     void drawCone(Vector3 const& pos, Vector3 const& dir, const float rad)
     {
         gym::transAlignZ(pos, rad, dir);
-        gym::translate(0,0,-1);
-        gym::scale(1,1,3);
-        cone3();
+        longCone();
     }
     
     //-----------------------------------------------------------------------
