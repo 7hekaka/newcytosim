@@ -290,7 +290,8 @@ void FiberSet::step()
 /**
  Cut all Fibers along the plane defined by n.pos + a = 0.
  */
-void FiberSet::planarCut(Vector const& n, const real a, state_t stateP, state_t stateM)
+void FiberSet::planarCut(Vector const& n, const real a,
+                         state_t stateP, state_t stateM, real min_len)
 {
     /*
      We must ensure here that each Fiber is processed only once.
@@ -301,7 +302,7 @@ void FiberSet::planarCut(Vector const& n, const real a, state_t stateP, state_t 
     while ( obj )
     {
         Fiber * nxt = obj->next();
-        obj->planarCut(n, a, stateP, stateM);
+        obj->planarCut(n, a, stateP, stateM, min_len);
         obj = nxt;
     }
 }
@@ -309,13 +310,14 @@ void FiberSet::planarCut(Vector const& n, const real a, state_t stateP, state_t 
 /**
  Cut given Fibers along the plane defined by n.pos + a = 0.
  */
-void FiberSet::planarCut(ObjectList& objs, Vector const& n, const real a, state_t stateP, state_t stateM)
+void FiberSet::planarCut(ObjectList& objs, Vector const& n, const real a,
+                         state_t stateP, state_t stateM, real min_len)
 {
     for ( Object * i : objs )
     {
         Fiber * fib = Fiber::toFiber(i);
         if ( fib )
-            fib->planarCut(n, a, stateP, stateM);
+            fib->planarCut(n, a, stateP, stateM, min_len);
     }
 }
 

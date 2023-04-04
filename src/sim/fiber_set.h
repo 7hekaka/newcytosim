@@ -73,10 +73,10 @@ public:
     Fiber * findID(ObjectID n) const { return static_cast<Fiber*>(inventory_.get(n)); }
 
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
-    void planarCut(Vector const& n, real a, state_t stateP, state_t stateM);
+    void planarCut(Vector const& n, real a, state_t stateP, state_t stateM, real min_len);
 
     /// Cut fibers in the list
-    void planarCut(ObjectList&, Vector const& n, real a, state_t stateP, state_t stateM);
+    void planarCut(ObjectList&, Vector const& n, real a, state_t stateP, state_t stateM, real min_len);
     
     /// Special code to trim a spindle from both ends
     void shortenSpindle(real, real) const;

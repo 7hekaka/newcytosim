@@ -651,10 +651,12 @@ size_t Fiber::hasKink(const real max_cosine) const
 }
 
 /**
- If `stateM=STATE_BLACK`, the minus end portion of the cut fiber is deleted
- If `stateP=STATE_BLACK`, the plus end portion of the cut fiber is deleted
+ If `stateM=STATE_BLACK`, the minus end portion of the cut fiber is deleted.
+ If `stateP=STATE_BLACK`, the plus end portion of the cut fiber is deleted.
+ Any portion that is shorter than 'min_length' is deleted.
  */
-size_t Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t stateM)
+size_t Fiber::planarCut(Vector const& n, const real a,
+                        state_t stateP, state_t stateM, real min_len)
 {
     Array<real> cuts;
     /*
@@ -673,20 +675,21 @@ size_t Fiber::planarCut(Vector const& n, const real a, state_t stateP, state_t s
         Fiber * frag = severNow(abs);
         if ( frag )
         {
-            if ( stateP == STATE_BLACK )
-                delete(this);
-            else
-                setEndStateP(stateP);
-            // dynamic of new ends are set as desired:
-            if ( stateM == STATE_BLACK )
+            // old plus end converves its state:
+            frag->setEndStateP(endStateP());
+            // frag is now plus end portion:
+            if ( stateM == STATE_BLACK || frag->length() < min_len )
                 delete(frag);
             else
             {
-                // old plus end converves its state:
-                frag->setEndStateP(endStateP());
                 frag->setEndStateM(stateM);
                 objset()->add(frag);
             }
+            // *this is reduced to its minus end portion:
+            if ( stateP == STATE_BLACK || length() < min_len )
+                delete(this);
+            else
+                setEndStateP(stateP);
         }
     }
     return cuts.size();

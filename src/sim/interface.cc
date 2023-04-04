@@ -844,10 +844,12 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
 {
     Vector n(1,0,0);
     real a = 0;
+    real len = 0;
     
     opt.set(n, "plane");
     opt.set(a, "plane", 1);
-    
+    opt.set(len, "min_length");
+
     Glossary::dict_type<state_t> keys{{"white",     STATE_WHITE},
                                       {"green",     STATE_GREEN},
                                       {"yellow",    STATE_YELLOW},
@@ -873,12 +875,12 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     {
         ObjectList objs = set->collect(match_property, pp, cnt);
         VLOG("-CUT " << objs.size() << " " << name " PLANE (" << n << ").x = " << -a);
-        sim_->fibers.planarCut(objs, n, a, stateP, stateM);
+        sim_->fibers.planarCut(objs, n, a, stateP, stateM, len);
     }
     else
     {
         VLOG("-CUT all fibers PLANE (" << n << ").x = " << -a);
-        sim_->fibers.planarCut(n, a, stateP, stateM);
+        sim_->fibers.planarCut(n, a, stateP, stateM, len);
     }
 }
 
