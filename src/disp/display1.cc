@@ -129,13 +129,28 @@ inline void shiftVertex(flute4D * ptr, const OBJ* obj)
 #endif
 }
 
-inline void shiftVertex(flute4D * ptr, const Fiber * fib)
+inline void shiftVertex(flute4D * ptr, const Fiber* fib)
 {
 #if ENABLE_EXPLODED_DISPLAY
+    float shift = fib->disp->explode_shift;
 #  if ( DIM == 1 )
-    ptr->setY(fib->disp->explode_shift);
+    ptr->setY(shift);
 #  else
-    ptr->setY(ptr->xyz[5]+fib->disp->explode_shift);
+    ptr->setY(ptr->xyz[5]+shift);
+#  endif
+#endif
+}
+
+inline void shiftVertex(flute4D * ptr, flute4D * qrt, const Fiber* fib)
+{
+#if ENABLE_EXPLODED_DISPLAY
+    float shift = fib->disp->explode_shift;
+#  if ( DIM == 1 )
+    ptr->setY(shift);
+    qrt->setY(shift);
+#  else
+    ptr->setY(ptr->xyz[5]+shift);
+    qrt->setY(ptr->xyz[5]+shift);
 #  endif
 #endif
 }
@@ -198,8 +213,9 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 Q = P;
                 d = air;
             }
-            ptr[0] = {c, P}; shiftVertex(ptr, fib);
-            ptr[1] = {d, Q}; shiftVertex(ptr+1, obj);
+            ptr[0] = {c, P};
+            ptr[1] = {d, Q};
+            shiftVertex(ptr, ptr+1, fib);
             ptr += 2;
         }
     }
@@ -376,15 +392,17 @@ void Display1::drawCouplesB1(CoupleSet const& set) const
         if ( modulo ) modulo->fold(Q, P);
         if ( vis1 | vis2 )
         {
-            ptr[0] = { col1, P }; shiftVertex(ptr, fib1);
-            ptr[1] = { col2, Q }; shiftVertex(ptr+1, fib1);
+            ptr[0] = { col1, P };
+            ptr[1] = { col2, Q };
+            shiftVertex(ptr, ptr+1, fib1);
             ptr += 2;
         }
 #if ENABLE_EXPLODED_DISPLAY
         if ( vis2 )
         {
-            ptr[0] = { col2, Q }; shiftVertex(ptr, fib2);
-            ptr[1] = { col1, P }; shiftVertex(ptr+1, fib2);
+            ptr[0] = { col2, Q };
+            ptr[1] = { col1, P };
+            shiftVertex(ptr, ptr+1, fib2);
             ptr += 2;
         }
 #endif
