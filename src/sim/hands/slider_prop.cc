@@ -116,6 +116,6 @@ void SliderProp::write_values(std::ostream& os) const
     HandProp::write_values(os);
     write_value(os, "mobility",  movability);
     write_value(os, "stiffness", stiffness);
-    write_value(os, "line_diffusion", line_diffusion);
+    write_value(os, "diffusion", line_diffusion);
 }
 
