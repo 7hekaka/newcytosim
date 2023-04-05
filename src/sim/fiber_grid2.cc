@@ -53,7 +53,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real)
     for ( const Fiber * f = first ; f != last ; f=f->next() )
     {
         for ( size_t s = 0; s < f->nbSegments(); ++s )
-            allSegments.emplace(f, s);
+            allSegments.emplace_back(f, s);
     }
 }
 

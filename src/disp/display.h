@@ -169,8 +169,10 @@ public:
     {
 #if ( DIM == 3 )
         return cross(dir, depthAxis).normalized(rad);
-#else
+#elif ( DIM == 2 )
         return dir.orthogonal(rad);
+#else
+        return Vector(0, 0, 0);
 #endif
     }
     

@@ -120,7 +120,8 @@ template < typename OBJ >
 inline void shiftVertex(flute4D * ptr, const OBJ* obj)
 {
 #if ENABLE_EXPLODED_DISPLAY
-    float shift = float(obj->signature()>>28) - 4.f;
+    constexpr float mag = 1.f/UINT32_MAX;
+    float shift = mag * float(obj->signature()) - 0.5f;
 #  if ( DIM == 1 )
     ptr->setY(shift);
 #  else

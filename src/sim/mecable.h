@@ -128,7 +128,7 @@ public:
     
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/
-    Vector posP(size_t p)      const { return Vector(pPos+DIM*p); }
+    Vector posP(size_t p)     const { return Vector(pPos+DIM*p); }
     
     /// Address of coordinate array
     const real * addrPoints()        const { return pPos; }

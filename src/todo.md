@@ -18,6 +18,7 @@ Cytosim Todo List
 - add units to documentation of parameters
 - Export Cytosim's world to Python (pybind, Serge).
 - https://github.com/pybind/pybind11 seems better than Boost::Python 
+- Replace PCB and MersenneTwister by XORISHIRO: https://en.wikipedia.org/wiki/Xoroshiro128%2B
 
 # Improvements
 
