@@ -4,16 +4,34 @@
 
 #if DIM == 1
 
-static flute4D * last_map = nullptr;
+static float * last_map = nullptr;
 static size_t last_cnt = 0;
+
+/// in 1D we need to reset the Y-coordinate
+fluteD* gym::mapBufferVD(size_t n)
+{
+    last_cnt = n;
+    last_map = mapFloatBuffer(2*n);
+    return (fluteD*)last_map;
+}
+
+/// in 1D we need to reset the Y-coordinate
+void gym::unmapBufferVD(bool reset)
+{
+    if ( reset )
+    for ( size_t i = 0; i < last_cnt; ++i )
+        last_map[2*i+1] = 0.f;
+    unmap();
+    setBufferV(2);
+}
 
 
 /// in 1D we need to reset the Y-coordinate
 flute4D* gym::mapBufferC4VD(size_t n)
 {
     last_cnt = n;
-    last_map = (flute4D*)mapFloatBuffer(6*n);
-    return last_map;
+    last_map = mapFloatBuffer(6*n);
+    return (flute4D*)last_map;
 }
 
 /// in 1D we need to reset the Y-coordinate
@@ -21,9 +39,9 @@ void gym::unmapBufferC4VD(bool reset)
 {
     if ( reset )
     for ( size_t i = 0; i < last_cnt; ++i )
-        last_map[i].setY(0.f);
+        last_map[6*i+5] = 0.f;
     unmap();
-    setBufferCV(4, (DIM>2?4:2));
+    setBufferCV(4, 2);
 }
 
 #endif
