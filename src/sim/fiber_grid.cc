@@ -224,7 +224,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
             Q = fib->posP(n);
             job.segment.set(fib, n-1);
 
-#if   ( DIM == 1 )
+#if ( DIM == 1 )
             Rasterizer::paintThickLine1D(paint, &job, P, Q, width, offset, deltas);
 #elif ( DIM == 2 )
             Rasterizer::paintRectangle(paint, &job, P, Q, iPQ, width, offset, deltas);
@@ -236,7 +236,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
         }
     }
     
-    //Cytosim::log("FiberGrid distributed %lu segments over %lu cells\n", nbTargets(), nbCells());
+    //if ( first ) printf("FiberGrid has %lu segments in %lu cells\n", nbTargets(), nbCells());
 }
 
 

@@ -222,12 +222,12 @@ void Rasterizer::paintThickLine1D(void (*paint)(int, int, int, int, void*), void
                                   const Vector1& P, const Vector1& Q,
                                   const real radius, const Vector1& offset, const Vector1& delta)
 {
-    real p = ( P.XX - radius - offset.XX ) * delta.XX;
-    real q = ( Q.XX - radius - offset.XX ) * delta.XX;
-    
-    int inf = (int) std::ceil(std::min(p,q));
-    int sup = (int)std::floor(std::max(p,q));
-    
+    real L = std::min(P.XX, Q.XX);
+    real R = std::max(P.XX, Q.XX);
+
+    int inf = (int) ceil( ( L - radius - offset.XX ) * delta.XX );
+    int sup = (int)floor( ( R + radius - offset.XX ) * delta.XX );
+
     paint(inf, sup, 0, 0, arg);
 }
 
