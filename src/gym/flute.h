@@ -118,7 +118,7 @@ struct flute8
 {
     float xyz[8];
     flute8() : xyz{0, 0, 0, 0, 0, 0, 0, 0} {}
-    flute8(float x, float y, float z, float t, float r, float g, float b, float a) : xyz{x, y, z, t, r, g, b, a} {}
+    flute8(float r, float g, float b, float a, float x, float y, float z, float t) : xyz{r, g, b, a, x, y, z, t} {}
     flute8(const float c[4], float x, float y, float z) : xyz{c[0], c[1], c[2], c[3], x, y, z, 1.f} {}
     flute8(const float c[4], flute3 const& v) : xyz{c[0], c[1], c[2], c[3], v.xyz[0], v.xyz[1], v.xyz[2], 1.f} {}
     flute8(const float c[4], const float d[4]) : xyz{c[0], c[1], c[2], c[3], d[0], d[1], d[2], 1.0f} {}
@@ -128,6 +128,7 @@ struct flute8
     flute8(const float c[4], Vector2 const& v) : xyz{c[0], c[1], c[2], c[3], float(v.XX), float(v.YY), 0.f, 1.f} {}
     flute8(const float c[4], Vector3 const& v) : xyz{c[0], c[1], c[2], c[3], float(v.XX), float(v.YY), float(v.ZZ), 1.f} {}
 #endif
+    void setY(float y) { xyz[5] = y; }
 };
 
 

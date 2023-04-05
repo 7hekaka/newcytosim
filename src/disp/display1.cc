@@ -114,36 +114,39 @@ void Display1::drawFibers(FiberSet const& set)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Graphics primitives with shift
+#pragma mark - Methods to shift vertices vertically in exploded display
 
 template < typename OBJ >
-inline fluteD makeVertex(Vector const& pos, const OBJ& obj)
+inline void shiftVertex(flute4D * ptr, const OBJ* obj)
 {
+#if ENABLE_EXPLODED_DISPLAY
+    float shift = float(obj->signature()>>28) - 4.f;
 #  if ( DIM == 1 )
-    return flute2{float(pos.XX), float(obj->signature()>>28)-4.f};
+    ptr->setY(shift);
 #  else
-    return fluteD{pos};
+    ptr->setY(ptr->xyz[5]+shift);
 #  endif
+#endif
 }
 
+inline void shiftVertex(flute4D * ptr, const Fiber * fib)
+{
 #if ENABLE_EXPLODED_DISPLAY
-inline fluteD makeVertex(Vector const& pos, const Fiber * fib)
-{
-    float shift = fib->disp->explode_shift;
 #  if ( DIM == 1 )
-    return flute2{float(pos.XX), shift};
-#  elif ( DIM == 2 )
-    return flute2{float(pos.XX), float(pos.YY)+shift};
+    ptr->setY(fib->disp->explode_shift);
 #  else
-    return flute3{float(pos.XX), float(pos.YY)+shift, float(pos.ZZ)};
+    ptr->setY(ptr->xyz[5]+fib->disp->explode_shift);
 #  endif
-}
-#else
-inline fluteD makeVertex(Vector const& pos, const Fiber*)
-{
-    return fluteD{pos};
-}
 #endif
+}
+
+inline void shiftVertex(flute4D * ptr, float y)
+{
+#if ENABLE_EXPLODED_DISPLAY
+    ptr->setY(y);
+#endif
+}
+
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -159,7 +162,11 @@ void Display1::drawSinglesF(const SingleSet & set) const
         for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
         {
             if ( obj->disp()->perceptible )
-                *ptr++ = {obj->disp()->color2, makeVertex(obj->posFoot(), obj)};
+            {
+                ptr[0] = {obj->disp()->color2, obj->posFoot()};
+                shiftVertex(ptr, obj);
+                ++ptr;
+            }
         }
         assert_true( ptr-flu <= cnt );
         gym::unmapBufferC4VD(0);
@@ -191,8 +198,8 @@ void Display1::drawSinglesA(const SingleSet & set) const
                 Q = P;
                 d = air;
             }
-            ptr[0] = {c, makeVertex(P, fib)};
-            ptr[1] = {d, makeVertex(Q, obj)};
+            ptr[0] = {c, P}; shiftVertex(ptr, fib);
+            ptr[1] = {d, Q}; shiftVertex(ptr+1, obj);
             ptr += 2;
         }
     }
@@ -242,8 +249,9 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
     {
         if ( obj->disp1()->perceptible )
         {
-            flute4D * f = ( obj->active() ? ptr++ : --end );
-            *f = {obj->disp1()->color2, makeVertex(obj->posFree(), obj)};
+            flute4D * f4d = ( obj->active() ? ptr++ : --end );
+            *f4d = {obj->disp1()->color2, obj->posFree()};
+            shiftVertex(f4d, obj);
         }
     }
     assert_true( ptr-flu <= cnt );
@@ -273,17 +281,29 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
     {
         nxt = obj->next();
         if ( obj->disp12()->perceptible )
-            *ptr++ = { obj->disp12()->color2, makeVertex(obj->posFree(), obj) };
+        {
+            ptr[0] = { obj->disp12()->color2, obj->posFree() };
+            shiftVertex(ptr, obj);
+            ++ptr;
+        }
         obj = nxt;
     }
     while ( obj )
     {
         nxt = obj->next();
         if ( obj->disp21()->perceptible )
-            *ptr++ = { obj->disp21()->color2, makeVertex(obj->posFree(), obj) };
+        {
+            ptr[0] = { obj->disp21()->color2, obj->posFree() };
+            shiftVertex(ptr, obj);
+            ++ptr;
+        }
         obj = nxt->next();
         if ( nxt->disp12()->perceptible )
-            *ptr++ = { nxt->disp12()->color2, makeVertex(nxt->posFree(), nxt) };
+        {
+            ptr[0] = { nxt->disp12()->color2, nxt->posFree() };
+            shiftVertex(ptr, nxt);
+            ++ptr;
+        }
     }
     assert_true( ptr-flu <= cnt );
     gym::unmapBufferC4VD(0);
@@ -304,13 +324,21 @@ void Display1::drawCouplesA(CoupleSet const& set) const
         {
             Fiber const* fib = obj->fiber1();
             if ( obj->disp1()->perceptible & fib->disp->visible )
-                *ptr++ = { obj->disp1()->color2, makeVertex(obj->posHand1(), fib) };
+            {
+                ptr[0] = { obj->disp1()->color2, obj->posHand1() };
+                shiftVertex(ptr, fib);
+                ++ptr;
+            }
         }
         for ( Couple * obj=set.firstFA(); obj ; obj=obj->next() )
         {
             Fiber const* fib = obj->fiber2();
             if ( obj->disp2()->perceptible & fib->disp->visible )
-                *ptr++ = { obj->disp2()->color2, makeVertex(obj->posHand2(), fib) };
+            {
+                ptr[0] = { obj->disp2()->color2, obj->posHand2() };
+                shiftVertex(ptr, fib);
+                ++ptr;
+            }
         }
         assert_true( ptr-flu <= cnt );
         gym::unmapBufferC4VD(0);
@@ -348,15 +376,15 @@ void Display1::drawCouplesB1(CoupleSet const& set) const
         if ( modulo ) modulo->fold(Q, P);
         if ( vis1 | vis2 )
         {
-            ptr[0] = { col1, makeVertex(P, fib1) };
-            ptr[1] = { col2, makeVertex(Q, fib1) };
+            ptr[0] = { col1, P }; shiftVertex(ptr, fib1);
+            ptr[1] = { col2, Q }; shiftVertex(ptr+1, fib1);
             ptr += 2;
         }
 #if ENABLE_EXPLODED_DISPLAY
         if ( vis2 )
         {
-            ptr[0] = { col2, makeVertex(Q, fib2) };
-            ptr[1] = { col1, makeVertex(P, fib2) };
+            ptr[0] = { col2, Q }; shiftVertex(ptr, fib2);
+            ptr[1] = { col1, P }; shiftVertex(ptr+1, fib2);
             ptr += 2;
         }
 #endif
