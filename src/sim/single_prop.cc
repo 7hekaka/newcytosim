@@ -133,9 +133,6 @@ void SingleProp::read(Glossary& glos)
 #endif
     glos.set(activity,       "activity");
 
-    if ( glos.has_key("confine") && activity=="fixed" )
-        throw InvalidParameter(name()+":confine is incompatible with activity=fixed");
-
     glos.set(confine,        "confine", {{"off",     CONFINE_OFF},
                                          {"on",      CONFINE_ON},
                                          {"none",    CONFINE_OFF},
@@ -171,6 +168,8 @@ void SingleProp::complete(Simul const& sim)
                 throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
             // this condition occur when the Property is created before the Space
         }
+        if ( primed(sim) && activity=="fixed" )
+            throw InvalidParameter(name()+":confine is incompatible with activity=fixed");
     }
     else
         confine_pointer = nullptr;
