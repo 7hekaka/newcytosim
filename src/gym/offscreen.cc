@@ -25,7 +25,7 @@ unsigned OffScreen::openContext()
     return 1;
 }
 
-unsigned OffScreen::makeBuffer(int, int, int)
+unsigned OffScreen::openBuffer(int, int, int)
 {
     //fprintf(stderr,"This program cannot render off-screen\n");
     return 0;

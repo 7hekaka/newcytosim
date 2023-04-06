@@ -119,7 +119,7 @@ GLXPbuffer OffScreen::makeBuffer(const int width, const int height, int)
     return pbuf;
 }
 
-GLXPbuffer OffScreen::openBuffer(const int width, const int height, int)
+unsigned OffScreen::openBuffer(const int width, const int height, int)
 {
     GLXPbuffer buf = makeBuffer(width, height, 0);
     glViewport(0, 0, width, height);
