@@ -118,9 +118,9 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
     if ( unbinding_rate && unloaded_speed  &&  ef < 1 )
     {
-        Cytosim::warn << "The efficiency of `" << name() << "' is low because\n"\
-        << PREF << "stiffness * unloaded_speed / unbinding_rate << stall_force\n"\
-        << PREF << "ratio = " << ef << "\n";
+        Cytosim::warn << "Walker `" << name() << "' is inefficient since\n"\
+        << PREF << "stiffness * unloaded_speed / unbinding_rate << stall_force"\
+        << "; ratio = " << ef << "\n";
     }
     
     

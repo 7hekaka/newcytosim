@@ -124,9 +124,9 @@ void MightyProp::checkStiffness(real stiff, real len, real mul, real kT) const
     ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
     if ( unbinding_rate != 0  &&  unloaded_speed != 0  &&  ef < 1 )
     {
-        Cytosim::warn << "The efficiency of `" << name() << "' is low because\n"\
-        << PREF << "stiffness * unloaded_speed / unbinding_rate << stall_force\n"\
-        << PREF << "ratio = " << ef << "\n";
+        Cytosim::warn << "Mighty `" << name() << "' is inefficient since\n"\
+        << PREF << "stiffness * unloaded_speed / unbinding_rate << stall_force"\
+        << "; ratio = " << ef << "\n";
     }
     
     /*
