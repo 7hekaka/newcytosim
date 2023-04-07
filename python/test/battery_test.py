@@ -96,14 +96,13 @@ def main(args):
     live = False
     err = sys.stderr
     for arg in args[1:]:
+        [key, equal, val] = arg.partition('=')
         if os.path.isfile(arg):
             files.append(os.path.abspath(arg))
         elif arg=='live' or arg=='live=1':
             live = True
-        elif arg.startswith('jobs='):
-            njobs = int(arg[5:])
-        elif arg.startswith('njobs='):
-            njobs = int(arg[6:])
+        elif key == 'njobs' or key == 'jobs':
+            njobs = int(val)
         else:
             err.write("Ignored`"+arg+"' on the command line\n")
     

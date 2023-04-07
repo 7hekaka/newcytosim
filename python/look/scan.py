@@ -110,12 +110,11 @@ def main(args):
     njobs = 1
     paths = []
     for arg in args[1:]:
+        [key, equal, val] = arg.partition('=')
         if os.path.isdir(arg):
             paths.append(os.path.abspath(arg))
-        elif arg.startswith('nproc=') or arg.startswith('njobs='):
-            njobs = int(arg[6:])
-        elif arg.startswith('jobs='):
-            njobs = int(arg[5:])
+        elif key == 'nproc' or key == 'njobs' or key == 'jobs':
+            njobs = int(val)
         elif arg == '-':
             verbose = 0
         elif arg == '+':

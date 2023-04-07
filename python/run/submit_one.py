@@ -117,6 +117,8 @@ def main(args):
                 memory = val
             elif key == 'cpu' or key == 'ncpu':
                 ncpu = int(val)
+            elif key == 'jobs' or key == 'njobs':
+                ncpu = int(val)
             elif key == 'day' or key == 'days':
                 runtime = val+'-00:00:00'
             elif key == 'hour' or key == 'hours':
