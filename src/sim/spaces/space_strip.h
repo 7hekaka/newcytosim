@@ -36,6 +36,9 @@ private:
     
     /// derived quantity: mid_ = ( top_ + bot_ ) / 2
     real mid_;
+    
+    /// an object used for cooking on which a top lid fits
+    real pot_;
 
     /// Object to handle periodic boundary conditions
     Modulo modulo_;

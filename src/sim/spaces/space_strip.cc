@@ -18,6 +18,7 @@ SpaceStrip::SpaceStrip(SpaceProp const* p)
     half_[1] = 0;
     bot_ = 0;
     top_ = 0;
+    pot_ = 0;
 }
 
 
@@ -74,6 +75,7 @@ void SpaceStrip::update()
     for ( unsigned d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
     mid_ = ( top_ + bot_ ) * 0.5;
+    pot_ = top_;
 }
 
 
@@ -193,10 +195,10 @@ Vector SpaceStrip::project(Vector const& pos) const
     real X = sign_select(pos.XX - mid_, bot_, top_);
     return Vector(X);
 #elif ( DIM == 2 )
-    real Y = sign_select(pos.YY - mid_, bot_, top_);
+    real Y = sign_select(pos.YY - mid_, bot_, pot_);
     return Vector(pos.XX, Y);
 #else
-    real Z = sign_select(pos.ZZ - mid_, bot_, top_);
+    real Z = sign_select(pos.ZZ - mid_, bot_, pot_);
     return Vector(pos.XX, pos.YY, Z);
 #endif
 }
@@ -210,10 +212,10 @@ void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& mp,
                                 Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real Y = sign_select(pos.YY - mid_, bot_, top_);
+    real Y = sign_select(pos.YY - mid_, bot_, pot_);
     meca.addPlaneClampY(mp, Y, stiff);
 #elif ( DIM > 2 )
-    real Z = sign_select(pos.ZZ - mid_, bot_, top_);
+    real Z = sign_select(pos.ZZ - mid_, bot_, pot_);
     meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
@@ -223,10 +225,10 @@ void SpaceStrip::setConfinement(Vector const& pos, Mecapoint const& mp,
                                 real rad, Meca& meca, real stiff) const
 {
 #if ( DIM == 2 )
-    real Y = sign_select(pos.YY - mid_, bot_+rad, top_-rad);
+    real Y = sign_select(pos.YY - mid_, bot_+rad, pot_-rad);
     meca.addPlaneClampY(mp, Y, stiff);
 #elif ( DIM > 2 )
-    real Z = sign_select(pos.ZZ - mid_, bot_+rad, top_-rad);
+    real Z = sign_select(pos.ZZ - mid_, bot_+rad, pot_-rad);
     meca.addPlaneClampZ(mp, Z, stiff);
 #endif
 }
