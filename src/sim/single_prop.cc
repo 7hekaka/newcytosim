@@ -131,24 +131,30 @@ void SingleProp::read(Glossary& glos)
 #if NEW_MOBILE_SINGLE
     glos.set(speed,          "speed");
 #endif
-    glos.set(activity,       "activity");
+    glos.set(activity, "activity");
 
-    glos.set(confine,        "confine", {{"off",     CONFINE_OFF},
-                                         {"on",      CONFINE_ON},
-                                         {"none",    CONFINE_OFF},
-                                         {"surface", CONFINE_ON},
-                                         {"inside",  CONFINE_INSIDE}});
-    
-    real val;
-    if ( glos.set(val, "confine", 1) && val > 0 )
-        throw InvalidParameter(name()+":confine[1] is ignored");
-    
-    glos.set(confine_space,  "confine", 2);
-
+    if ( activity=="fixed" )
+        confine = CONFINE_OFF;
+    else
+    {
+        glos.set(confine, "confine",
+           {{"off",     CONFINE_OFF},
+            {"on",      CONFINE_ON},
+            {"none",    CONFINE_OFF},
+            {"surface", CONFINE_ON},
+            {"inside",  CONFINE_INSIDE}});
+        
+        real val;
+        if ( glos.set(val, "confine", 1) && val > 0 )
+            throw InvalidParameter(name()+":confine[1] is ignored");
+        
+        glos.set(confine_space,  "confine", 2);
+        
 #if BACKWARD_COMPATIBILITY < 50
-    if ( confine_space == "current" )
-        confine_space = "last";
+        if ( confine_space == "current" )
+            confine_space = "last";
 #endif
+    }
 }
 
 
@@ -168,8 +174,6 @@ void SingleProp::complete(Simul const& sim)
                 throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
             // this condition occur when the Property is created before the Space
         }
-        if ( primed(sim) && activity=="fixed" )
-            throw InvalidParameter(name()+":confine is incompatible with activity=fixed");
     }
     else
         confine_pointer = nullptr;
