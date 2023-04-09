@@ -1110,7 +1110,6 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
 void LocusGrid::setStericsX(BigLocusList const& list1,
                             BigLocusList const& list2) const
 {
-    assert_false( pGrid.isPeriodic() );
     assert_true( &list1 != &list2 );
 #if 0
     {
@@ -1243,7 +1242,6 @@ void LocusGrid::setSterics0() const
 /** This calls setStericsT() */
 void LocusGrid::setSterics() const
 {
-    assert_false( pGrid.isPeriodic() );
     for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
@@ -1271,7 +1269,7 @@ void LocusGrid::setSterics() const
             {
                 BigLocusList& side = cell_list(inx+region[reg]);
                 if ( side.size() > 0 )
-                    setStericsT(base, side);
+                    setSterics0(base, side);
             }
 #endif
         }
