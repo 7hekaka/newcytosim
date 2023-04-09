@@ -23,6 +23,10 @@ public:
      @{
      */
     
+    /// different modes of operation
+    /// if ( selective = 1 ), cutting occurs as part of a briding couple
+    int selective;
+    
     /// rate of cutting event
     real cutting_rate;
     

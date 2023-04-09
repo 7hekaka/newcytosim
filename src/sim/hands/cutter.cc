@@ -21,13 +21,29 @@ void Cutter::cut()
 {
     assert_true( attached() );
 
+    if ( prop()->selective == 2 )
+    {
+        Hand const* h = otherHand();
+        if ( !h || !h->attached() )
+            return;
+        Vector P = pos();
+        Vector Q = h->pos();
+#if ( DIM > 2 )
+        // do not sever the fiber that is below:
+        if ( P.ZZ < Q.ZZ )
+            return;
+#else
+        throw InvalidParameter("Cutter::selective is only usable in 3D\n");
+#endif
+        std::cerr << "selectively cutting crossing fibers at Z " << P.ZZ << " vs. " << Q.ZZ << "\n";
+    }
     /**
      Cutting the fiber can invalidate the FiberGrid used for attachment,
      and this becomes a problem if the Cutter is part of a Couple,
      because calls for attachments and actions are intermingled.
      
      This is why sever() below will register the position of the cut,
-     but his cut will be performed later in Fiber::step()
+     but the cut will only be performed later in Fiber::step()
      */
     fiber()->sever(abscissa(), prop()->new_end_state[0], prop()->new_end_state[1]);
     //std::clog << "cut " << fiber()->reference() << " @ " << abscissaFromM() << "\n";
@@ -42,13 +58,16 @@ void Cutter::stepUnloaded()
 {
     assert_true( attached() );
 
-    nextAct -= prop()->cutting_rate_dt;
-    
-    if ( nextAct < 0 )
+    if ( !prop()->selective )
     {
-        nextAct = RNG.exponential();
-        if ( abscissaFromM() < prop()->cutting_range )
-            return cut();
+        nextAct -= prop()->cutting_rate_dt;
+        
+        if ( nextAct < 0 )
+        {
+            nextAct = RNG.exponential();
+            if ( abscissaFromM() < prop()->cutting_range )
+                return cut();
+        }
     }
 }
 

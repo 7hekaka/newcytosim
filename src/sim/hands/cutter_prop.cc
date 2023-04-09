@@ -18,6 +18,7 @@ void CutterProp::clear()
 {
     HandProp::clear();
 
+    selective = 0;
     cutting_rate = 0;
     cutting_range = INFINITY;
     
@@ -30,6 +31,7 @@ void CutterProp::read(Glossary& glos)
 {
     HandProp::read(glos);
     
+    glos.set(selective, "selective");
     glos.set(cutting_rate,  "cutting_rate");
     glos.set(cutting_range, "cutting_range");
     
@@ -71,6 +73,7 @@ void CutterProp::complete(Simul const& sim)
 void CutterProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);
+    write_value(os, "selective", selective);
     write_value(os, "cutting_rate",  cutting_rate);
     write_value(os, "cutting_range", cutting_range);
     write_value(os, "new_end_state", new_end_state, 2);
