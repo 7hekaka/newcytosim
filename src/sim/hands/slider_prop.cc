@@ -41,19 +41,19 @@ void SliderProp::complete(Simul const& sim)
     HandProp::complete(sim);
 
     if ( movability < 0 )
-        throw InvalidParameter("slider:mobility must be >= 0");
+        throw InvalidParameter(name()+"mobility must be >= 0");
     
     if ( primed(sim) && movability <= 0 )
         std::clog << "WARNING: slider `" << name() << "' will not slide because mobility=0\n";
 
     if ( line_diffusion < 0 )
-        throw InvalidParameter("slider:line_diffusion must be >= 0");
+        throw InvalidParameter(name()+":diffusion must be >= 0");
     
     // use Einstein's relation to get a mobility:
     if ( line_diffusion == 0 )
     {
         line_diffusion = movability * boltzmann(sim);
-        std::clog << "         slider:line_diffusion <--- " << line_diffusion << "\n";
+        std::clog << name()+":diffusion <--- " << line_diffusion << "\n";
     }
     
     /*

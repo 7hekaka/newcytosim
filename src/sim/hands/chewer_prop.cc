@@ -40,12 +40,12 @@ void ChewerProp::complete(Simul const& sim)
     HandProp::complete(sim);
     
     if ( chewing_speed < 0 )
-        throw InvalidParameter("chewer:chewing_speed must be >= 0");
+        throw InvalidParameter(name()+"chewing_speed must be >= 0");
 
     chewing_speed_dt = chewing_speed * time_step(sim);
     
     if ( line_diffusion < 0 )
-        throw InvalidParameter("chewer:diffusion must be >= 0");
+        throw InvalidParameter(name()+"diffusion must be >= 0");
 
     /*
      This is for unidimensional diffusion along the filaments, and we want:
