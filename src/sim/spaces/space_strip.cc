@@ -19,6 +19,7 @@ SpaceStrip::SpaceStrip(SpaceProp const* p)
     bot_ = 0;
     top_ = 0;
     pot_ = 0;
+    no_top_ = 0;
 }
 
 
@@ -64,7 +65,9 @@ void SpaceStrip::resize(Glossary& opt)
     
     bot_ = bot;
     top_ = top;
-    
+
+    opt.set(no_top_, "no_top");
+
     update();
 }
 
@@ -75,7 +78,10 @@ void SpaceStrip::update()
     for ( unsigned d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
     mid_ = ( top_ + bot_ ) * 0.5;
-    pot_ = top_;
+    if ( no_top_ )
+        pot_ = bot_;
+    else
+        pot_ = top_;
 }
 
 

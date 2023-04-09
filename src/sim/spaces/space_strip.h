@@ -43,6 +43,9 @@ private:
     /// Object to handle periodic boundary conditions
     Modulo modulo_;
 
+    /// if true, only the bottom plate is used for projection
+    int no_top_;
+    
 public:
     
     /// creator
