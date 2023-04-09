@@ -27,6 +27,9 @@ public:
     /// if ( selective = 1 ), cutting occurs as part of a briding couple
     int selective;
     
+    /// unidimensional diffusion coefficient while bound to a Fiber
+    real line_diffusion;
+
     /// rate of cutting event
     real cutting_rate;
     
@@ -43,6 +46,8 @@ public:
     state_t new_end_state[2];
     
     /// @}
+    
+    real line_diffusion_dt, movability_dt;
     
 private:
     

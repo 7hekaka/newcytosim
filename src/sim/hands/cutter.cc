@@ -57,7 +57,7 @@ void Cutter::cut()
 void Cutter::stepUnloaded()
 {
     assert_true( attached() );
-
+    
     if ( !prop()->selective )
     {
         nextAct -= prop()->cutting_rate_dt;
@@ -69,6 +69,27 @@ void Cutter::stepUnloaded()
                 return cut();
         }
     }
+    
+    real a = hAbs + prop()->line_diffusion_dt * RNG.sreal();
+    
+    const real M = hFiber->abscissaM();
+    const real P = hFiber->abscissaP();
+    
+    if ( a <= M )
+    {
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
+        a = M;
+    }
+    
+    if ( a >= P )
+    {
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
+        a = P;
+    }
+    
+    moveTo(a);
 }
 
 
@@ -84,5 +105,28 @@ void Cutter::stepLoaded(Vector const& force)
         if ( abscissaFromM() < prop()->cutting_range )
             return cut();
     }
+    
+    real load = dot(force, dirFiber());
+    real diff = prop()->line_diffusion_dt * RNG.sreal();
+    real a = hAbs + diff + prop()->movability_dt * load;
+    
+    const real M = hFiber->abscissaM();
+    const real P = hFiber->abscissaP();
+    
+    if ( a <= M )
+    {
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
+        a = M;
+    }
+    
+    if ( a >= P )
+    {
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
+        a = P;
+    }
+
+    moveTo(a);
 }
 
