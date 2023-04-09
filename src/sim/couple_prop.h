@@ -31,12 +31,12 @@ public:
      */
     enum Specificity 
     {
-        BIND_ALWAYS,           ///< can bind in any configuration
-        BIND_PARALLEL,         ///< can link two fibers only if `cosine(angle) > 0.5`
-        BIND_NOT_PARALLEL,     ///< can link two fibers only if `cosine(angle) < 0.5`
-        BIND_ANTIPARALLEL,     ///< can link two fibers only if `cosine(angle) < -0.5`
-        BIND_NOT_ANTIPARALLEL, ///< can link two fibers only if `cosine(angle) > -0.5`
-        BIND_ORTHOGONAL        ///< can link two fibers only if `-std::sqrt(3)/2 < cosine(angle) < std::sqrt(3)/2`
+        BIND_ALWAYS,           ///< bind in any configuration
+        BIND_PARALLEL,         ///< link angles below 60deg, only if `cosine(angle) > 0.5`
+        BIND_NOT_PARALLEL,     ///< link two fibers only if `cosine(angle) < 0.5`
+        BIND_ANTIPARALLEL,     ///< link two fibers only if `cosine(angle) < -0.5`
+        BIND_NOT_ANTIPARALLEL, ///< link two fibers only if `cosine(angle) > -0.5`
+        BIND_ORTHOGONAL        ///< link two fibers only if `abs(angle) < 30 deg`
     };
     
     /**

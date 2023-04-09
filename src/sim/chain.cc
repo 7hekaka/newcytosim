@@ -850,7 +850,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
  
  NOTE: if two consecutive points overlap, there is no unique way to
  restore the constraints! We do nothing in that case, because most 
- likely, the Brownian motion will push the points appart soon.
+ likely, the Brownian motion will push the points apart soon.
  */
 
 void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut)
@@ -1999,13 +1999,8 @@ Vector Chain::dirM(const real ab) const
         return dirSegment(0);
     
     real a = ab / fnCut;
-    size_t s = (size_t)a;
-    
-    // check if plus end is reached
-    if ( s+1 < nPoints )
-        return dirSegment(s);
-    else
-        return dirSegment(lastSegment());
+    size_t s = std::min((size_t)a, (size_t)nPoints-2);
+    return dirSegment(s);
 }
 #endif
 

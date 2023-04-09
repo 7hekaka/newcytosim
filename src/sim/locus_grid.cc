@@ -781,7 +781,7 @@ void LocusGrid::setSterics0(BigLocusList const& list1,
 /**
  This will consider once all pairs of objects from the given lists.
  Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on BigVector::near()
+ objects that are too far apart to interact, based on BigVector::near()
  */
 void LocusGrid::setStericsT(BigLocusList const& list) const
 {
@@ -816,7 +816,7 @@ void LocusGrid::setStericsT(BigLocusList const& list) const
  assuming that the list are different and no object is repeated.
 
  Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on BigVector::near()
+ objects that are too far apart to interact, based on BigVector::near()
 */
 void LocusGrid::setStericsT(BigLocusList const& list1,
                             BigLocusList const& list2) const
@@ -1094,7 +1094,7 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
  assuming that the list are different and no object is repeated.
 
  Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on BigVector::near()
+ objects that are too far apart to interact, based on BigVector::near()
  
  The same approach can be used for periodic boundary conditions, if:
  - BigVector should be folded to their cannonical representation

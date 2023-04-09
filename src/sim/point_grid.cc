@@ -458,7 +458,7 @@ void PointGrid::setSterics0(FatPointList & pots1, FatLocusList & locs1,
 /**
  This will consider once all pairs of objects from the given lists.
  Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on FatVector::near()
+ objects that are too far apart to interact, based on FatVector::near()
  */
 void PointGrid::setStericsT(FatPointList & pots, FatLocusList & locs) const
 {
@@ -491,7 +491,7 @@ void PointGrid::setStericsT(FatPointList & pots, FatLocusList & locs) const
  assuming that the list are different and no object is repeated.
 
  Compared to `setSterics0()`, this performs additional tests to exclude
- objects that are too far appart to interact, based on FatVector::near()
+ objects that are too far apart to interact, based on FatVector::near()
  */
 void PointGrid::setStericsT(FatPointList & pots1, FatLocusList & locs1,
                             FatPointList & pots2, FatLocusList & locs2) const
