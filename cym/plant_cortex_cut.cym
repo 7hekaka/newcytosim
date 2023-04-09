@@ -1,0 +1,107 @@
+% Growing and colliding microtubules in 3D, anchored to the surface
+% Maud Formanek 01.06.2020, FJN 1.10.2021, 1.11.2022, 9.4.2023
+% Parameters set to match the 5126 events measured by Carlos and Maud
+
+set simul system
+{
+    dim = 3
+    time_step = 0.005
+    viscosity = 0.1
+    steric = 1, 283.53
+    precondition = 1
+}
+
+set space cell
+{
+    shape = strip
+    display = (visible=0)
+}
+
+new cell
+{
+    length = 14, 14
+    bottom = 0
+    top = 0.5
+    no_top = 1
+}
+
+set fiber microtubule
+{
+    steric = 1, 0.0241
+    rigidity = 20   
+    segmentation = 0.2
+    activity = dynamic
+    growing_speed = 0.18
+    shrinking_speed = -0.36
+    growing_force = 1.67
+    hydrolysis_rate = 0.21
+    min_length = 0.016
+    confine = in_out, 32.47, 1000
+}
+
+set hand binder  
+{
+    binding_rate = 4.9
+    binding_range = 0.050
+    unbinding_rate = 0.2
+    unbinding_force = 3
+    display = ( size=5; color=blue; )
+}
+
+set single grafted 
+{
+    hand = binder
+    stiffness = 380.78
+    length = 0.0088
+    activity = fixed
+}
+
+set hand nucleator
+{
+    activity = nucleate
+    nucleate = 0.1, microtubule, ( length=0.032; end_state=grow; )
+}
+
+set single maker
+{
+    hand = nucleator
+    diffusion = 10
+}
+
+set hand katana
+{
+    binding_rate = 12
+    binding_range = 0.050
+    unbinding_rate = 1
+    unbinding_force = 3
+    
+    diffusion = 0.1
+    activity = cut
+    selective = 2
+    cutting_rate = 10
+    new_end_state = shrinking, static
+    display = ( size=5; color=yellow; )
+}
+
+set couple samurai
+{
+    hand1 = katana
+    hand2 = katana
+    stiffness = 10
+    specificity = orthogonal
+    diffusion = 10
+    fast_diffusion = 1
+}
+
+new 6400 grafted
+{
+    position = rectangle 14 14 0
+}
+
+new 128 maker
+new 1024 samurai
+
+run 200000 system
+{
+    nb_frames = 1000
+}
