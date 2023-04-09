@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 
 #include "cutter.h"
 #include "cutter_prop.h"
