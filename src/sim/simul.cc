@@ -88,6 +88,7 @@ void Simul::eraseObjects()
     couples.erase();
     
     prop.time = 0;
+    prop.end_time = INFINITY;
 #if ENABLE_PERIODIC_BOUNDARIES
     modulo = nullptr;
 #endif

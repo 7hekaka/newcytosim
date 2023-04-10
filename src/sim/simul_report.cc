@@ -3247,17 +3247,19 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
 #if ( DIM == 1 )
 	throw InvalidParameter("fiber:collision meaningless in 1D");
 #endif
-	if ( fibers.size() > 2 )
-		throw InvalidParameter("fiber:collision can only handle two fibers");
     
-    bool print = 0;
+    int abort = 0, print = 0;
     opt.set(print, "print");
+    static int mode = 1;
     static real abs = -77; // abscissa of contact point
     static real ang = 777; // angle at first contact
     static real dis = INFINITY; // minimum distance reached
-    static char cat = 'U'; // category
+    static char kat = 'U'; // category
+    bool K = 1, X = 0, T = 0, Z = 0;
 
-    Fiber const * fib = nullptr, *fox = nullptr;
+    if ( fibers.size() > 2 )
+        throw InvalidParameter("fiber:collision can only handle 2 fibers");
+    Fiber const * fib = nullptr, * fox = nullptr;
     for ( Fiber const* f = fibers.first(); f; f = f->next() )
     {
         if ( f->prop == sel )
@@ -3265,9 +3267,9 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         else
             fox = f;
     }
-    bool K = 1, X = 0, T = 0, Z = 0;
-
-    if ( fib && fox )
+    
+    // do not consider data if fiber has reached its max length
+    if ( fox && fib && fib->length()+0.01 < fib->prop->max_length )
     {
         const real sup = 3 * fib->prop->steric_radius;
         
@@ -3316,46 +3318,46 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
 #endif
         }
 
-        if ( cat == 'U' )
+        if ( kat == 'U' )
         {
             if ( K )
             {
                 // recorded catastrophes must be at contact
                 if ( contact )
-                    cat = 'K';
+                    kat = 'K';
                 // but in any case, we can stop the simulation
-                abort_time();
+                abort = 1;
             }
-            else if ( Z ) cat = 'Z';
-        }
-        // The 'X' may superseed the Z and U category
-        if ( X && !K ) cat = 'X';
-                
-        // check if MT has reached its max_length:
-        if ( fib->length() >= fib->prop->max_length - 0.01 )
-        {
-            cat = 'U';
-            abort_time();
+            else if ( X ) kat = 'X';
+            // can be 'Z' only if 'X' is not true
+            else if ( Z ) kat = 'Z';
         }
 
         // since these states are final, we can terminate the simulation
-        if ( cat == 'K' || cat == 'X' || cat == 'Z' )
-            abort_time();
+        if ( kat == 'K' || kat == 'X' || kat == 'Z' )
+            abort = 1;
     }
-    else
-        abort_time();
-    
-    if ( print )
+    else if ( fox )
+        abort = 1;
+
+    if ( print == 1 )
     {
         out << LIN << std::fixed << std::setprecision(5) << ang;
         out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
-        out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << cat;
+        out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << kat;
+        if ( mode == 2 ) mode = 0;
+    }
+    if ( print == 2 )
+        mode = 2;
+    if ( print )
+    {
         // reset static variables for next round:
         abs = -77;
         ang = 777;
         dis = INFINITY;
-        cat = 'U';
-    }
+        kat = 'U';
+    } else if ( abort && mode )
+        abort_time();
 }
 
 

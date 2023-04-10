@@ -1045,7 +1045,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     
     for ( int frm = 1; frm <= max; ++frm )
     {
-        sim_->prop.end_time = start + delta * frm;
+        sim_->stop_at(start + delta * frm);
         switch ( solve )
         {
             case 0: step_simul<&Simul::solve_not>(); break;
@@ -1068,8 +1068,15 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
             sim_->sMeca.doNotify = 2;  // to print convergence parameters
             sim_->unrelax();
         }
+        
+        // check if ending the simulation was requested:
+        if ( sim_->time() >= sim_->prop.end_time )
+        {
+            sim_->prop.end_time = INFINITY;
+            break;
+        }
     }
-    
+
 #if BACKWARD_COMPATIBILITY < 50
     if ( event )
         sim_->events.erase(event);
@@ -1096,7 +1103,7 @@ void Interface::execute_run(real sec)
     VLOG("-RUN START " << sec);
     sim_->prepare();
     // subtract half a time_step, to ensure we finish exactly on time!
-    sim_->prop.end_time = sim_->time() + sec - 0.5 * sim_->time_step();
+    sim_->stop_at(sim_->time() + sec - 0.5 * sim_->time_step());
 
     while ( sim_->incomplete() )
     {

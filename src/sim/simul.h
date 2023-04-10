@@ -172,11 +172,14 @@ public:
     /// change time in the simulated world
     void time(double t) { prop.time = t; }
 
-    /// true if `SimulProp::time < SimulProp::end_time`
-    bool incomplete() const { return prop.time < prop.end_time; }
+    /// true if `SimulProp::time < SimulProp::stop_time`
+    bool incomplete() const { return prop.time < prop.stop_time; }
 
-    /// set `SimulProp::end_time` to current time, to stop simulation
-    void abort_time() const { prop.end_time = prop.time; }
+    /// set next stopping time
+    void stop_at(double t) { prop.stop_time = std::min(t, prop.end_time); }
+    
+    /// set `SimulProp::end_time` to end simulation
+    void abort_time() const { prop.end_time = std::min(prop.end_time, prop.time); }
 
     /// time step (shortcut to `SimulProp::time_step`)
     double time_step() const { return prop.time_step; }

@@ -15,6 +15,8 @@ void SimulProp::clear()
 {
     time      = 0;
     time_step = 0;
+    stop_time = 0;
+    end_time  = INFINITY;
     viscosity = 1;
 #if NEW_CYTOPLASMIC_FLOW
     uniform_flow.reset();
@@ -72,7 +74,8 @@ void SimulProp::read(Glossary& glos)
 #if OLD_SPINDLE_FLUX
     glos.set(flux_speed, "flux_speed");
 #endif
-    glos.set(time, "time");
+    if ( glos.set(time, "time") )
+        end_time = INFINITY;
     glos.set(time_step, "time_step");
     
     real T = 0;

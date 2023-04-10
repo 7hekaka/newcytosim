@@ -122,6 +122,8 @@ void Simul::writeObjects(std::string const& name, bool append, bool binary) cons
     if ( ! out.good() )
         throw InvalidIO("could not open output file `"+name+"' for writing");
     
+    //std::clog << "frame @ " << time() << " " << prop.end_time << "\n";
+    
     try
     {
         out.lock();

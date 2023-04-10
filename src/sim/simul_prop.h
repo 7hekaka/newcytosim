@@ -79,10 +79,13 @@ public:
      .
      */
     double time_step;
+        
+    /// the time at which the simulation should stop
+    double stop_time;
     
-    /// the time at which the simulation can stop
+    /// the time at which the simulation is terminated
     double end_time;
-    
+
     /// Ambient viscosity
     /**
      The viscosity of the medium should be given in units of pN.s/um^2 = Pa.s.
