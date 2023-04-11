@@ -3337,8 +3337,6 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         if ( kat == 'K' || kat == 'X' || kat == 'Z' )
             abort = 1;
     }
-    else if ( fox )
-        abort = 1;
 
     if ( print == 1 )
     {
@@ -3356,8 +3354,12 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         ang = 777;
         dis = INFINITY;
         kat = 'U';
-    } else if ( abort && mode )
-        abort_time();
+    }
+    else if ( abort && mode )
+    {
+        end_at(time());
+        stop_at(time());
+    }
 }
 
 

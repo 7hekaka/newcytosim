@@ -175,11 +175,11 @@ public:
     /// true if `SimulProp::time < SimulProp::stop_time`
     bool incomplete() const { return prop.time < prop.stop_time; }
 
-    /// set next stopping time
-    void stop_at(double t) { prop.stop_time = std::min(t, prop.end_time); }
+    /// ask to halt the current series of 'run' immediately
+    void stop_at(double t) const { prop.stop_time = std::min(t, prop.end_time); }
     
-    /// set `SimulProp::end_time` to end simulation
-    void abort_time() const { prop.end_time = std::min(prop.end_time, prop.time); }
+    /// ask to end simulation at the next recorded frame
+    void end_at(double t) const { prop.end_time = std::min(t, prop.end_time); }
 
     /// time step (shortcut to `SimulProp::time_step`)
     double time_step() const { return prop.time_step; }
