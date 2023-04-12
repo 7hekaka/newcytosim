@@ -645,20 +645,47 @@ void Parser::parse_mark(std::istream& is)
 
 //------------------------------------------------------------------------------
 /**
- Cut all fibers that intersect a given plane.
+ Cut all fibers intersecting a given plane.
  
      cut FIBER_NAME
      {
         plane = VECTOR, REAL
+        min_length = REAL
+        new_end_state = NEW_PLUS_END_STATE, NEW_MINUS_END_STATE
      }
  
      cut all fiber
      {
         plane = VECTOR, REAL
+        min_length = REAL
+        new_end_state = PLUS_END_STATE, NEW_MINUS_END_STATE
      }
 
  The plane is specified by a normal vector `n` (VECTOR) and a scalar `a` (REAL).
- The plane is defined by <em> n.pos + a = 0 </em>
+ Its equation is <em> n.pos + a = 0 </em> where `pos = { x, y, z } is a vector.
+
+ Only the `plane` must be specified and other parameters are optional:
+ - new plus ends are set to state `NEW_PLUS_END_STATE` (default: shrinking)
+ - new plus ends are set to state `NEW_MINUS_END_STATE` (default: static)
+ - any fragment shorter than `min_length` is deleted (default: 0)
+ 
+ The states of the newly created fiber ends can be:
+ - static
+ - grow
+ - shrink
+ - delete
+ 
+ - if `NEW_PLUS_END_STATE = delete`, the minus end portion after the cut is deleted.
+ - if `NEW_MINUS_END_STATE = delete`, the plus end portion after the cut is deleted.
+
+ example:
+     
+     cut fiber
+     {
+         plane = 1 0 0, -5;
+         new_end_state = shrink, static;
+         min_length = 0.5;
+     }
  */
 
 void Parser::parse_cut(std::istream& is)

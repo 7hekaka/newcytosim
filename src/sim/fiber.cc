@@ -651,9 +651,13 @@ size_t Fiber::hasKink(const real max_cosine) const
 }
 
 /**
- If `stateM=STATE_BLACK`, the minus end portion of the cut fiber is deleted.
- If `stateP=STATE_BLACK`, the plus end portion of the cut fiber is deleted.
- Any portion that is shorter than 'min_length' is deleted.
+ Cut all Fibers along the plane defined by `n.pos + a = 0`.
+ - new plus ends are set to state `stateP`
+ - new plus ends are set to state `stateM`
+ - any fragment shorter than `min_length` is deleted
+ Furthermore:
+ - if `stateM=STATE_BLACK`, the minus end portion of the cut fiber is deleted.
+ - if `stateP=STATE_BLACK`, the plus end portion of the cut fiber is deleted.
  */
 size_t Fiber::planarCut(Vector const& n, const real a,
                         state_t stateP, state_t stateM, real min_len)

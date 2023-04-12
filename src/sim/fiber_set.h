@@ -75,7 +75,7 @@ public:
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
     void planarCut(Vector const& n, real a, state_t stateP, state_t stateM, real min_len);
 
-    /// Cut fibers in the list
+    /// Cut fibers in the list that are intersecting the plane defined by <em> n.pos + a = 0 </em>
     void planarCut(ObjectList&, Vector const& n, real a, state_t stateP, state_t stateM, real min_len);
     
     /// Special code to trim a spindle from both ends

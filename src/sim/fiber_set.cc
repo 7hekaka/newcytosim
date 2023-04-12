@@ -288,7 +288,10 @@ void FiberSet::step()
 
 
 /**
- Cut all Fibers along the plane defined by n.pos + a = 0.
+ Cut all Fibers along the plane defined by `n.pos + a = 0`.
+ - new plus ends are set to state `stateP`
+ - new plus ends are set to state `stateM`
+ - any fragment shorter than `min_length` is deleted
  */
 void FiberSet::planarCut(Vector const& n, const real a,
                          state_t stateP, state_t stateM, real min_len)
@@ -308,7 +311,10 @@ void FiberSet::planarCut(Vector const& n, const real a,
 }
 
 /**
- Cut given Fibers along the plane defined by n.pos + a = 0.
+ Cut all Fibers in list `objs` along the plane defined by `n.pos + a = 0`.
+ - new plus ends are set to state `stateP`
+ - new plus ends are set to state `stateM`
+ - any fragment shorter than `min_length` is deleted
  */
 void FiberSet::planarCut(ObjectList& objs, Vector const& n, const real a,
                          state_t stateP, state_t stateM, real min_len)
