@@ -33,7 +33,8 @@ void CutterProp::read(Glossary& glos)
 {
     HandProp::read(glos);
     
-    glos.set(selective, "selective");
+    glos.set(selective, "selective", {{"none", CUT_ANY_FIBER},
+             {"bridge", CUT_IF_BRIDGE}, {"top", CUT_TOP_FIBER}} );
     glos.set(line_diffusion, "diffusion");
     glos.set(cutting_rate,  "cutting_rate");
     glos.set(cutting_range, "cutting_range");

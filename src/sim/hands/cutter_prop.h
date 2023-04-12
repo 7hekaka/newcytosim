@@ -5,6 +5,9 @@
 
 #include "hand_prop.h"
 
+/// values for the 'cutter:selective'
+enum { CUT_ANY_FIBER = 0, CUT_IF_BRIDGE = 1, CUT_TOP_FIBER = 2 };
+
 
 /// Additional Property for Cutter
 /**
@@ -24,7 +27,12 @@ public:
      */
     
     /// different modes of operation
-    /// if ( selective = 1 ), cutting occurs as part of a briding couple
+    /**
+     Cutting can be restricted to certain configurations:
+     selective = 0: cutting occurs always on any type of fiber
+     selective = 1: cut only if the cutter is part of a doubly bound couple
+     selective = 2: cut only the topmost fiber (highest Z) if doubly bound
+     */
     int selective;
     
     /// unidimensional diffusion coefficient while bound to a Fiber

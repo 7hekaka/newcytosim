@@ -21,7 +21,7 @@ void Cutter::cut()
 {
     assert_true( attached() );
 
-    if ( prop()->selective == 2 )
+    if ( prop()->selective == CUT_TOP_FIBER )
     {
         Hand const* h = otherHand();
         if ( !h || !h->attached() )
@@ -58,7 +58,7 @@ void Cutter::stepUnloaded()
 {
     assert_true( attached() );
     
-    if ( !prop()->selective )
+    if ( prop()->selective == CUT_ANY_FIBER )
     {
         nextAct -= prop()->cutting_rate_dt;
         
