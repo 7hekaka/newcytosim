@@ -24,10 +24,9 @@ void SolidSet::step()
             Vector pos = B->posPoint(0);
             if ( B->prop->source_couple )
             {
-                Couple * C = B->prop->source_couple->newCouple();
-                C->setPosition(pos);
-                C->activate();
+                Couple * C = B->prop->source_couple->newCouple(pos);
                 simul_.couples.add(C);
+                C->activate();
             }
             else
             {

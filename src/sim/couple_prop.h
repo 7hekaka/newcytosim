@@ -5,6 +5,7 @@
 #include "real.h"
 #include "property.h"
 #include "hand_prop.h"
+#include "vector.h"
 
 class Couple;
 class Space;
@@ -191,6 +192,9 @@ public:
     /// create a Couple having this property
     virtual Couple * newCouple() const;
     
+    /// create a Couple at given position
+    Couple * newCouple(Vector const& pos) const;
+
     /// identifies the property
     std::string category() const { return "couple"; }
     

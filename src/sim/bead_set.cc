@@ -21,16 +21,16 @@ void BeadSet::step()
         while ( nextCreation <= 0 )
         {
             nextCreation += RNG.exponential();
+            Vector pos = B->position();
             if ( B->prop->source_couple )
             {
-                Couple * C = B->prop->source_couple->newCouple();
-                C->setPosition(B->position());
-                C->activate();
+                Couple * C = B->prop->source_couple->newCouple(pos);
                 simul_.couples.add(C);
+                C->activate();
             }
             else
             {
-                Single * S = B->prop->source_single->newSingle(B->position());
+                Single * S = B->prop->source_single->newSingle(pos);
                 simul_.singles.add(S);
             }
         }

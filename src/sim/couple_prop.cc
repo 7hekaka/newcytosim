@@ -25,6 +25,14 @@ Couple * CoupleProp::newCouple() const
     return new Couple(this);
 }
 
+
+Couple * CoupleProp::newCouple(Vector const& pos) const
+{
+    Couple * C = newCouple();
+    C->setPosition(pos);
+    return C;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
