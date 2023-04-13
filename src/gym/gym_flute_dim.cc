@@ -2,7 +2,7 @@
 
 #include "gym_flute_dim.h"
 
-#if DIM == 1
+#if ( DIM == 1 )
 
 static float * last_map = nullptr;
 static size_t last_cnt = 0;

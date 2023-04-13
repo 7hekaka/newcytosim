@@ -32,10 +32,10 @@ void Cutter::cut()
         // do not sever the fiber that is below:
         if ( P.ZZ < Q.ZZ )
             return;
+        std::cerr << "selectively cutting crossing fiber at Z " << P.ZZ << " vs. " << Q.ZZ << "\n";
 #else
         throw InvalidParameter("Cutter::selective is only usable in 3D\n");
 #endif
-        std::cerr << "selectively cutting crossing fibers at Z " << P.ZZ << " vs. " << Q.ZZ << "\n";
     }
     /**
      Cutting the fiber can invalidate the FiberGrid used for attachment,
