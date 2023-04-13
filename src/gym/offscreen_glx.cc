@@ -43,7 +43,7 @@ unsigned OffScreen::openContext()
 }
 
 
-GLXPbuffer OffScreen::makeBuffer(const int width, const int height, int)
+static GLXPbuffer makeBuffer(const int width, const int height, int)
 {
     dpy = XOpenDisplay(0);
     
