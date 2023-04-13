@@ -9,7 +9,7 @@
 #include "shackle_long.h"
 
 
-Couple * ShackleProp::newCouple(Glossary*) const
+Couple * ShackleProp::newCouple() const
 {
     //std::clog << "ShackleProp::newCouple" << '\n';
     if ( length > 0 )

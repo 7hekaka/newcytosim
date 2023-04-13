@@ -8,7 +8,7 @@
 #include "fork.h"
 
 
-Couple * ForkProp::newCouple(Glossary*) const
+Couple * ForkProp::newCouple() const
 {
     //std::clog << "ForkProp::newCouple" << '\n';
     return new Fork(this);

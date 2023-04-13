@@ -16,7 +16,7 @@
  This returns a new Couple if ( prop::length <= 0 ),
  or a CoupleLong if ( prop::length > 0 ).
  */
-Couple * CoupleProp::newCouple(Glossary*) const
+Couple * CoupleProp::newCouple() const
 {
     //std::clog << "CoupleProp::newCouple" << '\n';
     if ( length > 0 )

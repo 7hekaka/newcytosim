@@ -36,7 +36,7 @@ public:
     ~BridgeProp() { }
     
     /// return a Hand with this property
-    Couple * newCouple(Glossary*) const;
+    Couple * newCouple() const;
     
     /// set default values
     void clear();

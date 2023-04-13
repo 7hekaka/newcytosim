@@ -37,7 +37,7 @@ public:
     ~CrosslinkProp() { }
     
     /// return a Crosslink or a CrosslinkLong with this property
-    Couple * newCouple(Glossary*) const;
+    Couple * newCouple() const;
     
     /// set default values
     void clear();

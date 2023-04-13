@@ -9,7 +9,7 @@
 #include "bridge.h"
 
 
-Couple * BridgeProp::newCouple(Glossary*) const
+Couple * BridgeProp::newCouple() const
 {
     //std::clog << "BridgeProp::newCouple" << '\n';
     return new Bridge(this);

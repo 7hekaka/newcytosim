@@ -15,7 +15,7 @@
  returns a Duo if ( length <= 0 ),
  or a DuoLong if ( length > 0 )
  */
-Couple * DuoProp::newCouple(Glossary * opt) const
+Couple * DuoProp::newCouple() const
 {
     Duo * res = nullptr;
     //std::clog << "DuoProp::newCouple" << '\n';
@@ -23,13 +23,6 @@ Couple * DuoProp::newCouple(Glossary * opt) const
         res = new DuoLong(this);
     else
         res = new Duo(this);
-    
-    int a;
-    if ( opt  &&  opt->set(a, "active") )
-    {
-        if ( a )
-            res->activate();
-    }
     
     return res;
 }

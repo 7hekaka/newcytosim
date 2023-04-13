@@ -279,8 +279,13 @@ Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
 ObjectList CoupleSet::newObjects(Property const* p, Glossary& opt)
 {
     CoupleProp const* pp = static_cast<CoupleProp const*>(p);
-    Couple * obj = pp->newCouple(&opt);
-        
+    Couple * obj = pp->newCouple();
+    
+    // possibly activate
+    int a = 0;
+    if ( opt.set(a, "active") && a )
+        obj->activate();
+
     // Allow user to attach hand1:
     if ( opt.has_key("attach1") )
         obj->attach1(simul_.fibers.someSite("attach1", opt));

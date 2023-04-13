@@ -76,7 +76,7 @@ public:
     ~DuoProp() { }
     
     /// return a Duo or a DuoLong with this property
-    Couple * newCouple(Glossary*) const;
+    Couple * newCouple() const;
     
     /// set default values
     void clear();

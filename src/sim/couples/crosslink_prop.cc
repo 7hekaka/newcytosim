@@ -15,7 +15,7 @@
  This returns a new Crosslink if ( prop::length <= 0 ),
  or a CrosslinkLong if ( prop::length > 0 ).
  */
-Couple * CrosslinkProp::newCouple(Glossary*) const
+Couple * CrosslinkProp::newCouple() const
 {
     //std::clog << "CrosslinkProp::newCouple" << '\n';
     if ( length > 0 )

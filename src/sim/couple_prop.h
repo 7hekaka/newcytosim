@@ -189,7 +189,7 @@ public:
     ~CoupleProp() { }
     
     /// create a Couple having this property
-    virtual Couple * newCouple(Glossary * = nullptr) const;
+    virtual Couple * newCouple() const;
     
     /// identifies the property
     std::string category() const { return "couple"; }
