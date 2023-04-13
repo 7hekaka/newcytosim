@@ -35,7 +35,8 @@ void handle_signal(int sig)
     strncpy(str, "\nCytosim received signal   \n", 128);
     str[26] = (char)('0' + ( sig     % 10));
     str[25] = (char)('0' + ((sig/10) % 10));
-    (void) write(STDERR_FILENO, str, 29);
+    ssize_t __attribute__((unused)) u;
+    u = write(STDERR_FILENO, str, 29);
     print_backtrace();
     abort();
     //_exit(sig);
@@ -44,7 +45,8 @@ void handle_signal(int sig)
 void handle_abort(int sig)
 {
     // this will prevent crash reports to be generated
-    write(STDERR_FILENO, "\nCytosim catched abort\n", 23);
+    ssize_t __attribute__((unused)) u;
+    u = write(STDERR_FILENO, "\nCytosim catched abort\n", 23);
     _exit(sig);
 }
 

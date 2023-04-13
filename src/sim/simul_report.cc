@@ -2907,7 +2907,7 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Platelet's Microtubule Ring
+#pragma mark - Platelet Microtubule Ring
 
 /**
  Evaluates if the Fiber distribution makes a connected ring around the Z-axis
