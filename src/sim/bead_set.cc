@@ -30,8 +30,7 @@ void BeadSet::step()
             }
             else
             {
-                Single * S = B->prop->source_single->newSingle();
-                S->setPosition(B->position());
+                Single * S = B->prop->source_single->newSingle(B->position());
                 simul_.singles.add(S);
             }
         }

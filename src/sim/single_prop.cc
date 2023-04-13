@@ -61,6 +61,14 @@ Single * SingleProp::newSingle() const
 }
 
 
+Single * SingleProp::newSingle(Vector const& pos) const
+{
+    Single * S = newSingle();
+    S->setPosition(pos);
+    return S;
+}
+
+
 /**
  Create Wrist anchored to a Mecable vertex
  */

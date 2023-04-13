@@ -31,8 +31,7 @@ void SolidSet::step()
             }
             else
             {
-                Single * S = B->prop->source_single->newSingle();
-                S->setPosition(pos);
+                Single * S = B->prop->source_single->newSingle(pos);
                 simul_.singles.add(S);
             }
         }
