@@ -3278,12 +3278,12 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         
         // check if tip of 'fib' is close to 'fox':
         Vector tip = fib->posEndP();
-        real d, aaa = fox->projectPoint(tip, d);
+        real dpe, aaa = fox->projectPoint(tip, dpe);
         Vector dir = fox->dir(aaa);
-        dis = std::min(dis, d);
+        dis = std::min(dis, dpe);
         
         // plus-tip of 'fil' is in contact with 'fox':
-        bool contact = ( d < sup*sup );
+        bool contact = ( dpe < sup*sup );
         if ( contact )
         {
             // check direction of fib's tip to fox at closest point:
@@ -3306,15 +3306,21 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
             // consider a point 1um back, and check if it is on opposite side of 'fox'
             Vector bak = fib->posFrom(1, PLUS_END);
             real ddd, bbb = fox->projectPoint(bak, ddd);
-            bbb = 0.5 * ( aaa + bbb );
+            // bbb = 0.5 * ( aaa + bbb );  //OLD formula before 13.04.2023
+            // the abscissa on fox of the intersection is determined with Thales's theorem:
+            bbb = aaa + ( bbb - aaa ) * std::sqrt(dpe) / ( std::sqrt(dpe) + std::sqrt(ddd) );
             Vector mid = fox->pos(bbb);
             Vector axs = fox->dir(bbb);
             Torque TP = cross(axs, tip-mid);
             Torque TM = cross(axs, bak-mid);
-#if ( DIM == 3 )
             X = ( dot(TP, TM) < 0 );
-#else
-            X = ( TP * TM < 0 );
+#if 0
+            if ( X )
+            {
+                SingleProp * SP = static_cast<SingleProp*>(properties.find("single", "marker"));
+                Single * S = SP->newSingle(mid);
+                const_cast<Simul*>(this)->singles.add(S);
+            }
 #endif
         }
 

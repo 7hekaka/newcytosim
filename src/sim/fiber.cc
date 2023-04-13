@@ -1697,7 +1697,7 @@ void Fiber::infoMesh(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool 
 /**
  setGlue1 keeps the Single attached as long as the Fiber tip is outside the Space.
  The Single's hand is managed to always remain at the tip of the Fiber.
- The Single detaches immediately if the Fiber tip is back inside.
+ It detaches immediately if the Fiber tip is back inside.
  This generates mostly a pushing force from the cortex
  */
 void Fiber::setGlue1(Single* glue, const FiberEnd end, Space const* spc)

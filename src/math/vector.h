@@ -24,6 +24,7 @@ constexpr Torque nullTorque(0.0);
 inline Torque normalize(Torque x) { return sign_real(x); }
 inline real norm(Torque x) { return abs_real(x); }
 inline real normSqr(Torque x) { return x*x; }
+inline real dot(Torque x, Torque y) { return x*y; }
 
 #elif ( DIM == 2 )
 
@@ -35,6 +36,7 @@ constexpr Torque nullTorque(0.0);
 inline Torque normalize(Torque x) { return sign_real(x); }
 inline real norm(Torque x) { return abs_real(x); }
 inline real normSqr(Torque x) { return x*x; }
+inline real dot(Torque x, Torque y) { return x*y; }
 
 #elif ( DIM == 3 )
 
