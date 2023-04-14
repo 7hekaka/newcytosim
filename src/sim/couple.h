@@ -192,7 +192,7 @@ public:
     bool attached1() const { return cHand1->attached(); }
     
     /// Fiber to which Hand1 is attached, or zero if not attached
-    Fiber * fiber1() const { return cHand1->fiber(); }
+    Fiber const* fiber1() const { return cHand1->fiber(); }
     
     /// attachment position of Hand1 along fiber (only valid if Hand1 is attached)
     real abscissa1() const { return cHand1->abscissa(); }
@@ -224,7 +224,7 @@ public:
     bool attached2() const { return cHand2->attached(); }
     
     /// Fiber to which Hand2 is attached, or zero if not attached
-    Fiber * fiber2() const { return cHand2->fiber(); }
+    Fiber const* fiber2() const { return cHand2->fiber(); }
     
     /// attachment position of Hand2 along fiber (only valid if Hand2 is attached)
     real abscissa2() const { return cHand2->abscissa(); }

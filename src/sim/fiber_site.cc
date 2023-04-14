@@ -6,7 +6,7 @@
 #include "cymdef.h"
 
 
-FiberSite::FiberSite(Fiber* f, real a)
+FiberSite::FiberSite(Fiber const* f, real a)
 : hFiber(f), hAbs(a)
 {
     assert_true(f);

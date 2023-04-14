@@ -92,7 +92,7 @@ Vector Hand::posSide() const
 
 
 /** Used to transfer a bound Hand normally to a different fiber */
-void Hand::relocate(Fiber* f, const real a)
+void Hand::relocate(Fiber const* f, const real a)
 {
     assert_true(f && hFiber);
     hFiber->removeHand(this);
@@ -203,7 +203,7 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
 }
 
 
-void Hand::locate(Fiber* f, real a)
+void Hand::locate(Fiber const* f, real a)
 {
     assert_true(f);
     assert_true(!hFiber);
@@ -336,7 +336,7 @@ void Hand::stepLoaded(Vector const& force)
 
 ObjectID Hand::readHand(Inputter& in, Simul& sim)
 {
-    Fiber * fib = hFiber;
+    Fiber const* fib = hFiber;
     ObjectID id = readFiberSite(in, sim);
     resetTimers();
     

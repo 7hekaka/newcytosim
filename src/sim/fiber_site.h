@@ -39,7 +39,7 @@ public:
 protected:
     
     /// the Fiber of interest, or NULL
-    Fiber * hFiber;
+    Fiber const* hFiber;
 
     /// the abscissa from the origin of the Fiber
     real hAbs;
@@ -68,7 +68,7 @@ public:
 #endif
 
     /// construct at the given distance from the origin (i.e. abscissa)
-    FiberSite(Fiber*, real a);
+    FiberSite(Fiber const*, real a);
 
     /// make destructor non-virtual
     ~FiberSite() {}
@@ -136,7 +136,7 @@ public:
     bool attached() const { return hFiber; }
     
     /// Fiber to which this is attached, or zero if not attached
-    Fiber* fiber() const { return hFiber; }
+    Fiber const* fiber() const { return hFiber; }
     
     /// position in space (using current interpolation)
     Vector pos() const { assert_false(bad()); return hFiber->midPoint(segix_, inter_); }

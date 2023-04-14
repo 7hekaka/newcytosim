@@ -109,16 +109,16 @@ public:
     Vector posSide() const;
     
     /// move attached Hand to a different fiber, at the given abscissa
-    void relocate(Fiber* f, real a);
+    void relocate(Fiber const* f, real a);
     
     /// move to a different fiber, at the same abscissa
-    void relocate(Fiber* f) { relocate(f, abscissa()); }
+    void relocate(Fiber const* f) { relocate(f, abscissa()); }
 
     /// relocate to the specified tip of the current fiber
     void moveToEnd(FiberEnd);
 
     /// bind at position `a` on Fiber `f`
-    void locate(Fiber* f, real a);
+    void locate(Fiber const* f, real a);
 
     // Check that binding can occur on Fiber, from BITWISE AND of the binding keys
     bool keyMatch(Fiber const* fib) const { return prop->binding_key & fib->prop->binding_key; }
@@ -159,22 +159,22 @@ public:
     void checkFiberRange(real absM, real absP);
 
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void attach(Fiber * f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
+    void attach(Fiber const* f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
     
     /// attach at the given end of Fiber (this calls attach(FiberSite))
-    void attachEnd(Fiber * f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
+    void attachEnd(Fiber const* f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
 
     /// detach, without updating Monitor
     void detachHand();
 
     /// attach at abscissa of given Fiber (this calls attach(FiberSite))
-    void attachTo(Fiber * f, real a) { attach(FiberSite(f, a)); }
+    void attachTo(Fiber const* f, real a) { attach(FiberSite(f, a)); }
     
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void attachTo(Fiber * f, real a, FiberEnd ref) { attach(FiberSite(f, f->abscissaFrom(a, ref))); }
+    void attachTo(Fiber const* f, real a, FiberEnd ref) { attach(FiberSite(f, f->abscissaFrom(a, ref))); }
     
     /// attach at the given end of Fiber (this calls attach(FiberSite))
-    void attachToEnd(Fiber * f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
+    void attachToEnd(Fiber const* f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
     
     
     /// return position of other Hand, if part of a Couple, or position of Single

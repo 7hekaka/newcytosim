@@ -29,7 +29,7 @@ Mighty::Mighty(MightyProp const* p, HandMonitor* h)
  */
 void Mighty::handleDisassemblyM()
 {
-    Fiber * fib = fiber();
+    Fiber * fib = const_cast<Fiber*>(hFiber);
 
     if ( hAbs < fib->abscissaM() && fib->freshAssemblyM() < 0 )
     {
@@ -61,7 +61,7 @@ void Mighty::handleDisassemblyM()
  */
 void Mighty::handleDisassemblyP()
 {
-    Fiber * fib = fiber();
+    Fiber * fib = const_cast<Fiber*>(hFiber);
 
     /* increase MT length to cover position of Hand after checking that increment
     would be positive, since another Hand might have done the same job already. */

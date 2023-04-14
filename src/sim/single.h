@@ -94,7 +94,7 @@ public:
     int state() const { return sHand->attached(); }
 
     /// Fiber to which this is attached
-    Fiber * fiber() const { return sHand->fiber(); }
+    Fiber const* fiber() const { return sHand->fiber(); }
     
     /// attachment position of Hand along fiber (call is invalid if Hand is not attached)
     real abscissa() const { return sHand->abscissa(); }

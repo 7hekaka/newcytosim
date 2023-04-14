@@ -293,7 +293,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             if ( dis < sup )
             {
                 // ATTENTION: convert `abs` relative to the segment to Fiber's abscissa
-                FiberSite sit(const_cast<Fiber*>(seg.fiber()), seg.abscissa1()+abs);
+                FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
                 if ( ha.attachmentAllowed(sit) )
                 {
                     targets.emplace(sit, abs);
@@ -368,8 +368,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
              */
             if ( dis < sup )
             {
-                Fiber * fib = const_cast<Fiber*>(seg.fiber());
-                FiberSite sit(fib, seg.abscissa1()+abs);
+                FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
                 
                 if ( ha.keyMatch(fib) && ha.attachmentAllowed(sit) )
                 {
