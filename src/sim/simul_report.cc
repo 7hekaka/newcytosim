@@ -3306,20 +3306,30 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
             // consider a point 1um back, and check if it is on opposite side of 'fox'
             Vector bak = fib->posFrom(1, PLUS_END);
             real ddd, bbb = fox->projectPoint(bak, ddd);
-            // bbb = 0.5 * ( aaa + bbb );  //OLD formula before 13.04.2023
-            // the abscissa on fox of the intersection is determined with Thales's theorem:
-            bbb = aaa + ( bbb - aaa ) * std::sqrt(dpe) / ( std::sqrt(dpe) + std::sqrt(ddd) );
-            Vector mid = fox->pos(bbb);
+            // bbb = 0.5 * ( aaa + bbb );  // OLD formula before 13.04.2023
+            // the abscissa on `fox` below the intersection is estimated with Thales's theorem:
+            real alpha = std::sqrt(dpe) / ( std::sqrt(dpe) + std::sqrt(ddd) );
+            bbb = aaa + ( bbb - aaa ) * alpha;
+            Vector mid = fox->pos(bbb);  // position below the intersection
             Vector axs = fox->dir(bbb);
             Torque TP = cross(axs, tip-mid);
             Torque TM = cross(axs, bak-mid);
             X = ( dot(TP, TM) < 0 );
 #if 0
+            // the abscissa on `fib` above the intersection is estimated with Thales's theorem:
+            real ccc = fib->abscissaP() - alpha;
+            Vector top = fib->pos(ccc);  // position above the intersection
             if ( X )
             {
-                SingleProp * SP = static_cast<SingleProp*>(properties.find("single", "marker"));
-                Single * S = SP->newSingle(mid);
-                const_cast<Simul*>(this)->singles.add(S);
+                static int cnt = 0;
+                if ( ++cnt < 8 )
+                {
+                    CoupleProp * P = static_cast<CoupleProp*>(properties.find("couple", "marker"));
+                    Couple * C = P->newCouple(mid);
+                    C->hand1()->attachTo(fox, bbb);
+                    C->hand2()->attachTo(fib, ccc);
+                    const_cast<Simul*>(this)->couples.add(C);
+                }
             }
 #endif
         }
