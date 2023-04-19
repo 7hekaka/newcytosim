@@ -7,6 +7,7 @@
 #include "iowrapper.h"
 #include "simul_part.h"
 #include "hand_monitor.h"
+#include "space.h"
 
 //------------------------------------------------------------------------------
 
@@ -23,19 +24,28 @@ void Cutter::cut()
 
     if ( prop()->selective == CUT_TOP_FIBER )
     {
+        // do not sever the fiber that is below!
         Hand const* h = otherHand();
         if ( !h || !h->attached() )
             return;
         Vector P = pos();
         Vector Q = h->pos();
-#if ( DIM > 2 )
-        // do not sever the fiber that is below:
+#if ( 0 )
+        // using Z works if the boundary is aligned in XY with cell on top
         if ( P.ZZ < Q.ZZ )
             return;
-        std::cerr << "selectively cutting crossing fiber at Z " << P.ZZ << " vs. " << Q.ZZ << "\n";
 #else
-        throw InvalidParameter("Cutter::selective is only usable in 3D\n");
+        Vector PQ = 0.5 * ( P + Q );
+        Space const* spc = h->fiber()->prop->confine_pointer;
+        Vector pos = spc->project(PQ);
+        Vector dir = spc->normalToEdge(PQ);
+        real PZ = dot(P-pos, dir);
+        real QZ = dot(Q-pos, dir);
+        // do not sever the fiber that is below:
+        if ( PZ < QZ )
+            return;
 #endif
+        std::cerr << "selectively cutting crossing fiber at Z " << PZ << " vs. " << QZ << "\n";
     }
     /**
      Cutting the fiber can invalidate the FiberGrid used for attachment,
