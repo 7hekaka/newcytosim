@@ -72,8 +72,11 @@ public:
     /// the surface area of the edge
     real surface() const;
 
-    /// near the top edge
+    /// near the top or bottom edge
     Vector placeOnEdge(real) const;
+    
+    /// a vector aligned along Z
+    Vector normalToEdge(Vector const&) const;
 
     /// true if the point is inside the Space
     bool inside(Vector const&) const;

@@ -77,11 +77,11 @@ void SpaceStrip::update()
     modulo_.reset();
     for ( unsigned d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
-    mid_ = ( top_ + bot_ ) * 0.5;
     if ( no_top_ )
         pot_ = bot_;
     else
         pot_ = top_;
+    mid_ = ( pot_ + bot_ ) * 0.5;
 }
 
 
@@ -119,13 +119,30 @@ Vector SpaceStrip::bounce(Vector const& pos) const
  */
 Vector SpaceStrip::placeOnEdge(real) const
 {
-    real Z = RNG.choice(bot_, top_);
-#if ( DIM >= 3 )
+    real Z = RNG.choice(bot_, pot_);
+#if ( DIM > 2 )
     return Vector(RNG.sreal()*half_[0], RNG.sreal()*half_[0], Z);
 #elif ( DIM > 1 )
     return Vector(RNG.sreal()*half_[0], Z, 0);
 #else
     return Vector(Z, 0, 0);
+#endif
+}
+
+
+/**
+ directed away at the edge
+ */
+Vector SpaceStrip::normalToEdge(Vector const& pos) const
+{
+#if ( DIM > 2 )
+    real Z = sign_real(pos.ZZ - mid_);
+    return Vector(0, 0, Z);
+#elif ( DIM > 1 )
+    real Y = sign_real(pos.YY - mid_);
+    return Vector(0, Y, 0);
+#else
+    return Vector(1, 0, 0);
 #endif
 }
 
