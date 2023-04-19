@@ -30,7 +30,7 @@ void Chewer::stepUnloaded()
 #if ( NEW_FIBER_END_CHEW & 1 )
     if ( engaged == PLUS_END )
     {
-        Fiber * fib = const_cast<Fiber*>(hFiber);
+        Fiber * fib = modifiableFiber();
         fib->chew(engaged, prop()->chewing_speed_dt);
         moveToEnd(engaged);
         return;
@@ -76,7 +76,7 @@ void Chewer::stepLoaded(Vector const& force)
 #if ( NEW_FIBER_END_CHEW & 1 )
     if ( engaged == PLUS_END )
     {
-        Fiber * fib = const_cast<Fiber*>(hFiber);
+        Fiber * fib = modifiableFiber();
         fib->chew(engaged, prop()->chewing_speed_dt);
         moveToEnd(engaged);
         return;

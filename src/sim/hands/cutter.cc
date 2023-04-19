@@ -55,7 +55,7 @@ void Cutter::cut()
      This is why sever() below will register the position of the cut,
      but the cut will only be performed later in Fiber::step()
      */
-    Fiber * fib = const_cast<Fiber*>(hFiber);
+    Fiber * fib = modifiableFiber();
     fib->sever(abscissa(), prop()->new_end_state[0], prop()->new_end_state[1]);
     //std::clog << "cut " << fiber()->reference() << " @ " << abscissaFromM() << "\n";
     

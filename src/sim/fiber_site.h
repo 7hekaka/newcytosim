@@ -138,6 +138,9 @@ public:
     /// Fiber to which this is attached, or zero if not attached
     Fiber const* fiber() const { return hFiber; }
     
+    /// Fiber to which this is attached, or zero if not attached
+    Fiber * modifiableFiber() const { return const_cast<Fiber*>(hFiber); }
+    
     /// position in space (using current interpolation)
     Vector pos() const { assert_false(bad()); return hFiber->midPoint(segix_, inter_); }
     

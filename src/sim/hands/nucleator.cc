@@ -172,7 +172,7 @@ void Nucleator::stepLoaded(Vector const& force)
     
     if ( prop()->stabilize )
     {
-        Fiber * fib = const_cast<Fiber*>(hFiber);
+        Fiber * fib = modifiableFiber();
         fib->stabilize(nearestEnd(), prop()->stabilize);
     }
 }
@@ -183,7 +183,7 @@ void Nucleator::detach()
     // if `addictive`, give a poisonous goodbye kiss to the fiber
     if ( prop()->addictive )
     {
-        Fiber * fib = const_cast<Fiber*>(hFiber);
+        Fiber * fib = modifiableFiber();
         fib->setEndState(nearestEnd(), prop()->addictive_state);
     }
     Hand::detach();

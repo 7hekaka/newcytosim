@@ -423,7 +423,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
     grid.paintGrid(first(), nullptr, std::sqrt(square(len)+sup));
     
     FiberGrid::SegmentList list;
-    for ( Fiber * fib = first(); fib; fib = fib->next() )
+    for ( Fiber const* fib = first(); fib; fib = fib->next() )
     {
         //std::clog << fib->reference() << ":\n";
         for ( size_t s = 0; s < fib->nbSegments(); ++s )
@@ -433,7 +433,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
             //std::clog << seg << ":";
             for ( FiberSegment const& soc : list )
             {
-                Fiber * bif = const_cast<Fiber*>(soc.fiber());
+                Fiber const* bif = soc.fiber();
                 if ( fib < bif )
                 {
                     //std::clog << "   " << can;

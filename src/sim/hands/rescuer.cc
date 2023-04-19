@@ -29,7 +29,7 @@ Rescuer::Rescuer(RescuerProp const* p, HandMonitor* h)
  */
 void Rescuer::handleDisassemblyM()
 {
-    Fiber * fib = const_cast<Fiber*>(hFiber);
+    Fiber * fib = modifiableFiber();
 
     if ( hAbs < fib->abscissaM() && fib->freshAssemblyM() < 0 )
     {
@@ -61,7 +61,7 @@ void Rescuer::handleDisassemblyM()
  */
 void Rescuer::handleDisassemblyP()
 {
-    Fiber * fib = const_cast<Fiber*>(hFiber);
+    Fiber * fib = modifiableFiber();
 
     /* increase MT length to cover position of Hand after checking that increment
     would be positive, since another Hand might have done the same job already. */
