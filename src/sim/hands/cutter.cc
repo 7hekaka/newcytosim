@@ -24,27 +24,27 @@ void Cutter::cut()
 
     if ( prop()->selective == CUT_TOP_FIBER )
     {
-        // do not sever the fiber that is below!
         Hand const* h = otherHand();
         if ( !h || !h->attached() )
             return;
         Vector P = pos();
         Vector Q = h->pos();
 #if ( 0 )
-        // using Z works if the boundary is aligned in XY with cell on top
-        if ( P.ZZ < Q.ZZ )
-            return;
+        // using Z works only if the boundary is aligned in XY with cell on top
+        real PZ = P.ZZ;
+        real QZ = Q.ZZ;
 #else
         Vector PQ = 0.5 * ( P + Q );
         Space const* spc = h->fiber()->prop->confine_pointer;
-        Vector pos = spc->project(PQ);
+        Vector prj = spc->project(PQ);  // on the edge
         Vector dir = spc->normalToEdge(PQ);
-        real PZ = dot(P-pos, dir);
-        real QZ = dot(Q-pos, dir);
-        // do not sever the fiber that is below:
+        // calculate distances to the edge:
+        real PZ = dot(prj-P, dir);
+        real QZ = dot(prj-Q, dir);
+#endif
+        // do not sever the fiber that is closest to the edge:
         if ( PZ < QZ )
             return;
-#endif
         std::cerr << "selectively cutting crossing fiber at Z " << PZ << " vs. " << QZ << "\n";
     }
     /**

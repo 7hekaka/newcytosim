@@ -77,11 +77,12 @@ void SpaceStrip::update()
     modulo_.reset();
     for ( unsigned d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
+    mid_ = ( top_ + bot_ ) * 0.5;
+    // option to limit to bottom edge:
     if ( no_top_ )
         pot_ = bot_;
     else
         pot_ = top_;
-    mid_ = ( pot_ + bot_ ) * 0.5;
 }
 
 
@@ -131,7 +132,7 @@ Vector SpaceStrip::placeOnEdge(real) const
 
 
 /**
- directed away at the edge
+ directed away at the edge: up at the top surface, down at the bottom surface
  */
 Vector SpaceStrip::normalToEdge(Vector const& pos) const
 {

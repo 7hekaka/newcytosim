@@ -29,9 +29,10 @@ public:
     /// different modes of operation
     /**
      Cutting can be restricted to certain configurations:
-     selective = 0: cutting occurs always on any type of fiber
-     selective = 1: cut only if the cutter is part of a doubly bound couple
-     selective = 2: cut only the topmost fiber (highest Z) if doubly bound
+     - selective = 'none' (0): cutting occurs always on any type of fiber
+     - selective = 'bridge' (1): cut only if the cutter is part of a doubly bound couple
+     - selective = 'top' (2): cut only the topmost fiber (farthest from edge) if doubly bound
+     .
      */
     int selective;
     
