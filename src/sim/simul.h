@@ -178,7 +178,7 @@ public:
     /// ask to halt the current series of 'run' immediately
     void stop_at(double t) const { prop.stop_time = std::min(t, prop.end_time); }
     
-    /// ask to end simulation at the next recorded frame
+    /// ask to end simulation at the next recorded frame, if time exceeds 't'
     void end_at(double t) const { prop.end_time = std::min(t, prop.end_time); }
 
     /// time step (shortcut to `SimulProp::time_step`)
