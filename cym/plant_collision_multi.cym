@@ -5,13 +5,12 @@
 % `angle` is the collision angles in radians between the 2 microtubules
 % Maud Formanek 01.06.2020, FJN 1.10.2021, 1.11.2022
 
-
 set simul system
 {
     dim = 3
     time_step = 0.005
     viscosity = 0.1
-    steric = 1, 708.57
+    steric = 1, 708
     precondition = 1
 }
 
@@ -39,12 +38,12 @@ set fiber microtubule
     hydrolysis_rate = 0.200
     max_length = 8
     min_length = 0.5
-    confine = in_out, 14.75946275946276, 1000 
+    confine = in_out, 14.76, 1000 
 }
 
 set fiber obstacle
 {
-    steric = 1, 0.024864468864468865
+    steric = 1, 0.025
     rigidity = 20   
     segmentation = 0.2
     confine = in_out, 14.76, 1000 
@@ -67,19 +66,13 @@ set hand binder
     display = ( size = 5; color = 0x0072B2FF; )
 }
 
+
 set single pivot  
 {
     hand = keeper
     stiffness = 1000
     length = 0.015
     activity = fixed
-}
-
-set couple marker
-{
-    hand1 = keeper
-    hand2 = keeper
-    stiffness = 0
 }
 
 set single grafted 
@@ -119,9 +112,9 @@ for A=-85:5:85
     % allow for binding of grafted to obstacle:
     run system
     {
-        time = 2
+        time = 20
     }
-    
+    report microtubule:collision * { verbose=0; print=2; }
     new microtubule
     {
         mark = 1
@@ -132,18 +125,12 @@ for A=-85:5:85
         attach1 = pivot, 0, minus_end
         attach2 = pivot, 1, minus_end
     }
-    report microtubule:collision * {verbose=0; print=2;}
+    
     run system
     {
         time = 80
-        nb_frames = 320
     }
     report microtubule:collision * {verbose=0; print=1;}
-    run system
-    {
-        time = 5
-        nb_frames = 20
-    }
     delete all single
     delete all fiber
 }
