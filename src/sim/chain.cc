@@ -2171,15 +2171,22 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-    cDeltaM = +fnAbscissaM;
-    cDeltaP = -fnAbscissaP;
-
+    bool delta = ( fnAbscissaP > fnAbscissaM );
+    if ( delta )
+    {
+        cDeltaM = +fnAbscissaM;
+        cDeltaP = -fnAbscissaP;
+    }
+    
     fnAbscissaM = abs;
     fnAbscissaP = abs + len;
     
-    cDeltaM -= fnAbscissaM;
-    cDeltaP += fnAbscissaP;
-
+    if ( delta )
+    {
+        cDeltaM -= fnAbscissaM;
+        cDeltaP += fnAbscissaP;
+    }
+    
     setSegmentation(len/nbSegments());  // set segments' length
     //Mecable::write(std::cerr);
     

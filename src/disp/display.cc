@@ -854,7 +854,7 @@ void Display::drawFiberGrowth(Fiber const& fib, float size) const
         const float rad = 1.03125 * pixscale(size);
         gym::color_both(1, 1, 1, 1);
         gym::stretchAlignZ1(fib.posEndM(), rad, fib.dirEndM(), fib.freshAssemblyM());
-        gle::stripedTube(0.5);
+        gle::stripedTube(1.0);
     }
     if ( fib.freshAssemblyP() > 0 )
     {
@@ -862,7 +862,7 @@ void Display::drawFiberGrowth(Fiber const& fib, float size) const
         const float rad = 1.03125 * pixscale(size);
         gym::color_both(1, 1, 1, 1);
         gym::stretchAlignZ1(fib.posEndP(), rad, -fib.dirEndP(), fib.freshAssemblyP());
-        gle::stripedTube(0.5);
+        gle::stripedTube(1.0);
     }
 }
 
