@@ -231,6 +231,8 @@ void Duo::read(Inputter& in, Simul& sim, ObjectTag tag)
         active_ = in.readUInt8();
     else
         active_ = 1;
+    if ( active_ )
+        countdown_ = RNG.exponential();
     Couple::read(in, sim, tag);
 }
 
