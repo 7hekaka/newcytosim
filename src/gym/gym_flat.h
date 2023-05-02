@@ -8,9 +8,6 @@ namespace gym
 
     /// draw Bitmap using a texture over a rectangle
     void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
-
-    /// draw Bitmap using a texture over a rectangle
-    void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
     
     /// draw all pixels of the bitmap
     void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);

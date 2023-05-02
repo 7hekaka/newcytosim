@@ -101,9 +101,9 @@ void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigne
 
 /// convert binary image into one byte per pixel
 void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[], unsigned lda);
-
 void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data, const float color[4]);
-void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data);
+
+void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data, const float color[4]);
 
 
 /*
@@ -118,15 +118,15 @@ void fgBitmapCharacter(float x, float y, float S, int fontID, const float color[
         /*
          * Find the character we want to draw (???)
          */
-        face = font->Characters[ character ];
-        drawBitmap(face[0], font->Height, S*x-font->xorig, S*y-font->yorig, S, face+1, color);
+        face = font->Characters[character];
+        paintBitmap(face[0], font->Height, S*x-font->xorig, S*y-font->yorig, S, face+1, color);
     }
 }
 
 
 void fgBitmapString(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
 {
-    SFG_Font const* font = fghFont( fontID );
+    SFG_Font const* font = fghFont(fontID);
     if ( !font )
         return;
 
@@ -154,18 +154,22 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
         // calculate total string length in pixels:
         unsigned L = 7;
         for ( char * c = token; *c; ++c )
-            L += font->Characters[*c][0];
+            if ( isprint(*c) )
+                L += font->Characters[*c][0];
         pixels = (unsigned char*)realloc(pixels, L*H);
         memset(pixels, 0, L*H);
         unsigned W = 0;
         for ( char * c = token; *c; ++c )
         {
-            const uByte* face = font->Characters[*c];
-            unpackBitmap(pixels+W, face[0], H, 1+face, L);
-            //paintBitmap(face[0], H, X+scale*W, Y, scale, 1+face);
-            W += face[0];
+            if ( isprint(*c) )
+            {
+                const uByte* face = font->Characters[*c];
+                //unpackBitmap(pixels+W, face[0], H, 1+face, L);
+                paintBitmap(face[0], H, X+scale*W, Y, scale, 1+face, col);
+                W += face[0];
+            }
         }
-        drawPixels(L, H, X, Y, scale, pixels, col);
+        //drawPixels(L, H, X, Y, scale, pixels, col);
         // move down one line.
         Y += scale * vshift;
     }

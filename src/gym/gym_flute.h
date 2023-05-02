@@ -62,7 +62,8 @@ namespace gym
     /// map / unmap GPU buffer for 2D vertex
     inline flute2* mapBufferV2(size_t n) { return (flute2*)mapFloatBuffer(2*n); }
     inline void  unmapBufferV2() { unmap(); setBufferV(2); }
-    
+    inline void rebindBufferV2() { rebind(); setBufferV(2); }
+
     inline flute4* mapBufferV2T2(size_t n) { return (flute4*)mapFloatBuffer(4*n); }
     void setBufferV2T2();
     inline void  unmapBufferV2T2() { unmap(); setBufferV2T2(); }

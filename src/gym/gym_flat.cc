@@ -19,20 +19,13 @@ void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigne
 }
 
 /// global function accessible from C
+///\todo: we should unpack the whole font data only once!
 void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4])
 {
     gym::color(color);
-    gym::drawBitmap(W, H, X, Y, S, bits);
-}
-
-
-///\todo: we should unpack the whole font data only once!
-/** This is drawing `bits` by using a texture over a square, calling drawPixels() */
-void gym::drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits)
-{
     unsigned char pixels[W*H+8];
     unpackBitmap(pixels, W, H, bits, W);
-    drawPixels(W, H, X, Y, S, pixels);
+    gym::drawPixels(W, H, X, Y, S, pixels);
 }
 
 
@@ -55,7 +48,7 @@ void gym::printPixels(unsigned W, unsigned H, const unsigned char* pixels, unsig
 void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* pixels)
 {
     //printPixels(W, H, pixels, W);
-    CHECK_GL_ERROR("drawBitmap0");
+    CHECK_GL_ERROR("drawPixels0");
     glEnable(GL_TEXTURE_2D);
     if ( ! gym_font_texture_ )
         glGenTextures(1, &gym_font_texture_);
@@ -72,29 +65,29 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     flu[2] = { X+S*W, Y+S*H, 1, 0 };
     flu[3] = { X+S*W, Y,     1, 1 };
     gym::unmapBufferV2T2();
-    CHECK_GL_ERROR("drawBitmap1");
+    CHECK_GL_ERROR("drawPixels1");
 
     gym::drawTriangleStrip(0, 4);
     glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     glDisable(GL_TEXTURE_2D);
-    CHECK_GL_ERROR("drawBitmap2");
+    CHECK_GL_ERROR("drawPixels2");
 }
 
-void paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
+void paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits, const float col[4])
 {
+    gym::color(col);
     gym::paintBitmap(W, H, X0, Y0, S, bits);
 }
 
-/** This is drawing every pixels of `bits` using triangle strips */
+/** This is drawing pixels of `bits`, line by line, using triangle strips */
 void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
 {
-    const unsigned Wb = ( ( W + 7 ) & ~7 ) / 8;
+    const unsigned Wb = ( W + 7 ) >> 3;
     for ( unsigned i = 0; i < H; ++i )
     {
         float X = X0;
         float Y = Y0 + S * i, T = Y + S;
         const unsigned char* row = bits + i * Wb;
-        gym::color(1,1,1);
         flute2* flu = gym::mapBufferV2(24*Wb+2);
         flute2* ptr = flu;
         ptr[0] = { X, Y };

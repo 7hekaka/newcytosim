@@ -7,7 +7,7 @@
 void unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsigned char* bits, unsigned lda)
 {
     // number of bytes in a row of 'input'
-    const unsigned Wb = ( ( W + 7 ) & ~7 ) / 8;
+    const unsigned Wb = ( W + 7 ) >> 3;
     // each line is independent:
     for ( unsigned i = 0; i < H; ++i )
     {
@@ -17,14 +17,14 @@ void unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsigned 
         for ( unsigned j = 0; j < Wb; ++j )
         {
             unsigned char b = row[j];
-            ptr[0] = ( b & 128 ) ? ~0 : 0;
-            ptr[1] = ( b & 64  ) ? ~0 : 0;
-            ptr[2] = ( b & 32  ) ? ~0 : 0;
-            ptr[3] = ( b & 16  ) ? ~0 : 0;
-            ptr[4] = ( b & 8   ) ? ~0 : 0;
-            ptr[5] = ( b & 4   ) ? ~0 : 0;
-            ptr[6] = ( b & 2   ) ? ~0 : 0;
-            ptr[7] = ( b & 1   ) ? ~0 : 0;
+            ptr[0] = ( b & 128 ) ? 0xFF : 0;
+            ptr[1] = ( b & 64  ) ? 0xFF : 0;
+            ptr[2] = ( b & 32  ) ? 0xFF : 0;
+            ptr[3] = ( b & 16  ) ? 0xFF : 0;
+            ptr[4] = ( b & 8   ) ? 0xFF : 0;
+            ptr[5] = ( b & 4   ) ? 0xFF : 0;
+            ptr[6] = ( b & 2   ) ? 0xFF : 0;
+            ptr[7] = ( b & 1   ) ? 0xFF : 0;
             ptr += 8;
         }
     }

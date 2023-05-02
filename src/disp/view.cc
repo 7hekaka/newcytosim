@@ -257,7 +257,7 @@ float View::textPosition(float& px, float& py, int width, int height, int lines,
  Note: width and height are the current size of the viewport (window)
  */
 void View::placeText(int position, FontType font, const float color[4],
-                    const char text[], const float back[4], int W, int H) const
+                     const char text[], const float back[4], int W, int H) const
 {
     int lines = 1;
     int height = fgFontHeight(font);
@@ -279,6 +279,7 @@ void View::placeText(int position, FontType font, const float color[4],
     }
     
     fgBitmapString(X, Y, 1.f, font, color, text, vshift);
+    //fgStrokeString(X, Y, 1.f, 0, text, 1, 0, 0);
 }
 
 /**
