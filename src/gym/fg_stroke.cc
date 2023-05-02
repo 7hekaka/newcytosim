@@ -73,7 +73,7 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
     SFG_StrokeFont const* font = fghStrokeByID( mono );
-    if ( font && arg >= 0 && arg < font->Quantity )
+    if ( font && 0 <= arg && arg < font->Quantity )
     {
         schar = font->Characters[arg];
         if ( schar )

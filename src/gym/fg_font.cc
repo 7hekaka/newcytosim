@@ -153,20 +153,25 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
         const unsigned H = font->Height;
         // calculate total string length in pixels:
         unsigned L = 7;
-        for ( char * c = token; *c; ++c )
-            if ( isprint(*c) )
-                L += font->Characters[*c][0];
+        for ( char * ptr = token; *ptr; ++ptr )
+        {
+            unsigned char c = *ptr;
+            if ( isprint(c) && c < font->Quantity )
+                L += font->Characters[c][0];
+        }
         pixels = (unsigned char*)realloc(pixels, L*H);
         memset(pixels, 0, L*H);
         unsigned W = 0;
-        for ( char * c = token; *c; ++c )
+        for ( char * ptr = token; *ptr; ++ptr )
         {
-            if ( isprint(*c) )
+            unsigned char c = *ptr;
+            if ( isprint(c) )
             {
-                const uByte* face = font->Characters[*c];
+                const uByte* face = font->Characters[c];
                 //unpackBitmap(pixels+W, face[0], H, 1+face, L);
-                paintBitmap(face[0], H, X+scale*W, Y, scale, 1+face, col);
-                W += face[0];
+                unsigned cw = face[0];
+                paintBitmap(cw, H, X+scale*W, Y, scale, 1+face, col);
+                W += cw;
             }
         }
         //drawPixels(L, H, X, Y, scale, pixels, col);
