@@ -51,10 +51,10 @@ void heapsort(T & list, size_t n)
 }
 
 //------------------------------------------------------------------------------
-// this is not a true quicksort, since there is only using swaps()
+// this is not a true quicksort. Using only swaps and no storage
 
 template < typename T >
-int partition(T & list, size_t start, size_t end)
+static size_t partition(T & list, size_t start, size_t end)
 {
     size_t pivot = start;
     size_t cnt = 0;
@@ -104,4 +104,4 @@ void quicksort(T & list, size_t start, size_t end)
         quicksort(list, p+1, end);
     }
 }
- 
+
