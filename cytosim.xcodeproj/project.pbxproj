@@ -657,6 +657,7 @@
 		BB7B5A9D241A81BF0063F252 /* tesselator.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB55BF380A25FB22003333C9 /* tesselator.cc */; };
 		BB7B89AA27C965C50094532C /* matrix33sym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7B89A927C965C50094532C /* matrix33sym.h */; };
 		BB7C2B8505F94000002C69A9 /* test_rasterizer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73591105B98DA3006956D5 /* test_rasterizer.cc */; };
+		BB7DEF072A00EAA20016BDD5 /* smoothsort.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7DEF062A00EAA20016BDD5 /* smoothsort.h */; };
 		BB805D482419635D00B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BB805D492419637700B62699 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BB805D4A2419639500B62699 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
@@ -1989,6 +1990,7 @@
 		BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = /System/Library/Frameworks/OpenGL.framework; sourceTree = "<absolute>"; };
 		BB7C2BC105FA4EF8002C69A9 /* test_grid */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_grid; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB7DC19B2200DCE400DB779E /* test_glossary.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_glossary.cc; sourceTree = "<group>"; };
+		BB7DEF062A00EAA20016BDD5 /* smoothsort.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = smoothsort.h; sourceTree = "<group>"; };
 		BB805D5E241A3F1500B62699 /* space_dynamic_ellipse.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_dynamic_ellipse.h; path = spaces/space_dynamic_ellipse.h; sourceTree = "<group>"; };
 		BB805D5F241A3F1500B62699 /* space_dynamic_ellipse.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_ellipse.cc; path = spaces/space_dynamic_ellipse.cc; sourceTree = "<group>"; };
 		BB805D60241A3F1500B62699 /* space_dynamic_sphere.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_dynamic_sphere.cc; path = spaces/space_dynamic_sphere.cc; sourceTree = "<group>"; };
@@ -3086,6 +3088,7 @@
 		BB614DA105BE90330048FA70 /* misc */ = {
 			isa = PBXGroup;
 			children = (
+				BB7DEF062A00EAA20016BDD5 /* smoothsort.h */,
 				BB5BE47F29DC25C900A32BBE /* heapsort.h */,
 				BB99CAEA2979EC9300172211 /* blinksort.h */,
 				BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */,
@@ -4323,6 +4326,7 @@
 				BB9EC393209235CC00EF00E7 /* SFMT-common.h in Headers */,
 				BB71916E0EF1CD9900CED9E2 /* quaternion.h in Headers */,
 				BB71916F0EF1CD9900CED9E2 /* sparmatsym1.h in Headers */,
+				BB7DEF072A00EAA20016BDD5 /* smoothsort.h in Headers */,
 				BB7191700EF1CD9900CED9E2 /* dim.h in Headers */,
 				BB6485EE2057FD30005F2CD1 /* linear_operator.h in Headers */,
 				BB74F420232024AB0019D68E /* byteswap.h in Headers */,
