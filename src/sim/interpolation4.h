@@ -27,7 +27,7 @@ public:
     /// index of first interpolated point
     unsigned prime_;
     
-    /// number of interpolated points (order)
+    /// number of interpolated points (order), expected to be DIM+1 at most
     unsigned rank_;
     
     /// set coefficients
