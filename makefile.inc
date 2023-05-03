@@ -85,9 +85,9 @@ endif
 #-------------------------------------------------------------------------------
 
 # common options for all C++ objects: use '-fopenmp' to enable OpenMP
-CXXFLG := -std=gnu++14 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
-CXXFLG := -std=gnu++14 -fno-rtti $(OpenMP) #-g -fno-inline
-CXXFLG := -std=gnu++14 -fno-rtti
+CXXFLG := -std=c++17 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
+CXXFLG := -std=c++17 -fno-rtti $(OpenMP) #-g -fno-inline
+CXXFLG := -std=c++17 -fno-rtti
 
 # option concerning memory alignment:
 ALIGN  := -malign-double -falign-loops -falign-jumps -falign-functions

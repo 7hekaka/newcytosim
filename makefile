@@ -167,7 +167,7 @@ sterile:
 #---------------------------- dependencies -------------------------------------
 
 #command used to build the dependencies files automatically
-MAKEDEP := g++ -std=gnu++14 -MM $(addprefix -I, $(SRCDIR))
+MAKEDEP := g++ -std=c++17 -MM $(addprefix -I, $(SRCDIR))
 
 depdir:
 	mkdir -p dep

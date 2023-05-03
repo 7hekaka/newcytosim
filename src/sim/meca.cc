@@ -49,7 +49,7 @@ With a sequential simulation, the second option is usually faster.
 /*
  Parallelization uses Intel's OpenMP.
  This requires a specific flag for the compiler, so adjust the makefile.inc
- CXXFLG := -std=gnu++14 -fopenmp
+ CXXFLG := -std=c++17 -fopenmp
  */
 #include <omp.h>
 #endif

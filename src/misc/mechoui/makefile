@@ -84,7 +84,7 @@ build/SFMT.o: SFMT.c SFMT.h | build symlinks
 #----------------------------makedep--------------------------------------------
 
 #command used to build the dependencies files automatically
-MAKEDEP := g++ -std=gnu++14 -MM
+MAKEDEP := g++ -std=c++17 -MM
 
 build/dep: $(SRC_MECHOUI) | build
 	(rm -f $@; for F in $^; do $(MAKEDEP) $$F >> $@; done)
