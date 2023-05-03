@@ -13,14 +13,14 @@
 
 - [Reduction of cortical pulling at mitotic entry facilitates aster centration](https://doi.org/10.1101/2023.03.21.533625)
 - [Microtubule competition and cell growth recenter the nucleus after anaphase in fission yeast](https://www.biorxiv.org/content/10.1101/2023.01.31.526443v1)
-
+- [Self-organization of microtubules: complexity analysis of emergent patterns](https://arxiv.org/abs/2305.00539)
 
 2022
 
 - [The architecture of the actin network can balance the pushing forces produced by growing microtubules.](https://www.biorxiv.org/content/10.1101/2022.01.21.476947v1)
-- [Thermodynamic Control of Activity Patterns in Cytoskeletal Networks](https://arxiv.org/abs/2111.08677)
-- [Marco Pensalfini's strechable filaments](https://gitlab.com/f-nedelec/cytosim/-/merge_requests/27)
+- [Thermodynamic Control of Activity Patterns in Cytoskeletal Networks](https://doi.org/10.1103/PhysRevLett.129.128002)
 - [Emergence of flagella-like oscillations in single microtubules driven by collective dynein transport](https://www.biorxiv.org/content/10.1101/2022.09.11.507451v1)
+- [Slack-taut transition and emergent stiffness in bioinspired entangled filament networks](https://doi.org/10.48550/arXiv.2206.04043)
 
 2021
 
