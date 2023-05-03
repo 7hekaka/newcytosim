@@ -83,7 +83,12 @@ void paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsi
 void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
 {
     const unsigned Wb = ( W + 7 ) >> 3;
-    flute2* flu = gym::mapBufferV2(H*(24*Wb+3));
+    unsigned n_bits = 0;
+    for ( unsigned b = 0; b < H*Wb; ++b )
+        n_bits += __builtin_popcount(bits[b]);
+    if ( !n_bits )
+        return;
+    flute2* flu = gym::mapBufferV2(6*n_bits);
     flute2* ptr = flu;
     for ( unsigned i = 0; i < H; ++i )
     {
@@ -115,7 +120,7 @@ void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const
             ptr += 3;
         }
     }
-    //printf("%lu %u\n", ptr-flu, H*(24*Wb+3));
+    //printf("%4lu %4u\n", ptr-flu, 6*n_bits);
     gym::unmapBufferV2();
     gym::drawTriangleStrip(0, ptr-flu);
     CHECK_GL_ERROR("paintBitmap");
