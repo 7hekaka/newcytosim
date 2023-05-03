@@ -144,6 +144,7 @@ static void project_matrix(size_t siz, real const* src, size_t lll, real* dst, s
  if 'ku==0' and 'kl==0', only the diagonal is kept.
  if 'ku==1' and 'kl==1', the matrix is made tri-diagonal.
  */
+[[maybe_unused]]
 static void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t ku)
 {
     //VecPrint::full("\ntruncate_matrix", siz, siz, mat, ldd);
@@ -165,6 +166,7 @@ static void truncate_matrix(size_t siz, real* mat, size_t ldd, size_t kl, size_t
 
 
 /// sum(element^2) / sum(diagonal^2)
+[[maybe_unused]]
 static real off_diagonal_norm(size_t siz, real* mat)
 {
     real all = 0;
@@ -180,6 +182,7 @@ static real off_diagonal_norm(size_t siz, real* mat)
 
 
 /// set all values between '-val' and 'val' to zero
+[[maybe_unused]]
 static void threshold_matrix(size_t siz, real* mat, real val)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
@@ -200,6 +203,7 @@ inline static double truncate_double(const double& arg)
 }
 
 /// reduce precision of double
+[[maybe_unused]]
 static void truncate_double(size_t siz, double* mat)
 {
     for ( size_t i = 0; i < siz*siz; ++i )
@@ -212,6 +216,7 @@ static void truncate_double(size_t siz, double* mat)
 
 
 /// reduce precision of double
+[[maybe_unused]]
 static void compactify_double(size_t siz, double* mat)
 {
 #if 0
@@ -247,6 +252,7 @@ static void convert_to_floats(size_t cnt, double const* src, float* dst)
 
 
 /// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
+[[maybe_unused]]
 static void init_matrix(size_t siz, real* mat, real dia, real off)
 {
     for ( size_t k = 0; k < siz*siz; ++k )
@@ -257,6 +263,7 @@ static void init_matrix(size_t siz, real* mat, real dia, real off)
 
 
 /// erase all off-diagonal terms in `mat` of order `siz`
+[[maybe_unused]]
 static void make_diagonal(size_t siz, real* mat, size_t ldd)
 {
     for ( size_t j = 0; j < siz; ++j )
@@ -271,6 +278,7 @@ static void make_diagonal(size_t siz, real* mat, size_t ldd)
 
 
 /// a test matrix with integer components
+[[maybe_unused]]
 static void build_test_matrix(size_t siz, real* mat, size_t ldd)
 {
     for ( size_t i = 0; i < siz; ++i )
@@ -332,6 +340,7 @@ static void lower_band_storage(int N, real const* src, real* dst, int ldd)
            dst(KL+KU+i-j, j) = src(i,j)
  for max(0,j-KU) <= i <= min(N-1, j+KL)
 */
+[[maybe_unused]]
 static void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* dst, size_t ldd)
 {
     assert_true( ldd == 2*kl+ku+1 );
@@ -357,6 +366,7 @@ static void band_storage(size_t N, real const* src, size_t kl, size_t ku, real* 
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
+[[maybe_unused]]
 static real largest_eigenvalue(int siz, real const* blk, int const* piv, real const* mat, real alpha, real* vec, real* tmp)
 {
     assert_true(siz > 0);
@@ -398,6 +408,7 @@ static real largest_eigenvalue(int siz, real const* blk, int const* piv, real co
  @returns an estimate of the largest eigenvalue
  The precision of the estimate is low: 10%
  */
+[[maybe_unused]]
 static real largest_eigenvalue(int siz, real const* mat, real const* tam, real alpha, real* vec, real* tmp)
 {
     const real TOLERANCE = 0.05;
