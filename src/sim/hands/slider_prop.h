@@ -24,11 +24,11 @@ public:
     
     /// mobility coefficient (default=0)
     /*
-     The speed of a slider is proportional to projected force:
+     The displacement of a slider is proportional to the projected force component:
 
-         f_parallel = force_vector . direction_of_fiber
-         speed = mobility * f_parallel
-         abscissa = abscissa + time_step * speed
+         force_parallel_component = force_vector . direction_of_fiber
+         speed = mobility * force_parallel_component
+         abscissa += time_step * speed
      
      The mobility has unit of speed per force = um . s^-1 . pN^-1
      
