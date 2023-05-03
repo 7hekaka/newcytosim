@@ -152,8 +152,8 @@ void gym::transAlignZ(Vector1 const& P, float R, Vector1 const& D)
 // rotate to align Z with 'D', assuming norm(D)==1, and translate to center 'P'
 void gym::stretchAlignZ1(Vector1 const& P, float R, Vector1 const& D, float S)
 {
-    float X = std::copysign(R, float(D.XX));
-    float Z = std::copysign(S, float(D.XX));
+    float X = R * D.XX;
+    float Z = S * D.XX;
     float mat[16] = {
         0, -X,  0,  0,
         0,  0, -R,  0,
