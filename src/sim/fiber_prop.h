@@ -21,7 +21,7 @@ class Space;
 #define OLD_DYNAMIC_ZONE     0
 #define OLD_SQUEEZE_FORCE    0
 #define NEW_COLINEAR_FORCE   0
-#define NEW_FIBER_END_CHEW   1
+#define NEW_FIBER_END_CHEW   0
 #define NEW_FIBER_CONFINE2   0
 #define NEW_CONFINE_RANGE    0
 #define NEW_FIBER_END_FORCE  0
