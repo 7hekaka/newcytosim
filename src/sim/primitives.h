@@ -32,6 +32,9 @@ namespace Cytosim
     /// read an orientation, and return a normalized vector
     Vector readDirection(std::istream&, Vector const&, Space const*);
     
+    /// read an orientation, and return a normalized vector
+    Vector readDirection(std::string const&, Vector const&, Space const*);
+
     /// read a rotation specified in stream
     Rotation readRotation(std::istream&);
     

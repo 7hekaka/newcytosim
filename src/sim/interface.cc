@@ -223,9 +223,7 @@ Isometry Interface::read_placement(Glossary& opt)
         }
         else if ( opt.set_from_least_used_value(str, "direction") )
         {
-            std::istringstream iss(str);
-            vec = Cytosim::readDirection(iss, iso.mov, spc);
-            if ( has_trail(iss) ) warn_trail(iss);
+            vec = Cytosim::readDirection(str, iso.mov, spc);
             iso.rot = Rotation::randomRotationToVector(vec);
         }
         else if ( opt.set(str, "rotation") )

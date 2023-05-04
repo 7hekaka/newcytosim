@@ -880,6 +880,26 @@ restart:
     return dir;
 }
 
+
+Vector Cytosim::readDirection(std::string const& arg, Vector const& pos, Space const* spc)
+{
+    std::istringstream iss(arg);
+    Vector vec(0, 0, 0);
+    try {
+        vec = Cytosim::readDirection(iss, pos, spc);
+    }
+    catch ( Exception& e )
+    {
+        throw InvalidSyntax("could not determine direction from `"+arg+"'");
+    }
+    if ( StreamFunc::has_trail(iss) )
+    {
+        std::string sub = arg.substr(iss.tellg());
+        throw InvalidSyntax("discarded `"+sub+"' in direction");
+    }
+    return vec;
+}
+
 /**
  A rotation can be specified in 3D as follows:
  
