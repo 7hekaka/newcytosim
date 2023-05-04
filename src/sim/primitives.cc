@@ -438,13 +438,18 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
  */ 
 Vector Cytosim::readPosition(std::istream& is, Space const* spc)
 {
-    std::string tok;
-    std::streampos isp;
-    
     Vector pos = readPositionPrimitive(is, spc);
     assert_true(pos==pos);
     is.clear();
+    return modifyPosition(is, spc, pos);
+}
 
+
+Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
+{
+    std::string tok;
+    std::streampos isp;
+    
     while ( !is.eof() )
     {
         isp = is.tellg();
@@ -576,7 +581,7 @@ Vector Cytosim::readPosition(std::string const& arg, Space const* spc)
 }
 
 
-/// convert string to a position
+/// convert string to a position, bailing out after many trials
 Vector Cytosim::findPosition(std::string const& arg, Space const* spc)
 {
     long max_trials = 1 << 14;

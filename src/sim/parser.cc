@@ -343,7 +343,7 @@ void Parser::parse_change(std::istream& is)
 /**
  The command `new` creates one or more objects with given specifications:
  
-     new [COUNT] NAME
+     new COUNT NAME
      {
        position         = POSITION, [SPACE]
        direction        = DIRECTION
@@ -353,6 +353,7 @@ void Parser::parse_change(std::istream& is)
      }
  
  The NAME should have been defined previously with the command `set`.\n
+ The integer COUNT is optional.
 
  The other parameters are:
  
@@ -375,17 +376,19 @@ void Parser::parse_change(std::istream& is)
  
  Short syntax:
  
-     new [COUNT] NAME ( POSITION )
+     new COUNT NAME ( POSITION )
  
  Shorter syntax:
  
-     new [COUNT] NAME
+     new COUNT NAME
  
  To specify a concentration:
  
-     new (REAL * volume) NAME
+     new [REAL * volume] NAME
 
  `volume` appearing verbatim is replaced by the Space's volume in cubic micro-meters.
+  example:
+ 
 */
 
 void Parser::parse_new(std::istream& is)

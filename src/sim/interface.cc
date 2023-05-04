@@ -192,7 +192,7 @@ Isometry Interface::read_placement(Glossary& opt)
         spc = sim_->findSpace(str);
     
     // Position
-    Vector vec;
+    Vector vec(0,0,0);
     if ( opt.set_block(str, '[', "position") )
     {
         // can specify another object to copy its position
