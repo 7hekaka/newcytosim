@@ -216,6 +216,8 @@ void HandProp::read(Glossary& glos)
     glos.set(hold_shrinking_end, "hold_shrinking_end");
 #if NEW_BIND_ONLY_FREE_END
     glos.set(bind_only_free_end, "bind_only_free_end");
+    if ( bind_only_free_end && ! bind_only_end )
+        Cytosim::warn << "hand:bind_only_free_end is only effective if bind_only_end is set!\n";
 #endif
     
     glos.set(activity,           "activity");

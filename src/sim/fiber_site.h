@@ -176,8 +176,11 @@ public:
     /// nearest end to the current attachment point
     FiberEnd nearestEnd() const;
     
-    /// distance to the closest fiber tip
+    /// distance to specified fiber tip
     real distanceToEnd(FiberEnd) const;
+    
+    /// distance to the closest fiber tip
+    real distanceToNearestEnd() const;
 
     /// true if abscissa is below abscissaP
     bool belowP() const { return hFiber->belowP(hAbs); }

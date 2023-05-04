@@ -105,7 +105,15 @@ real FiberSite::distanceToEnd(FiberEnd end) const
 }
 
 
-real  FiberSite::abscissaFrom(const FiberEnd ref) const
+/// this will return a negative value if the abscissa is outside the fiber's ends
+real FiberSite::distanceToNearestEnd() const
+{
+    assert_true(hFiber);
+    return std::min(hAbs - hFiber->abscissaM(), hFiber->abscissaP() - hAbs);
+}
+
+
+real FiberSite::abscissaFrom(const FiberEnd ref) const
 {
     assert_true(hFiber);
     switch( ref )

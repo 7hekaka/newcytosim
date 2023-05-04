@@ -86,6 +86,20 @@ Vector Hand::posSide() const
      that rounds of binding/unbinding should not get the Couples closer to
      the Filaments, even after successive rounds of binding / unbinding.
      */
+    if ( distanceToNearestEnd() < 0.008 )
+    {
+        // if direct binding to the end is permitted, we need to reverse this:
+        FiberEnd end = nearestEnd();
+        if ( prop->bind_also_end & end )
+        {
+            Vector dir = hFiber->dirEnd(end);
+            Vector off = Vector::randB(prop->binding_range);
+            real x = dot(dir, off);
+            off = off + dir * ( abs_real(x) - x );
+            return pos() + off;
+        }
+    }
+    
     return pos() + dirFiber().randOrthoB(prop->binding_range);
 #endif
 }
