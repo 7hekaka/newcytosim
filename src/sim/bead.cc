@@ -23,6 +23,10 @@ Bead::Bead(BeadProp const* p, Vector pos, real rad)
     setNbPoints(1);
     setPoint(0, pos);
     setDragCoefficient();
+#if NEW_SOLID_CLAMP
+    clamp_place.reset();
+    clamp_stiff = 0;
+#endif
 }
 
 
@@ -51,8 +55,8 @@ void Bead::allocateMecable(const size_t nbp)
 void Bead::setInteractions(Meca& meca) const
 {
 #if NEW_SOLID_CLAMP
-    if ( prop->clamp_stiff > 0 )
-        meca.addPointClamp(Mecapoint(this,0), prop->clamp_place, prop->clamp_stiff);
+    if ( clamp_stiff > 0 )
+        meca.addPointClamp(Mecapoint(this,0), clamp_place, clamp_stiff);
 #endif
 
     if ( prop->confine != CONFINE_OFF )

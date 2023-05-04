@@ -41,6 +41,14 @@ private:
     
 public:
     
+#if NEW_SOLID_CLAMP
+    /// position of clamp
+    Vector clamp_place;
+    
+    /// stiffness of clamping force (known as `clamp[1]`)
+    real clamp_stiff;
+#endif
+
     /// Property
     BeadProp const* prop;
     
@@ -106,7 +114,12 @@ public:
 
     /// add the interactions due to confinement
     void setInteractions(Meca&) const;
-    
+
+#if NEW_SOLID_CLAMP
+    /// returns force due to clamping
+    Vector clampForce() const { return clamp_stiff * ( clamp_place - paCenter ); }
+#endif
+
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()

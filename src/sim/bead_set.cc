@@ -137,7 +137,15 @@ ObjectList BeadSet::newObjects(Property const* p, Glossary& opt)
         throw InvalidParameter("bead:radius must be specified and > 0");
 
     Bead * obj = new Bead(pp, Vector(0,0,0), rad);
-
+    
+#if NEW_SOLID_CLAMP
+    // clamp position set with 'new'
+    opt.set(obj->clamp_place, "clamp");
+    opt.set(obj->clamp_stiff, "clamp", 1);
+    if ( obj->clamp_stiff < 0 )
+        throw InvalidParameter("clamp[0] (stiffness) should be >= 0");
+#endif
+    
     // create list with one object:
     ObjectList res(obj);
 

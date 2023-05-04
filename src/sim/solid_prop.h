@@ -92,14 +92,6 @@ public:
     Vector      flow_center;
 #endif
     
-#if NEW_SOLID_CLAMP
-    /// position of clamping that applies to point 0 of Solid (known as `clamp`)
-    Vector      clamp_place;
-    
-    /// stiffness of clamping force (known as `clamp[1]`)
-    real        clamp_stiff;
-#endif
-    
 #if NEW_SOLID_MAKE_COUPLE
     /// rate
     real        source_rate;

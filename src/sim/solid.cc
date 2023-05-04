@@ -71,10 +71,10 @@ void Solid::setInteractions(Meca& meca) const
     }
 #endif
 #if NEW_SOLID_CLAMP
-    if ( prop->clamp_stiff > 0 )
+    if ( clamp_stiff > 0 )
     {
         // this attaches to first point of Solid:
-        meca.addPointClamp(Mecapoint(this,0), prop->clamp_place, prop->clamp_stiff);
+        meca.addPointClamp(Mecapoint(this,0), clamp_place, clamp_stiff);
     }
 #endif
 #if NEW_SOLID_HAS_TWIN
@@ -195,6 +195,10 @@ void Solid::reset()
 #endif
 #if NEW_SOLID_HAS_TWIN
     soTwin = nullptr;
+#endif
+#if NEW_SOLID_CLAMP
+    clamp_place.reset();
+    clamp_stiff = 0;
 #endif
 }
 
@@ -717,6 +721,14 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 {
     ObjectList objs;
     std::string str;
+    
+#if NEW_SOLID_CLAMP
+    // clamp position set with 'new'
+    opt.set(clamp_place, "clamp");
+    opt.set(clamp_stiff, "clamp", 1);
+    if ( clamp_stiff < 0 )
+        throw InvalidParameter("clamp[0] (stiffness) should be >= 0");
+#endif
     
     if ( opt.has_key("point0") || opt.has_key("sphere0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");

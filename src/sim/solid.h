@@ -86,6 +86,14 @@ private:
     
     /// the number of points when fixShape() was last called, used for verifications.
     unsigned soAmount;
+    
+#if NEW_SOLID_CLAMP
+    /// position of clamp
+    Vector clamp_place;
+    
+    /// stiffness of clamping force (known as `clamp[1]`)
+    real clamp_stiff;
+#endif
 
     /// reset private variables
     void reset();
@@ -222,7 +230,8 @@ public:
     Vector position() const { return centroid(); }
 
 #if NEW_SOLID_CLAMP
-    Vector clampForce() const { return prop->clamp_stiff * ( prop->clamp_place - posPoint(0) ); }
+    /// force due to clamping
+    Vector clampForce() const { return clamp_stiff * ( clamp_place - posPoint(0) ); }
 #endif
 #if NEW_SOLID_HAS_TWIN
     /// pointer to Solid linked to this one
