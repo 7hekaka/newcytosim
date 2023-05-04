@@ -230,12 +230,7 @@ Isometry Interface::read_placement(Glossary& opt)
         }
         else if ( opt.set(str, "rotation") )
         {
-            std::istringstream iss(str);
-            iso.rot = Cytosim::readRotation(iss);
-            // can combine a second rotation:
-            if ( iss.good() )
-                iso.rot = Cytosim::readRotation(iss) * iso.rot;
-            if ( has_trail(iss) ) warn_trail(iss);
+            iso.rot = Cytosim::readRotation(str);
         }
         else if ( opt.set(str, "orientation") )
         {

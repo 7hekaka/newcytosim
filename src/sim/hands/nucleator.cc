@@ -40,8 +40,8 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
         if ( opt.set(str, "direction") )
         {
             // nucleating in the bulk:
-            std::istringstream ss(str);
-            dir = Cytosim::readDirection(ss, pos, fip->confine_pointer);
+            std::istringstream iss(str);
+            dir = Cytosim::readDirection(iss, pos, fip->confine_pointer);
         }
         else
         {

@@ -35,6 +35,9 @@ namespace Cytosim
     /// read a rotation specified in stream
     Rotation readRotation(std::istream&);
     
+    /// read a rotation specified in string
+    Rotation readRotation(std::string const&);
+
     /// read a rotation specified in stream, at position `pos`
     Rotation readOrientation(std::istream&, Vector const&, Space const*);
     

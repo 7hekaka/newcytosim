@@ -899,7 +899,6 @@ restart:
 
 Rotation Cytosim::readRotation(std::istream& is)
 {
-    std::streampos isp = is.tellg();
     std::string tok = Tokenizer::get_symbol(is);
     
     if ( tok == "random" )
@@ -974,13 +973,32 @@ Rotation Cytosim::readRotation(std::istream& is)
         return Rotation::rotation(get_angle(is));
 #endif
     
-    // rewind before token:
-    is.clear();
-    is.seekg(isp);
-    throw InvalidSyntax("unexpected `"+tok+"' in rotation specificiation");
-    return Rotation::randomRotation();
+    throw InvalidSyntax("could not determine rotation from `"+tok+"'");
+    return Rotation(0, 1);
 }
 
+
+Rotation Cytosim::readRotation(std::string const& arg)
+{
+    std::istringstream iss(arg);
+    Rotation rot(0, 1);
+    try {
+        rot = Cytosim::readRotation(iss);
+        // can combine a second rotation:
+        if ( iss.good() )
+            rot = Cytosim::readRotation(iss) * rot;
+    }
+    catch ( Exception& e )
+    {
+        throw InvalidSyntax("could not determine rotation from `"+arg+"'");
+    }
+    if ( StreamFunc::has_trail(iss) )
+    {
+        std::string sub = arg.substr(iss.tellg());
+        throw InvalidSyntax("discarded `"+sub+"' in rotation");
+    }
+    return rot;
+}
 
 /**
  The initial orientation of objects is defined by a rotation, but it is usually
