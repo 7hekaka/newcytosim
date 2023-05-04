@@ -1275,9 +1275,18 @@ void Solid::reshape()
     //printf("optimal LWORK = %f\n", work[0]);
     if ( info == 0 )
     {
-        //printf("eigenvalue %6.2f :", val[0]); quat.println();
         //get the rotation matrix corresponding to the quaternion:
         quat.setMatrix3(S);
+        
+        if ( 0 )
+        {
+            // measure remaining error:
+            real dev = 0;
+            for ( size_t i = 0; i < nPoints; ++i )
+                dev += distanceSqr(avg+S*Vector3(soShape+DIM*i), pPos+DIM*i);
+            printf("%s error %6.4f :", reference().c_str(), dev);
+            printf(" eigenvalue %6.2f ", val[0]); quat.println();
+        }
 
         // apply rotation + translation:
         for ( size_t i = 0; i < nPoints; ++i )

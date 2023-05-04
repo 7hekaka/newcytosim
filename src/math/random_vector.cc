@@ -399,9 +399,9 @@ size_t tossPointsCap(std::vector<Vector2>& pts, real cap, real sep, size_t max_t
 
 /**
  Generate a random distribution of points over a portion of the unit sphere,
- near (1,0,0) and symmetric around the X-axis, defined by a thickness 'cap'.
+ near (1,0,0) and defined by a thickness `cap`, that is symmetric around the X-axis.
  No two points should be closer than `sep`.
- @return number of points stored in 'pts[]'
+ @return number of points stored in `pts[]`
  */
 size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_trials)
 {

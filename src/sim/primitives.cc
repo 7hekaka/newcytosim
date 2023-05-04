@@ -925,6 +925,8 @@ Rotation Cytosim::readRotation(std::istream& is)
         return Rotation::randomRotation();
     else if ( tok == "identity" || tok == "off" || tok == "none" )
         return Rotation::identity();
+    else if ( tok == "align111" )
+        return Rotation::align111();
     else if ( tok == "angle" )
     {
         real A = 0;
@@ -986,14 +988,23 @@ Rotation Cytosim::readRotation(std::istream& is)
         return Rotation::rotationAroundY(get_angle(is));
     else if ( tok == "Z" )
         return Rotation::rotationAroundZ(get_angle(is));
+    else if ( tok == "Xflip" )
+        return Rotation::rotationAroundX(M_PI);
+    else if ( tok == "Yflip" )
+        return Rotation::rotationAroundY(M_PI);
+    else if ( tok == "Zflip" )
+        return Rotation::rotationAroundZ(M_PI);
 #else
     else if ( tok == "X" )
         return Rotation(0, RNG.sflip());
     else if ( tok == "Z" )
         return Rotation::rotation(get_angle(is));
+    else if ( tok == "Xflip" )
+        return Rotation(0, RNG.sflip());
 #endif
     
-    throw InvalidSyntax("could not determine rotation from `"+tok+"'");
+    if ( tok.size() )
+        throw InvalidSyntax("unexpected token in rotation");
     return Rotation(0, 1);
 }
 
