@@ -74,7 +74,7 @@ void Solid::setInteractions(Meca& meca) const
     if ( prop->clamp_stiff > 0 )
     {
         // this attaches to first point of Solid:
-        meca.addPointClamp(Mecapoint(this,0), prop->clamp_pos, prop->clamp_stiff);
+        meca.addPointClamp(Mecapoint(this,0), prop->clamp_place, prop->clamp_stiff);
     }
 #endif
 #if NEW_SOLID_HAS_TWIN

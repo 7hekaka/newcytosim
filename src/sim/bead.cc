@@ -52,7 +52,7 @@ void Bead::setInteractions(Meca& meca) const
 {
 #if NEW_SOLID_CLAMP
     if ( prop->clamp_stiff > 0 )
-        meca.addPointClamp(Mecapoint(this,0), prop->clamp_pos, prop->clamp_stiff);
+        meca.addPointClamp(Mecapoint(this,0), prop->clamp_place, prop->clamp_stiff);
 #endif
 
     if ( prop->confine != CONFINE_OFF )

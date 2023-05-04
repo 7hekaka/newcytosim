@@ -26,8 +26,8 @@ void SolidProp::clear()
     flow_center.reset();
 #endif
 #if NEW_SOLID_CLAMP
-    clamp_stiff  = 0;
-    clamp_pos.reset();
+    clamp_stiff = 0;
+    clamp_place.reset();
 #endif
 #if NEW_SOLID_MAKE_COUPLE
     source_rate = 0;
@@ -90,8 +90,8 @@ void SolidProp::read(Glossary& glos)
         throw InvalidParameter("flow_time[0] should be lower than flow_time[1]");
 #endif
 #if NEW_SOLID_CLAMP
-    glos.set(clamp_pos,    "clamp");
-    glos.set(clamp_stiff,  "clamp", 1);
+    glos.set(clamp_place, "clamp");
+    glos.set(clamp_stiff, "clamp", 1);
     if ( clamp_stiff < 0 )
         throw InvalidParameter("clamp[0] (stiffness) should be >= 0");
 #endif
@@ -181,7 +181,7 @@ void SolidProp::write_values(std::ostream& os) const
     write_value(os, "flow_time",   flow_time, 2);
 #endif
 #if NEW_SOLID_CLAMP
-    write_value(os, "clamp", clamp_pos, clamp_stiff);
+    write_value(os, "clamp", clamp_place, clamp_stiff);
 #endif
 #if NEW_SOLID_MAKE_COUPLE
     write_value(os, "source", source_rate, source_type);

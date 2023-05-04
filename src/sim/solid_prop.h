@@ -94,7 +94,7 @@ public:
     
 #if NEW_SOLID_CLAMP
     /// position of clamping that applies to point 0 of Solid (known as `clamp`)
-    Vector      clamp_pos;
+    Vector      clamp_place;
     
     /// stiffness of clamping force (known as `clamp[1]`)
     real        clamp_stiff;

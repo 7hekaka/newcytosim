@@ -222,7 +222,7 @@ public:
     Vector position() const { return centroid(); }
 
 #if NEW_SOLID_CLAMP
-    Vector clampForce() const { return prop->clamp_stiff * ( prop->clamp_pos - posPoint(0) ); }
+    Vector clampForce() const { return prop->clamp_stiff * ( prop->clamp_place - posPoint(0) ); }
 #endif
 #if NEW_SOLID_HAS_TWIN
     /// pointer to Solid linked to this one
