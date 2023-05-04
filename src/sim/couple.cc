@@ -423,7 +423,7 @@ void Couple::beforeDetachment(Hand const* h)
             if ( cHand2->unattached() )
             {
                 cHand1->reinterpolate();
-                cPos = cHand1->posSide();
+                cPos = cHand1->unbindingPosition();
             }
         }
         else
@@ -433,7 +433,7 @@ void Couple::beforeDetachment(Hand const* h)
             if ( cHand1->unattached() )
             {
                 cHand2->reinterpolate();
-                cPos = cHand2->posSide();
+                cPos = cHand2->unbindingPosition();
             }
         }
     }

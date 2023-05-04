@@ -67,7 +67,7 @@ void Hand::resetTimers()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-Vector Hand::posSide() const
+Vector Hand::unbindingPosition() const
 {
     // needed if the interpolation is not up-to-date
     //reinterpolate();

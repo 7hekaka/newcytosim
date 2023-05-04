@@ -106,7 +106,7 @@ public:
 
     
     /// a random position, at distance `binding_range' on the side of the fiber
-    Vector posSide() const;
+    Vector unbindingPosition() const;
     
     /// move attached Hand to a different fiber, at the given abscissa
     void relocate(Fiber const* f, real a);
