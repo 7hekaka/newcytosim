@@ -23,7 +23,7 @@ class LineDisp;
 /// record birth time of fibers, used for display mostly
 #define FIBER_HAS_BIRTHTIME 0
 
-/// Flag to add a Lattice of integers to each Fiber {0, 1}
+/// Switch to add a Lattice of integers/floats to each Fiber {0, 1, -1}
 #define FIBER_HAS_LATTICE 0
 
 /// Flag to add a Lattice of reals to each Fiber {0, 1}
@@ -43,10 +43,10 @@ class LineDisp;
  The type of Lattice associated with each Fiber is defined here:
  */
 #if FIBER_HAS_LATTICE > 0
-/// Lattice cells contain integers, appropriate for discrete occupancy
+/// Lattice cells contain integers, appropriate for discrete occupancy tracking
 typedef Lattice<uint8_t> FiberLattice;
 #else
-/// Lattice cells contain continuous values
+/// Lattice cells contain floating-point values
 typedef Lattice<real> FiberLattice;
 #endif
 
@@ -106,11 +106,11 @@ private:
     
 #if FIBER_HAS_LATTICE
     /// Associated Lattice used for occupancy of Digit
-    FiberLattice fLattice;
+    mutable FiberLattice fLattice;
 #endif
 #if FIBER_HAS_MESH
     /// Associated Lattice of reals
-    Lattice<real> fMesh;
+    mutable Lattice<real> fMesh;
 #endif
 #if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
@@ -356,8 +356,8 @@ public:
     /// modifiable reference to Fiber's Lattice
     FiberLattice * lattice() { return &fLattice; }
     
-    /// const reference to Fiber's Lattice
-    FiberLattice const* lattice() const { return &fLattice; }
+    /// modifiable reference to Fiber's Lattice
+    FiberLattice * lattice() const { return &fLattice; }
     
     /// recalculate occupancy lattice from bound Digits
     void resetLattice();
