@@ -177,7 +177,7 @@ class Gosimer:
             else:
                 [key, equal, val] = arg.partition('=')
                 if key == 'nproc' or key == 'njobs' or key == 'jobs':
-                    self.njobs = val
+                    self.njobs = int(val)
                 elif key == 'preconfig' or key == 'script':
                     self.script = val
                 elif key == 'name':
