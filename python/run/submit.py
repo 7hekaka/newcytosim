@@ -204,7 +204,7 @@ def main(args):
                 conf = todo + '/config%04i.cym' % jcnt
                 shutil.copyfile(arg, conf)
                 jame = todo + '/R' + str(jcnt)
-                cmd = job_script(wdir, conf, jarg+' name=run%04i'%jcnt+' park='+jdir+'/save')
+                cmd = job_script(wdir, conf, jarg+' name=r%04i'%jcnt+' park='+jdir+'/save')
                 write_script(jame, cmd)
         elif arg.isdigit():
             jdup = int(arg)
