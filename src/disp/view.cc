@@ -156,7 +156,8 @@ void View::openDisplay()
         gym::disableDepthTest();
         gym::disableLighting();
         gym::closeDepthMask();
-        gym::drawTiledFloor(floor_radius, floor_tile, floor_height, floor_color, back_color);
+        gym::color(floor_color);
+        gym::drawTiledFloor(floor_radius, floor_tile, floor_height);
         gym::openDepthMask();
         gym::restoreDepthTest();
     }

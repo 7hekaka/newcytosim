@@ -25,7 +25,7 @@ namespace gym
     void fillRectangle(float L, float B, float R, float T, float Z, const float col[4]);
     
     /// draw plane with squares of alternating colors
-    void drawTiledFloor(int R, float T, float Z, const float col1[], const float col2[]);
+    void drawTiledFloor(int R, float T, float Z);
     
     /// draw Octagon
     void paintOctagon(float L, float B, float R, float T, const float col[4], float D);

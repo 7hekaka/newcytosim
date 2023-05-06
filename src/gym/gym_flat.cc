@@ -210,20 +210,28 @@ int copy_parity(const int a, const int b)
     return a + (( std::abs(a) + b ) & 1 );
 }
 
-void gym::drawTiledFloor(int R, float T, float Z, const float col[4], const float back[4])
+static void setRectangle(flute3*& flu, float L, float B, float R, float T, float Z)
+{
+    flu[0] = {L, B, Z};
+    flu[1] = {L, B, Z};
+    flu[2] = {L, T, Z};
+    flu[3] = {R, B, Z};
+    flu[4] = {R, T, Z};
+    flu[5] = {R, T, Z};
+    flu += 6;
+}
+
+void gym::drawTiledFloor(int R, float T, float Z)
 {
     float H = T * 0.5;
     int Q = std::floor( double(R) * M_SQRT1_2 );
     
-    if ( back && back[3] > 0 )
-    {
-        float U = R * T;
-        fillRectangle(-U, -U, U, U, Z, back);
-    }
-    
     int x = R;
     int RX = 2 * x - 3;
     int RY = 0;
+    flute3 * flu = gym::mapBufferV3(24*Q*Q);
+    flute3 * ptr = flu;
+    
     for ( int y = 0; y <= x; ++y )
     {
         /*
@@ -240,24 +248,26 @@ void gym::drawTiledFloor(int R, float T, float Z, const float col[4], const floa
         {
             float X = i * T;
             float Y = y * T;
-            fillRectangle( X-H, Y-H, X+H, Y+H, Z, col);
-            fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z, col);
+            setRectangle(ptr,  X-H, Y-H, X+H, Y+H, Z);
+            setRectangle(ptr, -X+H,-Y+H,-X-H,-Y-H, Z);
         }
         for ( int i = copy_parity(Q,y); i <= x; i+=2 )
         {
             float X = y * T;
             float Y = i * T;
-            fillRectangle( X-H, Y-H, X+H, Y+H, Z, col);
-            fillRectangle(-X+H,-Y+H,-X-H,-Y-H, Z, col);
+            setRectangle(ptr, X-H, Y-H, X+H, Y+H, Z);
+            setRectangle(ptr,-X+H,-Y+H,-X-H,-Y-H, Z);
         }
         for ( int i = copy_parity(Q,y); i <= x; i+=2 )
         {
             float X = y * T;
             float Y = i * T;
-            fillRectangle(-X-H, Y-H,-X+H, Y+H, Z, col);
-            fillRectangle( X+H,-Y+H, X-H,-Y-H, Z, col);
+            setRectangle(ptr,-X-H, Y-H,-X+H, Y+H, Z);
+            setRectangle(ptr, X+H,-Y+H, X-H,-Y-H, Z);
         }
     }
+    gym::unmapBufferV3();
+    gym::drawTriangleStrip(0, ptr-flu);
 }
 
 
