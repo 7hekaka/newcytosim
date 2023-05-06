@@ -119,7 +119,7 @@ size_t gym::zoo_init(flute2* flt, flute2* const ori)
         zoo_[j++] = flt - ori;
         const float A(M_PI * 0.1);
         const float B(M_PI * 0.3);
-        const float R = 1.3512958724134987f; //std::sqrt(4*M_PI/std::sqrt(25+10*std::sqrt(5)));
+        const float R = 1.3512958724134987f; //sqrt(4*M_PI/sqrt(25+10*std::sqrt(5)));
         const float C1 = R * cosf(A), S1 = R * sinf(A);
         const float C3 = R * cosf(B), S3 = R * sinf(B);
         *flt++ = {  0,  0};
@@ -133,8 +133,8 @@ size_t gym::zoo_init(flute2* flt, flute2* const ori)
     // hexagon
     {
         zoo_[j++] = flt - ori;
-        const float R = 1.0996361107912678f; //std::sqrt( 2 * M_PI / ( 3 * std::sqrt(3) ));
-        const float H = R * 0.8660254037844386f; // sqrtf(3)/2;
+        const float R = 1.0996361107912678f; //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
+        const float H = R * 0.8660254037844386f; // sqrt(3)/2;
         const float X = R * 0.5f;
         *flt++ = { 0,  0};
         *flt++ = { R,  0};
