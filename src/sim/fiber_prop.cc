@@ -332,8 +332,8 @@ void FiberProp::clear()
     confine2 = CONFINE_OFF;
     confine2_stiff[0] = 0;
     confine2_stiff[1] = 0;
-    confine2_space = "first";
-    confine2_pointer = nullptr;
+    confine2_label = "first";
+    confine2_space = nullptr;
 #endif
 #if NEW_CONFINE_RANGE
     confine_range[0] = 0;
@@ -488,13 +488,13 @@ void FiberProp::read(Glossary& glos)
     if ( glos.is_number("confine2", 2) )
     {
         glos.set(confine2_stiff[1], "confine2", 2);
-        glos.set(confine2_space, "confine2", 3);
+        glos.set(confine2_label, "confine2", 3);
     }
     else
-        glos.set(confine2_space, "confine2", 2);
+        glos.set(confine2_label, "confine2", 2);
 
     glos.set(confine2_stiff, 2, "confine2_stiffness");
-    glos.set(confine2_space, "confine2_space");
+    glos.set(confine2_label, "confine2_space");
 #endif
 #if NEW_CONFINE_RANGE
     glos.set(confine_range, 2,   "confine_range");
@@ -587,18 +587,18 @@ void FiberProp::complete(Simul const& sim)
 #if NEW_FIBER_CONFINE2
     if ( confine2 != CONFINE_OFF )
     {
-        confine2_pointer = sim.findSpace(confine2_space);
-        if ( confine2_pointer )
-            confine2_space = confine2_pointer->name();
+        confine2_space = sim.findSpace(confine2_label);
+        if ( confine2_space )
+            confine2_label = confine2_space->name();
         else
         {
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine2_space `"+confine2_space+"' was not found");
+                throw InvalidParameter(name()+":confine2_space `"+confine2_label+"' was not found");
             // this condition occur when the Property is created before the Space
         }
     }
     else
-        confine2_pointer = nullptr;
+        confine2_space = nullptr;
 
     if ( confine2 && confine2_stiff[0] < 0 )
         throw InvalidParameter(name()+":confine2_stiffness must be specified and >= 0");
@@ -762,7 +762,7 @@ void FiberProp::write_values(std::ostream& os) const
 #endif
     write_value(os, "confine", confine, confine_stiff[0], confine_stiff[1], confine_label);
 #if NEW_FIBER_CONFINE2
-    write_value(os, "confine2", confine2, confine2_stiff[0], confine2_stiff[1], confine2_space);
+    write_value(os, "confine2", confine2, confine2_stiff[0], confine2_stiff[1], confine2_label);
 #endif
 #if NEW_CONFINE_RANGE
     write_value(os, "confine_range",       confine_range, 2);

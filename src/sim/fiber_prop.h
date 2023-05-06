@@ -250,7 +250,7 @@ public:
     real confine2_stiff[2];
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string confine2_space;
+    std::string confine2_label;
 #endif
 #if NEW_CONFINE_RANGE
     real confine_range[2];
@@ -364,7 +364,7 @@ public:
    
 #if NEW_FIBER_CONFINE2
     /// pointer to actual confinement Space, derived from `confine_label`
-    Space const* confine2_pointer;
+    Space const* confine2_space;
 #endif
 #if NEW_FIBER_MAKE_COUPLE
     /// rate
