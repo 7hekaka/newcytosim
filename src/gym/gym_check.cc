@@ -76,12 +76,7 @@ void gym::printCaps(const char str[])
     print_cap(GL_COLOR_MATERIAL, "material");
     print_cap(GL_LINE_STIPPLE, "stipple");
     print_cap(GL_TEXTURE_2D, "texture");
-
-    
-    GLfloat c[4] = { 0 };
-    glGetFloatv(GL_CURRENT_COLOR, c);
-    print_rgba(stderr, "color", c);
-    std::clog << '\n';
+    fprintf(stderr, "\n");
 }
 
 void gym::printMatrices(FILE * f)

@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
 #include "save_image_gl.h"
+#include "gym_view.h"
 #include <cstdlib>
 #include <cstring>
 #include <new>
@@ -85,7 +86,6 @@ int SaveImage::saveCompositeImage(const int mag,
     if ( ! supported(format) )
         return UNKNOWN_FORMAT;
     int res = OPENGL_ERROR;
-#ifdef GL_VERSION_2_1
     int mW = mag * width;
     int mH = mag * height;
     
@@ -94,21 +94,17 @@ int SaveImage::saveCompositeImage(const int mag,
     uint8_t* sub    = new_pixels(width*height, PIX);
     
     const double cc = ( mag - 1 ) * 0.5;
-    const double dx = width * pixel_size / mag;
-    const double dy = height * pixel_size / mag;
+    const double dx = width * pixel_size;
+    const double dy = height * pixel_size;
     
-    glMatrixMode(GL_MODELVIEW);
-    glPushMatrix();
-    glScalef(mag, mag, mag);
-    
+    float mat[16];
+    gym::get_view(mat);
     for ( int iy = 0; iy < mag; ++iy )
     for ( int ix = 0; ix < mag; ++ix )
     {
-        glPushMatrix();
-        glTranslated((cc-ix)*dx, (cc-iy)*dy, 0);
+        gym::transScale((cc-ix)*dx, (cc-iy)*dy, 0, mag);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         drawFunc(mag, arg);
-        glPopMatrix();
         if ( 0 == readPixels(0, 0, width, height, sub) )
         {
             uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
@@ -116,12 +112,10 @@ int SaveImage::saveCompositeImage(const int mag,
                 memcpy(&dst[u*mW*PIX], &sub[u*width*PIX], width*PIX);
         }
     }
-    glPopMatrix();
-    
+    gym::set_view(mat);
     res = savePixels(filename, format, pixels, mW, mH, downsample);
     free_pixels(pixels);
     free_pixels(sub);
-#endif
     return res;
 }
 

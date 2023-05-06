@@ -318,18 +318,6 @@ void printInfo()
     printf("Current mode possible %i\n",   glutGet(GLUT_DISPLAY_MODE_POSSIBLE));
     printf("Overlay possible %i\n",        glutLayerGet(GLUT_OVERLAY_POSSIBLE));
 #endif
-    
-    //anti-aliasing of points and lines:
-    //printf("GL_POINT_SMOOTH enabled: %i\n", glIsEnabled(GL_POINT_SMOOTH));
-    GLfloat s[2];
-    glGetFloatv(GL_SMOOTH_POINT_SIZE_RANGE, s);
-    printf("GL_SMOOTH_POINT_SIZE_RANGE: %.2f - %.2f\n", s[0],s[1]);
-    
-    //printf("GL_LINE_SMOOTH enabled: %i\n", glIsEnabled(GL_LINE_SMOOTH));
-    glGetFloatv(GL_SMOOTH_LINE_WIDTH_RANGE, s);
-    printf("GL_SMOOTH_LINE_WIDTH_RANGE: %.2f - %.2f\n", s[0], s[1]);
-    glGetFloatv(GL_ALIASED_LINE_WIDTH_RANGE, s);
-    printf("GL_ALIASED_LINE_WIDTH_RANGE: %.2f - %.2f\n", s[0], s[1]);
 }
 
 void printExtensions()

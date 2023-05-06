@@ -382,7 +382,8 @@ void Player::drawSystem(View& view)
 int Player::saveView(const char* filename, const char* format, int downsample) const
 {
     View& view = glApp::currentView();
-    GLint const* vp = view.viewport();
+    GLint vp[4] = { 0 };
+    view.copyViewport(vp);
     //printf("Player::viewport %ix%i\n", vp[2], vp[3]);
     int err = SaveImage::saveImage(filename, format, vp, downsample);
     if ( err == 0 && simul.prop.verbose > 0 )

@@ -87,6 +87,9 @@ public:
     
     /// reset viewport
     void setViewport(int, int, size_t, size_t) const;
+    
+    /// height of display area in pixels
+    void copyViewport(GLint vp[4]) const { for(int i=0; i<4; ++i) vp[i] = viewport_[i]; }
 
     /// adjust parameters of projections, given window size
     void adjust(int, int) const;
@@ -122,9 +125,6 @@ public:
     
     /// distance between origin and camera plate
     float depth() const { return eyeDistance; }
-    
-    /// height of display area in pixels
-    GLint const* viewport() const { return viewport_; }
 
     /// size of pixel in drawing units
     float pixelSize() const;
