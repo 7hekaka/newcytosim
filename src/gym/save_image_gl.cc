@@ -57,12 +57,12 @@ int SaveImage::saveImage(const char * filename,
     int res = FAILED_READ;
 
     //allocate memory to hold image:
-    uint8_t* pixels = new_pixels(vp[2]*vp[3], 3);
+    uint8_t* pix = new_pixels(vp[2]*vp[3], 3);
 
-    if ( 0 == readPixels(vp[0], vp[1], vp[2], vp[3], pixels) )
-        res = savePixels(filename, format, pixels, vp[2], vp[3], downsample);
+    if ( 0 == readPixels(vp[0], vp[1], vp[2], vp[3], pix) )
+        res = savePixels(filename, format, pix, vp[2], vp[3], downsample);
     
-    free_pixels(pixels);
+    free_pixels(pix);
     return res;
 }
 
@@ -90,8 +90,8 @@ int SaveImage::saveCompositeImage(const int mag,
     int mH = mag * height;
     
     const int PIX = 3;  //number of bytes for each pixel
-    uint8_t* pixels = new_pixels(mW*mH, PIX);
-    uint8_t* sub    = new_pixels(width*height, PIX);
+    uint8_t* pix = new_pixels(mW*mH, PIX);
+    uint8_t* sub = new_pixels(width*height, PIX);
     
     const double cc = ( mag - 1 ) * 0.5;
     const double dx = width * pixel_size;
@@ -107,14 +107,14 @@ int SaveImage::saveCompositeImage(const int mag,
         drawFunc(mag, arg);
         if ( 0 == readPixels(0, 0, width, height, sub) )
         {
-            uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
+            uint8_t * dst = &pix[width*PIX*(ix+mH*iy)];
             for ( uint32_t u = 0; u < height; ++u )
                 memcpy(&dst[u*mW*PIX], &sub[u*width*PIX], width*PIX);
         }
     }
     gym::set_view(mat);
-    res = savePixels(filename, format, pixels, mW, mH, downsample);
-    free_pixels(pixels);
+    res = savePixels(filename, format, pix, mW, mH, downsample);
+    free_pixels(pix);
     free_pixels(sub);
     return res;
 }
@@ -148,7 +148,7 @@ int SaveImage::saveMagnifiedImage(const int mag,
     
     const int PIX = 3;  //number of bytes for each pixel
     //allocate memory to hold the full image:
-    uint8_t* pixels = new_pixels(mW*mH, PIX);
+    uint8_t* pix = new_pixels(mW*mH, PIX);
     uint8_t* sub = new_pixels(width*height, PIX);
 
     GLint svp[4];
@@ -161,13 +161,13 @@ int SaveImage::saveMagnifiedImage(const int mag,
         drawFunc(mag, arg);
         if ( 0 == readPixels(0, 0, width, height, sub) )
         {
-            uint8_t * dst = &pixels[width*PIX*(ix+mH*iy)];
+            uint8_t * dst = &pix[width*PIX*(ix+mH*iy)];
             for ( uint32_t h = 0; h < height; ++h )
                 memcpy(&dst[h*mW*PIX], &sub[h*width*PIX], width*PIX);
         }
     }
-    int res = savePixels(filename, format, pixels, mW, mH, downsample);
-    free_pixels(pixels);
+    int res = savePixels(filename, format, pix, mW, mH, downsample);
+    free_pixels(pix);
     //restore original viewport:
     glViewport(svp[0], svp[1], svp[2], svp[3]);
     free_pixels(sub);
@@ -240,14 +240,14 @@ int SaveImage::readDepthPixels(int32_t X, int32_t Y, uint32_t W, uint32_t H, GLv
 int SaveImage::saveDepthBuffer(const char * filename, const int vp[4])
 {
     int res = FAILED_READ;
-    uint8_t* pixels = new_pixels(vp[2]*vp[3], 4);
+    uint8_t* pix = new_pixels(vp[2]*vp[3], 4);
 
-    if ( 0 == readDepthPixels(vp[0], vp[1], vp[2], vp[3], pixels) )
+    if ( 0 == readDepthPixels(vp[0], vp[1], vp[2], vp[3], pix) )
     {
         FILE * file = SaveImage::openFile(filename);
         if ( file )
         {
-            res = saveGrayPNG(file, (uint16_t*)pixels, vp[2], vp[3]);
+            res = saveGrayPNG(file, (uint16_t*)pix, vp[2], vp[3]);
             fclose(file);
             if ( res )
             {
@@ -258,6 +258,6 @@ int SaveImage::saveDepthBuffer(const char * filename, const int vp[4])
         }
         return FILE_ERROR;
     }
-    free_pixels(pixels);
+    free_pixels(pix);
     return res;
 }
