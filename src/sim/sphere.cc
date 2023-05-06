@@ -264,10 +264,10 @@ void Sphere::setDragCoefficientStokes()
 void Sphere::setDragCoefficientPiston()
 {
     assert_true( radius() > 0 );
-    assert_true( prop->confine_pointer );
+    assert_true( prop->confine_space );
     
     const real rad = radius();
-    real thick = 0.5 * prop->confine_pointer->thickness();
+    real thick = 0.5 * prop->confine_space->thickness();
     real eps = ( thick - rad ) / rad;
     
     if ( eps <= 0 )
@@ -292,7 +292,7 @@ void Sphere::setDragCoefficient()
 
     if ( prop->piston_effect )
     {
-        if ( prop->confine_pointer )
+        if ( prop->confine_space )
             setDragCoefficientPiston();
         else
             Cytosim::warn << "Piston effect ignored because space is undefined\n";
@@ -330,7 +330,7 @@ void Sphere::setInteractions(Meca& meca) const
 {
     if ( prop->confine != CONFINE_OFF )
     {
-        Space const* spc = prop->confine_pointer;
+        Space const* spc = prop->confine_space;
         
         switch ( prop->confine )
         {
@@ -338,18 +338,18 @@ void Sphere::setInteractions(Meca& meca) const
             {
                 Vector cen(pPos);
                 if ( ! spc->inside(cen) )
-                    spc->setConfinement(cen, Mecapoint(this, 0), meca, prop->confine_stiffness);
+                    spc->setConfinement(cen, Mecapoint(this, 0), meca, prop->confine_stiff);
             } break;
             
             case CONFINE_ALL_INSIDE:
             {
                 Vector cen(pPos);
                 if ( ! spc->allInside(cen, spRadius) )
-                    spc->setConfinement(cen, Mecapoint(this, 0), spRadius, meca, prop->confine_stiffness);
+                    spc->setConfinement(cen, Mecapoint(this, 0), spRadius, meca, prop->confine_stiff);
             } break;
             
             case CONFINE_ON:
-                spc->setConfinement(posP(0), Mecapoint(this, 0), meca, prop->confine_stiffness);
+                spc->setConfinement(posP(0), Mecapoint(this, 0), meca, prop->confine_stiff);
             
             default:
                 throw InvalidParameter("Invalid sphere::confine");

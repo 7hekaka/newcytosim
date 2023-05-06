@@ -1144,7 +1144,7 @@ void Fiber::setInteractions(Meca& meca) const
 #endif
     
     if ( prop->confine != CONFINE_OFF )
-        setFiberConfinement(meca, prop->confine, prop->confine_pointer, prop->confine_stiff[0], prop->confine_stiff[1]);
+        setFiberConfinement(meca, prop->confine, prop->confine_space, prop->confine_stiff[0], prop->confine_stiff[1]);
     
 #if NEW_FIBER_CONFINE2
     /// add another confinement force
@@ -1876,9 +1876,9 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
     
     switch( mode )
     {
-        case 1: setGlue1(glue, end, prop->confine_pointer); break;
-        case 2: setGlue2(glue, end, prop->confine_pointer); break;
-        case 3: setGlue3(glue, prop->confine_pointer); break;
+        case 1: setGlue1(glue, end, prop->confine_space); break;
+        case 2: setGlue2(glue, end, prop->confine_space); break;
+        case 3: setGlue3(glue, prop->confine_space); break;
         case 4: setGlueG(glue, end); break;
         case 5: setGlueE(glue, end); break;
         default: throw InvalidParameter("invalid value of fiber:glue");

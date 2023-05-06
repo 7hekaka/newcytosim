@@ -15,10 +15,10 @@ void SolidProp::clear()
     steric       = 0;
     steric_range = 0;
     
-    confine           = CONFINE_OFF;
-    confine_stiffness = 0;
-    confine_space     = "first";
-    confine_pointer = nullptr;
+    confine = CONFINE_OFF;
+    confine_stiff = 0;
+    confine_label = "first";
+    confine_space = nullptr;
     
 #if NEW_RADIAL_FLOW
     flow_time[0] = 0;
@@ -63,20 +63,20 @@ void SolidProp::read(Glossary& glos)
 #endif
                                          {"all_inside",   CONFINE_ALL_INSIDE}});
     
-    glos.set(confine_stiffness, "confine", 1);
-    glos.set(confine_space,     "confine", 2);
+    glos.set(confine_stiff, "confine", 1);
+    glos.set(confine_label, "confine", 2);
     
-    glos.set(confine_stiffness, "confine_stiffness");
-    glos.set(confine_space,     "confine_space");
+    glos.set(confine_stiff, "confine_stiff");
+    glos.set(confine_label, "confine_label");
     
 #if BACKWARD_COMPATIBILITY < 50
-    if ( confine_space == "current" )
-        confine_space = "last";
+    if ( confine_label == "current" )
+        confine_label = "last";
     
     glos.set(confine, "confined",{{"none",    CONFINE_OFF},
                                   {"inside",  CONFINE_INSIDE},
                                   {"surface", CONFINE_ON}});
-    glos.set(confine_stiffness, "confined", 1);
+    glos.set(confine_stiff, "confined", 1);
 #endif
     
 #if NEW_RADIAL_FLOW
@@ -111,22 +111,22 @@ void SolidProp::complete(Simul const& sim)
     
     if ( confine != CONFINE_OFF )
     {
-        confine_pointer = sim.findSpace(confine_space);
-        if ( confine_pointer )
+        confine_space = sim.findSpace(confine_label);
+        if ( confine_space )
         {
-            if ( confine_space.empty() )
-                confine_space = confine_pointer->name();
+            if ( confine_label.empty() )
+                confine_label = confine_space->name();
         }
         else
         {
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+                throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
             // this condition occur when the Property is created before the Space
         }
     }
     
-    if ( confine && confine_stiffness < 0 )
-        throw InvalidParameter(name()+":confine_stiffness must be >= 0");
+    if ( confine && confine_stiff < 0 )
+        throw InvalidParameter(name()+":confine_stiff must be >= 0");
     
     if ( primed(sim) && steric && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
@@ -165,7 +165,7 @@ void SolidProp::write_values(std::ostream& os) const
     if ( drag > 0 )  write_value(os, "drag", drag);
     write_value(os, "viscosity", viscosity);
     write_value(os, "steric",    steric, steric_range);
-    write_value(os, "confine",   confine, confine_stiffness, confine_space);
+    write_value(os, "confine",   confine, confine_stiff, confine_label);
 #if NEW_RADIAL_FLOW
     write_value(os, "flow_center", flow_center);
     write_value(os, "flow_time",   flow_time, 2);

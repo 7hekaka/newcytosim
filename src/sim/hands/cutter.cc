@@ -35,7 +35,7 @@ void Cutter::cut()
         real QZ = Q.ZZ;
 #else
         Vector PQ = 0.5 * ( P + Q );
-        Space const* spc = h->fiber()->prop->confine_pointer;
+        Space const* spc = h->fiber()->prop->confine_space;
         Vector prj = spc->project(PQ);  // on the edge
         Vector dir = spc->normalToEdge(PQ);
         // calculate distances to the edge:

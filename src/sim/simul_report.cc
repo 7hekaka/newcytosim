@@ -1176,7 +1176,7 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
 {
     Space const* spc = spaces.master();
     if ( sel )
-        spc = static_cast<FiberProp const*>(sel)->confine_pointer;
+        spc = static_cast<FiberProp const*>(sel)->confine_space;
     if ( !isSymmetricAroundAxisZ(spc->prop->shape) )
         throw InvalidParameter("reportFiberDirections() cannot handle non symmetric Space");
 
@@ -1424,7 +1424,7 @@ void Simul::reportFiberConfineForce(std::ostream& out) const
      for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
      {
          out << COM << "fiber " << fib->reference();
-         Space const* spc = findSpace(fib->prop->confine_space);
+         Space const* spc = findSpace(fib->prop->confine_label);
          const real stiff = fib->prop->confine_stiff[0];
          const Confinement mode = fib->prop->confine;
 
@@ -1457,7 +1457,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
 #if ( DIM > 1 )
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
-        Space const* spc = findSpace(fib->prop->confine_space);
+        Space const* spc = findSpace(fib->prop->confine_label);
         const real stiff = fib->prop->confine_stiff[0];
         const Confinement mode = fib->prop->confine;
 

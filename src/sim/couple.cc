@@ -117,7 +117,7 @@ void Couple::setInteractions(Meca& meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        Space const* spc = prop->confine_pointer;
+        Space const* spc = prop->confine_space;
         spc->setConfinement(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
         spc->setConfinement(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
     }
@@ -132,7 +132,7 @@ void Couple::setInteractionsAF(Meca& meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        Space const* spc = prop->confine_pointer;
+        Space const* spc = prop->confine_space;
         spc->setConfinement(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
@@ -146,7 +146,7 @@ void Couple::setInteractionsFA(Meca& meca) const
 #ifdef NEW_DANGEROUS_CONFINEMENTS
     if ( prop->confine )
     {
-        Space const* spc = prop->confine_pointer;
+        Space const* spc = prop->confine_space;
         spc->setConfinement(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
     }
 #endif
@@ -168,11 +168,11 @@ void Couple::diffuse()
          Set concentration of molecules at edges of Space by letting molecules
          out, and put some back at a constant rate
          */
-        cPos = prop->confine_pointer->bounce(pos);
+        cPos = prop->confine_space->bounce(pos);
     }
     else if ( prop->confine == CONFINE_ON )
     {
-        cPos = prop->confine_pointer->project(pos);
+        cPos = prop->confine_space->project(pos);
     }
     else
     {
@@ -477,9 +477,9 @@ void Couple::randomizePosition()
     if ( prop->diffusion > 0 || prop->fast_diffusion )
     {
         if ( prop->confine == CONFINE_ON )
-            cPos = prop->confine_pointer->placeOnEdge(1.0);
+            cPos = prop->confine_space->placeOnEdge(1.0);
         else if ( prop->confine == CONFINE_INSIDE )
-            cPos = prop->confine_pointer->place();
+            cPos = prop->confine_space->place();
         else if ( prop->confine != CONFINE_OFF )
             throw InvalidParameter("`confine==off` is incompatible with `fast_diffusion`");
     }

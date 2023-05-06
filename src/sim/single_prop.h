@@ -92,10 +92,10 @@ public:
     Confinement confine;
     
     /// Unused Parameter: confinement stiffness (also known as `confine[1]`)
-    real confine_stiffness;
+    real confine_stiff;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string confine_space;
+    std::string confine_label;
     
     /// specialization
     /**
@@ -110,8 +110,8 @@ public:
 
 protected:
     
-    /// pointer to actual confinement Space, derived from `confine_space`
-    Space const* confine_pointer;
+    /// pointer to actual confinement Space, derived from `confine_label`
+    Space const* confine_space;
 
     /// displacement in one time step
     real diffusion_dt;
@@ -159,7 +159,7 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
 
-    /// return volume of confine_space
+    /// return volume of confine_label
     real spaceVolume() const;
 
 };

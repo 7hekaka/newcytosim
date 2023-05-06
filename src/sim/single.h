@@ -134,7 +134,7 @@ public:
     /// bring object to centered image using periodic boundary conditions
     void foldPosition(Modulo const*);
     
-    /// set the position randomly inside prop->confine_space
+    /// set the position randomly inside prop->confine_label
     void randomizePosition();
 
     //--------------------------------------------------------------------------
@@ -197,8 +197,8 @@ public:
     /// return PointDisp of associated Hand
     PointDisp const* disp() const { return sHand->property()->disp; }
 
-    /// return Property::confine_pointer
-    Space const* confineSpace() const { return prop->confine_pointer; }
+    /// return Property::confine_space
+    Space const* confineSpace() const { return prop->confine_space; }
     
     /// read from file
     void read(Inputter&, Simul&, ObjectTag);

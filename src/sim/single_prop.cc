@@ -116,9 +116,9 @@ void SingleProp::clear()
 #endif
     activity      = "diffuse";
     confine       = CONFINE_INSIDE;
-    //confine_stiffness = 0;
-    confine_space = "first";
-    confine_pointer = nullptr;
+    //confine_stiff = 0;
+    confine_label = "first";
+    confine_space = nullptr;
 }
 
 
@@ -156,11 +156,11 @@ void SingleProp::read(Glossary& glos)
         if ( glos.set(val, "confine", 1) && val > 0 )
             throw InvalidParameter(name()+":confine[1] is ignored");
         
-        glos.set(confine_space,  "confine", 2);
+        glos.set(confine_label,  "confine", 2);
         
 #if BACKWARD_COMPATIBILITY < 50
-        if ( confine_space == "current" )
-            confine_space = "last";
+        if ( confine_label == "current" )
+            confine_label = "last";
 #endif
     }
 }
@@ -170,21 +170,21 @@ void SingleProp::complete(Simul const& sim)
 {
     if ( confine != CONFINE_OFF )
     {
-        confine_pointer = sim.findSpace(confine_space);
-        if ( confine_pointer )
+        confine_space = sim.findSpace(confine_label);
+        if ( confine_space )
         {
-            if ( confine_space.empty() )
-                confine_space = confine_pointer->name();
+            if ( confine_label.empty() )
+                confine_label = confine_space->name();
         }
         else
         {
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+                throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
             // this condition occur when the Property is created before the Space
         }
     }
     else
-        confine_pointer = nullptr;
+        confine_space = nullptr;
 
     if ( hand.empty() )
         throw InvalidParameter(name()+":hand must be defined");
@@ -245,7 +245,7 @@ void SingleProp::write_values(std::ostream& os) const
 #if NEW_MOBILE_SINGLE
     write_value(os, "speed",          speed);
 #endif
-    write_value(os, "confine",        confine, 0, confine_space);
+    write_value(os, "confine",        confine, 0, confine_label);
     write_value(os, "activity",       activity);
 }
 
@@ -254,10 +254,10 @@ void SingleProp::write_values(std::ostream& os) const
 
 real SingleProp::spaceVolume() const
 {
-    if ( !confine_pointer )
+    if ( !confine_space )
         throw InvalidParameter("no single:confinement defined for `"+name()+"'");
     
-    real res = confine_pointer->volume();
+    real res = confine_space->volume();
     
     if ( res <= 0 )
         throw InvalidParameter(name()+":confinement has null volume");

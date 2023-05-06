@@ -79,10 +79,10 @@ public:
     Confinement confine;
     
     /// confinement stiffness (also known as `confine[1]`)
-    real        confine_stiffness;
+    real        confine_stiff;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string confine_space;
+    std::string confine_label;
     
 #if NEW_RADIAL_FLOW
     /// for the additional force
@@ -131,8 +131,8 @@ public:
 
 private:
     
-    /// pointer to actual confinement Space, derived from `confine_space`
-    Space const* confine_pointer;
+    /// pointer to actual confinement Space, derived from `confine_label`
+    Space const* confine_space;
     
     /// customized Label can be 'bead' or 'solid'
     std::string  mCategory;

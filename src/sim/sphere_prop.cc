@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 
 #include "sphere_prop.h"
 #include "glossary.h"
@@ -15,19 +15,19 @@
 
 void SphereProp::clear()
 {
-    point_mobility    = -1;
-    viscosity         = -1;
-    piston_effect     = false;
-    steric            = 0;
-    steric_range      = 0;
+    point_mobility = -1;
+    viscosity     = -1;
+    piston_effect = false;
+    steric        = 0;
+    steric_range  = 0;
     
-    confine           = CONFINE_OFF;
-    confine_stiffness = 0;
-    confine_space     = "first";
-    confine_pointer = nullptr;
+    confine = CONFINE_OFF;
+    confine_stiff = 0;
+    confine_label = "first";
+    confine_space = nullptr;
     
-    display           = "";
-    display_fresh     = false;
+    display       = "";
+    display_fresh = false;
 }
 
 
@@ -47,20 +47,20 @@ void SphereProp::read(Glossary& glos)
                                   {"surface",    CONFINE_ON},
                                   {"all_inside", CONFINE_ALL_INSIDE}});
     
-    glos.set(confine_stiffness, "confine", 1);
-    glos.set(confine_space,     "confine", 2);
+    glos.set(confine_stiff, "confine", 1);
+    glos.set(confine_label, "confine", 2);
 
-    glos.set(confine_stiffness, "confine_stiffness");
-    glos.set(confine_space,     "confine_space");
+    glos.set(confine_stiff, "confine_stiff");
+    glos.set(confine_label, "confine_label");
 
 #if BACKWARD_COMPATIBILITY < 50
-    if ( confine_space == "current" )
-        confine_space = "last";
+    if ( confine_label == "current" )
+        confine_label = "last";
 
     glos.set(confine, "confined",{{"none",    CONFINE_OFF},
                                   {"inside",  CONFINE_INSIDE},
                                   {"surface", CONFINE_ON}});
-    glos.set(confine_stiffness, "confined", 1);
+    glos.set(confine_stiff, "confined", 1);
 #endif
     
     if ( glos.set(display, "display") )
@@ -78,22 +78,22 @@ void SphereProp::complete(Simul const& sim)
     
     if ( confine != CONFINE_OFF )
     {
-        confine_pointer = sim.findSpace(confine_space);
-        if ( confine_pointer )
+        confine_space = sim.findSpace(confine_label);
+        if ( confine_space )
         {
-            if ( confine_space.empty() )
-                confine_space = confine_pointer->name();
+            if ( confine_label.empty() )
+                confine_label = confine_space->name();
         }
         else
         {
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+                throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
             // this condition occur when the Property is created before the Space
         }
     }
 
-    if ( confine && confine_stiffness < 0 )
-        throw InvalidParameter(name()+":confine_stiffness must be >= 0");
+    if ( confine && confine_stiff < 0 )
+        throw InvalidParameter(name()+":confine_stiff must be >= 0");
     
     if ( primed(sim) && steric && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
@@ -109,7 +109,7 @@ void SphereProp::write_values(std::ostream& os) const
     write_value(os, "point_mobility", point_mobility);
     write_value(os, "piston_effect",  piston_effect);
     write_value(os, "steric",         steric, steric_range);
-    write_value(os, "confine",        confine, confine_stiffness, confine_space);
+    write_value(os, "confine",        confine, confine_stiff, confine_label);
     write_value(os, "display",        "("+display+")");
 }
 

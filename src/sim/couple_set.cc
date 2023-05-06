@@ -465,7 +465,7 @@ void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
         if ( P )
         {
             CoupleProp * CP = static_cast<CoupleProp*>(P);
-            // renew pointers to 'confine_space'
+            // renew pointers to 'confine_label'
             CP->complete(simul_);
             while ( cnt[id] > 0 )
             {

@@ -325,8 +325,8 @@ void FiberProp::clear()
     confine = CONFINE_OFF;
     confine_stiff[0] = 0;
     confine_stiff[1] = 0;
-    confine_space = "first";
-    confine_pointer = nullptr;
+    confine_label = "first";
+    confine_space = nullptr;
     
 #if NEW_FIBER_CONFINE2
     confine2 = CONFINE_OFF;
@@ -469,12 +469,12 @@ void FiberProp::read(Glossary& glos)
     if ( glos.is_number("confine", 2) )
     {
         glos.set(confine_stiff[1], "confine", 2);
-        glos.set(confine_space, "confine", 3);
+        glos.set(confine_label, "confine", 3);
     }
     else
-        glos.set(confine_space, "confine", 2);
-    glos.set(confine_stiff, 2, "confine_stiffness");
-    glos.set(confine_space, "confine_space");
+        glos.set(confine_label, "confine", 2);
+    glos.set(confine_stiff, 2, "confine_stiff");
+    glos.set(confine_label, "confine_label");
 
 #if NEW_FIBER_CONFINE2
     glos.set(confine2, "confine2", {{"off",    CONFINE_OFF},
@@ -502,8 +502,8 @@ void FiberProp::read(Glossary& glos)
 
     
 #if BACKWARD_COMPATIBILITY < 50
-    if ( confine_space == "current" )
-        confine_space = "last";
+    if ( confine_label == "current" )
+        confine_label = "last";
 
     glos.set(confine, "confined", {{"none",     CONFINE_OFF},
                                   {"inside",    CONFINE_INSIDE},
@@ -512,7 +512,7 @@ void FiberProp::read(Glossary& glos)
                                   {"minus_end", CONFINE_MINUS_END},
                                   {"plus_end",  CONFINE_PLUS_END}});
     
-    glos.set(confine_stiffness, "confined", 1);
+    glos.set(confine_stiff, "confined", 1);
 #endif
 
 #if NEW_FIBER_MAKE_COUPLE
@@ -566,23 +566,23 @@ void FiberProp::complete(Simul const& sim)
     if ( viscosity <= 0 )
         throw InvalidParameter("fiber:viscosity or simul:viscosity should be defined > 0");
 
-    /* confine_space is also used for `glue' and `shrink_outside',
+    /* confine_label is also used for `glue' and `shrink_outside',
      and needs to be set here */
-    confine_pointer = sim.findSpace(confine_space);
-    if ( confine_pointer )
+    confine_space = sim.findSpace(confine_label);
+    if ( confine_space )
     {
-        if ( confine_space.empty() )
-            confine_space = confine_pointer->name();
+        if ( confine_label.empty() )
+            confine_label = confine_space->name();
     }
     else
     {
         if ( confine != CONFINE_OFF && primed(sim) )
-            throw InvalidParameter(name()+":confine_space `"+confine_space+"' was not found");
+            throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
         // this condition occur when the Property is created before the Space
     }
     
     if ( confine && confine_stiff[0] < 0 )
-        throw InvalidParameter(name()+":confine_stiffness must be >= 0");
+        throw InvalidParameter(name()+":confine_stiff must be >= 0");
 
 #if NEW_FIBER_CONFINE2
     if ( confine2 != CONFINE_OFF )
@@ -760,7 +760,7 @@ void FiberProp::write_values(std::ostream& os) const
     write_value(os, "mesh_unbinding_rate", mesh_unbinding_rate);
     write_value(os, "mesh_aging", mesh_aging_rate, mesh_aging_limit);
 #endif
-    write_value(os, "confine", confine, confine_stiff[0], confine_stiff[1], confine_space);
+    write_value(os, "confine", confine, confine_stiff[0], confine_stiff[1], confine_label);
 #if NEW_FIBER_CONFINE2
     write_value(os, "confine2", confine2, confine2_stiff[0], confine2_stiff[1], confine2_space);
 #endif
