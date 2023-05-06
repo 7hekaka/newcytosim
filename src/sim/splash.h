@@ -24,7 +24,7 @@ inline void print_version(std::ostream& os)
     os << "   Dimension " << DIM;
     os << "  Periodic " << ENABLE_PERIODIC_BOUNDARIES;
     os << "  AttachPool " << POOL_UNATTACHED;
-    os << "  Precision " << sizeof(real) << " bytes\n";
+    os << "  Precision " << sizeof(real) << "\n";
 
     os << "   Fiber has lattice " << FIBER_HAS_LATTICE;
     os << " mesh " << FIBER_HAS_MESH;

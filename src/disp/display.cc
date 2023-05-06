@@ -1561,7 +1561,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
 {
     const gym_color black(0,0,0,1);
     const real uni = inc + onc;
-    Vector pos, nxt, old = fib.posEndM();
+    Vector pos, nxt, old = fib.displayPosM(0);
     const real len = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
     real abs = uni * cnt - fib.abscissaM();
@@ -1581,7 +1581,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
         gym::color_load(lor);
         abs += inc;
     }
-    Vector dir = fib.dirEndM();
+    Vector dir = normalize(nxt-old);
     
     gym::enableClipPlane(4);
     gym::setClipPlane(4, -dir, pos);
