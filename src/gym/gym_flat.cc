@@ -205,12 +205,12 @@ void gym::fillRectangle(float L, float B, float R, float T, float Z, const float
 
 //-----------------------------------------------------------------------
 
-int copy_parity(const int a, const int b)
+static int copy_parity(const int a, const int b)
 {
     return a + (( std::abs(a) + b ) & 1 );
 }
 
-static void setRectangle(flute3*& flu, float L, float B, float R, float T, float Z)
+static void set_rect(flute3*& flu, float L, float B, float R, float T, float Z)
 {
     flu[0] = {L, B, Z};
     flu[1] = {L, B, Z};
@@ -248,22 +248,22 @@ void gym::drawTiledFloor(int R, float T, float Z)
         {
             float X = i * T;
             float Y = y * T;
-            setRectangle(ptr,  X-H, Y-H, X+H, Y+H, Z);
-            setRectangle(ptr, -X+H,-Y+H,-X-H,-Y-H, Z);
+            set_rect(ptr,  X-H, Y-H, X+H, Y+H, Z);
+            set_rect(ptr, -X+H,-Y+H,-X-H,-Y-H, Z);
         }
         for ( int i = copy_parity(Q,y); i <= x; i+=2 )
         {
             float X = y * T;
             float Y = i * T;
-            setRectangle(ptr, X-H, Y-H, X+H, Y+H, Z);
-            setRectangle(ptr,-X+H,-Y+H,-X-H,-Y-H, Z);
+            set_rect(ptr, X-H, Y-H, X+H, Y+H, Z);
+            set_rect(ptr,-X+H,-Y+H,-X-H,-Y-H, Z);
         }
         for ( int i = copy_parity(Q,y); i <= x; i+=2 )
         {
             float X = y * T;
             float Y = i * T;
-            setRectangle(ptr,-X-H, Y-H,-X+H, Y+H, Z);
-            setRectangle(ptr, X+H,-Y+H, X-H,-Y-H, Z);
+            set_rect(ptr,-X-H, Y-H,-X+H, Y+H, Z);
+            set_rect(ptr, X+H,-Y+H, X-H,-Y-H, Z);
         }
     }
     gym::unmapBufferV3();
