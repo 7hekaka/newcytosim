@@ -472,6 +472,7 @@ void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
                 --cnt[id];
                 Couple * C = CP->newCouple();
                 C->randomizePosition();
+                C->objset(this);
                 linkFF(C);
             }
         }

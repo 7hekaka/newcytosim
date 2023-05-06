@@ -344,6 +344,7 @@ void SingleSet::makeSingles(size_t cnt[], size_t n_cnt)
                 --cnt[id];
                 Single * S = SP->newSingle();
                 S->randomizePosition();
+                S->objset(this);
                 linkF(S);
             }
         }
