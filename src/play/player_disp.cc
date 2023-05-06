@@ -305,11 +305,11 @@ void Player::drawCytosim()
 #if DRAW_MECA_LINKS
         if ( disp.draw_links )
         {
+            gym::ref_view();
             gym::disableLighting();
-            gym::enableLineStipple();
             simul.drawLinks();
-            gym::cleanup();
             gym::disableLineStipple();
+            gym::restoreLighting();
             CHECK_GL_ERROR("Simul::drawLinks()");
         }
 #endif

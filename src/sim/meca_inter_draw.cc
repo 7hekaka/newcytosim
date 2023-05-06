@@ -6,6 +6,7 @@
 #include "../gym/gym_flute.h"
 #include "../gym/gym_flute_dim.h"
 #include "../gym/gym_draw.h"
+#include "../gym/gym_cap.h"
 
 #define DRAW_LINK(PT, ...)\
 { if ( drawLinks ) drawLink(gym::bright_color(PT.mecable()->signature()), PT.pos(), __VA_ARGS__); }
