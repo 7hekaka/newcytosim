@@ -15,28 +15,11 @@ GLboolean gym::alpha_ = 0;
 //-----------------------------------------------------------------------
 #pragma mark - Clip Planes
 
-void gym::enableLineStipple(short pattern)
-{
-#ifdef GL_VERSION_2_1
-#ifndef __aarch64__
-    glLineStipple(1, pattern);
-    glEnable(GL_LINE_STIPPLE);
-#endif
-#endif
-}
-
-void gym::disableLineStipple()
-{
-#ifdef GL_VERSION_2_1
-#ifndef __aarch64__
-    glDisable(GL_LINE_STIPPLE);
-#endif
-#endif
-}
-
 void gym::setClipPlane(unsigned glp, double X, double Y, double Z, double S)
 {
+#ifdef GL_VERSION_2_1
     GLdouble eq[4] = { X, Y, Z, S };
     glClipPlane(GL_CLIP_PLANE0+glp, eq);
+#endif
 }
 

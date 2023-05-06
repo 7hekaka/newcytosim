@@ -49,31 +49,91 @@ namespace gym
 #pragma mark - deprecated features
     
     /// enable Lighting effects
-    inline void enableLighting() { light_ = glIsEnabled(GL_LIGHTING); glEnable(GL_LIGHTING); }
+    inline void enableLighting()
+    {
+#ifdef GL_VERSION_2_1
+        light_ = glIsEnabled(GL_LIGHTING);
+        glEnable(GL_LIGHTING);
+#endif
+    }
     /// disable Lighting
-    inline void disableLighting() { light_ = glIsEnabled(GL_LIGHTING); glDisable(GL_LIGHTING); }
+    inline void disableLighting()
+    {
+#ifdef GL_VERSION_2_1
+        light_ = glIsEnabled(GL_LIGHTING);
+        glDisable(GL_LIGHTING);
+#endif
+    }
     /// restore previous Lighting state
-    inline void restoreLighting() { if ( light_ ) glEnable(GL_LIGHTING); else glDisable(GL_LIGHTING);  }
+    inline void restoreLighting()
+    {
+#ifdef GL_VERSION_2_1
+        if ( light_ ) glEnable(GL_LIGHTING);
+        else glDisable(GL_LIGHTING);
+#endif
+    }
     
     /// enable Lighting effects
-    inline void enableAlphaTest() { alpha_ = glIsEnabled(GL_ALPHA_TEST); glEnable(GL_ALPHA_TEST); }
+    inline void enableAlphaTest()
+    {
+#ifdef GL_VERSION_2_1
+        alpha_ = glIsEnabled(GL_ALPHA_TEST);
+        glEnable(GL_ALPHA_TEST);
+#endif
+    }
     /// disable Lighting
-    inline void disableAlphaTest() { alpha_ = glIsEnabled(GL_ALPHA_TEST); glDisable(GL_ALPHA_TEST); }
+    inline void disableAlphaTest()
+    {
+#ifdef GL_VERSION_2_1
+        alpha_ = glIsEnabled(GL_ALPHA_TEST);
+        glDisable(GL_ALPHA_TEST);
+#endif
+    }
     /// restore previous Lighting state
-    inline void restoreAlphaTest() { if ( alpha_ ) glEnable(GL_ALPHA_TEST); else glDisable(GL_ALPHA_TEST); }
+    inline void restoreAlphaTest()
+    {
+#ifdef GL_VERSION_2_1
+        if ( alpha_ ) glEnable(GL_ALPHA_TEST);
+        else glDisable(GL_ALPHA_TEST);
+#endif
+    }
     
-    /// enable Line Stipple
-    void enableLineStipple(short);
-    /// disable Line Stipple
-    void disableLineStipple();
-    
+    inline void enableLineStipple(short pattern)
+    {
+#ifdef GL_VERSION_2_1
+#ifndef __aarch64__
+        glLineStipple(1, pattern);
+        glEnable(GL_LINE_STIPPLE);
+#endif
+#endif
+    }
+
+    inline void disableLineStipple()
+    {
+#ifdef GL_VERSION_2_1
+#ifndef __aarch64__
+        glDisable(GL_LINE_STIPPLE);
+#endif
+#endif
+    }
+
 #pragma mark - Clip Planes
     
     /// enable
-    inline void enableClipPlane(unsigned i) { glEnable(GL_CLIP_PLANE0+i); }
+    inline void enableClipPlane(unsigned i)
+    {
+#ifdef GL_VERSION_2_1
+        glEnable(GL_CLIP_PLANE0+i);
+#endif
+    }
     
     /// disable clip plane
-    inline void disableClipPlane(unsigned i) { glDisable(GL_CLIP_PLANE0+i); }
+    inline void disableClipPlane(unsigned i)
+    {
+#ifdef GL_VERSION_2_1
+        glDisable(GL_CLIP_PLANE0+i);
+#endif
+    }
     
     /// define clipping equation
     void setClipPlane(unsigned, double, double, double, double);
