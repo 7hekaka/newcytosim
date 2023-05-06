@@ -16,15 +16,6 @@ SpaceMesh::SpaceMesh(SpaceProp const* p)
 {
     if ( DIM < 3 )
         throw InvalidParameter("mesh is only usable in 3D");
-    
-#if COMPLETE_SPACE_MESH
-    real x;
-    if ( opt.set(x, "scale") )
-        mMesh.scale(x, x);
-
-    if ( opt.set(x, "inflate") )
-        mMesh.inflate(x);
-#endif
 }
 
 
@@ -40,12 +31,24 @@ SpaceMesh::~SpaceMesh()
 void SpaceMesh::resize(Glossary& opt)
 {
 #if COMPLETE_SPACE_MESH
-    volume_ = mMesh.volume();
+    std::string file;
+    
+    if ( opt.set(file, "file") )
+        mesh_.read(file);
+    
+    real x;
+    if ( opt.set(x, "scale") )
+        mesh_.scale(x, x);
+
+    if ( opt.set(x, "inflate") )
+        mesh_.inflate(x);
+
+    volume_ = mesh_.volume();
     if ( volume_ < 0 )
         throw InvalidParameter("mesh volume is < 0");
 
     real box[4];
-    mMesh.find_extremes(box);
+    mesh_.find_extremes(box);
     inf_.set(box[0], box[2], 0);
     sup_.set(box[1], box[3], 0);
 #endif
@@ -55,7 +58,7 @@ void SpaceMesh::resize(Glossary& opt)
 bool SpaceMesh::inside(Vector const& W) const
 {
 #if COMPLETE_SPACE_MESH
-    return mMesh.inside(W.XX, W.YY, W.ZZ);
+    return mesh_.inside(W.XX, W.YY, W.ZZ);
 #endif
     return true;
 }
@@ -64,7 +67,7 @@ bool SpaceMesh::inside(Vector const& W) const
 Vector SpaceMesh::project(Vector const& W) const
 {
 #if COMPLETE_SPACE_MESH
-    return mMesh.project(W);
+    return mesh_.project(W);
 #endif
     return Vector(0,0,0);
 }
