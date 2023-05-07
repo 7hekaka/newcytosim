@@ -59,10 +59,10 @@ def main(args):
 
     home = os.getcwd()
     for path in paths:
-        with os.scandir(path) as it:
-            for e in it:
-                if e.is_dir():
-                     process(os.path.join(path,e.name))
+        stuff = sorted(os.scandir(path), key=lambda e: e.name)
+        for e in stuff:
+            if e.is_dir():
+                process(os.path.join(path, e.name))
         os.chdir(home)
 
 #------------------------------------------------------------------------
