@@ -1088,6 +1088,102 @@ void alsatian_xtrsmLUN1I_3D(const int M, const float* A, const int lda, real* B)
 #pragma mark - SIMD ALSATIAN DTRSM for mixed double/single-precision matrix argument
 
 #if USE_SIMD
+/// version for M = multiple of 3
+void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* A, const int lda, double* B)
+{
+    assert_true( M <= lda );
+    assert_true( M >= 3 );
+    assert_true( M%3 == 0 );
+    double *const end = B + M;
+    //process columns 3 by 3
+    for ( int K = 0; K < M; K += 3 )
+    {
+        const float* pA = A + K;
+        A += 3*lda;
+        double * pB = B + K;
+        const vec2 t0 = loaddup2(pB);  // { T0 T0 }
+        vec2 t2 = fnmadd2(t0, load2d(pA+1), load2(pB+1));  // { T1 B2-T0*A[2] }
+        vec2 t1 = load2d(pA+1+lda);  // using upper value
+        t2 = fnmadd2(unpacklo2(setzero2(), t2), t1, t2);  // { T1 T2 }
+        store2(pB+1, t2);
+        t1 = unpacklo2(t2, t2);  // { T1 T1 }
+        t2 = unpackhi2(t2, t2);  // { T2 T2 }
+        pA += 3;
+        pB += 3;
+        if ( pB < end )
+        {
+            if ( ( end - pB ) & 1 )
+            {
+                vec2 x = fnmadd2(t0, load1d(pA), load1(pB));
+                x = fnmadd2(t1, load1d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load1d(pA+lda*2), x); // column K+2
+                store1(pB, x);
+                pA += 1;
+                pB += 1;
+            }
+            #pragma ivdep
+            for ( ; pB < end; pB += 2 )
+            {
+                vec2 x = fnmadd2(t0, load2d(pA), load2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load2d(pA+lda*2), x); // column K+2
+                store2(pB, x);
+                pA += 2;
+            }
+        }
+    }
+}
+#endif
+
+#if USE_SIMD
+/// this version works for M multiple of 3
+void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, double* B)
+{
+    assert_true( M <= lda );
+    assert_true( M >= 3 );
+    assert_true( M%3 == 0 );
+    A += M * lda;
+    //process columns 3 by 3
+    for ( int K = M - 3; K >= 0; K -= 3 )
+    {
+        A -= 3*lda;
+        double * pB = B + K;
+        float const* pA = A + K;
+        vec2 t2 = mul2(loaddup2(pB+2), duplo2(load1d(pA+2*lda+2))); // { T2, T2 }
+        vec2 t0 = fnmadd2(t2, load2d(pA+2*lda), load2(pB)); // { -, T1/A }
+        vec2 b = load2d(pA+lda);
+        vec2 t1 = duphi2(mul2(t0, b)); // { T1, T1 }
+        t0 = duplo2(mul2(fnmadd2(t1, b, t0), load2d(pA))); // { T0, T0 }
+        store2(pB, blend11(t0, t1));
+        store1(pB+2, t2);
+        if ( pB > B )
+        {
+            if ( ( pB - B ) & 1 )
+            {
+                --pA;
+                --pB;
+                vec2 x = fnmadd2(t0, load1d(pA), load1(pB));
+                x = fnmadd2(t1, load1d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load1d(pA+lda*2), x); // column K+2
+                store1(pB, x);
+            }
+            #pragma ivdep
+            while ( pB > B )
+            {
+                pA -= 2;
+                pB -= 2;
+                vec2 x = fnmadd2(t0, load2d(pA), load2(pB));
+                x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
+                x = fnmadd2(t2, load2d(pA+lda*2), x); // column K+2
+                store2(pB, x);
+            }
+        }
+    }
+}
+#endif
+
+
+#if USE_SIMD
 /// this version works for any M
 void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* A, const int lda, double* B)
 {
@@ -1334,6 +1430,7 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
     for ( ; K < M; K += 2 )
     {
         float const* pA = A + K;
+        A += 2*lda;
         vec2f t0 = load2f(B + K);
         vec2f t1 = load2f(pA); // will use upper value
         t1 = fnmadd2f(unpacklo2f(setzero2f(), t0), t1, t0);
@@ -1349,14 +1446,13 @@ void alsatian_xtrsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
             store2f(pB, x);
             pA += 2;
         }
-        A += 2*lda;
     }
 }
 #endif
 
 #if USE_SIMD
 /// version for M = multiple of 3
-void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, float* B)
+void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* A, const int lda, float* B)
 {
     assert_true( M <= lda );
     assert_true( M >= 3 );
@@ -1365,8 +1461,8 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, flo
     //process columns 3 by 3
     for ( int K = 0; K < M; K += 3 )
     {
+        float const* pA = A + K;
         float * pB = B + K;
-        pA += K;
         const vec2f t0 = loaddupf(pB);  // { T0 T0 }
         vec2f t2 = fnmadd2f(t0, load2f(pA+1), load2f(pB+1));  // { T1 B2-T0*A[2] }
         vec2f t1 = load2f(pA+1+lda);  // using upper value
@@ -1397,7 +1493,7 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* pA, const int lda, flo
                 pA += 2;
             }
         }
-        pA += lda*2;
+        A += 3*lda;
     }
 }
 #endif
