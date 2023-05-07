@@ -932,8 +932,8 @@ void alsatian_xtrsmLUN2(const int M, const double* A, const int lda, double* B)
 
 
 /// specialized DTRSM('L','L','N', diag, M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
-template < char diag, typename REAL >
-void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
+template < char diag, typename FLOAT, typename REAL >
+void alsatian_xtrsmLLN1(const int M, const FLOAT* A, const int lda, REAL* B)
 {
     assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
@@ -955,8 +955,8 @@ void alsatian_xtrsmLLN1(const int M, const REAL* A, const int lda, REAL* B)
 
 
 /// specialized DTRSM('L','L','T', diag, M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
-template < char diag, typename REAL >
-void alsatian_xtrsmLLT1(const int M, const REAL* A, const int lda, REAL* B)
+template < char diag, typename FLOAT, typename REAL >
+void alsatian_xtrsmLLT1(const int M, const FLOAT* A, const int lda, REAL* B)
 {
     assert_true( M <= lda );
     A += M * lda;
@@ -1721,13 +1721,13 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 }
 
 
-void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
+void alsatian_xpotrsL(const int N, const double* A, const int LDA, real* B)
 {
 #if 1
     // Solve L*X = B, overwriting B with X
-    alsatian_xtrsmLLN1<'I'>(N, A, LDA, B);
+    alsatian_xtrsmLLN1<'I'>(N, (float*)A, LDA, B);
     // Solve U*X = B, overwriting B with X
-    alsatian_xtrsmLLT1<'I'>(N, A, LDA, B);
+    alsatian_xtrsmLLT1<'I'>(N, (float*)A, LDA, B);
 #else
     iso_xtrsmLLN<1,'I'>(N, A, LDA, B);
     iso_xtrsmLLT<1,'I'>(N, A, LDA, B);

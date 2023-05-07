@@ -242,10 +242,10 @@ void Simul::solve_auto()
     // list of preconditionning method to be tried:
     std::initializer_list<unsigned> methods { 0, 1, 6 };
     
-    // how many timestep accumulated to test a method:
-    constexpr size_t N_TESTS = 16;
+    // how many timestep accumulated for each method:
+    constexpr size_t N_TESTS = 8;
     // number of timestep for next trial series:
-    constexpr size_t PERIOD = 128;
+    constexpr size_t PERIOD = 32;
     
     //automatically select the preconditionning mode:
     //by trying each methods N_STEP steps, adding CPU time and use fastest.
@@ -260,7 +260,7 @@ void Simul::solve_auto()
         
         if ( autoCounter == N_TESTS * methods.size() )
         {
-            autoPrecond = 0;
+            unsigned z = * methods.begin();
             for ( unsigned m : methods )
             {
                 /*
@@ -268,9 +268,10 @@ void Simul::solve_auto()
                  The number of iterations should be decreased, with some CPU gain.
                  Only adopt a more complicated method if the gain is significant.
                  */
-                if ( autoCNT[m] < autoCNT[0] && autoCPU[m] < autoCPU[autoPrecond] * 0.95 )
-                    autoPrecond = m;
+                if ( autoCNT[m] < autoCNT[z] && autoCPU[m] < autoCPU[z] * 0.95 )
+                    z = m;
             }
+            autoPrecond = z;
             if ( 1 )
             {
                 char str[256], *ptr = str;

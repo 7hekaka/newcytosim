@@ -775,23 +775,31 @@ void Meca::computePrecondBand(Mecable* mec)
 void Meca::computePrecondHalf(Mecable* mec)
 {
     const size_t bks = DIM * mec->nbPoints();
+#if CHOUCROUTE && REAL_IS_DOUBLE
+    mec->blockSize(bks, 4+bks*bks/2, bks);
+    // use temporary memory to build matrix block:
+    double* blk = new_real(4+bks*bks);
+#else
     mec->blockSize(bks, bks*bks, 0);
-    getHalfBlock(mec, mec->pblock());
+    real * blk = mec->pblock();
+#endif
+    getHalfBlock(mec, blk);
     
     //VecPrint::full("half block "+std::to_string(bks), bks, bks, mec->pblock(), bks);
 
     int info = 0;
     // calculate Cholesky factorization:
 #if CHOUCROUTE
-    alsatian_xpotf2L(bks, mec->pblock(), bks, &info);
+    alsatian_xpotf2L(bks, blk, bks, &info);
 #else
-    lapack::xpotf2('L', bks, mec->pblock(), bks, &info);
+    lapack::xpotf2('L', bks, blk, bks, &info);
 #endif
 
     if ( 0 == info )
     {
         mec->blockType(5);
         //checkBlock(mec, blk);
+        //VecPrint::full("half", bks, bks, blk, bks);
     }
     else
     {
@@ -799,6 +807,11 @@ void Meca::computePrecondHalf(Mecable* mec)
         //std::clog << "failed to compute half Preconditionner bloc of size " << bks << "\n";
         ++bump_;
     }
+    
+#if CHOUCROUTE && REAL_IS_DOUBLE
+    convert_to_floats(bks*bks, blk, (float*)mec->pblock());
+    free_real(blk);
+#endif
 }
 
 /**
@@ -832,6 +845,7 @@ void Meca::computePrecondFull(Mecable* mec)
     {
         mec->blockType(6);
         //checkBlock(mec, blk);
+        //VecPrint::full("half", bks, bks, blk, bks);
     }
     else
     {
@@ -894,8 +908,12 @@ void Meca::computePreconditionner()
             for ( Mecable * mec : mecables )
                 computePrecondFull(mec);
             break;
-#if RECYCLED_PRECONDITIONNER
         case 7:
+            for ( Mecable * mec : mecables )
+                computePrecondFull(mec);
+            break;
+#if RECYCLED_PRECONDITIONNER
+        case 9:
             renewPreconditionner(span);
             break;
 #endif

@@ -194,50 +194,41 @@ static void threshold_matrix(size_t siz, real* mat, real val)
 
 
 /// remove 2 bytes of fraction data, rounding up the value
-inline static double truncate_double(const double& arg)
+inline static float truncate_float(const float arg)
 {
-    constexpr uint64_t MASK = ~(0xFFFFFFFFUL);
-    union { double d; uint64_t i; } udi { arg };
+    constexpr uint32_t MASK{0xffff0000};
+    union { float f; uint32_t i; } udi { arg };
     udi.i &= MASK;
-    return udi.d;
+    return udi.f;
 }
 
-/// reduce precision of double
+/// reduce precision of floating point by zeroing out part of the mantissa
 [[maybe_unused]]
-static void truncate_double(size_t siz, double* mat)
+static void truncate_floats(size_t num, float* mat)
 {
-    for ( size_t i = 0; i < siz*siz; ++i )
+    for ( size_t i = 0; i < num; ++i )
     {
-        real y = truncate_double(mat[i]);
+        float y = truncate_float(mat[i]);
         //printf(" %.12f --> %.12f\n", mat[i], y);
         mat[i] = y;
     }
 }
 
-
-/// reduce precision of double
+/// reduce precision of floating point by zeroing out part of the mantissa
 [[maybe_unused]]
-static void compactify_double(size_t siz, double* mat)
+static void tile_floats(size_t num, float* mat)
 {
-#if 0
-    // print first column of 'A' for checking
-    for ( size_t i = 0; i < siz; ++i )
-        printf(" > %.12f\n", mat[i]);
-#endif
-    char * ptr = (char*)mat;
-    short int num = 0x1;
-    // copy the most significant 2 bytes of the IEEE 754 'double' format:
-    if ( ((char*)&num)[0] )
+    size_t Z = sizeof(float);
+    unsigned char * slow = (unsigned char*)mat + Z;
+    unsigned char * fast = (unsigned char*)mat + Z*2;
+    unsigned char * end = (unsigned char*)(mat + num);
+
+    while ( fast < end )
     {
-        // little-Endian
-        for ( size_t i = 0; i < siz*siz; ++i )
-            memcpy(ptr+4*i, ptr+8*i+4, 4);
-    }
-    else
-    {
-        // big-Endian
-        for ( size_t i = 0; i < siz*siz; ++i )
-            memcpy(ptr+4*i, ptr+8*i, 4);
+        slow[0] = fast[0];
+        slow[1] = fast[1];
+        slow += 2;
+        fast += Z;
     }
 }
 
