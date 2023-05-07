@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 
 #ifndef INVENTORY_H
 #define INVENTORY_H
@@ -57,16 +57,16 @@ public:
     /// Destructor
     ~Inventory() { release(); }
     
-    /// the smallest assigned identity
+    /// the smallest assigned ID
     ObjectID lowest() const { return lowest_; }
 
-    /// the largest assigned identity
+    /// the largest assigned ID
     ObjectID highest() const { return highest_; }
     
-    /// lowest assigned number strictly greater than `n`
+    /// lowest assigned ID strictly greater than `n`
     ObjectID next_identity(ObjectID n) const;
     
-    /// the smallest unassigned number
+    /// the smallest unassigned ID
     ObjectID first_unassigned() const;
 
     /// current size of array
@@ -75,37 +75,37 @@ public:
     /// allocate to be ready to handle `cnt` references
     void reserve(const size_t cnt) { if ( cnt > alloca_ ) allocate(cnt); }
     
-    /// remember `obj`, assign a new ObjectID if necessary
+    /// remember `obj`, assign a new ID if necessary
     void assign(Inventoried * obj);
     
-    /// forget the object and release its serial number
+    /// forget the object and release its ID
     void unassign(const Inventoried * obj);
     
-    /// reattribute all serial numbers consecutively and pack the array
+    /// reattribute all IDs consecutively, packing the array to remove any gap
     void reassign();
 
-    /// number of non-zero entries in the registry
+    /// number of non-zero IDs in the registry
     size_t count() const;
 
     /// clear all entries
     void clear();
 
-    /// return the object with given serial number, or 0 if not found
-    Inventoried * get(size_t number) const;
+    /// return the object with given ID or 0 if not found
+    Inventoried * get(ObjectID) const;
     
     /// return object with given serial number
     Inventoried * operator[](ObjectID n) const { assert_true(n<alloca_); return record_[n]; }
 
-    /// object with the smallest inventory number
+    /// object with the smallest ID
     Inventoried * first() const;
     
-    /// object with the largest inventory number
+    /// object with the largest ID
     Inventoried * last() const;
     
-    /// return object just before in the inventory
+    /// return object just before given object
     Inventoried * previous(Inventoried const*) const;
     
-    /// return object just after in the inventory
+    /// return object found just after given object
     Inventoried * next(Inventoried const*) const;
     
     /// Human friendly ouput

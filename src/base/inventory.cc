@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 
 #include "inventory.h"
 #include "assert_macro.h"
@@ -126,7 +126,7 @@ void Inventory::unassign(const Inventoried * obj)
 
 /**
  This will pack the array by filling up the empty spots,
- without changing the order of the objects.
+ by moving objects from the end of the list to fill in available slots.
  */
 void Inventory::reassign()
 {
@@ -134,7 +134,6 @@ void Inventory::reassign()
     ObjectID inf = nxt;
     ObjectID sup = highest_;
     assert_true(!record_[inf]);
-    
     assert_true(record_[sup]);
     while ( inf < sup )
     {
@@ -151,7 +150,6 @@ void Inventory::reassign()
             ++nxt;
         }
     }
-    
     lowest_ = 1;
     highest_ = nxt-1;
 }
@@ -186,7 +184,7 @@ ObjectID Inventory::next_identity(ObjectID n) const
 }
 
 
-Inventoried * Inventory::get(const size_t n) const
+Inventoried * Inventory::get(const ObjectID n) const
 {
     if ( n <= highest_ )
     {
@@ -245,7 +243,7 @@ Inventoried* Inventory::previous(Inventoried const* i) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - I/O
 
 
 size_t Inventory::count() const
