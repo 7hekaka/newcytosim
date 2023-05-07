@@ -85,15 +85,15 @@ void NucleatorProp::complete(Simul const& sim)
     HandProp::complete(sim);
 
     if ( fiber_type.empty() )
-        throw InvalidParameter("hand:nucleate[1] (=fiber_type) must be specified if activity=nucleate");
+        throw InvalidParameter(name()+":nucleate[1] (=fiber_type) must be specified if activity=nucleate");
 
     sim.properties.find_or_die("fiber", fiber_type);
     
     if ( rate < 0 )
-        throw InvalidParameter("hand:nucleate (=rate) must be positive");
+        throw InvalidParameter(name()+":nucleate (=rate) must be positive");
 
     if ( track_end && track_end != hold_end )
-        throw InvalidParameter("if set, hand:track_end should be equal to hold_end");
+        throw InvalidParameter("if set, "+name()+":track_end should be equal to hold_end");
     
     rate_dt = rate * time_step(sim) * POOL_UNATTACHED;
 }

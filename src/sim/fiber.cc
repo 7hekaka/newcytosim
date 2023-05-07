@@ -1209,7 +1209,7 @@ void Fiber::makeAttachedHands(ObjectList& objs, std::string const& name, size_t 
         else
         {
             delete(cs);
-            throw InvalidParameter("hand cannot attach to specified fiber");
+            throw InvalidParameter(h->property()->name()+" cannot attach to specified fiber");
         }
     }
 }

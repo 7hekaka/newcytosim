@@ -224,7 +224,7 @@ void SingleProp::complete(Simul const& sim)
          In most cases, this is not desirable and physically inconsistent.
          */
         if ( length > hand_prop->binding_range )
-            throw InvalidParameter("hand:binding_range must be >= single:length");
+            throw InvalidParameter(hand_prop->name()+":binding_range must be >= "+name()+":length");
             //Cytosim::warn << "Attachment cannot occur because single:length > hand:binding_range\n";
     }
 }
