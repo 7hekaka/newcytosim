@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include "bead_set.h"
 #include "bead_prop.h"
