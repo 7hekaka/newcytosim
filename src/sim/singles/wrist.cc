@@ -72,7 +72,7 @@ void Wrist::setInteractions(Meca& meca) const
     Interpolation i = sHand->interpolation();
     base_.addLink(meca, i, prop->stiffness);
 #if NEW_ANCHOR_STIFFNESS
-    if ( prop->anchor_stiffness > 0 )
+    if ( prop->anchor_stiff > 0 )
     {
         real seg = sHand->fiber()->segmentation();
         /*
@@ -82,7 +82,7 @@ void Wrist::setInteractions(Meca& meca) const
          To keep the angular stiffness constant, we scale `weight` by the distance.
          */
         size_t j = i.lightest_point();
-        base_.addAlignedOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiffness/seg);
+        base_.addAlignedOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiff/seg);
     }
 #endif
 }

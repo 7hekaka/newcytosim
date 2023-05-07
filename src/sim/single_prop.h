@@ -42,7 +42,7 @@ public:
     
 #if NEW_ANCHOR_STIFFNESS
     /// A stiffness to anchor fibers on Solids with angular constraints
-    real anchor_stiffness;
+    real anchor_stiff;
 #endif
     
     /// resting length of link (um)
