@@ -176,7 +176,7 @@ void SpaceSet::report(std::ostream& os) const
         for ( Property const* i : plist )
         {
             SpaceProp const* p = static_cast<SpaceProp const*>(i);
-            size_t cnt = count(match_property, p);
+            size_t cnt = count(p);
             os << '\n' << std::setw(10) << cnt << ' ' << p->name();
             os << " ( " << p->shape << " )";
         }

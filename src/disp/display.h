@@ -269,10 +269,10 @@ public:
     void drawAverageFiber(ObjectList const&, gym_color) const;
     
     /// draw the averaged fiber
-    void drawAverageFiber1(FiberSet const&, void const*) const;
+    void drawAverageFiber1(FiberSet const&, Property const* ) const;
     
     /// draw the average for left-pointing and right-pointing fibers
-    void drawAverageFiber2(FiberSet const&, void const*) const;
+    void drawAverageFiber2(FiberSet const&, Property const* ) const;
 
     
     /// draw a Bead

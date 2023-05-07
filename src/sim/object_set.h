@@ -191,6 +191,9 @@ public:
     
     /// number of objects for which ( func(obj, val) == true )
     virtual size_t count(bool (*func)(Object const*, void const*), void const*) const;
+    
+    /// number of objects for which ( property() == p )
+    size_t count(Property const* p) const { return count(match_property, p); }
 
     /// collect all objects
     virtual ObjectList collect() const;
@@ -205,8 +208,8 @@ public:
     ObjectList collect(bool (*func)(Object const*, void const*), void const*, size_t cnt) const;
 
     /// collect objects that have given Property
-    ObjectList collect(Property const*) const;
-    
+    ObjectList collect(Property const* p) const { return collect(match_property, p); }
+
     /// load one Object from file
     void loadObject(Inputter&, ObjectTag tag, bool fat);
     

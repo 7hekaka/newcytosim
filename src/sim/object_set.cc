@@ -318,10 +318,10 @@ Object* ObjectSet::pickObject(const std::string& cat, std::string spec) const
     }
     
     // check property name:
-    Property const* p = simul_.findProperty(cat, spec);
-    if ( p )
+    Property const* P = simul_.findProperty(cat, spec);
+    if ( P )
     {
-        ObjectList sel = collect(match_property, p);
+        ObjectList sel = collect(match_property, P);
         //std::clog << "pickObject(" << sel.size() << " " << spec << ")\n";
         if ( sel.size() > 0 )
             return sel.pick_one();
@@ -410,12 +410,6 @@ ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void con
         objs.truncate(cnt);
     }
     return objs;
-}
-
-
-ObjectList ObjectSet::collect(Property const* p) const
-{
-    return collect(match_property, p);
 }
 
 
@@ -646,7 +640,7 @@ void ObjectSet::writeReport(std::ostream& os, const std::string& title) const
         {
             for ( Property * p : plist )
             {
-                size_t cnt = count(match_property, p);
+                size_t cnt = count(p);
                 os << '\n' << std::setw(10) << cnt << " " << p->name();
             }
             if ( plist.size() > 1 )

@@ -151,7 +151,7 @@ void DynamicFiberProp::complete(Simul const& sim)
     FiberProp::complete(sim);
 
     /// print predicted average length in verbose mode:
-    bool undone = sim.fibers.count(match_property, this);
+    bool undone = sim.fibers.count(this);
     if ( undone && primed(sim) && sim.prop.verbose )
         splash(std::clog);
 

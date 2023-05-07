@@ -206,7 +206,7 @@ void FiberSet::report(std::ostream& os) const
         for ( Property const* i : plist )
         {
             FiberProp const* p = static_cast<FiberProp const*>(i);
-            size_t cnt = count(match_property, p);
+            size_t cnt = count(p);
             os << '\n' << std::setw(10) << cnt << ' ' << p->name();
             os << " ( " << p->activity << " )";
         }

@@ -749,14 +749,14 @@ bool selectL(Object const* obj, void const* arg)
     return fib->prop==arg  &&  dot(fib->diffPoints(0), Vector(fib->prop->disp->hide_axis)) < 0;
 }
 
-void Display::drawAverageFiber1(FiberSet const& fibers, void const* arg) const
+void Display::drawAverageFiber1(FiberSet const& fibers, Property const* arg) const
 {
-    ObjectList objs = fibers.collect(match_property, arg);
+    ObjectList objs = fibers.collect(arg);
     drawAverageFiber(objs, gym_color(1,1,1));
 }
 
 
-void Display::drawAverageFiber2(FiberSet const& fibers, void const* arg) const
+void Display::drawAverageFiber2(FiberSet const& fibers, Property const* arg) const
 {
     ObjectList objsR = fibers.collect(selectR, arg);
     ObjectList objsL = fibers.collect(selectL, arg);
@@ -780,11 +780,11 @@ void Display::drawMisc(Simul const& sim)
 #if ( 0 )
     for ( Property const* i : sim.properties.find_all("fiber") )
     {
-        FiberProp const* fp = static_cast<FiberProp const*>(i);
-        if ( fp->disp->draw_average == 1 )
-            drawAverageFiber1(sim.fibers, fp);
-        else if ( fp->disp->draw_average == 2 )
-            drawAverageFiber2(sim.fibers, fp);
+        FiberProp const* P = static_cast<FiberProp const*>(i);
+        if ( P->disp->draw_average == 1 )
+            drawAverageFiber1(sim.fibers, P);
+        else if ( P->disp->draw_average == 2 )
+            drawAverageFiber2(sim.fibers, P);
     }
 #endif
 }

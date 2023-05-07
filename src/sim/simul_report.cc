@@ -1856,7 +1856,7 @@ void reportSimulSet(std::ostream& out, SET& set, PropertyList const& properties)
     {
         ObjectID id = 0;
         size_t points = 0, sup = 0;
-        ObjectList objs = set.collect(match_property, i);
+        ObjectList objs = set.collect(i);
         for ( Object * o : objs )
         {
             Mecable * mec = Simul::toMecable(o);
