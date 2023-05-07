@@ -38,14 +38,14 @@ static inline bool any_equal(const size_t a, const size_t b, const size_t c)
 
 /// true if 'a' is equal to 'b', 'c' or 'd'
 static inline bool any_equal(const size_t a, const size_t b,
-                      const size_t c, const size_t d)
+                             const size_t c, const size_t d)
 {
     return ( a == b ) | ( a == c ) | ( a == d );
 }
 
 /// true if 'a' is equal to 'b', 'c', 'd' or 'e'
 static inline bool any_equal(const size_t a, const size_t b, const size_t c,
-                      const size_t d, const size_t e)
+                             const size_t d, const size_t e)
 {
     return ( a == b ) | ( a == c ) | ( a == d ) | ( a == e );
 }
@@ -85,46 +85,16 @@ static Vector interpolate4(const real vec[], const size_t inx, const real a, rea
 
 //------------------------------------------------------------------------------
 
-static inline Vector position_delta(Mecapoint const& A, Mecapoint const& B)
+template < typename T, typename U >
+static inline Vector position_diff(T const& A, U const& B)
 {
     return B.pos() - A.pos();
 }
 
-static inline Vector position_delta(Mecapoint const& A, Interpolation const& B)
+template < typename T, typename U >
+static inline Vector modulo_offset(T const& A, U const& B)
 {
-    return B.pos() - A.pos();
-}
-
-static inline Vector position_delta(Interpolation const& A, Mecapoint const& B)
-{
-    return B.pos() - A.pos();
-}
-
-static inline Vector position_delta(Interpolation const& A, Interpolation const& B)
-{
-    return B.pos() - A.pos();
-}
-
-//------------------------------------------------------------------------------
-
-static inline Vector modulo_offset(Mecapoint const& A, Mecapoint const& B)
-{
-    return modulo->offset(position_delta(A, B));
-}
-
-static inline Vector modulo_offset(Mecapoint const& A, Interpolation const& B)
-{
-    return modulo->offset(position_delta(A, B));
-}
-
-static inline Vector modulo_offset(Interpolation const& A, Mecapoint const& B)
-{
-    return modulo->offset(position_delta(A, B));
-}
-
-static inline Vector modulo_offset(Interpolation const& A, Interpolation const& B)
-{
-    return modulo->offset(position_delta(A, B));
+    return modulo->offset(position_diff(A, B));
 }
 
 //------------------------------------------------------------------------------
@@ -1014,7 +984,7 @@ void Meca::addTorque3(Mecapoint const& ptA,
     const size_t iiC = ptC.matIndex0();
 
     /*
-    Vector CD = position_delta(ptC, ptB) + R * AB;
+    Vector CD = position_diff(ptC, ptB) + R * AB;
     Vector fA = T * CD;
     Vector fB = ( W + T ) * ( -CD );
     Vector fC = weight * CD;
@@ -1061,8 +1031,8 @@ void Meca::addTorque3Plane(Mecapoint const& ptA,
 
 #if ( DIM >= 3 )
     /*
-    const Vector3 AB = position_delta(ptA, ptB);
-    const Vector3 BC = position_delta(ptB, ptC);
+    const Vector3 AB = position_diff(ptA, ptB);
+    const Vector3 BC = position_diff(ptB, ptC);
     Vector3 axi = normalize(cross(AB, BC));
     if ( axi != axi )
         return;
@@ -1121,7 +1091,7 @@ void Meca::addTorque3Long(Mecapoint const& ptA,
     assert_true( weight >= 0 );
     assert_true( weightL >= 0 );
     const MatrixBlock W(0, -weight);
-    const Vector AB = position_delta(ptA, ptB);
+    const Vector AB = position_diff(ptA, ptB);
     const MatrixBlock T = R.transposed();
     
     // indices:
@@ -2185,7 +2155,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     if ( aa == bb )
         return;
     
-    Vector off, axi = position_delta(ptA, ptB);
+    Vector off, axi = position_diff(ptA, ptB);
 
     if ( modulo )
         modulo->foldOffset(axi, off);
@@ -2248,7 +2218,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     if ( any_equal(ii2, ii0, ii1) )
         return;
 
-    Vector off, axi = position_delta(ptA, ptB);
+    Vector off, axi = position_diff(ptA, ptB);
 
     if ( modulo )
         modulo->foldOffset(axi, off);
@@ -2333,7 +2303,7 @@ void Meca::addLongLink(Interpolation const& ptA,
     const real cc2 =  ptB.coef0();
     const real cc3 =  ptB.coef1();
 
-    Vector off, axi = position_delta(ptA, ptB);
+    Vector off, axi = position_diff(ptA, ptB);
 
     if ( modulo )
         modulo->foldOffset(axi, off);
@@ -3195,14 +3165,14 @@ void Meca::addSideSideLink(Interpolation const& ptA,
     
 #elif ( DIM == 2 )
     
-    Vector dir = position_delta(ptA, ptB);
+    Vector dir = position_diff(ptA, ptB);
     real armA = std::copysign(0.5*len, cross(ptA.diff(), dir));
     real armB = std::copysign(0.5*len, cross(dir, ptB.diff()));
     addSideSideLink(ptA, armA, ptB, armB, weight);
 
 #else
     
-    Vector dir = position_delta(ptA, ptB);
+    Vector dir = position_diff(ptA, ptB);
     Vector armA = cross(ptA.diff(), dir).normalized(0.5*len);
     Vector armB = cross(dir, ptB.diff()).normalized(0.5*len);
     addSideSideLink(ptA, armA, ptB, armB, weight);
@@ -4923,7 +4893,7 @@ void Meca::addTriLink(Interpolation const& pt1, const real w1,
  */
 void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
 {
-    Vector ab = position_delta(ptA, ptB);
+    Vector ab = position_diff(ptA, ptB);
     real abnSqr = ab.normSqr(), abn=std::sqrt(abnSqr);
     
     const size_t aa = ptA.matIndex0();
