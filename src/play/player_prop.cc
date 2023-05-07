@@ -90,7 +90,7 @@ static std::string standardReport(unsigned inx)
     switch( inx )
     {
         case 0: return "";
-        case 1: return "fiber:lengths,fiber:segment";
+        case 1: return "fiber:lengths,fiber:mark";
         case 2: return "fiber:dynamics{split=1}";
         case 3: return "single,couple";
         case 4: return "single:force,couple:force";

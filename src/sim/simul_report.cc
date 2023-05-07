@@ -333,6 +333,8 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportFiberSamples(out, opt);
         if ( what == "length" )
             return reportFiberLengths(out, sel);
+        if ( what == "mark" )
+            return reportFiberMarks(out, sel);
         if ( what == "distribution" || what == "histogram" )
             return reportFiberLengthHistogram(out, opt);
         if ( what == "tension" )
@@ -600,6 +602,29 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
             out << LIN << ljust(i->name(), 2);
             printFiberLengths(out, objs);
         }
+    }
+    out.precision(p);
+}
+
+/**
+ Export average length and variance for fibers grouped by mark
+ */
+void Simul::reportFiberMarks(std::ostream& out, Property const*) const
+{
+    out << COM << ljust("mark", 1, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
+    out << SEP << "min_len" << SEP << "max_len" << SEP << "total";
+    
+    ObjectMark sup = 0;
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+        sup = std::max(sup, fib->mark());
+
+    std::streamsize p = out.precision();
+    for ( ObjectMark k = 0; k <= sup; ++k )
+    {
+        std::uintptr_t val = k;
+        ObjectList objs = fibers.collect(match_mark, reinterpret_cast<void*>(val));
+        out << LIN << ljust(std::to_string(val), 1);
+        printFiberLengths(out, objs);
     }
     out.precision(p);
 }

@@ -85,7 +85,7 @@ Vector FiberSite::outerPos() const
 FiberEnd FiberSite::nearestEnd() const
 {
     assert_true(hFiber);
-    if ( 2.0 * hAbs < hFiber->abscissaM() + hFiber->abscissaP() )
+    if ( hAbs - hFiber->abscissaC() < 0 )
         return MINUS_END;
     else
         return PLUS_END;
