@@ -562,14 +562,11 @@ void Simul::reportFiberAge(std::ostream& out) const
 /**
 Export average length and variance of length for a class of fiber
 */
-void Simul::reportFiberLengths(std::ostream& out, FiberProp const* sel) const
+static void printFiberLengths(std::ostream& out, ObjectList const& objs)
 {
     size_t cnt = 0;
     real avg = 0, var = 0, mn = INFINITY, mx = -INFINITY;
-    ObjectList objs = fibers.collect(sel);
-    fibers.infoLength(objs, cnt, avg, var, mn, mx);
-    
-    out << LIN << ljust(sel->name(), 2);
+    FiberSet::infoLength(objs, cnt, avg, var, mn, mx);
     out << SEP << cnt;
     out.precision(3);
     out << SEP << std::fixed << avg;
@@ -590,11 +587,19 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
     
     std::streamsize p = out.precision();
     if ( sel )
-        reportFiberLengths(out, static_cast<FiberProp const*>(sel));
+    {
+        ObjectList objs = fibers.collect(sel);
+        out << LIN << ljust(sel->name(), 2);
+        printFiberLengths(out, objs);
+    }
     else
     {
         for ( Property const* i : properties.find_all("fiber") )
-            reportFiberLengths(out, static_cast<FiberProp const*>(i));
+        {
+            ObjectList objs = fibers.collect(i);
+            out << LIN << ljust(i->name(), 2);
+            printFiberLengths(out, objs);
+        }
     }
     out.precision(p);
 }
@@ -3083,7 +3088,7 @@ void Simul::reportPlatelet(std::ostream& out) const
 {
     size_t nfib;
     real pol, var, mn, mx;
-    fibers.infoLength(fibers.collect(), nfib, pol, var, mn, mx);
+    FiberSet::infoLength(fibers.collect(), nfib, pol, var, mn, mx);
     pol *= nfib;
     
     if ( nfib > 1024 )
