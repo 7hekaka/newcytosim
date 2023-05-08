@@ -23,7 +23,6 @@
 void print_backtrace(int out)
 {
     void* buffer[128];
-    size_t n_ptr = 512;
     int size = backtrace(buffer, 128);
     if ( size < 2 )
     {
@@ -31,8 +30,9 @@ void print_backtrace(int out)
         return;
     }
 #if ( 1 )
-    char** buf = backtrace_symbols(buffer, size);
+    size_t n_ptr = 512;
     char * ptr = (char*)malloc(n_ptr);
+    char** buf = backtrace_symbols(buffer, size);
 
     ssize_t __attribute__((unused)) u;
     u = write(out, "Cytosim execution stack:\n", 25);
