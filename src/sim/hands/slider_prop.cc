@@ -107,7 +107,7 @@ void SliderProp::checkStiffness(real stiff, real len, real mul, real kT) const
         //std::clog << oss.str();
     }
     else
-        Cytosim::log << "Slider `" << name() << "' stability = " << e << "\n";
+        Cytosim::log << "   Slider `" << name() << "' stability = " << e << "\n";
 }
 
 
