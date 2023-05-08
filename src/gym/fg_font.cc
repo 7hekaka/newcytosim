@@ -182,58 +182,6 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
     free(str);
 }
 
-#ifdef GL_VERSION_2_1
-void fgBitmapString0(float x0, float y, int fontID, const float color[4], const char *string, float vshift)
-{
-    glColor4fv(color);
-    glRasterPos2i(0, 0);
-    glBitmap(0, 0, 0, 0, x0, y, NULL);
-    unsigned char c;
-    float x = 0.0f;
-    SFG_Font const* font = fghFont( fontID );
-    if ( font && string && *string )
-    {
-        glPushClientAttrib( GL_CLIENT_PIXEL_STORE_BIT );
-        glPixelStorei( GL_UNPACK_SWAP_BYTES,  GL_FALSE );
-        glPixelStorei( GL_UNPACK_LSB_FIRST,   GL_FALSE );
-        glPixelStorei( GL_UNPACK_ROW_LENGTH,  0        );
-        glPixelStorei( GL_UNPACK_SKIP_ROWS,   0        );
-        glPixelStorei( GL_UNPACK_SKIP_PIXELS, 0        );
-        glPixelStorei( GL_UNPACK_ALIGNMENT,   1        );
-        
-        if ( vshift == 0 )
-            vshift = font->Height;
-        /*
-         * Step through the string, drawing each character.
-         * A newline will simply translate the next character's insertion
-         * point back to the start of the line and down one line.
-         */
-        while( ( c = *string++) )
-        {
-            if( c == '\n' )
-            {
-                glBitmap ( 0, 0, 0, 0, -x, vshift, NULL );
-                x = 0.0f;
-            }
-            else  /* Not an EOL, draw the bitmap character */
-            {
-                const uByte* face = font->Characters[ c ];
-                
-                glBitmap(
-                         face[ 0 ], font->Height,     /* Bitmap's width and height    */
-                         font->xorig, font->yorig,    /* The origin in the font glyph */
-                         ( float )( face[ 0 ] ), 0.0, /* The raster advance; inc. x,y */
-                         ( face + 1 )                 /* The packed bitmap data...    */
-                         );
-                
-                x += ( float )( face[ 0 ] );
-            }
-        }
-        glPopClientAttrib( );
-    }
-}
-#endif
-
 /*
  * Returns the width in pixels of a font's character
  */

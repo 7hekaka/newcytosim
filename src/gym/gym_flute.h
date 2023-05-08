@@ -64,10 +64,15 @@ namespace gym
     inline void  unmapBufferV2() { unmap(); setBufferV(2); }
     inline void rebindBufferV2() { rebind(); setBufferV(2); }
 
+    void setBufferVxT2(size_t, size_t);
+    inline void clenupTexture() { glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisable(GL_TEXTURE_2D); }
+
     inline flute4* mapBufferV2T2(size_t n) { return (flute4*)mapFloatBuffer(4*n); }
-    void setBufferV2T2();
-    inline void  unmapBufferV2T2() { unmap(); setBufferV2T2(); }
+    inline void  unmapBufferV2T2() { unmap(); setBufferVxT2(2, 4); }
     
+    inline flute6* mapBufferV4T2(size_t n) { return (flute6*)mapFloatBuffer(6*n); }
+    inline void  unmapBufferV4T2() { unmap(); setBufferVxT2(4, 6); }
+
     /// map / unmap GPU buffer for 3D vertex
     inline flute3* mapBufferV3(size_t n) { return (flute3*)mapFloatBuffer(3*n); }
     inline void  unmapBufferV3() { unmap(); setBufferV(3); }

@@ -64,12 +64,12 @@ namespace gym
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void setBufferV2T2()
+    void setBufferVxT2(size_t pts, size_t gap)
     {
         assert_true(!glIsEnabled(GL_TEXTURE_COORD_ARRAY));
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointer(2, GL_FLOAT, 4*Q, nullptr);
-        glTexCoordPointer(2, GL_FLOAT, 4*Q, (void*)(2*Q));
+        glVertexPointer(std::min(pts, 3UL), GL_FLOAT, gap*Q, nullptr);
+        glTexCoordPointer(2, GL_FLOAT, gap*Q, (void*)(pts*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -128,29 +128,29 @@ namespace gym
     void setBufferCV(size_t col, size_t pts, size_t gap)
     {
         assert_true(currStream() == boundBuffer());
-        size_t tot = ( col + pts ) * gap;
+        gap *= ( col + pts );
         if ( col > 0 )
         {
             glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, GL_FLOAT, tot*Q, nullptr);
+            glColorPointer(4, GL_FLOAT, gap*Q, nullptr);
         }
         else
         {
             assert_true(!glIsEnabled(GL_COLOR_ARRAY));
         }
         assert_enabled(GL_VERTEX_ARRAY);
-        glVertexPointer(std::min(pts, 3UL), GL_FLOAT, tot*Q, (void*)(col*Q));
+        glVertexPointer(std::min(pts, 3UL), GL_FLOAT, gap*Q, (void*)(col*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
     void setBufferCNV(size_t col, size_t nor, size_t pts, size_t gap)
     {
         assert_true(currStream() == boundBuffer());
-        size_t tot = ( col + pts + nor ) * gap;
+        gap *= ( col + pts + nor );
         if ( col > 0 )
         {
             glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, GL_FLOAT, tot*Q, nullptr);
+            glColorPointer(4, GL_FLOAT, gap*Q, nullptr);
         }
         else
         {
@@ -159,14 +159,14 @@ namespace gym
         if ( nor > 1 )
         {
             glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_FLOAT, tot*Q, (void*)(col*Q));
+            glNormalPointer(GL_FLOAT, gap*Q, (void*)(col*Q));
         }
         else
         {
             assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
         }
         assert_enabled(GL_VERTEX_ARRAY);
-        glVertexPointer(pts, GL_FLOAT, tot*Q, (void*)((col+nor)*Q));
+        glVertexPointer(pts, GL_FLOAT, gap*Q, (void*)((col+nor)*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     

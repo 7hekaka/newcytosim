@@ -49,10 +49,10 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
 {
     //printPixels(W, H, pixels, W);
     CHECK_GL_ERROR("drawPixels0");
-    glEnable(GL_TEXTURE_2D);
     if ( ! gym_font_texture_ )
         glGenTextures(1, &gym_font_texture_);
 
+    glEnable(GL_TEXTURE_2D);
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glBindTexture(GL_TEXTURE_2D, gym_font_texture_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -66,10 +66,8 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     flu[3] = { X+S*W, Y,     1, 1 };
     gym::unmapBufferV2T2();
     CHECK_GL_ERROR("drawPixels1");
-
     gym::drawTriangleStrip(0, 4);
-    glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-    glDisable(GL_TEXTURE_2D);
+    gym::clenupTexture();
     CHECK_GL_ERROR("drawPixels2");
 }
 

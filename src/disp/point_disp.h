@@ -12,7 +12,7 @@
 
 
 /** \todo: replace PIXELMAPS by a texture, and draw each particle as a textured Square */
-#define POINTDISP_USES_PIXELMAPS 0
+#define POINTDISP_USES_PIXELMAPS 1
 
 
 /// the parameters necessary to display a point-like object
@@ -30,21 +30,15 @@ private:
     
     /// pointer to 3 square bitmaps with RGBA components
     uint8_t * pixels_;
-
-    /// index of the Pixel Buffer Objects on GPU
-    GLuint pbo_;
     
-    /// center of bitmap
-    GLfloat pixOffset_;
+    /// texture ID
+    GLuint texture_;
     
-    /// size of feature in pixels
+    /// size in pixels, must be a power of 2
     unsigned pixSize;
 
     /// allocated size for square bitmaps, in pixels
     unsigned pixAlloc_;
-
-    /// size occupied by bitmap in bytes
-    unsigned pixStride;
 
     /// allocate pixelmap memory
     void allocatePixelmap(unsigned);
@@ -62,7 +56,7 @@ private:
     void createPixelmaps(float);
 
     /// draw pixel map
-    void drawPixelmap(size_t) const;
+    void drawPixelmap(float X, float Y, float Z, size_t) const;
 
 #endif
 
@@ -187,15 +181,14 @@ public:
     
     /// draw inactive state
     template < typename VECTOR >
-    void drawI(VECTOR const& pos) const
+    void drawI(VECTOR const& vec) const
     {
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            glRasterPos3f(pos.x(), pos.y(), pos.z());
-            drawPixelmap(0);
+            drawPixelmap(vec.XX, vec.y(), vec.z(), 0);
     #else
-            gym::transScale(pos, sizeR);
+            gym::transScale(vec, sizeR);
             gym::color(color2);
             gle::disc();
     #endif
@@ -204,15 +197,14 @@ public:
 
     /// draw active state, unattached
     template < typename VECTOR >
-    void drawF(VECTOR const& pos) const
+    void drawF(VECTOR const& vec) const
     {
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            glRasterPos3f(pos.x(), pos.y(), pos.z());
-            drawPixelmap(1);
+            drawPixelmap(vec.XX, vec.y(), vec.z(), 1);
     #else
-            gym::transScale(pos, sizeR);
+            gym::transScale(vec, sizeR);
             gym::color(color2);
             strokeA(widthX);
     #endif
@@ -221,15 +213,14 @@ public:
 
     /// draw active state, attached
     template < typename VECTOR >
-    void drawA(VECTOR const& pos) const
+    void drawA(VECTOR const& vec) const
     {
         if ( perceptible )
         {
     #if POINTDISP_USES_PIXELMAPS
-            glRasterPos3f(pos.x(), pos.y(), pos.z());
-            drawPixelmap(2);
+            drawPixelmap(vec.XX, vec.y(), vec.z(), 2);
     #else
-            gym::transScale(pos, sizeR);
+            gym::transScale(vec, sizeR);
             gym::color(color);
             strokeA(widthX);
     #endif

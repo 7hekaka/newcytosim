@@ -23,11 +23,6 @@ void fgBitmapString(float x, float y, float S, int font, const float color[4], c
 
 
 /*
-* Draw a bitmap string
-*/
-void fgBitmapString0(float x, float y, int font, const float color[4], const char *string, float vshift);
-
-/*
  * Returns the width in pixels of a font's character
  */
 int fgBitmapWidth(int font, unsigned char character);

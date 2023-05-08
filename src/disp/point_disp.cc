@@ -10,10 +10,7 @@
 #include "gym_view.h"
 #include "gym_draw.h"
 #include "gym_image.h"
-
-
-/// if this is defined, the pixelmap are stored in graphical memory
-#define POINTDISP_USES_PIXEL_BUFFERS 0
+#include "gym_flute.h"
 
 
 void PointDisp::clearPixelmaps()
@@ -21,11 +18,8 @@ void PointDisp::clearPixelmaps()
 #if POINTDISP_USES_PIXELMAPS
     pixSize = 0;
     pixAlloc_ = 0;
-    for ( int i = 0; i < 3; ++i )
-    {
-        pixels_ = nullptr;
-        pbo_ = 0;
-    }
+    pixels_ = nullptr;
+    texture_ = 0;
 #endif
 }
 
@@ -174,9 +168,8 @@ void savePixelmap(uint8_t* bitmap, unsigned dim, unsigned id, char const* name)
 void PointDisp::allocatePixelmap(unsigned dim)
 {
     pixAlloc_ = pixSize;
-    pixStride = ( 4 * pixSize * pixSize + 7U ) & ~7U;
     delete(pixels_);
-    pixels_ = new uint8_t[3*pixStride]();
+    pixels_ = new uint8_t[16*pixSize*pixSize]();
 }
 
 
@@ -185,28 +178,33 @@ void PointDisp::releasePixelmap()
     delete(pixels_);
     pixels_ = nullptr;
     pixAlloc_ = 0;
-#if POINTDISP_USES_PIXEL_BUFFERS
-    if ( pbo_ > 0 )
+    if ( texture_ > 0 )
     {
-        glDeleteBuffers(1, &pbo_);
-        pbo_ = 0;
+        glDeleteTextures(1, &texture_);
+        texture_ = 0;
     }
-#endif
 }
 
 
-void PointDisp::drawPixelmap(size_t inx) const
+void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
 {
-    //translate to center the bitmap:
-    glBitmap(0,0,0,0,pixOffset_,pixOffset_,nullptr);
-#if POINTDISP_USES_PIXEL_BUFFERS
-    glBindBuffer(GL_PIXEL_UNPACK_BUFFER, pbo_);
-    glDrawPixels(pixSize, pixSize, GL_RGBA, GL_UNSIGNED_BYTE, (void*)(inx*pixStride));
-    //glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
-#else
-    glDrawPixels(pixSize, pixSize, GL_RGBA, GL_UNSIGNED_BYTE, pixels_+inx*pixStride);
-#endif
-    CHECK_GL_ERROR("PointDisp::drawPixelmap");
+    CHECK_GL_ERROR("drawPixelmap0");
+    float S = sizeR;
+    float T = 0.25 * inx;
+    float U = 0.25 + T;
+    gym::ref_view();
+    gym::color(0,1,0,1);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, texture_);
+    flute6* flu = gym::mapBufferV4T2(4);
+    flu[0] = { X-S, Y+S, Z, 0, 0, T };
+    flu[1] = { X-S, Y-S, Z, 0, 0, U };
+    flu[2] = { X+S, Y+S, Z, 0, 1, T };
+    flu[3] = { X+S, Y-S, Z, 0, 1, U };
+    gym::unmapBufferV4T2();
+    gym::drawTriangleStrip(0, 4);
+    gym::clenupTexture();
+    CHECK_GL_ERROR("drawPixelmap1");
 }
 
 
@@ -215,15 +213,15 @@ void PointDisp::drawPixelmap(size_t inx) const
  */
 void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
 {
-    float s = size * unit_value * 0.5f;
-    float w = width * unit_value * 0.5f;
-    gym::transScale(dim*0.5, dim*0.5, 0, s);
+    float S = size * unit_value * 0.5f;
+    float W = width * unit_value * 0.5f;
+    gym::transScale(dim*0.5, dim*0.5, 0, S);
 
-    if ( width > 0 ) glLineWidth(w);
+    if ( width > 0 ) glLineWidth(W);
 
     for ( int i = 0; i < 3; ++i )
     {
-        uint8_t * pix = pixels_ + i * pixStride;
+        uint8_t * pix = pixels_ + i * pixSize * pixSize;
         // we use a transparent background, because points will overlap
         gym::clearPixels(0,0,0,0);
         switch ( i )
@@ -234,11 +232,11 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
                 break;
             case 1:
                 gym::color(color2);
-                strokeA(w);
+                strokeA(W);
                 break;
             case 2:
                 gym::color(color);
-                strokeA(w);
+                strokeA(W);
                 break;
         }
         if ( sampling > 1 )
@@ -246,14 +244,13 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
             uint8_t * tmp = new uint8_t[4*dim*dim];
             glReadPixels(0, 0, dim, dim, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
             gym::downsampleRGBA(pix, pixSize, pixSize, tmp, sampling);
-            //gym::printPixels(stdout, tmp, dim, dim);
+            gym::printPixels(stdout, tmp, dim, dim);
             delete[] tmp;
         }
         else
         {
             glReadPixels(0, 0, pixSize, pixSize, GL_RGBA, GL_UNSIGNED_BYTE, pix);
         }
-        //for ( size_t u = 0; u < pixStride; ++u ) pix[u] = 255;
 #if ( 0 )
         //savePixelmap(pix, pixSize, i, name_str());
         std::clog << name() << i << " " << size << " " << width << "\n";
@@ -293,7 +290,17 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling)
     glViewport(svp[0], svp[1], svp[2], svp[3]);
 }
 
-
+static void setRGBA(size_t cnt, uint8_t ptr[], uint8_t R, uint8_t G, uint8_t B, uint8_t A)
+{
+    for ( size_t i = 0; i < cnt; ++i )
+    {
+        ptr[4*i+3] = R;
+        ptr[4*i+2] = G;
+        ptr[4*i+1] = B;
+        ptr[4*i+0] = A;
+    }
+}
+                           
 void PointDisp::createPixelmaps(float uv)
 {
     if ( pixSize > pixAlloc_ )
@@ -304,21 +311,44 @@ void PointDisp::createPixelmaps(float uv)
         CHECK_GL_ERROR("2 PointDisp::prepare");
     }
     
-    pixOffset_ = -0.5f * pixSize;
     makePixelmaps(3*uv, 3);
 
-#if POINTDISP_USES_PIXEL_BUFFERS
-    if ( pbo_ == 0 )
-        glGenBuffers(1, &pbo_);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, pbo_);
-    glBufferData(GL_PIXEL_PACK_BUFFER_ARB, 3*pixStride, pixels_, GL_STATIC_DRAW);
-    glBindBuffer(GL_PIXEL_PACK_BUFFER_ARB, 0);
-    CHECK_GL_ERROR("PointDisp::storePixelmap");
-#endif
+    if ( ! texture_ )
+        glGenTextures(1, &texture_);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glBindTexture(GL_TEXTURE_2D, texture_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    if ( 1 )
+    {
+        size_t S = pixSize*pixSize;
+        setRGBA(S, pixels_, 100, 90, 128, 255);
+        setRGBA(S, pixels_+4*S, 100, 200, 0, 255);
+        setRGBA(S, pixels_+8*S, 0, 0, 255, 255);
+        setRGBA(S, pixels_+12*S, 255, 0, 0, 255);
+    }
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, pixSize, pixSize, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, pixels_);
+    //printf("%10s:texture %i x %i\n", name().c_str(), pixSize, pixSize);
+    CHECK_GL_ERROR("PointDisp::createPixelmaps");
 }
 
 #endif
 
+
+/// return smallest power of 2 that is greater or equal to `x`
+static unsigned next_power(unsigned x)
+{
+    if ( x > 0 )
+    {
+        --x;
+        x |= x >> 1;
+        x |= x >> 2;
+        x |= x >> 4;
+        x |= x >> 8;
+        x |= x >> 16;
+    }
+    return x+1;
+}
 
 /// arguments are ps = pixel_size; uv = unit_value
 void PointDisp::setPixels(float ps, float uv, bool make_maps)
@@ -333,11 +363,8 @@ void PointDisp::setPixels(float ps, float uv, bool make_maps)
     //printf("widthX %6.3f sizeX %6.3f\n", widthX, sizeX);
 
 #if POINTDISP_USES_PIXELMAPS
-    unsigned S = static_cast<unsigned>(std::ceil(uv*sw));
-    // make it a multiple of 2:
-    pixSize = ( S + 2U ) & ~1U;
-    //pixSize = S;
-
+    // make it a power of 2:
+    pixSize = next_power(std::ceil(uv*sw));
     if ( make_maps )
         createPixelmaps(uv);
 #endif
