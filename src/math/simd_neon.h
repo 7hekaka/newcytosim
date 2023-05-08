@@ -36,18 +36,32 @@ LOCAL vec2 load1d(float const* a) { return vcvt_f64_f32(vset_lane_f32(*a, vdup_n
 // load 2 floats and convert to double
 LOCAL vec2 load2d(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
 
+//------ half-precision, float16
+LOCAL float load_half(__fp16 const* a) { float16x4_t h = vld1_f16(a); float32x4_t f = vcvt_f32_f16(h); return f[0]; }
 
+// load 1 float on 2 bytes and convert to double and zero
+LOCAL float32x2_t load1_half(__fp16 const* a) { return vget_low_f32(vcvt_f32_f16(float16x4_t{a[0], 0, 0, 0})); }
+// load 1 float on 2 bytes and convert to double and zero
+LOCAL float32x2_t load2_half(__fp16 const* a) { return vget_low_f32(vcvt_f32_f16(float16x4_t{a[0], a[1], 0, 0})); }
+
+LOCAL vec2 load1h(__fp16 const* a) { return vcvt_f64_f32(load1_half(a)); }
+// load 2 floats on 2x2 bytes and convert to double
+LOCAL vec2 load2h(__fp16 const* a) { return vcvt_f64_f32(load2_half(a)); }
+
+//------ bfloat16
 typedef uint16_t bfloat16;
 
-LOCAL float load_half(bfloat16 const* a) { union { float f; uint16_t i[2]; } u; u.i[1]=a[0]; u.i[0]=0; return u.f; }
-// load 1 float on 2 bytes and convert to double and zero
-LOCAL float32x2_t load1_half(bfloat16 const* a) { return uint16x4_t{0, a[0], 0, 0}; }
-// load 1 float on 2 bytes and convert to double and zero
-LOCAL float32x2_t load2_half(bfloat16 const* a) { return uint16x4_t{0, a[0], 0, a[1]}; }
+LOCAL float load_bf16(bfloat16 const* a) { union { float f; uint16_t i[2]; } u; u.i[1]=a[0]; u.i[0]=0; return u.f; }
 
-LOCAL vec2 load1h(bfloat16 const* a) { return vcvt_f64_f32(load1_half(a)); }
+// load 1 float on 2 bytes and convert to double and zero
+LOCAL float32x2_t load1_bf16(bfloat16 const* a) { return uint16x4_t{0, a[0], 0, 0}; }
+// load 1 float on 2 bytes and convert to double and zero
+LOCAL float32x2_t load2_bf16(bfloat16 const* a) { return uint16x4_t{0, a[0], 0, a[1]}; }
+
+LOCAL vec2 load1b(bfloat16 const* a) { return vcvt_f64_f32(load1_bf16(a)); }
 // load 2 floats on 2x2 bytes and convert to double
-LOCAL vec2 load2h(bfloat16 const* a) { return vcvt_f64_f32(load2_half(a)); }
+LOCAL vec2 load2b(bfloat16 const* a) { return vcvt_f64_f32(load2_bf16(a)); }
+
 
 //LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
 LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
@@ -331,4 +345,19 @@ LOCAL int lower_mask4f(vec4f a, vec4f b)
     constexpr int32x4_t mask = { 1, 2, 4, 8 };
     int res = vaddvq_u32(vandq_u32(lowerthan, mask));
     return res;
+}
+
+//----------------------------- Half Precision -------------------------------
+
+/// convert doubles to half-precision floats
+LOCAL void convert_to_halfs(size_t cnt, double const* src, __fp16* dst)
+{
+    #pragma omp simd
+    for ( size_t i = 0; i < cnt; i += 4 )
+    {
+        float32x2_t f = vcvt_f32_f64(vld1q_f64(src+i));
+        float32x2_t g = vcvt_f32_f64(vld1q_f64(src+i+2));
+        float16x4_t h = vcvt_f16_f32(vcombine_f32(f, g));
+        vst1_f16(dst+i, h);
+    }
 }

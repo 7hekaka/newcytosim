@@ -206,6 +206,21 @@ LOCAL vec4 normalize4(vec4 vec, double n)
     return mul4(vec, div4(set4(n), sqrt4(m)));
 }
 
+
+//----------------------------- Half Precision -------------------------------
+
+/// convert doubles to half-precision floats
+LOCAL void convert_to_halfs(size_t cnt, double const* src, uint16_t* dst)
+{
+    for ( size_t i = 0; i < cnt; i += 4 )
+    {
+        __m256d d = _mm256_load_pd(src+i);
+        __m128 f = _mm256_cvtpd_ps(d);
+        __m128i h = _mm_cvtps_ph(f, _MM_FROUND_TO_NEAREST_INT);
+        _mm_storel_epi64((__m128i*)(dst+i), h);
+    }
+}
+
 //---------------------------------- AVX2 --------------------------------------
 
 #if defined(__AVX2__)
@@ -254,4 +269,3 @@ LOCAL vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_fnmadd_pd(a,b,c); }
 LOCAL vec4 fmadd4(vec4 a, vec4 b, vec4 c)  { return _mm256_add_pd(_mm256_mul_pd(a,b), c); }
 LOCAL vec4 fnmadd4(vec4 a, vec4 b, vec4 c) { return _mm256_sub_pd(c, _mm256_mul_pd(a,b)); }
 #endif
-
