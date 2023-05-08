@@ -2,50 +2,8 @@
 
 #include "gym_flute_dim.h"
 
-#if ( DIM == 1 )
-
-static float * last_map = nullptr;
-static size_t last_cnt = 0;
-
-/// in 1D we need to reset the Y-coordinate
-fluteD* gym::mapBufferVD(size_t n)
-{
-    last_cnt = n;
-    last_map = mapFloatBuffer(2*n);
-    return (fluteD*)last_map;
-}
-
-/// in 1D we need to reset the Y-coordinate
-void gym::unmapBufferVD(bool reset)
-{
-    if ( reset )
-    for ( size_t i = 0; i < last_cnt; ++i )
-        last_map[2*i+1] = 0.f;
-    unmap();
-    setBufferV(2);
-}
-
-
-/// in 1D we need to reset the Y-coordinate
-flute4D* gym::mapBufferC4VD(size_t n)
-{
-    last_cnt = n;
-    last_map = mapFloatBuffer(6*n);
-    return (flute4D*)last_map;
-}
-
-/// in 1D we need to reset the Y-coordinate
-void gym::unmapBufferC4VD(bool reset)
-{
-    if ( reset )
-    for ( size_t i = 0; i < last_cnt; ++i )
-        last_map[6*i+5] = 0.f;
-    unmap();
-    setBufferCV(4, 2);
-}
-
-#endif
-
+float * gym::last_map = nullptr;
+size_t gym::last_cnt = 0;
 
 void gym::loadPoints(size_t cnt, const float pts[])
 {
