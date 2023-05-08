@@ -268,7 +268,7 @@ void Simul::solve_auto()
                  The number of iterations should be decreased, with some CPU gain.
                  Only adopt a more complicated method if the gain is significant.
                  */
-                if ( autoCNT[m] < autoCNT[z] && autoCPU[m] < autoCPU[z] * 0.95 )
+                if ( autoCNT[m] < autoCNT[z] && autoCPU[m] < autoCPU[z] )
                     z = m;
             }
             autoPrecond = z;

@@ -607,12 +607,12 @@ void Meca::computePrecondIsoB(Mecable* mec)
     {
         getIsoBlock(mec, mec->pblock());
         // calculate Cholesky factorization:
-        //VecPrint::full("block", nbp, nbp, mec->pblock(), nbp, 2);
 #if CHOUCROUTE
         alsatian_xpotf2L(nbp, mec->pblock(), nbp, &info);
 #else
         lapack::xpotf2('L', nbp, mec->pblock(), nbp, &info);
 #endif
+        //VecPrint::full("isoB", nbp, nbp, mec->pblock(), nbp, 2);
         bt = 2;
     }
 
@@ -763,7 +763,7 @@ void Meca::computePrecondBand(Mecable* mec)
     else
     {
         mec->blockType(0);
-        //std::clog << "failed to compute half Preconditionner block of size " << bks << "\n";
+        //std::clog << "failed to compute band Preconditionner block of size " << bks << "\n";
         ++bump_;
     }
 }
@@ -817,14 +817,13 @@ void Meca::computePrecondHalf(Mecable* mec)
 /**
 Compute preconditionner block corresponding to 'mec'
  */
-void Meca::computePrecondFull(Mecable* mec)
+void Meca::computePrecondFull(Mecable* mec, real* tmp)
 {
     const size_t bks = DIM * mec->nbPoints();
     
 #if CHOUCROUTE && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*bks/2, bks);
-    // use temporary memory to build matrix block:
-    double* blk = new_real(4+bks*bks);
+    double* blk = tmp;
 #else
     mec->blockSize(bks, bks*bks, bks);
     real * blk = mec->pblock();
@@ -845,7 +844,7 @@ void Meca::computePrecondFull(Mecable* mec)
     {
         mec->blockType(6);
         //checkBlock(mec, blk);
-        //VecPrint::full("half", bks, bks, blk, bks);
+        //if ( bks < 4 ) VecPrint::full("full", bks, bks, blk, bks);
     }
     else
     {
@@ -856,7 +855,6 @@ void Meca::computePrecondFull(Mecable* mec)
     
 #if CHOUCROUTE && REAL_IS_DOUBLE
     convert_to_floats(bks*bks, blk, (float*)mec->pblock());
-    free_real(blk);
 #endif
 }
 
@@ -871,6 +869,9 @@ void Meca::computePrecondFull(Mecable* mec)
 void Meca::computePreconditionner()
 {
     bump_ = 0;
+    size_t sup = DIM * largestMecable();
+    real * tmp = new_real(4+sup*sup);
+
     switch( precond_ )
     {
         case 0:
@@ -881,9 +882,7 @@ void Meca::computePreconditionner()
             for ( Mecable * mec : mecables )
             {
                 if ( mec->tag() == Solid::TAG )
-                    computePrecondFull(mec);
-                else if ( mec->tag() == Bead::TAG )
-                    mec->blockType(0);
+                    computePrecondFull(mec, tmp);
                 else
                     computePrecondIsoB(mec);
             }
@@ -906,11 +905,16 @@ void Meca::computePreconditionner()
             break;
         case 6:
             for ( Mecable * mec : mecables )
-                computePrecondFull(mec);
+                computePrecondFull(mec, tmp);
             break;
         case 7:
             for ( Mecable * mec : mecables )
-                computePrecondFull(mec);
+            {
+                if ( mec->tag() == Bead::TAG )
+                    computePrecondIsoB(mec);
+                else
+                    computePrecondFull(mec, tmp);
+            }
             break;
 #if RECYCLED_PRECONDITIONNER
         case 9:
@@ -921,6 +925,7 @@ void Meca::computePreconditionner()
             throw InvalidParameter("unknown `precondition' value");
             break;
     }
+    free_real(tmp);
 }
 
 
