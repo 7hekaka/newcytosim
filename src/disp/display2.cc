@@ -63,9 +63,9 @@ void Display2::drawObjects(Simul const& sim)
     drawSpheres(sim.spheres);
     
 #if ( DIM >= 3 )
-    gym::disableLighting();
     gym::disableCullFace();
 #endif
+    gym::disableLighting();
 
     if (( prop->couple_select & 4 ) && ( sim.couples.sizeAA() > 0 ))
         drawCouplesB(sim.couples);
