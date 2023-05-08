@@ -263,7 +263,7 @@ void Couple::stepAA()
 
 
 /**
- Simulates only attached activity of cHand1
+ Simulates only detachement & activity of cHand1
  */
 void Couple::stepHand1()
 {
@@ -275,7 +275,7 @@ void Couple::stepHand1()
 
 
 /**
- Simulates only attached activity of cHand2
+ Simulates only detachement & activity of cHand2
  */
 void Couple::stepHand2()
 {

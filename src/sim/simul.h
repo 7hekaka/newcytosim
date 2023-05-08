@@ -155,6 +155,9 @@ public:
     /// total number of objects in the Simulation
     size_t nbObjects() const;
 
+    /// maximum Hand::binding_range
+    real maxBindingRange() const;
+    
     //----------------------------- SIMULATING ---------------------------------
    
     /// perform basic initialization; register callbacks

@@ -15,6 +15,8 @@ Duo::Duo(DuoProp const* p, Vector const& w)
 : Couple(p, w), active_(0)
 {
     countdown_ = 0;
+    if ( p->fast_diffusion )
+        throw InvalidParameter("`fast_diffusion` is incompatible with `activity=duo`");
 }
 
 Duo::~Duo()

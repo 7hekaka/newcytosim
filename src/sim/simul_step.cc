@@ -90,6 +90,16 @@ void Simul::prepare()
 }
 
 
+// calculate grid range from Hand's binding range:
+real Simul::maxBindingRange() const
+{
+    real res = 0.0;
+    for ( Property const* i : properties.find_all("hand") )
+        res = std::max(res, static_cast<HandProp const*>(i)->binding_range);
+    return res;
+}
+
+
 /**
  This is the master Monte-Carlo step function.
  
@@ -143,20 +153,15 @@ void Simul::step()
     else
 #endif
     {
-        // calculate grid range from Hand's binding range:
-        real range = 0.0;
-        for ( Property const* i : properties.find_all("hand") )
-            range = std::max(range, static_cast<HandProp const*>(i)->binding_range);
-        
         // distribute Fibers over a grid for binding of Hands:
+        const real range = maxBindingRange();
         fiberGrid.paintGrid(fibers.first(), nullptr, range);
         
         //printf("     ::paint    %16llu\n", (timer()-rdt)>>5); rdt = timer();
         
-#if ( 0 )
-        // This code continuously tests the binding algorithm.
-        if ( fiberGrid.hasGrid() )
+        if ( 0 )
         {
+            // This code continuously tests the binding algorithm.
             HandProp hp("test_binding");
             hp.binding_rate  = INFINITY;
             hp.binding_range = RNG.preal() * range;
@@ -170,7 +175,7 @@ void Simul::step()
                 fiberGrid.testAttach(stdout, pos, fibers, &hp);
             }
         }
-#endif
+
         // step Hand-containing objects, giving them a possibility to attach Fibers:
         couples.step();
         singles.step();
