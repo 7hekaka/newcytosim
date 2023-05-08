@@ -180,6 +180,9 @@ public:
     /// simulate movement and detachement of Hand2, skipping attachment
     void stepHand2();
 
+    /// simulate attachment of hands for the Duo
+    void stepDiffusingDuo() {}
+
     //--------------------------------------------------------------------------
 
     /// pointer to Hand1

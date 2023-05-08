@@ -92,7 +92,7 @@ void DuoProp::complete(Simul const& sim)
     if ( deactivation_rate < 0 )
         throw InvalidParameter("deactivation_rate should be >= 0");
     
-    deactivation_rate_dt = deactivation_rate * time_step(sim) * POOL_UNATTACHED;
+    deactivation_rate_dt = deactivation_rate * time_step(sim);
     
 #if NEW_DUO_HAS_TORQUE
     rest_dir.XX = std::cos(rest_angle);
