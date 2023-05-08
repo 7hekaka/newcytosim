@@ -36,6 +36,19 @@ LOCAL vec2 load1d(float const* a) { return vcvt_f64_f32(vset_lane_f32(*a, vdup_n
 // load 2 floats and convert to double
 LOCAL vec2 load2d(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
 
+
+typedef uint16_t bfloat16;
+
+LOCAL float load_half(bfloat16 const* a) { union { float f; uint16_t i[2]; } u; u.i[1]=a[0]; u.i[0]=0; return u.f; }
+// load 1 float on 2 bytes and convert to double and zero
+LOCAL float32x2_t load1_half(bfloat16 const* a) { return uint16x4_t{0, a[0], 0, 0}; }
+// load 1 float on 2 bytes and convert to double and zero
+LOCAL float32x2_t load2_half(bfloat16 const* a) { return uint16x4_t{0, a[0], 0, a[1]}; }
+
+LOCAL vec2 load1h(bfloat16 const* a) { return vcvt_f64_f32(load1_half(a)); }
+// load 2 floats on 2x2 bytes and convert to double
+LOCAL vec2 load2h(bfloat16 const* a) { return vcvt_f64_f32(load2_half(a)); }
+
 //LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
 LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
 LOCAL void store1(double* a, vec2 b)   { vst1_f64(a, vget_low_f64(b)); }

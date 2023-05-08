@@ -241,6 +241,28 @@ static void convert_to_floats(size_t cnt, double const* src, float* dst)
         dst[i] = (float)src[i];
 }
 
+typedef uint16_t bfloat16;
+
+static inline bfloat16 convert_to_bfloat16(float val)
+{
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
+    return *reinterpret_cast<bfloat16*>(
+        reinterpret_cast<uint16_t*>(&val));
+#else
+    return *reinterpret_cast<bfloat16*>(
+        &(reinterpret_cast<uint16_t*>(&val)[1]));
+#endif
+}
+
+
+/// convert doubles to floats
+static void convert_to_bfloat16s(size_t cnt, double const* src, bfloat16* dst)
+{
+    #pragma omp simd
+    for ( size_t i = 0; i < cnt; ++i )
+        dst[i] = convert_to_bfloat16(src[i]);
+}
+
 
 /// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
 [[maybe_unused]]
