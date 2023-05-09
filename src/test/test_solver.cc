@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 /*
  A test for linear iterative solver (BCGS, GMRES, etc):
  Read 'A' from "matrix.mtx" and 'b' from "vector.mtx" and solves the linear system
@@ -22,7 +22,7 @@
 class System
 {
     /// dimension
-    int   dim;
+    int dim;
     
     /// data matrix
     real* mat;
@@ -42,7 +42,7 @@ public:
     }
     
     /// allocate for given size
-    void allocate(size_t d)
+    void allocate(int d)
     {
         dim = d;
         free_real(mat);
@@ -184,13 +184,14 @@ int main(int argc, char* argv[])
     real * sol = new_real(dim);
     real * vec = new_real(dim);
 
-    print_real(stdout, std::min(16, dim), rhs, " rhs\n");
+    print_real(stdout, std::min(16, dim), rhs, " rhs |");
+    fprintf(stdout, "\n");
 
     if ( 1 )
     {
         mon.reset();
         zero_real(dim, sol);
-        LinearSolvers::BCGS(sys, rhs, sol, mon, alc);
+        LinearSolvers::BCGS<0>(sys, rhs, sol, mon, alc);
         print_real(stdout, std::min(16, dim), sol, " sol |");
         
         // calculate true residual:
