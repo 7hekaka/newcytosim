@@ -407,7 +407,7 @@ class Preconfig:
             #print(self.locals)
             self.report(blok, '', blok)
             return ('', blok)
-        self.report(code, k, v)
+        self.report(code, k, res)
         return (k, res)
     
     def process(self, file, text):
