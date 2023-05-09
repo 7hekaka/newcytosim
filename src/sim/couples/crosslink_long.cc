@@ -100,7 +100,7 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     mArm2 = std::copysign(len, cross(dir, pt2.diff()));
     meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop()->stiffness);
 
-#elif ( DIM >= 3 ) && FIBER_HAS_FAMILY
+#elif ( DIM >= 3 ) && FIBER_HAS_FAMILY > 12
     
     /* calculate the Arms to offset the position along the radial direction
     of the microtubules */
