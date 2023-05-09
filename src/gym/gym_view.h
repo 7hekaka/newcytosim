@@ -70,6 +70,9 @@ namespace gym
     /// scale current view in each direction separately
     inline void scale(float X, float Y, float Z) { gym::mat_scale(mvp_, X, Y, Z); load(); }
     
+    /// translate by (X, Y, Z) and then scale by S
+    inline void translate_scale(float X, float Y, float Z, float S) { gym::mat_transscale(mvp_, X, Y, Z, S); load(); }
+
     /// rotate current view around axis (X, Y, Z) by angle defined by (C, S)
     inline void rotate(float X, float Y, float Z, float C, float S) { GLfloat T[16];  gym::mat_rotation(T, X, Y, Z, C, S); apply(T); }
 

@@ -47,10 +47,10 @@ private:
     void releasePixelmap();
     
     /// create the pixelmaps
-    void makePixelmaps(float, unsigned supersampling, unsigned dim);
+    void makePixelmaps(unsigned supersampling, unsigned dim);
     
     /// create the pixelmaps
-    void makePixelmaps(float, unsigned supersampling);
+    void makePixelmaps(unsigned supersampling);
 
     /// create the pixelmaps
     void createPixelmaps(float);

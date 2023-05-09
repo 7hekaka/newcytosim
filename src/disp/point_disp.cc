@@ -11,6 +11,7 @@
 #include "gym_draw.h"
 #include "gym_image.h"
 #include "gym_flute.h"
+#include "gym_flat.h"
 
 
 void PointDisp::clearPixelmaps()
@@ -97,6 +98,69 @@ void PointDisp::clear()
     symbol = 0;
     colorS = 0xFFFFFFFF;
 }
+
+
+#pragma mark - I/O
+
+
+void PointDisp::read(Glossary& glos)
+{
+    glos.set(visible, "visible");
+    
+    // set 'color2' as a darker tone of 'color':
+    if ( glos.set(color, "color") )
+    {
+        color2 = color.alpha_scaled(0.5f);
+        colorS = color.inverted();
+    }
+    glos.set(color2, "color", 1, "back_color", 0);
+    glos.set(coloring, "coloring");
+    
+    // if 'size' is specified, width is set accordingly:
+    if ( glos.set(size, "size") )
+        width = size / 4;
+    else
+        glos.set(size, "point_size");
+    // harmless backward compatibility
+    glos.set(size, "points");
+    glos.set(shape, "points", 1);
+
+    glos.set(width, "width") || glos.set(width, "size", 1);
+    glos.set(scale, "scale");
+    glos.set(style, "style");
+    glos.set(shape, "shape");
+    glos.set(symbol, "symbol");
+    glos.set(colorS, "symbol", 1);
+    
+    if ( ! isprint(symbol) )
+        symbol = 0;
+    shape = tolower(shape);
+    
+#if POINTDISP_USES_PIXELMAPS
+    releasePixelmap();
+#endif
+}
+
+
+void PointDisp::write_values(std::ostream& os) const
+{
+    write_value(os, "visible", visible);
+    if ( color2 != color.alpha_scaled(0.5f) )
+        write_value(os, "color", color, color2);
+    else
+        write_value(os, "color", color);
+    write_value(os, "coloring", coloring);
+    write_value(os, "size", size);
+    write_value(os, "width", width);
+    write_value(os, "scale", scale);
+    write_value(os, "shape", shape);
+    write_value(os, "style", style);
+    if ( isprint(symbol) )
+        write_value(os, "symbol", symbol, colorS);
+}
+
+
+#pragma mark - Stroke
 
 void PointDisp::strokeA(float w) const
 {
@@ -190,10 +254,10 @@ void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
 {
     CHECK_GL_ERROR("drawPixelmap0");
     float S = sizeR;
-    float T = 0.25 * inx;
-    float U = 0.25 + T;
+    float T = 0;//0.25 * inx;
+    float U = 1;//0.25 + T;
     gym::ref_view();
-    gym::color(0,1,0,1);
+    gym::color(1,1,1,1);
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, texture_);
     flute6* flu = gym::mapBufferV4T2(4);
@@ -202,6 +266,7 @@ void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
     flu[2] = { X+S, Y+S, Z, 0, 1, T };
     flu[3] = { X+S, Y-S, Z, 0, 1, U };
     gym::unmapBufferV4T2();
+    //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     gym::drawTriangleStrip(0, 4);
     gym::clenupTexture();
     CHECK_GL_ERROR("drawPixelmap1");
@@ -211,32 +276,31 @@ void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
 /**
  `sampling` defines the level of oversampling used to improve the quality of bitmaps
  */
-void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
+void PointDisp::makePixelmaps(unsigned sampling, unsigned dim)
 {
-    float S = size * unit_value * 0.5f;
-    float W = width * unit_value * 0.5f;
-    gym::transScale(dim*0.5, dim*0.5, 0, S);
-
-    if ( width > 0 ) glLineWidth(W);
-
+    float col[4] = {1,1,1,1};
     for ( int i = 0; i < 3; ++i )
     {
-        uint8_t * pix = pixels_ + i * pixSize * pixSize;
+        uint8_t * pix = pixels_ + i * pixSize * pixSize * 4;
         // we use a transparent background, because points will overlap
         gym::clearPixels(0,0,0,0);
         switch ( i )
         {
             case 0:
+                //gym::clearPixels(1.0,0.4,0,1);
+                //gle::disc(); //gym::fillRectangle(0, 0, dim, dim, 0, col);
                 gym::color(color2);
                 strokeI();
                 break;
             case 1:
+                //gym::clearPixels(0,1,0,1);
                 gym::color(color2);
-                strokeA(W);
+                strokeA(widthX*sampling);
                 break;
             case 2:
+                //gym::clearPixels(0,0,1,1);
                 gym::color(color);
-                strokeA(W);
+                strokeA(widthX*sampling);
                 break;
         }
         if ( sampling > 1 )
@@ -244,18 +308,26 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
             uint8_t * tmp = new uint8_t[4*dim*dim];
             glReadPixels(0, 0, dim, dim, GL_RGBA, GL_UNSIGNED_BYTE, tmp);
             gym::downsampleRGBA(pix, pixSize, pixSize, tmp, sampling);
-            gym::printPixels(stdout, tmp, dim, dim);
+            //gym::printPixels(stdout, tmp, dim, dim);
             delete[] tmp;
         }
         else
         {
+            /*
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, texture_);
+            glBlitFramebuffer(0, 0, dim, dim, 0, 0, dim, dim, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+            glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
+            glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 1);
+             */
             glReadPixels(0, 0, pixSize, pixSize, GL_RGBA, GL_UNSIGNED_BYTE, pix);
         }
-#if ( 0 )
-        //savePixelmap(pix, pixSize, i, name_str());
-        std::clog << name() << i << " " << size << " " << width << "\n";
-        gym::printPixels(stdout, pix, pixSize, pixSize);
-#endif
+        if ( 0 )
+        {
+            //savePixelmap(pix, pixSize, i, name_str());
+            printf("%s-%i %3.1f %3.1f %u\n", name().c_str(), i, size, width, pixSize);
+            gym::printPixels(stdout, pix, pixSize, pixSize);
+        }
         CHECK_GL_ERROR("5 PointDisp::makePixelmaps");
     }
 }
@@ -263,24 +335,28 @@ void PointDisp::makePixelmaps(float unit_value, unsigned sampling, unsigned dim)
 /**
  `sampling` defines the level of oversampling used to improve the quality of bitmaps
  */
-void PointDisp::makePixelmaps(float unit_value, unsigned sampling)
+void PointDisp::makePixelmaps(unsigned sampling)
 {
     CHECK_GL_ERROR("1 PointDisp::makePixelmaps");
     GLint svp[4];
     glGetIntegerv(GL_VIEWPORT, svp);
     
     unsigned dim = sampling * pixSize;
-    unsigned buf = OffScreen::openBuffer(dim, dim, 0);
+    unsigned buf = 0;//OffScreen::openBuffer(dim, dim, 0);
     if ( buf )
         gym::one_view(dim, dim);
     else
         gym::one_view(svp[2], svp[3]);
+    float W = 0.5 * dim;
+    gym::translate_scale(W, W, 0, W);
 
     gym::disableLighting();
     gym::disableBlending();
     gym::disableAlphaTest();
+    //gym::disableDepthTest();
     //gym::printCaps("P");
-    makePixelmaps(unit_value, sampling, dim);
+    makePixelmaps(sampling, dim);
+    //gym::restoreDepthTest();
     gym::restoreAlphaTest();
     gym::restoreBlending();
     gym::restoreLighting();
@@ -294,10 +370,10 @@ static void setRGBA(size_t cnt, uint8_t ptr[], uint8_t R, uint8_t G, uint8_t B, 
 {
     for ( size_t i = 0; i < cnt; ++i )
     {
-        ptr[4*i+3] = R;
-        ptr[4*i+2] = G;
-        ptr[4*i+1] = B;
-        ptr[4*i+0] = A;
+        ptr[4*i+0] = R;
+        ptr[4*i+1] = G;
+        ptr[4*i+2] = B;
+        ptr[4*i+3] = A;
     }
 }
                            
@@ -305,31 +381,32 @@ void PointDisp::createPixelmaps(float uv)
 {
     if ( pixSize > pixAlloc_ )
     {
-        CHECK_GL_ERROR("1 PointDisp::prepare");
+        CHECK_GL_ERROR("1 PointDisp::createPixelmaps");
         allocatePixelmap(pixSize);
         //fprintf(stderr, " new %i bitmap for %s\n", pixSize, name_str());
-        CHECK_GL_ERROR("2 PointDisp::prepare");
+        CHECK_GL_ERROR("2 PointDisp::createPixelmaps");
     }
     
-    makePixelmaps(3*uv, 3);
+    makePixelmaps(3);
 
     if ( ! texture_ )
         glGenTextures(1, &texture_);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 0);
     glBindTexture(GL_TEXTURE_2D, texture_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    if ( 1 )
+    if ( 0 )
     {
-        size_t S = pixSize*pixSize;
-        setRGBA(S, pixels_, 100, 90, 128, 255);
-        setRGBA(S, pixels_+4*S, 100, 200, 0, 255);
+        size_t S = pixSize * pixSize;
+        setRGBA(S/2, pixels_, 0, 90, 255, 200);
+        setRGBA(S, pixels_+4*S, 0, 200, 0, 255);
         setRGBA(S, pixels_+8*S, 0, 0, 255, 255);
-        setRGBA(S, pixels_+12*S, 255, 0, 0, 255);
+        setRGBA(S, pixels_+12*S, 0, 255, 0, 255);
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, pixSize, pixSize, 0, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8, pixels_);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixSize, pixSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels_);
+    //glGenerateMipmap(GL_TEXTURE_2D);
     //printf("%10s:texture %i x %i\n", name().c_str(), pixSize, pixSize);
-    CHECK_GL_ERROR("PointDisp::createPixelmaps");
+    CHECK_GL_ERROR("3 PointDisp::createPixelmaps");
 }
 
 #endif
@@ -369,64 +446,3 @@ void PointDisp::setPixels(float ps, float uv, bool make_maps)
         createPixelmaps(uv);
 #endif
 }
-
-
-#pragma mark - I/O
-
-
-void PointDisp::read(Glossary& glos)
-{
-    glos.set(visible, "visible");
-    
-    // set 'color2' as a darker tone of 'color':
-    if ( glos.set(color, "color") )
-    {
-        color2 = color.alpha_scaled(0.5f);
-        colorS = color.inverted();
-    }
-    glos.set(color2, "color", 1, "back_color", 0);
-    glos.set(coloring, "coloring");
-    
-    // if 'size' is specified, width is set accordingly:
-    if ( glos.set(size, "size") )
-        width = size / 4;
-    else
-        glos.set(size, "point_size");
-    // harmless backward compatibility
-    glos.set(size, "points");
-    glos.set(shape, "points", 1);
-
-    glos.set(width, "width") || glos.set(width, "size", 1);
-    glos.set(scale, "scale");
-    glos.set(style, "style");
-    glos.set(shape, "shape");
-    glos.set(symbol, "symbol");
-    glos.set(colorS, "symbol", 1);
-    
-    if ( ! isprint(symbol) )
-        symbol = 0;
-    shape = tolower(shape);
-    
-#if POINTDISP_USES_PIXELMAPS
-    releasePixelmap();
-#endif
-}
-
-
-void PointDisp::write_values(std::ostream& os) const
-{
-    write_value(os, "visible", visible);
-    if ( color2 != color.alpha_scaled(0.5f) )
-        write_value(os, "color", color, color2);
-    else
-        write_value(os, "color", color);
-    write_value(os, "coloring", coloring);
-    write_value(os, "size", size);
-    write_value(os, "width", width);
-    write_value(os, "scale", scale);
-    write_value(os, "shape", shape);
-    write_value(os, "style", style);
-    if ( isprint(symbol) )
-        write_value(os, "symbol", symbol, colorS);
-}
-
