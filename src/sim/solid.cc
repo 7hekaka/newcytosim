@@ -80,7 +80,7 @@ void Solid::setInteractions(Meca& meca) const
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin )
     {
-        constexpr unsigned POLE = DIM+1; // index of 4th point
+        const unsigned POLE = std::min(DIM+1, nPoints-1); // index of 4th point
         real stiff = prop->twin_stiffness;
         if ( stiff > 0 )
         {
@@ -88,14 +88,14 @@ void Solid::setInteractions(Meca& meca) const
             //oldLinkTwins(meca, prop->twin_stiffness);
         }
         stiff = prop->twin_torque_stiffness;
-        if ( stiff > 0 )
+        if ( stiff > 0 && POLE > 0 )
         {
             size_t ii = matIndex(), jj = soTwin->matIndex();
             meca.addTorque4(ii, ii+POLE, jj+POLE, jj, stiff);
         }
         // add clamp to the plane X = +/- sep:
         stiff = prop->twin_metastiff;
-        if ( stiff > 0 )
+        if ( stiff > 0 && POLE >= DIM )
         {
             real R0 = radius(0);
             constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;

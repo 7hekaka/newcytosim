@@ -29,10 +29,10 @@ public:
     Mecapoint() : mec_(nullptr), pti_(0) { }
 
     /// Build to refer to point p in ps
-    Mecapoint(const Mecable * m, unsigned p) : mec_(m), pti_(p) { }
+    Mecapoint(const Mecable * m, unsigned p) : mec_(m), pti_(p) { assert_true(p < m->nbPoints() ); }
     
     /// Set to refer to point p in ps
-    void set(const Mecable * m, unsigned p) { mec_ = m; pti_ = p; }
+    void set(const Mecable * m, unsigned p) { mec_ = m; pti_ = p; assert_true(p < m->nbPoints() ); }
     
     /// Constant pointer to the Mecable 
     Mecable const* mecable() const { return mec_; }

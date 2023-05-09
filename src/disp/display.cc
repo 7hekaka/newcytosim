@@ -2063,7 +2063,7 @@ void Display::drawSolid(Solid const& obj)
         real rad = M_SQRT2 * pixscale(disp->size);
         const size_t inx = 0;
         // three points are expected:
-        if ( obj.radius(inx) > 0 && obj.nbPoints() > inx+DIM )
+        if ( obj.radius(inx) > 0 && obj.nbPoints() > inx+4 )
         {
             gym::enableLighting();
             gym::color_both(col, 1);

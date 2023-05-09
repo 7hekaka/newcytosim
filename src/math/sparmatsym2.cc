@@ -54,7 +54,7 @@ void SparMatSym2::allocate(size_t alc)
         constexpr size_t chunk = 64;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
-        //fprintf(stderr, "SMS2 allocate matrix %u\n", alc);
+        //fprintf(stderr, "SMS2 allocate matrix %lu\n", alc);
         Element ** column_new = new Element*[alc];
         unsigned * colsiz_new = new unsigned[alc];
         unsigned * colmax_new = new unsigned[alc];

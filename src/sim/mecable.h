@@ -134,7 +134,7 @@ public:
     const real * addrPoints()        const { return pPos; }
     
     /// Address of point `p`
-    const real * addrPoint(size_t p) const { return pPos + DIM*p; }
+    const real * addrPoint(size_t p) const { assert_true(p<nPoints); return pPos + DIM*p; }
 
     /// Set position of point `i` to `x`
     void setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
