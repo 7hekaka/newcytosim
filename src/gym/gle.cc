@@ -28,7 +28,7 @@ namespace gle
     GLuint buf_[4] = { 0 };
 
     /// offset for objects data stored in buffers
-    size_t tubes_[28] = { 0 };
+    size_t tubes_[30] = { 0 };
 
     /// offset for objects data stored in buffers
     size_t cubes_[12] = { 0 };
@@ -1368,7 +1368,7 @@ namespace gle
 
     static size_t sizeTubeBuffers()
     {
-        return 2 + 28 * pi_twice;  // this is empirical!
+        return 2 + 29 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)
@@ -1408,6 +1408,7 @@ namespace gle
         tubes_[25] = i+s; i += setDisc(ptr+i, 2, 0, -1);
         tubes_[26] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
         tubes_[27] = i+s; i += setRing(ptr+i, 2, M_SQRT2, 0, 1);
+        tubes_[28] = i+s; i += setRing(ptr+i, 2, 1.19, 0, 1);
         size_t j = sizeTubeBuffers();
         assert_true( i <= j );
         return i;
@@ -1453,6 +1454,7 @@ namespace gle
     void discBottom2()   { doTubeStrip(tubes_[25], pi_twice/2); }
     void discMid2()      { doTubeStrip(tubes_[26], pi_twice/2); }
     void ring()          { doTubeStrip(tubes_[27], 2+pi_twice); }
+    void thin_ring()     { doTubeStrip(tubes_[28], 2+pi_twice); }
 
     void stripedTube(float w) { gym::bindBufferV3N3(buf_[0]); gym::cleanup(1); gym::drawLines(w, tubes_[2], nbTrianglesTube(4)); }
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }

@@ -53,7 +53,7 @@ private:
     void makePixelmaps(unsigned supersampling);
 
     /// create the pixelmaps
-    void createPixelmaps(float);
+    void createPixelmaps();
 
     /// draw pixel map
     void drawPixelmap(float X, float Y, float Z, size_t) const;
@@ -62,12 +62,6 @@ private:
 
     /// used to differentiate between different uses of the class
     std::string mKind;
-    
-    /// draw outline of shape
-    void strokeShape(float w) const { gle::ring(); /*gym::zoo_stroke(shape);*/ }
-    
-    /// draw surface of shape
-    void paintShape() const { gle::disc(); /*gym::zoo_paint(shape);*/ }
 
     /// draw active state with OpenGL vector primitives
     void strokeA(float) const;
@@ -138,13 +132,13 @@ public:
     /// visible and big enough to be seen
     bool perceptible;
     
-    /// size in simulation units
-    float sizeR;
+    /// radius of feature in simulation units
+    float ulna_;
     
-    /// rescaled point size
+    /// rescaled point size in pixels
     float sizeX;
     
-    /// rescaled line width
+    /// rescaled line width in pixels
     float widthX;
 
 public:
@@ -188,7 +182,7 @@ public:
     #if POINTDISP_USES_PIXELMAPS
             drawPixelmap(vec.XX, vec.y(), vec.z(), 0);
     #else
-            gym::transScale(vec, sizeR);
+            gym::transScale(vec, radius);
             gym::color(color2);
             gle::disc();
     #endif
@@ -204,7 +198,7 @@ public:
     #if POINTDISP_USES_PIXELMAPS
             drawPixelmap(vec.XX, vec.y(), vec.z(), 1);
     #else
-            gym::transScale(vec, sizeR);
+            gym::transScale(vec, radius);
             gym::color(color2);
             strokeA(widthX);
     #endif
@@ -220,7 +214,7 @@ public:
     #if POINTDISP_USES_PIXELMAPS
             drawPixelmap(vec.XX, vec.y(), vec.z(), 2);
     #else
-            gym::transScale(vec, sizeR);
+            gym::transScale(vec, radius);
             gym::color(color);
             strokeA(widthX);
     #endif

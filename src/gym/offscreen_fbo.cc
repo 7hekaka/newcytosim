@@ -276,7 +276,7 @@ static unsigned makeBuffer(const int width, const int height, int multisample)
     GLenum err = glGetError();
     if ( err != GL_NO_ERROR )
     {
-        fprintf(stderr, "OpenGL error `%s'\n", glErrorString(err));
+        fprintf(stderr, "Offscreen OpenGL error `%s'\n", glErrorString(err));
         fprintf(stderr, " (max. buffer size is %i)\n", GL_MAX_RENDERBUFFER_SIZE);
         return 0;
     }

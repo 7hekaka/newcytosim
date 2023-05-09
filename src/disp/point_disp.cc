@@ -31,7 +31,7 @@ PointDisp::PointDisp(const std::string& k, const std::string& n)
     mKind = k;
     clearPixelmaps();
     clear();
-    sizeR = 0;
+    ulna_ = 0;
     sizeX = 0;
     widthX = 0;
 }
@@ -164,11 +164,11 @@ void PointDisp::write_values(std::ostream& os) const
 
 void PointDisp::strokeA(float w) const
 {
-    paintShape();
+    gle::disc();
     if ( w > 0 )
     {
         gym::color(color.darken(2.0));
-        strokeShape(w);
+        gle::thin_ring();  /*gym::zoo_stroke(shape);*/ 
         if ( symbol )
         {
             /* Character C of width ~104.76 units, and ~150 unit high max
@@ -184,9 +184,9 @@ void PointDisp::strokeA(float w) const
 
 void PointDisp::strokeI() const
 {
-    paintShape();
+    gle::disc();
     
-    // draw a transparent hole in the center:
+    // punch a transparent hole:
     gym::scale(0.5f);
     gym::color(0,0,0,0);
     gle::disc();
@@ -253,9 +253,9 @@ void PointDisp::releasePixelmap()
 void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
 {
     CHECK_GL_ERROR("drawPixelmap0");
-    float S = sizeR;
-    float T = 0;//0.25 * inx;
-    float U = 1;//0.25 + T;
+    float S = ulna_;
+    float T = 0.25 * inx;
+    float U = 0.25 + T;
     gym::ref_view();
     gym::color(1,1,1,1);
     glEnable(GL_TEXTURE_2D);
@@ -266,7 +266,6 @@ void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
     flu[2] = { X+S, Y+S, Z, 0, 1, T };
     flu[3] = { X+S, Y-S, Z, 0, 1, U };
     gym::unmapBufferV4T2();
-    //glDisableClientState(GL_TEXTURE_COORD_ARRAY);
     gym::drawTriangleStrip(0, 4);
     gym::clenupTexture();
     CHECK_GL_ERROR("drawPixelmap1");
@@ -284,21 +283,19 @@ void PointDisp::makePixelmaps(unsigned sampling, unsigned dim)
         uint8_t * pix = pixels_ + i * pixSize * pixSize * 4;
         // we use a transparent background, because points will overlap
         gym::clearPixels(0,0,0,0);
+        //gym::fillRectangle(0, 0, dim, dim, 0, col);
         switch ( i )
         {
             case 0:
-                //gym::clearPixels(1.0,0.4,0,1);
                 //gle::disc(); //gym::fillRectangle(0, 0, dim, dim, 0, col);
                 gym::color(color2);
                 strokeI();
                 break;
             case 1:
-                //gym::clearPixels(0,1,0,1);
                 gym::color(color2);
                 strokeA(widthX*sampling);
                 break;
             case 2:
-                //gym::clearPixels(0,0,1,1);
                 gym::color(color);
                 strokeA(widthX*sampling);
                 break;
@@ -342,21 +339,20 @@ void PointDisp::makePixelmaps(unsigned sampling)
     glGetIntegerv(GL_VIEWPORT, svp);
     
     unsigned dim = sampling * pixSize;
-    unsigned buf = 0;//OffScreen::openBuffer(dim, dim, 0);
+    unsigned buf = 0; //OffScreen::openBuffer(dim, dim, 0);
     if ( buf )
         gym::one_view(dim, dim);
     else
         gym::one_view(svp[2], svp[3]);
-    float W = 0.5 * dim;
-    gym::translate_scale(W, W, 0, W);
+    gym::translate_scale(0.5*dim, 0.5*dim, 0, 0.5*dim*sizeX/pixSize);
 
     gym::disableLighting();
     gym::disableBlending();
     gym::disableAlphaTest();
-    //gym::disableDepthTest();
+    gym::disableDepthTest();
     //gym::printCaps("P");
     makePixelmaps(sampling, dim);
-    //gym::restoreDepthTest();
+    gym::restoreDepthTest();
     gym::restoreAlphaTest();
     gym::restoreBlending();
     gym::restoreLighting();
@@ -377,7 +373,7 @@ static void setRGBA(size_t cnt, uint8_t ptr[], uint8_t R, uint8_t G, uint8_t B, 
     }
 }
                            
-void PointDisp::createPixelmaps(float uv)
+void PointDisp::createPixelmaps()
 {
     if ( pixSize > pixAlloc_ )
     {
@@ -389,12 +385,6 @@ void PointDisp::createPixelmaps(float uv)
     
     makePixelmaps(3);
 
-    if ( ! texture_ )
-        glGenTextures(1, &texture_);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 0);
-    glBindTexture(GL_TEXTURE_2D, texture_);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     if ( 0 )
     {
         size_t S = pixSize * pixSize;
@@ -403,7 +393,12 @@ void PointDisp::createPixelmaps(float uv)
         setRGBA(S, pixels_+8*S, 0, 0, 255, 255);
         setRGBA(S, pixels_+12*S, 0, 255, 0, 255);
     }
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixSize, pixSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels_);
+    if ( ! texture_ )
+        glGenTextures(1, &texture_);
+    glBindTexture(GL_TEXTURE_2D, texture_);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, pixSize, 4*pixSize, 0, GL_RGBA, GL_UNSIGNED_BYTE, pixels_);
     //glGenerateMipmap(GL_TEXTURE_2D);
     //printf("%10s:texture %i x %i\n", name().c_str(), pixSize, pixSize);
     CHECK_GL_ERROR("3 PointDisp::createPixelmaps");
@@ -434,15 +429,17 @@ void PointDisp::setPixels(float ps, float uv, bool make_maps)
     // object is 'perceptible' if it covers more than half a pixel:
     perceptible = visible && ( uv*sw > 0.5 );
     
-    sizeR = size * uv * ps * 0.5f;
     sizeX = std::max(size * uv, 0.25f);
     widthX = std::max(width * uv, 0.25f);
-    //printf("widthX %6.3f sizeX %6.3f\n", widthX, sizeX);
+    //printf("%s: sizeX %6.3f widthX %6.3f\n", name.c_str(), sizeX, widthX);
 
 #if POINTDISP_USES_PIXELMAPS
     // make it a power of 2:
-    pixSize = next_power(std::ceil(uv*sw));
     if ( make_maps )
-        createPixelmaps(uv);
+    {
+        pixSize = next_power(std::ceil(uv*size*M_SQRT2));
+        ulna_ = pixSize * ps * 0.5f;
+        createPixelmaps();
+    }
 #endif
 }
