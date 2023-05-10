@@ -650,7 +650,7 @@ Normally, the results should look the same, and if the CPU time is not too high,
 <summary>
 **Can I re-run the Loughlin et al. simulations of the mitotic spindle?**
 </summary>
-Cytosim has changed completely in 2012, breaking backward compatibility, and if you compare the config files, you will understand the magnitude of the changes... we have not maintained some of the functionalities implemented for this model. Hence we cannot run this model in the up-to-date version of cytosim. Please ask us for the code used back in 2011, and we will send it. It compiled and still workson Mac OSX 10.12.6, in july 2018.
+Cytosim has changed completely in 2012, breaking backward compatibility, and if you compare the config files, you will understand the magnitude of the changes... we have not maintained some of the functionalities implemented for this model. Hence we cannot run this model in the up-to-date version of cytosim. Please ask us for the code used back in 2011, and we will send it. It compiled and still workson MacOS 10.12.6, in july 2018.
 </details>
 
 
@@ -1121,7 +1121,7 @@ Multithreading is not a solution, if you need to run multiple simulations (many 
 **Do you know of coding tricks for making 3D simulations run faster?**
 </summary>
 </summary>
-You can investigate why it is slow by profiling the program. On Mac OSX, use Xcode's performance tools. On Linux if you compiled with gcc, check this:
+You can investigate why it is slow by profiling the program. On MacOS, use Xcode's performance tools. On Linux if you compiled with gcc, check this:
 https://www.thegeekstuff.com/2012/08/gprof-tutorial/
 </details>
 

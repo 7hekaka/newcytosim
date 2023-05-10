@@ -13,7 +13,7 @@ We outline here the steps involved in building the installation.
 
 # Equipement
 
-- Mac Pro (Late 2013) "Six Core" 3.5 Ghz running Mac OSX 10.13.6
+- Mac Pro (Late 2013) "Six Core" 3.5 Ghz running MacOS 10.13.6
 - Keyboard, mouse
 - USB MIDI controller: The [Novation Launch Control XL](https://novationmusic.com/launch/launch-control-xl).
 
@@ -84,7 +84,7 @@ We made a specific program `cytomaster` to read the MIDI messages and pipe comma
 `Cytomaster` uses [RtMIDI by Gary Scavone](https://www.music.mcgill.ca/~gary/rtmidi/) for cross-platform access to the MIDI interface. 
 You will need to adjust [`cytomaster.cpp`](../../src/misc/installation) and recompile multiple times during preparation.
 
-On Mac OSX you can make it as:
+On MacOS you can make it as:
 
 	g++ -Wall -o cytomaster cytomaster.cpp -D__MACOSX_CORE__ RtMidi.cpp -framework CoreMidi -framework CoreAudio -framework CoreFoundation
 
@@ -102,7 +102,7 @@ This process is automated from the command line, you should be able to compile a
 Even if the MIDI device is plugged in your USB computer, it may not immediately be enabled by the system.
 The procedure depends on the OS.
 
-On Mac OSX, open an Application called "Audio MIDI Setup" (`Menu > Windows > Show MIDI Studio`)  
+On MacOS, open an Application called "Audio MIDI Setup" (`Menu > Windows > Show MIDI Studio`)  
 The MIDI device should show up there, allowing you to customize (double click)
 and **activate the output port**.
 You may need to create a new configuration.

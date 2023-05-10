@@ -58,7 +58,7 @@ Cytosim is migrating from GLUT/FreeGLUT to GLFW:
 
 ### GLUT/FreeGLUT
 
-GLUT and OpenGL are included in Mac OSX, adjust linkage to include:
+GLUT and OpenGL are included in MacOS, adjust linkage to include:
 
 	-framework GLUT -framework OpenGL 
 
@@ -78,7 +78,7 @@ The GLFW library and header file should be copied in folder 'ext' in the base di
 
 Cytosim's source includes a copy of [libspng](https://libspng.org/), which is used to export PNG images.
 To use the PNG library [http://www.libpng.org](libpng), you must install it. 
-On macOS, use [Homebrew](https://brew.sh):
+On MacOS, use [Homebrew](https://brew.sh):
 
 	brew install libpng
  

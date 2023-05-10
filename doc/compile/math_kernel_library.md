@@ -50,7 +50,7 @@ Check the library dependencies of cytosim with `ldd`:
 
     ldd bin/sim
 
-The OSX equivalent to is
+The MacOS equivalent is
 	
 	otool -L bin/sim
 

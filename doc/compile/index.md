@@ -26,7 +26,7 @@ If possible, use a precompiled library, which is possible on most platforms:
 - [OpenBLAS](https://www.openblas.net)
 - Also available for many Linux distributions.
 
-Apple's veclib is preinstalled on Mac OSX, and [Intel's MKL](https://en.wikipedia.org/wiki/Math_Kernel_Library) is available free of charge, but is optimal only on Intel processors.
+Apple's veclib is preinstalled on MacOS, and [Intel's MKL](https://en.wikipedia.org/wiki/Math_Kernel_Library) is available free of charge, but is optimal only on Intel processors.
 
 ### Interactive player
  
@@ -38,7 +38,7 @@ Cytosim's ***play*** is built on:
 - [GLUT](http://www.opengl.org/resources/libraries/glut/) for windowing.
 
 Note that GLUT can be replaced by [freeGLUT](http://freeglut.sourceforge.net/).  
-GLUT and OpenGL are included in Mac OSX.
+GLUT and OpenGL are included in MacOS.
 
 Cytosim's `play` can export PNG images, because its code include a copy of [libspng](https://libspng.org/), but it can be linked against [libPNG]() instead. See the [compile options](options.md).
 
@@ -56,9 +56,9 @@ One option is to [compile](https://www.glfw.org/docs/latest/compile_guide.html) 
 
 # Getting Ready 
 
-### Mac-OSX
+### MacOS
 
-On Mac OSX, install [Xcode](https://developer.apple.com/technologies/tools/), which is available on the Mac App Store. After installing Xcode, install the Xcode 'Command-Line Tools', which is an optional package providing 'make'. All necessary libraries are already included in MacOSX.
+On MacOS, install [Xcode](https://developer.apple.com/technologies/tools/), which is available on the Mac App Store. After installing Xcode, install the Xcode 'Command-Line Tools', which is an optional package providing 'make'. All necessary libraries are already included in MacOS.
 
 We provide the Xcode project file for cytosim, which is a convenient way to access the code.
 

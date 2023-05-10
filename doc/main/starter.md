@@ -7,7 +7,7 @@ If you are already familiar with the Command-line, you can skip this.
 
 You will need a terminal to start Cytosim using the command line interface.
 
-* On Mac OSX: simply open the Terminal located in Applications/Utilities.
+* On MacOS: simply open the Terminal located in Applications/Utilities.
 * On Linux: search for `Terminal` in your desktop environment (varies on distribution). 
 * On Windows: Always use the Cygwin terminal (and not MS-DOS prompt).
 
