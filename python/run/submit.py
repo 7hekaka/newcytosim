@@ -96,13 +96,13 @@ def write_script(filename, cmd):
 
 #------------------------------------------------------------------------
 
-def job_script(path, conf, jarg):
+def job_script(path, conf, exe, jarg):
     """return bash script that will run one job"""
     cmd  = ['cd %s;' % path]
     # change time of script file to indicate activity:
     cmd += ['touch %s;' % conf]
     # actual work: the job will call go_sim.py once:
-    cmd += ['go_sim.py %s %s;' % (jarg, conf)]
+    cmd += ['go_sim.py exe="%s" %s %s;' % (exe, jarg, conf)]
     # cleanup: move config file into subdirectory 'done'
     cmd += ['mv '+conf+' '+jdir+'/done/.;']
     # cleanup: move itself into subdirectory 'done'
@@ -172,10 +172,12 @@ def main(args):
         #print('|'+submit+'|')
     
     # first argument is used for go_sim.py:
-    jarg = args.pop(0)
-    
+    exe = args.pop(0)
+    # run executable within the debugger, to get trace if it crashes:
+    #exe = 'gdb -batch -ex run -ex bt /home/fjn28/rds/hpc-work/spindle/simd'
+
     # catch old-style invocation
-    if jarg.endswith(".cym"):
+    if exe.endswith(".cym"):
         print(__doc__)
         sys.exit()
     
@@ -187,7 +189,7 @@ def main(args):
     os.mkdir(os.path.join(jdir, 'save'))
     os.mkdir(os.path.join(jdir, 'logs'))
 
-    print("    go_sim.py will run `%s' in %s" % (jarg, jdir))
+    print("    go_sim.py will run `%s' in %s" % (exe, jdir))
 
     jdup = 1  # number of time each job should be repeated
     jcnt = 0  # number of jobs
@@ -204,7 +206,7 @@ def main(args):
                 conf = todo + '/config%04i.cym' % jcnt
                 shutil.copyfile(arg, conf)
                 jame = todo + '/R' + str(jcnt)
-                cmd = job_script(wdir, conf, jarg+' name=r%04i'%jcnt+' park='+jdir+'/save')
+                cmd = job_script(wdir, conf, exe, 'name=r%04i'%jcnt+' park='+jdir+'/save')
                 write_script(jame, cmd)
         elif arg.isdigit():
             jdup = int(arg)

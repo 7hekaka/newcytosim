@@ -87,12 +87,11 @@ class Gosimer:
 
         self.njobs  = 1
         self.repeat = 1
-        self.park   = ''
-        self.exe    = os.path.abspath('sim')
+        self.park = ''
+        self.exe = os.path.abspath('sim')
         self.script = None
         self.queue = ()
         self.arguments = []
-        self.trust_exe = False
         self.config = "config.cym"
 
     def run_one(self, conf, name):
@@ -185,7 +184,6 @@ class Gosimer:
                 elif key == 'park':
                     self.park = val
                 elif key == 'exe':
-                    self.trust_exe = True
                     self.exe = val
                 elif key == "args" or key == "arguments":
                     self.arguments += val
@@ -199,10 +197,6 @@ class Gosimer:
 
         if not len(files):
             self.err.write("go_sim.py expects a config file on the command line\n")
-            sys.exit()
-
-        if not executable(self.exe) and not self.trust_exe:
-            self.err.write("go_sim.py could not find executable '%s'\n" % exe)
             sys.exit()
 
         # prepare for multiprocessing

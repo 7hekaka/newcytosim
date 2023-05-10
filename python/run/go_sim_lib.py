@@ -166,11 +166,12 @@ def run_sim(exe, args):
     errname = 'err.txt'
     outfile = open(outname, 'w')
     errfile = open(errname, 'w')
+    exe = exe.split(' ')
     # run simulation
     if not args:
         val = subprocess.call(exe, stdout=outfile, stderr=errfile)
     else:
-        val = subprocess.call([exe]+args, stdout=outfile, stderr=errfile)
+        val = subprocess.call(exe+args, stdout=outfile, stderr=errfile)
     outfile.close()
     errfile.close()
     # remove output files if empty:
