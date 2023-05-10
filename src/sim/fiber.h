@@ -223,7 +223,7 @@ public:
     void cutP(real len);
     
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
-    size_t planarCut(Vector const& n, real a, state_t stateP, state_t stateM, real min_len);
+    void planarCut(Vector const& n, real a, state_t stateP, state_t stateM, real min_len);
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
     void sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }

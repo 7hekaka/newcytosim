@@ -659,8 +659,8 @@ size_t Fiber::hasKink(const real max_cosine) const
  - if `stateM=STATE_BLACK`, the minus end portion of the cut fiber is deleted.
  - if `stateP=STATE_BLACK`, the plus end portion of the cut fiber is deleted.
  */
-size_t Fiber::planarCut(Vector const& n, const real a,
-                        state_t stateP, state_t stateM, real min_len)
+void  Fiber::planarCut(Vector const& n, const real a,
+                       state_t stateP, state_t stateM, real min_len)
 {
     Array<real> cuts;
     /*
@@ -691,12 +691,11 @@ size_t Fiber::planarCut(Vector const& n, const real a,
             }
             // *this is reduced to its minus end portion:
             if ( stateP == STATE_BLACK || length() < min_len )
-                delete(this);
+                return delete(this);
             else
                 setEndStateP(stateP);
         }
     }
-    return cuts.size();
 }
 
 
