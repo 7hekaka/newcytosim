@@ -109,7 +109,6 @@ def writeMovieLinks(files):
         shot = os.path.basename(f)
         out.write('<video controls="controls" width="%s" height="%s" loop="true" alt="%s">\n' % (W, H, shot))
         out.write('  <source src="%s" type="video/mp4">\n' % f)
-        out.write('  This is a HTML5 VIDEO element\n')
         out.write('</video>\n')
     if files:
         out.write('\n')
