@@ -4091,7 +4091,7 @@ void Meca::addPointClamp(Mecapoint const& ptA,
     assert_true( weight >= 0 );
     const size_t inx = ptA.matIndex0();
     
-    sub_iso(inx, inx, weight);
+    sub_iso_diag(inx, weight);
     
     if ( modulo )
         modulo->fold(pos, ptA.pos());
@@ -4184,7 +4184,7 @@ void Meca::addPointClampToAll(Vector const& pos, const real weight)
     Vector vec = weight * pos;
     for ( size_t p = 0; p < nbVertices(); ++p )
     {
-        sub_iso(p, p, weight);
+        sub_iso_diag(p, weight);
         add_base(p, vec);
     }
 }
