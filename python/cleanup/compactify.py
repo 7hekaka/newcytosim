@@ -11,7 +11,7 @@ compactify.py:
 Usage:
     compactify.py DIRECTORY [DIRECTORY2] ...
     
-F. Nedelec, 04.02.2023
+F. Nedelec, 04.02.2023, 14.05.2023
 """
 
 import sys, os, subprocess, shutil
@@ -36,7 +36,7 @@ def process(path):
     if code:
         err.write('tar -czf '+path+' failed!')
     else:
-        shutil.rmtree(path)
+        shutil.move(path, os.path.join('compacted', path))
         print(path+" ----> "+zip)
 
 #------------------------------------------------------------------------
@@ -51,14 +51,13 @@ def main(args):
             paths.extend(glob.glob(arg))
         else:
             err.write("ignored '%s' on command line\n" % arg)
-
     if not paths:
         paths.append('.')
         err.write("Error: you must specify directories: scan.py COMMAND PATHS\n")
         return 2
-
     home = os.getcwd()
     for path in paths:
+        os.mkdir('compacted')
         stuff = sorted(os.scandir(path), key=lambda e: e.name)
         for e in stuff:
             if e.is_dir():
