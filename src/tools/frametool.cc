@@ -4,11 +4,11 @@
  'Frametool' is a simple utility that can read and extract frames in
  Cytosim's trajectory files, usually called "objects.cmo".
  
- It only uses the START and END tags of frames, and does not care
- about the organization of the data contained between these tags.
+ It only uses the START and END tags of frames, and will copy verbatim
+ all the data contained between these tags.
  
- 'Frametool' can extract frames from the file, which is useful
- for example to reduce the size of 'objects.cmo' by dropping some frames.
+ 'Frametool' can extract frames from the file, by dropping off ones,
+ or at a regular interval, using a slice: start:period:end
 
  You can reduce the file size by half by dropping every odd frame:
  > frametool objects.cmo 0:2: > o.cmo
@@ -41,20 +41,20 @@ unsigned long frame_pid = 0;
 double frame_time = 0;
 
 
-FILE * openfile(char name[], char const* mode)
+FILE * openFile(char name[], char const* mode)
 {
     FILE * file = fopen(name, mode);
     
     if ( file==nullptr )
     {
-        fprintf(stderr, "Could not open file `%s'\n", name);
+        fprintf(stderr, "Could not open `%s'\n", name);
         return nullptr;
     }
     
     if ( ferror(file) )
     {
         fclose(file);
-        fprintf(stderr, "Error opening file `%s'\n", name);
+        fprintf(stderr, "Error opening `%s'\n", name);
         return nullptr;
     }
     
@@ -125,15 +125,15 @@ public:
     
     Slice()
     {
-        s =  0;
-        i =  1;
+        s = 0;
+        i = 1;
         e = ~0UL;
     }
     
     Slice(const char arg[])
     {
-        s =  0;
-        i =  1;
+        s = 0;
+        i = 1;
         e = ~0UL;
 
         int c = 0;
@@ -335,7 +335,7 @@ void split(FILE * in)
         {
             case FRAME_START:
                 snprintf(name, sizeof(name), "objects%04lu.cmo", frm);
-                out = openfile(name, "w");
+                out = openFile(name, "w");
                 if ( out ) {
                     flockfile(out);
                     fprintf(out, "#Cytosim\n");
@@ -479,12 +479,9 @@ int main(int argc, char* argv[])
     
     //----------------------------------------------
     
-    FILE * file = openfile(filename, "r");
-    if ( !file || ferror(file) )
-    {
-        fprintf(stderr, "failed to open input file\n");
+    FILE * file = openFile(filename, "r");
+    if ( !file )
         return EXIT_FAILURE;
-    }
     flockfile(file);
 
     if ( mode == COUNT )

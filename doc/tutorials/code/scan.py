@@ -42,7 +42,7 @@ def execute(tool, path):
     """
     os.chdir(path)
     try:
-        subprocess.call(tool, shell=True)
+        subprocess.run(tool, shell=True, check=True)
     except Exception as e:
         sys.stderr.write("Error: %s\n" % repr(e))
 

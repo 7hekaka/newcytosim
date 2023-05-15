@@ -30,7 +30,7 @@ def process(path):
     # Unzip object file:
     obj = path+'/objects.cmo.gz'
     if os.path.isfile(obj):
-        subprocess.call(['gunzip', obj])
+        subprocess.run(['gunzip', obj], check=True)
     # tarzip directory:
     zip = path + '.tar.gz'
     code = subprocess.call(['tar', '-czf', zip, path])
@@ -54,7 +54,7 @@ def main(args):
             err.write("ignored '%s' on command line\n" % arg)
     if not paths:
         paths.append('.')
-        err.write("Error: you must specify directories: scan.py COMMAND PATHS\n")
+        err.write("Error: you must specify directories: compactify.py PATHS\n")
         return 2
     home = os.getcwd()
     for path in paths:
