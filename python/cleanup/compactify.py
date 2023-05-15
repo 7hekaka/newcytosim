@@ -17,6 +17,7 @@ F. Nedelec, 04.02.2023, 14.05.2023
 import sys, os, subprocess, shutil
 
 err = sys.stderr
+park = 'compacted'
 
 #------------------------------------------------------------------------
 
@@ -36,7 +37,7 @@ def process(path):
     if code:
         err.write('tar -czf '+path+' failed!')
     else:
-        shutil.move(path, os.path.join('compacted', path))
+        shutil.move(path, os.path.join(park, path))
         print(path+" ----> "+zip)
 
 #------------------------------------------------------------------------
@@ -57,10 +58,13 @@ def main(args):
         return 2
     home = os.getcwd()
     for path in paths:
-        os.mkdir('compacted')
         stuff = sorted(os.scandir(path), key=lambda e: e.name)
+        try:
+            os.mkdir(park)
+        except FileExistsError:
+            pass
         for e in stuff:
-            if e.is_dir():
+            if e.is_dir() and not e.name==park:
                 process(os.path.join(path, e.name))
         os.chdir(home)
 
