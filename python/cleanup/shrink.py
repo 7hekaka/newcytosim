@@ -11,7 +11,7 @@ shrink.py:
 Usage:
     shrink.py FILE1 [FILE2] ...
     
-F.J. Nedelec, 15.05.2023
+F.J. Nedelec, 15--16.05.2023
 """
 
 import sys, os, subprocess, shutil
@@ -92,20 +92,25 @@ def process(file, path):
 def main(args):
     global min_frames
     files = []
+    paths = []
     for arg in args:
         if arg.endswith('.tarz'):
             files.append([arg, arg[:-5]])
         elif arg.endswith('.tar.gz'):
             files.append([arg, arg[:-7]])
+        elif os.path.isdir(arg):
+            paths.append(arg)
         elif arg.startswith('min='):
             min_frames = int(arg[4:])
         else:
             err.write("ignored '%s' on command line\n" % arg)
-    if not files:
+    if not files and not paths:
         err.write("Error: you must specify files: *.tarz or *.tar.gz\n")
         return 2
     for f in files:
         process(f[0], f[1])
+    for d in paths:
+        process('', d)
 
 #-------------------------------------------------------------------------------
 
