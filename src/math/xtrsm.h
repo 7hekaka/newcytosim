@@ -1112,7 +1112,7 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* A, const int lda, doub
         pB += 3;
         if ( pB < end )
         {
-            if ( ( end - pB ) & 1 )
+            if (( M & 1 ) == ( K & 1 ))
             {
                 vec2 x = fnmadd2(t0, load1d(pA), load1(pB));
                 x = fnmadd2(t1, load1d(pA+lda), x); // column K+1
@@ -1147,51 +1147,60 @@ void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, doub
     assert_true( M >= 3 );
     assert_true( M%3 == 0 );
     A += M * lda;
-    //process columns 3 by 3
-    for ( int K = M - 3; K >= 0; K -= 3 )
+    // process columns 3 by 3
+    for ( int K = M - 3; K > 0; K -= 3 )
     {
         A -= 3*lda;
         double * pB = B + K;
         float const* pA = A + K;
-        vec2 t2 = mul2(loaddup2(pB+2), duplo2(load1d(pA+2*lda+2))); // { T2, T2 }
+        vec2 t2 = duplo2(mul1(load1(pB+2), load1d(pA+2*lda+2)));
+        store1(pB+2, t2);
         vec2 t0 = fnmadd2(t2, load2d(pA+2*lda), loadu2(pB)); // { -, T1/A }
-        vec2 b = load2d(pA+lda);
-        vec2 t1 = duphi2(mul2(t0, b)); // { T1, T1 }
-        t0 = duplo2(mul2(fnmadd2(t1, b, t0), load2d(pA))); // { T0, T0 }
-        storeu2(pB+1, blend11(t1, t2));
+        vec2 a = load2d(pA+lda);
+        vec2 t1 = duphi2(mul2(t0, a)); // { T1, T1 }
+        t0 = duplo2(mul2(fnmadd2(t1, a, t0), load1d(pA))); // { T0, T0 }
+        store1(pB+1, t1);
         store1(pB, t0);
-        if ( pB > B )
+        // there should be at least 3 lines remaining
+        if ( K & 1 )
         {
-            // there should be at least 3 lines remaining
-            if ( ( pB - B ) & 1 )
+            --pA;
+            --pB;
+            vec2 x = fnmadd2(t0, load1d(pA), load1(pB));
+            x = fnmadd2(t1, load1d(pA+lda), x); // column K+1
+            x = fnmadd2(t2, load1d(pA+lda*2), x); // column K+2
+            store1(pB, x);
+        }
+        vec2 x2 = fnmadd2(t2, load2d(pA-2+lda*2), loadu2(pB-2));
+        vec2 x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
+        if ( K > 3 )
+        {
+            x2 = fnmadd2(t2, load2d(pA-4+lda*2), loadu2(pB-4));
+            while ( pB > B + 4 )
             {
-                --pA;
-                --pB;
-                vec2 x = fnmadd2(t0, load1d(pA), load1(pB));
-                x = fnmadd2(t1, load1d(pA+lda), x); // column K+1
-                x = fnmadd2(t2, load1d(pA+lda*2), x); // column K+2
-                store1(pB, x);
-            }
-            vec2 x2 = fnmadd2(t2, load2d(pA-2+lda*2), loadu2(pB-2));
-            vec2 x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
-            if ( pB > B + 2 )
-            {
-                x2 = fnmadd2(t2, load2d(pA-4+lda*2), loadu2(pB-4));
-                while ( pB > B + 4 )
-                {
-                    pA -= 2;
-                    pB -= 2;
-                    storeu2(pB, fnmadd2(t0, load2d(pA), x1));
-                    x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
-                    x2 = fnmadd2(t2, load2d(pA-4+lda*2), loadu2(pB-4));
-                }
                 pA -= 2;
                 pB -= 2;
                 storeu2(pB, fnmadd2(t0, load2d(pA), x1));
                 x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
+                x2 = fnmadd2(t2, load2d(pA-4+lda*2), loadu2(pB-4));
             }
-            storeu2(pB-2, fnmadd2(t0, load2d(pA-2), x1));
+            pA -= 2;
+            pB -= 2;
+            storeu2(pB, fnmadd2(t0, load2d(pA), x1));
+            x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
         }
+        storeu2(pB-2, fnmadd2(t0, load2d(pA-2), x1));
+    }
+    if ( M > 0 )  // case K = 0
+    {
+        float const* pA = A - 3*lda;
+        vec2 t2 = mul2(loaddup2(B+2), duplo2(load1d(pA+2*lda+2))); // { T2, T2 }
+        vec2 t0 = fnmadd2(t2, load2d(pA+2*lda), loadu2(B)); // { -, T1/A }
+        vec2 b = load2d(pA+lda);
+        vec2 t1 = duphi2(mul2(t0, b)); // { T1, T1 }
+        t0 = duplo2(mul2(fnmadd2(t1, b, t0), load2d(pA))); // { T0, T0 }
+        storeu2(B+1, blend11(t1, t2));
+        store1(B, t0);
     }
 }
 #endif
@@ -1488,7 +1497,7 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* A, const int lda, floa
         pB += 3;
         if ( pB < end )
         {
-            if ( ( end - pB ) & 1 )
+            if (( M & 1 ) == ( K & 1 ))
             {
                 vec2f x = fnmadd2f(t0, load1f(pA), load1f(pB));
                 x = fnmadd2f(t1, load1f(pA+lda), x); // column K+1
@@ -1590,7 +1599,7 @@ void alsatian_xtrsmLUN1I_3D_SSE(const int M, const float* A, const int lda, floa
         store1f(pB+2, t2);
         if ( pB > B )
         {
-            if ( ( pB - B ) & 1 )
+            if ( K & 1 )
             {
                 --pA;
                 --pB;
