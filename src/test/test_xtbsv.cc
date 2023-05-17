@@ -29,9 +29,8 @@ namespace U
 }
 
 
-
-/// print only 16 scalars from given vector
-inline void print(unsigned num, real const* vec)
+/// print 12 scalars from `vec[]` of dimension `num`
+inline void print_vector(int num, real const* vec)
 {
     if ( num > 12 )
     {
@@ -47,7 +46,10 @@ inline void print(unsigned num, real const* vec)
         fprintf(stdout, " |");
         VecPrint::print(2, vec+num, 1);
     }
-    printf("  nrm %9.7f ", blas::nrm2(num, vec));
+    real sum = vec[0];
+    for ( int i = 1; i < num; ++i )
+        sum += vec[i];
+    printf("  sum %9.16f ", sum);
 }
 
 void nan_spill(real * dst)
@@ -64,7 +66,7 @@ void check(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char
     copy_real(ORD*N, S, B);
     nan_spill(B+ORD*N);
     FUNC(N, AB, LDA, B);
-    print(ORD*N, B);
+    print_vector(ORD*N, B);
     tick();
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -550,6 +552,7 @@ void getrs5(int N, real const* B, int LDB, real* Y)
     //alsatian_xtrsmLLN1U_3D(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1I_3D_SSE(N, (float*)B, LDB, Y);
+    //alsatian_xtrsmLUN1I_3D(N, (float*)B, LDB, Y);
 }
 
 /// convert doubles to floats
@@ -608,7 +611,7 @@ void testGETRS(int N, size_t cnt)
         check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrsN", cnt);
         check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrsNSSE", cnt);
         if ( DIM == 3 )
-        check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsN_3D", cnt, MULTI);
+        check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsN_3D", cnt);
     }
     
     if ( 1 )
