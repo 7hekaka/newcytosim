@@ -32,6 +32,12 @@ LOCAL void dump(vec4f v, char const* s)
     printf("%16s f( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
 
+/// print two SIMD vector of 4 floats
+LOCAL void dump(vec4f x, vec4f y, char const* s)
+{
+    printf("%16s f( %5.2f %5.2f)( %5.2f %5.2f )( %5.2f %5.2f)( %5.2f %5.2f)\n", s, x[3], y[3], x[2], y[2], x[1], y[1], x[0], y[0]);
+}
+
 #endif
 
 //------------------------------- INTEGERS -------------------------------------

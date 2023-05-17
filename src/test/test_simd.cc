@@ -103,6 +103,16 @@ void test_shuffle()
 #endif
 }
 
+
+void test_signselect()
+{
+    vec4f s { -1, +1, -1, +1 };
+    vec4f n { -2, -2, -2, -2 };
+    vec4f p { +3, +3, +3, +3 };
+    vec4f x = signselect4f(s, n, p);
+    dump(x, "signselect");
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -956,6 +966,7 @@ int main(int argc, char * argv[])
             test_swapSSE();
             test_loads();
             test_transpose4x4();
+            test_signselect();
             break;
 #ifdef __AVX__
         case 1:

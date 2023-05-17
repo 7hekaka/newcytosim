@@ -15,7 +15,8 @@ static inline void fold_corners4f(vec4f& x, vec4f& y)
     vec4f mut = greaterequal4f(add4f(abs4f(x), abs4f(y)), set4f(M_SQRT2));
     // coordinates of nearest corner, scaled by S: copysign(S, x)
     constexpr float S = M_SQRT2 + 1.0f;
-    const vec4f pos = set4f(S), neg = set4f(-S);
+    constexpr vec4f pos{S, S, S, S};
+    constexpr vec4f neg{-S, -S, -S, -S};
     vec4f cx = signselect4f(x, neg, pos);
     vec4f cy = signselect4f(y, neg, pos);
     // subtract corner to recover a square of side 2, covering the circle

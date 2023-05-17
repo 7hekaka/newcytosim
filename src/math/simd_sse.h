@@ -120,7 +120,7 @@ LOCAL vec2 normalize2(vec2 vec, double n)
 #if defined(__SSE4_1__)
 
 /// return `neg` if `val < 0` and `pos` otherwise
-LOCAL vec2 signselect2(vec2 val, vec2 neg, vec2  pos) { return _mm_blendv_pd(pos, neg, val); }
+LOCAL vec2 signselect2(vec2 val, vec2 neg, vec2 pos) { return _mm_blendv_pd(pos, neg, val); }
 
 #endif
 
