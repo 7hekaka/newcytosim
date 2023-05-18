@@ -49,7 +49,7 @@ inline void print_vector(int num, real const* vec)
     real sum = vec[0];
     for ( int i = 1; i < num; ++i )
         sum += vec[i];
-    printf("  sum %9.16f ", sum);
+    printf("  sum %+18.16f ", sum);
 }
 
 void nan_spill(real * dst)
@@ -524,16 +524,20 @@ void getrs2(int N, real const* B, int LDB, real* Y)
 
 void getrs3(int N, real const* B, int LDB, real* Y)
 {
-    //alsatian_xgetrsN(N, B, N, pivot, Y);
+    alsatian_xgetrsN(N, B, LDB, pivot, Y);
+}
+
+void getrs4(int N, real const* B, int LDB, real* Y)
+{
     // Apply row interchanges to the right hand side.
     xlaswp1(Y, 1, N, pivot); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1I(N, (float*)B, LDB, Y);
+    alsatian_xtrsmLUN1C(N, (float*)B, LDB, Y);
 }
 
-void getrs4(int N, real const* B, int LDB, real* Y)
+void getrs5(int N, real const* B, int LDB, real* Y)
 {
 #if USE_SIMD
     alsatian_xgetrsN_SSE(N, B, LDB, pivot, Y);
@@ -542,17 +546,24 @@ void getrs4(int N, real const* B, int LDB, real* Y)
 #endif
 }
 
-void getrs5(int N, real const* B, int LDB, real* Y)
+void getrs6(int N, real const* B, int LDB, real* Y)
 {
-    //alsatian_xgetrsN(N, B, N, pivot, Y);
+    // Apply row interchanges to the right hand side.
+    xlaswp1(Y, 1, N, pivot); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
+    // Solve L*X = B, overwriting B with X.
+    alsatian_xtrsmLLN1U_3D(N, (float*)B, LDB, Y);
+    // Solve U*X = B, overwriting B with X.
+    alsatian_xtrsmLUN1C_3D(N, (float*)B, LDB, Y);
+}
+
+void getrs7(int N, real const* B, int LDB, real* Y)
+{
     // Apply row interchanges to the right hand side.
     xlaswp1(Y, 1, N, pivot); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_3D_SSE(N, (float*)B, LDB, Y);
-    //alsatian_xtrsmLLN1U_3D(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1I_3D_SSE(N, (float*)B, LDB, Y);
-    //alsatian_xtrsmLUN1I_3D(N, (float*)B, LDB, Y);
+    alsatian_xtrsmLUN1C_3D_SSE(N, (float*)B, LDB, Y);
 }
 
 /// convert doubles to floats
@@ -563,6 +574,7 @@ void convert_to_floats(size_t cnt, double const* src, float* dst)
         dst[i] = (float)src[i];
 }
 
+/* initialize a general matrix that would be inversible. */
 void setMatrix(size_t N, real* A, size_t LDA)
 {
     zero_real(N*N, A);
@@ -570,8 +582,8 @@ void setMatrix(size_t N, real* A, size_t LDA)
     for ( size_t i = 0; i < N; ++i )
     {
         for ( size_t j = 0; j < N; ++j )
-            A[j+LDA*i] = 0.01 * RNG.sreal();
-        A[i+LDA*i] = 1.0 + RNG.preal(); //dominant diagonal term
+            A[j+LDA*i] = RNG.sreal();
+        A[i+LDA*i] = 1.0 + std::sqrt(N); // dominant diagonal term
     }
 }
 
@@ -600,7 +612,7 @@ void testGETRS(int N, size_t cnt)
     if ( info == 0 )
     {
         check<getrs1>(N, 1, S, M, LDA, Y, "lapack::xgetrs", cnt);
-        check<getrs2>(N, 1, S, M, LDA, Y, "lapack_xgetrsN", cnt);
+        check<getrs2>(N, 1, S, M, LDA, Y, "lapack_xgetrs", cnt);
     }
     alsatian_xgetf2(N, A, LDA, pivot, &info);
 #if REAL_IS_DOUBLE
@@ -608,10 +620,14 @@ void testGETRS(int N, size_t cnt)
 #endif
     if ( info == 0 )
     {
-        check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrsN", cnt);
-        check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrsNSSE", cnt);
+        check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt);
+        check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", cnt);
+        check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", cnt);
         if ( DIM == 3 )
-        check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsN_3D", cnt);
+        {
+            check<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", cnt);
+            check<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", cnt);
+        }
     }
     
     if ( 1 )
@@ -624,7 +640,7 @@ void testGETRS(int N, size_t cnt)
             lapack::xgetf2(N, N, mat, N, pivot, &info);
         }
         multi<getrs1>(N, 1, S, A, LDA, Y, "lapack::xgetrs", cnt, MULTI);
-        multi<getrs2>(N, 1, S, A, LDA, Y, "lapack_xgetrsN", cnt, MULTI);
+        multi<getrs2>(N, 1, S, A, LDA, Y, "lapack_xgetrs", cnt, MULTI);
         
         for ( size_t u = 0; u < MULTI; ++u )
         {
@@ -635,10 +651,14 @@ void testGETRS(int N, size_t cnt)
             convert_to_floats(N*LDA, mat, (float*)mat);
 #endif
         }
-        multi<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrsN", cnt, MULTI);
-        multi<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrsNSSE", cnt, MULTI);
+        multi<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt, MULTI);
+        multi<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt, MULTI);
+        multi<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", cnt, MULTI);
         if ( DIM == 3 )
-        multi<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsN_3D", cnt, MULTI);
+        {
+            multi<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", cnt, MULTI);
+            multi<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", cnt, MULTI);
+        }
     }
     
     free_real(Y);
@@ -650,7 +670,7 @@ void testGETRS(int N, size_t cnt)
 
 int main(int argc, char* argv[])
 {
-    int CNT = 111;
+    int CNT = 13;
     if ( argc > 1 )
         CNT = std::max(1, atoi(argv[1]));
     size_t REP = 1<<10;
@@ -658,6 +678,6 @@ int main(int argc, char* argv[])
     //testISO(CNT, REP);
     //testPOTRS(CNT, REP);
     //testTBSV(CNT, REP);
-    testGETRS(CNT, REP);
+    testGETRS(DIM*CNT, REP);
     printf("\n");
 }
