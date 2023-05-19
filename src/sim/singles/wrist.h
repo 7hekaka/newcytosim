@@ -65,8 +65,8 @@ public:
     /// the position of the anchoring point
     Vector posFoot() const { return base_.pos(); }
     
-    /// the position of the anchoring point
-    Vector dirFoot() const { return base_.dir(); }
+    /// a radial direction at the anchoring point
+    Vector dirFoot() const { return base_.normal(); }
 
     /// stretch of the link = ( posFoot() - posHand() )
     Vector stretch() const;

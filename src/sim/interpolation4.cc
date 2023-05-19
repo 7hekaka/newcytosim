@@ -31,7 +31,7 @@ void Interpolation4::polish()
 }
 
 /// (position of interpolation) - (position of prime point = center of sphere)
-Vector Interpolation4::dir() const
+Vector Interpolation4::normal() const
 {
     if ( rank_ < 2 )
         return Vector::randU();

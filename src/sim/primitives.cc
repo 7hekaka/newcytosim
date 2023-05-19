@@ -590,7 +590,15 @@ Vector Cytosim::findPosition(std::string const& arg, Space const* spc)
         std::istringstream iss(arg);
         Vector vec = Cytosim::readPosition(iss, spc);
         if ( vec.valid() )
+        {
+            if ( StreamFunc::has_trail(iss) )
+            {
+                std::string str;
+                std::getline(iss, str);
+                throw InvalidSyntax("unexpected trailing `"+str+"' in position `"+arg+"'");
+            }
             return vec;
+        }
     }
     throw InvalidParameter("failed to determine Vector from `"+arg+"'");
     return Vector(0,0,0);

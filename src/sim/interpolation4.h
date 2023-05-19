@@ -59,8 +59,8 @@ public:
     /// position in space calculated from interpolation
     Vector pos() const { return mec_->interpolatePoints(prime_, coef_, rank_); }
     
-    /// direction in space calculated from interpolation
-    Vector dir() const;
+    /// direction normal to the sphere, at the point of interpolation
+    Vector normal() const;
 
     /// number of points beeing interpolated
     size_t rank() const { return rank_; }
