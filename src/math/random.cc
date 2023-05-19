@@ -15,7 +15,7 @@ thread_local Random RNG;
 
 
 /// use Vectorized makeGaussians(), if available (requires NEON/SSE3)
-#if  defined(__ARM_NEON__) || defined(__SSE3__)
+#if  defined(__ARM_NEON__) || defined(__SSE4_1__)
 #  define RANDOM_USES_SIMD 1
 #  include "simd.h"
 #  include "simd_float.h"

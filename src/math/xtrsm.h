@@ -1195,7 +1195,7 @@ void alsatian_xtrsmLLN1U_3D_SSE(const int M, const float* A, const int lda, doub
                 vec2 xx = fnmadd2(t2, load2d(pA+lda*2), loadu2(pB));
                 xx = fnmadd2(t1, load2d(pA+lda), xx);
                 xx = fnmadd2(t0, load2d(pA), xx);
-                store2(pB, xx);
+                storeu2(pB, xx);
                 pA += 2;
             }
         }
@@ -1245,7 +1245,7 @@ void alsatian_xtrsmLUN1C_3D_SSE(const int M, const float* A, const int lda, doub
         //B[i] = B[i] - T2 * A[i+2*lda] - T1 * A[i+lda] - T0 * A[i];
         aa = blend11(load1d(pA), aa);
         store1(pB+2, mul1(t2, load1d(pA+2*lda+2)));
-        store2(pB, mul2(blend11(t0, t1), aa));
+        storeu2(pB, mul2(blend11(t0, t1), aa));
         //if ( K > 3 )
         {
             // there should be at least 3 lines remaining
@@ -1289,7 +1289,7 @@ void alsatian_xtrsmLUN1C_3D_SSE(const int M, const float* A, const int lda, doub
         // multiply vector component by diagonal term:
         aa = blend11(load1d(pA), aa);
         store1(pB+2, mul1(t2, load1d(pA+2*lda+2)));
-        store2(pB, mul2(blend11(t0, t1), aa));
+        storeu2(pB, mul2(blend11(t0, t1), aa));
         //if ( pB > B )
         {
             // there should be at least 3 lines remaining
@@ -1317,7 +1317,7 @@ void alsatian_xtrsmLUN1C_3D_SSE(const int M, const float* A, const int lda, doub
         aa = blend11(load1d(A-3*lda), aa);
         // multiply vector component by diagonal term:
         store1(B+2, mul1(t2, load1d(A-lda+2)));
-        store2(B, mul2(blend11(t0, t1), aa));
+        storeu2(B, mul2(blend11(t0, t1), aa));
     }
 }
 #endif
