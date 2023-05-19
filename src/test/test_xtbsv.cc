@@ -606,30 +606,32 @@ void testGETRS(int N, size_t cnt)
     for ( int i = 0; i < N; ++i )
         S[i] = RNG.sreal();
     
-    setMatrix(N, A, LDA);
-    copy_real(BLK, A, M);
-    lapack::xgetf2(N, N, M, LDA, pivot, &info);
-    if ( info == 0 )
+    if ( 1 )
     {
-        check<getrs1>(N, 1, S, M, LDA, Y, "lapack::xgetrs", cnt);
-        check<getrs2>(N, 1, S, M, LDA, Y, "lapack_xgetrs", cnt);
-    }
-    alsatian_xgetf2(N, A, LDA, pivot, &info);
-#if REAL_IS_DOUBLE
-    convert_to_floats(N*LDA, A, (float*)A);
-#endif
-    if ( info == 0 )
-    {
-        check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt);
-        check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", cnt);
-        check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", cnt);
-        if ( DIM == 3 )
+        setMatrix(N, A, LDA);
+        copy_real(BLK, A, M);
+        lapack::xgetf2(N, N, M, LDA, pivot, &info);
+        if ( info == 0 )
         {
-            check<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", cnt);
-            check<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", cnt);
+            check<getrs1>(N, 1, S, M, LDA, Y, "lapack::xgetrs", cnt);
+            check<getrs2>(N, 1, S, M, LDA, Y, "lapack_xgetrs", cnt);
+        }
+        alsatian_xgetf2(N, A, LDA, pivot, &info);
+#if REAL_IS_DOUBLE
+        convert_to_floats(N*LDA, A, (float*)A);
+#endif
+        if ( info == 0 )
+        {
+            check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt);
+            check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", cnt);
+            check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", cnt);
+            if ( DIM == 3 )
+            {
+                check<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", cnt);
+                check<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", cnt);
+            }
         }
     }
-    
     if ( 1 )
     {
         std::cout << "\n" << DIM << "D xGETRS--- " << MULTI << " matrices";
@@ -641,7 +643,9 @@ void testGETRS(int N, size_t cnt)
         }
         multi<getrs1>(N, 1, S, A, LDA, Y, "lapack::xgetrs", cnt, MULTI);
         multi<getrs2>(N, 1, S, A, LDA, Y, "lapack_xgetrs", cnt, MULTI);
-        
+    }
+    if ( 1 )
+    {
         for ( size_t u = 0; u < MULTI; ++u )
         {
             real* mat = A + u * BLK;
