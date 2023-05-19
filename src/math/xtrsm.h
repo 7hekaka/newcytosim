@@ -1258,19 +1258,19 @@ void alsatian_xtrsmLUN1C_3D_SSE(const int M, const float* A, const int lda, doub
                 x = fnmadd2(t2, load1d(pA+lda*2), x); // column K+2
                 store1(pB, x);
             }
-            vec2 x2 = fnmadd2(t2, load2d(pA-2+lda*2), loadu2(pB-2));
-            vec2 x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
-            x2 = fnmadd2(t2, load2d(pA-4+lda*2), loadu2(pB-4));
-            while ( pB > B + 4 )
+            pA -= 2;
+            pB -= 2;
+            vec2 x2 = fnmadd2(t1, load2d(pA+lda), loadu2(pB));
+            vec2 x1 = fnmadd2(t2, load2d(pA+lda*2), x2);
+            x2 = fnmadd2(t2, load2d(pA-2+lda*2), loadu2(pB-2));
+            while ( pB > B + 2 )
             {
-                pA -= 2;
-                pB -= 2;
                 storeu2(pB, fnmadd2(t0, load2d(pA), x1));
                 x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
                 x2 = fnmadd2(t2, load2d(pA-4+lda*2), loadu2(pB-4));
+                pA -= 2;
+                pB -= 2;
             }
-            pA -= 2;
-            pB -= 2;
             storeu2(pB, fnmadd2(t0, load2d(pA), x1));
             x1 = fnmadd2(t1, load2d(pA-2+lda), x2);
             storeu2(pB-2, fnmadd2(t0, load2d(pA-2), x1));
