@@ -530,7 +530,7 @@ void getrs3(int N, real const* B, int LDB, real* Y)
 void getrs4(int N, real const* B, int LDB, real* Y)
 {
     // Apply row interchanges to the right hand side.
-    xlaswp1(Y, 1, N, pivot); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
+    xlaswp1(Y, 1, N, pivot);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
@@ -549,7 +549,7 @@ void getrs5(int N, real const* B, int LDB, real* Y)
 void getrs6(int N, real const* B, int LDB, real* Y)
 {
     // Apply row interchanges to the right hand side.
-    xlaswp1(Y, 1, N, pivot); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
+    xlaswp1(Y, 1, N, pivot);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_3D(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
@@ -559,7 +559,7 @@ void getrs6(int N, real const* B, int LDB, real* Y)
 void getrs7(int N, real const* B, int LDB, real* Y)
 {
     // Apply row interchanges to the right hand side.
-    xlaswp1(Y, 1, N, pivot); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
+    xlaswp1(Y, 1, N, pivot);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_3D_SSE(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
@@ -583,7 +583,7 @@ void setMatrix(size_t N, real* A, size_t LDA)
     {
         for ( size_t j = 0; j < N; ++j )
             A[j+LDA*i] = RNG.sreal();
-        A[i+LDA*i] = 1.0 + std::sqrt(N); // dominant diagonal term
+        A[i+LDA*i] = std::sqrt(N); // dominant diagonal term
     }
 }
 
@@ -611,9 +611,10 @@ void testGETRS(int N, size_t cnt)
         setMatrix(N, A, LDA);
         copy_real(BLK, A, M);
         lapack::xgetf2(N, N, M, LDA, pivot, &info);
+        printf("\n %lu swaps", count_swaps(1, N, pivot));
         if ( info == 0 )
         {
-            check<getrs1>(N, 1, S, M, LDA, Y, "lapack::xgetrs", cnt);
+            //check<getrs1>(N, 1, S, M, LDA, Y, "lapack::xgetrs", cnt);
             check<getrs2>(N, 1, S, M, LDA, Y, "lapack_xgetrs", cnt);
         }
         alsatian_xgetf2(N, A, LDA, pivot, &info);
@@ -656,7 +657,7 @@ void testGETRS(int N, size_t cnt)
 #endif
         }
         multi<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt, MULTI);
-        multi<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt, MULTI);
+        multi<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", cnt, MULTI);
         multi<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", cnt, MULTI);
         if ( DIM == 3 )
         {
@@ -674,7 +675,7 @@ void testGETRS(int N, size_t cnt)
 
 int main(int argc, char* argv[])
 {
-    int CNT = 13;
+    int CNT = DIM*13;
     if ( argc > 1 )
         CNT = std::max(1, atoi(argv[1]));
     size_t REP = 1<<10;

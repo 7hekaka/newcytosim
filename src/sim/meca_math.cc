@@ -214,22 +214,27 @@ static void truncate_floats(size_t num, float* mat)
     }
 }
 
-/// reduce precision of floating point by zeroing out part of the mantissa
+/// keep only two bytes from floats
 [[maybe_unused]]
-static void tile_floats(size_t num, float* mat)
+static void tile_doubles(size_t num, double const* src, float * dst)
 {
-    size_t Z = sizeof(float);
-    unsigned char * slow = (unsigned char*)mat + Z;
-    unsigned char * fast = (unsigned char*)mat + Z*2;
-    unsigned char * end = (unsigned char*)(mat + num);
-
+    assert_true(sizeof(double) == 2*sizeof(uint32_t));
+    uint32_t * fast = (uint32_t*)src;
+    uint32_t * slow = (uint32_t*)dst;
+    uint32_t * end = (uint32_t*)(src+num);
+    //printf("\n%10.7f %10.7f -->", src[0], src[1]);
     while ( fast < end )
     {
+#if __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
         slow[0] = fast[0];
-        slow[1] = fast[1];
-        slow += 2;
-        fast += Z;
+#else
+        slow[0] = fast[1];
+#endif
+        slow += 1;
+        fast += 2;
     }
+    //vec2 v = load1d(dst), vv = load2d(dst);
+    //printf("  %10.7f %10.7f | %10.7f %10.7f\n", v[0], v[1], vv[0], vv[1]);
 }
 
 

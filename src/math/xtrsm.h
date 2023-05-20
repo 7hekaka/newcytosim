@@ -1998,6 +1998,23 @@ void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)
 }
 
 
+/// Counting the number of permutations performed by xlaswp1()
+size_t count_swaps(int K1, int K2, const int* IPIV)
+{
+    /*
+     as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
+     but we can shift the pointers to directly use these one-based rray indices
+     */
+    --IPIV;
+    size_t cnt = 0;
+    for ( int I = K1; I <= K2; ++I )
+    {
+        const int P = IPIV[I];
+        cnt += ( P != I );
+    }
+    return cnt;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK-STYLE ROUTINES for General Matrix LU factorization
 
