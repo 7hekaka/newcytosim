@@ -1795,8 +1795,8 @@ namespace gle
     }
 
     /// some volume of revolution with axis along Z
-    float dumbbellRadius(float z) { return sinf(3.14159265f*z) * (1.3f+cosf(6.28318530f*z)); }
-    float barrelRadius(float z) { return sinf(3.14159265f*z); }
+    float dumbbellRadius(float z) { return sinf(M_PI*z) * (1.3f+cosf(2*M_PI*z)); }
+    float barrelRadius(float z) { return sinf(M_PI*z); }
     void dumbbell() { drawRevolution(dumbbellRadius, 0, 1, 0.0625); }
     void barrel() { drawRevolution(barrelRadius, 0, 1, 0.0625); }
 
