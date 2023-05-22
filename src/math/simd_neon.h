@@ -9,8 +9,9 @@ typedef float64x2_t vec2;
 LOCAL void _mm_empty() {};
 
 LOCAL vec2 setr2(double a, double b) { return vec2{a, b}; }
-LOCAL vec2 set2(double a)            { return vdupq_n_f64(a); }
-LOCAL vec2 setzero2()                { return vdupq_n_f64(0); }
+LOCAL vec2 set2(double a)  { return vdupq_n_f64(a); }
+LOCAL vec2 setzero2()      { return vdupq_n_f64(0); }
+LOCAL vec2 negate2(vec2 a) { return vnegq_f64(a); }
 
 LOCAL vec2 load1(double const* a) { return vsetq_lane_f64(*a, setzero2(), 0); }
 LOCAL vec2 load1Z(double const* a) { return vandq_u32(vld1q_f64(a), uint32x4_t{~0U,~0U,0,0}); }
@@ -32,7 +33,7 @@ LOCAL vec2 cvtsd2(float32x2_t a) { return vcvt_f64_f32(a); }
 LOCAL vec2 cvtsd2(float32x4_t a) { return vcvt_f64_f32(vget_low_f32(a)); }
 
 // load 1 float and convert to double and zero
-LOCAL vec2 load1d(float const* a) { return vcvt_f64_f32(vset_lane_f32(*a, vdup_n_f32(0), 0)); }
+LOCAL vec2 load1d(float const* a) { return vec2{a[0], 0}; }
 // load 2 floats and convert to double
 LOCAL vec2 load2d(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
 
@@ -169,9 +170,9 @@ LOCAL vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return vfmsq_f64(c,a,b); }
 #endif
 
 /// a * b + c
-LOCAL vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return vfmaq_f64(c,a,b); }
+LOCAL vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return vfmaq_f64(c,a,b); } //vmlaq_f64 will issue mul & add
 /// c - a * b
-LOCAL vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return vfmsq_f64(c,a,b); }
+LOCAL vec2 fnmadd2(vec2 a, vec2 b, vec2 c) { return vfmsq_f64(c,a,b); } //vmlsq_f64 will issue mul & sub
 
 //----------------------------- Single Precision -------------------------------
 
@@ -217,6 +218,7 @@ LOCAL vec4i cast4fi(vec4f a) { return vreinterpretq_s32_f32(a); }
 LOCAL vec4f cast4if(vec4i a) { return vreinterpretq_f32_s32(a); }
 
 LOCAL vec4f setzero4f() { return vdupq_n_f32(0); }
+LOCAL vec4f negate4f(vec4f a) { return vnegq_f32(a); }
 
 LOCAL vec4f broadcast1f(float const* a) { return vld1q_dup_f32(a); }
 //LOCAL vec4f load1f(float const* a) { return vcombine_f32(vld1_f32(a), setzero2f()); }

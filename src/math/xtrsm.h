@@ -1253,9 +1253,9 @@ void alsatian_xtrsmLUN1C_3D_SSE(const int M, const float* A, const int lda, doub
             {
                 --pA;
                 --pB;
-                vec2 x = fnmadd2(t0, load1d(pA), load1(pB));
-                x = fnmadd2(t1, load1d(pA+lda), x); // column K+1
-                x = fnmadd2(t2, load1d(pA+lda*2), x); // column K+2
+                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+                x = fnmadd1(t1, load1d(pA+lda), x); // column K+1
+                x = fnmadd1(t2, load1d(pA+lda*2), x); // column K+2
                 store1(pB, x);
             }
             pA -= 2;
@@ -1297,9 +1297,9 @@ void alsatian_xtrsmLUN1C_3D_SSE(const int M, const float* A, const int lda, doub
             {
                 --pA;
                 --pB;
-                vec2 x = fnmadd2(t0, load1d(pA), load1(pB));
-                x = fnmadd2(t1, load1d(pA+lda), x); // column K+1
-                x = fnmadd2(t2, load1d(pA+lda*2), x); // column K+2
+                vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
+                x = fnmadd1(t1, load1d(pA+lda), x); // column K+1
+                x = fnmadd1(t2, load1d(pA+lda*2), x); // column K+2
                 store1(pB, x);
             }
             vec2 x2 = fnmadd2(t2, load2d(pA-2+lda*2), loadu2(pB-2));
