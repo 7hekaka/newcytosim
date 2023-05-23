@@ -122,8 +122,8 @@ def sub_script(exe):
     cmd += ['--time='+runtime] 
     cmd += ['--mem='+memory]
     # define signals sent if time is exceeded:
-    cmd += ['--signal=15@120']
-    cmd += ['--signal=2@60']
+    cmd += ['--signal=INT@240']
+    cmd += ['--signal=TERM@10']
     # redirect stderr and sdtout to files:
     cmd += ['--output='+jdir+'/logs/out']
     cmd += ['--error='+jdir+'/logs/err']
@@ -144,8 +144,8 @@ def array_script(jobcnt):
     cmd += ['#SBATCH --time='+runtime]
     cmd += ['#SBATCH --mem='+memory]
     # define signals sent if time is exceeded:
-    cmd += ['#SBATCH --signal=INT@60']
-    cmd += ['#SBATCH --signal=TERM@120']
+    cmd += ['#SBATCH --signal=INT@240']
+    cmd += ['#SBATCH --signal=TERM@10']
     # redirect stderr and sdtout to files:
     cmd += ['#SBATCH --output='+jdir+'/logs/%a.out']
     cmd += ['#SBATCH --error='+jdir+'/logs/%a.err']
