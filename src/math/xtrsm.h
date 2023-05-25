@@ -1875,7 +1875,7 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 }
 
 
-void alsatian_xpotrsL(const int N, const double* A, const int LDA, real* B)
+void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
 {
 #if 1
     // Solve L*X = B, overwriting B with X

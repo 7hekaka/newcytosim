@@ -102,7 +102,7 @@ static inline void applyPrecondBand(Mecable const* mec, real* Y)
 }
 
 
-/// apply symmetric preconditionner block in full storage
+/// apply full size symmetric preconditionner block
 static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
     const int bks = DIM * mec->nbPoints();
@@ -119,7 +119,7 @@ static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 }
 
 
-/// apply non-symmetric preconditionner block in full storage
+/// apply full size non-symmetric preconditionner block
 static inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     const int bks = DIM * mec->nbPoints();
