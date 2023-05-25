@@ -21,7 +21,7 @@ void BeadSet::step()
         while ( nextCreation <= 0 )
         {
             nextCreation += RNG.exponential();
-            Vector pos = B->position();
+            Vector pos = B->position() + Vector::randB(B->radius());
             if ( B->prop->source_couple )
             {
                 Couple * C = B->prop->source_couple->newCouple(pos);

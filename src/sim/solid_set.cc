@@ -21,7 +21,7 @@ void SolidSet::step()
         {
             nextCreation += RNG.exponential();
             // we only consider creation on the first point!
-            Vector pos = B->posPoint(0);
+            Vector pos = B->posPoint(0) + Vector::randB(B->radius(0));
             if ( B->prop->source_couple )
             {
                 Couple * C = B->prop->source_couple->newCouple(pos);
