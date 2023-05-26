@@ -37,7 +37,7 @@ Some options are available:
 
 Option to `play`      | Description 
 ----------------------|--------------------------------------------------------------------
-`png` `tga` `png`     | set the image file format
+`png` `tga` `ppm`     | set the image file format
 `size=INT,INT`        | set size of image
 `image_dir=PATH`      | set the destination directory for exported images
 `image_name=STRING`   | specifies the name of the image to be generated, and the format
@@ -57,7 +57,7 @@ In addition, parameters of [View](../../src/disp/view_prop.h) and
 [Display](../../src/disp/display_prop.h) can also be specified on the command line:
 
 	play back_color=black samples=5
-	play rotation='0.998 0 0.0491 0' zoom=2 focus='0 1 0' image.tga
+	play rotation='0.998 0 0.0491 0' zoom=2 focus='0 1 0' image.png
 
 Morover, the display parameters can also be included in a separate file with extension ".cyp":
 
@@ -79,11 +79,21 @@ Option to `play`      | Description
 
 Example:
 
-	play frame=100 magnify=4 downsample=2 image.tga
+	play frame=100 magnify=4 downsample=2 image.png
 
 Note that specifying both `magnify` and `downsample` will achieve [antialiasing](https://en.wikipedia.org/wiki/Spatial_anti-aliasing).
  Alternatively, the `samples` parameter can be set to use [multisampling](https://en.wikipedia.org/wiki/Multisample_anti-aliasing).
 
+## Performance
+
+If one specifies `play frame=100`, then every frame from 1 to 100 will be read, and this may be slow.
+In that case, it is possible to speed up things by first extracting the frame with `frametool`:
+
+    frametool last > frame.cmo
+    play image.png system=frame.cmo
+
+The simpler utility `frametool` does not interpret the data contained in the frames.
+This can naturally be executed over many directories using `scan.py`.
 
 # Generating images on-screen
 
@@ -93,8 +103,8 @@ Without this option, off-screen mode is the default. The same options are availa
 
 Examples:
 
-	play zoom=2 on image.tga
-	play zoom=2 on tga movie
+	play zoom=2 on image.png
+	play zoom=2 on png movie
 	
 Check a scripting example: [multi_views.py](../../python/misc/multi_views.py).
 
