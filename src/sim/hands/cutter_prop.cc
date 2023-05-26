@@ -36,9 +36,10 @@ void CutterProp::read(Glossary& glos)
     glos.set(selective, "selective", {{"none", CUT_ANY_FIBER},
              {"bridge", CUT_IF_BRIDGE}, {"top", CUT_TOP_FIBER}} );
     glos.set(line_diffusion, "diffusion");
-    glos.set(cutting_rate,  "cutting_rate");
+    glos.set(cutting_rate, "cutting_rate");
     glos.set(cutting_range, "cutting_range");
-    
+    glos.set(cut_width, "cut_width");
+
     // possible dynamic states of the ends
     Glossary::dict_type<state_t> keys{{"white",     STATE_WHITE},
                                       {"green",     STATE_GREEN},
@@ -85,6 +86,9 @@ void CutterProp::complete(Simul const& sim)
     if ( cutting_range < 0 )
         throw InvalidParameter(name()+"cutting_range must be >= 0");
     
+    if ( cut_width < 0 )
+        throw InvalidParameter(name()+"cut_width must be >= 0");
+
     cutting_rate_dt = cutting_rate * time_step(sim);
     
     if ( new_end_state[0] == STATE_BLACK )
@@ -99,6 +103,7 @@ void CutterProp::write_values(std::ostream& os) const
     write_value(os, "diffusion", line_diffusion);
     write_value(os, "cutting_rate",  cutting_rate);
     write_value(os, "cutting_range", cutting_range);
+    write_value(os, "cut_width", cut_width);
     write_value(os, "new_end_state", new_end_state, 2);
 }
 

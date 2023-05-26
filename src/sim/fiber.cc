@@ -518,7 +518,6 @@ Fiber* Fiber::severM(real abs)
 
     resetLattice();
     fib->resetLattice();
-
     return fib;
 }
 
@@ -532,7 +531,7 @@ Fiber* Fiber::severNow(const real abs, const real min)
         // this will remove a section near the minus-end
         if ( 0 < disM && abs < abscissaP() )
             cutM(disM);
-        return nullptr;
+        return this;
     }
     real disP = abscissaP() - abs;
     if ( disP < min )
@@ -559,65 +558,33 @@ void Fiber::severNow()
      */
     for ( CutFacts const& cut : pendingCuts )
     {
-        //std::clog << "cut " << cut.abs << " [ " << abscissaM() << " " << abscissaP() << " ]\n";
-        if ( cut.abs - abscissaM() <= prop->min_length )
-        {
-            // we check the range again, since the fiber tip may have changed:
-            if ( cut.abs > abscissaM() )
-            {
-                cutM(cut.abs-abscissaM());
-                setEndStateM(cut.stateM);
-            }
-            /*
-             since we have deleted the minus end section,
-             the following cuts in the list, which will be of lower abscissa,
-             should not be processed.
-             */
-            break;
-        }
-        else if ( abscissaP() - cut.abs <= prop->min_length )
-        {
-            // we check the range again, since the fiber tip may have changed:
-            if ( cut.abs < abscissaP() )
-            {
-                cutP(abscissaP()-cut.abs);
-                setEndStateP(cut.stateP);
-            }
-        }
-        else
-        {
-            Fiber * frag = severNow(cut.abs, min_len);
-            
+        Fiber * frag = severNow(cut.abs, min_len);
+        
+        try {
             // special case where the plus end section is simply deleted
             if ( cut.stateM == STATE_BLACK )
             {
                 delete(frag);
                 continue;
             }
-
             if ( frag )
             {
-                //add new fragment to simulation:
-                objset()->add(frag);
-
-                // check that ends spatially match:
-                assert_small((frag->posEndM() - posEndP()).norm());
-                
-                try {
+                if ( frag != this )
+                {
                     // old plus end converves its state:
                     frag->setEndStateP(endStateP());
-                    
-                    // new ends are set as wished:
-                    this->setEndStateP(cut.stateP);
-                    frag->setEndStateM(cut.stateM);
+                    // new plus end:
+                    setEndStateP(cut.stateP);
                 }
-                catch ( Exception & e )
-                {
-                    e << "while cutting fiber " << reference();
-                    throw;
-                }
-            
-#ifdef LOGGING
+                // new minus end:
+                frag->setEndStateM(cut.stateM);
+                
+                //add new fragment to simulation:
+                objset()->add(frag);
+                
+                // check that ends spatially match:
+                assert_small((frag->posEndM() - posEndP()).norm());
+#if 1
                 Cytosim::log << "severed " << reference() << " at abscissa " << cut.abs;
                 Cytosim::log << "   creating " << frag->reference();
                 Cytosim::log << "   position " << frag->posEndM() << '\n';
@@ -626,9 +593,14 @@ void Fiber::severNow()
             }
             else
             {
-                Cytosim::log << " sever abscissa " << cut.abs << " is out of range";
-                Cytosim::log << " [ " << abscissaM() << "   " << abscissaP() << " ]" << '\n';
+                // a section near the plus end was removed
+                setEndStateP(cut.stateP);
             }
+        }
+        catch ( Exception & e )
+        {
+            e << "while cutting fiber " << reference();
+            throw;
         }
     }
     pendingCuts.clear();
@@ -1655,7 +1627,7 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
             assert_true( abs >= ai - REAL_EPSILON );
             assert_true( abs <= as + REAL_EPSILON );
             
-            sever(abs, STATE_RED, STATE_GREEN);
+            severSoon(abs, 0, STATE_RED, STATE_GREEN);
             val += fac * RNG.exponential();
         }
         

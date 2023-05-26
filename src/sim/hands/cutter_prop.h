@@ -41,10 +41,13 @@ public:
 
     /// rate of cutting event
     real cutting_rate;
-    
+
     /// max distance from the minus end for cutting
     real cutting_range;
     
+    /// amount of polymer removed upon cutting
+    real cut_width;
+
     /// dynamic state of newly created Fiber ends
     /**
       This defines the dynamic state of the new ends that are created by a cut:

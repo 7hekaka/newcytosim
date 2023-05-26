@@ -260,7 +260,7 @@ void FiberSet::step()
 #endif
     /*
      We call step() here exactly once for every Fiber.
-     New Fiber may be created, for instance by Fiber::sever(), but they should
+     New Fiber may be created, for instance by Fiber::severSoon(), but they should
      be linked at the start of the list, and thus not considered here.
      */
     Fiber * obj = first();

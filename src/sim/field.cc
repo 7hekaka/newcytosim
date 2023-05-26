@@ -527,7 +527,7 @@ void Field::step(FiberSet& fibers)
             if ( prop->cut_fibers == 2 )
                 val = val * val / cellVolume();
             if ( RNG.test(-std::expm1(-fac*val)) )
-                i.fiber()->sever(i.abscissa(), STATE_RED, STATE_GREEN);
+                i.fiber()->severSoon(i.abscissa(), 0, STATE_RED, STATE_GREEN);
         }
     }
     

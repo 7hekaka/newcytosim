@@ -90,12 +90,13 @@ private:
     class CutFacts
     {
     public:
-        real    abs;      ///< abscissa of the cut, from the reference
+        real abs;         ///< abscissa of the cut, from the reference
+        real width;       ///< amount removed
         state_t stateM;   ///< state of the new minus end
         state_t stateP;   ///< state of the new plus end
         
         /// constructor (abscissa, new_plus_end_state, new_minus_end_state)
-        CutFacts(real a, state_t p, state_t m) { abs=a; stateP=p; stateM=m; }
+        CutFacts(real a, real w, state_t p, state_t m) { abs=a; width=w; stateP=p; stateM=m; }
         
         /// sort from plus end to minus end, i.e. with decreasing abscissa
         bool operator < (CutFacts const&b) const { return abs > b.abs; }
@@ -157,7 +158,7 @@ protected:
     /// cut fiber at abscissa `abs`; returns section `[ abs - plus end ]`
     Fiber * severNow(real abs, const real min);
     
-    /// perform all the cuts registered by sever()
+    /// perform all the cuts registered by severSoon()
     void severNow();
 
 public:
@@ -226,7 +227,7 @@ public:
     void planarCut(Vector const& n, real a, state_t stateP, state_t stateM, real min_len);
 
     /// register a cut at abscissa `a` from the ORIGIN, with `m` and `p` the states of the new ends
-    void sever(real a, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, p, m)); }
+    void severSoon(real a, real w, state_t p, state_t m) { pendingCuts.insert(CutFacts(a, w, p, m)); }
 
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
     virtual void join(Fiber *);
