@@ -173,6 +173,8 @@ def main(args):
     
     # first argument is used for go_sim.py:
     exe = args.pop(0)
+    if os.path.isfile(exe):
+        exe = os.path.abspath(exe)
     # run executable within the debugger, to get trace if it crashes:
     #exe = 'gdb -batch -ex run -ex bt /home/fjn28/rds/hpc-work/spindle/simd'
 
