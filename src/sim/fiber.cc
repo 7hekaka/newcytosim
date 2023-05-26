@@ -523,14 +523,13 @@ Fiber* Fiber::severM(real abs)
 }
 
 
-Fiber* Fiber::severNow(const real abs)
+Fiber* Fiber::severNow(const real abs, const real min)
 {
-    real min = prop->min_length;
     //std::clog << "sever " << reference() << " at " << abs << '\n';
     real disM = abs - abscissaM();
     if ( disM < min )
     {
-        // this will remove a tiny fraction of the fiber at the minus-end
+        // this will remove a section near the minus-end
         if ( 0 < disM && abs < abscissaP() )
             cutM(disM);
         return nullptr;
@@ -538,7 +537,7 @@ Fiber* Fiber::severNow(const real abs)
     real disP = abscissaP() - abs;
     if ( disP < min )
     {
-        // this will remove a tiny fraction of the fiber at the plus-end
+        // this will remove a section near the plus-end
         if ( 0 < disP && abscissaM() < abs )
             cutP(disP);
         return nullptr;
@@ -553,6 +552,7 @@ Fiber* Fiber::severNow(const real abs)
 */
 void Fiber::severNow()
 {
+    const real min_len = prop->min_length;
     /**
      The std::set keeps its objects always in order of descending abscissa, and
      it is essential here to avoid data loss: cutting from high to low abscissa
@@ -586,7 +586,7 @@ void Fiber::severNow()
         }
         else
         {
-            Fiber * frag = severNow(cut.abs);
+            Fiber * frag = severNow(cut.abs, min_len);
             
             // special case where the plus end section is simply deleted
             if ( cut.stateM == STATE_BLACK )
@@ -676,7 +676,7 @@ void  Fiber::planarCut(Vector const& n, const real a,
     
     for ( real abs : cuts )
     {
-        Fiber * frag = severNow(abs);
+        Fiber * frag = severNow(abs, min_len);
         if ( frag )
         {
             // old plus end converves its state:

@@ -155,7 +155,7 @@ protected:
     Fiber * severM(real abs);
 
     /// cut fiber at abscissa `abs`; returns section `[ abs - plus end ]`
-    Fiber * severNow(real abs);
+    Fiber * severNow(real abs, const real min);
     
     /// perform all the cuts registered by sever()
     void severNow();
