@@ -48,7 +48,7 @@ F. Nedelec
 submit  = 'sbatch'
 queue   = 'skylake'
 runtime = '12:00:00' # 12 hours
-memory  = '4048'     # in MB
+memory  = 4048       # in MB
 ncpu    = 1          # nb of threads per job
 
 import sys, os, shutil, subprocess
@@ -92,7 +92,7 @@ def write_script(filename, cmd):
     for s in cmd:
         f.write(s+'\n')
     f.close()
-    os.chmod(filename, 0700)
+    os.chmod(filename, 0o0700)
 
 #------------------------------------------------------------------------
 
@@ -120,7 +120,7 @@ def sub_script(exe):
     cmd += ['--job-name='+jdir]
     cmd += ['--partition='+queue] 
     cmd += ['--time='+runtime] 
-    cmd += ['--mem='+memory]
+    cmd += ['--mem='+repr(memory)]
     # define signals sent if time is exceeded:
     cmd += ['--signal=INT@240']
     cmd += ['--signal=TERM@10']
@@ -142,7 +142,7 @@ def array_script(jobcnt):
         cmd += ['--cpus-per-task=%i' % ncpu]
     cmd += ['#SBATCH --partition='+queue]
     cmd += ['#SBATCH --time='+runtime]
-    cmd += ['#SBATCH --mem='+memory]
+    cmd += ['#SBATCH --mem='+repr(memory)]
     # define signals sent if time is exceeded:
     cmd += ['#SBATCH --signal=INT@240']
     cmd += ['#SBATCH --signal=TERM@10']
@@ -213,7 +213,7 @@ def main(args):
         else:
             [key, equal, val] = arg.partition('=')
             if key == 'mem' or key == 'memory':
-                memory = val
+                memory = int(val)
             elif key == 'cpu' or key == 'ncpu':
                 ncpu = int(val)
             elif key == 'day' or key == 'days':
