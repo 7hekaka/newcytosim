@@ -291,8 +291,8 @@ public:
     /// Name of output trajectory file (also known as `system`, <em>default = objects.cmo</em>)
     std::string system_file;
     
-    /// If `true`, any pre-existing trajectory file will be cleared (<em>default = true</em>)
-    bool clear_trajectory;
+    /// If `true`, any pre-existing system file will be cleared (<em>default = true</em>)
+    bool clear_system_file;
     
     /// If `true` free singles are not saved/read to/from file (<em>default = false</em>)
     int skip_free_single;

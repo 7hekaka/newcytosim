@@ -1017,9 +1017,9 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     if ( do_write )
     {
         sim_->writeProperties(prune);
-        if ( sim_->prop.clear_trajectory )
+        if ( sim_->prop.clear_system_file )
         {
-            sim_->prop.clear_trajectory = false;
+            sim_->prop.clear_system_file = false;
             // write initial state:
             if ( frames > 1 )
                 sim_->writeObjects(sim_->prop.system_file, false, binary);

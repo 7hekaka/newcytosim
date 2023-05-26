@@ -233,7 +233,9 @@ int main(int argc, char* argv[])
     
     if ( arg.has_key(".cmi") )
         simul.prop.system_file = arg.value(".cmi");
-    
+    if ( arg.has_key(".cmo") )
+        simul.prop.system_file = arg.value(".cmo");
+
     if ( arg.use_key("image") )
     {
         prop.image_name = "image%";

@@ -45,7 +45,7 @@ void SimulProp::clear()
 
     property_file = "properties.cmp";
     system_file   = Simul::TRAJECTORY;
-    clear_trajectory = true;
+    clear_system_file = true;
     
     skip_free_single = 0;
     skip_free_couple = 0;
@@ -113,11 +113,11 @@ void SimulProp::read(Glossary& glos)
     glos.set(system_file, "object_file", "trajectory");
     bool a = false;
     if ( glos.set(a, "append_file") )
-        clear_trajectory = !a;
+        clear_system_file = !a;
 #endif
 
     glos.set(system_file, "system_file", "system");
-    glos.set(clear_trajectory, "clear_trajectory");
+    glos.set(clear_system_file, "clear_system_file");
     
     glos.set(skip_free_single, "skip_free_single");
     glos.set(skip_free_couple, "skip_free_couple");
