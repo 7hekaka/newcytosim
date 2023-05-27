@@ -282,6 +282,8 @@ void FiberSet::step()
         }
 #endif
         obj->step(); // this may delete 'obj'
+        // delete object that have been flagged
+        if ( ! obj->prop ) delete(obj);
         obj = nxt;
     }
 }
@@ -306,6 +308,7 @@ void FiberSet::planarCut(Vector const& n, const real a,
     {
         Fiber * nxt = obj->next();
         obj->planarCut(n, a, stateP, stateM, min_len);
+        if ( ! obj->prop ) delete(obj);
         obj = nxt;
     }
 }

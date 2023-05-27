@@ -38,7 +38,7 @@ void Fiber::step()
     if ( hasKink(0) )
     {
         LOG_ONCE("DELETE_KINKED_FIBERS\n");
-        delete(this);
+        prop = nullptr; // flag object to be deleted
         return;
     }
 #endif
@@ -50,7 +50,7 @@ void Fiber::step()
     // delete self if shorter than 'FiberProp::min_length'
     if ( length() < prop->min_length && ! prop->persistent )
     {
-        delete(this);
+        prop = nullptr; // flag object to be deleted
         return;
     }
     
@@ -147,7 +147,7 @@ bool Fiber::updateLength(real addM, real addP, bool split)
         {
             if ( !prop->persistent )
             {
-                delete(this);
+                prop = nullptr; // flag object to be deleted
                 return false;
             }
             else
@@ -661,7 +661,10 @@ void  Fiber::planarCut(Vector const& n, const real a,
             }
             // *this is reduced to its minus end portion:
             if ( stateP == STATE_BLACK || length() < min_len )
-                return delete(this);
+            {
+                prop = nullptr; // flag object to be deleted
+                return;
+            }
             else
                 setEndStateP(stateP);
         }
