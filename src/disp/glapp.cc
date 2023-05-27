@@ -447,7 +447,7 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
             
         case 'b':
             view.scalebar = ( view.scalebar + 1 ) & 3;
-            flashText("view:scalebar = %i", view.scalebar);
+            flashText("view:pixel_size = %.2f nm", 1000*view.pixelSize());
             break;
         
             
