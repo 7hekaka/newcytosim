@@ -232,8 +232,8 @@ public:
     /// call Chain::join(), and transfer Hands (caller should delete `fib`).
     virtual void join(Fiber *);
     
-    /// simulation step with some growth/shrinkage from the ends
-    void growStep(real, real, bool = true);
+    /// implements some growth/shrinkage at the ends as part of a simulation step
+    bool updateLength(real, real, bool = true);
     
     /// update Lattice and Mesh ranges
     void updateRange(Field*);

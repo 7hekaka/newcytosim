@@ -106,10 +106,9 @@ void Fiber::step()
 
 
 
-void Fiber::growStep(real addM, real addP, bool split)
+bool Fiber::updateLength(real addM, real addP, bool split)
 {
     //std::clog << reference() << " P " << addP << " M " << addM << " len " << length() << "\n";
-
     // reset increments; they will be set again by growP and growM
     cDeltaM = 0;
     cDeltaP = 0;
@@ -149,7 +148,7 @@ void Fiber::growStep(real addM, real addP, bool split)
             if ( !prop->persistent )
             {
                 delete(this);
-                return;
+                return false;
             }
             else
             {
@@ -194,8 +193,7 @@ void Fiber::growStep(real addM, real addP, bool split)
             }
         }
     }
-    
-    Fiber::step();
+    return true;
 }
 
 //------------------------------------------------------------------------------
