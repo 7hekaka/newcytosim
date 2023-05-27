@@ -36,7 +36,7 @@ public:
      */
     
     /// rate for nucleation (also known as `nucleate[0]`)
-    real rate;
+    real nucleation_rate;
 
     /// type of fiber that is nucleated (also known as `nucleate[1]`)
     std::string fiber_type;
@@ -50,6 +50,9 @@ public:
     
     /// angle of newly made fiber, relative to mother filament for Nucleator in Couple
     real nucleation_angle;
+    
+    ///
+    real nucleation_limit;
     
     /// specificity of nucleation
     int specificity;
@@ -95,8 +98,7 @@ public:
     
 private:
     
-    real rate_dt;
-    
+    real nucleation_rate_dt;
     
 public:
     

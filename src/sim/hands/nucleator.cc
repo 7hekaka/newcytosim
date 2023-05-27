@@ -119,15 +119,17 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
 void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
 {
     assert_false( attached() );
+    FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop()->fiber_type);
+    size_t cnt = sim.fibers.count(fip);
     
-    nextAct -= prop()->rate_dt;
+    real rate = prop()->nucleation_rate_dt * ( 1.0 - real(cnt) * prop()->nucleation_limit );
+    nextAct -= rate;
     
     if ( nextAct < 0 )
     {
         nextAct = RNG.exponential();
         try {
             Glossary opt(prop()->fiber_spec);
-            FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop()->fiber_type);
             ObjectList objs = makeFiber(sim, pos, fip, opt);
             sim.add(objs);
         }
