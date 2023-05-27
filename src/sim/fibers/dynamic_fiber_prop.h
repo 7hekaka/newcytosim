@@ -5,6 +5,8 @@
 
 #include "fiber_prop.h"
 
+/// Enables code to reduce growth of plus ends that are outside
+#define NEW_STALL_OUTSIDE 0
 
 /// additional Property for DynamicFiber
 /**
@@ -86,6 +88,17 @@ public:
     real zone_hydrolysis_rate[2];
 #endif
 
+#if NEW_STALL_OUTSIDE
+    /// catastrophe rate scaling factor applied if the plus end is outside
+    /**
+     A value < 1 inhibits catastrophe at the edge; A value > 1 accelerates catastrophes
+     */
+    real stall_outside;
+
+    /// space used for `stall_outside'
+    std::string stall_label;
+#endif
+
     /// The probability of encountering an unhydrolysed tubulin unit while shrinking (default=0)
     real unhydrolyzed_prob[2];
     /// @}
@@ -104,9 +117,12 @@ private:
 #if OLD_DYNAMIC_ZONE
     real zone_hydrolysis_rate_2dt[2];
     real zone_radius_sqr;
-    Space const*  zone_space_ptr;
+    Space const* zone_space_ptr;
 #endif
-    
+#if NEW_STALL_OUTSIDE
+    Space const* stall_space;
+#endif
+
 public:
     
     /// constructor

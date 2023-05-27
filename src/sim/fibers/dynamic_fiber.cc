@@ -5,6 +5,7 @@
 #include "assert_macro.h"
 #include "dynamic_fiber.h"
 #include "dynamic_fiber_prop.h"
+#include "messages.h"
 #include "exceptions.h"
 #include "iowrapper.h"
 //#include "object_set.h"
@@ -326,6 +327,15 @@ int DynamicFiber::stepPlusEnd()
         // antagonistic force (< 0) decreases assembly rate exponentially
         if (( forceP < 0 ) & ( growth > 0 ))
             growth *= std::exp(forceP*prop()->growing_force_inv[P]);
+
+#if NEW_STALL_OUTSIDE
+        // Growth is reduced if the plus end is outside
+        if ( prop()->stall_space && prop()->stall_space->outside(posEndP()) )
+        {
+            LOG_ONCE("Fiber's plus-end growth rate is different outside the Space\n");
+            growth /= prop()->stall_outside;
+        }
+#endif
 
         real hydrol = prop()->hydrolysis_rate_2dt[P];
         

@@ -40,6 +40,11 @@ void DynamicFiberProp::clear()
     for ( int i = 0; i < 2; ++i )
         zone_hydrolysis_rate[i] = 0;
 #endif
+#if NEW_STALL_OUTSIDE
+    stall_outside = 1;
+    stall_label = "";
+    stall_space = nullptr;
+#endif
 }
 
 
@@ -121,6 +126,10 @@ void DynamicFiberProp::read(Glossary& glos)
     glos.set(zone_radius,             "zone_radius");
     glos.set(zone_hydrolysis_rate, 2, "zone_hydrolysis_rate");
 #endif
+#if NEW_STALL_OUTSIDE
+    glos.set(stall_outside, "stall_outside");
+    glos.set(stall_label, "stall_outside", 1);
+#endif
 #if BACKWARD_COMPATIBILITY < 44
     if ( glos.set(growing_force[0], "dynamic_force") )
         Cytosim::warn << "fiber:dynamic_force was renamed growing_force\n";
@@ -201,6 +210,14 @@ void DynamicFiberProp::complete(Simul const& sim)
         Cytosim::log("fiber:min_length <-- %.3f\n", unit_length);
         min_length = unit_length;
     }
+    
+#if NEW_STALL_OUTSIDE
+    stall_space = sim.findSpace(stall_label);
+    if ( stall_space )
+        stall_label = stall_space->name();
+    else if ( primed(sim) && stall_outside != 1 )
+        throw InvalidParameter("A space must be specified as stall_outside[1]");
+#endif
 }
 
 
@@ -220,6 +237,9 @@ void DynamicFiberProp::write_values(std::ostream& os) const
     write_value(os, "zone_space",           zone_space);
     write_value(os, "zone_radius",          zone_radius);
     write_value(os, "zone_hydrolysis_rate", zone_hydrolysis_rate, 2);
+#endif
+#if NEW_STALL_OUTSIDE
+    write_value(os, "stall_outside", stall_outside, stall_label);
 #endif
 }
 
