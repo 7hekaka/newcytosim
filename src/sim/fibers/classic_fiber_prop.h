@@ -6,10 +6,10 @@
 #include "fiber_prop.h"
 
 
-/// Enables support for an option to make catastrophe rate dependent on fiber length
+/// Enables code to make catastrophe rate dependent on fiber length
 #define NEW_LENGTH_DEPENDENT_CATASTROPHE 0
 
-/// Enables support for an option that induces catastrophe if the plus end is outside
+/// Enables code that induces catastrophe if the plus end is outside
 #define NEW_CATASTROPHE_OUTSIDE 0
 
 
@@ -120,7 +120,7 @@ public:
     real catastrophe_outside;
 
     /// space used for `catastrophe_outside'
-    std::string catastrophe_space;
+    std::string catastrophe_label;
 
 #endif
     
@@ -159,7 +159,7 @@ private:
 
 #if NEW_CATASTROPHE_OUTSIDE
     /// pointer to actual Space used for `catastrophe_outside`
-    Space const* catastrophe_space_ptr;
+    Space const* catastrophe_space;
 #endif
     
 public:

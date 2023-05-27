@@ -39,7 +39,8 @@ void ClassicFiberProp::clear()
 #endif
 #if NEW_CATASTROPHE_OUTSIDE
     catastrophe_outside = 1;
-    catastrophe_space_ptr = nullptr;
+    catastrophe_label = "";
+    catastrophe_space = nullptr;
 #endif
 }
 
@@ -63,7 +64,7 @@ void ClassicFiberProp::read(Glossary& glos)
 #endif
 #if NEW_CATASTROPHE_OUTSIDE
     glos.set(catastrophe_outside, "catastrophe_outside");
-    glos.set(catastrophe_space, "catastrophe_outside", 1);
+    glos.set(catastrophe_label, "catastrophe_outside", 1);
 #endif
 
 #if BACKWARD_COMPATIBILITY < 44
@@ -163,10 +164,10 @@ void ClassicFiberProp::complete(Simul const& sim)
     }
     
 #if NEW_CATASTROPHE_OUTSIDE
-    catastrophe_space_ptr = sim.findSpace(catastrophe_space);
+    catastrophe_space = sim.findSpace(catastrophe_label);
     
-    if ( catastrophe_space_ptr )
-        catastrophe_space = catastrophe_space_ptr->name();
+    if ( catastrophe_space )
+        catastrophe_label = catastrophe_space->name();
     else if ( primed(sim) && catastrophe_outside != 1 )
         throw InvalidParameter("A space must be specified as catastrophe_outside[1]");
 #endif
@@ -190,7 +191,7 @@ void ClassicFiberProp::write_values(std::ostream& os) const
     write_value(os, "catastrophe_length",       catastrophe_length);
 #endif
 #if NEW_CATASTROPHE_OUTSIDE
-    write_value(os, "catastrophe_outside", catastrophe_outside, catastrophe_space);
+    write_value(os, "catastrophe_outside", catastrophe_outside, catastrophe_label);
 #endif
 }
 
