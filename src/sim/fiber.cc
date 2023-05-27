@@ -546,6 +546,45 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
 }
 
 
+void Fiber::severNow(const real abs1, const real abs2, const real min_len,
+                     state_t stateP, state_t stateM)
+{
+    Fiber * frag = severNow(abs1, abs2, min_len);
+    
+    // special case where the plus end section is simply deleted
+    if ( stateM == STATE_BLACK )
+        return delete(frag);
+    if ( frag == nullptr )
+    {
+        // a section near the plus end was removed
+        setEndStateP(stateP);
+    }
+    else if ( frag != this )
+    {
+        // old plus end converves its state:
+        frag->setEndStateP(endStateP());
+        // new plus end:
+        setEndStateP(stateP);
+        // new minus end:
+        frag->setEndStateM(stateM);
+        
+        //add new fragment to simulation:
+        objset()->add(frag);
+#if 1
+        Cytosim::log << reference() << " cut at [ " << abs1 << " " << abs2 << " ] ";
+        Cytosim::log << " creating " << frag->reference() << " at " << frag->posEndM() << '\n';
+#endif
+        //Cytosim::log << " severed at X = " << frag->posEndM().XX << '\n';
+    }
+    else
+    {
+        assert_true( frag == this );
+        // a section near the minus end was removed
+        setEndStateM(stateM);
+    }
+}
+
+
 void Fiber::findSeverEdges(real& a, real& b)
 {
     real w = b * 0.5;
@@ -569,44 +608,8 @@ void Fiber::severNow()
     {
         real a = cut.abscissa, w = cut.cutwidth;
         findSeverEdges(a, w);
-        Fiber * frag = severNow(a, w, min_len);
-        
         try {
-            // special case where the plus end section is simply deleted
-            if ( cut.stateM == STATE_BLACK )
-            {
-                delete(frag);
-                continue;
-            }
-            if ( frag == nullptr )
-            {
-                // a section near the plus end was removed
-                setEndStateP(cut.stateP);
-            }
-            else if ( frag != this )
-            {
-                // old plus end converves its state:
-                frag->setEndStateP(endStateP());
-                // new plus end:
-                setEndStateP(cut.stateP);
-                // new minus end:
-                frag->setEndStateM(cut.stateM);
-                
-                //add new fragment to simulation:
-                objset()->add(frag);
-#if 0
-                Cytosim::log << "severed " << reference() << " at abscissa " << cut.abscissa;
-                Cytosim::log << "   creating " << frag->reference();
-                Cytosim::log << "   position " << frag->posEndM() << '\n';
-#endif
-                //Cytosim::log << " severed at X = " << frag->posEndM().XX << '\n';
-            }
-            else
-            {
-                assert_true( frag == this );
-                // a section near the minus end was removed
-                setEndStateM(cut.stateM);
-            }
+            severNow(a, w, min_len, cut.stateP, cut.stateM);
         }
         catch ( Exception & e )
         {
@@ -658,28 +661,7 @@ void  Fiber::planarCut(Vector const& n, const real a,
     
     for ( real abs : cuts )
     {
-        Fiber * frag = severNow(abs, abs, min_len);
-        if ( frag )
-        {
-            // old plus end converves its state:
-            frag->setEndStateP(endStateP());
-            // frag is now plus end portion:
-            if ( stateM == STATE_BLACK || frag->length() < min_len )
-                delete(frag);
-            else
-            {
-                frag->setEndStateM(stateM);
-                objset()->add(frag);
-            }
-            // *this is reduced to its minus end portion:
-            if ( stateP == STATE_BLACK || length() < min_len )
-            {
-                prop = nullptr; // flag object to be deleted
-                return;
-            }
-            else
-                setEndStateP(stateP);
-        }
+        severNow(abs, abs, min_len, stateP, stateM);
     }
 }
 

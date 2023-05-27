@@ -158,9 +158,12 @@ protected:
     /// calculate the edges of the cut around `a` (arguments used for input/output)
     virtual void findSeverEdges(real& a, real& b);
 
-    /// cut fiber at abscissa `abs`; returns section `[ abs - plus end ]`
+    /// cut fiber at abscissa `[abs1, ab2]`; returns section `[ abs - plus end ]`
     Fiber * severNow(real abs1, real abs2, const real min);
-    
+
+    /// cut fiber, and set states of the newly created ends
+    void severNow(real abs1, real abs2, const real min, state_t P, state_t M);
+
     /// perform all the cuts registered by severSoon()
     void severNow();
 
