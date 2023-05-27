@@ -158,27 +158,27 @@ void DynamicFiberProp::complete(Simul const& sim)
     for ( int i = 0; i < 2; ++i )
     {
         if ( growing_force[i] <= 0 )
-            throw InvalidParameter("fiber:growing_force should be > 0");
+            throw InvalidParameter(name()+":growing_force should be > 0");
         growing_force_inv[i] = 1.0 / growing_force[i];
 
         if ( growing_speed[i] < 0 )
-            throw InvalidParameter("fiber:growing_speed should be >= 0");
+            throw InvalidParameter(name()+":growing_speed should be >= 0");
         growing_rate_dt[i] = time_step(sim) * abs_real(growing_speed[i]) / unit_length;
 
         if ( growing_off_speed[i] > 0 )
-            throw InvalidParameter("growing_off_speed should be <= 0");
+            throw InvalidParameter(name()+":growing_off_speed should be <= 0");
         growing_off_rate_dt[i] = -time_step(sim) * growing_off_speed[i] / unit_length;
 
         if ( hydrolysis_rate[i] < 0 )
-            throw InvalidParameter("fiber:hydrolysis_rate should be >= 0");
+            throw InvalidParameter(name()+":hydrolysis_rate should be >= 0");
         hydrolysis_rate_2dt[i] = 2 * time_step(sim) * hydrolysis_rate[i];
         
 #if OLD_DYNAMIC_ZONE
         zone_space_ptr = sim.findSpace(zone_space);
         if ( zone_radius < 0 )
-            throw InvalidParameter("fiber:zone_radius should be >= 0");
+            throw InvalidParameter(name()+":zone_radius should be >= 0");
         if ( zone_hydrolysis_rate[i] < 0 )
-            throw InvalidParameter("fiber:zone_hydrolysis_rate should be >= 0");
+            throw InvalidParameter(name()+":zone_hydrolysis_rate should be >= 0");
         zone_hydrolysis_rate_2dt[i] = 2 * time_step(sim) * zone_hydrolysis_rate[i];
 
         zone_radius_sqr = square(zone_radius);
@@ -197,7 +197,10 @@ void DynamicFiberProp::complete(Simul const& sim)
     }
 
     if ( min_length <= 0 )
+    {
+        Cytosim::log("fiber:min_length <-- %.3f\n", unit_length);
         min_length = unit_length;
+    }
 }
 
 

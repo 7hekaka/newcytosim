@@ -165,6 +165,9 @@ public:
     /// Stochastic simulation
     void step();
     
+    /// calculate the edges of the cut around `a` (arguments used for input/output)
+    void findSeverEdges(real& a, real& b);
+
     //--------------------------------------------------------------------------
     
     /// return specification of fiber class

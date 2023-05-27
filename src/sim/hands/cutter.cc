@@ -45,7 +45,7 @@ void Cutter::cut()
         // do not sever the fiber that is closest to the edge:
         if ( PZ < QZ )
             return;
-        std::cerr << "selectively cutting crossing fiber at Z " << PZ << " vs. " << QZ << "\n";
+        std::clog << "selectively cutting crossing fiber at Z " << PZ << " over " << QZ << "\n";
     }
     /**
      Cutting the fiber can invalidate the FiberGrid used for attachment,
@@ -57,7 +57,7 @@ void Cutter::cut()
      */
     Fiber * fib = modifiableFiber();
     fib->severSoon(abscissa(), prop()->cut_width, prop()->new_end_state[0], prop()->new_end_state[1]);
-    //std::clog << "cut " << fiber()->reference() << " @ " << abscissaFromM() << "\n";
+    //std::clog << "cut " << fiber()->reference() << " @ " << abscissa() << "\n";
     
     // simplest is to detach since the location will be at the tip of new fiber
     detach();

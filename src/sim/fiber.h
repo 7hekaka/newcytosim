@@ -90,16 +90,16 @@ private:
     class CutFacts
     {
     public:
-        real abs;         ///< abscissa of the cut, from the reference
-        real width;       ///< amount removed
+        real abscissa;    ///< abscissa of the cut, from the reference
+        real cutwidth;    ///< amount removed
         state_t stateM;   ///< state of the new minus end
         state_t stateP;   ///< state of the new plus end
         
         /// constructor (abscissa, new_plus_end_state, new_minus_end_state)
-        CutFacts(real a, real w, state_t p, state_t m) { abs=a; width=w; stateP=p; stateM=m; }
+        CutFacts(real a, real w, state_t p, state_t m) { abscissa=a; cutwidth=w; stateP=p; stateM=m; }
         
         /// sort from plus end to minus end, i.e. with decreasing abscissa
-        bool operator < (CutFacts const&b) const { return abs > b.abs; }
+        bool operator < (CutFacts const&b) const { return abscissa > b.abscissa; }
     };
 
     /// list of bound Hands
@@ -153,10 +153,13 @@ protected:
     void setFiberConfinement(Meca&, Confinement, Space const*, real stiff, real stiff2) const;
     
     /// cut fiber at distance `abs` from the minus end; returns section `[ abs - plus end ]`
-    Fiber * severM(real abs);
+    Fiber * severM(real abs1, real abs2);
+
+    /// calculate the edges of the cut around `a` (arguments used for input/output)
+    virtual void findSeverEdges(real& a, real& b);
 
     /// cut fiber at abscissa `abs`; returns section `[ abs - plus end ]`
-    Fiber * severNow(real abs, const real min);
+    Fiber * severNow(real abs1, real abs2, const real min);
     
     /// perform all the cuts registered by severSoon()
     void severNow();

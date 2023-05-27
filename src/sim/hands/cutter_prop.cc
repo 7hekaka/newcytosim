@@ -23,6 +23,7 @@ void CutterProp::clear()
     line_diffusion = 0;
     cutting_rate = 0;
     cutting_range = INFINITY;
+    cut_width = 0;
     
     new_end_state[0] = STATE_WHITE;
     new_end_state[1] = STATE_WHITE;

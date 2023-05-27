@@ -390,6 +390,15 @@ int DynamicFiber::stepPlusEnd()
 //------------------------------------------------------------------------------
 #pragma mark -
 
+void DynamicFiber::findSeverEdges(real& a, real& b)
+{
+    const real uni = prop()->unit_length;
+    real w = b * 0.5;
+    b = uni * std::ceil((a+w)/uni);
+    a = uni * std::floor((a-w)/uni);
+}
+
+
 void DynamicFiber::step()
 {
     //std::clog << prop()->name() << " " << this << " " << stabilized_[0] << "  " << stabilized_[1] << "\n";
@@ -453,11 +462,15 @@ void DynamicFiber::step()
     else
         addP = stepPlusEnd();
 
-    addM *= prop()->unit_length;
-    addP *= prop()->unit_length;
+    const real uni = prop()->unit_length;
+    addM *= uni;
+    addP *= uni;
     
     if ( Fiber::updateLength(addM, addP, false) )
+    {
         Fiber::step();
+        //if ( prop() ) std::clog << reference() << "  " << abscissaM()/uni << "  " << abscissaP()/uni << "\n";
+    }
 }
 
 

@@ -453,18 +453,19 @@ Fiber* Fiber::severPoint(size_t pti)
 
 
 /**
-The Fiber is cut at distance `abs` from its minus end:
- - current Fiber is truncated to keep only the section [ minus end , abs ],
- - A new Fiber is created representing the other section [ abs , PLUS_END ],
+The Fiber is cut at distance `dis1` and `dis2` from its minus end:
+ - current Fiber is truncated to keep only the section [ minus end , dis1 ],
+ - A new Fiber is created representing the other section [ dis2 , PLUS_END ],
  - Hands are relocated to the new Fiber if appropriate,
- - Lattice substances are also relocated,
+ - Lattice substances are also relocated or released
  .
  A pointer to the new Fiber is returned (containing the PLUS_END), but this
- pointer may be zero, if `abs` was not within the valid range of abscissa.
+ pointer may be zero, if the cut position was not within the valid range of abscissa.
  If a new Fiber was created, it should be added to the FiberSet.
  */
-Fiber* Fiber::severM(real abs)
+Fiber* Fiber::severM(real dis1, real dis2)
 {
+    assert_true( dis1 <= dis2 );
     // create a new Fiber of the same class:
     Fiber* fib = prop->newFiber();
     assert_true( fib->prop == prop );
@@ -475,14 +476,13 @@ Fiber* Fiber::severM(real abs)
 
     // copy the Chain part of the object:
     *(static_cast<Chain*>(fib)) = *this;
-    *(static_cast<Object*>(fib)) = *this;
 
-    // check correctness of values:
+    // check that abscissa were transferred:
     assert_small(fib->abscissaM() - abscissaM());
     assert_small(fib->abscissaP() - abscissaP());
 
-    // remove minus end portion on new piece
-    fib->Chain::cutM(abs);
+    // remove minus end section on new piece
+    fib->Chain::cutM(dis2);
     // initialize Lattice on new piece
     fib->updateRange(nullptr);
 
@@ -491,26 +491,27 @@ Fiber* Fiber::severM(real abs)
     {
         assert_true( fMesh.unit() == fib->fMesh.unit() );
         // transfer Lattice values located above the cut:
-        fib->fMesh.takeP(fMesh, fMesh.index_round(abscissaM()+abs));
+        fib->fMesh.takeP(fMesh, fMesh.index_round(abscissaM()+dis2));
     }
 #endif
     
-    // remove plus end portion on self
-    Chain::cutP(length()-abs);
-    
-    assert_small(fib->abscissaM()-abscissaP());
+    // remove plus end section on self
+    Chain::cutP(length()-dis1);
 
     // transfer all Hands above cut to new piece
     // their abscissa should not change in this transfer
-    abs += abscissaM();
+    dis1 += abscissaM();
+    dis2 += abscissaM();
     Hand * h = fHands.front();
     while ( h )
     {
         Hand * x = h->next();
-        if ( h->abscissa() >= abs )
+        if ( h->abscissa() >= dis2 )
             h->relocate(fib);
-        else
+        else if ( h->abscissa() < dis1 )
             h->reinterpolate();
+        else
+            h->detach();
         h = x;
     }
 
@@ -520,26 +521,36 @@ Fiber* Fiber::severM(real abs)
 }
 
 
-Fiber* Fiber::severNow(const real abs, const real min)
+Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
 {
-    //std::clog << "sever " << reference() << " at " << abs << '\n';
-    real disM = abs - abscissaM();
-    if ( disM < min )
+    //std::clog << "cut " << reference() << " @ [ " << a << " , " << w << "]\n";
+    real dis1 = abs1 - abscissaM();
+    real dis2 = abs2 - abscissaM();
+    if ( dis1 < min )
     {
         // this will remove a section near the minus-end
-        if ( 0 < disM && abs < abscissaP() )
-            cutM(disM);
+        if ( 0 < dis2 && abs2 < abscissaP() )
+            cutM(dis2);
         return this;
     }
-    real disP = abscissaP() - abs;
+    real disP = abscissaP() - abs2;
     if ( disP < min )
     {
+        real dis = abscissaP() - abs1;
         // this will remove a section near the plus-end
-        if ( 0 < disP && abscissaM() < abs )
-            cutP(disP);
+        if ( 0 < dis && abscissaM() < abs1 )
+            cutP(dis);
         return nullptr;
     }
-    return severM(disM);
+    return severM(dis1, dis2);
+}
+
+
+void Fiber::findSeverEdges(real& a, real& b)
+{
+    real w = b * 0.5;
+    b = a + w;
+    a = a - w;
 }
 
 
@@ -556,7 +567,9 @@ void Fiber::severNow()
      */
     for ( CutFacts const& cut : pendingCuts )
     {
-        Fiber * frag = severNow(cut.abs, min_len);
+        real a = cut.abscissa, w = cut.cutwidth;
+        findSeverEdges(a, w);
+        Fiber * frag = severNow(a, w, min_len);
         
         try {
             // special case where the plus end section is simply deleted
@@ -565,25 +578,24 @@ void Fiber::severNow()
                 delete(frag);
                 continue;
             }
-            if ( frag )
+            if ( frag == nullptr )
             {
-                if ( frag != this )
-                {
-                    // old plus end converves its state:
-                    frag->setEndStateP(endStateP());
-                    // new plus end:
-                    setEndStateP(cut.stateP);
-                }
+                // a section near the plus end was removed
+                setEndStateP(cut.stateP);
+            }
+            else if ( frag != this )
+            {
+                // old plus end converves its state:
+                frag->setEndStateP(endStateP());
+                // new plus end:
+                setEndStateP(cut.stateP);
                 // new minus end:
                 frag->setEndStateM(cut.stateM);
                 
                 //add new fragment to simulation:
                 objset()->add(frag);
-                
-                // check that ends spatially match:
-                assert_small((frag->posEndM() - posEndP()).norm());
-#if 1
-                Cytosim::log << "severed " << reference() << " at abscissa " << cut.abs;
+#if 0
+                Cytosim::log << "severed " << reference() << " at abscissa " << cut.abscissa;
                 Cytosim::log << "   creating " << frag->reference();
                 Cytosim::log << "   position " << frag->posEndM() << '\n';
 #endif
@@ -591,8 +603,9 @@ void Fiber::severNow()
             }
             else
             {
-                // a section near the plus end was removed
-                setEndStateP(cut.stateP);
+                assert_true( frag == this );
+                // a section near the minus end was removed
+                setEndStateM(cut.stateM);
             }
         }
         catch ( Exception & e )
@@ -606,8 +619,7 @@ void Fiber::severNow()
 
 
 /**
- returns index of first point for which ( std::cos(angle) < max_cosine ),
- or zero
+ returns index of first point for which `std::cos(angle) < max_cosine`  or zero
  */
 size_t Fiber::hasKink(const real max_cosine) const
 {
@@ -646,7 +658,7 @@ void  Fiber::planarCut(Vector const& n, const real a,
     
     for ( real abs : cuts )
     {
-        Fiber * frag = severNow(abs, min_len);
+        Fiber * frag = severNow(abs, abs, min_len);
         if ( frag )
         {
             // old plus end converves its state:
