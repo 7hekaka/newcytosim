@@ -148,8 +148,9 @@ void Digit::handleDisassemblyM()
 {
     assert_true( attached() );
     
-    if ( RNG.test(prop()->hold_shrinking_end) )
+    if ( RNG.test(prop()->hold_shrinking_end[1]) )
     {
+        // do not detach:
         jumpToEndM();
         if ( site() < lattice()->entry() )
             detach();
@@ -166,8 +167,9 @@ void Digit::handleDisassemblyP()
 {
     assert_true( attached() );
     
-    if ( prop()->hold_shrinking_end > 0 )
+    if ( RNG.test(prop()->hold_shrinking_end[0]) )
     {
+        // do not detach:
         jumpToEndP();
         if ( site() > lattice()->fence() )
             detach();

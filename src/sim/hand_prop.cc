@@ -163,8 +163,9 @@ void HandProp::clear()
     bind_only_free_end = false;
 #endif
     hold_growing_end   = 0;
-    hold_shrinking_end = 0;
-    
+    hold_shrinking_end[0] = 0;
+    hold_shrinking_end[1] = 0;
+
     activity           = "bind";
     display            = "";
     display_fresh      = false;
@@ -213,7 +214,7 @@ void HandProp::read(Glossary& glos)
     
     
     glos.set(hold_growing_end,   "hold_growing_end");
-    glos.set(hold_shrinking_end, "hold_shrinking_end");
+    glos.set(hold_shrinking_end, 2, "hold_shrinking_end");
 #if NEW_BIND_ONLY_FREE_END
     glos.set(bind_only_free_end, "bind_only_free_end");
     if ( bind_only_free_end && ! bind_only_end )
@@ -253,8 +254,10 @@ void HandProp::complete(Simul const& sim)
     if ( hold_growing_end < 0 )
         throw InvalidParameter(name()+":hold_growing_end must be >= 0");
     
-    if ( hold_shrinking_end < 0 )
-        throw InvalidParameter(name()+":hold_shrinking_end must be >= 0");
+    if ( hold_shrinking_end[0] < 0 )
+        throw InvalidParameter(name()+":hold_shrinking_end[0] must be >= 0");
+    if ( hold_shrinking_end[1] < 0 )
+        throw InvalidParameter(name()+":hold_shrinking_end[1] must be >= 0");
 
     if ( primed(sim) )
     {
@@ -336,7 +339,7 @@ void HandProp::write_values(std::ostream& os) const
     
     write_value(os, "bind_also_end",      bind_also_end);
     write_value(os, "hold_growing_end",   hold_growing_end);
-    write_value(os, "hold_shrinking_end", hold_shrinking_end);
+    write_value(os, "hold_shrinking_end", 2, hold_shrinking_end);
     write_value(os, "bind_only_end",      bind_only_end, bind_end_range);
 #if NEW_BIND_ONLY_FREE_END
     write_value(os, "bind_only_free_end", bind_only_free_end);
