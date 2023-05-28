@@ -623,8 +623,11 @@ void Simul::reportFiberMarks(std::ostream& out, Property const*) const
     {
         std::uintptr_t val = k;
         ObjectList objs = fibers.collect(match_mark, reinterpret_cast<void*>(val));
-        out << LIN << ljust(std::to_string(val), 1);
-        printFiberLengths(out, objs);
+        if ( objs.size() )
+        {
+            out << LIN << ljust(std::to_string(val), 1);
+            printFiberLengths(out, objs);
+        }
     }
     out.precision(p);
 }
