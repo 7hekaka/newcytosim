@@ -731,7 +731,13 @@ Vector Cytosim::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
         
         if ( tok == "orthoradial" )
             return pos.randOrthoU(1.0);
-      
+        
+        if ( tok == "inwardX" )
+            return Vector(sign_real(pos.XX), 0, 0);
+        
+        if ( tok == "outwardX" )
+            return Vector(-sign_real(pos.XX), 0, 0);
+
         if ( spc )
         {
             if ( tok == "tangent" )
