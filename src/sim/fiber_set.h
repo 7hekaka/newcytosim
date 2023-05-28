@@ -129,7 +129,7 @@ public:
     real totalLength(FiberProp const *) const;
     
     /// calculate: number of fibers, mean, variance, min and max of fiber length
-    static void infoLength(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);
+    static void infoLength(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx, real& off);
     
     /// calculate: number of fibers, mean, variance, min and max of fiber length
     static void infoBirthtime(ObjectList const&, size_t& cnt, real& avg, real& var, real& mn, real& mx);

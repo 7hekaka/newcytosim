@@ -779,13 +779,14 @@ real FiberSet::totalLength(FiberProp const* sel) const
 
 
 void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
-                          real& avg, real& var, real& mn, real& mx)
+                          real& avg, real& var, real& mn, real& mx, real& off)
 {
     cnt = 0;
     avg = 0;
     var = 0;
     mn = INFINITY;
     mx = 0;
+    off = 0;
 
     for ( Object * i : objs )
     {
@@ -798,6 +799,7 @@ void FiberSet::infoLength(ObjectList const& objs, size_t& cnt,
             var += x * x;
             mn = std::min(mn, x);
             mx = std::max(mx, x);
+            off += fib->abscissaM();
         }
     }
     

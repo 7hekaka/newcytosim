@@ -567,8 +567,8 @@ Export average length and variance of length for a class of fiber
 static void printFiberLengths(std::ostream& out, ObjectList const& objs)
 {
     size_t cnt = 0;
-    real avg = 0, var = 0, mn = INFINITY, mx = -INFINITY;
-    FiberSet::infoLength(objs, cnt, avg, var, mn, mx);
+    real avg = 0, var = 0, mn = INFINITY, mx = -INFINITY, off = 0;
+    FiberSet::infoLength(objs, cnt, avg, var, mn, mx, off);
     out << SEP << cnt;
     out.precision(3);
     out << SEP << std::fixed << avg;
@@ -577,6 +577,8 @@ static void printFiberLengths(std::ostream& out, ObjectList const& objs)
     out << SEP << std::fixed << mx;
     out.precision(1);
     out << SEP << std::fixed << avg*cnt;
+    out << SEP << std::fixed << off;
+
 }
 
 /**
@@ -585,7 +587,7 @@ static void printFiberLengths(std::ostream& out, ObjectList const& objs)
 void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
 {
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
-    out << SEP << "min_len" << SEP << "max_len" << SEP << "total";
+    out << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
     
     std::streamsize p = out.precision();
     if ( sel )
@@ -612,7 +614,7 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
 void Simul::reportFiberMarks(std::ostream& out, Property const*) const
 {
     out << COM << ljust("mark", 1, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
-    out << SEP << "min_len" << SEP << "max_len" << SEP << "total";
+    out << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
     
     ObjectMark sup = 0;
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
@@ -3114,9 +3116,9 @@ void Simul::reportRing(std::ostream& out) const
  */
 void Simul::reportPlatelet(std::ostream& out) const
 {
-    size_t nfib;
-    real pol, var, mn, mx;
-    FiberSet::infoLength(fibers.collect(), nfib, pol, var, mn, mx);
+    size_t nfib = 0;
+    real pol = 0, var = 0, mn = INFINITY, mx = -INFINITY, off = 0;
+    FiberSet::infoLength(fibers.collect(), nfib, pol, var, mn, mx, off);
     pol *= nfib;
     
     if ( nfib > 1024 )
