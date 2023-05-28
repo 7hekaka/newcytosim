@@ -554,14 +554,15 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
 #if ( DIM > 1 )
             if ( str == "cap" )
             {
+                Rotation rot = Rotation::align111();
+                rotateTriad(ref, rot);
                 real cap = 0.25;
                 // distribute points randomly over a portion of the unit sphere:
                 std::vector<Vector> pts(num, Vector(0,0,0));
                 size_t cnt = tossPointsCap(pts, cap, 1024);
-                Rotation rot = -Rotation::align111().transposed();
                 for ( size_t i = 0; i < cnt; ++i )
                 {
-                    Wrist * w = sip->newWrist(this, ref, rot*pts[i]);
+                    Wrist * w = sip->newWrist(this, ref, -rot.trans_vecmul(pts[i]));
                     objs.push_back(w);
                 }
             }
@@ -821,8 +822,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         if ( str == "mirror" )
         {
             // align (1,1,1) with the X axis, translate to bring plate to origin:
-            Isometry iso(Rotation::align111(), Vector(-sep, 0, 0));
-            ObjectSet::moveObjects(objs, iso);
+            ObjectSet::translateObjects(objs, Vector(-sep, 0, 0));
             if ( !soTwin )
             {
                 // create a twin Solid that is the mirror image of *this:
@@ -904,6 +904,21 @@ size_t Solid::addTriad(real arm)
     
     return inx;
 }
+
+
+void Solid::rotateTriad(size_t ref, Rotation const& rot)
+{
+    if ( nPoints < ref + DIM )
+        throw InvalidParameter("cannot identify Triad at this index");
+
+    Vector vec = posP(ref);
+    for ( size_t i = 1; i <= DIM; ++i )
+    {
+        Vector off = posPoint(ref+i) - vec;
+        setPoint(ref+i, vec + rot*off);
+    }
+}
+
 
 /** will return the size of the base vector, negated if triad is indirect */
 real Solid::hasTriad(size_t inx) const

@@ -206,6 +206,9 @@ public:
     /// add DIM points separated by `len`, to make a coordinate system around the last point
     size_t addTriad(real len);
 
+    /// rotate the 3 points to align the diagonal with the X-axis
+    void rotateTriad(size_t, Rotation const&);
+
     /// check if a coordinate system already exist at given index
     real hasTriad(size_t) const;
     

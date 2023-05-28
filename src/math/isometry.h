@@ -85,7 +85,7 @@ public:
     void inverse()
     {
         rot.inverse();
-        mov = -rot * mov;
+        mov = -( rot * mov );
     }
 
     /// allow automatic conversion to a Vector
