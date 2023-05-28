@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
+#include "primitives.h"
 #include "bead_set.h"
 #include "bead_prop.h"
 #include "iowrapper.h"
@@ -138,9 +139,16 @@ ObjectList BeadSet::newObjects(Property const* p, Glossary& opt)
 
     Bead * obj = new Bead(pp, Vector(0,0,0), rad);
     
+    std::string str;
 #if NEW_SOLID_CLAMP
     // clamp position set with 'new'
-    opt.set(obj->clamp_place, "clamp");
+    if ( opt.set(str, "clamp") )
+    {
+        if ( str == "position" )
+            opt.set(obj->clamp_place, "position");
+        else
+            obj->clamp_place = Cytosim::readPosition(str, nullptr); //obj->prop->confine_space);
+    }
     opt.set(obj->clamp_stiff, "clamp", 1);
     if ( obj->clamp_stiff < 0 )
         throw InvalidParameter("clamp[0] (stiffness) should be >= 0");
@@ -149,7 +157,6 @@ ObjectList BeadSet::newObjects(Property const* p, Glossary& opt)
     // create list with one object:
     ObjectList res(obj);
 
-    std::string str;
     // attach anchored Singles:
     while ( opt.set(str, var, inx++) )
         simul_.singles.makeWrists(res, obj, 0, 1, str);

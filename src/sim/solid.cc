@@ -723,8 +723,14 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     std::string str;
     
 #if NEW_SOLID_CLAMP
-    // clamp position set with 'new'
-    opt.set(clamp_place, "clamp");
+    if ( opt.set(str, "clamp") )
+    {
+        if ( str == "position" )
+            opt.set(clamp_place, "position");
+        else
+            clamp_place = Cytosim::readPosition(str, prop->confine_space);
+        //std::clog << reference() << " clamped at " << clamp_place << "\n";
+    }
     opt.set(clamp_stiff, "clamp", 1);
     if ( clamp_stiff < 0 )
         throw InvalidParameter("clamp[0] (stiffness) should be >= 0");
