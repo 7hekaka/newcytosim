@@ -390,6 +390,9 @@ protected:
     
     /// SingleProp used for glue
     SingleProp * glue_prop;
+    
+    /// number of fibers of this type
+    mutable size_t fiber_count;
 
 public:
     
@@ -425,6 +428,9 @@ public:
 
     /// write
     virtual void write_values(std::ostream&) const;
+    
+    /// number of fibers of this type
+    size_t nbFibers() const { return fiber_count; }
 
 };
 

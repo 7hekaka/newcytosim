@@ -120,9 +120,9 @@ void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
 {
     assert_false( attached() );
     FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop()->fiber_type);
-    size_t cnt = sim.fibers.count(fip);
     
-    real rate = prop()->nucleation_rate_dt * ( 1.0 - real(cnt) * prop()->nucleation_limit );
+    real damp = 1.0 - real(fip->nbFibers()) * prop()->nucleation_limit;
+    real rate = prop()->nucleation_rate_dt * damp;
     nextAct -= rate;
     
     if ( nextAct < 0 )

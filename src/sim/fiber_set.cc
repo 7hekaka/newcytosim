@@ -230,12 +230,16 @@ void FiberSet::step()
     
     // calculate the total length used for each kind of Fiber:
     for ( Property * i : plist )
+    {
         static_cast<FiberProp*>(i)->used_polymer = 0;
+        static_cast<FiberProp*>(i)->fiber_count = 0;
+    }
 
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
         assert_false(fib->bad());
         fib->prop->used_polymer += fib->length();
+        ++fib->prop->fiber_count;
     }
     
     // calculate the ratio of free polymer for each class of Fiber:

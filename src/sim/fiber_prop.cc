@@ -375,6 +375,7 @@ void FiberProp::clear()
     
     used_polymer = 0;
     free_polymer = 1;
+    fiber_count = 0;
     
 #if OLD_SQUEEZE_FORCE
     squeeze       = 0;
