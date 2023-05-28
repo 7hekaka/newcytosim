@@ -52,18 +52,19 @@ void Chewer::stepUnloaded()
     if ( a <= M )
     {
         a = M;
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
         engaged = MINUS_END;
     }
     
     if ( a >= P )
     {
         a = P;
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
         engaged = PLUS_END;
     }
     
-    if ( engaged && RNG.test_not(prop()->hold_growing_end) )
-        return detach();
-
     moveTo(a);
 }
 
@@ -100,17 +101,18 @@ void Chewer::stepLoaded(Vector const& force)
     if ( a <= M )
     {
         a = M;
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
         engaged = MINUS_END;
     }
     
     if ( a >= P )
     {
         a = P;
+        if ( RNG.test_not(prop()->hold_growing_end) )
+            return detach();
         engaged = PLUS_END;
     }
-    
-    if ( engaged && RNG.test_not(prop()->hold_growing_end) )
-        return detach();
 
     moveTo(a);
 }
