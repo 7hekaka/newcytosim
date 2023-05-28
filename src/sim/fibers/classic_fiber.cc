@@ -130,7 +130,7 @@ real ClassicFiber::stepPlusEnd()
         // Catastrophe rate is multiplied if the plus end is outside
         if ( prop()->catastrophe_space && prop()->catastrophe_space->outside(posEndP()) )
         {
-            LOG_ONCE("Fiber's plus-end catastrophe rate is different outside the Space\n");
+            LOG_ONCE("*** Fiber's plus-end catastrophe changed outside Space\n");
             cata *= prop()->catastrophe_outside;
         }
 #endif

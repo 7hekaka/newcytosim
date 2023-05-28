@@ -332,7 +332,7 @@ int DynamicFiber::stepPlusEnd()
         // Growth is reduced if the plus end is outside
         if ( prop()->stall_space && prop()->stall_space->outside(posEndP()) )
         {
-            LOG_ONCE("Fiber's plus-end growth rate is different outside the Space\n");
+            LOG_ONCE("*** Fiber's plus-end stall outside the Space\n");
             growth /= prop()->stall_outside;
         }
 #endif
