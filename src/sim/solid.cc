@@ -484,6 +484,9 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     addTriad(rad);
     rad = std::fabs(rad);
     
+    if ( opt.has_key("twin") )
+        rotateTriad(ref, Rotation::align111());
+
 #if ( DIM > 2 )
     real sep = 1.0, dev = 0.0;
     if ( opt.set(sep, "separation") && opt.set(dev, "deviation") )
@@ -555,7 +558,6 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             if ( str == "cap" )
             {
                 Rotation rot = Rotation::align111();
-                rotateTriad(ref, rot);
                 real cap = 0.25;
                 // distribute points randomly over a portion of the unit sphere:
                 std::vector<Vector> pts(num, Vector(0,0,0));
@@ -816,12 +818,11 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     {
 #if NEW_SOLID_HAS_TWIN
         real rad = radius(0);
-        constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-        real sep = std::max(rad*Q, prop->twin_separation/2-rad);
-        addPoint(Vector(sep*Q,sep*Q,sep*Q));
+        real sep = std::max(rad, prop->twin_separation/2-rad);
+        addPoint(Vector(sep, 0, 0));
         if ( str == "mirror" )
         {
-            // align (1,1,1) with the X axis, translate to bring plate to origin:
+            // translate to bring plate to origin:
             ObjectSet::translateObjects(objs, Vector(-sep, 0, 0));
             if ( !soTwin )
             {
@@ -874,6 +875,9 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     return objs;
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark - Shape
 
 size_t Solid::addSphere(Vector const& vec, real rad)
 {
