@@ -49,8 +49,7 @@ enum AssemblyState
     STATE_GREEN  = 1,   ///<  First dynamic state: usually growing
     STATE_YELLOW = 2,   ///<  Intermediate dynamic state
     STATE_ORANGE = 3,   ///<  Intermediate dynamic state
-    STATE_RED    = 4,   ///<  Third dynamic state: usually shrinking
-    STATE_BLACK  = 7    ///<  used by cutter to indicate deletion
+    STATE_RED    = 4    ///<  Third dynamic state: usually shrinking
 };
 
 

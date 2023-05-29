@@ -187,6 +187,7 @@ public:
     /// save lattice in files
     bool save_lattice;
     
+#if FIBER_HAS_MESH
     /// if true, associate an analog lattice
     int mesh;
     
@@ -213,7 +214,8 @@ public:
     
     /// set mesh to evolve from 0 towards equilibrium at 1, with given rate
     real mesh_aging_limit;
-
+#endif
+    
     /// flag controlling the forces exerted by Space on fiber points
     /**
      Possible values:

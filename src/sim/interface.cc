@@ -852,8 +852,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
                                       {"grow",      STATE_GREEN},
                                       {"growing",   STATE_GREEN},
                                       {"shrink",    STATE_RED},
-                                      {"shrinking", STATE_RED},
-                                      {"delete",    STATE_BLACK}};
+                                      {"shrinking", STATE_RED}};
 
     state_t stateP = STATE_RED, stateM = STATE_WHITE;
     opt.set(stateP, "new_end_state", 0, keys);

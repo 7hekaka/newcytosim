@@ -63,8 +63,7 @@ void NucleatorProp::read(Glossary& glos)
                                       {"grow",      STATE_GREEN},
                                       {"growing",   STATE_GREEN},
                                       {"shrink",    STATE_RED},
-                                      {"shrinking", STATE_RED},
-                                      {"delete",    STATE_BLACK}};
+                                      {"shrinking", STATE_RED}};
 
     glos.set(addictive, "addictive");
     glos.set(addictive_state, "addictive", 1, keys);

@@ -312,7 +312,7 @@ void FiberProp::clear()
     lattice      = 0;
     lattice_unit = 0;
     save_lattice = 0;
-    
+#if FIBER_HAS_MESH
     mesh                = 0;
     mesh_unit           = 0;
     mesh_cut_fiber      = 0;
@@ -321,7 +321,7 @@ void FiberProp::clear()
     mesh_unbinding_rate = 0;
     mesh_aging_rate     = 0;
     mesh_aging_limit    = 1;
-
+#endif
     confine = CONFINE_OFF;
     confine_stiff[0] = 0;
     confine_stiff[1] = 0;
@@ -430,6 +430,7 @@ void FiberProp::read(Glossary& glos)
     glos.set(mesh,         "mesh");
     glos.set(mesh_unit,    "mesh", 1, "mesh_unit", 0);
 
+#if FIBER_HAS_MESH
 #  ifdef BACKWARD_COMPATIBILITY
     // parameters `lattice_*' were renamed `mesh_*' on 28.11.2019
     glos.set(mesh_cut_fiber, "mesh_cut_fiber", "lattice_cut_fiber");
@@ -448,7 +449,7 @@ void FiberProp::read(Glossary& glos)
     glos.set(mesh_aging_limit, "mesh_aging", 1);
     glos.set(mesh_aging_limit, "mesh_aging_limit");
 #endif
-
+#endif
     glos.set(confine, "confine", {{"off",       CONFINE_OFF},
                                   {"on",        CONFINE_ON},
                                   {"inside",    CONFINE_INSIDE},
@@ -643,9 +644,9 @@ void FiberProp::complete(Simul const& sim)
 #endif
     }
 
+#if FIBER_HAS_MESH
     if ( mesh && primed(sim) )
     {
-#if FIBER_HAS_MESH
         if ( mesh_unit <= 0 )
             throw InvalidParameter("fiber:mesh_unit (known as mesh[1]) must be specified and > 0");
         
@@ -664,13 +665,11 @@ void FiberProp::complete(Simul const& sim)
             throw InvalidParameter("fiber:mesh_aging_limit must be >= 0");
         if ( mesh_aging_rate * time_step(sim) > 1 )
             throw InvalidParameter("fiber:mesh_aging_rate is too high (unstable)");
-#else
-        throw InvalidParameter("Cytosim cannot handle fiber:mesh. Please recompile after setting FIBER_HAS_MESH to 1");
-#endif
     }
-    
+
     if ( mesh_aging_rate > 0 && !mesh && primed(sim) )
         throw InvalidParameter("for `mesh_aging_rate', the mesh must be defined");
+#endif
 
     if ( rigidity < 0 )
         throw InvalidParameter("fiber:rigidity must be specified and >= 0");

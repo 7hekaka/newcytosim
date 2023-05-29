@@ -51,8 +51,7 @@ void CutterProp::read(Glossary& glos)
                                       {"grow",      STATE_GREEN},
                                       {"growing",   STATE_GREEN},
                                       {"shrink",    STATE_RED},
-                                      {"shrinking", STATE_RED},
-                                      {"delete",    STATE_BLACK}};
+                                      {"shrinking", STATE_RED}};
     
     glos.set(new_end_state[0], "new_end_state", keys);
     glos.set(new_end_state[1], "new_end_state", 1, keys);
@@ -91,9 +90,6 @@ void CutterProp::complete(Simul const& sim)
         throw InvalidParameter(name()+"cut_width must be >= 0");
 
     cutting_rate_dt = cutting_rate * time_step(sim);
-    
-    if ( new_end_state[0] == STATE_BLACK )
-        throw InvalidParameter(name()+"new_end_state[0] is invalid");
 }
 
 

@@ -70,7 +70,6 @@ void Fiber::step()
     assert_false(needUpdate);
     
 #if FIBER_HAS_MESH
-    
     //std::clog << reference() << " mesh " << std::fixed << fMesh->data(0) << '\n';
     //std::clog << reference() << " mesh sum = " << fMesh->sum() << "     ";
     const real tau = time_step(simul());
@@ -220,18 +219,15 @@ Fiber::Fiber(FiberProp const* p)
             //throw InvalidParameter("Cytosim does not support fiber:lattice");
 #endif
         }
-        
+#if FIBER_HAS_MESH
         if ( prop->mesh )
         {
-#if FIBER_HAS_MESH
             if ( prop->mesh_unit < REAL_EPSILON )
                 throw InvalidParameter("the Mesh unit (mesh[1]) must be > 0");
             //Cytosim::log << reference() <<  " new Mesh" << '\n';
             fMesh.setUnit(prop->mesh_unit);
-#else
-            //throw InvalidParameter("Cytosim does not support fiber:mesh");
-#endif
         }
+#endif
     }
 #if FIBER_HAS_BIRTHTIME
     fBirthTime = 0;
@@ -526,7 +522,7 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
     //std::clog << "cut " << reference() << " @ [ " << a << " , " << w << "]\n";
     real dis1 = abs1 - abscissaM();
     real dis2 = abs2 - abscissaM();
-    if ( dis1 < min )
+    if ( dis1 <= min )
     {
         // this will remove a section near the minus-end
         if ( 0 < dis2 && abs2 < abscissaP() )
@@ -534,11 +530,11 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
         return this;
     }
     real disP = abscissaP() - abs2;
-    if ( disP < min )
+    if ( disP <= min )
     {
         real dis = abscissaP() - abs1;
         // this will remove a section near the plus-end
-        if ( 0 < dis && abscissaM() < abs1 )
+        if ( 0 < dis && 0 < dis1 )
             cutP(dis);
         return nullptr;
     }
@@ -551,9 +547,6 @@ void Fiber::severNow(const real abs1, const real abs2, const real min_len,
 {
     Fiber * frag = severNow(abs1, abs2, min_len);
     
-    // special case where the plus end section is simply deleted
-    if ( stateM == STATE_BLACK )
-        return delete(frag);
     if ( frag == nullptr )
     {
         // a section near the plus end was removed
@@ -640,11 +633,8 @@ size_t Fiber::hasKink(const real max_cosine) const
  - new plus ends are set to state `stateP`
  - new plus ends are set to state `stateM`
  - any fragment shorter than `min_length` is deleted
- Furthermore:
- - if `stateM=STATE_BLACK`, the minus end portion of the cut fiber is deleted.
- - if `stateP=STATE_BLACK`, the plus end portion of the cut fiber is deleted.
  */
-void  Fiber::planarCut(Vector const& n, const real a,
+void Fiber::planarCut(Vector const& n, const real a,
                        state_t stateP, state_t stateM, real min_len)
 {
     Array<real> cuts;
@@ -658,10 +648,16 @@ void  Fiber::planarCut(Vector const& n, const real a,
         if ( 0 <= abs  &&  abs < 1 )
             cuts.push_back(abscissaPoint(s-1+abs));
     }
-    
+    min_len = std::max(min_len, prop->min_length);
+
     for ( real abs : cuts )
     {
         severNow(abs, abs, min_len, stateP, stateM);
+        if ( length() < min_len )
+        {
+            delete(this);
+            return;
+        }
     }
 }
 
@@ -2009,6 +2005,8 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
  */
 int Fiber::bad() const
 {
+    if ( ! prop )
+        return 32;
     if ( targetSegmentation() < 1e-6 )
         return 1;
     if ( segmentation() < 1e-9 )
