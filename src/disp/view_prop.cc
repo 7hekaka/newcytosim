@@ -165,7 +165,7 @@ void ViewProp::write_values(std::ostream& os) const
 {
     write_value(os, "zoom",          zoom);
     write_value(os, "magnify",       magnify);
-    write_value(os, "view_scale",     view_scale);
+    write_value(os, "view_scale",    view_scale);
     write_value(os, "auto_scale",    auto_scale);
     write_value(os, "focus",         focus+focus_shift);
     write_value(os, "rotation",      rotation);
@@ -178,7 +178,7 @@ void ViewProp::write_values(std::ostream& os) const
     write_value(os, "depth_clamp",   depth_clamp);
     write_value(os, "stencil",       stencil);
     write_value(os, "multisample",   multisample);
-    write_value(os, "label",         label);
+    write_value(os, "label",         "("+label+")");
     write_value(os, "track_fibers",  track_fibers);
     //write_value(os, "window_position", window_position, 2);
     write_value(os, "window_size",   window_size, 2);
@@ -189,7 +189,6 @@ void ViewProp::write_values(std::ostream& os) const
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         std::string var = "clip_plane" + std::to_string(k);
-        
         write_value(os, var, clip_plane_mode[k], Vector3(clip_plane[k]), clip_plane[k].ZZ);
     }
 }
