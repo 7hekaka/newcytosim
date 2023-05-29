@@ -92,7 +92,7 @@ public:
     state_t addictive_state;
     
     /// stabilize attached fibers plus-ends
-    int stabilize;
+    real stabilize;
     
     /// @}
     
