@@ -91,7 +91,8 @@ int timerOn = false;
 int timerDelay = 50;
 
 //display parameter for OpenGL
-GLfloat LW = 1.0f;
+float LW = 1.0f;
+float PS = 3.0f;
 
 //amount of white added to colors
 const GLfloat COL = 0.8f;
@@ -436,6 +437,9 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             setGeometry();
         } break;
             
+        case '9': PS += 1; break;
+        case '8': PS = std::max(1.f, PS-1); break;
+        
         case 't':
             timerOn = ! timerOn;
             if ( timerOn )
@@ -486,8 +490,6 @@ int display(View& view)
         gym::color(0, 0, 0, 1);
         gym::enableCullFace(GL_FRONT);
         spc->draw3D();
-        gym::restoreCullFace();
-        gym::restoreLighting();
     }
 #endif
     if ( spc && ( showSpace & 1 ))
@@ -501,31 +503,42 @@ int display(View& view)
         gym::closeDepthMask();
         spc->draw3D();
         gym::openDepthMask();
-        gym::restoreCullFace();
-        gym::restoreLighting();
+        gym::disableCullFace();
 #else
         gym::color(1, 1, 1, 1);
-        gym::disableLighting();
         spc->draw2D(1);
 #endif
     }
     gym::ref_view();
-    if ( 1 )
+    gym::disableLighting();
+    
+    if ( showInside )
     {
-        //use green for points inside, magenta for point outside:
-        flute8* flu = gym::mapBufferC4V4(nbpts);
-        gym_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
+        flute3* flu = gym::mapBufferV3(nbpts);
         size_t n = 0;
         for ( size_t i=0; i < nbpts; ++i )
         {
-            if ( visible(i) )
-                flu[n++] = { inside[i] ? col : lor, point[i] };
+            if ( inside[i] )
+                flu[n++] = { (float)point[i].XX, (float)point[i].y(), (float)point[i].z() };
          }
-        gym::unmapBufferC4V4();
-        gym::drawPoints(2, 0, n);
-        gym::cleanup();
+        gym::unmapBufferV3();
+        gym::color(0.f, COL, 0.f); //use green for points inside
+        gym::drawPoints(PS, 0, n);
     }
-    
+    if ( showOutside )
+    {
+        flute3* flu = gym::mapBufferV3(nbpts);
+        size_t n = 0;
+        for ( size_t i=0; i < nbpts; ++i )
+        {
+            if ( !inside[i] )
+                flu[n++] = { (float)point[i].XX, (float)point[i].y(), (float)point[i].z() };
+         }
+        gym::unmapBufferV3();
+        gym::color(0.f, 0.f, COL); //use magenta for point outside
+        gym::drawPoints(PS, 0, n);
+    }
+
     if ( showProjected )
     {
         //use green for points inside, magenta for point outside:
@@ -534,7 +547,7 @@ int display(View& view)
         for ( size_t i=0; i < nbpts; ++i )
             flu[i] = { inside[i] ? col : lor, project[i] };
         gym::unmapBufferC4V4();
-        gym::drawPoints(2, 0, nbpts);
+        gym::drawPoints(PS, 0, nbpts);
         gym::cleanup();
     }
 
