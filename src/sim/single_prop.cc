@@ -139,38 +139,40 @@ void SingleProp::read(Glossary& glos)
 #if NEW_MOBILE_SINGLE
     glos.set(speed,          "speed");
 #endif
-    glos.set(activity, "activity");
-
-    if ( activity=="fixed" )
-        confine = CONFINE_OFF;
-    else
+    if ( glos.set(activity, "activity") )
     {
-        glos.set(confine, "confine",
-           {{"off",     CONFINE_OFF},
-            {"on",      CONFINE_ON},
-            {"none",    CONFINE_OFF},
-            {"surface", CONFINE_ON},
-            {"inside",  CONFINE_INSIDE}});
-        
-        real val;
-        if ( glos.set(val, "confine", 1) && val > 0 )
-            throw InvalidParameter(name()+":confine[1] is ignored");
-        
-        glos.set(confine_label,  "confine", 2);
-        
-#if BACKWARD_COMPATIBILITY < 50
-        if ( confine_label == "current" )
-            confine_label = "last";
-#endif
+        // change the default value for confinement
+        if ( activity=="fixed" )
+            confine = CONFINE_OFF;
     }
+    
+    glos.set(confine, "confine",
+        {{"off",    CONFINE_OFF},
+        {"on",      CONFINE_ON},
+        {"none",    CONFINE_OFF},
+        {"surface", CONFINE_ON},
+        {"inside",  CONFINE_INSIDE}});
+    
+    real val;
+    if ( glos.set(val, "confine", 1) && val > 0 )
+        throw InvalidParameter(name()+":confine[1] is ignored");
+    
+    glos.set(confine_label, "confine", 2);
+    
+#if BACKWARD_COMPATIBILITY < 50
+    if ( confine_label == "current" )
+        confine_label = "last";
+#endif
 }
 
 
 void SingleProp::complete(Simul const& sim)
 {
+    confine_space = sim.findSpace(confine_label);
     if ( confine != CONFINE_OFF )
     {
-        confine_space = sim.findSpace(confine_label);
+        if ( activity=="fixed" )
+            throw InvalidParameter(name()+":confine is ignored since activity=fixed");
         if ( confine_space )
         {
             if ( confine_label.empty() )
@@ -178,13 +180,11 @@ void SingleProp::complete(Simul const& sim)
         }
         else
         {
+            // this condition may occur when the Property is created before the Space
             if ( primed(sim) )
                 throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
-            // this condition occur when the Property is created before the Space
         }
     }
-    else
-        confine_space = nullptr;
 
     if ( hand.empty() )
         throw InvalidParameter(name()+":hand must be defined");

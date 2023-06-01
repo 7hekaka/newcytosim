@@ -114,9 +114,9 @@ void CoupleProp::read(Glossary& glos)
 
 void CoupleProp::complete(Simul const& sim)
 {
+    confine_space = sim.findSpace(confine_label);
     if ( confine != CONFINE_OFF )
     {
-        confine_space = sim.findSpace(confine_label);
         if ( confine_space )
         {
             if ( confine_label.empty() )
@@ -124,13 +124,11 @@ void CoupleProp::complete(Simul const& sim)
         }
         else
         {
+            // this condition may occur when the Property is created before the Space
             if ( primed(sim) )
                 throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
-            // this condition occur when the Property is created before the Space
         }
     }
-    else
-        confine_space = nullptr;
 
     if ( length < 0 )
         throw InvalidParameter(name()+":length must be >= 0");

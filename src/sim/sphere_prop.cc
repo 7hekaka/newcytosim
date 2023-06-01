@@ -76,9 +76,9 @@ void SphereProp::complete(Simul const& sim)
     if ( viscosity <= 0 )
         throw InvalidParameter("sphere:viscosity or simul:viscosity should be defined > 0");
     
+    confine_space = sim.findSpace(confine_label);
     if ( confine != CONFINE_OFF )
     {
-        confine_space = sim.findSpace(confine_label);
         if ( confine_space )
         {
             if ( confine_label.empty() )
@@ -86,9 +86,9 @@ void SphereProp::complete(Simul const& sim)
         }
         else
         {
+            // this condition may occur when the Property is created before the Space
             if ( primed(sim) )
                 throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
-            // this condition occur when the Property is created before the Space
         }
     }
 
