@@ -337,7 +337,7 @@ void Display3::drawFiberSegmentsJoin(Fiber const& fib, float rad,
     
     gym::color_front(select_color(fib, 0));
     gym::transAlignZ(pos, rad, nxt-pos);
-    gle::hemisphereF();
+    gle::dome();
     gym::scale(1, 1, fib.segmentation()/rad);
     if ( last == 0 )
     {
@@ -924,7 +924,7 @@ void Display3::drawSinglesF(SingleSet const& set) const
                     /// draw a disc tangent to the Space:
                     Vector pos = obj->posFoot();
                     Vector dir = spc->normalToEdge(pos);
-                    drawObject(pos, dir, rad, gle::disc);
+                    drawObject(pos, dir, rad, gle::dome);
                     continue;
                 }
             }

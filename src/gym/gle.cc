@@ -1532,7 +1532,7 @@ namespace gle
     void hemisphere1() { drawIcoBuffer(ico_pts_[4], ico_idx_[4], ico_cnt_[4]); }
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
-    void hemisphereF() { gym::scale(1,1,0.75); drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
+    void dome() { gym::scale(1,1,0.75); drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
 
     void droplet() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
     

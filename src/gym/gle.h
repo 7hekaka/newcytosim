@@ -241,8 +241,8 @@ namespace gle
     void hemisphere2();
     /// draw half a sphere of radius 1 in Z < 0
     void hemisphere4();
-    /// draw a falt hemisphere of radius 1 in Z < 0
-    void hemisphereF();
+    /// draw a flattened dome of radius 1 in Z < 0
+    void dome();
 
     /// draw a blob with a pointy ends up in Z
     void droplet();
@@ -267,10 +267,10 @@ namespace gle
     void stripedTube(float width);
     /// primitive used to draw the central segments of fibers
     inline void innerTube() { longTube4(); }
-    /// primitive used to draw the MINUS ends of fibers
-    inline void capedTube() { halfTube4(); hemisphereF(); }
+    /// primitive used to draw the minus ends of fibers
+    inline void capedTube() { halfTube4(); dome(); }
     //inline void capedTube() { halfTube2(); discBottom2(); }
-    /// primitive used to draw the PLUS ends of fibers
+    /// primitive used to draw the plus ends of fibers
     inline void endedTube() { endedTube4(); }
     //inline void endedTube() { halfTube4(); discBottom2(); }
 
