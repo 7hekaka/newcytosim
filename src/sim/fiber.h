@@ -26,9 +26,6 @@ class LineDisp;
 /// Switch to add a Lattice of integers/floats to each Fiber {0, 1, -1}
 #define FIBER_HAS_LATTICE 0
 
-/// Flag to add a Lattice of reals to each Fiber {0, 1}
-#define FIBER_HAS_MESH 0
-
 /// Flag to allow `family` member variable to control Couple's binding {0, 1}
 #define FIBER_HAS_FAMILY 0
 

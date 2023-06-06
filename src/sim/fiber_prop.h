@@ -28,6 +28,9 @@ class Space;
 #define NEW_FIBER_SILHOUETTE 0
 #define NEW_FIBER_MAKE_COUPLE 0
 
+/// Flag to add a Lattice of reals to each Fiber {0, 1}
+#define FIBER_HAS_MESH 0
+
 /// Property for a Fiber
 /**
  @ingroup Properties
