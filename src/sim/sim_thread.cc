@@ -353,6 +353,7 @@ SingleProp * SimThread::makeHandleProperty(real range)
     SingleProp * sip = new SingleProp("live_single");
     sip->hand = "live_hand";
     sip->activity = "fixed";
+    sip->confine = CONFINE_OFF;
     sip->stiffness = 2000;
     sip->complete(*sim_);
     sim_->properties.deposit(sip);
