@@ -519,7 +519,7 @@ Fiber* Fiber::severM(real dis1, real dis2)
 
 Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
 {
-    //std::clog << "cut " << reference() << " @ [ " << a << " , " << w << "]\n";
+    //std::clog << "cut " << reference() << " @ [" << abs1 << ", " << abs2 << "]\n";
     real dis1 = abs1 - abscissaM();
     real dis2 = abs2 - abscissaM();
     if ( dis1 <= min )
@@ -563,11 +563,12 @@ void Fiber::severNow(const real abs1, const real abs2, const real min_len,
         
         //add new fragment to simulation:
         objset()->add(frag);
-#if 1
+#if 0
         Cytosim::log << reference() << " cut at [ " << abs1 << " " << abs2 << " ] ";
-        Cytosim::log << " creating " << frag->reference() << " at " << frag->posEndM() << '\n';
+        Cytosim::log << " creating " << frag->reference() << " len " << frag->length();
+        Cytosim::log << " remaining " << length() << "\n";
+        //Cytosim::log << " at X = " << frag->posEndM().XX << '\n';
 #endif
-        //Cytosim::log << " severed at X = " << frag->posEndM().XX << '\n';
     }
     else
     {
@@ -652,7 +653,9 @@ void Fiber::planarCut(Vector const& n, const real a,
 
     for ( real abs : cuts )
     {
-        severNow(abs, abs, min_len, stateP, stateM);
+        real m = abs, p = 0;
+        findSeverEdges(m, p);
+        severNow(m, p, min_len, stateP, stateM);
         if ( length() < min_len )
         {
             delete(this);
