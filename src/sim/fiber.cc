@@ -45,7 +45,11 @@ void Fiber::step()
 
     // perform the cuts that were registered by sever()
     if ( pendingCuts.size() )
+    {
         severNow();
+        if ( !prop )
+            return;
+    }
     
     // delete self if shorter than 'FiberProp::min_length'
     if ( length() < prop->min_length && ! prop->persistent )
@@ -519,26 +523,49 @@ Fiber* Fiber::severM(real dis1, real dis2)
 
 Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
 {
-    //std::clog << "cut " << reference() << " @ [" << abs1 << ", " << abs2 << "]\n";
-    real dis1 = abs1 - abscissaM();
-    real dis2 = abs2 - abscissaM();
-    if ( dis1 <= min )
+    assert_true( abs1 <= abs2 );
+    const real M = abscissaM();
+    const real P = abscissaP();
+    //std::clog << "cut " << reference() << "  " << M << " | " << abs1 << "  " << abs2 << " | " << P;
+    real lenM = abs1 - M;
+    real lenP = P - abs2;
+    // consider the shortest section remaining:
+    if ( lenM < lenP )
     {
-        // this will remove a section near the minus-end
-        if ( 0 < dis2 && abs2 < abscissaP() )
-            cutM(dis2);
-        return this;
+        if ( lenM < min )
+        {
+            if ( lenP > REAL_EPSILON )
+            {
+                cutM(abs2-M);
+                //std::clog << " chopped " << abs2-M << " from minus end\n";
+            }
+            else
+            {
+                //std::clog << " removed entirely\n";
+                prop = nullptr;
+            }
+            return this;
+        }
     }
-    real disP = abscissaP() - abs2;
-    if ( disP <= min )
+    else
     {
-        real dis = abscissaP() - abs1;
-        // this will remove a section near the plus-end
-        if ( 0 < dis && 0 < dis1 )
-            cutP(dis);
-        return nullptr;
+        if ( lenP < min )
+        {
+            if ( lenM > REAL_EPSILON )
+            {
+                cutP(P-abs1);
+                //std::clog << " chopped " << P-abs1 << " from plus end\n";
+            }
+            else
+            {
+                //std::clog << " removed entirely\n";
+                prop = nullptr;
+            }
+            return nullptr;
+        }
     }
-    return severM(dis1, dis2);
+    //std::clog << "\n";
+    return severM(lenM, abs2-M);
 }
 
 
@@ -604,6 +631,8 @@ void Fiber::severNow()
         findSeverEdges(a, w);
         try {
             severNow(a, w, min_len, cut.stateP, cut.stateM);
+            if ( prop == nullptr )
+                break;
         }
         catch ( Exception & e )
         {
@@ -656,7 +685,7 @@ void Fiber::planarCut(Vector const& n, const real a,
         real m = abs, p = 0;
         findSeverEdges(m, p);
         severNow(m, p, min_len, stateP, stateM);
-        if ( length() < min_len )
+        if ( prop == nullptr || length() < min_len )
         {
             delete(this);
             return;

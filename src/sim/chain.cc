@@ -1108,11 +1108,9 @@ void Chain::addSegmentM()
 void Chain::cutM(const real delta)
 {
     real len = length();
-    assert_true( 0 <= delta );
-    assert_true( delta < len );
-    
     const size_t ns = bestNumberOfPoints((len-delta)/fnSegmentation) - 1;
     const real cut = (len-delta) / ns;
+    assert_true( cut > 0 );
     real* tmp = new_real(DIM*(ns+1));
 
     // calculate intermediate points:
@@ -1227,11 +1225,9 @@ void Chain::addSegmentP()
 void Chain::cutP(const real delta)
 {
     real len = length();
-    assert_true( 0 <= delta );
-    assert_true( delta < len );
-    
     const size_t np = bestNumberOfPoints((len-delta)/fnSegmentation);
     const real cut = (len-delta) / (np-1);
+    assert_true( cut > 0 );
     real* tmp = new_real(DIM*np);
 
     // copy minus end:
