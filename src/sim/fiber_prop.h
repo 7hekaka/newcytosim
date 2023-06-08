@@ -19,7 +19,7 @@ class Space;
 
 /// compile switches to enable specialized features:
 #define OLD_DYNAMIC_ZONE     0
-#define OLD_SQUEEZE_FORCE    0
+#define NEW_SQUEEZE_FORCE    0
 #define NEW_COLINEAR_FORCE   0
 #define NEW_FIBER_END_CHEW   0
 #define NEW_FIBER_CONFINE2   0
@@ -330,7 +330,7 @@ public:
     /// display string (see @ref FiberDispPar)
     std::string display;
     
-#if OLD_SQUEEZE_FORCE
+#if NEW_SQUEEZE_FORCE
     /// add a force toward the X-axis
     int squeeze;
     /// max norm of squeezing force (set as \c squeeze[1])

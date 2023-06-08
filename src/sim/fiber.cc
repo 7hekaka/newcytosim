@@ -1069,27 +1069,23 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
 
 void Fiber::setInteractions(Meca& meca) const
 {
-#if OLD_SQUEEZE_FORCE
+#if NEW_SQUEEZE_FORCE
     if ( prop->squeeze == 1 )
     {
-        // squeezing force in the YZ-plane:
-        const real f = prop->squeeze_force;
-        const real r = prop->squeeze_range;
+        // squeezing force in the YZ-plane: force = -F * tanh(YZ/R)
+        // derivative: -4F / ( exp(-u) + exp(u) )^2  with u = YZ/R
+        //
+        const real F = prop->squeeze_force;
+        const real R = prop->squeeze_range;
         for ( size_t i = 0; i < nPoints; ++i )
         {
             Vector P = posP(i);
-            if ( P.normYZ() < r )
-                meca.addLineClamp(Mecapoint(this, i), Vector(P.XX, 0, 0), Vector(1,0,0), f/r);
-            else {
-                // forces is capped to a maximum magnitude 'f':
-#if ( DIM == 3 )
-                Vector n = Vector(0, -P.YY, -P.ZZ).normalized(f);
-                meca.addForce(this, i, n);
-#elif ( DIM == 2 )
-                Vector n(0, std::copysign(f, -P.YY), 0);
-                meca.addForce(this, i, n);
-#endif
-            }
+            real N = P.normYZ();
+            real U = N / R;
+            real F0 = -4 * F * std::tanh(U) / N;
+            real dF = -4 * F / square( std::exp(-U) + std::exp(U) );
+            meca.addLineClampX(Mecapoint(this, i), dF);
+            meca.addForce(this, i, Vector(0, F0*P.YY, F0*P.ZZ));
         }
     }
 #endif

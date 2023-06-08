@@ -377,7 +377,7 @@ void FiberProp::clear()
     free_polymer = 1;
     fiber_count = 0;
     
-#if OLD_SQUEEZE_FORCE
+#if NEW_SQUEEZE_FORCE
     squeeze       = 0;
     squeeze_force = 0;
     squeeze_range = 1;
@@ -521,7 +521,7 @@ void FiberProp::read(Glossary& glos)
     glos.set(source_rate, "source");
     glos.set(source_type, "source", 1);
 #endif
-#if OLD_SQUEEZE_FORCE
+#if NEW_SQUEEZE_FORCE
     glos.set(squeeze,       "squeeze");
     glos.set(squeeze_force, "squeeze", 1);
     glos.set(squeeze_range, "squeeze", 2);
@@ -744,7 +744,7 @@ void FiberProp::write_values(std::ostream& os) const
     write_value(os, "drag_radius",         drag_radius);
     write_value(os, "drag_length",         drag_length);
     write_value(os, "drag_model",          drag_model, drag_gap);
-#if OLD_SQUEEZE_FORCE
+#if NEW_SQUEEZE_FORCE
     write_value(os, "squeeze",             squeeze, squeeze_force, squeeze_range);
 #endif
 #if NEW_FIBER_END_FORCE
