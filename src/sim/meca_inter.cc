@@ -4684,9 +4684,32 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
 //------------------------------------------------------------------------------
 
 /**
+ Link `ptA` to the X-axis with a stiffness `weight`.
+ The component parallel to `X` are removed corresponding to a frictionless line
+ 
+     force_Y = -weight * Y
+     force_Z = -weight * Z
+
+ */
+void Meca::addLineClampX(Mecapoint const& pte, const real weight)
+{
+    assert_true( weight >= 0 );
+    const size_t inx = pte.matIndex0();
+    
+#if ( DIM == 3 )
+    MatrixBlock wT(0, 0, 0, 0, -weight, 0, 0, 0, -weight);
+    add_block_diag(inx, wT);
+#elif ( DIM == 2 )
+    MatrixBlock wT(0, 0, 0, -weight);
+    add_block_diag(inx, wT);
+#endif    
+}
+
+
+/**
  Link `ptA` (X) to the line defined by `G` and tangent vector `dir`.
  The force is linear with position with a stiffness `weight`, and its
- components parallel to `dir` are removed corresponding to a frictionless line:
+ component parallel to `dir` are removed corresponding to a frictionless line:
  
      matrix M = 1 - dir (x) dir'
      force_X = weight * M * ( G - X )

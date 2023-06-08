@@ -517,6 +517,9 @@ public:
     /// Link of stiffness `weight` with fixed position `pos`, on the side of the segment
     void addSidePointClamp(Interpolation const&, Vector const& pos, real len, real weight);
     
+    /// Link of stiffness `weight` with the X-axis
+    void addLineClampX(Mecapoint const&, real weight);
+
     /// Link of stiffness `weight` with a line defined by `pos` and its tangent `dir`
     void addLineClamp(Mecapoint const&, Vector const& pos, Vector const& dir, real weight);
     

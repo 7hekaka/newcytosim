@@ -137,7 +137,7 @@ void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
     }
     else
     {
-        meca.addLineClamp(mp, Vector(pos.XX,0,0), Vector(1,0,0), stiff);
+        meca.addLineClampX(mp, stiff);
         std::cerr << "object is too big to fit in SpaceRing\n";
     }
 }
