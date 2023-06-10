@@ -229,7 +229,8 @@ void Couple::stepAF()
 void Couple::stepFA()
 {
     //we use cHand2->pos() first, because stepUnloaded() may detach cHand2
-    cHand1->stepUnattached(simul(), cHand2->outerPos());
+    if ( !prop->trans_activated )
+        cHand1->stepUnattached(simul(), cHand2->outerPos());
     
     if ( cHand2->checkDetachment() )
         cHand2->detach();

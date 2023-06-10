@@ -104,11 +104,9 @@ public:
 
     /// if ( trans_activated == 1 ), Hand2 is active only if Hand1 is bound
     /**
-     Both Hands of a Couple are normally equally active. With this feature,
-     the activity of Hand2 is conditioned on Hand1 being attached.
-     In other words, Hand2 remains inactive if Hand1 is not attached.
-     This is very useful for example to make a nucleator that nucleates only after
-     it has docked on an existing filament.
+     If the couple is `trans_activated`, the activity of Hand2 is conditioned on Hand1 being attached.
+     Hand2 remains inactive if Hand1 is not attached, and Hand1 does not bind if Hand2 is bound.
+     This can be used to simulate a nucleator that is active only if bound to an existing filament.
      */
     bool trans_activated;
 
