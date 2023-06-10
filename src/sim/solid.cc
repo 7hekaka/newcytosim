@@ -868,7 +868,8 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
             ObjectSet::rotateObjects(objs, Rotation::flipX());
         }
 #else
-        throw InvalidParameter("Solid's twin code is not enabled");
+        if ( str != "off" )
+            throw InvalidParameter("Solid's twin code is not enabled");
 #endif
     }
     fixShape();
