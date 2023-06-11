@@ -101,7 +101,7 @@ namespace Cytosim
             out_.flush();
         }
 
-        /// front-end to a `printf()` syntax followed by flush
+        /// C-style `printf()` syntax followed by flush
         template < typename Arg1, typename... Args >
         void operator()(const char* fmt, Arg1 arg1, Args&&... args)
         {

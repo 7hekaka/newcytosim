@@ -205,7 +205,6 @@ void Chain::setShape(const real pts[], size_t n_pts, size_t np)
     }
     b.load(pts+DIM*n_pts-DIM);
     setPoint(np, b);
-    //updateFiber();
     reshape();
 }
 
@@ -857,7 +856,7 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
 {
     Vector inc(0,0,0), sum(0,0,0), seg;
     seg.load_diff(src);
-    real   dis = seg.norm();
+    real dis = seg.norm();
     
     // translation needed to restore first segment
     if ( dis > REAL_EPSILON )
@@ -880,7 +879,7 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
             inc += ( cut/dis - 1.0 ) * seg;
     }
     
-    // move the last point by dp:
+    // move the last point by `inc`:
     (inc+Vector(src+DIM*ns)).store(dst+DIM*ns);
     
     // calculate uniform motion needed to conserve the center of gravity:
@@ -926,8 +925,9 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut
 #endif
 
 /**
- Replace coordinates by the ones provided in `ptr`
- A reshape operation is done
+ Replace coordinates by the ones provided in `ptr`, and call 'reshape()':
+ the points are displaced to bring adjacent points to a distance 'segmentation'
+ This is done in a way that can be parallellize on multiple threads
  */
 void Chain::getPoints(real const* ptr)
 {
@@ -980,9 +980,10 @@ void Chain::getPoints(real const* ptr)
 #endif
     {
         std::string doc = document(ptr);
+        real mov = sumDistances(ptr);
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        Cytosim::warn << "crude motion was applied to " << doc << '\n';
+        Cytosim::warn << "crude motion was applied to " << doc << " " << mov << '\n';
         //copy_real(DIM*nbPoints(), ptr, pPos);
         //Cytosim::warn << document(pPos) << '\n';
 #endif
@@ -1758,7 +1759,6 @@ void Chain::adjustSegmentation(real arg)
         fnSegmentation = arg;
         adjustSegmentation();
         updateFiber();
-        reshape();
     }
 }
 

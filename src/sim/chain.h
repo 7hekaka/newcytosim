@@ -71,6 +71,8 @@ class Glossary;
 */
 class Chain : public Mecable
 {
+public:
+    
     /// the ideal number of points for ratio = length / segmentation
     static size_t bestNumberOfPoints(real ratio);
 
