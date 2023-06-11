@@ -358,7 +358,7 @@ private:
     void computePrecondBand(Mecable*);
 
     /// compute the preconditionner block corresponding to given Mecable
-    void computePrecondHalf(Mecable*);
+    void computePrecondHalf(Mecable*, real*);
 
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondFull(Mecable*, real*);

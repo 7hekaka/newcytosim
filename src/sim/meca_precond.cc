@@ -772,13 +772,13 @@ void Meca::computePrecondBand(Mecable* mec)
  Compute preconditionner block corresponding to 'mec'
  This block is symmetric, and factorized by Cholesky's method.
  */
-void Meca::computePrecondHalf(Mecable* mec)
+void Meca::computePrecondHalf(Mecable* mec, real* tmp)
 {
     const size_t bks = DIM * mec->nbPoints();
 #if CHOUCROUTE && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*bks/2, bks);
     // use temporary memory to build matrix block:
-    double* blk = new_real(4+bks*bks);
+    real * blk = tmp;
 #else
     mec->blockSize(bks, bks*bks, 0);
     real * blk = mec->pblock();
@@ -823,7 +823,7 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
     
 #if CHOUCROUTE && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*bks/2, bks);
-    double* blk = tmp;
+    real * blk = tmp;
 #else
     mec->blockSize(bks, bks*bks, bks);
     real * blk = mec->pblock();
@@ -869,7 +869,7 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
 void Meca::computePreconditionner()
 {
     bump_ = 0;
-    size_t sup = DIM * largestMecable();
+    size_t sup = ( 1 + DIM * largestMecable() ) & ~1;
     real * tmp = new_real(4+sup*sup);
 
     switch( precond_ )
@@ -901,7 +901,7 @@ void Meca::computePreconditionner()
             break;
         case 5:
             for ( Mecable * mec : mecables )
-                computePrecondHalf(mec);
+                computePrecondHalf(mec, tmp);
             break;
         case 6:
             for ( Mecable * mec : mecables )
