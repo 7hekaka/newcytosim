@@ -165,6 +165,14 @@ size_t Meca::largestMecable() const
     return res;
 }
 
+size_t Meca::smallestMecable() const
+{
+    size_t res = ~0;
+    for ( Mecable * mec : mecables )
+        res = std::min(res, mec->nbPoints());
+    return res;
+}
+
 size_t Meca::nbConstraints() const
 {
     size_t res = 0;
@@ -843,9 +851,53 @@ unsigned Meca::solve()
 
     auto solve = cycles_;
     cycles_ = timer() - start;
+
+#if 0
+    real dis = 0;
+    static real mean = 0;
+    Mecable * mac = nullptr;
+    for ( Mecable * mec : mecables )
+    {
+        const size_t off = DIM * mec->matIndex();
+        const size_t dim = DIM * mec->nbPoints();
+        real d = blas::nrm2(dim, vSOL+off);
+        if ( d > dis )
+        {
+            dis = d;
+            mac = mec;
+        }
+    }
+    if ( mac )
+    {
+        Cytosim::out << "max disp. (" << mac->reference() << ") " << std::setprecision(6) << dis;
+        mean = 0.9 * mean + 0.1 * dis;
+        if ( dis > 2 * mean )
+            Cytosim::out << "  ****\n";
+        else
+            Cytosim::out << "\n";
+    }
+#endif
     
     //add the solution (the displacement) to update the Mecable's vertices
     blas::xadd(dimension(), vSOL, vPTS);
+    
+#if 1
+    // calculate true residual: tmp = rhs - A * x
+    size_t dim = dimension();
+    real * tmp = allocator_.bind(0);
+    multiply(vSOL, tmp);
+    blas::xsub(dim, vRHS, tmp);
+    real true_residual = blas::nrm8(dim, tmp);
+    real displacement = blas::nrm8(dim, vSOL);
+    
+    if ( true_residual > tolerance_ )
+    {
+        Cytosim::out << " --> failed true_residual : " << std::setw(11) << std::left << true_residual;
+        Cytosim::out << " dx " << std::setw(11) << std::left << displacement;
+        doNotify = 1;
+    }
+    else
+#endif
 
     ready_ = 1;
 
@@ -863,19 +915,9 @@ unsigned Meca::solve()
         if ( useFullMatrix )
 #endif
         oss << " " << mFUL.what();
-        oss << " precond " << precond_ << " (" << preconditionnerSize() << ")";
+        oss << " precond " << precond_ << " (" << preconditionnerSize() << ")" << CHOUCROUTE;
         oss << " count " << std::setw(4) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
-        size_t dim = dimension();
-        if ( verbose_ & 8 )
-        {
-            // calculate true residual: tmp = rhs - A * x
-            real * tmp = allocator_.bind(0);
-            multiply(vSOL, tmp);
-            blas::xsub(dim, vRHS, tmp);
-            oss << ": " << std::setw(11) << std::left << blas::nrm8(dim, tmp);
-            oss << " dx " << std::setw(11) << std::left << blas::nrm8(dim, vSOL);
-        }
         if ( verbose_ & 4 )
         {
             unsigned cnt = std::max(1U, monitor.count());

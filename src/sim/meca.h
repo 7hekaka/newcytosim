@@ -386,6 +386,9 @@ public:
     /// Number of points in the Mecable that has the most number of points
     size_t largestMecable() const;
     
+    /// Number of points in the Mecable that has the most number of points
+    size_t smallestMecable() const;
+
     /// Number of distance constraints applied to the movements of vertices
     size_t nbConstraints() const;
 
