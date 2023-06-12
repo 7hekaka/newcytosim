@@ -511,7 +511,7 @@ This updates the right-hand-side:
  Vector 'rhs' is both input and output.
 */
 real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* rhs)
-{        
+{
     real n = mec->addBrownianForces(rnd, alpha, rhs);
 
 #if ADD_PROJECTION_DIFF == 2
@@ -621,6 +621,7 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
  */
 unsigned Meca::solve()
 {
+    const size_t dim = dimension();
     assert_true(ready_==0);
 
     prepareMatrices();
@@ -632,11 +633,11 @@ unsigned Meca::solve()
     addAllRigidity(vPTS, vRHS);
 #endif
     
-    /* 
-     Fill `vRND` with Gaussian random numbers 
+    /*
+     Fill `vRND` with Gaussian random numbers
      This operation can be done in parallel, in a separate thread
      */
-    RNG.gauss_set(vRND, dimension());
+    RNG.gauss_set(vRND, dim);
     
     /*
      Add Brownian motions to 'vRHS', and calculate vRHS by multiplying by mobilities.
@@ -673,10 +674,6 @@ unsigned Meca::solve()
 
     // scale minimum noise level to serve as a measure of required precision
     noiseLevel *= tau_;
-#if 0
-    real n = blas::nrm2(dimension(), vRHS) / (noiseLevel * std::sqrt(dimension()));
-    printf("noiseLeveld = %8.2e   variance(vRHS) / estimate = %8.4f\n", noiseLevel, n);
-#endif
     
 #if NEW_CYTOPLASMIC_FLOW
     /**
@@ -696,7 +693,7 @@ unsigned Meca::solve()
      The method is quite inefficient, since we have constructed the stiffness matrix,
      which is not necessary for this explicit scheme. Force would be sufficient.
      */
-    blas::xadd(dimension(), vRHS, vPTS);
+    blas::xadd(dim, vRHS, vPTS);
     ready_ = 1;
     return 1;
 #endif
@@ -716,7 +713,7 @@ unsigned Meca::solve()
      that the blocks from two consecutive iterations do not match.
      From this, using zero for the initial guess seems safer:
      */
-    zero_real(dimension(), vSOL);
+    zero_real(dim, vSOL);
 
     /*
      We now solve the system MAT * vSOL = vRHS  by an iterative method:
@@ -741,10 +738,10 @@ unsigned Meca::solve()
      with each BCGGS iteration involving 2 matrix-vector multiplications.
      This limit is however too large, and we set an arbitrary limit in practice.
      */
-    size_t max_iter = std::min(1111UL, 2*dimension());
+    size_t max_iter = std::min(1111UL, 2*dim);
     LinearSolvers::Monitor monitor(max_iter, tolerance_);
 
-    //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dimension(), max_iter, tolerance_, precond);
+    //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dim, max_iter, tolerance_, precond);
 
     /*
      GMRES may converge faster than BCGGS, but has overheads and uses more memory
@@ -773,7 +770,7 @@ unsigned Meca::solve()
     for ( int RS : {8, 16, 32} )
     {
         monitor.reset();
-        zero_real(dimension(), vSOL);
+        zero_real(dim, vSOL);
         LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator_, mH, mV, temporary_);
         fprintf(stderr, "    GMRES-%i  count %4i  residual %.3e\n", RS, monitor.count(), monitor.residual());
     }
@@ -782,14 +779,14 @@ unsigned Meca::solve()
     // enable this to compare BCGS and GMRES
     fprintf(stderr, "    BCGS     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
     monitor.reset();
-    zero_real(dimension(), vSOL);
+    zero_real(dim, vSOL);
     LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
     fprintf(stderr, "    GMRES-64 count %4i  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
     monitor.reset();
-    zero_real(dimension(), vSOL);
+    zero_real(dim, vSOL);
     LinearSolvers::bicgstab(*this, vRHS, vSOL, monitor, allocator_);
     fprintf(stderr, "    bcgs     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
@@ -797,11 +794,11 @@ unsigned Meca::solve()
     if ( !monitor.converged() )
     {
         Cytosim::out("Failed with size %lu precond %i flag %u count %4u residual %.3e (%.3f)",
-            dimension(), precond_, monitor.flag(), monitor.count(), monitor.residual(), monitor.residual()/tolerance_);
+            dim, precond_, monitor.flag(), monitor.count(), monitor.residual(), monitor.residual()/tolerance_);
         
         // in case the solver did not converge, we try safer mode:
         monitor.reset();
-        zero_real(dimension(), vSOL);
+        zero_real(dim, vSOL);
         if ( precond_ )
             LinearSolvers::BCGSP<1>(*this, vRHS, vSOL, monitor, allocator_);
         else
@@ -846,8 +843,8 @@ unsigned Meca::solve()
                             " achieved ", monitor.residual()/tolerance_);
     }
 
-    //printf("\n   /sol "); VecPrint::print(std::cerr, dimension(), vSOL, 3);
-    //printf("\n   >pts "); VecPrint::print(std::cerr, dimension(), vPTS, 3);
+    //printf("\n   /sol "); VecPrint::print(std::cerr, dim, vSOL, 3);
+    //printf("\n   >pts "); VecPrint::print(std::cerr, dim, vPTS, 3);
 
     auto solve = cycles_;
     cycles_ = timer() - start;
@@ -878,15 +875,10 @@ unsigned Meca::solve()
     }
 #endif
     
-    //add the solution (the displacement) to update the Mecable's vertices
-    blas::xadd(dimension(), vSOL, vPTS);
-    //real displacement = blas::nrm8(dim, vSOL);
-
     ready_ = 1;
     
 #if 1
     // calculate true residual: tmp = rhs - A * x
-    size_t dim = dimension();
     real * tmp = allocator_.bind(0);
     multiply(vSOL, tmp);
     blas::xsub(dim, vRHS, tmp);
@@ -895,15 +887,14 @@ unsigned Meca::solve()
     if ( true_residual > tolerance_ )
     {
         ready_ = 0;
-        Cytosim::out(" --> failed true_residual %8.2e", true_residual);
-        real nl = blas::nrm8(dimension(), vRND);
-        Cytosim::out(" noise %8.2e", nl);
         doNotify = 1;
+        Cytosim::out(" --> failed true_residual %8.2e", true_residual);
+        Cytosim::out(" noise %8.2e", blas::nrm8(dim, vRND));
 
-        // try with a different noise:
+        // recalculate solution with a different noise:
         monitor.reset();
-        zero_real(dimension(), vSOL);
-        RNG.gauss_set(vRND, dimension());
+        zero_real(dim, vSOL);
+        RNG.gauss_set(vRND, dim);
         noiseLevel = INFINITY;
         for ( Mecable * mec : mecables )
         {
@@ -917,19 +908,22 @@ unsigned Meca::solve()
         else
             LinearSolvers::BCGS<0>(*this, vRHS, vSOL, monitor, allocator_);
         
-        nl = blas::nrm8(dimension(), vRND);
-        Cytosim::out(" --> noise %8.2e count %4i residual %.3e", nl, monitor.count(), monitor.residual());
+        Cytosim::out(" --> noise %8.2e count %4i residual %.3e", blas::nrm8(dim, vRND), monitor.count(), monitor.residual());
         // recalculate residual:
         multiply(vSOL, tmp);
         blas::xsub(dim, vRHS, tmp);
         true_residual = blas::nrm8(dim, tmp);
-        Cytosim::out(" true_residual %8.2e\n", true_residual);
-
+        Cytosim::out(" true_residual %8.2e", true_residual);
+        Cytosim::out(" disp. %8.2e\n", blas::nrm8(dim, vSOL));
+        
         if ( true_residual < tolerance_ )
             ready_ = 1;
     }
 #endif
-
+    
+    //add the solution (the displacement) to update the Mecable's vertices
+    blas::xadd(dim, vSOL, vPTS);
+    
     // report on the matrix type and size, sparsity, and the number of iterations
     if (( 0 < doNotify ) || ( verbose_ & 1 ))
     {
@@ -944,7 +938,7 @@ unsigned Meca::solve()
         if ( useFullMatrix )
 #endif
         oss << " " << mFUL.what();
-        //oss << " noise " << noiseLevel << "  " << blas::nrm8(dimension(), vRND);
+        //oss << " noise " << noiseLevel << "  " << blas::nrm8(dim, vRND);
         oss << " precond " << precond_ << " (" << preconditionnerSize() << ")" << CHOUCROUTE;
         oss << " count " << std::setw(4) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
