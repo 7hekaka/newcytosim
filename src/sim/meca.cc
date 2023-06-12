@@ -880,6 +880,9 @@ unsigned Meca::solve()
     
     //add the solution (the displacement) to update the Mecable's vertices
     blas::xadd(dimension(), vSOL, vPTS);
+    //real displacement = blas::nrm8(dim, vSOL);
+
+    ready_ = 1;
     
 #if 1
     // calculate true residual: tmp = rhs - A * x
@@ -888,18 +891,44 @@ unsigned Meca::solve()
     multiply(vSOL, tmp);
     blas::xsub(dim, vRHS, tmp);
     real true_residual = blas::nrm8(dim, tmp);
-    real displacement = blas::nrm8(dim, vSOL);
     
     if ( true_residual > tolerance_ )
     {
-        Cytosim::out << " --> failed true_residual : " << std::setw(11) << std::left << true_residual;
-        Cytosim::out << " dx " << std::setw(11) << std::left << displacement;
+        ready_ = 0;
+        Cytosim::out(" --> failed true_residual %8.2e", true_residual);
+        real nl = blas::nrm8(dimension(), vRND);
+        Cytosim::out(" noise %8.2e", nl);
         doNotify = 1;
-    }
-    else
-#endif
 
-    ready_ = 1;
+        // try with a different noise:
+        monitor.reset();
+        zero_real(dimension(), vSOL);
+        RNG.gauss_set(vRND, dimension());
+        noiseLevel = INFINITY;
+        for ( Mecable * mec : mecables )
+        {
+            const size_t inx = DIM * mec->matIndex();
+            real n = brownian1(mec, vRND+inx, alpha_, tau_, vRHS+inx);
+            noiseLevel = std::min(noiseLevel, n);
+        }
+        noiseLevel *= tau_;
+        if ( precond_ )
+            LinearSolvers::BCGSP<0>(*this, vRHS, vSOL, monitor, allocator_);
+        else
+            LinearSolvers::BCGS<0>(*this, vRHS, vSOL, monitor, allocator_);
+        
+        nl = blas::nrm8(dimension(), vRND);
+        Cytosim::out(" --> noise %8.2e count %4i residual %.3e", nl, monitor.count(), monitor.residual());
+        // recalculate residual:
+        multiply(vSOL, tmp);
+        blas::xsub(dim, vRHS, tmp);
+        true_residual = blas::nrm8(dim, tmp);
+        Cytosim::out(" true_residual %8.2e\n", true_residual);
+
+        if ( true_residual < tolerance_ )
+            ready_ = 1;
+    }
+#endif
 
     // report on the matrix type and size, sparsity, and the number of iterations
     if (( 0 < doNotify ) || ( verbose_ & 1 ))
@@ -915,6 +944,7 @@ unsigned Meca::solve()
         if ( useFullMatrix )
 #endif
         oss << " " << mFUL.what();
+        //oss << " noise " << noiseLevel << "  " << blas::nrm8(dimension(), vRND);
         oss << " precond " << precond_ << " (" << preconditionnerSize() << ")" << CHOUCROUTE;
         oss << " count " << std::setw(4) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
