@@ -545,6 +545,17 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
 //------------------------------------------------------------------------------
 #pragma mark - Solve & Apply
 
+/// calculate the norm of `RHS - MATRIX * SOL`
+real Meca::residualNorm() const
+{
+    size_t dim = dimension();
+    real * tmp = allocator_.bind(0);
+    multiply(vSOL, tmp);
+    blas::xsub(dim, vRHS, tmp);
+    return blas::nrm8(dim, tmp);
+}
+
+
 /**
  Meca::solve() solves the equation of motion with all Mecables:
  
@@ -733,12 +744,12 @@ unsigned Meca::solve()
     }
     
     /*
-     With exact arithmetic, biConjugate Gradient should converge at most
-     in a number of iterations equal to the size of the linear system,
-     with each BCGGS iteration involving 2 matrix-vector multiplications.
-     This limit is however too large, and we set an arbitrary limit in practice.
+     With exact arithmetic, biConjugate Gradient should converge within a number
+     of iterations equal to the size of the linear system, with each BCGGS
+     iteration involving 2 matrix-vector multiplications.
+     Here we set the limit to half of the theoretical maximum:
      */
-    size_t max_iter = std::min(1111UL, 2*dim);
+    size_t max_iter = dim;
     LinearSolvers::Monitor monitor(max_iter, tolerance_);
 
     //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dim, max_iter, tolerance_, precond);
@@ -753,13 +764,13 @@ unsigned Meca::solve()
     {
         // change initial condition to be `P * RHS`:
         precondition(vRHS, vSOL);
-        LinearSolvers::BCGSP<0>(*this, vRHS, vSOL, monitor, allocator_);
+        LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         //fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator_, mH, mV, temporary_);
     }
     else
     {
-        LinearSolvers::BCGS<0>(*this, vRHS, vSOL, monitor, allocator_);
+        LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
     }
     
@@ -791,56 +802,75 @@ unsigned Meca::solve()
     fprintf(stderr, "    bcgs     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
 #endif
     
-    if ( !monitor.converged() )
+    real residual = residualNorm();
+    if ( residual > tolerance_ )
     {
-        Cytosim::out("Failed with size %lu precond %i flag %u count %4u residual %.3e (%.3f)",
-            dim, precond_, monitor.flag(), monitor.count(), monitor.residual(), monitor.residual()/tolerance_);
+        doNotify = 1;
+        Cytosim::out("Failed with size %lu precond %i flag %u count %4u residual %.3e (%.3e)",
+            dim, precond_, monitor.flag(), monitor.count(), residual, monitor.residual());
         
-        // in case the solver did not converge, we try safer mode:
+        // in case the solver did not converge, try again:
         monitor.reset();
         zero_real(dim, vSOL);
         if ( precond_ )
-            LinearSolvers::BCGSP<1>(*this, vRHS, vSOL, monitor, allocator_);
+            LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         else
-            LinearSolvers::BCGS<1>(*this, vRHS, vSOL, monitor, allocator_);
+            LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         
-        Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+        residual = residualNorm();
+        Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), residual);
         
-        if ( monitor.residual() > tolerance_ )
+        if ( residual > tolerance_ )
         {
+            // generate a different noise vector:
+            RNG.gauss_set(vRND, dim);
+            for ( Mecable * mec : mecables )
+            {
+                const size_t inx = DIM * mec->matIndex();
+                brownian1(mec, vRND+inx, alpha_, tau_, vRHS+inx);
+            }
+            // recalculate solution:
             monitor.reset();
+            zero_real(dim, vSOL);
             if ( precond_ )
-                LinearSolvers::BCGSP<1>(*this, vRHS, vSOL, monitor, allocator_);
+                LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
             else
-                LinearSolvers::BCGS<1>(*this, vRHS, vSOL, monitor, allocator_);
-            Cytosim::out(" --> continued: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
+            residual = residualNorm();
+            Cytosim::out(" --> new noise count %4i residual %.3e", monitor.count(), residual);
         }
         
-        // relax the convergence criteria a bit
-        //tolerance_ *= M_SQRT2;
-        
-        if ( monitor.residual() > tolerance_ )
+        if ( residual > tolerance_ )
         {
+            // generate a different noise vector:
+            RNG.gauss_set(vRND, dim);
+            for ( Mecable * mec : mecables )
+            {
+                const size_t inx = DIM * mec->matIndex();
+                brownian1(mec, vRND+inx, alpha_, tau_, vRHS+inx);
+            }
+            // recalculate solution:
             monitor.reset();
+            zero_real(dim, vSOL);
             if ( precond_ )
             {
-                LinearSolvers::BCGS<1>(*this, vRHS, vSOL, monitor, allocator_);
-                Cytosim::out(" --> extended: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
+                Cytosim::out(" --> extended: count %4i residual %.3e\n", monitor.count(), residual);
             }
             else
             {
                 // try with our strongest preconditioner
                 precond_ = 6;
                 computePreconditionner();
-                LinearSolvers::BCGSP<1>(*this, vRHS, vSOL, monitor, allocator_);
-                Cytosim::out(" --> restarted precond 6: count %4i residual %.3e\n", monitor.count(), monitor.residual());
+                LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
+                Cytosim::out(" --> restarted precond 6: count %4i residual %.3e\n", monitor.count(), residual);
             }
+            residual = residualNorm();
         }
 
-        // if the solver did not converge, its result cannot be used!
-        if ( monitor.residual() > 2 * tolerance_ )
-            throw Exception("no convergence, residual ", monitor.residual(),
-                            " achieved ", monitor.residual()/tolerance_);
+        // stop if the solver did not converge:
+        if ( residual > M_SQRT2 * tolerance_ )
+            throw Exception("no convergence, residual ", residual, " achieved ", residual/tolerance_);
     }
 
     //printf("\n   /sol "); VecPrint::print(std::cerr, dim, vSOL, 3);
@@ -850,6 +880,7 @@ unsigned Meca::solve()
     cycles_ = timer() - start;
 
 #if 0
+    // print displacement of Mecable that has moved the most
     real dis = 0;
     static real mean = 0;
     Mecable * mac = nullptr;
@@ -876,51 +907,6 @@ unsigned Meca::solve()
 #endif
     
     ready_ = 1;
-    
-#if 1
-    // calculate true residual: tmp = rhs - A * x
-    real * tmp = allocator_.bind(0);
-    multiply(vSOL, tmp);
-    blas::xsub(dim, vRHS, tmp);
-    real true_residual = blas::nrm8(dim, tmp);
-    
-    if ( true_residual > tolerance_ )
-    {
-        ready_ = 0;
-        doNotify = 1;
-        Cytosim::out(" --> failed true_residual %8.2e", true_residual);
-        Cytosim::out(" noise %8.2e", blas::nrm8(dim, vRND));
-
-        // recalculate solution with a different noise:
-        monitor.reset();
-        zero_real(dim, vSOL);
-        RNG.gauss_set(vRND, dim);
-        noiseLevel = INFINITY;
-        for ( Mecable * mec : mecables )
-        {
-            const size_t inx = DIM * mec->matIndex();
-            real n = brownian1(mec, vRND+inx, alpha_, tau_, vRHS+inx);
-            noiseLevel = std::min(noiseLevel, n);
-        }
-        noiseLevel *= tau_;
-        if ( precond_ )
-            LinearSolvers::BCGSP<0>(*this, vRHS, vSOL, monitor, allocator_);
-        else
-            LinearSolvers::BCGS<0>(*this, vRHS, vSOL, monitor, allocator_);
-        
-        Cytosim::out(" --> noise %8.2e count %4i residual %.3e", blas::nrm8(dim, vRND), monitor.count(), monitor.residual());
-        // recalculate residual:
-        multiply(vSOL, tmp);
-        blas::xsub(dim, vRHS, tmp);
-        true_residual = blas::nrm8(dim, tmp);
-        Cytosim::out(" true_residual %8.2e", true_residual);
-        Cytosim::out(" disp. %8.2e\n", blas::nrm8(dim, vSOL));
-        
-        if ( true_residual < tolerance_ )
-            ready_ = 1;
-    }
-#endif
-    
     //add the solution (the displacement) to update the Mecable's vertices
     blas::xadd(dim, vSOL, vPTS);
     

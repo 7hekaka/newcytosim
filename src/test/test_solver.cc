@@ -191,7 +191,7 @@ int main(int argc, char* argv[])
     {
         mon.reset();
         zero_real(dim, sol);
-        LinearSolvers::BCGS<0>(sys, rhs, sol, mon, alc);
+        LinearSolvers::BCGS(sys, rhs, sol, mon, alc);
         print_real(stdout, std::min(16, dim), sol, " sol |");
         
         // calculate true residual:

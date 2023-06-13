@@ -65,8 +65,8 @@ namespace LinearSolvers
             //deallocate();
         }
         
-        /// return the memory allocated for i-th vector
-        real * bind(size_t i)
+        /// return pointer to the memory allocated for i-th vector
+        real * bind(size_t i) const
         {
             if ( !mem_ )
             {

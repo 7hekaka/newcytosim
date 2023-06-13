@@ -404,6 +404,9 @@ public:
     /// total allocated memory size for preconditionner
     size_t preconditionnerSize() const;
     
+    /// returns the norm of `RHS - MATRIX * SOL`
+    real residualNorm() const;
+
     /// calculate Y <- M*X, where M is the matrix associated with the system
     void multiply(const real* X, real* Y) const;
 

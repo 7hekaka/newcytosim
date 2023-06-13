@@ -24,7 +24,7 @@ namespace LinearSolvers
         /// maximum allowed number of iterations
         unsigned limit_;
 
-        /// counter for iterations or number of matrix-vector operations
+        /// counter for number of matrix-vector operations
         unsigned count_;
         
         /// exit flag
@@ -62,7 +62,7 @@ namespace LinearSolvers
         /// true if achieve residual < residual threshold
         bool converged() const { return converged_; }
         
-        /// true if converged or number of iterations are exceeded
+        /// true if converged or number of multiplications exceeded
         bool finished() const { return converged_ | ( count_ > limit_ ); }
 
         /// register given residual and return true if target is achieved

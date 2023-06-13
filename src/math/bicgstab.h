@@ -23,14 +23,14 @@ namespace LinearSolvers
     /*
      This solves `mat * x = rhs` with a tolerance specified in 'monitor'
      */
-    template < int SAFE, typename LinearOperator, typename Monitor, typename Allocator >
+    template < typename LinearOperator, typename Monitor, typename Allocator >
     void BCGS(const LinearOperator& mat, const real* rhs, real* sol,
               Monitor& monitor, Allocator& allocator)
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
         
         const int dim = mat.dimension();
-        allocator.allocate(dim, 5+SAFE);
+        allocator.allocate(dim, 5);
         real * r  = allocator.bind(0);
         real * r0 = allocator.bind(1);
         real * p  = allocator.bind(2);
@@ -55,32 +55,10 @@ namespace LinearSolvers
         rho = blas::dot(dim, r, r);
         real * best = nullptr;
         real best_residual = 0;
-        if ( SAFE )
-        {
-            best = allocator.bind(5);
-            blas::xcopy(dim, sol, 1, best, 1);
-            best_residual = monitor.residual();
-            //fprintf(stderr, " (BCGS init %10.7f)\n", best_residual);
-        }
         goto start;
         
-#if RELAXED_CONVERGENCE
-        while ( ! monitor.finished(dim, r, M_SQRT1_2) )
-#else
         while ( ! monitor.finished(dim, r) )
-#endif
         {
-            if ( SAFE )
-            {
-                // save closest vector to solution so far
-                if ( monitor.residual() < 0.707 * best_residual )
-                {
-                    blas::xcopy(dim, sol, 1, best, 1);
-                    best_residual = monitor.residual();
-                    //fprintf(stderr, " (BCGS %4i  %10.7f -> stored)\n", monitor.count(), best_residual);
-                }
-                //else fprintf(stderr, " (BCGS %4i  %10.7f)\n", monitor.count(), monitor.residual());
-            }
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
             
@@ -142,32 +120,6 @@ namespace LinearSolvers
             else
                 omega = 0.0;
         }
-        if ( SAFE )
-        {
-            /* With numerical drift, the residual 'r' can be far from its exact mathematical
-             value, and to avoid returning a wrong information on the residual achieved,
-             we recalculate here the true residual r0 = rhs - MAT * sol */
-            ++monitor;
-            mat.multiply(sol, r);
-            blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-            monitor.finished(dim, r);
-            if ( !monitor.converged() )
-            {
-                real res = monitor.residual();
-                ++monitor;
-                mat.multiply(best, r0);
-                blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
-                monitor.finished(dim, r0);
-                if ( monitor.residual() < res )
-                {
-                    blas::xcopy(dim, best, 1, sol, 1);
-                    //fprintf(stderr, "(recovered res %10.7f --> %10.7f not %10.7f)", res, monitor.residual(), best_residual);
-                }
-                else
-                    monitor.finished(res);
-            }
-            //fprintf(stderr, "(BCGS %4i res %10.7f %10.7f)", monitor.count(), est, monitor.residual());
-        }
         allocator.release();
     }
     
@@ -176,14 +128,14 @@ namespace LinearSolvers
     /*
      This solves `mat * x = rhs` with a tolerance specified in 'monitor'
      */
-    template < int SAFE, typename LinearOperator, typename Monitor, typename Allocator >
+    template < typename LinearOperator, typename Monitor, typename Allocator >
     void BCGSP(const LinearOperator& mat, const real* rhs, real* sol,
                Monitor& monitor, Allocator& allocator)
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0, delta;
         
         const int dim = mat.dimension();
-        allocator.allocate(dim, 7+SAFE);
+        allocator.allocate(dim, 7);
         real * r    = allocator.bind(0);
         real * r0   = allocator.bind(1);
         real * p    = allocator.bind(2);
@@ -210,32 +162,10 @@ namespace LinearSolvers
         rho = blas::dot(dim, r, r);
         real * best = nullptr;
         real best_residual = 0;
-        if ( SAFE )
-        {
-            best = allocator.bind(7);
-            blas::xcopy(dim, sol, 1, best, 1);
-            best_residual = monitor.residual();
-            //fprintf(stderr, " (BCGSP init %10.7f)\n", best_residual);
-        }
         goto start;
 
-#if RELAXED_CONVERGENCE
-        while ( ! monitor.finished(dim, r, M_SQRT1_2) )
-#else
         while ( ! monitor.finished(dim, r) )
-#endif
         {
-            if ( SAFE )
-            {
-                // save closest vector to solution so far
-                if ( monitor.residual() < 0.707 * best_residual )
-                {
-                    blas::xcopy(dim, sol, 1, best, 1);
-                    best_residual = monitor.residual();
-                    //fprintf(stderr, " (BCGSP %4i  %10.7f -> stored)\n", monitor.count(), best_residual);
-                }
-                //else fprintf(stderr, " (BCGSP %4i  %10.7f)\n", monitor.count(), monitor.residual());
-            }
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
             
@@ -311,31 +241,6 @@ namespace LinearSolvers
         monitor.finished(dim, r);
         fprintf(stderr, "[BCGSP %4i res %14.9f %14.9f]", monitor.count(), est, monitor.residual());
 #endif
-        if ( SAFE )
-        {
-            /* With numerical drift, the residual 'r' can be far from its exact mathematical
-             value, and to avoid returning a wrong information on the residual achieved,
-             we recalculate here the true residual r0 = rhs - MAT * sol */
-            ++monitor;
-            mat.multiply(sol, r);
-            blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-            monitor.finished(dim, r);
-            if ( !monitor.converged() )
-            {
-                real res = monitor.residual();
-                ++monitor;
-                mat.multiply(best, r0);
-                blas::xaxpy(dim, -1.0, rhs, 1, r0, 1);
-                monitor.finished(dim, r0);
-                if ( monitor.residual() < res )
-                {
-                    blas::xcopy(dim, best, 1, sol, 1);
-                    //fprintf(stderr, "(recovered res %10.7f --> %10.7f not %10.7f)", res, monitor.residual(), best_residual);
-                }
-                else
-                    monitor.finished(res);
-            }
-        }
         //fprintf(stderr, "(BCGS %4i res %10.7f %10.7f)", monitor.count(), est, monitor.residual());
         allocator.release();
     }
