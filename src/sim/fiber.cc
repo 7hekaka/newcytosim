@@ -415,6 +415,7 @@ Fiber* Fiber::severPoint(size_t pti)
     // the signature should be conserved:
     fib->signature(signature());
     fib->birthTime(birthTime());
+    fib->mark(mark());
 
     assert_true( fib->abscissaM() == abscissaM() );
     // remove minus end portion on new piece:
@@ -473,6 +474,7 @@ Fiber* Fiber::severM(real dis1, real dis2)
     // the signature should be conserved:
     fib->signature(signature());
     fib->birthTime(birthTime());
+    fib->mark(mark());
 
     // copy the Chain part of the object:
     *(static_cast<Chain*>(fib)) = *this;
