@@ -2,7 +2,7 @@
 #
 # Make a plot using matplotlib
 #
-# F. Nedelec, Strasbourg, 08.03.2022
+# F. Nedelec, Strasbourg, 08.03.2022, Cambridge 15.06.2023
 
 
 """
@@ -31,14 +31,15 @@ def uncode(arg):
         return arg
 
 
-def plot_histograms(time, data, scale, name):
+def plot_histogram(time, data, scale, name):
     """
         Plot surface as a function of time
     """
-    fig = plt.figure(figsize=(4, 3.5))
+    fig = plt.figure(figsize=(4, 3))
     Y = data[-1]
     W = (scale[1]-scale[0])*0.8
     plt.bar(scale, Y, W, label=name)
+    plt.xlim(0, max(scale))
     sup = 10 * math.ceil((min(Y)+max(Y))/10)
     plt.ylim(0, sup)
     plt.xlabel('Length (um)', fontsize=fts)
@@ -70,20 +71,19 @@ def get_lengths(file):
             H = [ float(x) for x in s[1:] ]
             D.append(H)
     return T, D, S, F
-    
+
 
 def process(dirpath):
     """
         Process given directory
     """
     os.chdir(dirpath)
-    if 1:
-        filename='len.txt'
-        if not os.path.isfile(filename):
-            subprocess.call(['reportN', 'fiber:histogram', 'interval=0.5,10'], stdout=open(filename, 'w'))
-        with open(filename, 'r') as f:
-            T, D, S, F = get_lengths(f)
-            plot_histograms(T, D, S, F)
+    filename='len.txt'
+    args = ['report3', 'fiber:histogram', 'interval=0.1,32', 'verbose=0']
+    subprocess.call(args, stdout=open(filename, 'w'))
+    with open(filename, 'r') as f:
+        T, D, S, F = get_lengths(f)
+        plot_histogram(T, D, S, F)
     plt.savefig('lengths.png', dpi=150)
     #plt.show()
     plt.close()
