@@ -339,7 +339,7 @@ void HandProp::write_values(std::ostream& os) const
     
     write_value(os, "bind_also_end",      bind_also_end);
     write_value(os, "hold_growing_end",   hold_growing_end);
-    write_value(os, "hold_shrinking_end", 2, hold_shrinking_end);
+    write_value(os, "hold_shrinking_end", hold_shrinking_end, 2);
     write_value(os, "bind_only_end",      bind_only_end, bind_end_range);
 #if NEW_BIND_ONLY_FREE_END
     write_value(os, "bind_only_free_end", bind_only_free_end);
