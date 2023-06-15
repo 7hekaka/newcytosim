@@ -649,8 +649,8 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
 
     size_t nbin = BMAX;
     real delta = ( sup > 2 ) ? 1 : 0.1;
-    opt.set(delta, "interval", "bins");
-    if ( !opt.set(nbin, "interval", 1, "bins", 1) )
+    opt.set(delta, "interval", "bin");
+    if ( !opt.set(nbin, "interval", 1, "bin", 1) )
         nbin = std::ceil(sup/delta);
     nbin = std::min(nbin, BMAX);
     
