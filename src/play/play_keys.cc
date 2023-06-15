@@ -897,11 +897,6 @@ void processKey(unsigned char key, int modifiers = 0)
                 worker.period(prop.period);
                 flashText("period = %i", prop.period);
             }
-            else
-            {
-                // this will initialize the simulation engine without making a step
-                worker.prolong_run(0);
-            }
             break;
             
         case 's':
