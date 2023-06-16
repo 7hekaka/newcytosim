@@ -15,7 +15,7 @@ Syntax:
     ARG is passed as arguments to 'go_sim.py' (please check go_sim.py help),
     and you must use quotes if you have multiple arguments to group them together.
     
-    Unless specified otherwise, the queue is 'skylake'.
+    Unless specified otherwise, the queue is 'icelake'.
     The amount of requested memory (default=2G) should be specified in MB:
        mem=1024 (for 1 GB)
        mem=512  (for 512 MB)
@@ -46,7 +46,8 @@ F. Nedelec
 
 # default parameters for submission:
 submit  = 'sbatch'
-queue   = 'skylake'
+queue   = 'icelake'
+
 runtime = '12:00:00' # 12 hours
 memory  = 4048       # in MB
 ncpu    = 1          # nb of threads per job
