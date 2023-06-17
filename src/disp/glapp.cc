@@ -148,25 +148,28 @@ void glApp::toggleFullScreen()
  Adjust the size of window to maximize the vertical or horizontal dimension,
  without changing the aspect ratio of the window.
  */
-void glApp::maximizeWindow()
+void glApp::toggleWindowSize()
 {
+    int menuBar = 53;
     int W = glutGet(GLUT_WINDOW_WIDTH);
     int H = glutGet(GLUT_WINDOW_HEIGHT);
     
     /// using addition by Renaud Blanch to handle Retina display:
-    int S = 1; //std::max(1, glutGet(GLUT_WINDOW_SCALE));
+    float S = 1; //std::max(1, glutGet(GLUT_WINDOW_SCALE));
+
+    int winW = glutGet(GLUT_SCREEN_WIDTH);
+    int winH = glutGet(GLUT_SCREEN_HEIGHT) - menuBar;
+
+    if ( H == winH ) S = 0.5;
     
-    int maxW = S * glutGet(GLUT_SCREEN_WIDTH);
-    int maxH = S * ( glutGet(GLUT_SCREEN_HEIGHT) - 49 );
+    float zW((winW*S)/(float)W);
+    float zH((winH*S)/(float)H);
     
-    float zW(maxW/(float)W);
-    float zH(maxH/(float)H);
-    
-    glutPositionWindow(0, 45);
+    glutPositionWindow(0, menuBar);
     if ( zW < zH )
-        glutReshapeWindow(maxW, int(zW*H));
+        glutReshapeWindow(winW*S, int(zW*H));
     else
-        glutReshapeWindow(int(zH*W), maxH);
+        glutReshapeWindow(int(zH*W), winH*S);
 }
 
 //------------------------------------------------------------------------------
@@ -423,7 +426,7 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
             break;
         
         case 'F':
-            maximizeWindow();
+            toggleWindowSize();
             break;
 
         case 'z':

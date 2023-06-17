@@ -41,7 +41,7 @@ namespace glApp
     void toggleFullScreen();
 
     /// maximize window size within the current screen
-    void maximizeWindow();
+    void toggleWindowSize();
     
     /// callback function for window resize event
     void resizeWindow(int, int);
