@@ -160,7 +160,7 @@ void glApp::toggleWindowSize()
     int winW = glutGet(GLUT_SCREEN_WIDTH);
     int winH = glutGet(GLUT_SCREEN_HEIGHT) - menuBar;
 
-    if ( H == winH ) S = 0.5;
+    if ( H >= winH || W >= winW ) S = 0.5;
     
     float zW((winW*S)/(float)W);
     float zH((winH*S)/(float)H);
