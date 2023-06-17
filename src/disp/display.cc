@@ -878,8 +878,10 @@ void Display::drawFiberBackbone(Fiber const& fib) const
 }
 
 
-void Display::drawFiberLines(Fiber const& fib, int style) const
+void Display::drawFiberLines(Fiber const& fib, const int style) const
 {
+    if ( style == 8 && fib.endStateP() != STATE_GREEN )
+        return;
     size_t cnt = 2 * fib.nbSegments();
     flute4D* flu = gym::mapBufferC4VD(cnt+4);
     flute4D* ptr = flu;
@@ -913,12 +915,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
                 ptr += 2;
             }
             break;
-        case 4: // display segments with color indicating the curvature
-            for ( size_t i = 0; i < fib.nbPoints(); ++i )
-                flu[i] = {color_by_curvature(fib, i), fib.posP(i)};
-            ptr = flu + fib.nbPoints();
-            break;
-        case 5: // color according to the angle with respect to the XY-plane:
+        case 4: // color according to the angle with respect to the XY-plane:
             strip = 0;
             for ( size_t n = 0; n < fib.nbSegments(); ++n )
             {
@@ -928,6 +925,11 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
                 ptr += 2;
             }
             break;
+        case 5: // display segments with color indicating the curvature
+            for ( size_t i = 0; i < fib.nbPoints(); ++i )
+                flu[i] = {color_by_curvature(fib, i), fib.posP(i)};
+            ptr = flu + fib.nbPoints();
+            break;
         case 6: // color according to the distance from the minus end
             *ptr++ = {color_by_distanceM(fib, 0), fib.posP(0)};
             for ( real a = 0.0625; a < 0.6; a *= 2 )
@@ -935,7 +937,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
             for ( size_t n = 1; n < fib.nbPoints(); ++n )
                 *ptr++ = {color_by_distanceM(fib, n), fib.posP(n)};
             break;
-        case 7: { // color according to the distance from the plus end
+        case 7: case 8: { // color according to the distance from the plus end
             const size_t last = fib.lastPoint();
             for ( size_t n = 0; n < last; ++n )
                 *ptr++ = {color_by_distanceP(fib, n), fib.posP(n)};
@@ -943,7 +945,7 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
                 *ptr++ = {color_by_distanceP(fib, last-a), fib.midPoint(last-1, 1-a)};
             *ptr++ = {color_by_distanceP(fib, last), fib.posP(last)};
         } break;
-        case 8: // color according to distance to the confining Space
+        case 9: // color according to distance to the confining Space
             for ( size_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {color_by_height(fib, i), fib.posP(i)};
             ptr = flu + fib.nbPoints();
@@ -963,13 +965,15 @@ void Display::drawFiberLines(Fiber const& fib, int style) const
 
 void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
-    gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
+    const int style = disp->line_style;
+    if ( style == 8 && fib.endStateP() != STATE_GREEN )
+        return;
     size_t cnt = 8;
     flute4D* flu = gym::mapBufferC4VD(cnt);
     flute4D* ptr = flu;
-
-    if ( disp->line_style == 6 )
+    
+    if ( style == 6 )
     {
         // color by distance to Minus end
         *ptr++ = {color_by_distanceM(fib, inx), fib.posP(inx)};
@@ -980,7 +984,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         }
         *ptr++ = {color_by_distanceM(fib, inx+1), fib.posP(inx+1)};
     }
-    else if ( disp->line_style == 7 )
+    else if ( style == 7 || style == 8 )
     {
         // color by distance to Plus end
         *ptr++ = {color_by_distanceP(fib, inx), fib.posP(inx)};
@@ -994,9 +998,9 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     else
     {
         gym_color c;
-        if ( disp->line_style == 2 )
+        if ( style == 2 )
             c = color_by_tension(fib, inx);
-        else if ( disp->line_style == 3 )
+        else if ( style == 3 )
             c = color_by_tension_jet(fib, inx);
         else
             c = fib.disp->color;
@@ -1005,6 +1009,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
         ptr[1] = {c, fib.posP(inx+1)};
         ptr += 2;
     }
+    gym::ref_view();
     gym::disableLighting();
     gym::unmapBufferC4VD();
     gym::drawLineStrip(pixwidth(disp->line_width), 0, ptr-flu);

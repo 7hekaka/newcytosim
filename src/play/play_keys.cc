@@ -288,12 +288,13 @@ static void flashLineStyle(FiberDisp const* p)
         case 1: flashText("%s: lines", n); break;
         case 2: flashText("%s: color by axial tensions", n); break;
         case 3: flashText("%s: jet color by axial tensions", n); break;
-        case 4: flashText("%s: color by curvature", n); break;
-        case 5: flashText("%s: color by orientation", n); break;
-        case 6: flashText("%s: highlight near minus-end", n); break;
-        case 7: flashText("%s: highlight near plus-end", n); break;
-        case 8: flashText("%s: color by height", n); break;
-        case 9: flashText("%s: color by grid (if style=3)", n); break;
+        case 4: flashText("%s: color by orientation", n); break;
+        case 5: flashText("%s: color by curvature", n); break;
+        case 6: flashText("%s: gradient from minus-end", n); break;
+        case 7: flashText("%s: gradient from plus-end", n); break;
+        case 8: flashText("%s: gradient from growing plus-end", n); break;
+        case 9: flashText("%s: color by height", n); break;
+        case 10: flashText("%s: color by grid (if style=3)", n); break;
         default: flashText("unknown %s:line style", n); break;
     }
 }
@@ -401,7 +402,7 @@ static void changeScale(FiberDisp* p, int d)
         changeScale(p->point_gap, d);
         flashText("fiber:point_gap = %.5f", p->point_gap);
     }
-    else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 || p->line_style == 8 )
+    else if ( p->line_style > 4 )
     {
         changeScale(p->length_scale, d);
         flashText("fiber:length_scale = %.5f", p->length_scale);
@@ -426,7 +427,7 @@ static void invertScale(FiberDisp* p, int)
         else
             flashText("fiber:tension_scale: pushing");
     }
-    else if ( p->line_style == 4 || p->line_style == 6 || p->line_style == 7 || p->line_style == 8 )
+    else if ( p->line_style > 4 )
     {
         p->length_scale = -p->length_scale;
         flashText("fiber:length_scale = %.5f", p->length_scale);
@@ -473,7 +474,7 @@ static void toggleLineStyle(FiberDisp* p, int val)
 
 static void changeLineStyle(FiberDisp* p, int inc)
 {
-    p->line_style = ( p->line_style + inc ) % 9;
+    p->line_style = ( p->line_style + inc ) % 10;
     flashLineStyle(p);
 }
 

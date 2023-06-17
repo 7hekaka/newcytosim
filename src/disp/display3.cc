@@ -470,10 +470,10 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
             drawFiberSegments(fib, rad, color_by_tension_jet);
             break;
         case 4:
-            drawFiberSegments(fib, rad, color_seg_curvature);
+            drawFiberSegments(fib, rad, color_by_direction);
             break;
         case 5:
-            drawFiberSegments(fib, rad, color_by_direction);
+            drawFiberSegments(fib, rad, color_seg_curvature);
             break;
         case 6: {
             /** This is using transparency with segments that are not depth sorted
@@ -482,6 +482,7 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
             drawFiberSegments(fib, rad, color_by_abscissaM);
             gym::restoreCullFace();
         } break;
+        case 8: if ( fib.endStateM() == STATE_GREEN )
         case 7: {
             /** This is using transparency with segments that are not depth sorted
              but this code is only used in 2D normally, so it's okay */
@@ -490,10 +491,10 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
             gym::restoreCullFace();
 
         } break;
-        case 8:
+        case 9:
             drawFiberSegments(fib, rad, color_by_height);
             break;
-        case 9:
+        case 10:
             drawFiberSegments(fib, rad, color_by_grid);
             break;
     }
@@ -504,33 +505,30 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
 void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
+    const int style = disp->line_style;
+    if ( disp->line_style == 8 && fib.endStateP() != STATE_GREEN )
+        return;
+    const real iseg = fib.segmentationInv();
     real rad = pixscale(disp->line_width);
 #if NEW_FIBER_SILHOUETTE
     if ( fib.chiasma() > -1 ) rad = fib.silhouette(inx);
 #endif
-    real iseg = fib.segmentationInv();
-
     Vector A = fib.posP(inx);
     Vector B = fib.posP(inx+1);
 
-    gym::enableLighting();
-    /* Either CULL_FACE should be enable to hide the back side,
-     or every primitive should be renderred with a double pass*/
-    gym::enableCullFace(GL_BACK);
-
-    if ( disp->line_style == 6 )
+    if ( style == 6 )
         gym::color_front(color_by_abscissaM(fib, inx));
-    else if ( disp->line_style == 7 )
+    else if ( style == 7 || style == 8 )
         gym::color_front(color_by_abscissaP(fib, inx));
-    else if ( disp->line_style == 2 )
+    else if ( style == 2 )
         gym::color_front(color_by_tension(fib, inx));
-    else if ( disp->line_style == 3 )
+    else if ( style == 3 )
         gym::color_front(color_by_tension_jet(fib, inx));
     else
         gym::color_front(fib.disp->color);
-    
+
     // truncate terminal segment according to length_scale
-    if ( inx == 0 && disp->line_style == 6 )
+    if ( inx == 0 && style == 6 )
     {
         real x = 3 * disp->length_scale * iseg;
         if ( x < 1.0 )
@@ -541,7 +539,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     
     // truncate terminal segment according to length_scale
-    if ( inx == fib.lastSegment() && disp->line_style == 7 )
+    if ( inx == fib.lastSegment() && style == 7 )
     {
         real x = 3 * disp->length_scale * iseg;
         if ( x < 1.0 )
@@ -550,6 +548,11 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
             color_by_abscissaP(fib, inx);
         }
     }
+    
+    gym::enableLighting();
+    /* Either CULL_FACE should be enable to hide the back side,
+     or every primitive should be renderred with a double pass*/
+    gym::enableCullFace(GL_BACK);
 
 #if USE_CLIP_PLANES
     if ( inx == 0 )
@@ -602,7 +605,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     gym::stretchAlignZ(A, B, rad);
     gle::tube4();
     if ( inx == 0 )
-        gle::hemisphere();
+        gle::dome();
     if ( inx == fib.lastSegment() )
         gle::discTop2();
 #endif
