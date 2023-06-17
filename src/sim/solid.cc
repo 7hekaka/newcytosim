@@ -558,7 +558,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             if ( str == "cap" )
             {
                 Rotation rot = Rotation::align111();
-                real cap = 0.25;
+                real cap = 0.18;
                 // distribute points randomly over a portion of the unit sphere:
                 std::vector<Vector> pts(num, Vector(0,0,0));
                 size_t cnt = tossPointsCap(pts, cap, 1024);
