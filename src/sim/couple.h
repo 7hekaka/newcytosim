@@ -281,10 +281,10 @@ public:
     /// return PointDisp of Hand2
     PointDisp const* disp2() const { return cHand2->disp(); }
     
-    /// return PointDisp of Hand1
+    /// return PointDisp of Hand1 if it is visible, otherwise Hand2
     PointDisp const* disp12() const;
     
-    /// return PointDisp of Hand2
+    /// return PointDisp of Hand2 if it is visible, otherwise Hand1
     PointDisp const* disp21() const;
 
 };
