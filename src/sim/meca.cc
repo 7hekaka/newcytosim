@@ -28,7 +28,6 @@
 #include "filepath.h"
 #include "bicgstab.h"
 #include "gmres.h"
-#include "timer.h"
 #include "simul.h"
 
 /**
@@ -710,9 +709,9 @@ unsigned Meca::solve()
 #endif
 
     // compute preconditionner:
-    auto start = timer();
+    auto start = milliseconds();
     computePreconditionner();
-    auto factor = timer() - start;
+    auto factor = milliseconds() - start;
     cycles_ = 0;
 
     /*
@@ -877,7 +876,7 @@ unsigned Meca::solve()
     //printf("\n   >pts "); VecPrint::print(std::cerr, dim, vPTS, 3);
 
     auto solve = cycles_;
-    cycles_ = timer() - start;
+    cycles_ = milliseconds() - start;
 
 #if 0
     // print displacement of Mecable that has moved the most

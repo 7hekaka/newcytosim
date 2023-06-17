@@ -1,5 +1,14 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
+#include <sys/time.h>
+
+unsigned long milliseconds()
+{
+    timeval tv;
+    gettimeofday(&tv, nullptr);
+    return 1000 * (unsigned long)tv.tv_sec + tv.tv_usec / 1000;
+}
+
 #include "xtbsv.h"
 #include "xtrsm.h"
 
@@ -159,12 +168,11 @@ static inline void applyPreconditionner(Mecable const* mec, real* Y)
     }
 }
 
-
 /// apply preconditionner to entire system: Y <- Preconditionner * X
 /** This can be done in parallel if the preconditionner is block-diagonal */
 void Meca::precondition(const real* X, real* Y) const
 {
-    auto rdt = timer();
+    unsigned long rdt = milliseconds();
     if ( Y != X )
         copy_real(dimension(), X, Y);
     
@@ -179,7 +187,7 @@ void Meca::precondition(const real* X, real* Y) const
 #endif
             applyPreconditionner(mec, Y+inx);
     }
-    cycles_ += timer() - rdt;
+    cycles_ += milliseconds() - rdt;
 }
 
 
