@@ -97,7 +97,7 @@ private:
     state_t mStateM;
 
     /// stabilizing factor
-    int stabilized_[2];
+    real stabilized_[2];
     
     /// calculate dynamic state from unit states near plus end
     state_t calculateStateP() const;
@@ -159,6 +159,9 @@ public:
     /// simulate dynamic instability of plus end
     int stepPlusEnd();
     
+    /// simulate dynamic instability of plus end
+    int stepPlusEndStabilized(real);
+
     /// simulate dynamic instability of minus end
     int stepMinusEnd();
     

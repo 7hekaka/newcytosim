@@ -397,6 +397,35 @@ int DynamicFiber::stepPlusEnd()
 }
 
 
+int DynamicFiber::stepPlusEndStabilized(real factor)
+{
+    constexpr size_t P = 0;
+    int res = 0;
+    
+    // calculate the force acting on the point at the end:
+    real forceP = projectedForceEndP();
+
+    // Special case for Kinetochores: grow slowly with no catastrophe...
+    real growth = prop()->growing_rate_dt[P] * prop()->free_polymer / factor;
+    
+    //std::clog << prop()->name() << " P " << factor << " " << forceP << "\n";
+    // force modulates assembly rate exponentially
+    if ( growth > 0 )
+    {
+        // we use tanh(force) which is bounded, scaled to approach exp(-F):
+        real e = std::exp(-M_SQRT2 * forceP * prop()->growing_force_inv[P]);
+        growth *= 2 / ( 1 + e );
+    }
+    
+    nextGrowthP -= growth;
+    while ( nextGrowthP < 0 )
+    {
+        addUnitP();
+        ++res;
+    }
+    return res;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -411,14 +440,9 @@ void DynamicFiber::findSeverEdges(real& a, real& b)
 
 void DynamicFiber::step()
 {
-    //std::clog << prop()->name() << " " << this << " " << stabilized_[0] << "  " << stabilized_[1] << "\n";
     real addM = 0;
     constexpr size_t M = 1;
-    if ( stabilized_[M] > 0 )
-    {
-        stabilized_[M] = 0;
-    }
-    else if ( mStateM == STATE_WHITE )
+    if ( mStateM == STATE_WHITE )
     {
 #if ( NEW_FIBER_END_CHEW & 2 )
         if ( fChew[M] > 0 )
@@ -440,19 +464,7 @@ void DynamicFiber::step()
     
     real addP = 0;
     constexpr size_t P = 0;
-    if ( stabilized_[P] > 0 )
-    {
-        // Special case for Kinetochores: grow slowly with no catastrophe...
-        real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
-        nextGrowthP -= growth / stabilized_[P];
-        while ( nextGrowthP < 0 )
-        {
-            addUnitP();
-            ++addP;
-        }
-        stabilized_[P] = 0;
-    }
-    else if ( mStateP == STATE_WHITE )
+    if ( mStateP == STATE_WHITE )
     {
 #if ( NEW_FIBER_END_CHEW & 1 )
         if ( fChew[P] > 0 )
@@ -468,6 +480,11 @@ void DynamicFiber::step()
         // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
         if ( RNG.test(prop()->rebirth_prob[P]) )
             setEndStateP(STATE_GREEN);
+    }
+    else if ( stabilized_[P] > 0 )
+    {
+        addP = stepPlusEndStabilized(stabilized_[P]);
+        stabilized_[P] = 0;
     }
     else
         addP = stepPlusEnd();
