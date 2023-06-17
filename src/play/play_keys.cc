@@ -314,7 +314,7 @@ static void flashFiberStyle(FiberDisp const* p)
     }
 }
 
-static void flashExclude(FiberDisp const* p)
+static void flashHide(FiberDisp const* p)
 {
     char const* n = p->name_str();
     switch ( p->hide )
@@ -346,14 +346,28 @@ static void flashTracking(unsigned mode)
 //---------------------------------------------------------------------
 #pragma mark - Fibers
 
-static void changeExclude(FiberDisp* p, int val)
+static void changeHide(FiberDisp* p, int val)
 {
     if ( val )
         p->hide >>= 2;
     p->hide = ( p->hide + 1 ) & 3;
     if ( val )
         p->hide <<= 2;
-    flashExclude(p);
+    flashHide(p);
+}
+
+
+static void changeMarked(FiberDisp* p, int val)
+{
+    unsigned &n = p->show_marked;
+    ++n;
+    if ( n == 4 )
+    {
+        n = ~0U;
+        flashText("%s: showing all marks", p->name_str());
+    }
+    else
+        flashText("%s: showing only mark=%i", p->name_str(), n);
 }
 
 
@@ -851,6 +865,9 @@ void processKey(unsigned char key, int modifiers = 0)
             flashText("draw_links = %i", disp.draw_links);
             break;
 #endif
+        case 'k':
+            setFiberDisp(player.allVisibleFiberDisp(), changeMarked, 0);
+            break;
 
         case 'l': {
             try {
@@ -1019,12 +1036,12 @@ void processKey(unsigned char key, int modifiers = 0)
             }
             else
             {
-                setFiberDisp(player.allVisibleFiberDisp(), changeExclude, 0);
+                setFiberDisp(player.allVisibleFiberDisp(), changeHide, 0);
             }
             break;
             
         case 'D':
-            setFiberDisp(player.allVisibleFiberDisp(), changeExclude, 1);
+            setFiberDisp(player.allVisibleFiberDisp(), changeHide, 1);
             break;
                 
         case 'q':

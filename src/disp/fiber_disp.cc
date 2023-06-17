@@ -54,6 +54,7 @@ void FiberDisp::clear()
     mask          = 0;
     mask_bitfield = 0;
     hide_state    = 7;  // not a possible state
+    show_marked   = ~0U;
     
     length_scale  = 1;
     tension_scale = 1;
@@ -148,6 +149,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(hide, "hide", "exclude");
     glos.set(hide_axis, "hide_axis") || glos.set(hide_axis, "hide", 1, "exclude", 1);
     glos.set(hide_state, "hide_state");
+    glos.set(show_marked, "show_marked");
 
     if ( glos.set(mask, "mask") )
         mask_bitfield = RNG.distributed_bits(mask);
@@ -191,6 +193,7 @@ void FiberDisp::write_values(std::ostream& os) const
     write_value(os, "speckles",     speckle_size, speckle_style, speckle_gap);
     write_value(os, "hide",         hide, hide_axis);
     write_value(os, "hide_state",   hide_state);
+    write_value(os, "show_marked",  show_marked);
     write_value(os, "mask",         mask, mask_bitfield);
     
     write_value(os, "length_scale", length_scale);

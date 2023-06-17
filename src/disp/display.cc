@@ -436,6 +436,10 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
     if ( fib->endStateP() == disp->hide_state )
         hide = true;
     
+    // hide fibers in a specified state
+    if ( disp->show_marked != ~0U && fib->mark() != disp->show_marked )
+        hide = true;
+
     // change color of 'hidden' filament:
     if ( hide )
         self->color = disp->hide_color;
