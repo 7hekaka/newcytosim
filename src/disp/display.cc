@@ -1918,7 +1918,7 @@ void Display::drawFiber(Fiber const& fib)
                 zObjects.push_back(zObject(&fib, i));
         style = 0;
     }
-    else if ( style == 7 )
+    else if ( style == 7 || ( style == 8 && fib.endStateP() == STATE_GREEN ))
     {
         // color according to the distance from the plus end
         for ( size_t i = 0; i < fib.lastPoint(); ++i )

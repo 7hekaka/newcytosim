@@ -506,8 +506,6 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const int style = disp->line_style;
-    if ( disp->line_style == 8 && fib.endStateP() != STATE_GREEN )
-        return;
     const real iseg = fib.segmentationInv();
     real rad = pixscale(disp->line_width);
 #if NEW_FIBER_SILHOUETTE
@@ -539,7 +537,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
     }
     
     // truncate terminal segment according to length_scale
-    if ( inx == fib.lastSegment() && style == 7 )
+    if ( inx == fib.lastSegment() && ( style == 7 || style == 8 ) )
     {
         real x = 3 * disp->length_scale * iseg;
         if ( x < 1.0 )
