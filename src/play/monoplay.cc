@@ -18,8 +18,8 @@
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_flat.h"
-#include "gle.h"
 #include "glfw.h"
+#include "gle.h"
 
 // size of window (updated if window is resized)
 int winW = 1024;
@@ -154,7 +154,7 @@ void reshape(GLFWwindow* win, int W, int H)
     bugW = W;
     bugH = H;
     view.reshape(W, H);
-    printf("reshape window %ix%i : framebuffer %ix%i\n", winW, winH, W, H);
+    printf("GLFW window %ix%i buffer %ix%i\n", winW, winH, W, H);
 }
 
 
@@ -178,7 +178,8 @@ GLFWwindow * initWindow(int W, int H)
     glfwWindowHint(GLFW_DOUBLEBUFFER, GLFW_TRUE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
-
+    glfwWindowHint(GLFW_COCOA_RETINA_FRAMEBUFFER, GLFW_TRUE);
+    
     GLFWwindow* win = glfwCreateWindow(W, H, "Cytosim", nullptr, nullptr);
     if (!win)
     {
@@ -241,13 +242,14 @@ int main(int argc, char *argv[])
         disp.read(arg);
         unsigned P = 1;
         arg.set(P, "period");
+        arg.set(winW, "size") && ( arg.set(winH, "size", 1) || ( winH = winW ));
         worker.period(P);
         simul.initialize(arg);
         arg.print_warnings(std::cerr, 1, "\n");
     }
     
-    GLFWwindow* win = initWindow(winW, winH);
     worker.start();
+    GLFWwindow* win = initWindow(winW, winH);
 
     while( !glfwWindowShouldClose(win) )
     {
