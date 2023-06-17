@@ -92,6 +92,9 @@ void NucleatorProp::complete(Simul const& sim)
     
     if ( nucleation_rate < 0 )
         throw InvalidParameter(name()+":nucleate (=rate) must be positive");
+    
+    if ( nucleation_limit < 0 )
+        throw InvalidParameter(name()+":nucleation_limit must be >= 0");
 
     if ( track_end && track_end != hold_end )
         throw InvalidParameter("if set, "+name()+":track_end should be equal to hold_end");
