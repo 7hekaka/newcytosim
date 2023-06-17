@@ -5,6 +5,7 @@
 
 #include <ctime>
 #include "dim.h"
+#include "timer.h"
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "glossary.h"
@@ -624,6 +625,16 @@ int display(View& view)
     return 0;
 }
 
+
+
+void speedTest(size_t cnt)
+{
+    tick();
+    for ( size_t i = 0; i < cnt; ++i )
+        distributePoints();
+    printf(" %lu tests: cpu %5.0f\n", cnt, tock());
+}
+
 //------------------------------------------------------------------------------
 int main(int argc, char* argv[])
 {
@@ -638,20 +649,27 @@ int main(int argc, char* argv[])
     initMenus();
     RNG.seed();
 
-    if ( argc > 1 )
+    int mode = 1;
+    size_t cnt = 1;
+    if ( argc > 1 && isdigit(argv[1][0]) )
+        mode = 2;
+    if ( argc > mode )
     {
-        if ( opt.read_strings(argc-1, argv+1) )
+        if ( opt.read_strings(argc-mode, argv+mode) )
             return EXIT_FAILURE;
         setGeometry();
     }
-    
     if ( ! spc )
     {
         printf("A geometry should be given in the command line, for example:\n");
         printf("    test_space shape=ellipse length=2,3,4\n");
         exit(EXIT_SUCCESS);
     }
-
-    glutMainLoop();
+    if ( mode == 2 )
+    {
+        speedTest(strtoul(argv[1], nullptr, 10));
+    }
+    else
+        glutMainLoop();
 }
 
