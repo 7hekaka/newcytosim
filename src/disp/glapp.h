@@ -56,7 +56,7 @@ namespace glApp
     void resetView();
     
     /// draw System
-    void displayAll(void (*drawFunc)(View&));
+    void displayAll(int (*drawFunc)(View&));
 
     /// save higher resolution image with magnification 'mag'
     int saveImage(const char* name, unsigned mag, unsigned downsample);

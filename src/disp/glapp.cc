@@ -1108,7 +1108,7 @@ void glApp::flashText(std::string const& str)
 
 
 
-void glApp::displayAll(void (*drawFunc)(View&))
+void glApp::displayAll(int (*drawFunc)(View&))
 {
     for ( size_t n = 1; n < views.size(); ++n )
     {

@@ -22,7 +22,7 @@ Simul&      simul = player.simul;
 PlayerProp&  prop = player.prop;
 DisplayProp& disp = player.disp;
 
-void drawSimul(View& view);
+int drawSimul(View& view);
 
 /// create a player suitable for command-line offscreen rendering only
 #define HEADLESS_PLAYER 0
@@ -73,7 +73,7 @@ void drawMag(View& view)
 /**
  calls drawSystem() if data can be accessed by current thread
  */
-void drawSimul(View& view)
+int drawSimul(View& view)
 {
     if ( simul.prop.display_fresh )
     {
@@ -83,6 +83,7 @@ void drawSimul(View& view)
     //worker.debug("drawSimul");
     player.prepareDisplay(view);
     player.drawSystem(view);
+    return 0;
 }
 
 
