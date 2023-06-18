@@ -44,7 +44,6 @@ def assemble(path, lines, verb):
     """
     res = ''
     if verb == 2:
-        sys.stderr.write('-  '*24+path+"\n")
         for s in lines:
             res += s
     elif verb == 1:
@@ -65,6 +64,8 @@ def execute(tool, path, verb):
     lines = []
     try:
         os.chdir(path)
+        if verb == 2:
+            sys.stderr.write('-  '*24+path+"\n")
         sub = subprocess.Popen(tool, shell=True, stdout=subprocess.PIPE)
         for s in sub.stdout:
             lines.append(s.decode())
