@@ -277,7 +277,7 @@ void drawBug(Simul const& sim)
 //------------------------------------------------------------------------------
 
 /// read 'x:y' where ':' is specified as the character 'sep'
-int readTileDimensions(int& X, int& Y, const char str[], char sep)
+int readDimensions(int& X, int& Y, const char str[], char sep)
 {
     char const* c = strchr(str, sep);
     if ( c && isdigit(str[0]) )
@@ -301,11 +301,6 @@ int readTileDimensions(int& X, int& Y, const char str[], char sep)
         }
         if ( *ptr && !isspace(*ptr) )
             return 5;
-        if ( x * y > TOP )
-        {
-            printf("Error: tile is limited to %i cells max\n", TOP);
-            exit(1);
-        }
         X = x;
         Y = y;
         return 0;
@@ -321,8 +316,13 @@ int main(int argc, char *argv[])
     SimThread worker[TOP];
 
     //parse the command line:
-    if ( argc > 1 && 0 == readTileDimensions(tileX, tileY, argv[1], ':') )
+    if ( argc > 1 && 0 == readDimensions(tileX, tileY, argv[1], ':') )
         *argv[1] = 0;
+    if ( tileX * tileY > TOP )
+    {
+        printf("Error: tile is limited to %i cells max\n", TOP);
+        exit(1);
+    }
     Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
