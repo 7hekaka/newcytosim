@@ -42,11 +42,6 @@ using glApp::flashText;
 #  include "play_mouse.cc"
 #endif
 
-
-/// different modes:
-enum Style { ONSCREEN, OFFSCREEN };
-enum Mode { STANDARD = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
-
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
@@ -139,6 +134,11 @@ void byebye()
 //------------------------------------------------------------------------------
 #pragma mark - main
 
+/// different modes:
+enum Style { ONSCREEN, OFFSCREEN };
+enum Mode { SAVE_NOTHING = 0, SAVE_IMAGE = 1, SAVE_MOVIE = 2 };
+
+
 void help(std::ostream& os)
 {
     os << "play [OPTIONS] [PATH] [FILE]\n"
@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 {
     Style style = OFFSCREEN;
     int menu = 1;
-    int mode = STANDARD;
+    int mode = SAVE_NOTHING;
     int fullscreen = 0;
     Glossary arg;
     std::string name = "Cytosim     ";
@@ -278,7 +278,7 @@ int main(int argc, char* argv[])
     
     if ( arg.use_key("movie") )
     {
-        if ( mode == STANDARD )
+        if ( mode == SAVE_NOTHING )
             prop.image_name = "movie%";
         mode = SAVE_MOVIE;
     }
@@ -374,7 +374,7 @@ int main(int argc, char* argv[])
     
     //-------- off-screen (non interactive) rendering -------
     
-    if ( mode != STANDARD && style == OFFSCREEN )
+    if ( mode != SAVE_NOTHING && style == OFFSCREEN )
     {
         view.resize();
         const int W = view.width() * view.magnify;
