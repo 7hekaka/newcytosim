@@ -427,6 +427,7 @@ public:
     {
         if ( sim )
             thaw_all();
+        sim = nullptr;
         //Cytosim::log("Simul::InportLock deleted with %i objects\n", sim->nbObjects());
     }
 };
