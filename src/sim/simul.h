@@ -651,8 +651,11 @@ public:
     /// print Aster & Spindle indices
     void reportSpindleIndices(std::ostream&) const;
 
+    /// report position of 'condensate' beads on left and right sides (06.2023)
+    void reportSpindleLength(std::ostream&, Glossary&) const;
+
     /// print number of Fibers pointing left and right that intersect plane YZ at different X positions
-    void reportSpindleProfile(std::ostream&) const;
+    void reportSpindleProfile(std::ostream&, Glossary&) const;
 
     /// print some coefficients calculated from the distribution of fibers
     void reportSpindleFitness(std::ostream&, Glossary&) const;

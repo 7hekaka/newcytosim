@@ -501,8 +501,10 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     {
         if ( what == "indice" )
             return reportSpindleIndices(out);
+        if ( what == "length" )
+            return reportSpindleLength(out, opt);
         if ( what == "profile" )
-            return reportSpindleProfile(out);
+            return reportSpindleProfile(out, opt);
         if ( what == "fitnes" )
             return reportSpindleFitness(out, opt);
         throw InvalidSyntax("I can only report spindle: indices, profile, fitness\n");
@@ -3178,17 +3180,43 @@ void Simul::reportSpindleIndices(std::ostream& out) const
 
 
 /**
+ Export average position of beads "condensate" on left and right side, relative to axis,
+ and the distance between the two barycenters.
+ */
+void Simul::reportSpindleLength(std::ostream& out, Glossary& opt) const
+{
+    BeadProp * bip = findProperty<BeadProp>("bead", "condensate");
+    if ( bip )
+    {
+        out << COM << "left_cnt" << SEP << "left_pos" << SEP << "right_cnt" << SEP << "right_pos" << SEP << "distance";
+        Vector axis(1,0,0), R(0,0,0), L(0,0,0);
+        size_t nR = 0, nL = 0;
+        
+        for ( Object const* i : beads.collect(bip) )
+        {
+            Vector pos = i->position();
+            if ( dot(pos, axis) < 0 ) { L += pos; ++nL; } else { R += pos; ++nR; }
+        }
+        if ( nL ) L /= nL;
+        if ( nR ) R /= nR;
+        out << LIN << nL << SEP << L << SEP << nR << SEP << R << SEP << norm(R-L);
+    }
+}
+
+
+/**
  Export number of Fibers pointing left and right,
  that intersect a plane parallel to YZ.
  The planes are distributed regularly every 0.5 um along the X-axis.
  */
-void Simul::reportSpindleProfile(std::ostream& out) const
+void Simul::reportSpindleProfile(std::ostream& out, Glossary& opt) const
 {
     out << COM << "position" << SEP << "leftward" << SEP << "rightward" << SEP << "right-left";
     Vector n(1,0,0);
-    real m = 10, dm = 0.5;
+    real m = 10, interval = 0.5;
+    opt.set(interval, "interval");
     int R, L;
-    for ( real x = -m ; x <= m ; x += dm )
+    for ( real x = -m ; x <= m ; x += interval )
     {
         fibers.infoPlane(R, L, n, -x);
         out << LIN << x;

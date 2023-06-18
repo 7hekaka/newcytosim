@@ -574,8 +574,8 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
         if ( obj->property()->number() != pid )
         {
             Property const* P = obj->property();
-            std::clog << "Remark: erasing " << P->category() << P->number() << " `" << P->name();
-            std::clog << "' to load object with property #" << pid << '\n';
+            //std::clog << "Remark: erasing " << P->category() << P->number() << " `" << P->name();
+            //std::clog << "' to load object with property #" << pid << '\n';
             // the orphan Object remains on the 'ice_' to be deleted during pruning:
             inventory_.unassign(obj);
             obj->setIdentity(0);
