@@ -43,8 +43,8 @@ void SimulProp::clear()
     verbose = 0;
     flag = 0;
 
+    system_file = Simul::TRAJECTORY;
     property_file = "properties.cmp";
-    system_file   = Simul::TRAJECTORY;
     clear_system_file = true;
     
     skip_free_single = 0;
@@ -107,7 +107,6 @@ void SimulProp::read(Glossary& glos)
     glos.set(config_file, ".cym");
     
     glos.set(property_file, "property_file");
-    glos.set(property_file, "property");
     
 #if BACKWARD_COMPATIBILITY < 100
     glos.set(system_file, "object_file", "trajectory");
@@ -116,7 +115,7 @@ void SimulProp::read(Glossary& glos)
         clear_system_file = !a;
 #endif
 
-    glos.set(system_file, "system_file", "system");
+    glos.set(system_file, "system_file");
     glos.set(clear_system_file, "clear_system_file");
     
     glos.set(skip_free_single, "skip_free_single");
