@@ -1,17 +1,16 @@
 #!/usr/bin/env python3
 #
-# Make a plot using matplotlib
+# Plot spindle length, calculated by `report spindle:length`
 #
-# F. Nedelec, Strasbourg, 08.03.2022, Cambridge 15.06.2023
+# F. Nedelec, Strasbourg, Cambridge 20.06.2023
 
 
 """
 Description:
-    Plot the histogram of filament length distribution
-    This relies on 'reportN' to produce data in 'len.txt'
+    Plot spindle length, calculated by `report spindle:length`
     
 Syntax:
-    plot_lengths.py DIRECTORY_PATH
+    plot_spindle_length.py DIRECTORY_PATH
 
 """
 
@@ -31,46 +30,39 @@ def uncode(arg):
         return arg
 
 
-def plot_histogram(time, data, scale, name):
+def plot_data(T, D, name):
     """
         Plot surface as a function of time
     """
     fig = plt.figure(figsize=(4, 3))
-    Y = data[-1]
-    W = (scale[1]-scale[0])*0.8
-    plt.bar(scale, Y, W, label=name)
-    plt.xlim(0, max(scale))
-    sup = 10 * math.ceil((min(Y)+max(Y))/10)
-    plt.ylim(0, sup)
-    plt.xlabel('Length (um)', fontsize=fts)
-    plt.ylabel('Count', fontsize=fts)
-    plt.title('Length histogram', fontsize=fts)
+    plt.plot(T, D, label="pole-to-pole")
+    plt.xlim(0, math.ceil(max(T)/100)*100)
+    plt.ylim(0, math.ceil(max(D)))
+    plt.xlabel('Time (s)', fontsize=fts)
+    plt.ylabel('Length (um)', fontsize=fts)
+    plt.title('Spindle Length', fontsize=fts)
     plt.legend()
     fig.tight_layout()
 
 
-def get_lengths(file):
+def get_data(file):
     """
-        Retreive length histogram from file
+        Retreive length from file
     """
     T = []
     D = []
-    S = []
-    F = 'fiber'
+    ts = 0
     for line in file:
         s = uncode(line).split()
         if len(s) < 2:
             pass
         elif s[0] == '%':
             if s[1] == "time":
-                T.append(float(s[2]))
-        elif s[0] == "scale":
-            S = [ float(x) for x in s[1:] ]
-        else:
-            F = s[0]
-            H = [ float(x) for x in s[1:] ]
-            D.append(H)
-    return T, D, S, F
+                ts = float(s[2])
+        elif len(s) > 7:
+            T.append(ts)
+            D.append(float(s[-1]))
+    return T, D
 
 
 def process(dirpath):
@@ -78,34 +70,38 @@ def process(dirpath):
         Process given directory
     """
     os.chdir(dirpath)
-    filename='len.txt'
-    args = ['report3', 'fiber:histogram', 'interval=0.1,32', 'verbose=0']
+    filename = 'spindle_length.txt'
+    args = ['report3', 'spindle:length', 'verbose=1']
     subprocess.call(args, stdout=open(filename, 'w'))
+    res = 0
     with open(filename, 'r') as f:
-        T, D, S, F = get_lengths(f)
-        plot_histogram(T, D, S, F)
-    plt.savefig('lengths.png', dpi=150)
+        T, L = get_data(f)
+        #print(T, L)
+        plot_data(T, L, dirpath)
+        # calculate mean length for data above 1000s:
+        LL = [ x for t,x in zip(T,L) if t > 1000 ]
+        res = sum(LL) / len(LL)
+    plt.savefig('spindle_length.png', dpi=150)
     #plt.show()
     plt.close()
+    print(f'{dirpath} {res}\n')
+
 
 #------------------------------------------------------------------------
 
 def main(args):
     paths = []
-    
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
         else:
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
-    
     if not paths:
         process('.')
     else:
         cdir = os.getcwd()
         for p in paths:
-            sys.stdout.write('- '*32+p+"\n")
             process(p)
             os.chdir(cdir)
 
