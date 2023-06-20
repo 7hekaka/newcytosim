@@ -65,15 +65,6 @@ namespace gle
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void circle(float radius, float stroke_width);
 
-    /// draw 2D oval within -1 to 1
-    void stroke_capsule(float stroke_width);
-    /// 2D oval within -1 to 1
-    void paint_capsule();
-    /// 2D cross within -1.5 to 1.5
-    void paint_cross();
-    /// 2D cross within -1.5 to 1.5
-    void stroke_cross();
-
     /// draw nice 2D disc of radius 1 in XY plane, with +Z as normal
     void disc1();
     /// draw 2D disc of radius 1 in XY plane, with +Z as normal
@@ -96,16 +87,25 @@ namespace gle
     /// draw nice 2D disc of radius 1 in XY plane, with +Z as normal
     inline void disc() { disc1(); }
 
+    /// draw 2D oval within -1 to 1
+    void strokeCapsule(float stroke_width);
+    /// 2D oval within -1 to 1
+    void paintCapsule();
+    /// 2D cross within -1.5 to 1.5
+    void paintCross();
+    /// 2D cross within -1.5 to 1.5
+    void strokeCross();
+
     /// paint a disc in XY plane, covering all points at distance to origin [ R0, R1 ]
-    void paint_halo(float R0, float R1);
+    void paintHalo(float R0, float R1);
     /// paint spherocylinder in 2D, using current color
-    void paint_capsule(float left, float right, float rad, size_t inc=1);
+    void paintCapsule(float left, float right, float rad, size_t inc=1);
     /// draw spherocylinder contour in 2D
-    void stroke_capsule(float left, float right, float rad, float stroke_width, size_t inc=1);
+    void strokeCapsule(float left, float right, float rad, float stroke_width, size_t inc=1);
     /// paint two spherocylinder in 2D, joined by a cylinder of size tube x clos
-    void paint_bicapsule(float left, float right, float rad, float clos, float tube, size_t inc=1);
+    void paintBicapsule(float left, float right, float rad, float clos, float tube, size_t inc=1);
     /// draw two spherocylinder contours in 2D, joined by a cylinder of size tube x clos
-    void stroke_bicapsule(float left, float right, float rad, float clos, float tube, float stroke_width, size_t inc=1);
+    void strokeBicapsule(float left, float right, float rad, float clos, float tube, float stroke_width, size_t inc=1);
 
     /// draw a tetrahedron of radius 1
     void tetrahedron();

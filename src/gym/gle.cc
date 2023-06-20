@@ -1004,7 +1004,7 @@ namespace gle
         return i;
     }
     
-    /// set buffer for stroke_capsule
+    /// set buffer for strokeCapsule
     size_t setCapsuleStroke(flute2* flu, float R)
     {
         float Y = R * 0.5 * M_SQRT3;
@@ -1027,7 +1027,7 @@ namespace gle
         return 15;
     }
     
-    /// set buffer for paint_capsule
+    /// set buffer for paintCapsule
     size_t setCapsulePaint(flute2* flu, float R)
     {
         float Y = R * 0.5 * M_SQRT3;
@@ -1050,7 +1050,7 @@ namespace gle
         return 15;
     }
     
-    /// set buffer for stroke_cross
+    /// set buffer for strokeCross
     size_t setCrossStroke(flute2* flu)
     {
         float W = 0.2;
@@ -1072,7 +1072,7 @@ namespace gle
         return 13;
     }
 
-    /// set buffer for paint_cross
+    /// set buffer for paintCross
     size_t setCrossPaint(flute2* flu)
     {
         float W = 0.2;
@@ -1111,7 +1111,7 @@ namespace gle
         return i;
     }
     
-    void paint_halo(float R0, float R1)
+    void paintHalo(float R0, float R1)
     {
         flute2 *buf = gym::mapBufferV2(2*pi_twice+2);
         flute2 *ptr = buf;
@@ -1128,7 +1128,7 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void paint_capsule(float L, float R, float rad, size_t inc)
+    void paintCapsule(float L, float R, float rad, size_t inc)
     {
         flute2 *buf = gym::mapBufferV2(pi_twice+4);
         flute2 *ptr = buf;
@@ -1154,7 +1154,7 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void stroke_capsule(float L, float R, float rad, float width, size_t inc)
+    void strokeCapsule(float L, float R, float rad, float width, size_t inc)
     {
         flute2 *buf = gym::mapBufferV2(pi_twice+4);
         flute2 *ptr = buf;
@@ -1169,7 +1169,7 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
         
-    void paint_bicapsule(float L, float R, float rad, float G, float H, size_t inc)
+    void paintBicapsule(float L, float R, float rad, float G, float H, size_t inc)
     {
         const float F = std::max(rad - G, 0.f);
         const float X = F + H;
@@ -1211,7 +1211,7 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void stroke_bicapsule(float L, float R, float rad, float G, float H, float width, size_t inc)
+    void strokeBicapsule(float L, float R, float rad, float G, float H, float width, size_t inc)
     {
         const float F = std::max(rad - G, 0.f);
         const float X = F + H;
@@ -1462,10 +1462,10 @@ namespace gle
     void dottedCircle(float w) { gym::bindBufferV2(buf_[0]); gym::drawPoints(w, discs_[1], 1+pi_twice/2); }
     void circle(float R, float w) { gym::scale(R); circle1(w); gym::pull_ref(); }
 
-    void stroke_capsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }
-    void paint_capsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
-    void stroke_cross(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[4], 12); }
-    void paint_cross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[5], 12); }
+    void strokeCapsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }
+    void paintCapsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
+    void strokeCross(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[4], 12); }
+    void paintCross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[5], 12); }
     
     // these primitices do not preserve the modelview transformation
     void cylinderT() { gym::translate(0,0,-0.5f); discBottom2(); tube2(); discTop2(); }

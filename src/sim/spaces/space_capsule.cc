@@ -263,12 +263,12 @@ void SpaceCapsule::draw2D(float width) const
     if ( prop->disp && prop->disp->visible & 2 )
     {
         gym::color(prop->disp->color2);
-        gle::paint_capsule(-L, L, R);
+        gle::paintCapsule(-L, L, R);
     }
 
     // draw contour:
     gym::color(prop->disp->color);
-    gle::stroke_capsule(-L, L, R, width);
+    gle::strokeCapsule(-L, L, R, width);
 }
 
 
