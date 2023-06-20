@@ -116,6 +116,12 @@ public:
     void setInteractions(Meca&) const;
 
 #if NEW_SOLID_CLAMP
+    /// returns clamping stiffness
+    real clampStiffness() const { return clamp_stiff; }
+
+    /// returns clamp position
+    Vector clampPosition() const { return clamp_place; }
+    
     /// returns force due to clamping
     Vector clampForce() const { return clamp_stiff * ( clamp_place - paCenter ); }
 #endif

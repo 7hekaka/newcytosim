@@ -2054,13 +2054,22 @@ void Display::drawSolid(Solid const& obj)
     //display points:
     if (( disp->style & 2 ) && disp->perceptible )
     {
-        real rad = pixscale(disp->size);
+        const float rad = pixscale(disp->size);
         gym::color_both(col);
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), rad, gle::hedron(obj.radius(i)>0));
         gym::cleanup(1);
     }
+    
+#if NEW_SOLID_CLAMP
+    if ( obj.clampStiffness() > 0 )
+    {
+        gym::color_both(col);
+        gym::enableLighting();
+        drawObject(obj.clampPosition(), pixscale(disp->size), gle::star);
+    }
+#endif
     
 #if NEW_SOLID_HAS_TWIN
     // display links between twin solids
@@ -2280,6 +2289,15 @@ void Display::drawBead(Bead const& obj)
         drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
     }
     
+#if NEW_SOLID_CLAMP
+    if ( obj.clampStiffness() > 0 )
+    {
+        gym::color_both(col);
+        gym::enableLighting();
+        drawObject(obj.clampPosition(), pixscale(disp->size), gle::star);
+    }
+#endif
+
     if ( disp->style & 4 )
     {
 #if ( DIM <= 2 )

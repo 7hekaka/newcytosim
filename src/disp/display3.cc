@@ -449,7 +449,7 @@ void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
 void Display3::drawFiberLines(Fiber const& fib, int style) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    const real rad = pixscale(disp->line_width);
+    const float rad = pixscale(disp->line_width);
 
     // set back color:
     if ( disp->coloring )
@@ -1216,7 +1216,7 @@ void Display3::drawCoupleB(Couple const* cx) const
 #endif
         if ( pd1->visible )
         {
-            real R1 = pixscale(pd1->size);
+            float R1 = pixscale(pd1->size);
             gym::color_both(pd1->color);
             //gym::stretchAlignZ(p1, p2, R1);
             gym::transAlignZ(p1, R1, p2-p1);
@@ -1224,7 +1224,7 @@ void Display3::drawCoupleB(Couple const* cx) const
         }
         if ( pd2->visible )
         {
-            real R2 = pixscale(pd2->size);
+            float R2 = pixscale(pd2->size);
             gym::color_both(pd2->color);
             //gym::stretchAlignZ(p2, p1, R2);
             gym::transAlignZ(p2, R2, p1-p2);

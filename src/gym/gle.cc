@@ -961,6 +961,7 @@ namespace gle
 
     void tetrahedron() { doVNTriangles(cubes_[0], 12); }
     void upsideTetra() { doVNTriangles(cubes_[1], 12); }
+    void star()        { doVNTriangles(cubes_[0], 24); } // union of 2 tetrahedrons
 
     void octahedron()  { doVNTriangles(cubes_[2]+6, 24); }
     void invPyramid()  { doVNTriangles(cubes_[2], 18); }
@@ -969,7 +970,6 @@ namespace gle
     
     void arrowTail() { doVNTriangles(cubes_[4], 45); }
     void cube()      { doVNTriangles(cubes_[5], 36); }
-    void star()      { doVNTriangles(cubes_[0], 24); } // union of 2 tetrahedrons
     
     void hexTube()      { doVNTriangleStrip(cubes_[6], 22); }
     void thinTube()     { doVNTriangleStrip(cubes_[7], 22); }
