@@ -2,7 +2,7 @@
 #
 # Plot spindle length, calculated by `report spindle:length`
 #
-# F. Nedelec, Strasbourg, Cambridge 20.06.2023
+# F. Nedelec, Strasbourg, Cambridge 20--21.06.2023
 
 
 """
@@ -11,6 +11,13 @@ Description:
     
 Syntax:
     plot_spindle_length.py DIRECTORY_PATH
+
+To get the augmin value:
+    grep -H preconfig */config.cym > A
+    sed "s/config.cym:%preconfig.augmin_source=/ /" A > augmin.txt
+    cut -c 4-7 -c 9- augmin.txt > A
+    cut -c 4- spindle_length.txt > L
+    paste A L > AL.txt
 
 """
 
@@ -35,7 +42,7 @@ def plot_data(T, D, name):
         Plot surface as a function of time
     """
     fig = plt.figure(figsize=(4, 3))
-    plt.plot(T, D, label="pole-to-pole")
+    plt.plot(T, D, label="pole-to-pole", linewidth=4.0)
     plt.xlim(0, math.ceil(max(T)/100)*100)
     plt.ylim(0, math.ceil(max(D)))
     plt.xlabel('Time (s)', fontsize=fts)
@@ -59,6 +66,9 @@ def get_data(file):
         elif s[0] == '%':
             if s[1] == "time":
                 ts = float(s[2])
+        elif len(s) == 10:
+            T.append(float(s[0]))
+            D.append(float(s[9]))
         elif len(s) > 7:
             T.append(ts)
             D.append(float(s[-1]))
@@ -71,8 +81,9 @@ def process(dirpath):
     """
     os.chdir(dirpath)
     filename = 'spindle_length.txt'
-    args = ['report3', 'spindle:length', 'verbose=1']
-    subprocess.call(args, stdout=open(filename, 'w'))
+    if not os.path.isfile(filename):
+        args = ['report3', 'time', 'spindle:length']
+        subprocess.call(args, stdout=open(filename, 'w'))
     res = 0
     with open(filename, 'r') as f:
         T, L = get_data(f)
@@ -81,10 +92,10 @@ def process(dirpath):
         # calculate mean length for data above 1000s:
         LL = [ x for t,x in zip(T,L) if t > 1000 ]
         res = sum(LL) / len(LL)
-    plt.savefig('spindle_length.png', dpi=150)
+    plt.savefig('spindle_length.png', dpi=75)
     #plt.show()
     plt.close()
-    print(f'{dirpath} {res}\n')
+    print(f'{dirpath} {res}')
 
 
 #------------------------------------------------------------------------
