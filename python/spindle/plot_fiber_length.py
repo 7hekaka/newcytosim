@@ -45,12 +45,13 @@ def plot_data(D, N, name):
     N = len(D[0])
     X = range(0, N)
     M = [0, 0, 0]
-    for i in [ 0, 1, 2 ]:
-        plt.plot(X, D[i], label=f"cat={i}", linewidth=4.0)
+    cat = [ 'kinetochore', 'augmin', 'pole' ]
+    for i in [ 2, 1, 0 ]:
+        plt.plot(X, D[i], label=cat[i], linewidth=4.0)
         M[i] = max(D[i])
-    plt.xlim(0, math.ceil(N/100)*100)
+    plt.xlim(0, math.ceil(N))
     plt.ylim(0, math.ceil(max(M)))
-    plt.xlabel('Time (s)', fontsize=fts)
+    plt.xlabel('Frame', fontsize=fts)
     plt.ylabel('Length (um)', fontsize=fts)
     plt.title('Fiber Length', fontsize=fts)
     plt.legend()
@@ -101,7 +102,7 @@ def process(dirpath):
         L = [0, 0, 0]
         for i in [ 0, 1, 2 ]:
             L[i] = sum(D[i]) / float(sum(N[i]))
-    plt.savefig('spindle_length.png', dpi=75)
+    plt.savefig('fiber_length.png', dpi=75)
     #plt.show()
     plt.close()
     print(f'{dirpath} {L[0]:.4f} {L[1]:.4f} {L[2]:.4f}')
