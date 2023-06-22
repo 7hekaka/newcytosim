@@ -37,19 +37,20 @@ def uncode(arg):
         return arg
 
 
-def plot_data(D, N, name):
+def plot_data(P, N, name):
     """
         Plot surface as a function of time
     """
     fig = plt.figure(figsize=(4, 3))
-    N = len(D[0])
-    X = range(0, N)
+    X = len(P[0])
+    XR = range(0, X)
     M = [0, 0, 0]
     cat = [ 'kinetochore', 'augmin', 'pole' ]
     for i in [ 2, 1, 0 ]:
-        plt.plot(X, D[i], label=cat[i], linewidth=4.0)
-        M[i] = max(D[i])
-    plt.xlim(0, math.ceil(N))
+        L = [ p/max(1,n) for p, n in zip(P[i], N[i]) ]
+        plt.plot(XR, L, label=cat[i], linewidth=4.0)
+        M[i] = max(L)
+    plt.xlim(0, math.ceil(X))
     plt.ylim(0, math.ceil(max(M)))
     plt.xlabel('Frame', fontsize=fts)
     plt.ylabel('Length (um)', fontsize=fts)
@@ -62,7 +63,7 @@ def get_data(file):
     """
         Retreive data from file
     """
-    D = [[], [], []]
+    P = [[], [], []]
     N = [[], [], []]
     for line in file:
         s = uncode(line).split()
@@ -70,18 +71,18 @@ def get_data(file):
             pass
         elif s[0] == '%':
             if s[1] == "frame":
-                iD = [ 0, 0, 0 ]
+                iP = [ 0, 0, 0 ]
                 iN = [ 0, 0, 0 ]
             if s[1] == "end":
                 #print(iD, iN)
                 for i in [ 0, 1, 2 ]:
-                    D[i].append(iD[i])
+                    P[i].append(iP[i])
                     N[i].append(iN[i])
         elif len(s) == 8:
             K = int(s[0])
-            iD[K] = float(s[6])
+            iP[K] = float(s[6])
             iN[K] = int(s[1])
-    return D, N
+    return P, N
 
 
 def process(dirpath):
@@ -95,13 +96,13 @@ def process(dirpath):
         subprocess.call(args, stdout=open(filename, 'w'))
     res = 0
     with open(filename, 'r') as f:
-        D, N = get_data(f)
+        P, N = get_data(f)
         #print(D, N)
-        plot_data(D, N, dirpath)
+        plot_data(P, N, dirpath)
         # calculate mean length for data above 1000s:
         L = [0, 0, 0]
         for i in [ 0, 1, 2 ]:
-            L[i] = sum(D[i]) / float(sum(N[i]))
+            L[i] = sum(P[i]) / float(sum(N[i]))
     plt.savefig('fiber_length.png', dpi=75)
     #plt.show()
     plt.close()
