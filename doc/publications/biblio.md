@@ -11,8 +11,8 @@
 
 2023
 
+- [Microtubule competition and cell growth recenter the nucleus after anaphase in fission yeast](https://doi.org/10.1091/mbc.E23-01-0034)
 - [Reduction of cortical pulling at mitotic entry facilitates aster centration](https://doi.org/10.1101/2023.03.21.533625)
-- [Microtubule competition and cell growth recenter the nucleus after anaphase in fission yeast](https://www.biorxiv.org/content/10.1101/2023.01.31.526443v1)
 - [Self-organization of microtubules: complexity analysis of emergent patterns](https://arxiv.org/abs/2305.00539)
 
 2022
