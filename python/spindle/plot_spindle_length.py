@@ -37,14 +37,14 @@ def uncode(arg):
         return arg
 
 
-def plot_data(T, D, name):
+def plot_data(X, Y, name):
     """
         Plot surface as a function of time
     """
     fig = plt.figure(figsize=(4, 3))
-    plt.plot(T, D, label="pole-to-pole", linewidth=4.0)
-    plt.xlim(0, math.ceil(max(T)/100)*100)
-    plt.ylim(0, math.ceil(max(D)))
+    plt.plot(X, Y, label="pole-to-pole", linewidth=4.0)
+    plt.xlim(0, math.ceil(max(X)/100)*100)
+    plt.ylim(math.floor(min(Y)), math.ceil(max(Y)))
     plt.xlabel('Time (s)', fontsize=fts)
     plt.ylabel('Length (um)', fontsize=fts)
     plt.title('Spindle Length', fontsize=fts)

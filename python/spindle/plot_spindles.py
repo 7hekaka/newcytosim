@@ -7,11 +7,17 @@
 
 """
 Description:
-    Make different master plots
-    
-Syntax:
+
+    Make different master plots for spindle simulation analysis
+
+Usage:
+    get_parameters.py run* > parameters.txt
+    plot_spindle_length.py run* > spindle_length.txt
+    plot_fiber_length.py run* > fiber_length.txt
+
     plot_spindles.py
 
+23.06.2023
 """
 
 #font size:
@@ -33,7 +39,7 @@ def uncode(arg):
 
 def read_data_file(path):
     """
-        get data from file in column format
+        read data from file and return in column format
     """
     res = []
     with open(path, 'r') as file:
@@ -49,18 +55,17 @@ def read_data_file(path):
                 data.append(float(i))
             res.append(data)
     res = list(zip(*res))
-    #print(res)
     return res
 
 
-def plot_spindle_length(X, L):
+def plot_spindle_length(X, Y):
     """
         Plot surface as a function of time
     """
     fig = plt.figure(figsize=(4, 3))
-    plt.plot(X, L, marker='o', markersize=4, linewidth=0, markeredgecolor='none')
+    plt.plot(X, Y, marker='o', markersize=4, linewidth=0, markeredgecolor='none')
     plt.xlim(1, math.ceil(max(X)))
-    plt.ylim(math.floor(min(L)), math.ceil(max(L)))
+    plt.ylim(math.floor(min(Y)), math.ceil(max(Y)))
     plt.xlabel('Augmin level', fontsize=fts)
     plt.ylabel('Pole-to-pole distance (um)', fontsize=fts)
     plt.title('Spindle Length', fontsize=fts)
@@ -70,18 +75,18 @@ def plot_spindle_length(X, L):
 
 
 
-def plot_fiber_lengths(X, L0, L1, L2):
+def plot_fiber_lengths(X, Y0, Y1, Y2):
     """
         Plot surface as a function of time
     """
     fig = plt.figure(figsize=(4, 3))
-    plt.plot(X, L0, marker='o', markersize=4, linewidth=0, color='green')
-    plt.plot(X, L1, marker='o', markersize=4, linewidth=0, color='orange')
-    plt.plot(X, L2, marker='o', markersize=4, linewidth=0, color='blue')
+    plt.plot(X, Y0, marker='o', markersize=4, linewidth=0, color='green')
+    plt.plot(X, Y1, marker='o', markersize=4, linewidth=0, color='orange')
+    plt.plot(X, Y2, marker='o', markersize=4, linewidth=0, color='blue')
     plt.xlim(1, math.ceil(max(X)))
-    mL = min(min(L0), min(L1), min(L2))
-    xL = max(max(L0), max(L1), max(L2))
-    plt.ylim(math.floor(mL), math.ceil(xL))
+    mY = min(min(Y0), min(Y1), min(Y2))
+    xY = max(max(Y0), max(Y1), max(Y2))
+    plt.ylim(math.floor(mY), math.ceil(xY))
     plt.xlabel('Augmin level', fontsize=fts)
     plt.ylabel('Fiber length (um)', fontsize=fts)
     plt.title('Mean fiber Lengths', fontsize=fts)
@@ -90,14 +95,47 @@ def plot_fiber_lengths(X, L0, L1, L2):
     plt.savefig('fiber_length.png', dpi=150)
 
 
+def plot_fiber_count(X, Y0, Y1, Y2):
+    """
+        Plot surface as a function of time
+    """
+    fig = plt.figure(figsize=(4, 3))
+    plt.plot(X, Y0, marker='o', markersize=4, linewidth=0, color='green')
+    plt.plot(X, Y1, marker='o', markersize=4, linewidth=0, color='orange')
+    plt.plot(X, Y2, marker='o', markersize=4, linewidth=0, color='blue')
+    plt.xlim(1, math.ceil(max(X)))
+    mY = min(min(Y0), min(Y1), min(Y2))
+    xY = max(max(Y0), max(Y1), max(Y2))
+    plt.ylim(math.floor(mY), math.ceil(xY))
+    plt.xlabel('Augmin level', fontsize=fts)
+    plt.ylabel('Fiber count (um)', fontsize=fts)
+    plt.title('Mean fiber cpunts', fontsize=fts)
+    plt.legend()
+    fig.tight_layout()
+    plt.savefig('fiber_count.png', dpi=150)
+
+
 #------------------------------------------------------------------------
 
 def main(args):
-    pam = read_data_file('parameters.txt')
-    len = read_data_file('spindle_length.txt')
-    mtl = read_data_file('fiber_length.txt')
-    plot_spindle_length(pam[1], len[1])
-    plot_fiber_lengths(pam[1], mtl[1], mtl[2], mtl[3])
+    try:
+        pam = read_data_file('parameters.txt')
+    except FileNotFoundError:
+        print("please run `get_parameters.py > parameters.txt'");
+        return
+    try:
+        spi = read_data_file('spindle_length.txt')
+    except FileNotFoundError:
+        print("please run `get_spindle_length.py > spindle_length.txt'");
+        return
+    try:
+        fib = read_data_file('fiber_length.txt')
+    except FileNotFoundError:
+        print("please run `get_fiber_length.py > fiber_length.txt'");
+        return
+    plot_spindle_length(pam[1], spi[1])
+    plot_fiber_count(pam[1], fib[1], fib[3], fib[5])
+    plot_fiber_lengths(pam[1], fib[2], fib[4], fib[6])
 
 
 if __name__ == "__main__":

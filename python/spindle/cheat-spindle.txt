@@ -1,0 +1,69 @@
+ rsync -rav --exclude log.txt --delete fjn28@login-cpu.hpc.cam.ac.uk:/home/fjn28/rds/hpc-work/plant/cortexscan00 .
+ rsync -rav --exclude log.txt --delete fjn28@login-cpu.hpc.cam.ac.uk:/home/fjn28/rds/hpc-work/spindle/set34 .
+
+
+ rsync -va --exclude objects.cmo --exclude messages.cmo --exclude properties.cmp set59 slim/
+ rsync -va --exclude objects.cmo --exclude messages.cmo --exclude properties.cmp set60 slim/
+ rsync -va --exclude objects.cmo --exclude messages.cmo --exclude properties.cmp set62 slim/
+
+
+
+# ------------ faster image
+
+scan.py '[[ -f frame.cmo ]] || frametool last > frame.cmo' run*
+scan.py '[[ -f image.png ]] || playf image.png trajectory=frame.cmo window_size=1024,384' r*
+
+# ------------- classic
+
+ scan.py '[[ -f image.png ]] || ~/bin/playf image.png size=1024,512 frame=1200' run*
+ scan.py '[[ -f image.png ]] || ~/bin/playf image.png size=1536,768 frame=1200' run*
+ scan.py '[[ -f image.png ]] || ~/bin/playf image.png size=2048,1024 frame=1000' run*
+
+
+~/byn/compactify.py set5
+
+~/byn/make_page.py width=512 tile=4 run*
+
+ for d in j0???; do  mv $d run${d#j}; done
+
+
+# ------------- reduce size
+
+for d in /Volumes/TeamFJN/nedelec/simul/spindle/set21/run????.tar.gz; do tar -xf $d; done
+~/byn/shrink.py .
+
+for d in run????; do grep -v kern ${d}/messages.cmo > ${d}/m; done
+for d in run????; do mv ${d}/m ${d}/messages.cmo; done
+
+~/byn/compactify .
+mv run????.tar.gz /Volumes/TeamFJN/nedelec/simul/spindle/set19/.
+
+
+ scan.py 'grep -v kern messages.cmo > m' run*
+ scan.py 'mv m messages.cmo' run*
+
+
+===== cluster side
+
+
+ for d in r????-*; do mv $d ${d%%-*}; done
+ for d in r????; do mv $d save/run${d#r}; done
+cd save
+ for d in r????; do mv $d run${d#r}; done
+
+
+====== sorting by augmin
+
+grep -H preconfig */config.cym > x
+sed "s/config.cym:%preconfig.augmin_source=/ /" x > y
+sort -k 2 -n y > z
+mkdir tmp
+mv r* tmp
+cut -c 1-7 z | xargs -n 1 -I {} collect.py run%%%% tmp/{}
+rmdir tmp
+rm x y z
+
+======= plots
+
+scan.py 'report3 fiber:mark > mark.txt' run*
+

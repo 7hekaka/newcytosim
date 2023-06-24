@@ -37,9 +37,9 @@ def uncode(arg):
         return arg
 
 
-def plot_data(P, N, name):
+def plot_fiber_length(P, N, name):
     """
-        Plot surface as a function of time
+        Plot fiber length as function of frame
     """
     fig = plt.figure(figsize=(4, 3))
     X = len(P[0])
@@ -57,6 +57,29 @@ def plot_data(P, N, name):
     plt.title('Fiber Length', fontsize=fts)
     plt.legend()
     fig.tight_layout()
+    plt.savefig('fiber_length.png', dpi=75)
+
+
+def plot_fiber_count(N, name):
+    """
+        Plot fiber count as a function of frame
+    """
+    fig = plt.figure(figsize=(4, 3))
+    X = len(N[0])
+    XR = range(0, X)
+    cat = [ 'kinetochore', 'augmin', 'pole' ]
+    M = [0, 0, 0]
+    for i in [ 2, 1, 0 ]:
+        plt.plot(XR, N[i], label=cat[i], linewidth=4.0)
+        M[i] = max(N[i])
+    plt.xlim(0, math.ceil(X))
+    plt.ylim(0, math.ceil(max(M)))
+    plt.xlabel('Frame', fontsize=fts)
+    plt.ylabel('Count', fontsize=fts)
+    plt.title('Fiber count', fontsize=fts)
+    plt.legend()
+    fig.tight_layout()
+    plt.savefig('fiber_count.png', dpi=75)
 
 
 def get_data(file):
@@ -98,15 +121,17 @@ def process(dirpath):
     with open(filename, 'r') as f:
         P, N = get_data(f)
         #print(D, N)
-        plot_data(P, N, dirpath)
-        # calculate mean length for data above 1000s:
-        L = [0, 0, 0]
-        for i in [ 0, 1, 2 ]:
-            L[i] = sum(P[i]) / float(sum(N[i]))
-    plt.savefig('fiber_length.png', dpi=75)
+    plot_fiber_length(P, N, dirpath)
+    plot_fiber_count(N, dirpath)
+    # calculate mean length and count for all data:
+    L = [0, 0, 0]
+    C = [0, 0, 0]
+    for i in [ 0, 1, 2 ]:
+        L[i] = sum(P[i]) / float(sum(N[i]))
+        C[i] = sum(N[i]) / len(N[i])
     #plt.show()
     plt.close()
-    print(f'{dirpath} {L[0]:.4f} {L[1]:.4f} {L[2]:.4f}')
+    print(f'{dirpath} {C[0]:.1f} {L[0]:.4f} {C[1]:.1f} {L[1]:.4f} {C[2]:.1f} {L[2]:.4f}')
 
 
 #------------------------------------------------------------------------
