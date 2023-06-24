@@ -37,21 +37,6 @@ def uncode(arg):
         return arg
 
 
-def plot_data(X, Y, name):
-    """
-        Plot surface as a function of time
-    """
-    fig = plt.figure(figsize=(4, 3))
-    plt.plot(X, Y, label="pole-to-pole", linewidth=4.0)
-    plt.xlim(0, math.ceil(max(X)/100)*100)
-    plt.ylim(math.floor(min(Y)), math.ceil(max(Y)))
-    plt.xlabel('Time (s)', fontsize=fts)
-    plt.ylabel('Length (um)', fontsize=fts)
-    plt.title('Spindle Length', fontsize=fts)
-    plt.legend()
-    fig.tight_layout()
-
-
 def get_data(file):
     """
         Retreive length from file
@@ -75,6 +60,24 @@ def get_data(file):
     return T, D
 
 
+def plot_data(X, Y, name):
+    """
+        Plot surface as a function of time
+    """
+    fig = plt.figure(figsize=(4, 3))
+    plt.plot(X, Y, label="pole-to-pole", linewidth=4.0)
+    plt.xlim(0, math.ceil(max(X)/100)*100)
+    plt.ylim(math.floor(min(Y)), math.ceil(max(Y)))
+    plt.xlabel('Time (s)', fontsize=fts)
+    plt.ylabel('Length (um)', fontsize=fts)
+    plt.title('Spindle Length', fontsize=fts)
+    plt.legend()
+    fig.tight_layout()
+    plt.savefig('spindle_length.png', dpi=75)
+    #plt.show()
+    plt.close()
+
+
 def process(dirpath):
     """
         Process given directory
@@ -92,9 +95,6 @@ def process(dirpath):
         # calculate mean length for data above 1000s:
         LL = [ x for t,x in zip(T,L) if t > 1000 ]
         res = sum(LL) / len(LL)
-    plt.savefig('spindle_length.png', dpi=75)
-    #plt.show()
-    plt.close()
     print(f'{dirpath} {res}')
 
 

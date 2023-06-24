@@ -58,6 +58,8 @@ def plot_fiber_length(P, N, name):
     plt.legend()
     fig.tight_layout()
     plt.savefig('fiber_length.png', dpi=75)
+    #plt.show()
+    plt.close()
 
 
 def plot_fiber_count(N, name):
@@ -80,6 +82,8 @@ def plot_fiber_count(N, name):
     plt.legend()
     fig.tight_layout()
     plt.savefig('fiber_count.png', dpi=75)
+    #plt.show()
+    plt.close()
 
 
 def get_data(file):
@@ -129,8 +133,6 @@ def process(dirpath):
     for i in [ 0, 1, 2 ]:
         L[i] = sum(P[i]) / float(sum(N[i]))
         C[i] = sum(N[i]) / len(N[i])
-    #plt.show()
-    plt.close()
     print(f'{dirpath} {C[0]:.1f} {L[0]:.4f} {C[1]:.1f} {L[1]:.4f} {C[2]:.1f} {L[2]:.4f}')
 
 

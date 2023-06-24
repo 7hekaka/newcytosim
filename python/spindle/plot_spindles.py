@@ -121,17 +121,17 @@ def main(args):
     try:
         pam = read_data_file('parameters.txt')
     except FileNotFoundError:
-        print("please run `get_parameters.py > parameters.txt'");
+        print("please run `get_parameters.py run* > parameters.txt'");
         return
     try:
         spi = read_data_file('spindle_length.txt')
     except FileNotFoundError:
-        print("please run `get_spindle_length.py > spindle_length.txt'");
+        print("please run `get_spindle_length.py run* > spindle_length.txt'");
         return
     try:
         fib = read_data_file('fiber_length.txt')
     except FileNotFoundError:
-        print("please run `get_fiber_length.py > fiber_length.txt'");
+        print("please run `get_fiber_length.py run* > fiber_length.txt'");
         return
     plot_spindle_length(pam[1], spi[1])
     plot_fiber_count(pam[1], fib[1], fib[3], fib[5])
