@@ -17,14 +17,11 @@
  */
 Couple * DuoProp::newCouple() const
 {
-    Duo * res = nullptr;
     //std::clog << "DuoProp::newCouple" << '\n';
     if ( length > 0 )
-        res = new DuoLong(this);
+        return new DuoLong(this);
     else
-        res = new Duo(this);
-    
-    return res;
+        return new Duo(this);
 }
 
 
