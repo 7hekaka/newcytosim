@@ -237,20 +237,27 @@ float Inputter::readFloatBinary()
 
 float Inputter::readFloat()
 {
-    float v;
+    union { float f; uint8_t i[4]; } u;
     if ( binary_ )
     {
-        if ( 1 != fread(&v, 4, 1, mFile) )
+#if 1
+        u.i[0] = get_char();
+        u.i[1] = get_char();
+        u.i[2] = get_char();
+        u.i[3] = get_char();
+#else
+        if ( 1 != fread(&u, 4, 1, mFile) )
             throw InvalidIO("readFloat() failed");
+#endif
         if ( binary_ == 2 )
-            v = byteswap32(v);
+            u.f = byteswap32(u.f);
     }
     else
     {
-        if ( 1 != fscanf(mFile, " %f", &v) )
+        if ( 1 != fscanf(mFile, " %f", &u.f) )
             throw InvalidIO("readFloat failed");
     }
-    return v;
+    return u.f;
 }
 
 
