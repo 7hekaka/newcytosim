@@ -21,6 +21,7 @@ namespace glApp
     int mDIM        = 3;     ///< current dimensionality mode
     int mFullScreen = false; ///< flag indicating full-screen mode
     int specialKeys = 0;     ///< state of special keys given by GLUT
+    int drawRefresh = 0;     ///< true if display needs to be updated
     
     // --------------- MOUSE
     
@@ -1088,8 +1089,6 @@ void glApp::processMouseDrag(int mX, int mY)
 void glApp::processPassiveMouseMotion(int mx, int my)
 {
     //printf("passive mouse (%i %i)\n", mx, my);
-    //int x = glutGet(GLUT_WINDOW_WIDTH)-8;
-    //int y = glutGet(GLUT_WINDOW_HEIGHT)-8;
 }
 
 //------------------------------------------------------------------------------
@@ -1103,25 +1102,6 @@ void glApp::flashText(std::string const& str)
         view.flashText(str);
         if ( view.window()==1 )
             glutPostWindowRedisplay(1);
-    }
-}
-
-
-
-void glApp::displayAll(int (*drawFunc)(View&))
-{
-    for ( size_t n = 1; n < views.size(); ++n )
-    {
-        if ( views[n].window() > 0 )
-        {
-            drawFunc(views[n]);
-            if ( n == 1 )
-                views[n].drawInteractiveFeatures();
-            if ( views[n].buffered )
-                glutSwapBuffers();
-            else
-                glFlush();
-        }
     }
 }
 
@@ -1172,24 +1152,33 @@ void glApp::displayMain()
         if ( view.buffered )
             glutSwapBuffers();
     }
+    drawRefresh = 0;
+}
+
+
+void glApp::displayOtherWindows(int (*drawFunc)(View&))
+{
+    for ( size_t n = 2; n < views.size(); ++n )
+    {
+        if ( views[n].window() > 0 )
+        {
+            glutSetWindow(views[n].window());
+            drawFunc(views[n]);
+            if ( n == 1 )
+                views[n].drawInteractiveFeatures();
+            if ( views[n].buffered )
+                glutSwapBuffers();
+            else
+                glFlush();
+        }
+    }
 }
 
 
 void glApp::postRedisplay()
 {
     //std::clog << " postRedisplay\n";
-    glutPostRedisplay();
-}
-
-
-void glApp::postRedisplayAll()
-{
-    for ( unsigned n = 1; n < views.size(); ++n )
-        if ( views[n].window() > 0 )
-        {
-            //std::clog << " postRedisplay(" << n << ")\n";
-            glutPostWindowRedisplay(n);
-        }
+    ++drawRefresh;
 }
 
 

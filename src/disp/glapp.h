@@ -15,7 +15,10 @@ namespace glApp
 {
     /// different View associated with the display windows
     extern std::vector<View> views;
-
+    
+    /// flag indicating that display should be redone
+    extern int drawRefresh;
+    
     /// initialize first view
     void initialize();
     
@@ -56,7 +59,7 @@ namespace glApp
     void resetView();
     
     /// draw System
-    void displayAll(int (*drawFunc)(View&));
+    void displayOtherWindows(int (*drawFunc)(View&));
 
     /// save higher resolution image with magnification 'mag'
     int saveImage(const char* name, unsigned mag, unsigned downsample);
@@ -144,9 +147,6 @@ namespace glApp
     
     /// declare that current display needs a refresh
     void postRedisplay();
-
-    /// declare that a display must be refreshed
-    void postRedisplayAll();
 }
 
 

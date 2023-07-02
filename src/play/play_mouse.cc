@@ -78,13 +78,13 @@ void timerCallback(const int value)
     else
     {
         // in replay mode, no need to lock the simulation data
-        bool draw = simul.fresh_;
+        bool draw = simul.fresh_ || glApp::drawRefresh;
         if ( worker.read_input() )
             draw = true;
         
         if ( prop.replay > 0 )
         {
-            // skip `prop.period` frames, and at least one since prop.period > 0
+            // skip `prop.period` frames, and at least one if prop.period > 0
             for ( unsigned s = 0; s < prop.period; ++s )
                 player.nextFrame();
             draw = true;
@@ -94,11 +94,14 @@ void timerCallback(const int value)
             player.previousFrame();
             draw = true;
         }
-        else
-            millisec = 100;
         
         if ( draw )
-            glApp::displayAll(drawSimul);
+        {
+            glApp::displayMain();
+            //glApp::displayOtherWindows(drawSimul);
+        }
+        else
+            millisec = 100;
     }
     
     glutTimerFunc(millisec, timerCallback, 2);

@@ -154,7 +154,7 @@ public:
     /// read parameters contained in string
     void readDisplayString(View&, std::string const&);
     
-    /// draw cytosim's system
+    /// draw all simulation components
     void drawCytosim();
     
     /// draw system calling drawCytosim
