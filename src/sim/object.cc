@@ -118,9 +118,10 @@ void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
                  leaving 3 bytes and at most 16 777 216 objects */
                 if ( id > 1<<24 ) // ~16 Million objects
                     throw InvalidIO("binary file data format overflow");
-                uint8_t u[4] = { uint8_t(g|HIGH_BIT), uint8_t((id>>16)&0xFF), uint8_t((id>>8)&0xFF), uint8_t(id&0xFF) };
-                if ( 1 != fwrite(&u, 4, 1, out.file()) )
-                    throw InvalidIO("writeReference() failed");
+                out.writeChar(g|HIGH_BIT);
+                out.writeChar((id>>16)&0xFF);
+                out.writeChar((id>>8)&0xFF);
+                out.writeChar(id&0xFF);
             }
             else
             {

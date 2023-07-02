@@ -255,13 +255,16 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
             //assert_true(isalpha(tag));
             if ( c & HIGH_BIT )
             {
-                uint8_t u[4] = { 0, 0, 0, 0 };
-                if ( 1 != fread(u, 3, 1, in.file()) )
-                    throw InvalidIO("readObjectID(binary) failed");
-                id = ( ObjectID(u[0]) << 16 ) + ( ObjectID(u[1]) << 8 ) + ObjectID(u[2]);
+                ObjectID a = in.get_char();
+                ObjectID b = in.get_char();
+                id = ( a << 16 ) + ( b << 8 ) + ObjectID(in.get_char());
             }
             else if ( c != Object::NULL_TAG )
-                id = in.readUInt16bin();
+            {
+                ObjectID a = in.get_char();
+                ObjectID b = in.get_char();
+                id = ( b << 8 ) + a;
+            }
         }
     }
     else
