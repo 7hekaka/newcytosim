@@ -237,11 +237,7 @@ ObjectList SingleSet::distributeWrists(SingleProp const* sp, size_t cnt,
     ObjectList list = simul_.beads.collect(bip);
     if ( list.empty() )
         throw InvalidParameter("could not find Bead of type `"+name+"'");
-    if ( cnt < list.size() )
-    {
-        list.shuffle();
-        list.truncate(cnt);
-    }
+    list.shuffle_truncate(cnt);
     // create one Single on each of 'cnt' Beads:
     for ( Object const* i : list )
         objs.push_back(sp->newWrist(static_cast<Bead const*>(i), 0));
@@ -687,12 +683,8 @@ void SingleSet::uniRefill(SingleReserve& can, size_t cnt, SingleProp const* sip)
 void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserve& can)
 {
     // crop list to match available number of candidates:
-    if ( can.size() < loc.size() )
-    {
-        loc.shuffle();
-        loc.truncate(can.size());
-    }
-    
+    loc.shuffle_truncate(can.size());
+
     for ( FiberSite & i : loc )
     {
         Single * s = can.head();

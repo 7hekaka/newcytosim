@@ -788,11 +788,7 @@ void CoupleSet::uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const* cop)
 void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleReserve& can)
 {
     // crop list to match available number of candidates:
-    if ( can.size() < loc.size() )
-    {
-        loc.shuffle();
-        loc.truncate(can.size());
-    }
+    loc.shuffle_truncate(can.size());
 
     for ( FiberSite & i : loc )
     {
@@ -815,11 +811,7 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleReserve& can)
 void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleReserve& can)
 {
     // crop list to match available number of candidates:
-    if ( can.size() < loc.size() )
-    {
-        loc.shuffle();
-        loc.truncate(can.size());
-    }
+    loc.shuffle_truncate(can.size());
 
     for ( FiberSite & i : loc )
     {

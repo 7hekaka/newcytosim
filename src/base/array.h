@@ -647,6 +647,19 @@ public:
         shuffle32();
 #endif
     }
+    
+    /// possibly reduce array to a maximum of 'cnt' objects, chosen randomly
+    void shuffle_truncate(size_t cnt)
+    {
+        if ( cnt < size() )
+        {
+            if ( cnt == 1 )
+                val_[0] = pick_one();
+            else
+                shuffle();
+            truncate(cnt);
+        }
+    }
 };
 
 

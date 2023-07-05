@@ -378,15 +378,7 @@ ObjectList ObjectSet::collect() const
 ObjectList ObjectSet::collect(const size_t cnt) const
 {
     ObjectList objs = collect();
-    if ( cnt < objs.size() )
-    {
-        // limit the list to a random subset
-        if ( cnt == 1 )
-            objs[0] = objs.pick_one();
-        else
-            objs.shuffle();
-        objs.truncate(cnt);
-    }
+    objs.shuffle_truncate(cnt);
     return objs;
 }
 
@@ -400,15 +392,7 @@ ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void con
 ObjectList ObjectSet::collect(bool (*func)(Object const*, void const*), void const* arg, const size_t cnt) const
 {
     ObjectList objs = collect(func, arg);
-    if ( cnt < objs.size() )
-    {
-        // limit the list to a random subset
-        if ( cnt == 1 )
-            objs[0] = objs.pick_one();
-        else
-            objs.shuffle();
-        objs.truncate(cnt);
-    }
+    objs.shuffle_truncate(cnt);
     return objs;
 }
 
