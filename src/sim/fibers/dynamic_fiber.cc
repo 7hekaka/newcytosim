@@ -397,6 +397,10 @@ int DynamicFiber::stepPlusEnd()
 }
 
 
+/*
+ Special case for Kinetochores: grow slowly with no catastrophe...
+ force modulates assembly rate exponentially
+*/
 int DynamicFiber::stepPlusEndStabilized(real factor)
 {
     constexpr size_t P = 0;
@@ -408,7 +412,8 @@ int DynamicFiber::stepPlusEndStabilized(real factor)
     // Special case for Kinetochores: grow slowly with no catastrophe...
     real growth = prop()->growing_rate_dt[P] * prop()->free_polymer / factor;
     
-    //std::clog << prop()->name() << " P " << factor << " " << forceP << "\n";
+    //real fP = tension(lastSegment());
+    //std::clog << prop()->name() << " stabilized P " << factor << " " << forceP << " " << fP << "\n";
     // force modulates assembly rate exponentially
     if ( growth > 0 )
     {

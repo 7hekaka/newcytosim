@@ -95,7 +95,7 @@ void Mecafil::allocateMecable(const size_t nbp)
 #pragma mark -
 
 /**
- The argument should be: alpha = kT / timestep;
+ The argument should be: alpha = 2 * kT / timestep;
  */
 real Mecafil::addBrownianForces(real const* rnd, real alpha, real* rhs) const
 {

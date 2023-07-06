@@ -216,11 +216,11 @@ void Interpolation4::addAlignedOffsetLink(Meca& meca, real len, Mecapoint const&
             meca.addLink2(arg, off, coef_[0]-inc, coef_[1]+inc, weight);
         } break;
         case 3: {
-            real inc = len / ( -M_SQRT2 * rad );
+            real inc = -len / ( M_SQRT2 * rad );
             meca.addLink3(arg, off, coef_[0]-inc*2, coef_[1]+inc, coef_[2]+inc, weight);
         } break;
         case 4: {
-            real inc = len / ( -M_SQRT3 * rad );
+            real inc = -len / ( M_SQRT3 * rad );
             meca.addLink4(arg, off, coef_[0]-inc*3, coef_[1]+inc, coef_[2]+inc, coef_[3]+inc, weight);
         } break;
     }

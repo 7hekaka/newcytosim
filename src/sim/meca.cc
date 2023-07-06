@@ -961,8 +961,9 @@ void Meca::apply()
         for ( Mecable * mec : mecables )
         {
             const size_t off = DIM * mec->matIndex();
+            //fprintf(stderr, "\n  /"); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+off, 2, DIM);
             mec->addBrownianForces(vRND+off, alpha_, vFOR+off);
-            //fprintf(stderr, "\n  "); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+off, 2, DIM);
+            //fprintf(stderr, "\n  L"); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+off, 2, DIM);
             if ( 1 )
             {
                 // check validity of results:

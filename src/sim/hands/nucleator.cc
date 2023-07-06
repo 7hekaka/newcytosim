@@ -160,6 +160,12 @@ void Nucleator::stepUnloaded()
         relocateM();
     else if ( prop()->track_end == PLUS_END )
         relocateP();
+    
+    if ( prop()->stabilize )
+    {
+        Fiber * fib = modifiableFiber();
+        fib->stabilize(nearestEnd(), prop()->stabilize);
+    }
 }
 
 
