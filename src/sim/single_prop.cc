@@ -60,15 +60,6 @@ Single * SingleProp::newSingle() const
     return new Single(this);
 }
 
-
-Single * SingleProp::newSingle(Vector const& pos) const
-{
-    Single * S = newSingle();
-    S->setPosition(pos);
-    return S;
-}
-
-
 /**
  Create Wrist anchored to a Mecable vertex
  */
@@ -119,6 +110,7 @@ void SingleProp::clear()
     //confine_stiff = 0;
     confine_label = "first";
     confine_space = nullptr;
+    uni_counts = 0;
 }
 
 

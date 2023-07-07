@@ -24,7 +24,7 @@ class SingleReserve
     SingleProp const* property_;
     /// Pointer to first member in list
     Single * head_;
-    /// Number of Couples in list
+    /// Number of elements in list
     size_t count_;
     
 public:
@@ -33,13 +33,13 @@ public:
     SingleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
     
     /// number of objects stored
-    size_t size() const { return count_; }
-    
+    size_t reserved() const { return count_; }
+
     /// return property
-    SingleProp const* property() { return property_; }
+    SingleProp const* property() const { return property_; }
     
     /// set Property
-    void property(SingleProp const* p) { property_ = p; }
+    void set_property(SingleProp const* p) { property_ = p; }
     
     /// first object
     Single * head() const { return head_; }
@@ -97,9 +97,6 @@ private:
     /// flag to enable `fast_diffusion` attachment algorithm
     bool uniEnabled;
 
-    /// initialize `fast_diffusion` attachment algorithm
-    bool uniPrepare(PropertyList const& properties);
-    
     /// gather all Single with `fast_diffusion` in reserve lists
     void uniStepCollect(Single*);
 
@@ -120,12 +117,24 @@ private:
     
 public:
     
+    /// return a Couple from the reserve, or made by newCouple()
+    Single * makeSingle(SingleProp const*);
+    
+    /// create a Single at given position
+    Single * addSingle(SingleProp const*, Vector const&);
+
+    /// initialize `fast_diffusion` attachment algorithm
+    bool uniPrepare(PropertyList const& properties);
+
     /// total count in reserves
-    size_t reserved() const;
+    size_t all_reserved() const;
     
     /// total count in reserves
-    size_t reserved(size_t i) const { return uniReserves[i].size(); }
+    size_t reserved(size_t i) const { return uniReserves[i].reserved(); }
     
+    /// print number of elements in each reserve bin
+    void infoReserves(std::ostream& os) const;
+
     /// creator
     SingleSet(Simul& s) : ObjectSet(s), uniEnabled(0) {}
     
@@ -238,7 +247,13 @@ public:
     //--------------------------
     
     /// create unattached Singles
+    void makeSingles(SingleProp const*, size_t cnt);
+
+    /// create unattached Singles
     void makeSingles(size_t cnt[], size_t n_cnt);
+    
+    /// move Singles into reserve lists, instead of deleting them
+    void defrostSave();
 
     /// unlink all objects before import
     void freeze();

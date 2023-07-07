@@ -171,6 +171,9 @@ public:
     HandProp * hand1_prop;
     /// pointer to Property of Hand 2
     HandProp * hand2_prop;
+    
+    /// counter for fast diffusion algorithm
+    mutable size_t uni_counts;
 
 protected:
     
@@ -189,9 +192,6 @@ public:
     
     /// create a Couple having this property
     virtual Couple * newCouple() const;
-    
-    /// create a Couple at given position
-    Couple * newCouple(Vector const& pos) const;
 
     /// identifies the property
     std::string category() const { return "couple"; }

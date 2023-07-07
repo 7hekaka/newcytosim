@@ -636,6 +636,7 @@ public:
         }
     }
 
+    /// Randomly permutes all objects in the array
     void shuffle()
     {
 #if HANDLE_HUGE_ARRAYS

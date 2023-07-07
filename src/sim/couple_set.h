@@ -25,22 +25,22 @@ class CoupleReserve
     CoupleProp const* property_;
     /// Pointer to first member in list
     Couple * head_;
-    /// Number of Couples in list
+    /// Number of elements in list
     size_t count_;
-    
+
 public:
     
     /// constructor
     CoupleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
     
     /// number of objects stored
-    size_t size() const { return count_; }
+    size_t reserved() const { return count_; }
     
     /// return property
-    CoupleProp const* property() { return property_; }
+    CoupleProp const* property() const { return property_; }
     
     /// set Property
-    void property(CoupleProp const* p) { property_ = p; }
+    void set_property(CoupleProp const* p) { property_ = p; }
     
     /// first object
     Couple * head() const { return head_; }
@@ -116,9 +116,6 @@ private:
     /// flag to enable `fast_diffusion` attachment algorithm
     bool uniEnabled;
     
-    /// initialize `fast_diffusion` attachment algorithm
-    bool uniPrepare(PropertyList const& properties);
-    
     /// gather all Couple with `fast_diffusion` in reserve lists
     void uniStepCollect(Couple*);
 
@@ -131,7 +128,7 @@ private:
     /// attach Hand2 of Couple from `can` on locations specified in `loc`
     void uniAttach2(Array<FiberSite>& loc, CoupleReserve& can);
     
-    /// attach both Hands of `nb` Couple at crossing points specified by first argument
+    /// attach both Hands of `nb` Couple at crossing points specified by arguments 1 & 2
     void uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleReserve&, size_t nb);
 
     /// `fast_diffusion` attachment assuming that free Couples are uniformly distributed
@@ -142,8 +139,23 @@ private:
 
 public:
     
+    /// return a Couple from the reserve, or made by newCouple()
+    Couple * makeCouple(CoupleProp const*);
+    
+    /// return a Couple from the reserve, or made by newCouple()
+    Couple * addCouple(CoupleProp const*, Vector const&);
+
+    /// initialize `fast_diffusion` attachment algorithm
+    bool uniPrepare(PropertyList const& properties);
+
     /// total count in reserves
-    size_t reserved() const;
+    size_t all_reserved() const;
+    
+    /// total count in reserves
+    size_t reserved(size_t i) const { return uniReserves[i].reserved(); }
+
+    /// print number of elements in each reserve bin
+    void infoReserves(std::ostream& os) const;
 
     ///creator
     CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(0) {}
@@ -277,10 +289,10 @@ public:
     //--------------------------
 
     /// distribute the Couple on the fibers to approximate an equilibrated state
-    void equilibrateSym(FiberSet const&, CoupleReserve&);
+    void equilibrateSym(FiberSet const&, CoupleReserve&, size_t);
 
     /// distribute Couples of given class on the fibers to approximate an equilibrated state
-    void equilibrate(FiberSet const&, CoupleReserve&);
+    void equilibrate(FiberSet const&, CoupleReserve&, size_t);
     
     /// distribute all Couple on the fibers to approximate an equilibrated state
     void equilibrate(FiberSet const&, PropertyList const&);
@@ -303,7 +315,13 @@ public:
     //--------------------------
     
     /// create unattached Couples
+    void makeCouples(CoupleProp const*, size_t cnt);
+
+    /// create unattached Couples
     void makeCouples(size_t cnt[], size_t n_cnt);
+    
+    /// move Couples into reserve lists, instead of deleting them
+    void defrostSave();
 
     /// unlink all objects before import
     void freeze();

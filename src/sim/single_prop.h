@@ -107,6 +107,9 @@ public:
     
     /// derived variable: Property of associated Hand
     HandProp * hand_prop;
+    
+    /// counter for fast diffusion algorithm
+    mutable size_t uni_counts;
 
 protected:
     
@@ -131,9 +134,6 @@ public:
     
     /// create a Single with this property
     virtual Single * newSingle() const;
-    
-    /// create a Single at given position
-    Single * newSingle(Vector const& pos) const;
 
     /// create a Wrist attached to a Mecable vertex
     Wrist * newWrist(Mecable const*, size_t inx) const;

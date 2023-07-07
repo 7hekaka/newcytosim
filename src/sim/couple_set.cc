@@ -48,8 +48,8 @@ static inline void step_couples(Couple * obj, bool odd)
 
 
 /**
- Transfer free Couple with `fast_diffusion` to the reserves, starting from `obj`,
- and execute FUNC for all other Couples
+ Call stepFF() for all free Couple starting from `obj`, except that if
+ `fast_diffusion==true`, the Couple is transferred to corresponding reserve list
 */
 void CoupleSet::uniStepCollect(Couple * obj)
 {
@@ -61,7 +61,9 @@ void CoupleSet::uniStepCollect(Couple * obj)
         if ( P->fast_diffusion )
         {
             ffList.pop(obj);
-            uniReserves[P->number()].push(obj);
+            PropertyID i = P->number();
+            uniReserves[i].push(obj);
+            ++P->uni_counts;
         }
         else
             obj->stepFF();
@@ -84,7 +86,7 @@ void CoupleSet::step()
 {
 #if 1
     ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + reserved() ) )
+    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
     {
         inventory_.reassign();
         //Cytosim::log << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
@@ -242,12 +244,39 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
+Couple * CoupleSet::makeCouple(CoupleProp const* P)
+{
+    PropertyID i = P->number();
+    // pick from reserves if possible:
+    if ( i < uniReserves.size() )
+    {
+        Couple * C = uniReserves[i].head();
+        if ( C )
+        {
+            uniReserves[i].pop();
+            return C;
+        }
+    }
+    return P->newCouple();
+}
+
+
+Couple * CoupleSet::addCouple(CoupleProp const* P, Vector const& pos)
+{
+    // pick from reserves if possible:
+    Couple * C = makeCouple(P);
+    C->setPosition(pos);
+    add(C);
+    return C;
+}
+
+
 Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
 {
     if ( tag == Couple::TAG || tag == Couple::TAG_DUO )
     {
         CoupleProp * P = simul_.findProperty<CoupleProp>("couple", pid);
-        return P->newCouple();
+        return makeCouple(P);
     }
     throw InvalidIO("Warning: unknown Couple tag `"+std::to_string(tag)+"'");
     return nullptr;
@@ -282,7 +311,7 @@ Object * CoupleSet::newObject(const ObjectTag tag, PropertyID pid)
 ObjectList CoupleSet::newObjects(Property const* p, Glossary& opt)
 {
     CoupleProp const* pp = static_cast<CoupleProp const*>(p);
-    Couple * obj = pp->newCouple();
+    Couple * obj = makeCouple(pp);
     
     // possibly activate
     int a = 0;
@@ -460,26 +489,47 @@ void CoupleSet::erase()
 }
 
 
+void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
+{
+    while ( cnt-- > 0 )
+    {
+        Couple * C = makeCouple(P);
+        assert_true(!C->attached1() && !C->attached2());
+        C->randomizePosition();
+        C->objset(this);
+        linkFF(C);
+    }
+}
+
+
 void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
 {
-    for ( size_t id = 1; id < n_cnt; ++id )
+    for ( size_t i = 1; i < n_cnt; ++i )
     {
-        Property * P = simul_.properties.find("couple", id);
-        if ( P )
+        Property * cp = simul_.properties.find("couple", i);
+        if ( cp )
         {
-            CoupleProp * CP = static_cast<CoupleProp*>(P);
-            // renew pointers to 'confine_label'
-            CP->complete(simul_);
-            while ( cnt[id] > 0 )
-            {
-                --cnt[id];
-                Couple * C = CP->newCouple();
-                C->randomizePosition();
-                C->objset(this);
-                linkFF(C);
-            }
+            CoupleProp * P = static_cast<CoupleProp*>(cp);
+            // renew pointers to 'confine_space'
+            P->complete(simul_);
+            makeCouples(P, cnt[i]);
         }
     }
+}
+
+
+void CoupleSet::defrostSave()
+{
+    Object * i;
+    while (( i = ice_.front() ))
+    {
+        ice_.pop_front();
+        inventory_.unassign(i);
+        i->objset(nullptr);
+        Couple * C = static_cast<Couple*>(i);
+        uniReserves[C->prop->number()].push(C);
+    }
+    //infoReserves(std::clog);
 }
 
 //------------------------------------------------------------------------------
@@ -488,7 +538,6 @@ void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
 
 void CoupleSet::freeze()
 {
-    relax();
 #ifdef MORE_ROBUST_READING
     flag(aaList, 7);
     flag(faList, 7);
@@ -544,7 +593,7 @@ void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
 
 void CoupleSet::reheat()
 {
-    size_t sup = reserved();
+    size_t sup = all_reserved();
     size_t cnt[16] = { 0 };
     for ( int i = 0; i < 16; ++i ) cnt[i] = sup;
     reheat(cnt, 16);
@@ -581,22 +630,23 @@ void CoupleSet::writeFF(Outputter& out) const
 
 void CoupleSet::writeFF_skip(Outputter& out) const
 {
-    const size_t TOP = 16;
-    size_t cnt[TOP] = { 0 };
     out.write("\n#section couple FF");
     writeRecords(out, ffList.size(), inventory_.highest());
    
-    size_t sup = std::min(TOP, uniReserves.size());
+    // count all the elements that are not written:
+    const size_t UNI_MAX = 16;
+    size_t cnt[UNI_MAX] = { 0 };
+    size_t sup = std::min(UNI_MAX, uniReserves.size());
     for ( size_t i = 0; i < sup; ++i )
-        cnt[i] += uniReserves[i].size();
+        cnt[i] = uniReserves[i].property()->uni_counts;
 
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
-        if ( ! n->prop->fast_diffusion )
-            n->write(out);
-        else if ( i < TOP )
+        if ( i < UNI_MAX && n->prop->fast_diffusion )
             ++cnt[i];
+        else
+            n->write(out);
     }
     out.write("\n#section couple reheat");
     for ( size_t i = 0; i < sup; ++i )
@@ -760,18 +810,31 @@ int CoupleSet::bad() const
 //------------------------------------------------------------------------------
 #pragma mark - Fast Diffusion
 
-size_t CoupleSet::reserved() const
+size_t CoupleSet::all_reserved() const
 {
     size_t res = 0;
     for ( CoupleReserve const& can : uniReserves )
-        res += can.size();
+        res += can.reserved();
     return res;
+}
+
+
+void CoupleSet::infoReserves(std::ostream& os) const
+{
+    os << "  Couple:reserves";
+    for ( CoupleReserve const& can : uniReserves )
+    {
+        CoupleProp const* P = can.property();
+        if ( P )
+            os << " " << P->number() << ":" << can.reserved();
+    }
+    os << "\n";
 }
 
 
 void CoupleSet::uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const* cop)
 {
-    for ( size_t i = can.size(); i < cnt; ++i )
+    for ( size_t i = can.reserved(); i < cnt; ++i )
     {
         Couple* c = cop->newCouple();
         inventory_.assign(c);
@@ -788,7 +851,7 @@ void CoupleSet::uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const* cop)
 void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleReserve& can)
 {
     // crop list to match available number of candidates:
-    loc.shuffle_truncate(can.size());
+    loc.shuffle_truncate(can.reserved());
 
     for ( FiberSite & i : loc )
     {
@@ -811,7 +874,7 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleReserve& can)
 void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleReserve& can)
 {
     // crop list to match available number of candidates:
-    loc.shuffle_truncate(can.size());
+    loc.shuffle_truncate(can.reserved());
 
     for ( FiberSite & i : loc )
     {
@@ -834,7 +897,7 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleReserve& can)
  The Couples are distributed randomly on the crosspoints
  */
 void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
-                            CoupleReserve& can, size_t nb)
+                            CoupleReserve& can, size_t count)
 {
     const size_t nbc = loc1.size();
     assert_true(nbc == loc2.size());
@@ -842,7 +905,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
     if ( nbc < 1 )
         return;
     
-    const size_t sup = std::min(nb, can.size());
+    const size_t sup = std::min(count, can.reserved());
 
     for ( size_t n = 0; n < sup; ++n )
     {
@@ -910,10 +973,12 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
         
         // assuming (or not) a given number of diffusing molecules
         bool fixed = ( P->fast_reservoir > 0 );
-        size_t cnt = ( fixed ? P->fast_reservoir : can.size());
-
+        size_t cnt = ( fixed ? P->fast_reservoir : P->uni_counts );
+        std::clog << P->number() << ": " << P->uni_counts << " " << can.reserved() << "\n";
+        
         if ( cnt > 0 )
         {
+            size_t total = size();
             const real alpha = 2 * P->spaceVolume() / cnt;
             
             if ( P->fast_diffusion & 2 )
@@ -951,17 +1016,15 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
                 uniRefill(can, loc.size(), P);
             
             uniAttach2(loc, can);
+            P->uni_counts -= total - size();
         }
     }
 }
 
 
 /**
- 
+ Allocates a reserve list for each CoupleProp.
  Return true if at least one couple:fast_diffusion is true,
- and in this case allocate uniReserves.
- 
- The Volume of the Space is assumed to remain constant until the next uniPrepare() 
  */
 bool CoupleSet::uniPrepare(PropertyList const& properties)
 {
@@ -978,19 +1041,14 @@ bool CoupleSet::uniPrepare(PropertyList const& properties)
         res |= P->fast_diffusion;
     }
     
-    if ( res )
+    uniReserves.resize(last+1);
+    for ( CoupleReserve & can : uniReserves )
+        can.set_property(nullptr);
+    for ( Property const* i : allprop )
     {
-        uniReserves.resize(last+1);
-        for ( CoupleReserve & can : uniReserves )
-            can.property(nullptr);
-        for ( Property const* i : allprop )
-        {
-            CoupleProp const* P = static_cast<CoupleProp const*>(i);
-            if ( P->fast_diffusion )
-                uniReserves[P->number()].property(P);
-        }
+        CoupleProp const* P = static_cast<CoupleProp const*>(i);
+        uniReserves[P->number()].set_property(P);
     }
-    
     return res;
 }
 
@@ -1002,24 +1060,21 @@ void CoupleSet::uniRelax()
 {
     for ( CoupleReserve & can : uniReserves )
     {
-        Couple * o = can.head();
-        while ( o )
+        CoupleProp const* P = can.property();
+        if ( P )
         {
-            assert_true(!o->attached1() && !o->attached2());
-            can.pop();
-            o->randomizePosition();
-            linkFF(o);
-            o = can.head();
+            makeCouples(P, P->uni_counts);
+            P->uni_counts = 0;
         }
     }
 }
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Direct Attachment
+#pragma mark - Direct Equilibration of bound/unbound Couples
 
 
-void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleReserve& can)
+void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleReserve& can, size_t total)
 {
     Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
     CoupleProp const* cop = can.property();
@@ -1057,7 +1112,7 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleReserve& can)
     real AsF = ( ratio_fibs - ratio_cros ) * bind;
     real GsF = ratio_cros * bind;
     
-    real popF = can.size() / ( 1 + AsF + GsF + BsG * GsF );
+    real popF = total / ( 1 + AsF + GsF + BsG * GsF );
     real popA = AsF * popF;
     real popG = GsF * popF;
     real popB = BsG * popG;
@@ -1073,19 +1128,16 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleReserve& can)
     printf("     F %9.2f A %9.2f G %9.2f B %9.2f\n", popF, popA, popG, popB);
 #endif
     
-    if ( can.size() )
-    {
-        // distribute Couples at filament's crosspoints:
-        uniAttach12(loc1, loc2, can, RNG.poisson(popB));
-
-        real dis = 2 * total_length / ( popA + popG );
-
-        fibers.uniFiberSites(loc1, dis);
-        uniAttach1(loc1, can);
+    // distribute Couples at filament's crosspoints:
+    uniAttach12(loc1, loc2, can, RNG.poisson(popB));
     
-        fibers.uniFiberSites(loc2, dis);
-        uniAttach2(loc2, can);
-    }
+    real dis = 2 * total_length / ( popA + popG );
+    
+    fibers.uniFiberSites(loc1, dis);
+    uniAttach1(loc1, can);
+    
+    fibers.uniFiberSites(loc2, dis);
+    uniAttach2(loc2, can);
 }
 
 
@@ -1095,7 +1147,7 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleReserve& can)
  This assumes that the configuration of filaments does not change, and also that
  it is random, in particular without bundles. The motion of the motor is also ignored.
  */
-void CoupleSet::equilibrate(FiberSet const& fibers, CoupleReserve& can)
+void CoupleSet::equilibrate(FiberSet const& fibers, CoupleReserve& can, size_t total)
 {
     Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
     CoupleProp const* cop = can.property();
@@ -1139,7 +1191,7 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleReserve& can)
     // the two should be equal
     real BsF = 0.5 * ( BsG1 * G1sF + BsG2 * G2sF );
 
-    real popF = can.size() / ( 1.0 + A1sF + A2sF + G1sF + G2sF + BsF );
+    real popF = total / ( 1.0 + A1sF + A2sF + G1sF + G2sF + BsF );
     real popA1 = A1sF * popF;
     real popA2 = A2sF * popF;
     real popG1 = G1sF * popF;
@@ -1157,19 +1209,16 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleReserve& can)
     printf("     F %9.2f A %9.2f G %9.2f B %9.2f\n", popF, popA1+popA2, popG1+popG2, popB);
 #endif
     
-    if ( can.size() )
-    {
-        // distribute Couples at filament's crosspoints:
-        uniAttach12(loc1, loc2, can, RNG.poisson(popB));
-
-        const real dis1 = total_length / ( popA1 + popG1 );
-        fibers.uniFiberSites(loc1, dis1);
-        uniAttach1(loc1, can);
-
-        const real dis2 = total_length / ( popA2 + popG2 );
-        fibers.uniFiberSites(loc2, dis2);
-        uniAttach2(loc2, can);
-    }
+    // distribute Couples at filament's crosspoints:
+    uniAttach12(loc1, loc2, can, RNG.poisson(popB));
+    
+    const real dis1 = total_length / ( popA1 + popG1 );
+    fibers.uniFiberSites(loc1, dis1);
+    uniAttach1(loc1, can);
+    
+    const real dis2 = total_length / ( popA2 + popG2 );
+    fibers.uniFiberSites(loc2, dis2);
+    uniAttach2(loc2, can);
 }
 
 /**
@@ -1198,9 +1247,9 @@ void CoupleSet::equilibrate(FiberSet const& fibers, PropertyList const& properti
                 }
                 C = nxt;
             }
-            if ( can.size() > 0 )
+            if ( can.head() )
             {
-                equilibrate(fibers, can);
+                equilibrate(fibers, can, can.reserved());
                 
                 // release all collected Couple
                 C = can.head();
@@ -1246,7 +1295,7 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleReserve& can, 
     
     Cytosim::log << "Connect on " << loc1.size() << " intersections within range " << range << "\n";
     
-    uniAttach12(loc1, loc2, can, can.size());
+    uniAttach12(loc1, loc2, can, can.reserved());
 }
 
 

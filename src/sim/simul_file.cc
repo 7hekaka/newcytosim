@@ -386,8 +386,8 @@ public:
         //sim->events.defrost();
         sim->organizers.defrost();
         sim->tubules.defrost();
-        sim->couples.defrost();
-        sim->singles.defrost();
+        sim->couples.defrostSave();
+        sim->singles.defrostSave();
         sim->beads.defrostMore();
         sim->solids.defrostMore();
         sim->spheres.defrost();
@@ -456,6 +456,8 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
 {
     in.lock();
     InportLock lock(this);
+    couples.uniPrepare(properties);
+    singles.uniPrepare(properties);
     try
     {
         int res = readObjects(in, subset);

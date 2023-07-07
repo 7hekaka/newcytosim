@@ -25,14 +25,6 @@ Couple * CoupleProp::newCouple() const
     return new Couple(this);
 }
 
-
-Couple * CoupleProp::newCouple(Vector const& pos) const
-{
-    Couple * C = newCouple();
-    C->setPosition(pos);
-    return C;
-}
-
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -56,6 +48,7 @@ void CoupleProp::clear()
     //confine_stiff = 0;
     confine_label = "first";
     confine_space = nullptr;
+    uni_counts = 0;
 }
 
 
