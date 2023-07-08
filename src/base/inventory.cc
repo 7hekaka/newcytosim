@@ -65,11 +65,12 @@ void Inventory::clear()
  */
 void Inventory::assign(Inventoried * obj)
 {
-    ObjectID& n = obj->identity();
+    ObjectID n = obj->identity();
     
     if ( n <= 0 )
     {
         n = ++highest_;
+        obj->setIdentity(n);
         //std::clog << "Inventory::assign(" << obj << " <- " << n << ")\n";
     }
     else
@@ -77,7 +78,6 @@ void Inventory::assign(Inventoried * obj)
         // already allocated and registered
         if ( n < alloca_ && record_[n] == obj )
             return;
-
         highest_ = std::max(highest_, n);
     }
     

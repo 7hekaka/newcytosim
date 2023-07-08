@@ -191,7 +191,7 @@ public:
     void makeSingles(size_t cnt[], size_t n_cnt);
     
     /// move Singles into reserve lists, instead of deleting them
-    void defrostSave();
+    void defrostStore();
 
     /// unlink all objects before import
     void freeze();

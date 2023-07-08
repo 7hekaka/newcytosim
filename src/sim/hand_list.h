@@ -62,7 +62,7 @@ public:
     size_t countInRange(real abs_min, real abs_max) const;
     
     /// check data integrity
-    int bad() const;
+    int bad(Fiber const*) const;
 };
 
 

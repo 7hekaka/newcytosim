@@ -557,9 +557,11 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
          objects are created/destroyed since the identity numbers are recycled */
         if ( obj->property()->number() != pid )
         {
+#if 0
             Property const* P = obj->property();
-            //std::clog << "Remark: erasing " << P->category() << P->number() << " `" << P->name();
-            //std::clog << "' to load object with property #" << pid << '\n';
+            std::clog << "Remark: transmuting " << P->category() << P->number() << " `" << P->name();
+            std::clog << "' to load object with property #" << pid << '\n';
+#endif
             // the orphan Object remains on the 'ice_' to be deleted during pruning:
             inventory_.unassign(obj);
             obj->setIdentity(0);
@@ -573,7 +575,10 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
                 ice_.pop(obj);
             }
 #else
-        ice_.pop(obj);
+        if ( obj->objset() )
+            ice_.pop(obj);
+        else
+            obj->objset(this);
 #endif
     }
     
@@ -582,11 +587,12 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
         assert_true(update);
         assert_true(isprint(tag));
         //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
-        // create new object of required class, indentified by property-id
+        // create new object of required class, identified by property-id
         obj = newObject(tag, pid);
         assert_true(obj);
-        obj->setIdentity(id);
         obj->objset(this);
+        obj->setIdentity(id);
+        //inventory_.get(id);
         inventory_.assign(obj);
     }
     assert_true( obj->identity() == id );

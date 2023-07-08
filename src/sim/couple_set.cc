@@ -61,6 +61,8 @@ void CoupleSet::uniStepCollect(Couple * obj)
         if ( P->fast_diffusion )
         {
             ffList.pop(obj);
+            obj->objset(nullptr);
+            inventory_.unassign(obj);
             P->reserves.push(obj);
             ++P->uni_counts;
         }
@@ -121,7 +123,15 @@ void CoupleSet::step()
         // this loop is unrolled, processing objects 2 by 2:
         step_couples<&Couple::stepFF>(ffHead, ffOdd);
     }
-
+    
+#if 1
+    ObjectID h = inventory_.highest();
+    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
+    {
+        inventory_.reassign();
+        Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+    }
+#endif
     //printf("  : %lu couples [ %u %u ]\n", size(), inventory_.lowest(), inventory_.highest());
 }
 
@@ -244,14 +254,6 @@ Couple * CoupleSet::makeCouple(CoupleProp const* P)
         P->reserves.pop();
         return C;
     }
-#if 1
-    ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
-    {
-        inventory_.reassign();
-        //Cytosim::log << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
-    }
-#endif
     return P->newCouple();
 }
 
@@ -516,15 +518,17 @@ void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
 }
 
 
-void CoupleSet::defrostSave()
+void CoupleSet::defrostStore()
 {
     Object * i;
     while (( i = ice_.front() ))
     {
         ice_.pop_front();
-        inventory_.unassign(i);
         i->objset(nullptr);
+        inventory_.unassign(i);
         Couple * C = static_cast<Couple*>(i);
+        C->hand1()->detachHand();
+        C->hand2()->detachHand();
         C->prop->reserves.push(C);
     }
     //infoReserves(std::clog);
@@ -557,26 +561,26 @@ void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
     Object * i = ice_.front();
     while ( i )
     {
-        Couple* o = static_cast<Couple*>(i);
+        Couple* C = static_cast<Couple*>(i);
         i = i->next();
-        if ( o->prop->fast_diffusion )
+        if ( C->prop->fast_diffusion )
         {
-            ice_.pop(o);
+            ice_.pop(C);
             // we want to skip the 'beforeDetachment' here:
-            o->hand1()->detachHand();
-            o->hand2()->detachHand();
-            PropertyID id = o->prop->number();
+            C->hand1()->detachHand();
+            C->hand2()->detachHand();
+            PropertyID id = C->prop->number();
             if ( id < n_cnt && 0 < cnt[id] )
             {
                 --cnt[id];
-                o->randomizePosition();
-                linkFF(o);
+                C->randomizePosition();
+                linkFF(C);
             }
             else
             {
-                inventory_.unassign(o);
-                o->objset(nullptr);
-                delete(o);
+                C->objset(nullptr);
+                inventory_.unassign(C);
+                C->prop->reserves.push(C);
             }
         }
     }
@@ -1035,6 +1039,7 @@ void CoupleSet::uniPrepare(PropertyList const& properties)
     for ( Property const* i : simul_.properties.find_all("couple") )
     {
         CoupleProp const * P = static_cast<CoupleProp const*>(i);
+        //assert_true( P->reserves.size() == P->reserves.recount() );
         if ( P->fast_diffusion )
             uniCouples.push_back(P);
     }

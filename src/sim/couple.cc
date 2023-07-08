@@ -429,6 +429,7 @@ void Couple::beforeDetachment(Hand const* h)
         }
         else
         {
+            assert_true( h == cHand2 );
             // cHand2 will detach
             set->relinkD2(this);
             if ( cHand1->unattached() )

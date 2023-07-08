@@ -3,6 +3,7 @@
 #include "single_prop.h"
 #include "glossary.h"
 #include "iowrapper.h"
+#include "messages.h"
 
 #include "simul.h"
 #include "simul_prop.h"
@@ -59,6 +60,8 @@ void SingleSet::uniStepCollect(Single * obj)
         if ( P->fast_diffusion && !obj->base() )
         {
             fList.pop(obj);
+            obj->objset(nullptr);
+            inventory_.unassign(obj);
             P->reserves.push(obj);
             ++P->uni_counts;
         }
@@ -98,6 +101,14 @@ void SingleSet::step()
     {
         step_singles<&Single::stepF>(fHead, fOdd);
     }
+#if 1
+    ObjectID h = inventory_.highest();
+    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
+    {
+        inventory_.reassign();
+        Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+    }
+#endif
 }
 
 
@@ -139,14 +150,6 @@ Single * SingleSet::makeSingle(SingleProp const* P)
         P->reserves.pop();
         return S;
     }
-#if 1
-    ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
-    {
-        inventory_.reassign();
-        //Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
-    }
-#endif
     return P->newSingle();
 }
 
@@ -382,15 +385,16 @@ void SingleSet::makeSingles(size_t cnt[], size_t n_cnt)
 }
 
 
-void SingleSet::defrostSave()
+void SingleSet::defrostStore()
 {
     Object * i;
     while (( i = ice_.front() ))
     {
         ice_.pop_front();
-        inventory_.unassign(i);
-        i->objset(nullptr);
         Single * S = static_cast<Single*>(i);
+        S->objset(nullptr);
+        inventory_.unassign(S);
+        S->hand()->detachHand();
         S->prop->reserves.push(S);
     }
     //infoReserves(std::clog);
@@ -419,25 +423,25 @@ void SingleSet::reheat(size_t cnt[], size_t n_cnt)
     Object * i = ice_.front();
     while ( i )
     {
-        Single* o = static_cast<Single*>(i);
+        Single* S = static_cast<Single*>(i);
         i = i->next();
-        if ( o->prop->fast_diffusion )
+        if ( S->prop->fast_diffusion )
         {
-            ice_.pop(o);
+            ice_.pop(S);
             // we want to skip the 'beforeDetachment' here:
-            o->hand()->detachHand();
-            PropertyID id = o->prop->number();
+            S->hand()->detachHand();
+            PropertyID id = S->prop->number();
             if ( id < n_cnt && 0 < cnt[id] )
             {
                 --cnt[id];
-                o->randomizePosition();
-                linkF(o);
+                S->randomizePosition();
+                linkF(S);
             }
             else
             {
-                inventory_.unassign(o);
-                o->objset(nullptr);
-                delete(o);
+                S->objset(nullptr);
+                inventory_.unassign(S);
+                S->prop->reserves.push(S);
             }
         }
     }

@@ -62,14 +62,13 @@ void HandList::updateAll() const
 
 void HandList::detachAll()
 {
-    assert_false(bad());
     // we must iterate one step ahead, because detach() will unlink
     Hand * h = haFront;
     while ( h )
     {
         Hand * n = h->next();
         // need to update since upon detachment Hands will need their position:
-        h->reinterpolate();
+        //h->reinterpolate();
         // no need to update Lattice here:
         h->Hand::detach();
         h = n;
@@ -161,13 +160,15 @@ size_t HandList::countInRange(real i, real s) const
 /**
  This traverses the entire list, checking every link
  */
-int HandList::bad() const
+int HandList::bad(Fiber const* fib) const
 {
     int res = 0;
     Hand * h = haFront;
     Hand * p = nullptr;
     while ( h )
     {
+        if ( h->fiber() != fib )
+            return 7;
         res |= ( h->prev() != p );
         p = h;
         h = h->next();

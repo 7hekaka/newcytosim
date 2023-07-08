@@ -30,18 +30,20 @@ public:
     OBJECT * head() const { return head_; }
     
     /// add object
-    void push(OBJECT* arg)
+    void push(OBJECT * obj)
     {
-        arg->Object::next(head_);
-        head_ = arg;
+        assert_true( obj->objset() == nullptr );
+        obj->Object::next(head_);
+        head_ = obj;
         ++count_;
     }
     
     /// remove first object in list
     void pop()
     {
-        head_ = head_->next();
         --count_;
+        head_ = head_->next();
+        assert_true( count_ > 0 || head_ == nullptr );
     }
     
     /// delete all objects
@@ -51,10 +53,21 @@ public:
         while ( obj )
         {
             pop();
-            obj->objset(nullptr);
             delete(obj);
             obj = head();
         }
+    }
+    
+    size_t recount() const
+    {
+        size_t res = 0;
+        OBJECT * obj = head_;
+        while ( obj )
+        {
+            ++res;
+            obj = obj->next();
+        }
+        return res;
     }
 };
 

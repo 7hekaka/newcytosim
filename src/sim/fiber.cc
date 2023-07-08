@@ -270,6 +270,7 @@ Vector Fiber::displayPosM(real ab) const
 
 Fiber::~Fiber()
 {
+    assert_false(fHands.bad(this));
     //std::clog << reference() << " deleted\n";
     fHands.detachAll();
     
