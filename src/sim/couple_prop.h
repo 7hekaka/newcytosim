@@ -5,10 +5,14 @@
 #include "real.h"
 #include "property.h"
 #include "hand_prop.h"
-#include "vector.h"
+#include "reserve_list.h"
 
 class Couple;
 class Space;
+
+/// to hold unused Couples
+typedef ReserveList<Couple> CoupleReserve;
+
 
 /// Property for Couple
 /**
@@ -175,13 +179,16 @@ public:
     /// counter for fast diffusion algorithm
     mutable size_t uni_counts;
 
+    /// a list to hold Couple made with this Property
+    mutable CoupleReserve reserves;
+
 protected:
     
     /// magnitude of diffusion:
     real diffusion_dt;
     /// pointer to actual confinement Space, derived from `confine_label`
     Space const* confine_space;
-
+    
 public:
     
     /// constructor
@@ -189,7 +196,7 @@ public:
     
     /// destructor
     ~CoupleProp() { }
-    
+
     /// create a Couple having this property
     virtual Couple * newCouple() const;
 

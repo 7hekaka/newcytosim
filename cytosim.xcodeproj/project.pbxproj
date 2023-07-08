@@ -104,6 +104,8 @@
 		BB0A754F282650E00062EDC5 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB0A7550282650E00062EDC5 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB0A7551282650E00062EDC5 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
+		BB0BD2DD2A58BE0300FC76A9 /* reserve_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0BD2DC2A58BE0300FC76A9 /* reserve_list.h */; };
+		BB0BD2DE2A58BE0300FC76A9 /* reserve_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0BD2DC2A58BE0300FC76A9 /* reserve_list.h */; };
 		BB0CB11B20C170C10016D73D /* qmr.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0CB11A20C170C10016D73D /* qmr.h */; };
 		BB0DF4810D93F11F006CB71A /* lattice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1749A407D798E600BC7BDC /* lattice.cc */; };
 		BB0E4BD81002698100A96B34 /* random_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0E4BD61002698100A96B34 /* random_vector.h */; };
@@ -1703,6 +1705,7 @@
 		BB089A092228A26D00C070E7 /* matrix33.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = matrix33.cc; sourceTree = "<group>"; };
 		BB0A7556282650E00062EDC5 /* mechoui */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = mechoui; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB0AB41E201BBA41004739CE /* doc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = doc; sourceTree = "<group>"; };
+		BB0BD2DC2A58BE0300FC76A9 /* reserve_list.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = reserve_list.h; sourceTree = "<group>"; };
 		BB0C409E069A043600CF45A8 /* sparmatsym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym.cc; path = src/math/sparmatsym.cc; sourceTree = SOURCE_ROOT; };
 		BB0C409F069A043600CF45A8 /* sparmatsym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym.h; path = src/math/sparmatsym.h; sourceTree = SOURCE_ROOT; };
 		BB0CB11A20C170C10016D73D /* qmr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qmr.h; path = src/math/qmr.h; sourceTree = SOURCE_ROOT; };
@@ -2954,6 +2957,7 @@
 		BB614D9A05BE8F150048FA70 /* Singles */ = {
 			isa = PBXGroup;
 			children = (
+				BB0BD2DC2A58BE0300FC76A9 /* reserve_list.h */,
 				BB669ACA0FE2E9FA00E5AC10 /* single.h */,
 				BB669AC90FE2E9FA00E5AC10 /* single.cc */,
 				BB669AC80FE2E9FA00E5AC10 /* single_set.h */,
@@ -4105,6 +4109,7 @@
 				BB3FF4D02644902200969E5E /* space.h in Headers */,
 				BBD6F5C212D9D16400A5F99B /* bundle_prop.h in Headers */,
 				BBD6F5C412D9D16400A5F99B /* bundle.h in Headers */,
+				BB0BD2DD2A58BE0300FC76A9 /* reserve_list.h in Headers */,
 				BBD6F5CA12D9D17A00A5F99B /* aster_prop.h in Headers */,
 				BBD6F5CC12D9D17A00A5F99B /* aster.h in Headers */,
 				BBD6F5D212D9D18D00A5F99B /* nucleus_prop.h in Headers */,
@@ -4264,6 +4269,7 @@
 				BB692178233D359F00F528D2 /* bundle_prop.h in Headers */,
 				BB692179233D359F00F528D2 /* bundle.h in Headers */,
 				BB69217A233D359F00F528D2 /* aster_prop.h in Headers */,
+				BB0BD2DE2A58BE0300FC76A9 /* reserve_list.h in Headers */,
 				BB69217B233D359F00F528D2 /* aster.h in Headers */,
 				BB69217C233D359F00F528D2 /* nucleus_prop.h in Headers */,
 				BB69217D233D359F00F528D2 /* nucleus.h in Headers */,

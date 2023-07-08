@@ -12,61 +12,7 @@
 class PropertyList;
 
 
-/// holds a list of Couple of the same type
-/**
- This list is build using 'Object::next()' and thus can only hold
- objects that are not linked in CoupleSet already (see below).
- It is a single-linked list and addition/removal is made on the same end.
- CoupleReserve is used for the 'fast_diffusion' algorithm.
- */
-class CoupleReserve
-{
-    /// All Couple in the list should be of the same type
-    CoupleProp const* property_;
-    /// Pointer to first member in list
-    Couple * head_;
-    /// Number of elements in list
-    size_t count_;
-
-public:
-    
-    /// constructor
-    CoupleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
-    
-    /// number of objects stored
-    size_t reserved() const { return count_; }
-    
-    /// return property
-    CoupleProp const* property() const { return property_; }
-    
-    /// set Property
-    void set_property(CoupleProp const* p) { property_ = p; }
-    
-    /// first object
-    Couple * head() const { return head_; }
-    
-    /// add object
-    void push(Couple* arg) { arg->Object::next(head_); head_ = arg; ++count_; }
-    
-    /// remove first object in list
-    void pop() { head_ = head_->next(); --count_; }
-    
-    /// delete all objects
-    void erase()
-    {
-        Couple * obj = head_;
-        while ( obj )
-        {
-            pop();
-            obj->objset(nullptr);
-            delete(obj);
-            obj = head();
-        }
-    }
-};
-
-
-/// Set for Couple
+/// Set holding objects of class Couple
 /**
  A Couple is stored in one of 4 ObjectPool, depending on its state:
  - ffList = hand1 and hand2 unattached,
@@ -106,21 +52,12 @@ private:
             if ( attached2 ) return faList; else return ffList;
         }
     }
-
-    /// an array of Reserve Couple
-    typedef std::vector<CoupleReserve> CoupleReserveList;
-    
-    /// uniReserves[p] holds Couples with ( property()->number() == p )
-    CoupleReserveList uniReserves;
-    
-    /// flag to enable `fast_diffusion` attachment algorithm
-    bool uniEnabled;
     
     /// gather all Couple with `fast_diffusion` in reserve lists
     void uniStepCollect(Couple*);
 
     /// ensures that `can` holds `cnt` Couple, creating them of specified CoupleProp
-    void uniRefill(CoupleReserve& can, size_t cnt, CoupleProp const*);
+    void uniRefill(CoupleProp const*, size_t cnt);
 
     /// attach Hand1 of Couple from `can` on locations specified in `loc`
     void uniAttach1(Array<FiberSite>& loc, CoupleReserve& can);
@@ -136,29 +73,29 @@ private:
 
     /// release Couples from reserve lists
     void uniRelax();
+    
+    /// list of Properties for which `fast_diffusion == true`
+    std::vector<CoupleProp const*> uniCouples;
 
 public:
+
+    /// initialize `fast_diffusion` attachment algorithm
+    void uniPrepare(PropertyList const& properties);
     
+    /// total count in reserves
+    size_t all_reserved() const;
+
+    /// print number of elements in each reserve bin
+    void infoReserves(std::ostream& os) const;
+
     /// return a Couple from the reserve, or made by newCouple()
     Couple * makeCouple(CoupleProp const*);
     
     /// return a Couple from the reserve, or made by newCouple()
     Couple * addCouple(CoupleProp const*, Vector const&);
 
-    /// initialize `fast_diffusion` attachment algorithm
-    bool uniPrepare(PropertyList const& properties);
-
-    /// total count in reserves
-    size_t all_reserved() const;
-    
-    /// total count in reserves
-    size_t reserved(size_t i) const { return uniReserves[i].reserved(); }
-
-    /// print number of elements in each reserve bin
-    void infoReserves(std::ostream& os) const;
-
-    ///creator
-    CoupleSet(Simul& s) : ObjectSet(s), uniEnabled(0) {}
+    /// constructor
+    CoupleSet(Simul& s) : ObjectSet(s) {}
     
     //--------------------------
     
@@ -289,13 +226,13 @@ public:
     //--------------------------
 
     /// distribute the Couple on the fibers to approximate an equilibrated state
-    void equilibrateSym(FiberSet const&, CoupleReserve&, size_t);
+    void equilibrateSym(FiberSet const&, CoupleProp const*, size_t);
 
     /// distribute Couples of given class on the fibers to approximate an equilibrated state
-    void equilibrate(FiberSet const&, CoupleReserve&, size_t);
+    void equilibrate(FiberSet const&, CoupleProp const*, CoupleReserve&, size_t);
     
     /// distribute all Couple on the fibers to approximate an equilibrated state
-    void equilibrate(FiberSet const&, PropertyList const&);
+    void equilibrate(FiberSet const&, CoupleProp const*);
     
     /// distribute all Couple on the fibers to approximate an equilibrated state
     void equilibrate();
