@@ -6,10 +6,11 @@
 
 set simul system
 {
-    viscosity = 0.1
-    time_step = 0.005
+    viscosity = 1
+    time_step = 0.002
     steric = 1, 1111, 222
     verbose = 0
+    kT = 0.0041
 }
 
 set system display
@@ -47,12 +48,12 @@ set fiber microtubule
     
     activity = dynamic
     min_length = 0.024
-    growing_speed = 0.21
+    growing_speed = 0.210
     shrinking_speed = -0.42, -0.04
     hydrolysis_rate = 1.0
     growing_force = 5
     total_polymer = 4000
-    display = ( color=0xFFFFFF88; line_width=2.5; style=2; coloring=2; )
+    display = ( color=0xFFFFFF88; line_width=2.5; style=2; coloring=2; plus_end=7, 7; )
 }
 
 % ---------------------- AMPLIFICATION ------------------------
@@ -167,7 +168,7 @@ set solid kinetochore
     twin_stiffness = 100, 10
     twin_metastiff = 0
     twin_separation = 0.5
-    display = ( coloring=1; color=0x00FFFF44; size=2; style=5; )
+    display = ( coloring=1; color=0x00FFFFFF; size=2; style=5; )
 }
 
 % ---------------------- CUTTING ------------------------
@@ -192,9 +193,9 @@ new 0 augmin
 new 0 katanin
 
 
-new kinetochore
+new 1 kinetochore
 {
-    sphere1 = 0 0 0, 0.100, corona -0.8 -0.5 -0.5, corona -0.5 -0.8 -0.5, corona -0.5 -0.5 -0.8
+    sphere1 = 0 0 0, 0.100, corona -0.84 -0.4 -0.4, corona -0.4 -0.84 -0.4, corona -0.4 -0.4 -0.84
     position = 0 0 0
     direction = 1 0 0
     twin = mirror
