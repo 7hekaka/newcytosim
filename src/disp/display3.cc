@@ -687,15 +687,17 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
 
 /**
  Display the minus end of a Fiber, according to `style`:
- - 1: draw a sphere
- - 2: draw a cone
- - 3: draw a flat cylinder
- - 4: draw an arrow-head
+ - 1: sphere
+ - 2: cone
+ - 3: flat cylinder
+ - 4: arrow-head
  - 5: arrow-head in reverse direction
+ - 6: cube
+ - 7: cylinder placed backward so as to overlap with the fiber
  .
  with 3D objects
  */
-void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
+void Display3::drawFiberEndMinus(Fiber const& fib, int style, float size) const
 {
     const float rad = pixscale(size);
     if ( rad > pixelSize ) switch(style)
@@ -703,26 +705,28 @@ void Display3::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
         default: break;
         case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
         case 2: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::longCone); break;
-        case 3: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cylinderT); break;
+        case 3: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cylinderC); break;
         case 4: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::arrowTail); break;
         case 5: drawObject(fib.posEndM(), fib.dirEndM(), rad, gle::arrowTail); break;
         case 6: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cube); break;
-        case 7: drawObject(fib.posEndM(), fib.dirEndM(), rad, gle::cylinderT); break;
+        case 7: drawObject(fib.posEndM(), fib.dirEndM(), rad, gle::cylinder1); break;
     }
 }
 
 
 /**
  Display the plus end of a Fiber, according to `style`:
- - 1: draw a sphere
- - 2: draw a cone
- - 3: draw a flat cylinder
- - 4: draw an arrow-head
+ - 1: sphere
+ - 2: cone
+ - 3: flat cylinder
+ - 4: arrow-head
  - 5: arrow-head in reverse direction
+ - 6: cube
+ - 7: cylinder placed backward so as to overlap with the fiber
  .
  with 3D objects
  */
-void Display3::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
+void Display3::drawFiberEndPlus(Fiber const& fib, int style, float size) const
 {
     const float rad = pixscale(size);
     if ( rad > pixelSize ) switch(style)
@@ -730,11 +734,11 @@ void Display3::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
         default: break;
         case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
         case 2: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::longCone); break;
-        case 3: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cylinderT); break;
+        case 3: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cylinderC); break;
         case 4: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::arrowTail); break;
         case 5: drawObject(fib.posEndP(),-fib.dirEndP(), rad, gle::arrowTail); break;
         case 6: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cube); break;
-        case 7: drawObject(fib.posEndP(),-fib.dirEndP(), rad, gle::cylinderT); break;
+        case 7: drawObject(fib.posEndP(),-fib.dirEndP(), rad, gle::cylinder1); break;
     }
 }
 

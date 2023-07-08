@@ -174,8 +174,12 @@ namespace gle
     void halfTube2();
     /// draw a rough tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube4();
+    /// draw a tube along Z, of diameter 1 with Z=[-0.5, 0.5], closed at Z=0
+    void closedTubeC();
+    /// draw a tube along Z, of diameter 1 with Z=[-256, 0], closed at Z=0
+    void closedTube2();
     /// draw a rough tube along Z, of diameter 1 with Z=[-256, 0], closed at Z=0
-    void endedTube4();
+    void closedLongTube4();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void hexTube();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
@@ -196,10 +200,11 @@ namespace gle
     /// display an open cone directed along Z, of radius 1 at Z=0
     void truncatedCone();
 
-    /// display a cylinder of axis Z, radius 1 in Z=[0, 1]
-    inline void cylinder1() { tube2(); discBottom2(); discTop2(); }
-    /// display a cylinder of axis Z, radius 1 in Z=[-0.5, 0.5]
-    void cylinderT();
+    /// display a cylinder of axis Z, radius 1 covering Z=[0, 1]
+    inline void cylinder1() { closedTube2(); discTop2(); }
+    /// display a cylinder of axis Z, radius 1 covering Z=[-0.5, 0.5]
+    inline void cylinderC() { closedTubeC(); discTop2(); }
+    
     /// draw a 3-portion cylinder with a larger central section
     void barrel();
     /// draw a 3-portion cylinder with a larger central section
@@ -271,7 +276,7 @@ namespace gle
     inline void capedTube() { halfTube4(); dome(); }
     //inline void capedTube() { halfTube2(); discBottom2(); }
     /// primitive used to draw the plus ends of fibers
-    inline void endedTube() { endedTube4(); }
+    inline void endedTube() { closedLongTube4(); }
     //inline void endedTube() { halfTube4(); discBottom2(); }
 
     //------------------------------------------------------------------------------

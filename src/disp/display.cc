@@ -799,14 +799,16 @@ void Display::drawMisc(Simul const& sim)
 
 /**
  Display the minus end of a Fiber, according to `style`:
- - 1: draw a sphere
- - 2: draw a cone
- - 3: draw a flat cylinder
- - 4: draw an arrow-head
+ - 1: sphere
+ - 2: cone
+ - 3: flat cylinder
+ - 4: arrow-head
  - 5: arrow-head in reverse direction
+ - 6: cube
+ - 7: cylinder placed backward so as to overlap with the fiber
  .
  */
-void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
+void Display::drawFiberEndMinus(Fiber const& fib, int style, float size) const
 {
     const float rad = pixscale(size);
     if ( rad > pixelSize ) switch(style)
@@ -825,14 +827,16 @@ void Display::drawFiberMinusEnd(Fiber const& fib, int style, float size) const
 
 /**
  Display the plus end of a Fiber, according to `style`:
- - 1: draw a sphere
- - 2: draw a cone
- - 3: draw a flat cylinder
- - 4: draw an arrow-head
+ - 1: sphere
+ - 2: cone
+ - 3: flat cylinder
+ - 4: arrow-head
  - 5: arrow-head in reverse direction
+ - 6: cube
+ - 7: cylinder placed backward so as to overlap with the fiber
  .
  */
-void Display::drawFiberPlusEnd(Fiber const& fib, int style, float size) const
+void Display::drawFiberEndPlus(Fiber const& fib, int style, float size) const
 {
     gym::ref_view();
     const float rad = pixscale(size);
@@ -1957,7 +1961,7 @@ void Display::drawFiber(Fiber const& fib)
             gym::color_load(fib.disp->end_color[1]);
             //gym::color_load(fib.disp->color);
             gym::color_back(disp->back_color);
-            drawFiberMinusEnd(fib, disp->end_style[1], disp->end_size[1]);
+            drawFiberEndMinus(fib, disp->end_style[1], disp->end_size[1]);
         }
         
         if ( disp->end_style[0] )
@@ -1965,7 +1969,7 @@ void Display::drawFiber(Fiber const& fib)
             gym::color_load(fib.disp->end_color[0]);
             //gym::color_load(fib.disp->color);
             gym::color_back(disp->back_color);
-            drawFiberPlusEnd(fib, disp->end_style[0], disp->end_size[0]);
+            drawFiberEndPlus(fib, disp->end_style[0], disp->end_size[0]);
         }
         
         if ( disp->force_style )

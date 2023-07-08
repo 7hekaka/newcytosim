@@ -200,10 +200,10 @@ public:
     void drawFiberBackbone(Fiber const&) const;
 
     /// draw Fiber minus end
-    virtual void drawFiberMinusEnd(Fiber const&, int style, float size) const;
+    virtual void drawFiberEndMinus(Fiber const&, int style, float size) const;
     
     /// draw Fiber plus end
-    virtual void drawFiberPlusEnd(Fiber const&, int style, float size) const;
+    virtual void drawFiberEndPlus(Fiber const&, int style, float size) const;
     
     /// draw Fiber plus end
     void drawFiberGrowth(Fiber const&, float size) const;
