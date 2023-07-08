@@ -83,14 +83,6 @@ void CoupleSet::uniStepCollect(Couple * obj)
  */
 void CoupleSet::step()
 {
-#if 1
-    ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
-    {
-        inventory_.reassign();
-        //Cytosim::log << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
-    }
-#endif
     /*
     Cytosim::log("CoupleSet::step : FF %5i AF %5i FA %5i AA %5i\n",
                  ffList.size(), afList.size(), faList.size(), aaList.size());
@@ -243,22 +235,29 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
+/// pick from reserves if possible:
 Couple * CoupleSet::makeCouple(CoupleProp const* P)
 {
-    // pick from reserves if possible:
     Couple * C = P->reserves.head();
     if ( C )
     {
         P->reserves.pop();
         return C;
     }
+#if 1
+    ObjectID h = inventory_.highest();
+    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
+    {
+        inventory_.reassign();
+        //Cytosim::log << "Couple::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+    }
+#endif
     return P->newCouple();
 }
 
 
 Couple * CoupleSet::addCouple(CoupleProp const* P, Vector const& pos)
 {
-    // pick from reserves if possible:
     Couple * C = makeCouple(P);
     C->setPosition(pos);
     add(C);

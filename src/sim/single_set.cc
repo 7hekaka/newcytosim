@@ -81,14 +81,6 @@ was first before any transfer could occur, we process each Couple only once.
 */
 void SingleSet::step()
 {
-#if 1
-    ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
-    {
-        inventory_.reassign();
-        //Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
-    }
-#endif
     //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
     
     Single *const fHead = firstF();
@@ -147,6 +139,14 @@ Single * SingleSet::makeSingle(SingleProp const* P)
         P->reserves.pop();
         return S;
     }
+#if 1
+    ObjectID h = inventory_.highest();
+    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
+    {
+        inventory_.reassign();
+        //Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+    }
+#endif
     return P->newSingle();
 }
 
