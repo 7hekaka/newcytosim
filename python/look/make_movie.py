@@ -2,7 +2,7 @@
 #
 # make_movie.py creates MPEG4 movies for cytosim
 #
-# Copyright F. Nedelec, 2007 - 2022
+# Copyright F. J. Nedelec, 2007 - 2023
 #
 # To make MP4 Quicktime movies, you need to install ffmpeg:
 # http://www.ffmpeg.org
@@ -145,7 +145,7 @@ def getImages(path, format):
         images = sorted(glob.glob('m*[0-9].'+format))
         if not images:
             images = sorted(glob.glob('i*[0-9].'+format))
-        err.write(prefix+" using %i images found in `%s'\n" % (len(images), path))
+        err.write(prefix+"using %i images found inside `%s'\n" % (len(images), path))
     if not images:
         raise IOError("could not produce images!")
     return copyFiles(images, tmp_dir)
@@ -197,14 +197,14 @@ def makeMovie(path, filename):
 
 #-------------------------------------------------------------------------------
 
-def process(cwd, filenames):
+def process(path, filenames):
     """
-        make movie in cirremt working directory (`cwd`)
+        assemble movie in given directory (`path`)
     """
     global tmp_dir, cleanup
     res = 'movie.mp4'
     if ( res in filenames ) and lazy:
-        err.write(prefix+"bailing out: `%s/%s' already exists!\n" % (cwd, res))
+        err.write(prefix+"bailing out: `%s/%s' already exists!\n" % (path, res))
         return ''
     err.write("\n")
     try:
@@ -214,7 +214,7 @@ def process(cwd, filenames):
     except Exception as e:
         err.write(prefix+"could not make temporary directory %s\n" % repr(e))
     try:
-        makeMovie(cwd, res)
+        makeMovie(path, res)
     except Exception as e:
         err.write(prefix+" %s\n" % str(e))
         return ''
@@ -226,14 +226,14 @@ def process(cwd, filenames):
     return res
 
 
-def process_dir(dirpath):
+def process_dir(path):
     """call process() with appropriate arguments"""
     files = []
     with os.scandir() as it:
         for e in it:
             if e.is_file():
                 files.append(e.name)
-    process(dirpath, files)
+    return process(path, files)
     
 
 #-------------------------------------------------------------------------------
@@ -253,11 +253,10 @@ def main(args):
 
     arg0 = os.path.expanduser(arg.split()[0])
     if os.access(arg0, os.X_OK) and os.path.isfile(arg0):
-        if os.path.isdir(arg):
-            paths.append(arg)
-        else:
-            tool = arg.split()
-            tool[0] = os.path.abspath(arg0)
+        tool = arg.split()
+        tool[0] = os.path.abspath(arg0)
+    elif os.path.isdir(arg):
+        paths.append(arg)
     else:
         err.write(prefix+"You must specify an executable or a directory containing images\n")
         sys.exit()
@@ -291,18 +290,18 @@ def main(args):
     if not paths:
         paths.append('.')
 
-    home = os.getcwd()
+    cwd = os.getcwd()
+    res = ''
     for p in paths:
         os.chdir(p)
         res = process_dir(p)
-        os.chdir(home)
+        os.chdir(cwd)
+        # move file to parent directory if only one path was specified
         if res and len(paths) == 1 and not os.path.isfile(res):
-            # copy to parent directory if only one path specified
-            os.rename(p+'/'+res, os.path.basename(res))
+            os.rename(os.path.join(paths[0],res), os.path.basename(res))
             err.write(prefix+"created %s\n" % res)
-        elif res:
+        else:
             err.write(prefix+"created %s/%s\n" % (p, res))
-
 
 #-------------------------------------------------------------------------------
 
