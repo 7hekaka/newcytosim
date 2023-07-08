@@ -473,9 +473,9 @@ void CoupleSet::shuffle()
 
 void CoupleSet::erase()
 {
-    for ( Property const* cp : simul_.properties.find_all("couple") )
+    for ( Property const* i : simul_.properties.find_all("couple") )
     {
-        CoupleProp const * P = static_cast<CoupleProp const*>(cp);
+        CoupleProp const * P = static_cast<CoupleProp const*>(i);
         P->reserves.erase();
         P->uni_counts = 0;
     }
@@ -815,9 +815,9 @@ int CoupleSet::bad() const
 size_t CoupleSet::all_reserved() const
 {
     size_t res = 0;
-    for ( Property const* cp : simul_.properties.find_all("couple") )
+    for ( Property const* i : simul_.properties.find_all("couple") )
     {
-        CoupleProp const * P = static_cast<CoupleProp const*>(cp);
+        CoupleProp const * P = static_cast<CoupleProp const*>(i);
         res += P->reserves.size();
     }
     return res;
@@ -827,9 +827,9 @@ size_t CoupleSet::all_reserved() const
 void CoupleSet::infoReserves(std::ostream& os) const
 {
     os << "  Couple:reserves";
-    for ( Property const* cp : simul_.properties.find_all("couple") )
+    for ( Property const* i : simul_.properties.find_all("couple") )
     {
-        CoupleProp const * P = static_cast<CoupleProp const*>(cp);
+        CoupleProp const * P = static_cast<CoupleProp const*>(i);
         os << " " << P->number() << ":" << P->reserves.size();
     }
     os << "\n";
@@ -1032,9 +1032,9 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
 void CoupleSet::uniPrepare(PropertyList const& properties)
 {
     uniCouples.clear();
-    for ( Property const* cp : simul_.properties.find_all("couple") )
+    for ( Property const* i : simul_.properties.find_all("couple") )
     {
-        CoupleProp const * P = static_cast<CoupleProp const*>(cp);
+        CoupleProp const * P = static_cast<CoupleProp const*>(i);
         if ( P->fast_diffusion )
             uniCouples.push_back(P);
     }
@@ -1261,9 +1261,9 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleReserve& can, 
 {
     // calculate maximum range of Hands
     real range = 0;
-    for ( Property const* cp : properties.find_all("couple") )
+    for ( Property const* i : properties.find_all("couple") )
     {
-        CoupleProp const* P = static_cast<CoupleProp const*>(cp);
+        CoupleProp const* P = static_cast<CoupleProp const*>(i);
         range = std::max(range, P->hand1_prop->binding_range);
         range = std::max(range, P->hand2_prop->binding_range);
     }

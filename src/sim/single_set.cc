@@ -340,9 +340,9 @@ void SingleSet::shuffle()
 
 void SingleSet::erase()
 {
-    for ( Property const* sp : simul_.properties.find_all("single") )
+    for ( Property const* i : simul_.properties.find_all("single") )
     {
-        SingleProp const * P = static_cast<SingleProp const*>(sp);
+        SingleProp const * P = static_cast<SingleProp const*>(i);
         P->reserves.erase();
         P->uni_counts = 0;
     }
@@ -711,11 +711,8 @@ void SingleSet::deleteInvalidWrists()
 size_t SingleSet::all_reserved() const
 {
     size_t res = 0;
-    for ( Property const* cp : simul_.properties.find_all("single") )
-    {
-        SingleProp const * P = static_cast<SingleProp const*>(cp);
-        res += P->reserves.size();
-    }
+    for ( Property const* i : simul_.properties.find_all("single") )
+        res += static_cast<SingleProp const*>(i)->reserves.size();
     return res;
 }
 
@@ -723,9 +720,9 @@ size_t SingleSet::all_reserved() const
 void SingleSet::infoReserves(std::ostream& os) const
 {
     os << "  Single:reserves";
-    for ( Property const* cp : simul_.properties.find_all("single") )
+    for ( Property const* i : simul_.properties.find_all("single") )
     {
-        SingleProp const * P = static_cast<SingleProp const*>(cp);
+        SingleProp const * P = static_cast<SingleProp const*>(i);
         os << " " << P->number() << ":" << P->reserves.size();
     }
     os << "\n";

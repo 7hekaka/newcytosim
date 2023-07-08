@@ -21,7 +21,7 @@ class ReserveList
 public:
     
     /// constructor
-    ReserveList() { count_ = 0; head_ = nullptr; }
+    ReserveList() : head_(nullptr), count_(0) { }
     
     /// number of objects stored
     size_t size() const { return count_; }
@@ -38,7 +38,11 @@ public:
     }
     
     /// remove first object in list
-    void pop() { head_ = head_->next(); --count_; }
+    void pop()
+    {
+        head_ = head_->next();
+        --count_;
+    }
     
     /// delete all objects
     void erase()
