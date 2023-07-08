@@ -6,6 +6,7 @@
 #include "vector.h"
 #include "property.h"
 #include "hand_prop.h"
+#include "reserve_list.h"
 
 class Mecable;
 class Single;
@@ -14,6 +15,9 @@ class Space;
 
 #define NEW_MOBILE_SINGLE 0
 #define NEW_ANCHOR_STIFFNESS 1
+
+/// to hold unused Couples
+typedef ReserveList<Single> SingleReserve;
 
 /// Property for Single
 /**
@@ -110,6 +114,9 @@ public:
     
     /// counter for fast diffusion algorithm
     mutable size_t uni_counts;
+
+    /// a list to hold Couple made with this Property
+    mutable SingleReserve reserves;
 
 protected:
     

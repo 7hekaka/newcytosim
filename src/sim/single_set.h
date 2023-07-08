@@ -11,61 +11,8 @@ class PropertyList;
 /// a list of pointers to Single
 typedef Array<Single *> SingleList;
 
-/// holds a list of Single of the same type
-/**
- This list is build using 'Object::next()' and thus can only hold
- objects that are not linked in SingleSet already (see below).
- It is a single-linked list and addition/removal is made on the same end.
- SingleReserve is used for the 'fast_diffusion' algorithm.
- */
-class SingleReserve
-{
-    /// All Single in the list should be of the same type
-    SingleProp const* property_;
-    /// Pointer to first member in list
-    Single * head_;
-    /// Number of elements in list
-    size_t count_;
-    
-public:
-    
-    /// constructor
-    SingleReserve() { count_ = 0; head_ = nullptr; property_ = nullptr; }
-    
-    /// number of objects stored
-    size_t reserved() const { return count_; }
 
-    /// return property
-    SingleProp const* property() const { return property_; }
-    
-    /// set Property
-    void set_property(SingleProp const* p) { property_ = p; }
-    
-    /// first object
-    Single * head() const { return head_; }
-    
-    /// add object
-    void push(Single* arg) { arg->Object::next(head_); head_ = arg; ++count_; }
-    
-    /// remove first object in list
-    void pop() { head_ = head_->next(); --count_; }
-    
-    /// delete all objects
-    void erase()
-    {
-        Single * obj = head_;
-        while ( obj )
-        {
-            pop();
-            obj->objset(nullptr);
-            delete(obj);
-            obj = head();
-        }
-    }
-};
-
-
-/// Set for Single
+/// Set holding objects of class Single
 /**
  A Single is stored in one of 2 ObjectPool, depending on its state:
  - fList = free,
@@ -88,20 +35,11 @@ private:
     /// List for attached Singles (a=attached)
     ObjectPool aList;
 
-    /// an array of SingleReserveList
-    typedef std::vector<SingleReserve> SingleReserveList;
-    
-    /// uniReserves[p] holds Singles with ( property()->number() == p )
-    SingleReserveList uniReserves;
-    
-    /// flag to enable `fast_diffusion` attachment algorithm
-    bool uniEnabled;
-
     /// gather all Single with `fast_diffusion` in reserve lists
     void uniStepCollect(Single*);
 
     /// ensures that `can` holds `cnt` Singles, creating them of specified SingleProp
-    void uniRefill(SingleReserve& can, size_t cnt, SingleProp const*);
+    void uniRefill(SingleProp const*, size_t cnt);
 
     /// attach Singles from `can` on locations specified in `loc`
     void uniAttach(Array<FiberSite>& can, SingleReserve& loc);
@@ -115,28 +53,28 @@ private:
     /// save free Single for which `fast_diffusion == 0`
     void writeF_skip(Outputter&) const;
     
+    /// list of Properties for which `fast_diffusion == true`
+    std::vector<SingleProp const*> uniSingles;
+
 public:
     
+    /// initialize `fast_diffusion` attachment algorithm
+    void uniPrepare(PropertyList const& properties);
+
+    /// total count in reserves
+    size_t all_reserved() const;
+    
+    /// print number of elements in each reserve bin
+    void infoReserves(std::ostream& os) const;
+
     /// return a Couple from the reserve, or made by newCouple()
     Single * makeSingle(SingleProp const*);
     
     /// create a Single at given position
     Single * addSingle(SingleProp const*, Vector const&);
 
-    /// initialize `fast_diffusion` attachment algorithm
-    bool uniPrepare(PropertyList const& properties);
-
-    /// total count in reserves
-    size_t all_reserved() const;
-    
-    /// total count in reserves
-    size_t reserved(size_t i) const { return uniReserves[i].reserved(); }
-    
-    /// print number of elements in each reserve bin
-    void infoReserves(std::ostream& os) const;
-
     /// creator
-    SingleSet(Simul& s) : ObjectSet(s), uniEnabled(0) {}
+    SingleSet(Simul& s) : ObjectSet(s) {}
     
     //--------------------------
 

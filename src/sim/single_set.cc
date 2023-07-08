@@ -16,7 +16,7 @@
 
 void SingleSet::prepare(PropertyList const& properties)
 {
-    uniEnabled = uniPrepare(properties);
+    uniPrepare(properties);
 }
 
 
@@ -59,8 +59,7 @@ void SingleSet::uniStepCollect(Single * obj)
         if ( P->fast_diffusion && !obj->base() )
         {
             fList.pop(obj);
-            PropertyID i = P->number();
-            uniReserves[i].push(obj);
+            P->reserves.push(obj);
             ++P->uni_counts;
         }
         else
@@ -98,7 +97,7 @@ void SingleSet::step()
     step_singles<&Single::stepA>(firstA(), sizeA() & 1);
     
     // use alternative attachment strategy:
-    if ( uniEnabled )
+    if ( uniSingles.size() )
     {
         uniStepCollect(fHead);
         uniAttach(simul_.fibers);
@@ -139,18 +138,14 @@ Property* SingleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
+/// pick from reserves if possible:
 Single * SingleSet::makeSingle(SingleProp const* P)
 {
-    PropertyID i = P->number();
-    // pick from reserves if possible:
-    if ( i < uniReserves.size() )
+    Single * S = P->reserves.head();
+    if ( S )
     {
-        Single * S = uniReserves[i].head();
-        if ( S )
-        {
-            uniReserves[i].pop();
-            return S;
-        }
+        P->reserves.pop();
+        return S;
     }
     return P->newSingle();
 }
@@ -345,8 +340,13 @@ void SingleSet::shuffle()
 
 void SingleSet::erase()
 {
-    for ( SingleReserve & can : uniReserves )
-        can.erase();
+    for ( Property const* sp : simul_.properties.find_all("single") )
+    {
+        SingleProp const * P = static_cast<SingleProp const*>(sp);
+        P->reserves.erase();
+        P->uni_counts = 0;
+    }
+
     ObjectSet::erasePool(fList);
     ObjectSet::erasePool(aList);
     inventory_.clear();
@@ -391,8 +391,9 @@ void SingleSet::defrostSave()
         inventory_.unassign(i);
         i->objset(nullptr);
         Single * S = static_cast<Single*>(i);
-        uniReserves[S->prop->number()].push(S);
+        S->prop->reserves.push(S);
     }
+    //infoReserves(std::clog);
 }
 
 //------------------------------------------------------------------------------
@@ -457,12 +458,16 @@ void SingleSet::writeF_skip(Outputter& out) const
     writeRecords(out, fList.size(), inventory_.highest());
     
     // count all the elements that are not written:
-    const size_t UNI_MAX = 16;
+    const PropertyID UNI_MAX = 16;
     size_t cnt[UNI_MAX] = { 0 };
-    size_t sup = std::min(UNI_MAX, uniReserves.size());
-    for ( size_t i = 0; i < sup; ++i )
-        cnt[i] = uniReserves[i].property()->uni_counts;
-    
+    PropertyID sup = 0;
+    for ( SingleProp const* P : uniSingles )
+    {
+        PropertyID i = P->number();
+        sup = std::max(sup, i);
+        if ( i < UNI_MAX )
+            cnt[i] = P->uni_counts;
+    }
     for ( Single const* n=firstF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
@@ -472,7 +477,7 @@ void SingleSet::writeF_skip(Outputter& out) const
             n->write(out);
     }
     out.write("\n#section single reheat");
-    for ( size_t i = 0; i < sup; ++i )
+    for ( size_t i = 0; i < std::min(sup, UNI_MAX); ++i )
         out.writeInt(cnt[i], ' ');
 }
 
@@ -706,8 +711,11 @@ void SingleSet::deleteInvalidWrists()
 size_t SingleSet::all_reserved() const
 {
     size_t res = 0;
-    for ( SingleReserve const& can : uniReserves )
-        res += can.reserved();
+    for ( Property const* cp : simul_.properties.find_all("single") )
+    {
+        SingleProp const * P = static_cast<SingleProp const*>(cp);
+        res += P->reserves.size();
+    }
     return res;
 }
 
@@ -715,19 +723,19 @@ size_t SingleSet::all_reserved() const
 void SingleSet::infoReserves(std::ostream& os) const
 {
     os << "  Single:reserves";
-    for ( SingleReserve const& can : uniReserves )
+    for ( Property const* cp : simul_.properties.find_all("single") )
     {
-        SingleProp const* P = can.property();
-        if ( P )
-            os << " " << P->number() << ":" << can.reserved();
+        SingleProp const * P = static_cast<SingleProp const*>(cp);
+        os << " " << P->number() << ":" << P->reserves.size();
     }
     os << "\n";
 }
 
 
-void SingleSet::uniRefill(SingleReserve& can, size_t cnt, SingleProp const* sip)
+void SingleSet::uniRefill(SingleProp const* sip, size_t cnt)
 {
-    for ( size_t i = can.reserved(); i < cnt; ++i )
+    SingleReserve & can = sip->reserves;
+    for ( size_t i = can.size(); i < cnt; ++i )
     {
         Single* S = sip->newSingle();
         inventory_.assign(S);
@@ -744,7 +752,7 @@ void SingleSet::uniRefill(SingleReserve& can, size_t cnt, SingleProp const* sip)
 void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserve& can)
 {
     // crop list to match available number of candidates:
-    loc.shuffle_truncate(can.reserved());
+    loc.shuffle_truncate(can.size());
 
     for ( FiberSite & i : loc )
     {
@@ -816,13 +824,9 @@ void SingleSet::uniAttach(FiberSet const& fibers)
     Array<FiberSite> loc(128, 128);
     
     // uniform attachment for the reserves:
-    for ( SingleReserve & can : uniReserves )
+    for ( SingleProp const* P : uniSingles )
     {
-        SingleProp const* P = can.property();
-        if ( !P )
-            continue;
-        
-        const real vol = P->spaceVolume();
+        SingleReserve& can = P->reserves;
         
         // assuming (or not) a fixed number of diffusing molecules
         bool fixed = ( P->fast_reservoir > 0 );
@@ -830,6 +834,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 
         if ( cnt > 0 )
         {
+            const real vol = P->spaceVolume();
             size_t total = size();
             if ( P->fast_diffusion & 2 )
             {
@@ -843,7 +848,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
             }
             
             if ( fixed ) // create enough candidates for all sites
-                uniRefill(can, loc.size(), P);
+                uniRefill(P, loc.size());
 
             uniAttach(loc, can);
             P->uni_counts -= total - size();
@@ -857,30 +862,15 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 
  Return true if at least one single:fast_diffusion is true,
  */
-bool SingleSet::uniPrepare(PropertyList const& properties)
+void SingleSet::uniPrepare(PropertyList const& properties)
 {
-    bool res = false;
-    PropertyID last = 0;
-
-    PropertyList allprop = properties.find_all("single");
-    
-    for ( Property const* i : allprop )
+    uniSingles.clear();
+    for ( Property const* i : properties.find_all("single") )
     {
         SingleProp const* P = static_cast<SingleProp const*>(i);
-        last = std::max(last, P->number());
-        assert_true(P->number() > 0);
-        res |= P->fast_diffusion;
+        if ( P->fast_diffusion )
+            uniSingles.push_back(P);
     }
-    
-    uniReserves.resize(last+1);
-    for ( SingleReserve & can : uniReserves )
-        can.set_property(nullptr);
-    for ( Property const* i : allprop )
-    {
-        SingleProp const* P = static_cast<SingleProp const*>(i);
-        uniReserves[P->number()].set_property(P);
-    }
-    return res;
 }
 
 
@@ -889,14 +879,10 @@ Release all Singles from the reserves
 */
 void SingleSet::uniRelax()
 {
-    for ( SingleReserve & can : uniReserves )
+    for ( SingleProp const* P : uniSingles )
     {
-        SingleProp const* P = can.property();
-        if ( P )
-        {
-            makeSingles(P, P->uni_counts);
-            P->uni_counts = 0;
-        }
+        makeSingles(P, P->uni_counts);
+        P->uni_counts = 0;
     }
 }
 
