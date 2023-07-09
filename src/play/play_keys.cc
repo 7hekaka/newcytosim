@@ -5,18 +5,18 @@
  disabling this capacity in public distribution might be safer:
  It can be done by disabling ENABLE_WRITE below:
  */
-#define ENABLE_WRITE 1
+#define PLAY_CAN_WRITE 1
 
 
 /// change `x` by adding `inc` while keeping discrete values
 static float grained(float x, int inc)
 {
-    const float grain = 0.25f;
-    // if the value is large, we scale the increment up:
-    float dx = inc * ( 1 + ( x >= 4 ) + 2 * ( x >= 8 ) + 4 * ( x >= 16 ) );
-    float nx = std::nearbyint( x / grain + dx );
-    float ii = std::abs(inc);
-    return grain * std::max(ii, nx);
+    const float grain = 0.125f;
+    // for large values, the increment is larger:
+    float g = 1 + ( x >= 2 ) + 2 * ( x >= 4 ) + 4 * ( x >= 8 ) + 8 * ( x >= 16 );
+    float n = std::nearbyint( x / grain + inc * g );
+    float i = std::abs(inc);
+    return grain * std::max(i, n);
 }
 
 //------------------------------------------------------------------------------
@@ -763,7 +763,7 @@ void helpKeys(std::ostream& os)
     os << "   i v b       Invert colors; toggle slice view; toggle scale bar\n";
     os << "   l L         Read parameter file; Print display parameters\n";
     os << "   r R         Report various informations on display window\n";
-#if ENABLE_WRITE
+#if PLAY_CAN_WRITE
     os << "   y Y         Save current image; Play and save all images\n";
 #endif
     os << "\nSimulation\n";
@@ -820,8 +820,7 @@ void processKey(unsigned char key, int modifiers = 0)
             //glApp::newWindow(drawSimul);
             break;
 
-#if ENABLE_WRITE
-            
+#if PLAY_CAN_WRITE
         case 'y':
             // save current image, without decorations
             player.drawSystem(glApp::currentView());
@@ -842,7 +841,6 @@ void processKey(unsigned char key, int modifiers = 0)
                 prop.save_images = 0;
             }
             break;
-
 #endif
 
         //------------------------- Global controls ----------------------------

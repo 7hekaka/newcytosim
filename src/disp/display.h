@@ -162,7 +162,7 @@ public:
     float pixscale(float w) const { return w * sizeScale; }
     
     /// scale from size into OpenGL line width (pixel) units
-    float pixwidth(float w) const { return std::max(w * unitValue, 0.25f); }
+    float pixwidth(float w) const { return std::max(w * unitValue, 0.125f); }
     
     /// return vector orthogonal to `dir` and to the view depth axis
     Vector inViewPlane(Vector const& dir, const real rad) const
