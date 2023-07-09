@@ -250,7 +250,7 @@ public:
     /// return a Couple from the reserve, or made by newCouple()
     Couple * makeCouple(CoupleProp const*);
     
-    /// return a Couple from the reserve, or made by newCouple()
+    /// create a Couple at given position
     Couple * addCouple(CoupleProp const*, Vector const&);
 
     /// create unattached Couples

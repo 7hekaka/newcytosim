@@ -177,7 +177,7 @@ public:
 
     //--------------------------
     
-    /// return a Couple from the reserve, or made by newCouple()
+    /// return a Single from the reserve, or made by newSingle()
     Single * makeSingle(SingleProp const*);
     
     /// create a Single at given position
