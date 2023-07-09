@@ -79,21 +79,6 @@ private:
 
 public:
 
-    /// initialize `fast_diffusion` attachment algorithm
-    void uniPrepare(PropertyList const& properties);
-    
-    /// total count in reserves
-    size_t all_reserved() const;
-
-    /// print number of elements in each reserve bin
-    void infoReserves(std::ostream& os) const;
-
-    /// return a Couple from the reserve, or made by newCouple()
-    Couple * makeCouple(CoupleProp const*);
-    
-    /// return a Couple from the reserve, or made by newCouple()
-    Couple * addCouple(CoupleProp const*, Vector const&);
-
     /// constructor
     CoupleSet(Simul& s) : ObjectSet(s) {}
     
@@ -138,7 +123,7 @@ public:
     void unlink(Object *);
 
     /// link unattached Couple into FF list
-    void linkFF(Couple * c) { assert_true(!c->attached1()&&!c->attached2()); ffList.push_back(c); }
+    void linkFF(Couple * C) { assert_true(!C->attached()); C->objset(this); ffList.push_back(C); }
 
     /// reassign Couple to sublist following attachement of Hand 1
     void relinkA1(Couple *);
@@ -225,6 +210,17 @@ public:
 
     //--------------------------
 
+    /// initialize `fast_diffusion` attachment algorithm
+    void uniPrepare(PropertyList const& properties);
+    
+    /// total count in reserves
+    size_t all_reserved() const;
+
+    /// print number of elements in each reserve bin
+    void infoReserves(std::ostream& os) const;
+
+    //--------------------------
+
     /// distribute the Couple on the fibers to approximate an equilibrated state
     void equilibrateSym(FiberSet const&, CoupleProp const*, size_t);
 
@@ -251,12 +247,20 @@ public:
 
     //--------------------------
     
+    /// return a Couple from the reserve, or made by newCouple()
+    Couple * makeCouple(CoupleProp const*);
+    
+    /// return a Couple from the reserve, or made by newCouple()
+    Couple * addCouple(CoupleProp const*, Vector const&);
+
     /// create unattached Couples
     void makeCouples(CoupleProp const*, size_t cnt);
 
     /// create unattached Couples
     void makeCouples(size_t cnt[], size_t n_cnt);
     
+    //--------------------------
+
     /// move Couples into reserve lists, instead of deleting them
     void defrostStore();
 

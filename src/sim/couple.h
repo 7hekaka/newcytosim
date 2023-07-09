@@ -136,6 +136,9 @@ public:
     /// the state of the Couple in { 0 ... 3 } representing { FF, AF, FA, AA }
     int state() const { return cHand1->attached() + 2 * cHand2->attached(); }
     
+    /// true if Hand1 or Hand2 are attached
+    int attached() const { return cHand1->attached() || cHand2->attached(); }
+
     /// category of link: Parallel; Anti-parallel; X; T+; V+; T-; V-
     int configuration(real len, real max_cos=0.5) const;
 

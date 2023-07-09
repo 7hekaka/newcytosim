@@ -32,7 +32,7 @@ public:
     /// add object
     void push(OBJECT * obj)
     {
-        assert_true( obj->objset() == nullptr );
+        obj->objset(nullptr);
         obj->Object::next(head_);
         head_ = obj;
         ++count_;

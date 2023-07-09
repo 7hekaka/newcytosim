@@ -57,21 +57,6 @@ private:
     std::vector<SingleProp const*> uniSingles;
 
 public:
-    
-    /// initialize `fast_diffusion` attachment algorithm
-    void uniPrepare(PropertyList const& properties);
-
-    /// total count in reserves
-    size_t all_reserved() const;
-    
-    /// print number of elements in each reserve bin
-    void infoReserves(std::ostream& os) const;
-
-    /// return a Couple from the reserve, or made by newCouple()
-    Single * makeSingle(SingleProp const*);
-    
-    /// create a Single at given position
-    Single * addSingle(SingleProp const*, Vector const&);
 
     /// creator
     SingleSet(Simul& s) : ObjectSet(s) {}
@@ -105,7 +90,7 @@ public:
     void unlink(Object *);
     
     /// link unattached Single
-    void linkF(Single * s) { assert_true(!s->attached()); fList.push_back(s); }
+    void linkF(Single * S) { assert_true(!S->attached()); S->objset(this); fList.push_back(S); }
 
     /// reassign Single to different sublist following attachement of Hand
     void relinkA(Single *);
@@ -181,15 +166,34 @@ public:
     
     /// bring all objects to centered image using periodic boundary conditions
     void foldPositions(Modulo const*) const;
+    
+    //--------------------------
+
+    /// initialize `fast_diffusion` attachment algorithm
+    void uniPrepare(PropertyList const& properties);
+
+    /// total count in reserves
+    size_t all_reserved() const;
+    
+    /// print number of elements in each reserve bin
+    void infoReserves(std::ostream& os) const;
 
     //--------------------------
     
+    /// return a Couple from the reserve, or made by newCouple()
+    Single * makeSingle(SingleProp const*);
+    
+    /// create a Single at given position
+    Single * addSingle(SingleProp const*, Vector const&);
+
     /// create unattached Singles
     void makeSingles(SingleProp const*, size_t cnt);
 
     /// create unattached Singles
     void makeSingles(size_t cnt[], size_t n_cnt);
     
+    //--------------------------
+
     /// move Singles into reserve lists, instead of deleting them
     void defrostStore();
 

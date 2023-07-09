@@ -60,7 +60,6 @@ void SingleSet::uniStepCollect(Single * obj)
         if ( P->fast_diffusion && !obj->base() )
         {
             fList.pop(obj);
-            obj->objset(nullptr);
             inventory_.unassign(obj);
             P->reserves.push(obj);
             ++P->uni_counts;
@@ -146,11 +145,11 @@ Single * SingleSet::makeSingle(SingleProp const* P)
 {
     Single * S = P->reserves.head();
     if ( S )
-    {
         P->reserves.pop();
-        return S;
-    }
-    return P->newSingle();
+    else
+        S = P->newSingle();
+    S->objset(this);
+    return S;
 }
 
 
@@ -362,7 +361,6 @@ void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
     {
         Single * S = makeSingle(P);
         S->randomizePosition();
-        S->objset(this);
         linkF(S);
     }
 }
@@ -392,7 +390,6 @@ void SingleSet::defrostStore()
     {
         ice_.pop_front();
         Single * S = static_cast<Single*>(i);
-        S->objset(nullptr);
         inventory_.unassign(S);
         S->hand()->detachHand();
         S->prop->reserves.push(S);
@@ -439,7 +436,6 @@ void SingleSet::reheat(size_t cnt[], size_t n_cnt)
             }
             else
             {
-                S->objset(nullptr);
                 inventory_.unassign(S);
                 S->prop->reserves.push(S);
             }
@@ -737,12 +733,7 @@ void SingleSet::uniRefill(SingleProp const* sip, size_t cnt)
 {
     SingleReserve & can = sip->reserves;
     for ( size_t i = can.size(); i < cnt; ++i )
-    {
-        Single* S = sip->newSingle();
-        inventory_.assign(S);
-        S->objset(this);
-        can.push(S);
-    }
+        can.push(sip->newSingle());
 }
 
 

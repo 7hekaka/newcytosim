@@ -61,7 +61,6 @@ void CoupleSet::uniStepCollect(Couple * obj)
         if ( P->fast_diffusion )
         {
             ffList.pop(obj);
-            obj->objset(nullptr);
             inventory_.unassign(obj);
             P->reserves.push(obj);
             ++P->uni_counts;
@@ -250,11 +249,11 @@ Couple * CoupleSet::makeCouple(CoupleProp const* P)
 {
     Couple * C = P->reserves.head();
     if ( C )
-    {
         P->reserves.pop();
-        return C;
-    }
-    return P->newCouple();
+    else
+        C = P->newCouple();
+    C->objset(this);
+    return C;
 }
 
 
@@ -496,7 +495,6 @@ void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
         Couple * C = makeCouple(P);
         assert_true(!C->attached1() && !C->attached2());
         C->randomizePosition();
-        C->objset(this);
         linkFF(C);
     }
 }
@@ -524,7 +522,6 @@ void CoupleSet::defrostStore()
     while (( i = ice_.front() ))
     {
         ice_.pop_front();
-        i->objset(nullptr);
         inventory_.unassign(i);
         Couple * C = static_cast<Couple*>(i);
         C->hand1()->detachHand();
@@ -578,7 +575,6 @@ void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
             }
             else
             {
-                C->objset(nullptr);
                 inventory_.unassign(C);
                 C->prop->reserves.push(C);
             }
@@ -844,12 +840,7 @@ void CoupleSet::uniRefill(CoupleProp const* cop, size_t cnt)
 {
     CoupleReserve & can = cop->reserves;
     for ( size_t i = can.size(); i < cnt; ++i )
-    {
-        Couple* c = cop->newCouple();
-        inventory_.assign(c);
-        c->objset(this);
-        can.push(c);
-    }
+        can.push(cop->newCouple());
 }
 
 
@@ -918,13 +909,13 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
 
     for ( size_t n = 0; n < sup; ++n )
     {
-        Couple * c = can.head();
+        Couple * C = can.head();
         can.pop();
-        linkFF(c);
+        linkFF(C);
         // pick randomly with replacement:
-        size_t p = RNG.pint32(nbc);
-        c->attach1(loc1[p]);
-        c->attach2(loc2[p]);
+        size_t i = RNG.pint32(nbc);
+        C->attach1(loc1[i]);
+        C->attach2(loc2[i]);
     }
 }
 
@@ -1238,8 +1229,8 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleProp const* P)
             C = can.head();
             while ( C )
             {
-                linkFF(C);
                 can.pop();
+                linkFF(C);
                 C = can.head();
             }
         }
