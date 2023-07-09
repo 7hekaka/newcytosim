@@ -1498,6 +1498,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     gym::ref_view();
     gym::disableLighting();
     gym::drawTriangleStrip(0, ptr-flu);
+    gym::cleanup();
 }
 
 
@@ -1562,6 +1563,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     gym::ref_view();
     gym::disableLighting();
     gym::drawTriangleStrip(0, ptr-flu);
+    gym::cleanup();
 }
 
 

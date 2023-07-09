@@ -267,7 +267,7 @@ void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
     flu[3] = { X+S, Y-S, Z, 0, 1, U };
     gym::unmapBufferV4T2();
     gym::drawTriangleStrip(0, 4);
-    gym::clenupTexture();
+    gym::cleanupTexture();
     CHECK_GL_ERROR("drawPixelmap1");
 }
 

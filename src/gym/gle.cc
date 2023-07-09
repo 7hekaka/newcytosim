@@ -924,7 +924,7 @@ namespace gle
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangles(start, cnt);
-        gym::cleanup(1);
+        gym::cleanup();
     }
     
     void wireCube(float width)
@@ -940,14 +940,14 @@ namespace gle
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(start, cnt);
-        gym::cleanup(1);
+        gym::cleanup();
     }
 
     void doTriangleStrip(GLsizei start, GLsizei cnt)
     {
         gym::bindBufferV3N0(buf_[0], 0);
         gym::drawTriangleStrip(start, cnt);
-        gym::cleanup(1);
+        gym::cleanup();
     }
     
     void ICOSAHEDRON()
@@ -956,7 +956,7 @@ namespace gle
         setIcosahedron(tmp);
         gym::unmapBufferV3N3();
         gym::drawTriangles(0, 60);
-        gym::cleanup(1);
+        gym::cleanup();
     }
 
     void tetrahedron() { doVNTriangles(cubes_[0], 12); }
@@ -1421,7 +1421,7 @@ namespace gle
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(start, cnt);
-        gym::cleanup(1);
+        gym::cleanup();
     }
     
     // using Vertex Buffer Objects
@@ -2055,6 +2055,7 @@ namespace gle
         pts[0] = {S, B};
         gym::unmapBufferV3N3();
         gym::drawTriangles(0, 4);
+        gym::cleanup();
     }
 
     //-----------------------------------------------------------------------
@@ -2296,6 +2297,7 @@ namespace gle
         gym::unmapBufferV3N3();
         gym::drawTriangleStrip(0, 8);
         gym::drawTriangleStrip(8, 8);
+        gym::cleanup();
     }
 
     /// draw faces of cuboid of axis [A,B] and size `rad`

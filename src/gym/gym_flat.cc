@@ -67,7 +67,7 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     gym::unmapBufferV2T2();
     CHECK_GL_ERROR("drawPixels1");
     gym::drawTriangleStrip(0, 4);
-    gym::clenupTexture();
+    gym::cleanupTexture();
     CHECK_GL_ERROR("drawPixels2");
 }
 

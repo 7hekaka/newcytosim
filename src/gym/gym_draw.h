@@ -55,13 +55,11 @@ namespace gym
     inline void drawTriangles(size_t off, size_t cnt)
     {
         glDrawArrays(GL_TRIANGLES, off, cnt);
-        glDisableClientState(GL_COLOR_ARRAY);
     }
 
     inline void drawTriangleStrip(size_t off, size_t cnt)
     {
         glDrawArrays(GL_TRIANGLE_STRIP, off, cnt);
-        glDisableClientState(GL_COLOR_ARRAY);
     }
     
     inline void drawArrays(GLenum mode, GLint first, GLsizei cnt)

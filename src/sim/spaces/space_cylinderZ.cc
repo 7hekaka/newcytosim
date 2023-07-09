@@ -611,7 +611,7 @@ void SpaceCylinderZ::draw3D() const
         *ptr++ = {0, 0, B, 0, 0, -1};
         gym::unmapBufferV3N3();
         gym::drawTriangleStrip(0, ptr-flu);
-        gym::cleanup(1);
+        gym::cleanup();
     }
 }
 

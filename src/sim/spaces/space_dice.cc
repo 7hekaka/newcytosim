@@ -387,7 +387,7 @@ void SpaceDice::draw3D() const
     gym::drawTriangleStrip(16, 4);
     gym::drawTriangleStrip(20, 4);
 #endif
-    gym::cleanup(1);
+    gym::cleanup();
 }
 
 #else
