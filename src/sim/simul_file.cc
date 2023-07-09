@@ -701,7 +701,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
     int fat = 0;
     fresh_ = 1;
 
-    while ( in.good() )
+    while ( 1 )
     {
         do {
             c = in.get_char();

@@ -111,12 +111,27 @@ uint8_t Inputter::readUInt8()
 
 uint16_t Inputter::readUInt16bin()
 {
+#if 1
+    union { uint16_t u; uint8_t c[2]; } u16;
+    if ( binary_ == 2 )
+    {
+        u16.c[1] = get_char();
+        u16.c[0] = get_char();
+    }
+    else
+    {
+        u16.c[0] = get_char();
+        u16.c[1] = get_char();
+    }
+    return u16.u;
+#else
     uint16_t v;
     if ( 1 != fread(&v, 2, 1, mFile) )
         throw InvalidIO("readUInt16bin() failed");
     if ( binary_ == 2 )
         v = byteswap16(v);
     return v;
+#endif
 }
 
 
@@ -124,13 +139,27 @@ uint16_t Inputter::readUInt16()
 {
     if ( ! binary_ )
         return readUInt();
-    
+#if 1
+    union { uint16_t u; uint8_t c[2]; } u16;
+    if ( binary_ == 2 )
+    {
+        u16.c[1] = get_char();
+        u16.c[0] = get_char();
+    }
+    else
+    {
+        u16.c[0] = get_char();
+        u16.c[1] = get_char();
+    }
+    return u16.u;
+#else
     uint16_t v;
     if ( 1 != fread(&v, 2, 1, mFile) )
         throw InvalidIO("readUInt16() failed");
     if ( binary_ == 2 )
         v = byteswap16(v);
     return v;
+#endif
 }
 
 
@@ -226,12 +255,19 @@ void Inputter::readEulerAngles(float& a, float& b)
 float Inputter::readFloatBinary()
 {
     assert_true( binary_ );
-    float v;
-    if ( 1 != fread(&v, 4, 1, mFile) )
-        throw InvalidIO("readFloat() failed");
+    union { float f; uint8_t i[4]; } u;
+#if 1
+    u.i[0] = get_char();
+    u.i[1] = get_char();
+    u.i[2] = get_char();
+    u.i[3] = get_char();
+#else
+    if ( 1 != fread(&u, 4, 1, mFile) )
+        throw InvalidIO("readFloat failed");
+#endif
     if ( binary_ == 2 )
-        v = byteswap32(v);
-    return v;
+        u.f = byteswap32(u.f);
+    return u.f;
 }
 
 

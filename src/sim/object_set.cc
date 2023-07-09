@@ -472,6 +472,9 @@ void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list) const
 /**  read Object's mark in binary format. This should match Object::writeMarker() */
 static void readMarker(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
 {
+    union { uint16_t u; uint8_t c[2]; } u16;
+    union { uint32_t u; uint8_t c[4]; } u32;
+
     if ( fat )
     {
 #if BACKWARD_COMPATIBILITY < 58
@@ -484,15 +487,23 @@ static void readMarker(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, Obj
         else
 #endif
         {
-            mk = in.readUInt8();
-            ix = in.readUInt16();
-            id = in.readUInt32();
+            mk = in.get_char();
+            u16.c[0] = in.get_char();
+            u16.c[1] = in.get_char();
+            ix = u16.u;
+            u32.c[0] = in.get_char();
+            u32.c[1] = in.get_char();
+            u32.c[2] = in.get_char();
+            u32.c[3] = in.get_char();
+            id = u32.u;
         }
     }
     else
     {
-        ix = in.readUInt8();
-        id = in.readUInt16();
+        ix = in.get_char();
+        u16.c[0] = in.get_char();
+        u16.c[1] = in.get_char();
+        id = u16.u;
     }
     assert_true( id < 1<<24 );
 }
