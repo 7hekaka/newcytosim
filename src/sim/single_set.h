@@ -88,9 +88,6 @@ public:
 
     /// remove object
     void unlink(Object *);
-    
-    /// link unattached Single
-    void linkF(Single * S) { assert_true(!S->attached()); S->objset(this); fList.push_back(S); }
 
     /// reassign Single to different sublist following attachement of Hand
     void relinkA(Single *);
@@ -192,6 +189,9 @@ public:
     /// create unattached Singles
     void makeSingles(size_t cnt[], size_t n_cnt);
     
+    /// link unattached Single
+    void addFreeSingle(Single*);
+
     //--------------------------
 
     /// move Singles into reserve lists, instead of deleting them

@@ -135,12 +135,11 @@ void ObjectSet::add(Object * obj)
         inventory_.assign(obj);
         obj->objset(this);
         link(obj);
-        //std::clog << "ObjectSet::add(" << obj->reference() << ")\n";
+        //std::clog << "ObjectSet::add(" << obj->reference() << ") " << obj->identity() << "\n";
     }
     else
     {
-        // that is totally fine...
-        //std::cerr << "Warning: attempted to re-link "+obj->reference()+" \n";
+        std::clog << "Warning: attempted to re-link "+obj->reference()+" \n";
     }
 }
 

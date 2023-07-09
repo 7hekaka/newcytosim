@@ -148,8 +148,18 @@ Single * SingleSet::makeSingle(SingleProp const* P)
         P->reserves.pop();
     else
         S = P->newSingle();
-    S->objset(this);
     return S;
+}
+
+
+void SingleSet::addFreeSingle(Single * obj)
+{
+    assert_true(!obj->attached());
+    assert_true(!obj->objset());
+    obj->objset(this);
+    fList.push_back(obj);
+    inventory_.assign(obj);
+    //std::clog << "addFreeSingle(" << obj->reference() << ")\n";
 }
 
 
@@ -157,10 +167,9 @@ Single * SingleSet::addSingle(SingleProp const* P, Vector const& pos)
 {
     Single * S = makeSingle(P);
     S->setPosition(pos);
-    add(S);
+    addFreeSingle(S);
     return S;
 }
-
 
 
 Object * SingleSet::newObject(const ObjectTag tag, PropertyID pid)
@@ -361,7 +370,7 @@ void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
     {
         Single * S = makeSingle(P);
         S->randomizePosition();
-        linkF(S);
+        addFreeSingle(S);
     }
 }
 
@@ -432,7 +441,7 @@ void SingleSet::reheat(size_t cnt[], size_t n_cnt)
             {
                 --cnt[id];
                 S->randomizePosition();
-                linkF(S);
+                addFreeSingle(S);
             }
             else
             {
@@ -781,7 +790,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserve& can)
             }
 
             can.pop();
-            linkF(S);
+            addFreeSingle(S);
             S->setPosition(pos);
             S->attach(i);
         }

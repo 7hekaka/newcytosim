@@ -252,8 +252,18 @@ Couple * CoupleSet::makeCouple(CoupleProp const* P)
         P->reserves.pop();
     else
         C = P->newCouple();
-    C->objset(this);
     return C;
+}
+
+
+void CoupleSet::addFreeCouple(Couple * obj)
+{
+    assert_true(!obj->attached());
+    assert_true(!obj->objset());
+    obj->objset(this);
+    ffList.push_back(obj);
+    inventory_.assign(obj);
+    //std::clog << "addFreeCouple(" << obj->reference() << ")\n";
 }
 
 
@@ -261,7 +271,7 @@ Couple * CoupleSet::addCouple(CoupleProp const* P, Vector const& pos)
 {
     Couple * C = makeCouple(P);
     C->setPosition(pos);
-    add(C);
+    addFreeCouple(C);
     return C;
 }
 
@@ -495,7 +505,7 @@ void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
         Couple * C = makeCouple(P);
         assert_true(!C->attached1() && !C->attached2());
         C->randomizePosition();
-        linkFF(C);
+        addFreeCouple(C);
     }
 }
 
@@ -571,7 +581,7 @@ void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
             {
                 --cnt[id];
                 C->randomizePosition();
-                linkFF(C);
+                addFreeCouple(C);
             }
             else
             {
@@ -860,7 +870,7 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleReserve& can)
         if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
             can.pop();
-            linkFF(C);
+            addFreeCouple(C);
             h->attach(i);
         }
     }
@@ -883,7 +893,7 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleReserve& can)
         if ( h->keyMatch(i.fiber()) &&  h->attachmentAllowed(i) )
         {
             can.pop();
-            linkFF(C);
+            addFreeCouple(C);
             h->attach(i);
         }
     }
@@ -911,7 +921,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
     {
         Couple * C = can.head();
         can.pop();
-        linkFF(C);
+        addFreeCouple(C);
         // pick randomly with replacement:
         size_t i = RNG.pint32(nbc);
         C->attach1(loc1[i]);
@@ -1230,7 +1240,7 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleProp const* P)
             while ( C )
             {
                 can.pop();
-                linkFF(C);
+                addFreeCouple(C);
                 C = can.head();
             }
         }

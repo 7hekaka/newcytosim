@@ -123,7 +123,7 @@ public:
     void unlink(Object *);
 
     /// link unattached Couple into FF list
-    void linkFF(Couple * C) { assert_true(!C->attached()); C->objset(this); ffList.push_back(C); }
+    void addFF(Couple * C);
 
     /// reassign Couple to sublist following attachement of Hand 1
     void relinkA1(Couple *);
@@ -259,6 +259,9 @@ public:
     /// create unattached Couples
     void makeCouples(size_t cnt[], size_t n_cnt);
     
+    /// return a Couple from the reserve, or made by newCouple()
+    void addFreeCouple(Couple*);
+
     //--------------------------
 
     /// move Couples into reserve lists, instead of deleting them
