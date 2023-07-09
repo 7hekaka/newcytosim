@@ -1075,9 +1075,8 @@ void Fiber::setInteractions(Meca& meca) const
 #if NEW_SQUEEZE_FORCE
     if ( prop->squeeze == 1 )
     {
-        // squeezing force in the YZ-plane: force = -F * tanh(YZ/R)
-        // derivative: -4F / ( exp(-u) + exp(u) )^2  with u = YZ/R
-        //
+        // implements a radial force in the YZ-plane: force = -F * tanh(yz/R)
+        // derivative: -4F / R * ( exp(-u) + exp(u) )^2  with u = yz/R
         const real F = prop->squeeze_force;
         const real R = prop->squeeze_range;
         for ( size_t i = 0; i < nPoints; ++i )
@@ -1085,10 +1084,11 @@ void Fiber::setInteractions(Meca& meca) const
             Vector P = posP(i);
             real N = P.normYZ();
             real U = N / R;
-            real F0 = -4 * F * std::tanh(U) / N;
-            real dF = -4 * F / square( std::exp(-U) + std::exp(U) );
+            real dF = 4 * F / ( R * square(std::exp(-U) + std::exp(U)) );
+            real F0 = -F * std::tanh(U) / N - dF;
             meca.addLineClampX(Mecapoint(this, i), dF);
             meca.addForce(this, i, Vector(0, F0*P.YY, F0*P.ZZ));
+            //std::clog << -F * std::tanh(U) << "  " << ( F0 + dF ) * N << "\n";
         }
     }
 #endif
