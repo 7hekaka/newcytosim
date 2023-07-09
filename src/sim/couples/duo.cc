@@ -36,6 +36,12 @@ void Duo::deactivate()
     active_ = 0;
 }
 
+void Duo::recycle()
+{
+    objset()->remove(this);
+    prop()->reserves.push(this);
+}
+
 //------------------------------------------------------------------------------
 
 void Duo::stepFF()
@@ -70,10 +76,7 @@ void Duo::stepFF()
             cHand2->stepUnattached(simul(), cPos);
     }
     else if ( prop()->deactivation_mode )
-    {
-        delete(this);
-        return;
-    }
+        recycle();
 }
 
 
@@ -113,7 +116,7 @@ void Duo::stepAF()
     {
         cHand1->detach();
         if ( prop()->deactivation_mode )
-            delete(this);
+            recycle();
     }
 }
 
@@ -144,7 +147,7 @@ void Duo::stepFA()
     {
         cHand2->detach();
         if ( prop()->deactivation_mode )
-            delete(this);
+            recycle();
         return;
     }
 }
@@ -181,7 +184,7 @@ void Duo::stepAA()
         cHand1->detach();
         cHand2->detach();
         if ( prop()->deactivation_mode )
-            delete(this);
+            recycle();
         return;
     }
 }

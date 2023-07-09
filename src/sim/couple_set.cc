@@ -123,15 +123,16 @@ void CoupleSet::step()
         step_couples<&Couple::stepFF>(ffHead, ffOdd);
     }
     
-#if 1
+#if 0
     ObjectID h = inventory_.highest();
     if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
     {
+        uniRelax();
         inventory_.reassign();
         Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
     }
 #endif
-    //printf("  : %lu couples [ %u %u ]\n", size(), inventory_.lowest(), inventory_.highest());
+    //printf(" couples: %lu %lu [ %u %u ]\n", size(), inventory_.count(), inventory_.lowest(), inventory_.highest());
 }
 
 
@@ -503,7 +504,6 @@ void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
     while ( cnt-- > 0 )
     {
         Couple * C = makeCouple(P);
-        assert_true(!C->attached1() && !C->attached2());
         C->randomizePosition();
         addFreeCouple(C);
     }
@@ -840,7 +840,8 @@ void CoupleSet::infoReserves(std::ostream& os) const
     for ( Property const* i : simul_.properties.find_all("couple") )
     {
         CoupleProp const * P = static_cast<CoupleProp const*>(i);
-        os << " " << P->number() << ":" << P->reserves.size();
+        size_t cnt = count(match_property, P);
+        os << " " << P->number() << ": " << cnt << " ( " << P->reserves.size() << " " << P->uni_counts << " )";
     }
     os << "\n";
 }
@@ -982,11 +983,9 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
         // assuming (or not) a given number of diffusing molecules
         bool fixed = ( P->fast_reservoir > 0 );
         size_t cnt = ( fixed ? P->fast_reservoir : P->uni_counts );
-        //std::clog << P->number() << ": " << P->uni_counts << " " << can.size() << "\n";
         
         if ( cnt > 0 )
         {
-            size_t total = size();
             const real alpha = 2 * P->spaceVolume() / cnt;
             
             if ( P->fast_diffusion & 2 )
@@ -1003,28 +1002,29 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
             if ( fixed ) // create enough candidates for all sites
                 uniRefill(P, loc.size());
             
+            size_t total = size();
             uniAttach1(loc, can);
             
-            if ( P->trans_activated )
-                continue;
-            
-            // if ( couple:trans_activated == true ), Hand2 cannot bind
-            if ( P->fast_diffusion & 2 )
+            if ( !P->trans_activated )
             {
-                real dis = alpha / P->hand2_prop->bindingSectionRate();
-                fibers.newFiberSitesP(loc, dis);
+                // if ( couple:trans_activated == true ), Hand2 cannot bind
+                if ( P->fast_diffusion & 2 )
+                {
+                    real dis = alpha / P->hand2_prop->bindingSectionRate();
+                    fibers.newFiberSitesP(loc, dis);
+                }
+                else
+                {
+                    real dis = alpha / P->hand2_prop->bindingSectionProb();
+                    fibers.uniFiberSites(loc, dis);
+                }
+                
+                if ( fixed ) // create enough candidates for all sites
+                    uniRefill(P, loc.size());
+                
+                uniAttach2(loc, can);
             }
-            else
-            {
-                real dis = alpha / P->hand2_prop->bindingSectionProb();
-                fibers.uniFiberSites(loc, dis);
-            }
-            
-            if ( fixed ) // create enough candidates for all sites
-                uniRefill(P, loc.size());
-            
-            uniAttach2(loc, can);
-            P->uni_counts -= total - size();
+            P->uni_counts -= size() - total;
         }
     }
 }
@@ -1236,12 +1236,10 @@ void CoupleSet::equilibrate(FiberSet const& fibers, CoupleProp const* P)
             equilibrate(fibers, P, P->reserves, P->reserves.size());
             
             // release all collected Couple
-            C = can.head();
-            while ( C )
+            while (( C = can.head() ))
             {
                 can.pop();
                 addFreeCouple(C);
-                C = can.head();
             }
         }
     }

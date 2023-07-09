@@ -100,10 +100,11 @@ void SingleSet::step()
     {
         step_singles<&Single::stepF>(fHead, fOdd);
     }
-#if 1
+#if 0
     ObjectID h = inventory_.highest();
     if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
     {
+        uniRelax();
         inventory_.reassign();
         Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
     }
@@ -732,7 +733,8 @@ void SingleSet::infoReserves(std::ostream& os) const
     for ( Property const* i : simul_.properties.find_all("single") )
     {
         SingleProp const * P = static_cast<SingleProp const*>(i);
-        os << " " << P->number() << ":" << P->reserves.size();
+        size_t cnt = count(match_property, P);
+        os << " " << P->number() << ": " << cnt << " ( " << P->reserves.size() << " " << P->uni_counts << " )";
     }
     os << "\n";
 }
@@ -836,7 +838,6 @@ void SingleSet::uniAttach(FiberSet const& fibers)
         if ( cnt > 0 )
         {
             const real vol = P->spaceVolume();
-            size_t total = size();
             if ( P->fast_diffusion & 2 )
             {
                 real dis = vol / ( cnt * P->hand_prop->bindingSectionRate() );
@@ -851,8 +852,9 @@ void SingleSet::uniAttach(FiberSet const& fibers)
             if ( fixed ) // create enough candidates for all sites
                 uniRefill(P, loc.size());
 
+            size_t total = size();
             uniAttach(loc, can);
-            P->uni_counts -= total - size();
+            P->uni_counts -= size() - total;
         }
     }
 }

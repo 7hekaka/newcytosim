@@ -4,6 +4,7 @@
 #include "duo_prop.h"
 #include "modulo.h"
 #include "random.h"
+#include "object_set.h"
 #include "meca.h"
 
 
@@ -43,7 +44,7 @@ void DuoLong::stepAA()
         cHand1->detach();
         cHand2->detach();
         if ( prop()->deactivation_mode )
-            delete(this);
+            recycle();
         return;
     }
 }

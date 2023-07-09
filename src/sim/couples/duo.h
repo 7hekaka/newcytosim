@@ -35,6 +35,9 @@ class Duo : public Couple
     /// check for deactivation
     void tryDeactivate();
     
+    /// place in reserve
+    void recycle();
+
 protected:
     
     /// active/inactive boolean flag
