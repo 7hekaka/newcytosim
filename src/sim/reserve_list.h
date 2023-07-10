@@ -33,7 +33,7 @@ public:
     void push(OBJECT * obj)
     {
         obj->objset(nullptr);
-        obj->Object::next(head_);
+        obj->next(head_);
         head_ = obj;
         ++count_;
     }

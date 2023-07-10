@@ -252,6 +252,9 @@ public:
 
     //--------------------------------------------------------------------------
 
+    /// set next element
+    void next(Couple * x) { nextO = x; }
+
     /// a static_cast<> of Object::next()
     Couple * next() const { return static_cast<Couple*>(nextO); }
     
