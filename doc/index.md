@@ -16,10 +16,13 @@
 *  [Graphical rendering](sim/graphics.md)
 *  [Exporting images and making movies](main/movies.md)
 *  [Getting numbers out of Cytosim with `report`](sim/report.md)
-*  [Frequently asked questions](main/faq.md)
 *  [Publications](publications/index.md)
 *  [File types](main/file_types.md)
 *  [Installation](main/installation.md)
+
+# Frequently asked questions
+
+*  [Frequently asked questions](main/faq.md)
 
 # Advanced matter
 

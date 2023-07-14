@@ -388,6 +388,34 @@ Cytosim has classes that use A or B, but not C.
 Once you have decided what is the best way to go, all the events (stop, diffuse, unbind, etc) can be treated using stochastic methods, following standard practice (eg. Gillespie or just tossing random numbers).
 </details>
 
+
+<details>
+<summary>
+**How does Cytosim considers friction terms? Does the engine account for any frictional force that may arise from bond breakage between motors and microtubules?**
+</summary>
+At the macroscopic level, indeed you might replace the activity of crosslinkers with a friction term, if these crosslinker are passive. Cytosim however represents such entities individually. So binding/unbinding are instantaneous events, and the bond is represented by a Hookean spring when it is made, and vanish immediately. However if you simulated a system with many crosslinker, they would indeed induce an effective friction on the filaments. Example `cym/friction.cym` illustrates this point: it has one filaments, attached to the right with a permanent spring, under tension, and the filament slides slowly, as the bonds break sucessively. 
+</details>
+
+
+
+<details>
+<summary>
+**In Nedelec et al. NJP 2007, there is a discussion of how motors can bind onto a microtubule if it is some epsilon distance close. What is epsilon set to in Cytosim? Would it vary based on the timestep?**
+</summary>
+The epsilon is a parameter set by the user. The time step is also constant. Now a user can define multiple ‘run’ commands with different values of the parameters, but there is no mechanism to adjust these things automatically. 
+
+Since that paper was published, we made key modifications to some aspect of the simulation. In particular motor are displaced upon unbinding to satisfy detailed balance: now just the binding/unbinding of would not disturb the uniformity of the spatial distribution of the motors. In our (very) old work, we did not have this correction term, and if you would set all diffusion constants to zero, then binding would bring the motors within epsilon exactly onto the filament, and upon unbinding they would remain at this position. So the region around the filaments would be ‘depleted’. Although unphysical, this problem was never a concern because we always had diffusion, but now this is fixed. 
+
+Further, detachment can be made force dependent: unbinding_rate = k_0 * exp(force/f0), in which case you can also fulfill detailed balance between bound motors/unbound motors, which are at different energy level: the energy of the Hookean bound motor is set by the stiffness link and the distance epsilon. However, by default the unbinding rate is not force dependent, so if the user does not specify the parameter of the force dependence (f0), then the system will not obey detailed balance.
+
+However, Cytosim’s engine does not cover all possible cases. Imagine a 2D system in which you would set the binding rate to infinity. In that case diffusing motors should not cross the filament, because binding is so fast. In cytosim this will only be the case for sufficiently small time step. That is because binding is evaluated only one per time step, given the current position of the motor. So if the diffusive movement in one time step exceeds 2x the binding range (epsilon), then some motors will be able to pass without binding.
+For the systems we studied in the past, this is actually what we wanted, but there are cases for which it would be different. Right now the burden of choosing an appropriate time step is on the user. The binding algorithm of course can be improved, but we cannot cover all cases.
+
+These points are very important for a system at equilibrium. My understanding is that then the system if far from equilibrium (like a contractile acto-myosin network or a spindle), these aspects tend to be less important. It is easy enough to run a simulation with/without these things to check by yourself, and I would certainly advise anyone to run the same system with smaller time steps to verify.
+</details>
+
+
+
 ### Single / Couple #################################
 
 <details>
