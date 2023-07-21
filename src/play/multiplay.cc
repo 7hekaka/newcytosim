@@ -24,7 +24,7 @@
 #include "glfw.h"
 
 int tileX = 2;
-int tileY = 2;
+int tileY = 3;
 constexpr int TOP = 128;
 
 // size of each cell (updated if window is resized)
@@ -99,9 +99,11 @@ void scrollCallback(GLFWwindow* win, double dx, double dy)
 {
     double mx, my;
     glfwGetCursorPos(win, &mx, &my);
-    //printf("scroll @ %8.2f %8.2f (%8.2f %8.2f)\n", mx, my, dx, dy);
-    double Z = std::max(0.5, 1.0 + 0.0625 * dy);
-    view.zoom_in(Z);
+    double Z = std::max(0.5, 1.0 - 0.0625 * dy);
+    Vector3 pos = view.unproject(mx*bugW/winW, bugH-my*bugH/winH, 0.5);
+    //printf("scroll @ %8.2f %8.2f (%8.2f %8.2f) %8.2f %8.2f\n", mx, my, dx, dy, pos.XX, pos.YY);
+    view.zoom_out(Z);
+    view.move_to((1-Z)*pos+Z*(view.focus+view.focus_shift));
 }
 
 /* enter/exit full screen mode */
@@ -276,36 +278,35 @@ void drawBug(Simul const& sim)
 
 //------------------------------------------------------------------------------
 
-/// read 'x:y' where ':' is specified as the character 'sep'
-int readDimensions(int& X, int& Y, const char str[], char sep)
+/// read 'X:Y' or 'INTxINT' where the separating character (':') is returned
+int readDimensions(int& X, int& Y, const char str[])
 {
-    char const* c = strchr(str, sep);
-    if ( c && isdigit(str[0]) )
+    char sep = 0;
+    if ( !isdigit(*str) )
+        return 1;
+    int x = X, y = Y;
+    char* ptr = nullptr;
+    errno = 0;
+    x = (int)strtol(str, &ptr, 10);
+    if ( x <= 0 )
     {
-        int x = X, y = Y;
-        char* ptr = nullptr;
-        errno = 0;
-        x = (int)strtol(str, &ptr, 10);
-        if ( x <= 0 )
-        {
-            if ( errno ) perror(str);
-            return 2;
-        }
-        if ( ptr != c )
-            return 3;
-        y = (int)strtol(c+1, &ptr, 10);
-        if ( y <= 0 )
-        {
-            if ( errno ) perror(str);
-            return 4;
-        }
-        if ( *ptr && !isspace(*ptr) )
-            return 5;
-        X = x;
-        Y = y;
-        return 0;
+        if ( errno ) perror(str);
+        return 2;
     }
-    return 1;
+    sep = *ptr++;
+    if ( !isprint(sep) )
+        return 3;
+    y = (int)strtol(ptr, &ptr, 10);
+    if ( y <= 0 )
+    {
+        if ( errno ) perror(str);
+        return 4;
+    }
+    if ( *ptr && !isspace(*ptr) )
+        return 5;
+    X = x;
+    Y = y;
+    return sep;
 }
 
 
@@ -316,7 +317,7 @@ int main(int argc, char *argv[])
     SimThread worker[TOP];
 
     //parse the command line:
-    if ( argc > 1 && 0 == readDimensions(tileX, tileY, argv[1], ':') )
+    if ( argc > 1 && readDimensions(tileX, tileY, argv[1]) )
         *argv[1] = 0;
     if ( tileX * tileY > TOP )
     {

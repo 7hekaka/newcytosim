@@ -43,7 +43,8 @@ PropertyList dispList;
 void mouseMotionCallback(GLFWwindow* win, double mx, double my)
 {
     int state = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_RIGHT);
-    //printf("mouse @ %8.2f %8.2f (%i)\n", mx, my, state);
+    //Vector3 pos = view.unproject(mx*bugW/winW, bugH-my*bugH/winH, 0.5);
+    //printf("mouse @ %8.2f %8.2f (%i) %8.2f %8.2f \n", mx, my, state, pos.XX, pos.YY);
     if ( state == GLFW_PRESS )
     {
     }
@@ -65,9 +66,11 @@ void scrollCallback(GLFWwindow* win, double dx, double dy)
 {
     double mx, my;
     glfwGetCursorPos(win, &mx, &my);
-    //printf("scroll @ %8.2f %8.2f (%8.2f %8.2f)\n", mx, my, dx, dy);
-    double Z = std::max(0.5, 1.0 + 0.0625 * dy);
-    view.zoom_in(Z);
+    double Z = std::max(0.5, 1.0 - 0.0625 * dy);
+    Vector3 pos = view.unproject(mx*bugW/winW, bugH-my*bugH/winH, 0.5);
+    //printf("scroll @ %8.2f %8.2f (%8.2f %8.2f) %8.2f %8.2f\n", mx, my, dx, dy, pos.XX, pos.YY);
+    view.zoom_out(Z);
+    view.move_to((1-Z)*pos+Z*(view.focus+view.focus_shift));
 }
 
 /* enter/exit full screen mode */
@@ -126,6 +129,7 @@ void keysCallback(GLFWwindow* win, int k, int s, int action, int mods)
         case '-': view.zoom_in(0.91700404320); break;
         case '=': view.zoom_in(1.09050773266); break;
         case 'X': view.axes = ( view.axes ? 0 : 3 ); break;
+        case 'Z': view.reset(); break;
 #if ( DIM > 1 )
         case GLFW_KEY_UP:    view.rotate_by(Quaternion<real>(0.99,-.1,0,0)); break;
         case GLFW_KEY_DOWN:  view.rotate_by(Quaternion<real>(0.99,0.1,0,0)); break;
@@ -154,7 +158,7 @@ void reshape(GLFWwindow* win, int W, int H)
     bugW = W;
     bugH = H;
     view.reshape(W, H);
-    printf("GLFW window %ix%i buffer %ix%i\n", winW, winH, W, H);
+    printf("GLFW window %i:%i buffer %i:%i\n", winW, winH, W, H);
 }
 
 
