@@ -38,8 +38,8 @@ Space * spc = nullptr;
 
 // number of points
 const size_t maxpts = 1<<17;
-size_t nbpts = 1024;
-size_t scan  = 16;
+size_t n_pts = 1024;
+size_t n_bin = 16;
 
 // INFLATION of the rectangle containing point to be projected
 const real INFLATION = 1;
@@ -92,7 +92,7 @@ int timerOn = false;
 int timerDelay = 50;
 
 //display parameter for OpenGL
-float LW = 1.0f;
+float LW = 2.0f;
 float PS = 3.0f;
 
 //amount of white added to colors
@@ -109,24 +109,24 @@ void generatePoints(real len)
     
     if ( regular_distribution )
     {
-        dif /= scan;
+        dif /= n_bin;
         size_t kk = 0;
-        nbpts = 0;
+        n_pts = 0;
         //follow a regular lattice:
-        for ( size_t ii = 0; ii <= scan; ++ii )
-        for ( size_t jj = 0; jj <= scan; ++jj )
+        for ( size_t ii = 0; ii <= n_bin; ++ii )
+        for ( size_t jj = 0; jj <= n_bin; ++jj )
 #if ( DIM >= 3 )
-        for ( kk = 0; kk <= scan; ++kk )
+        for ( kk = 0; kk <= n_bin; ++kk )
 #endif
         {
-            point[nbpts++] = inf + dif.e_mul(Vector(ii, jj, kk));
-            if ( nbpts >= maxpts )
+            point[n_pts++] = inf + dif.e_mul(Vector(ii, jj, kk));
+            if ( n_pts >= maxpts )
                 return;
         }
     }
     else
     {
-        for ( size_t ii = 0; ii <= nbpts; ++ii )
+        for ( size_t ii = 0; ii <= n_pts; ++ii )
             point[ii] = inf + dif.e_mul(Vector::randP());
         //point[ii] = Vector::randU();
         //point[ii] = spc->placeNearEdge(0.1);
@@ -136,7 +136,7 @@ void generatePoints(real len)
 
 void calculateNormals()
 {
-    for ( size_t ii = 0; ii < nbpts; ++ii )
+    for ( size_t ii = 0; ii < n_pts; ++ii )
         normal[ii] = spc->normalToEdge(project[ii]);
 }
 
@@ -146,7 +146,7 @@ void distributePoints(real len = INFLATION)
     generatePoints(len);
     error = 0;
     
-    for ( size_t ii = 0; ii < nbpts; ++ii )
+    for ( size_t ii = 0; ii < n_pts; ++ii )
     {
         normal[ii].reset();
         //see if space finds it inside:
@@ -363,16 +363,16 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             break;
             
         case ']':
-            scan *= 2;
-            nbpts *= 2;
-            if ( nbpts > maxpts )
-                nbpts = maxpts;
+            n_bin *= 2;
+            n_pts *= 2;
+            if ( n_pts > maxpts )
+                n_pts = maxpts;
             distributePoints();
             break;
             
         case '[':
-            if ( scan > 2 ) scan /= 2;
-            if ( nbpts > 2 ) nbpts /= 2;
+            if ( n_bin > 2 ) n_bin /= 2;
+            if ( n_pts > 2 ) n_pts /= 2;
             distributePoints();
             break;
             
@@ -515,9 +515,9 @@ int display(View& view)
     
     if ( showInside )
     {
-        flute3* flu = gym::mapBufferV3(nbpts);
+        flute3* flu = gym::mapBufferV3(n_pts);
         size_t n = 0;
-        for ( size_t i=0; i < nbpts; ++i )
+        for ( size_t i=0; i < n_pts; ++i )
         {
             if ( inside[i] )
                 flu[n++] = { (float)point[i].XX, (float)point[i].y(), (float)point[i].z() };
@@ -528,9 +528,9 @@ int display(View& view)
     }
     if ( showOutside )
     {
-        flute3* flu = gym::mapBufferV3(nbpts);
+        flute3* flu = gym::mapBufferV3(n_pts);
         size_t n = 0;
-        for ( size_t i=0; i < nbpts; ++i )
+        for ( size_t i=0; i < n_pts; ++i )
         {
             if ( !inside[i] )
                 flu[n++] = { (float)point[i].XX, (float)point[i].y(), (float)point[i].z() };
@@ -543,27 +543,29 @@ int display(View& view)
     if ( showProjected )
     {
         //use green for points inside, magenta for point outside:
-        flute8* flu = gym::mapBufferC4V4(nbpts);
+        flute8* flu = gym::mapBufferC4V4(n_pts);
         gym_color col(COL, COL, 0.f), lor(COL, 0.f, COL);
-        for ( size_t i=0; i < nbpts; ++i )
+        for ( size_t i=0; i < n_pts; ++i )
             flu[i] = { inside[i] ? col : lor, project[i] };
         gym::unmapBufferC4V4();
-        gym::drawPoints(PS, 0, nbpts);
+        gym::drawPoints(PS, 0, n_pts);
         gym::cleanup();
     }
 
     if ( showProject )
     {
-        flute8* flu = gym::mapBufferC4V4(2*nbpts);
+        gym::enableBlending();
+        flute8* flu = gym::mapBufferC4V4(2*n_pts);
         gym_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
         size_t n = 0;
-        for ( size_t i = 0; i < nbpts; ++i )
+        for ( size_t i = 0; i < n_pts; ++i )
         {
             if ( visible(i) )
             {
+                real d = 1 - std::tanh(distance(point[i], project[i]));
                 gym_color c = inside[i] ? col : lor;
-                flu[n++] = { c, point[i] };
                 flu[n++] = { c, project[i] };
+                flu[n++] = { c.alpha(d), point[i] };
             }
         }
         gym::unmapBufferC4V4();
@@ -573,10 +575,10 @@ int display(View& view)
     
     if ( showNormals )
     {
-        flute8* flu = gym::mapBufferC4V4(2*nbpts);
+        flute8* flu = gym::mapBufferC4V4(2*n_pts);
         gym_color col(1.f, 1.f, 1.f), lor(1.f, 1.f, 1.f, 0.f);
         size_t n = 0;
-        for ( size_t i = 0; i < nbpts; ++i )
+        for ( size_t i = 0; i < n_pts; ++i )
         {
             flu[n++] = { col, project[i] };
             flu[n++] = { lor, project[i]+normal[i] };
@@ -588,10 +590,10 @@ int display(View& view)
     
     if ( showReproject )
     {
-        flute8* flu = gym::mapBufferC4V4(2*nbpts);
+        flute8* flu = gym::mapBufferC4V4(2*n_pts);
         gym_color col(COL, 0.f, 0.f), lor(COL, 0.f, 0.f, 0.5f);
         size_t n = 0;
-        for ( size_t i = 0; i < nbpts; ++i )
+        for ( size_t i = 0; i < n_pts; ++i )
         {
             if ( visible(i) )
             {
@@ -606,10 +608,10 @@ int display(View& view)
     
     if ( showEdges )
     {
-        flute8* flu = gym::mapBufferC4V4(2*nbpts);
+        flute8* flu = gym::mapBufferC4V4(2*n_pts);
         gym_color col(0.f, COL, COL), lor(0.f, COL, 0.f);
         size_t n = 0;
-        for ( size_t i = 0; i < nbpts; ++i )
+        for ( size_t i = 0; i < n_pts; ++i )
         {
             if ( visible(i) )
             {
@@ -650,7 +652,6 @@ int main(int argc, char* argv[])
     RNG.seed();
 
     int mode = 1;
-    size_t cnt = 1;
     if ( argc > 1 && isdigit(argv[1][0]) )
         mode = 2;
     if ( argc > mode )

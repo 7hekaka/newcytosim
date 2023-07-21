@@ -22,12 +22,12 @@ void drawObject()
     glEnable(GL_LIGHTING);
     gym::color_front(1, 0, 1, 1);
     gym::color_back(0, 0, 0.1, 1);
-    gle::endedTube4();
+    gle::endedTube();
     glLineWidth(0.5);
     glColor4f(0, 1, 1, 0.5f);
     glDisable(GL_LIGHTING);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    gle::endedTube4();
+    gle::endedTube();
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 }
 
