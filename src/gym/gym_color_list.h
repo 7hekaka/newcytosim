@@ -11,9 +11,12 @@ namespace gym
 {
     class named_color;
 
-    /// a small set of contrasted colors (indx is wrapped to the number of colors)
-    gym_color nice_color(size_t indx);
+    /// a small set of contrasted colors that can be changed
+    gym_color get_color(size_t indx);
   
+    /// change indx-th color
+    void set_color(size_t indx, gym_color const&);
+
     /// a set of ~150 standard colors (indx is wrapped to the number of colors)
     gym_color std_color(size_t indx);
 

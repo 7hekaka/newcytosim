@@ -1615,13 +1615,21 @@ namespace gym
     }
     
     
-    gym_color nice_color(size_t indx)
+    gym_color get_color(size_t indx)
     {
         static constexpr unsigned max = sizeof(nice_colors) / sizeof(gym_color);
         
         return nice_colors[ indx % max ];
     }
     
+    
+    void set_color(size_t indx, const gym_color& col)
+    {
+        static constexpr unsigned max = sizeof(nice_colors) / sizeof(gym_color);
+        
+        nice_colors[ indx % max ] = col;
+    }
+
     
     void print_colors(std::ostream& os, named_color list[], size_t max)
     {

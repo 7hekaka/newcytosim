@@ -357,7 +357,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
             col = radial_color(fib->direction(), disp->color.alpha());
             break;
         case FiberDisp::COLORING_MARK:
-            col = gym::nice_color(fib->mark());
+            col = gym::get_color(fib->mark());
             break;
         case FiberDisp::COLORING_FLAG:
             col = gym::std_color(fib->flag());
@@ -365,7 +365,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
 #if FIBER_HAS_FAMILY
         case FiberDisp::COLORING_FAMILY:
             if ( fib->family_ )
-                col = gym::nice_color(fib->family_->signature());
+                col = gym::get_color(fib->family_->signature());
             else
                 col = disp->color;
             break;
@@ -436,7 +436,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
     if ( fib->endStateP() == disp->hide_state )
         hide = true;
     
-    // hide fibers in a specified state
+    // hide fibers except those with a certain mark
     if ( disp->show_marked != ~0U && fib->mark() != disp->show_marked )
         hide = true;
 
@@ -550,7 +550,7 @@ void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
     prep_flag = 0;
     // create a FiberDisp for each FiberProp:
     for ( Property* p : plist )
-        prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gym::nice_color(idx++));
+        prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gym::get_color(idx++));
 
     // create a LineDisp for each Fiber:
     attributeLineDisp(sim.fibers);
@@ -587,7 +587,7 @@ void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
     
     //create a PointDisp for each HandProp:
     for ( Property * i : sim.properties.find_all("hand") )
-        preparePointDisp(static_cast<HandProp*>(i), alldisp, gym::nice_color(idx++));
+        preparePointDisp(static_cast<HandProp*>(i), alldisp, gym::get_color(idx++));
     
     //create a PointDisp for each SphereProp:
     for ( Property * i : sim.properties.find_all("sphere") )
@@ -2318,7 +2318,7 @@ void Display::drawBead(Bead const& obj)
 #else
         if ( obj.mark() )
         {
-            col = gym::nice_color(obj.mark());
+            col = gym::get_color(obj.mark());
             gym::color_both(col);
             drawObject(obj.position(), pixscale(disp->size), gle::cube);
         }
