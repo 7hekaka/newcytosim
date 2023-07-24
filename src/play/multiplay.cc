@@ -142,13 +142,11 @@ void toggleFullScreen(GLFWwindow* win)
     }
 }
 
-/* respond to keyboard events based on keyboard layout */
-void keysCallback(GLFWwindow* win, int k, int s, int action, int mods)
+/* respond to keyboard events based on keyboard layout: 'k' is capitalized */
+void keyCallback(GLFWwindow* win, int k, int s, int action, int mods)
 {
-    if ( action != GLFW_PRESS )
-        return;
     //printf("keyCallback %c (%i %i)\n", k, action, mods);
-    switch (k)
+    if ( action == GLFW_PRESS ) switch (k)
     {
         case GLFW_KEY_ESCAPE:
             if ( glfwGetWindowMonitor(win) )
@@ -156,27 +154,26 @@ void keysCallback(GLFWwindow* win, int k, int s, int action, int mods)
             else
                 glfwSetWindowShouldClose(win, GLFW_TRUE);
             break;
-        case 'F': toggleFullScreen(win); break;
-        case '-': view.zoom_in(0.91700404320); break;
-        case '=': view.zoom_in(1.09050773266); break;
-#if ( DIM > 1 )
+#if ( DIM > 2 )
         case GLFW_KEY_UP:    view.rotate_by(Quaternion<real>(0.99,-.1,0,0)); break;
         case GLFW_KEY_DOWN:  view.rotate_by(Quaternion<real>(0.99,0.1,0,0)); break;
         case GLFW_KEY_LEFT:  view.rotate_by(Quaternion<real>(0.99,0,-.1,0)); break;
         case GLFW_KEY_RIGHT: view.rotate_by(Quaternion<real>(0.99,0,0.1,0)); break;
 #endif
-        default: return;
     }
 }
 
-/* respond to keyboard event based on characters emitted */
+/* respond to keyboard event based on character emitted */
 void charCallback(GLFWwindow* win, unsigned int k, int mods)
 {
-    printf("charCallback %c (%i)\n", k, mods);
+    //printf("charCallback %i (%c)\n", k, k);
     switch (k)
     {
-        case '-': view.zoom_in(M_SQRT1_2); break;
-        case '=': view.zoom_in(M_SQRT2); break;
+        case 'f': toggleFullScreen(win); break;
+        case '-': view.zoom_in(0.91700404320); break;
+        case '=': view.zoom_in(1.09050773266); break;
+        case 'x': view.axes = ( view.axes ? 0 : 3 ); break;
+        case 'z': view.reset(); break;
     }
 }
 
@@ -221,12 +218,12 @@ GLFWwindow * initWindow(int W, int H)
     }
     
     // Set callback functions
-    glfwSetKeyCallback(win, keysCallback);
+    glfwSetKeyCallback(win, keyCallback);
+    glfwSetCharModsCallback(win, charCallback);
     glfwSetFramebufferSizeCallback(win, reshape);
     glfwSetCursorPosCallback(win, mouseMotionCallback);
     glfwSetMouseButtonCallback(win, mouseButtonCallback);
     glfwSetScrollCallback(win, scrollCallback);
-    //glfwSetCharModsCallback(win, charCallback);
     glfwMakeContextCurrent(win);
     //gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
