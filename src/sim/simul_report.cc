@@ -3188,7 +3188,7 @@ void Simul::reportSpindleLength(std::ostream& out, Glossary& opt) const
     BeadProp * bip = findProperty<BeadProp>("bead", "condensate");
     if ( bip )
     {
-        out << COM << "left_cnt" << SEP << "left_pos" << SEP << "right_cnt" << SEP << "right_pos" << SEP << "distance";
+        out << COM << "left_cnt" << SEP << repeatXYZ("left_") << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
         Vector axis(1,0,0), R(0,0,0), L(0,0,0);
         size_t nR = 0, nL = 0;
         

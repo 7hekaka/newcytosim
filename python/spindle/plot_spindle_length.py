@@ -62,7 +62,7 @@ def get_data(file):
 
 def plot_data(X, Y, name):
     """
-        Plot surface as a function of time
+        Plot data as a function of time
     """
     fig = plt.figure(figsize=(4, 3))
     plt.plot(X, Y, label="pole-to-pole", linewidth=4.0)
@@ -73,7 +73,7 @@ def plot_data(X, Y, name):
     plt.title('Spindle Length', fontsize=fts)
     plt.legend()
     fig.tight_layout()
-    plt.savefig('spindle_length.png', dpi=75)
+    plt.savefig('spindle_length.png', dpi=150)
     #plt.show()
     plt.close()
 

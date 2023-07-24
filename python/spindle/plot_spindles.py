@@ -109,7 +109,7 @@ def plot_fiber_count(X, Y0, Y1, Y2):
     plt.ylim(math.floor(mY), math.ceil(xY))
     plt.xlabel('Augmin level', fontsize=fts)
     plt.ylabel('Fiber count (um)', fontsize=fts)
-    plt.title('Mean fiber cpunts', fontsize=fts)
+    plt.title('Mean fiber counts', fontsize=fts)
     plt.legend()
     fig.tight_layout()
     plt.savefig('fiber_count.png', dpi=150)
