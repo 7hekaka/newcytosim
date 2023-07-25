@@ -1073,13 +1073,15 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
 void Fiber::setInteractions(Meca& meca) const
 {
 #if NEW_SQUEEZE_FORCE
-    if ( prop->squeeze == 1 )
+    if ( prop->squeeze )
     {
         // implements a radial force in the YZ-plane: force = -F * tanh(yz/R)
         // derivative: -4F / R * ( exp(-u) + exp(u) )^2  with u = yz/R
         const real F = prop->squeeze_force;
         const real R = prop->squeeze_range;
-        for ( size_t i = 0; i < nPoints; ++i )
+        // if squeze == 2, force applies only to minus-end
+        const size_t end = ( prop->squeeze > 1 ) ? 1 : nPoints;
+        for ( size_t i = 0; i < end; ++i )
         {
             Vector P = posP(i);
             real N = P.normYZ();
