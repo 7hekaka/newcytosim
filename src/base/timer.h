@@ -1,5 +1,60 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 
+#ifndef TIMER_H
+#define TIMER_H
+
+#include <sys/time.h>
+
+// using computer's clock
+struct timeval tic_t;
+
+/// return current time in milliseconds
+inline unsigned long timer()
+{
+    timeval tv;
+    gettimeofday(&tv, nullptr);
+    return 1000 * (unsigned long)tv.tv_sec + tv.tv_usec / 1000;
+}
+
+/// start timer
+inline void tick()
+{
+    gettimeofday(&tic_t, nullptr);
+}
+
+/// return time since last 'tick()', divided by 'arg'
+inline double tock(double arg = 1)
+{
+    timeval tv;
+    gettimeofday(&tv, nullptr);
+    return double(1000*(tv.tv_sec-tic_t.tv_sec) + (tv.tv_usec-tic_t.tv_usec)/1000)/arg;
+}
+
+
+#if ( 0 )
+// using the CPU time
+
+#include <ctime>
+clock_t tic_t;
+
+/// return current time value
+inline clock_t timer()
+{
+    return clock();
+}
+
+/// start timer
+void tick()
+{
+    tic_t = clock();
+}
+
+/// return time since last 'tick()', divided by 'arg'
+double tock(double arg = CLOCKS_PER_SEC)
+{
+    return (1e3*( clock() - tic_t )) / arg;
+}
+#endif
 
 #if ( 0 )
 
@@ -32,57 +87,6 @@ inline void tick() { rdt_ = __rdtsc(); }
 /// return time since last 'tick()', divided by 'arg'
 inline double tock(double arg = 1) { return double((__rdtsc()-rdt_) >> 20) / arg; }
 
-#elif ( 1 )
-
-#include <sys/time.h>
-
-// using real time
-struct timeval tic_t;
-
-/// return current time in milliseconds
-inline unsigned long timer()
-{
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    return 1000 * (unsigned long)tv.tv_sec + tv.tv_usec / 1000;
-}
-
-/// start timer
-inline void tick()
-{
-    gettimeofday(&tic_t, nullptr);
-}
-
-/// return time since last 'tick()', divided by 'arg'
-inline double tock(double arg = 1)
-{
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    return double(1000*(tv.tv_sec-tic_t.tv_sec) + (tv.tv_usec-tic_t.tv_usec)/1000)/arg;
-}
-
-#else
-// using the CPU time
-
-#include <ctime>
-clock_t tic_t;
-
-/// return current time value
-inline clock_t timer()
-{
-    return clock();
-}
-
-/// start timer
-void tick()
-{
-    tic_t = clock();
-}
-
-/// return time since last 'tick()', divided by 'arg'
-double tock(double arg = CLOCKS_PER_SEC)
-{
-    return (1e3*( clock() - tic_t )) / arg;
-}
+#endif
 
 #endif
