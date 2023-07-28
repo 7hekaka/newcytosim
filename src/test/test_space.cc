@@ -46,13 +46,14 @@ const real INFLATION = 1;
 
 // regular or random distribution of the test-points
 bool regular_distribution = false;
+bool points_around_mouse = false;
 bool points_on_edges = false;
 
 //coordinates of the points:
 Vector point[maxpts];
 
 //true if inside
-int    inside[maxpts];
+bool inside[maxpts];
 
 //coordinates of the projections
 Vector project[maxpts];
@@ -67,7 +68,7 @@ Vector normal[maxpts];
 Vector upward[maxpts];
 
 //max distance from projection to second projection
-real  error = 0;
+real error = 0;
 
 //slicing parameters
 int slicing = 0;
@@ -108,7 +109,12 @@ void generatePoints(real len)
     inf -= Vector(len, len, len);
     dif += Vector(len, len, len) - inf;
     
-    if ( points_on_edges )
+    if ( points_around_mouse )
+    {
+        for ( size_t i = 0; i <= n_pts; ++i )
+            point[i] = mouse + thickness * Vector::randB();
+    }
+    else if ( points_on_edges )
     {
         for ( size_t i = 0; i <= n_pts; ++i )
             point[i] = spc->placeOnEdge(1);
@@ -350,7 +356,11 @@ void initMenus()
 void processMouseClick(int, int, const Vector3 & a, int)
 {
     origin = a;
-    glApp::postRedisplay();
+    if ( points_around_mouse )
+    {
+        distributePoints();
+        glApp::postRedisplay();
+    }
 }
 
 ///set callback for shift-drag, with unprojected mouse and click positions
@@ -358,8 +368,11 @@ void processMouseDrag(int, int, Vector3 & a, const Vector3 & b, int)
 {
     origin = a;
     mouse = b;
-    std::cerr << b << std::endl;
-    glApp::postRedisplay();
+    if ( points_around_mouse )
+    {
+        distributePoints();
+        glApp::postRedisplay();
+    }
 }
 
 
@@ -430,6 +443,10 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
 
         case 'i':
             showInside = ! showInside;
+            break;
+            
+        case 'm':
+            points_around_mouse = ! points_around_mouse;
             break;
             
         case 'o':
