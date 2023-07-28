@@ -46,7 +46,7 @@ const real INFLATION = 1;
 
 // regular or random distribution of the test-points
 bool regular_distribution = false;
-
+bool points_on_edges = false;
 
 //coordinates of the points:
 Vector point[maxpts];
@@ -63,8 +63,8 @@ Vector project2[maxpts];
 //normals to the projections
 Vector normal[maxpts];
 
-//located on the edges
-Vector edge[maxpts];
+// point + normal
+Vector upward[maxpts];
 
 //max distance from projection to second projection
 real  error = 0;
@@ -74,17 +74,18 @@ int slicing = 0;
 const real grain = 0.1;
 real thickness = grain;
 
-Vector origin(0, 0, 0);
-Vector axis(1, 0, 0);
+real intercept = 0;
+Vector3 origin(0, 0, 0);
+Vector3 axis(1, 0, 0);
+Vector3 mouse(0,0,0);
 
 //show or hide points in or outside
 int showInside    = true;
 int showOutside   = true;
-int showProject   = true;
+int showProjection = true;
 int showProjected = true;
 int showReproject = true;
 int showNormals   = false;
-int showEdges     = false;
 int showSpace     = 3;
 
 //use timer function on or off
@@ -107,7 +108,12 @@ void generatePoints(real len)
     inf -= Vector(len, len, len);
     dif += Vector(len, len, len) - inf;
     
-    if ( regular_distribution )
+    if ( points_on_edges )
+    {
+        for ( size_t i = 0; i <= n_pts; ++i )
+            point[i] = spc->placeOnEdge(1);
+    }
+    else if ( regular_distribution )
     {
         dif /= n_bin;
         size_t kk = 0;
@@ -126,8 +132,8 @@ void generatePoints(real len)
     }
     else
     {
-        for ( size_t ii = 0; ii <= n_pts; ++ii )
-            point[ii] = inf + dif.e_mul(Vector::randP());
+        for ( size_t i = 0; i <= n_pts; ++i )
+            point[i] = inf + dif.e_mul(Vector::randP());
         //point[ii] = Vector::randU();
         //point[ii] = spc->placeNearEdge(0.1);
     }
@@ -136,8 +142,11 @@ void generatePoints(real len)
 
 void calculateNormals()
 {
-    for ( size_t ii = 0; ii < n_pts; ++ii )
-        normal[ii] = spc->normalToEdge(project[ii]);
+    for ( size_t i = 0; i < n_pts; ++i )
+    {
+        normal[i] = spc->normalToEdge(project[i]);
+        upward[i] = project[i] + normal[i];
+    }
 }
 
 
@@ -146,20 +155,18 @@ void distributePoints(real len = INFLATION)
     generatePoints(len);
     error = 0;
     
-    for ( size_t ii = 0; ii < n_pts; ++ii )
+    for ( size_t i = 0; i < n_pts; ++i )
     {
-        normal[ii].reset();
+        normal[i].reset();
         //see if space finds it inside:
-        inside[ii] = spc->inside(point[ii]);
+        inside[i] = spc->inside(point[i]);
         //calculate the projection:
-        project[ii] = spc->project(point[ii]);
+        project[i] = spc->project(point[i]);
         
         //calculate the projection of the projection:
-        project2[ii] = spc->project(project[ii]);
+        project2[i] = spc->project(project[i]);
         
-        edge[ii] = spc->placeOnEdge(1);
-        
-        real d = ( project[ii] - project2[ii] ).normSqr();
+        real d = ( project[i] - project2[i] ).normSqr();
         error = std::max(d, error);
     }
     error = std::sqrt(error);
@@ -279,19 +286,20 @@ void processMenu(int item)
             showOutside = ! showOutside;
             break;
         case MENU_EDGES:
-            showEdges = ! showEdges;
+            points_on_edges = ! points_on_edges;
+            distributePoints();
             break;
         case MENU_PROJECT:
-            showProject = ! showProject;
+            showProjection = ! showProjection;
             break;
         case MENU_PROJECTED:
             showProjected = ! showProjected;
             break;
         case MENU_XSLICING:
-            toggleSlicing(1);
             break;
         case MENU_YSLICING:
             toggleSlicing(2);
+            toggleSlicing(1);
             break;
         case MENU_ZSLICING:
             toggleSlicing(3);
@@ -324,15 +332,34 @@ void initMenus()
 }
 
 //------------------------------------------------------------------------------
+
+
+///set callback for shift-click, with unprojected click position
+void processMouseClick(int, int, const Vector3 & a, int)
+{
+    origin = a;
+    glApp::postRedisplay();
+}
+
+///set callback for shift-drag, with unprojected mouse and click positions
+void processMouseDrag(int, int, Vector3 & a, const Vector3 & b, int)
+{
+    origin = a;
+    mouse = b;
+    std::cerr << b << std::endl;
+    glApp::postRedisplay();
+}
+
+
 void processSpecialKey(int key, int x=0, int y=0)
 {
     switch (key)
     {
         case GLUT_KEY_LEFT:
-            origin -= grain * axis;
+            intercept -= grain;
             break;
         case GLUT_KEY_RIGHT:
-            origin += grain * axis;
+            intercept += grain;
             break;
         case GLUT_KEY_UP:
             thickness += grain;
@@ -405,7 +432,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             break;
             
         case 'p':
-            showProject = ! showProject;
+            showProjection = ! showProjection;
             break;
             
         case 's':
@@ -413,7 +440,8 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             break;
 
         case 'e':
-            showEdges = ! showEdges;
+            points_on_edges = ! points_on_edges;
+            distributePoints();
             break;
             
         case 'n':
@@ -459,21 +487,32 @@ bool visible(size_t i)
 {
     if ( inside[i] )
     {
-        if ( ! showInside )
-            return false;
+        if ( !showInside ) return false;
     }
     else
     {
-        if ( ! showOutside )
-            return false;
+        if ( !showOutside ) return false;
     }
-    
-    if ( slicing )
-    {
-        //return ( abs_real(dot(project[i]-origin, axis)) < thickness );
-        return ( abs_real(dot(point[i]-origin, axis)) < thickness );
-    }
+    if ( slicing && abs_real(dot(point[i], axis)-intercept) > thickness )
+        return false;
     return true;
+}
+
+void drawLines(Vector const A[], gym_color const& col, Vector const B[], gym_color const& lor)
+{
+    flute8* flu = gym::mapBufferC4V4(2*n_pts);
+    size_t n = 0;
+    for ( size_t i = 0; i < n_pts; ++i )
+    {
+        if ( visible(i) )
+        {
+            flu[n++] = { col, A[i] };
+            flu[n++] = { lor, B[i] };
+        }
+    }
+    gym::unmapBufferC4V4();
+    gym::drawLines(2*LW, 0, n);
+    gym::cleanup();
 }
 
 
@@ -513,116 +552,35 @@ int display(View& view)
     gym::ref_view();
     gym::disableLighting();
     
-    if ( showInside )
+    flute8* flu = gym::mapBufferC4V4(2*n_pts);
+    gym_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
+    size_t n = 0;
+    for ( size_t i = 0; i < n_pts; ++i )
     {
-        flute3* flu = gym::mapBufferV3(n_pts);
-        size_t n = 0;
-        for ( size_t i=0; i < n_pts; ++i )
+        if ( visible(i) )
         {
-            if ( inside[i] )
-                flu[n++] = { (float)point[i].XX, (float)point[i].y(), (float)point[i].z() };
-         }
-        gym::unmapBufferV3();
-        gym::color(0.f, COL, 0.f); //use green for points inside
-        gym::drawPoints(PS, 0, n);
+            real d = 1 - std::tanh(distance(point[i], project[i]));
+            gym_color c = inside[i] ? col : lor;
+            flu[n++] = { c, project[i] };
+            flu[n++] = { c.alpha(d), point[i] };
+        }
     }
-    if ( showOutside )
-    {
-        flute3* flu = gym::mapBufferV3(n_pts);
-        size_t n = 0;
-        for ( size_t i=0; i < n_pts; ++i )
-        {
-            if ( !inside[i] )
-                flu[n++] = { (float)point[i].XX, (float)point[i].y(), (float)point[i].z() };
-         }
-        gym::unmapBufferV3();
-        gym::color(0.f, 0.f, COL); //use magenta for point outside
-        gym::drawPoints(PS, 0, n);
-    }
+    gym::unmapBufferC4V4();
+    gym::drawPoints(PS, 0, 2*n);
 
-    if ( showProjected )
-    {
-        //use green for points inside, magenta for point outside:
-        flute8* flu = gym::mapBufferC4V4(n_pts);
-        gym_color col(COL, COL, 0.f), lor(COL, 0.f, COL);
-        for ( size_t i=0; i < n_pts; ++i )
-            flu[i] = { inside[i] ? col : lor, project[i] };
-        gym::unmapBufferC4V4();
-        gym::drawPoints(PS, 0, n_pts);
-        gym::cleanup();
-    }
-
-    if ( showProject )
+    if ( showProjection )
     {
         gym::enableBlending();
-        flute8* flu = gym::mapBufferC4V4(2*n_pts);
-        gym_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
-        size_t n = 0;
-        for ( size_t i = 0; i < n_pts; ++i )
-        {
-            if ( visible(i) )
-            {
-                real d = 1 - std::tanh(distance(point[i], project[i]));
-                gym_color c = inside[i] ? col : lor;
-                flu[n++] = { c, project[i] };
-                flu[n++] = { c.alpha(d), point[i] };
-            }
-        }
-        gym::unmapBufferC4V4();
         gym::drawLines(LW, 0, n);
-        gym::cleanup();
     }
-    
+    gym::cleanup();
+
     if ( showNormals )
-    {
-        flute8* flu = gym::mapBufferC4V4(2*n_pts);
-        gym_color col(1.f, 1.f, 1.f), lor(1.f, 1.f, 1.f, 0.f);
-        size_t n = 0;
-        for ( size_t i = 0; i < n_pts; ++i )
-        {
-            flu[n++] = { col, project[i] };
-            flu[n++] = { lor, project[i]+normal[i] };
-        }
-        gym::unmapBufferC4V4();
-        gym::drawLines(LW, 0, n);
-        gym::cleanup();
-    }
+        drawLines(project, gym_color(1.f, 1.f, 1.f), upward, gym_color(1.f, 1.f, 1.f, 0.f));
     
     if ( showReproject )
-    {
-        flute8* flu = gym::mapBufferC4V4(2*n_pts);
-        gym_color col(COL, 0.f, 0.f), lor(COL, 0.f, 0.f, 0.5f);
-        size_t n = 0;
-        for ( size_t i = 0; i < n_pts; ++i )
-        {
-            if ( visible(i) )
-            {
-                flu[n++] = { col, project[i] };
-                flu[n++] = { lor, project2[i] };
-            }
-        }
-        gym::unmapBufferC4V4();
-        gym::drawLines(2*LW, 0, n);
-        gym::cleanup();
-    }
-    
-    if ( showEdges )
-    {
-        flute8* flu = gym::mapBufferC4V4(2*n_pts);
-        gym_color col(0.f, COL, COL), lor(0.f, COL, 0.f);
-        size_t n = 0;
-        for ( size_t i = 0; i < n_pts; ++i )
-        {
-            if ( visible(i) )
-            {
-                flu[n++] = { col, edge[i] };
-                flu[n++] = { lor, project[i] };
-            }
-         }
-        gym::unmapBufferC4V4();
-        gym::drawPoints(2, 0, n);
-        gym::cleanup();
-    }
+        drawLines(project, gym_color(COL, 0.f, 0.f), project2, gym_color(COL, 0.5f, 0.5f));
+
     view.closeDisplay();
     return 0;
 }
@@ -644,6 +602,8 @@ int main(int argc, char* argv[])
     glApp::setDimensionality(DIM);
     glApp::normalKeyFunc(processNormalKey);
     glApp::specialKeyFunc(processSpecialKey);
+    glApp::actionFunc(processMouseClick);
+    glApp::actionFunc(processMouseDrag);
     glApp::newWindow(display);
     glApp::setScale(20);
     gle::initialize();
