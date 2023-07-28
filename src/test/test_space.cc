@@ -44,10 +44,15 @@ size_t n_bin = 16;
 // INFLATION of the rectangle containing point to be projected
 const real INFLATION = 1;
 
+// parameters for planar_distribution
+const real grain = 0.1;
+real thickness = grain;
+
 // regular or random distribution of the test-points
 bool regular_distribution = false;
 bool points_around_mouse = false;
 bool points_on_edges = false;
+int planar_distribution = 0;
 
 //coordinates of the points:
 Vector point[maxpts];
@@ -69,11 +74,6 @@ Vector upward[maxpts];
 
 //max distance from projection to second projection
 real error = 0;
-
-//slicing parameters
-int slicing = 0;
-const real grain = 0.1;
-real thickness = grain;
 
 real intercept = 0;
 Vector3 origin(0, 0, 0);
@@ -136,15 +136,20 @@ void generatePoints(real len)
                 return;
         }
     }
-    else if ( slicing )
+    else if ( planar_distribution )
     {
         for ( size_t i = 0; i <= n_pts; ++i )
         {
-            Vector pos;
-            do {
-                pos = inf + dif.e_mul(Vector::randP());
-            } while ( abs_real(dot(pos, axis)-intercept) > thickness );
-            point[i] = pos;
+            point[i] = inf + dif.e_mul(Vector::randP());
+            real a = intercept + RNG.shalf() * thickness;
+            switch ( planar_distribution )
+            {
+                case 1: point[i].XX = a; break;
+                case 2: point[i].YY = a; break;
+#if ( DIM >= 3 )
+                case 3: point[i].ZZ = a; break;
+#endif
+            }
         }
     }
     else
@@ -276,8 +281,11 @@ enum MENUS_ID {
 
 void toggleSlicing(int d)
 {
-    slicing = !slicing;
-    switch ( d )
+    if ( planar_distribution == d )
+        planar_distribution = 0;
+    else
+        planar_distribution = d;
+    switch ( planar_distribution )
     {
         case 0: break;
         case 1: axis.set(1,0,0); break;
@@ -340,7 +348,7 @@ void initMenus()
     glutAddMenuEntry("Toggle outside (o)",   MENU_OUTSIDE);
     glutAddMenuEntry("Toggle edges   (e)",   MENU_EDGES);
     glutAddMenuEntry("Toggle project (p)",   MENU_PROJECT);
-    glutAddMenuEntry("Toggle projected (s)",   MENU_PROJECTED);
+    glutAddMenuEntry("Toggle projected (s)", MENU_PROJECTED);
 
     glutAddMenuEntry("Toggle x-slicing (x)", MENU_XSLICING);
     glutAddMenuEntry("Toggle y-slicing (y)", MENU_YSLICING);
