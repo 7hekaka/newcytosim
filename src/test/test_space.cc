@@ -130,6 +130,17 @@ void generatePoints(real len)
                 return;
         }
     }
+    else if ( slicing )
+    {
+        for ( size_t i = 0; i <= n_pts; ++i )
+        {
+            Vector pos;
+            do {
+                pos = inf + dif.e_mul(Vector::randP());
+            } while ( abs_real(dot(pos, axis)-intercept) > thickness );
+            point[i] = pos;
+        }
+    }
     else
     {
         for ( size_t i = 0; i <= n_pts; ++i )
@@ -259,7 +270,7 @@ enum MENUS_ID {
 
 void toggleSlicing(int d)
 {
-    slicing = ( slicing == d ? 0 : d & 3 );
+    slicing = !slicing;
     switch ( d )
     {
         case 0: break;
@@ -267,6 +278,7 @@ void toggleSlicing(int d)
         case 2: axis.set(0,1,0); break;
         case 3: axis.set(0,0,1); break;
     }
+    distributePoints();
 }
 
 
@@ -296,10 +308,10 @@ void processMenu(int item)
             showProjected = ! showProjected;
             break;
         case MENU_XSLICING:
+            toggleSlicing(1);
             break;
         case MENU_YSLICING:
             toggleSlicing(2);
-            toggleSlicing(1);
             break;
         case MENU_ZSLICING:
             toggleSlicing(3);
@@ -370,6 +382,7 @@ void processSpecialKey(int key, int x=0, int y=0)
         default:
             break;
     }
+    distributePoints();
     glApp::postRedisplay();
 }
 
@@ -413,10 +426,6 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             
         case 'z':
             toggleSlicing(3);
-            break;
-                
-        case 'c':
-            toggleSlicing(slicing+1);
             break;
 
         case 'i':
@@ -493,8 +502,6 @@ bool visible(size_t i)
     {
         if ( !showOutside ) return false;
     }
-    if ( slicing && abs_real(dot(point[i], axis)-intercept) > thickness )
-        return false;
     return true;
 }
 
