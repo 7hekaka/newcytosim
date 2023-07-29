@@ -28,7 +28,7 @@ void Player::clear()
 {
     worker.stop();
     worker.eraseSimul(1);
-    dispList.erase();
+    allDisp.erase();
     if ( mDisplay )
         delete(mDisplay);
     mDisplay = nullptr;
@@ -199,7 +199,7 @@ void Player::restart()
     {
         worker.stop();
         worker.eraseSimul(1);
-        dispList.erase();
+        allDisp.erase();
         worker.start();
     }
     catch( Exception & e ) {
@@ -224,12 +224,12 @@ inline PointDisp* toPointDisp(Property * ptr)
 
 PropertyList Player::allFiberDisp() const
 {
-    return dispList.find_all("fiber:display");
+    return allDisp.find_all("fiber:display");
 }
 
 PropertyList Player::allVisibleFiberDisp() const
 {
-    PropertyList res, plist = dispList.find_all("fiber:display");
+    PropertyList res, plist = allDisp.find_all("fiber:display");
     
     for ( Property * i : plist )
     {
@@ -241,12 +241,12 @@ PropertyList Player::allVisibleFiberDisp() const
 
 PropertyList Player::allHandDisp() const
 {
-    return dispList.find_all("hand:display");
+    return allDisp.find_all("hand:display");
 }
 
 PropertyList Player::allVisibleHandDisp() const
 {
-    PropertyList res, plist = dispList.find_all("hand:display");
+    PropertyList res, plist = allDisp.find_all("hand:display");
     
     for ( Property * i : plist )
     {
@@ -258,13 +258,13 @@ PropertyList Player::allVisibleHandDisp() const
 
 PropertyList Player::allSphereDisp() const
 {
-    return dispList.find_all("bead:display", "solid:display", "sphere:display");
+    return allDisp.find_all("bead:display", "solid:display", "sphere:display");
 }
 
 PropertyList Player::allVisibleSphereDisp() const
 {
     PropertyList res;
-    PropertyList all = dispList.find_all("bead:display", "solid:display", "sphere:display");
+    PropertyList all = allDisp.find_all("bead:display", "solid:display", "sphere:display");
     for ( Property * i : all )
     {
         if ( toPointDisp(i)->visible )
@@ -275,7 +275,7 @@ PropertyList Player::allVisibleSphereDisp() const
 
 PropertyList Player::allSpaceDisp() const
 {
-    return dispList.find_all("space:display");
+    return allDisp.find_all("space:display");
 }
 
 FiberDisp * Player::firstFiberDisp() const
@@ -317,5 +317,5 @@ void Player::writePlayParameters(std::ostream& os, bool prune) const
  */
 void Player::writeDisplayParameters(std::ostream& os, bool prune) const
 {
-    dispList.write(os, prune);
+    allDisp.write(os, prune);
 }

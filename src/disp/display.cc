@@ -483,9 +483,9 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gym_color col)
         {
             //std::clog <<" new " << p->category() << ":display " << p->name() << "\n";
             disp = new PointDisp(p->category()+":display", p->name());
-            disp->clear();
             alldisp.push_back(disp);
             // set default:
+            disp->clear();
             disp->color  = col;
             disp->color2 = col.alpha_scaled(0.1875f);
             disp->size   = prop->point_size;

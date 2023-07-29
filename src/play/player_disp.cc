@@ -231,7 +231,7 @@ void Player::setPixelSize(View& view)
     mDisplay->setParameters(pix, mag, view.depthAxis());
     mDisplay->setStencil(view.stencil);
 
-    for ( Property * p : dispList )
+    for ( Property * p : allDisp )
     {
         if ( p->category() != "fiber:display" )
             static_cast<PointDisp*>(p)->setPixels(pix, mag, disp.style==2);
@@ -274,8 +274,8 @@ void Player::prepareDisplay(View& view)
 
         if ( simul.fresh_ )
         {
-            mDisplay->prepareDrawing(simul, dispList);
-            //std::clog << " dispList.size() = " << dispList.size() << '\n';
+            mDisplay->prepareDrawing(simul, allDisp);
+            //std::clog << " allDisp.size() = " << allDisp.size() << '\n';
             simul.fresh_ = 0;
         }
     }
