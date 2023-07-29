@@ -97,6 +97,9 @@ public:
     /// accelerate animation if possible
     void accelerate();
     
+    /// change replay speed
+    void setTimelapse(unsigned);
+    
     /// start reverse animation
     bool startBackward();
     

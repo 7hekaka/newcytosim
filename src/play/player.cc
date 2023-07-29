@@ -107,7 +107,7 @@ void Player::rewind()
 
 bool Player::startPlayback()
 {
-    if ( worker.goodFile()  &&  prop.replay != 1  && !goLive )
+    if ( worker.goodFile() && prop.replay<=0 && !goLive )
     {
         //rewind file if its end was reached:
         if ( worker.eof() )
@@ -131,6 +131,14 @@ bool Player::startBackward()
         return true;
     }
     return false;
+}
+
+
+void Player::setTimelapse(unsigned delay)
+{
+    const unsigned int min_delay = 1;
+    prop.delay = std::max(min_delay, delay);
+    flashText("Delay %i ms", prop.delay);
 }
 
 

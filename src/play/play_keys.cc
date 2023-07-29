@@ -991,7 +991,12 @@ void processKey(unsigned char key, int modifiers = 0)
             if ( !player.startPlayback() )
                 player.accelerate();
             return;
-        
+            
+        case 'P':
+            player.startPlayback();
+            player.setTimelapse(1);
+            return;
+
         case ' ':
             if ( altKeyDown )
             {
