@@ -41,7 +41,7 @@ unsigned period = 16;
 View view("multiplay", DIM==3);
 DisplayProp disp("multiplay");
 Display1 display(&disp);
-PropertyList dispList;
+PropertyList allDisp;
 
 int selected = 0;
 int fate[TOP] = { 0 };
@@ -251,7 +251,7 @@ void prepareDraw()
     view.setLights();
     view.adjust(bugW, bugH);
     view.loadView();
-    //printf("dispList: %lu\n", dispList.size());
+    //printf("allDisp: %lu\n", allDisp.size());
 }
 
 
@@ -267,7 +267,7 @@ inline void selectPanel(int x, int y)
 void drawBug(Simul const& sim)
 {
     display.setParameters(view.pixelSize(), 1, view.depthAxis());
-    display.prepareDrawing(sim, dispList);
+    display.prepareDrawing(sim, allDisp);
     gym::clearPixels(view.back_color);
     display.drawSimul(sim);
     //gym::enableLighting(); gym::scale(0.2); gle::star();

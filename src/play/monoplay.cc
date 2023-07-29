@@ -34,7 +34,7 @@ int bugH = 1024;
 View view("monoplay", DIM==3);
 DisplayProp disp("monoplay");
 Display1 display(&disp);
-PropertyList dispList;
+PropertyList allDisp;
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -218,7 +218,7 @@ void drawBug(Simul const& sim)
 {
     view.openDisplay();
     display.setParameters(view.pixelSize(), 1, view.depthAxis());
-    display.prepareDrawing(sim, dispList);
+    display.prepareDrawing(sim, allDisp);
     display.drawSimul(sim);
     view.closeDisplay();
 }
