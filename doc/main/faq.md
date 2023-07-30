@@ -340,7 +340,24 @@ With (3) the new fiber is created at the position of the Nucleator.
 
 
 ### Motors ##########################################
- 
+
+<details>
+<summary>
+With respect to the way motor binding is implemented in Cytosim, was that based on a specific kinetic model that I could read more about? 
+</summary>
+We did not describe this in a specific paper.
+
+The thing is, this is very easy to change, and we did this over the years. The ‘core’ of cytosim deals with the mechanics of fiber movement/deformation, in a system with many fibers. This is done within the timestep under the assumption that links between the filaments are fixed.
+
+The binding/unbinding of the entities is simulated after the mechanics has been determined. This may create/destroy links, and thus will affect the mechanics of the next time step. 
+
+In some work, we considered that unbinding was not force dependent. Some would argue that is ‘not physical’, and they are right, because it would require an infinite ‘binding potential’. But for some work, we believe that it was justified, because it made the model simpler and the ’non-physical effects’ were not important. In most studies, we use force-dependent unbinding. We always have to balance simplicity vs. realism.
+
+For the binding/unbinding, one would like to have ‘detailed balanced’ fulfilled, but I believe in some case one can depart from this. If you simulated a system at thermodynamic equilibrium with a method that did not fulfill ‘detailed balance’, the results would be wrong, ie. artificially out-of-equilibrium (doi:10.1006/jtbi.2003.3200).
+However, for a system that is far from equilibrium, this would induce an error that may not be the biggest one in your simulation. 
+</details>
+
+
 <details>
 <summary>
 **I simulate a gliding assay. How can I convert the value for surface density in the simulation to a filament line density that we know from experiments?**

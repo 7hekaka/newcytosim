@@ -22,7 +22,7 @@
 
 # Frequently asked questions
 
-*  [Frequently asked questions](main/faq.md)
+*  [FAQ *Frequently asked questions*](main/faq.md)
 
 # Advanced matter
 
