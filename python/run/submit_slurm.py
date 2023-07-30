@@ -2,8 +2,8 @@
 #
 # A script to submit jobs to the SLURM queuing system
 #
-# F. Nedelec, 10.2007 --- 4.11.2020
-# Adapted from LSF to SLURM on 17.02.2017
+# F. Nedelec, 10.2007 --- 9.02.2021, 10.01.2022, 14.03.2023
+# Adapted to SLURM at Cambridge on 29.01.2021
 
 """
     Submit an array of jobs to the SLURM system, to be handled by 'go_sim.py'
@@ -15,7 +15,7 @@ Syntax:
     ARG is passed as arguments to 'go_sim.py' (please check go_sim.py help),
     and you must use quotes if you have multiple arguments to group them together.
     
-    Unless specified otherwise, the queue is 'skylake'.
+    Unless specified otherwise, the queue is 'icelake'.
     The amount of requested memory (default=2G) should be specified in MB:
        mem=1024 (for 1 GB)
        mem=512  (for 512 MB)
@@ -40,23 +40,24 @@ Examples:
        Submit a different job for each config file provided, with 10 repeats of each
     
     
-Last updated 09.02.2021
+Last updated 26.09.2018
 F. Nedelec
 """
 
+# default parameters for submission:
+submit  = 'sbatch'
+queue   = 'icelake'
+
+runtime = '12:00:00' # 12 hours
+memory  = 4048       # in MB
+ncpu    = 1          # nb of threads per job
 
 import sys, os, shutil, subprocess
 
-# default parameters for submission:
-subcmd  = 'sbatch'
-queue   = 'icelake'
-runtime = '5-00:00:00' # 5 days
-memory  = '4096'       # in MB
-ncpu    = 1            # nb of threads per job
-
-# parameters of the program:
-jdir    = 'job00'
-out     = sys.stderr
+# output for error messages:
+out  = sys.stderr
+# name of subdirectory to create (will be set below)
+jdir = 'job00'
 
 #-------------------------------------------------------------------------------
 
@@ -71,8 +72,8 @@ def execute(cmd):
         out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
 
-def makeNumberedDirectory(root):
-    """Create an empty directories that start with 'root'"""
+def make_new_directory(root):
+    """Create an empty directory named as 'rootXX' with a 2-digits number XX"""
     cnt = 0
     while cnt < 10000:
         name = root + '%02i' % cnt
@@ -87,44 +88,43 @@ def makeNumberedDirectory(root):
 
 def write_script(filename, cmd):
     """create an executable file containing the commands"""
-    fid = open(filename, 'w')
-    fid.write("#!/bin/bash\n")
+    f = open(filename, 'w')
+    f.write("#!/bin/bash\n")
     for s in cmd:
-        fid.write(s+'\n')
-    fid.close()
-    os.chmod(filename, 0700)
+        f.write(s+'\n')
+    f.close()
+    os.chmod(filename, 0o0700)
 
 #------------------------------------------------------------------------
 
-def job(cwd, conf, jarg):
-    """return bash script that will run one simulation"""
-    cmd  = ['module purge']
-    cmd += ['module load foss']
-    cmd += ['module load LAPACK OpenBLAS']
-    cmd += ['cd %s;' % cwd]
+def job_script(path, conf, exe, jarg):
+    """return bash script that will run one job"""
+    cmd  = ['cd %s;' % path]
+    # change time of script file to indicate activity:
     cmd += ['touch %s;' % conf]
-    # the job will call go_sim.py once:
-    cmd += ['go_sim.py %s %s;' % (jarg, conf)]
+    # actual work: the job will call go_sim.py once:
+    cmd += ['go_sim.py exe="%s" %s %s;' % (exe, jarg, conf)]
+    # cleanup: move config file into subdirectory 'done'
     cmd += ['mv '+conf+' '+jdir+'/done/.;']
-    # cleanup
+    # cleanup: move itself into subdirectory 'done'
     cmd += ['mv $0 '+jdir+'/done/.;']
     return cmd
 
 
-def sub(exe):
+def sub_script(exe):
     """return command that will submit one job"""
     # specify memory, shell, minimum number of cores and queue
-    cmd  = [subcmd, '--nodes=1', '--ntasks=1']
+    cmd  = [submit, '--nodes=1', '--ntasks=1']
     # specify number of threads if executable is threaded:
     if ncpu > 1:
         cmd += ['--cpus-per-task=%i' % ncpu]
     cmd += ['--job-name='+jdir]
     cmd += ['--partition='+queue] 
     cmd += ['--time='+runtime] 
-    cmd += ['--mem='+memory]
+    cmd += ['--mem='+repr(memory)]
     # define signals sent if time is exceeded:
-    cmd += ['--signal=15@120']
-    cmd += ['--signal=2@60']
+    cmd += ['--signal=INT@240']
+    cmd += ['--signal=TERM@10']
     # redirect stderr and sdtout to files:
     cmd += ['--output='+jdir+'/logs/out']
     cmd += ['--error='+jdir+'/logs/err']
@@ -133,7 +133,7 @@ def sub(exe):
     return cmd
 
 
-def array(jobcnt):
+def array_script(jobcnt):
     """return command that will submit a job-array"""
     # define parameters directly in the script:
     cmd  = ['#SBATCH --nodes=1']
@@ -143,10 +143,10 @@ def array(jobcnt):
         cmd += ['--cpus-per-task=%i' % ncpu]
     cmd += ['#SBATCH --partition='+queue]
     cmd += ['#SBATCH --time='+runtime]
-    cmd += ['#SBATCH --mem='+memory]
+    cmd += ['#SBATCH --mem='+repr(memory)]
     # define signals sent if time is exceeded:
-    cmd += ['#SBATCH --signal=INT@60']
-    cmd += ['#SBATCH --signal=TERM@120']
+    cmd += ['#SBATCH --signal=INT@240']
+    cmd += ['#SBATCH --signal=TERM@10']
     # redirect stderr and sdtout to files:
     cmd += ['#SBATCH --output='+jdir+'/logs/%a.out']
     cmd += ['#SBATCH --error='+jdir+'/logs/%a.err']
@@ -154,6 +154,7 @@ def array(jobcnt):
     cmd += ['#SBATCH --job-name='+jdir]
     cmd += ['#SBATCH --array=1-%i' % jobcnt]
     cmd += ['']
+    # this will execute 'R????' files in `todo` subdirectory:
     cmd += [jdir+'/todo/R$SLURM_ARRAY_TASK_ID']
     return cmd
 
@@ -161,38 +162,42 @@ def array(jobcnt):
 
 def main(args):
     """submit jobs, depending on the arguments provided"""
-    global subcmd, memory, runtime, queue, jdir, ncpu
+    global submit, memory, runtime, queue, jdir, ncpu
     
-    #find subcmd command:
-    proc = subprocess.Popen(['which', subcmd], stdout=subprocess.PIPE)
+    #find submit command:
+    proc = subprocess.Popen(['which', submit], stdout=subprocess.PIPE)
     if proc.wait():
-        out.write("Error: submit command `"+subcmd+"' not found!\n")
+        out.write("Error: submit command `"+submit+"' not found!\n")
     else:
-        subcmd = proc.stdout.readline().strip()
-        #print('|'+subcmd+'|')
+        submit = proc.stdout.readline().strip()
+        #print('|'+submit+'|')
     
     # first argument is used for go_sim.py:
-    jarg = args.pop(0)
-    
+    exe = args.pop(0)
+    if os.path.isfile(exe):
+        exe = os.path.abspath(exe)
+    # run executable within the debugger, to get trace if it crashes:
+    #exe = 'gdb -batch -ex run -ex bt /home/fjn28/rds/hpc-work/spindle/simd'
+
     # catch old-style invocation
-    if jarg.endswith(".cym"):
+    if exe.endswith(".cym"):
         print(__doc__)
         sys.exit()
     
     # make new directories for this job
-    jdir = makeNumberedDirectory('job')
-    os.mkdir(os.path.join(jdir, 'todo'))
+    jdir = make_new_directory('job')
+    todo = os.path.join(jdir,'todo')
+    os.mkdir(todo)
     os.mkdir(os.path.join(jdir, 'done'))
     os.mkdir(os.path.join(jdir, 'save'))
     os.mkdir(os.path.join(jdir, 'logs'))
 
-    print("    go_sim.py will run `%s' in %s" % (jarg, jdir))
+    print("    go_sim.py will run `%s' in %s" % (exe, jdir))
 
-    jdup  = 1
-    jcnt  = 0
-    jname = ''
-    cwd   = os.getcwd()
-    todo  = os.path.join(jdir,'todo')
+    jdup = 1  # number of time each job should be repeated
+    jcnt = 0  # number of jobs
+    jame = '' # name of file containing job script
+    wdir = os.getcwd()
     
     for arg in args:
         if os.path.isfile(arg):
@@ -203,18 +208,16 @@ def main(args):
                 jcnt += 1
                 conf = todo + '/config%04i.cym' % jcnt
                 shutil.copyfile(arg, conf)
-                jname = todo + '/R' + str(jcnt)
-                cmd = job(cwd, conf, jarg+' name=run%04i'%jcnt+' park='+jdir+'/save')
-                write_script(jname, cmd)
+                jame = todo + '/R' + str(jcnt)
+                cmd = job_script(wdir, conf, exe, 'name=r%04i'%jcnt+' park='+jdir+'/save')
+                write_script(jame, cmd)
         elif arg.isdigit():
             jdup = int(arg)
         else:
             [key, equal, val] = arg.partition('=')
             if key == 'mem' or key == 'memory':
-                memory = val
+                memory = int(val)
             elif key == 'cpu' or key == 'ncpu':
-                ncpu = int(val)
-            elif key == 'jobs' or key == 'njobs':
                 ncpu = int(val)
             elif key == 'day' or key == 'days':
                 runtime = val+'-00:00:00'
@@ -244,14 +247,14 @@ def main(args):
 
     if jcnt > 1:
         print("    submit.py created %i scripts in `%s'" % (jcnt, todo))
-        cmd = array(jcnt)
-        # create script file:
-        name = todo + '/job.bash';
-        write_script(name, cmd)
+        jame = jdir + '/job.bash';
+        # create script file to run job array:
+        cmd = array_script(jcnt)
+        write_script(jame, cmd)
         # make command to submit this script:
-        cmd = (subcmd, name)
+        cmd = (submit, jame)
     else:
-        cmd = sub(jname)
+        cmd = sub_script(jame)
     execute(cmd)
 
 
