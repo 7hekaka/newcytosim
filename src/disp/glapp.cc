@@ -1178,6 +1178,7 @@ void glApp::displayOtherWindows(int (*drawFunc)(View&))
 void glApp::postRedisplay()
 {
     //std::clog << " postRedisplay\n";
+    glutPostRedisplay();
     ++drawRefresh;
 }
 

@@ -40,13 +40,13 @@ public:
     
     /// default diameter of points
     float point_size;
-    
-    /// default width of Hookean links
-    float link_width;
 
     /// default width of lines
     float line_width;
     
+    /// default width of links
+    float link_width;
+
     /// if set > 0, this defines the unit scale used for `point_size` and `line_width`
     /**
      Set this parameter to specify the fiber radius and point size in length units.

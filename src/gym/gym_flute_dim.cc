@@ -8,7 +8,7 @@ size_t gym::last_cnt = 0;
 void gym::loadPoints(size_t cnt, const float pts[])
 {
 #if ( DIM == 1 )
-    // OpenGL cannot have only 1 coordinate per vertex
+    // OpenGL cannot handle only 1 coordinate per vertex
     flute2 * flt = mapBufferV2(2*cnt);
     for ( size_t i = 0; i < cnt; ++i )
         flt[i].set(pts[i], 0.f);
@@ -23,7 +23,7 @@ void gym::loadPoints(size_t cnt, const float pts[])
 void gym::loadPoints(size_t cnt, const double pts[])
 {
 #if ( DIM == 1 )
-    // OpenGL cannot have only 1 coordinate per vertex
+    // OpenGL cannot handle only 1 coordinate per vertex
     flute2 * flt = mapBufferV2(2*cnt);
     for ( size_t i = 0; i < cnt; ++i )
         flt[i].set(pts[i], 0.f);

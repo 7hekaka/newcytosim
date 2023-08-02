@@ -114,7 +114,7 @@ void toggleFullScreen(GLFWwindow* win)
 /* respond to keyboard events based on keyboard layout: 'k' is capitalized */
 void keyCallback(GLFWwindow* win, int k, int s, int action, int mods)
 {
-    //printf("keyCallback %c (%i %i)\n", k, action, mods);
+    //printf("keyCallback %i (%c) %i %i\n", k, k, action, mods);
     if ( action == GLFW_PRESS ) switch (k)
     {
         case GLFW_KEY_ESCAPE:

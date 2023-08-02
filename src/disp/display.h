@@ -197,7 +197,7 @@ public:
 
 
     /// draw thin lines joining the Fiber vertices
-    void drawFiberBackbone(Fiber const&) const;
+    void drawFiberBackbone(Fiber const&, float width) const;
 
     /// draw Fiber minus end
     virtual void drawFiberEndMinus(Fiber const&, int style, float size) const;

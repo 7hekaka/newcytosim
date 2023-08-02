@@ -279,10 +279,27 @@ static void flashPointStyle(FiberDisp const* p)
     }
 }
 
+static void flashFiberStyle(FiberDisp const* p)
+{
+    char const* n = p->name_str();
+    switch ( p->style )
+    {
+        case 0: flashText("%s: style=0 (default)", n); break;
+        case 1: flashText("%s: style=1 (backbone)", n); break;
+        case 2: flashText("%s: style=2 (striped)", n); break;
+        case 3: flashText("%s: style=3 (filament)", n); break;
+        case 4: flashText("%s: style=4 (actin)", n); break;
+        case 5: flashText("%s: style=5 (microtubule)", n); break;
+        default: flashText("unknown %s:style", n); break;
+    }
+}
+
 static void flashLineStyle(FiberDisp const* p)
 {
     char const* n = p->name_str();
-    switch ( p->line_style )
+    if ( p->style )
+        flashFiberStyle(p);
+    else switch ( p->line_style )
     {
         case 0: flashText("%s: no lines", n); break;
         case 1: flashText("%s: lines", n); break;
@@ -296,21 +313,6 @@ static void flashLineStyle(FiberDisp const* p)
         case 9: flashText("%s: color by height", n); break;
         case 10: flashText("%s: color by grid (if style=3)", n); break;
         default: flashText("unknown %s:line style", n); break;
-    }
-}
-
-static void flashFiberStyle(FiberDisp const* p)
-{
-    char const* n = p->name_str();
-    switch ( p->style )
-    {
-        case 0: flashText("%s: default style", n); break;
-        case 1: flashText("%s: style=1 (backbone)", n); break;
-        case 2: flashText("%s: style=2 (striped)", n); break;
-        case 3: flashText("%s: style=3 (filament)", n); break;
-        case 4: flashText("%s: style=4 (actin)", n); break;
-        case 5: flashText("%s: style=5 (microtubule)", n); break;
-        default: flashText("unknown %s:style", n); break;
     }
 }
 
@@ -482,8 +484,16 @@ static void changePointStyle(FiberDisp* p, int arg)
 
 static void toggleLineStyle(FiberDisp* p, int val)
 {
-    p->line_style = ( p->line_style != val ) * val;
-    flashLineStyle(p);
+    if ( p->style )
+    {
+        p->style = 0;
+        flashFiberStyle(p);
+    }
+    else
+    {
+        p->line_style = ( p->line_style != val ) * val;
+        flashLineStyle(p);
+    }
 }
 
 static void changeLineStyle(FiberDisp* p, int inc)

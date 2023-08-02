@@ -875,13 +875,13 @@ void Display::drawFiberGrowth(Fiber const& fib, float size) const
 }
 
 
-void Display::drawFiberBackbone(Fiber const& fib) const
+void Display::drawFiberBackbone(Fiber const& fib, float width) const
 {
     gym::ref_view();
     gym::disableLighting();
     gym::color(fib.disp->color);
     gym::loadPoints(fib.nbPoints(), fib.addrPoints());
-    gym::drawLineStrip(fib.prop->disp->line_width, 0, fib.nbPoints());
+    gym::drawLineStrip(width, 0, fib.nbPoints());
     gym::cleanup();
 }
 
@@ -1872,9 +1872,9 @@ void Display::drawFiber(Fiber const& fib)
     }
 #endif
 
-    // if the Lattice was displayed, do not draw backbone:
     if ( disp->style == 1 )
-        drawFiberBackbone(fib);
+        drawFiberBackbone(fib, prop->line_width); //fib.prop->disp->line_width);
+    // if the Lattice was displayed, do not draw fancy styles:
     else if ( style && disp->style )
     {
         gym_color col1 = fib.disp->color.alpha(1.0);
