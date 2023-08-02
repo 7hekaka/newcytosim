@@ -7,7 +7,8 @@
 
 """
 Description:
-    get parameter value from the config file
+    get parameter value from the config file.
+    Extract lines starting with '%preconfig.' and print values in columnar format
     
 Syntax:
     get_parameters.py DIRECTORY_PATH
@@ -59,7 +60,8 @@ def main(args):
         key, val = process(p)
         if not keys:
             keys = key
-            #print('% path', *keys)
+            if len(paths) == 1:
+                print('% path', *keys)
         if key == keys:
             print(p, *val)
         else:

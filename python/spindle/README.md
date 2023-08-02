@@ -3,7 +3,7 @@
 
 # Plots
 
-    get_parameters run* > parameters.txt
+    get_parameters.py run* > parameters.txt
     plot_fiber_length.py run* > fiber_length.txt
     plot_spindle_length.py run* > spindle_length.txt
 

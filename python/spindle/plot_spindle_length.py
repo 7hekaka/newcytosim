@@ -7,8 +7,9 @@
 
 """
 Description:
-    Plot spindle length, calculated by `report spindle:length`
-    
+    Plot spindle length, calculated by:
+    report time spindle:length > spindle_length.txt
+
 Syntax:
     plot_spindle_length.py DIRECTORY_PATH
 
@@ -20,6 +21,9 @@ To get the augmin value:
     paste A L > AL.txt
 
 """
+
+# time cut off
+cutoff = 800
 
 #font size:
 fts = 14
@@ -92,10 +96,11 @@ def process(dirpath):
         T, L = get_data(f)
         #print(T, L)
         plot_data(T, L, dirpath)
-        # calculate mean length for data above 1000s:
-        LL = [ x for t,x in zip(T,L) if t > 1000 ]
-        res = sum(LL) / len(LL)
-    print(f'{dirpath} {res}')
+        # calculate mean length for data above cutoff:
+        LL = [ x for t,x in zip(T,L) if t > cutoff ]
+        if LL:
+            res = sum(LL) / len(LL)
+    print(f'{dirpath} {res:6.3f}')
 
 
 #------------------------------------------------------------------------

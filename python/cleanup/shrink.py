@@ -105,7 +105,7 @@ def main(args):
         else:
             err.write("ignored '%s' on command line\n" % arg)
     if not files and not paths:
-        err.write("Error: you must specify files: *.tarz or *.tar.gz\n")
+        err.write("Error: you must specify paths or files: *.tarz or *.tar.gz\n")
         return 2
     for f in files:
         process(f[0], f[1])

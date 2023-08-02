@@ -7,7 +7,8 @@
 
 """
 Description:
-    Plot fiber length, calculated by `report fiber:mark`
+    Plot fiber length, calculated by:
+    report3 fiber:mark > fiber_length.txt
     
 Syntax:
     plot_fiber_length.py DIRECTORY_PATH
