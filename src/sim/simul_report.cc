@@ -48,12 +48,12 @@ static std::string rjust(std::string const& str, size_t n, size_t p = 1)
 /// repeat string DIM times with X, Y, Z endings as appropriate
 static std::string repeatXYZ(std::string const& str)
 {
-    std::string res(rjust(str+"X", 1, 1));
+    std::string res(rjust(str+"X", 1));
 #if ( DIM > 1 )
-    res += " " + rjust(str+"Y", 1, 1);
+    res += " " + rjust(str+"Y", 1);
 #endif
 #if ( DIM > 2 )
-    res += " " + rjust(str+"Z", 1, 1);
+    res += " " + rjust(str+"Z", 1);
 #endif
     return res;
 }
@@ -2708,7 +2708,7 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
  */
 void Simul::reportCoupleAnatomy(std::ostream& out, Property const* sel) const
 {
-    out << COM << "hand_id" << SEP << rjust("hand_name", 2, 1);
+    out << COM << "hand_id" << SEP << rjust("hand_name", 2);
     
     for ( Property const* i : properties.find_all("hand") )
     {
@@ -2717,7 +2717,7 @@ void Simul::reportCoupleAnatomy(std::ostream& out, Property const* sel) const
         out << SEP << rjust(p->name(), 2);
     }
 
-    out << COM << "couple_id" << SEP << rjust("couple_name", 2, 1);
+    out << COM << "couple_id" << SEP << rjust("couple_name", 2);
     out << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
     
     for ( Property const* i : properties.find_all("couple") )
