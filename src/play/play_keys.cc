@@ -676,26 +676,23 @@ static void setFiberDispVisible(PropertyList const& plist, int val)
 }
 
 
-static void shuffleVisible(FiberDisp* p, int val)
+static void shuffleFiberStyle(FiberDisp* p, int val)
 {
     char const* n = p->name_str();
-    if ( val && p->visible && p->line_style )
+    if ( val && p->line_style )
     {
-        p->visible = 0;
-        flashText("%s:visible = %i", n, p->visible);
-    }
-    else if ( p->line_style )
-    {
-        p->visible = 1;
         p->line_style = 0;
         p->speckle_style = 1;
         flashText("%s:speckle_style = %i", n, p->speckle_style);
     }
+    else if ( p->speckle_style )
+    {
+        p->speckle_style = 0;
+        flashText("%s:line_style = %i", n, p->line_style);
+    }
     else
     {
-        p->visible = 1;
         p->line_style = 1;
-        p->speckle_style = 0;
         flashText("%s:line_style = %i", n, p->line_style);
     }
 }
@@ -723,7 +720,7 @@ static void shuffleFiberDispVisible(const PropertyList& plist, int val)
     if ( plist.size() == 1 )
     {
         for ( Property * i : plist )
-            shuffleVisible(toFiberDisp(i), 1);
+            shuffleFiberStyle(toFiberDisp(i), 1);
     }
     else
     {
@@ -1025,7 +1022,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case '~':
-            setFiberDisp(player.allVisibleFiberDisp(), shuffleVisible, 0);
+            setFiberDisp(player.allVisibleFiberDisp(), shuffleFiberStyle, 0);
             break;
 
         case 't':
