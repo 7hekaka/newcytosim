@@ -22,3 +22,8 @@
     cut -c 1-7 z | xargs -n 1 -I {} collect.py run%%%% tmp/{}
     rmdir tmp
     rm x y z
+
+# Underlying reports
+
+	report time spindle:length > spindle_length.txt
+	report3 fiber:mark > fiber_length.txt

@@ -59,7 +59,7 @@ static std::string repeatXYZ(std::string const& str)
 }
 
 /// remove any 's' at the end of the argument
-static void remove_plural(std::string & str)
+static void remove_trailing_s(std::string & str)
 {
     if ( str.size() > 2  &&  str.at(str.size()-1) == 's' )
         str.resize(str.size()-1);
@@ -179,9 +179,9 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
         what = arg.substr(pos+1);
     }
     
-    // allow for 's' or not at the ends of words:
-    remove_plural(who);
-    remove_plural(what);
+    // allow for 's' to be present or not at the ends of words:
+    remove_trailing_s(who);
+    remove_trailing_s(what);
     
     //std::clog << "report("<< who << "|" << what << ")\n";
     if ( isCategory(who) )
@@ -334,7 +334,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "length" )
             return reportFiberLengths(out, sel);
         if ( what == "mark" )
-            return reportFiberMarks(out, sel);
+            return reportMarkedFiberLengths(out, sel);
         if ( what == "distribution" || what == "histogram" )
             return reportFiberLengthHistogram(out, opt);
         if ( what == "tension" )
@@ -503,6 +503,8 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
             return reportSpindleIndices(out);
         if ( what == "length" )
             return reportSpindleLength(out, opt);
+        if ( what == "minus_end" )
+            return reportMarkedFiberEnds(out, opt);
         if ( what == "profile" )
             return reportSpindleProfile(out, opt);
         if ( what == "fitnes" )
@@ -613,7 +615,7 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
 /**
  Export average length and variance for fibers grouped by mark
  */
-void Simul::reportFiberMarks(std::ostream& out, Property const*) const
+void Simul::reportMarkedFiberLengths(std::ostream& out, Property const*) const
 {
     out << COM << ljust("mark", 1, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
     out << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
@@ -1008,7 +1010,7 @@ void Simul::reportFibers(std::ostream& out, Property const* sel) const
 
 /**
  Export dynamic state, positions and directions of fiber
- Argument `end` can be MINUS_END, PLUS_END or BOTH_ENDS
+ Argument `end` can be { MINUS_END, PLUS_END, BOTH_ENDS }
  */
 void Simul::reportFiberEnds(std::ostream& out, FiberEnd end, Property const* sel) const
 {
@@ -3180,16 +3182,18 @@ void Simul::reportSpindleIndices(std::ostream& out) const
 
 
 /**
- Export average position of beads "condensate" on left and right side, relative to axis,
- and the distance between the two barycenters.
+ Export average position of beads "condensate" located on left and right sides,
+ and the distance between the two barycenters. Right/Left are defined on X-axis.
  */
-void Simul::reportSpindleLength(std::ostream& out, Glossary& opt) const
+void Simul::reportSpindleLength(std::ostream& out, Glossary&) const
 {
+    Vector axis(1,0,0);
     BeadProp * bip = findProperty<BeadProp>("bead", "condensate");
     if ( bip )
     {
-        out << COM << "left_cnt" << SEP << repeatXYZ("left_") << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
-        Vector axis(1,0,0), R(0,0,0), L(0,0,0);
+        out << COM << "left_cnt" << SEP << repeatXYZ("left_");
+        out << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
+        Vector R(0,0,0), L(0,0,0);
         size_t nR = 0, nL = 0;
         
         for ( Object const* i : beads.collect(bip) )
@@ -3201,6 +3205,44 @@ void Simul::reportSpindleLength(std::ostream& out, Glossary& opt) const
         if ( nR ) R /= nR;
         out << LIN << nL << SEP << L << SEP << nR << SEP << R << SEP << norm(R-L);
     }
+}
+
+
+/**
+ Export number and average position of minus ends located on left and right sides,
+ and the distance between the two barycenters. Right/Left are defined on X-axis.
+ */
+void Simul::reportMarkedFiberEnds(std::ostream& out, Glossary& opt) const
+{
+    Vector axis(1,0,0);
+    out << COM << ljust("mark", 1, 2) << SEP << "left_cnt" << SEP << repeatXYZ("left_");
+    out << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
+
+    ObjectMark sup = 0;
+    for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
+        sup = std::max(sup, fib->mark());
+
+    std::streamsize p = out.precision();
+    for ( ObjectMark k = 0; k <= sup; ++k )
+    {
+        std::uintptr_t val = k;
+        ObjectList objs = fibers.collect(match_mark, reinterpret_cast<void*>(val));
+        if ( objs.size() )
+        {
+            Vector R(0,0,0), L(0,0,0);
+            size_t nR = 0, nL = 0;
+            out << LIN << ljust(std::to_string(val), 1);
+            for ( Object const* i : objs )
+            {
+                Vector pos = static_cast<Fiber const*>(i)->posEndM();
+                if ( dot(pos, axis) < 0 ) { L += pos; ++nL; } else { R += pos; ++nR; }
+            }
+            if ( nL ) L /= nL;
+            if ( nR ) R /= nR;
+            out << SEP << nL << SEP << L << SEP << nR << SEP << R << SEP << norm(R-L);
+        }
+    }
+    out.precision(p);
 }
 
 

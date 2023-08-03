@@ -34,9 +34,9 @@ bool match_all(Object const*, void const*)
 /**
  This is a selection function used in ObjectSet::collect()
  */
-bool match_mark(Object const* obj, void const* ptr)
+bool match_mark(Object const* obj, void const* mrk)
 {
-    return ( obj->mark() == reinterpret_cast<std::uintptr_t>(ptr) );
+    return ( obj->mark() == reinterpret_cast<std::uintptr_t>(mrk) );
 }
 
 /**

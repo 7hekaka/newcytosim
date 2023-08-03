@@ -445,7 +445,7 @@ public:
     /// print the coordinates of the vertices of each fiber
     void reportFiberDirections(std::ostream&, Property const*) const;
 
-    /// print the positions and the states for one ends of all fibers
+    /// print the positions and the states for one type of end of all fibers
     void reportFiberEnds(std::ostream&, FiberEnd, Property const*) const;
     
     /// print number of fibers in each state of specified end
@@ -458,7 +458,7 @@ public:
     void reportFiberAge(std::ostream&) const;
     
     /// print average length and standard deviation for each class of fiber
-    void reportFiberMarks(std::ostream&, Property const*) const;
+    void reportMarkedFiberLengths(std::ostream&, Property const*) const;
 
     /// print average length and standard deviation for each class of fiber
     void reportFiberLengths(std::ostream&, Property const*) const;
@@ -659,6 +659,9 @@ public:
 
     /// print some coefficients calculated from the distribution of fibers
     void reportSpindleFitness(std::ostream&, Glossary&) const;
+
+    /// report position of minus ends for fiber per marks on left and right sides (08.2023)
+    void reportMarkedFiberEnds(std::ostream&, Glossary&) const;
 
     /// a special print for Romain Gibeaux
     void reportAshbya(std::ostream&) const;
