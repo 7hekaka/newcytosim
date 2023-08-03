@@ -42,7 +42,7 @@ def shrink(path):
     else:
         mes = ''
     stat = os.stat('red.cmo')
-    if stat.st_size > 10000:
+    if stat.st_size > 10000 and red > 4:
         #os.rename('objects.cmo', 'full.cmo')
         os.remove('objects.cmo')
         os.rename('red.cmo', 'objects.cmo')
@@ -66,25 +66,30 @@ def process(file, path):
             return
     else:
         print(path, end='')
-    # count frames:
-    cnt = nbFrames(os.path.join(path, 'objects.cmo'))
-    print(f': {cnt} frames', end='')
+    cnt = 0
+    try:
+        # create sentinel file, failing if file already exists:
+        sentinel = os.path.join(path, 'reduced')
+        fd = os.open(sentinel, os.O_CREAT|os.O_EXCL|os.O_WRONLY)
+    except FileExistsError as e:
+        print(': already reduced?')
+        return
+    else:
+        cnt = nbFrames(os.path.join(path, 'objects.cmo'))
+        os.write(fd, f'{cnt}\n'.encode())
+        os.close(fd)
     if cnt > min_frames:
+        print(f': {cnt} frames', end='')
         cdir = os.getcwd()
         os.chdir(path)
         try:
-            # create sentinel file, failing if file already exists:
-            fd = os.open('reduced', os.O_CREAT|os.O_EXCL|os.O_WRONLY)
-            os.write(fd, f'{cnt}\n'.encode())
-            os.close(fd)
-            try:
-                shrink(path)
-            except Exception as e:
-                with open('failed', 'w') as f:
-                    f.write(type(e), str(e))
-        except FileExistsError as e:
-            print(': already reduced?')
+            shrink(path)
+        except Exception as e:
+            with open('failed', 'w') as f:
+                f.write(type(e), str(e))
         os.chdir(cdir)
+    else:
+        print(f': {cnt} frames')
 
 
 #-------------------------------------------------------------------------------

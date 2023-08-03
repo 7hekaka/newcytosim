@@ -71,7 +71,7 @@ def plot_data(X, Y, name):
     fig = plt.figure(figsize=(4, 3))
     plt.plot(X, Y, label="pole-to-pole", linewidth=4.0)
     plt.xlim(0, math.ceil(max(X)/100)*100)
-    plt.ylim(math.floor(min(Y)), math.ceil(max(Y)))
+    plt.ylim(0, math.ceil(max(Y)))
     plt.xlabel('Time (s)', fontsize=fts)
     plt.ylabel('Length (um)', fontsize=fts)
     plt.title('Spindle Length', fontsize=fts)
@@ -95,11 +95,11 @@ def process(dirpath):
     with open(filename, 'r') as f:
         T, L = get_data(f)
         #print(T, L)
-        plot_data(T, L, dirpath)
         # calculate mean length for data above cutoff:
         LL = [ x for t,x in zip(T,L) if t > cutoff ]
         if LL:
             res = sum(LL) / len(LL)
+        plot_data(T, L, dirpath)
     print(f'{dirpath} {res:6.3f}')
 
 

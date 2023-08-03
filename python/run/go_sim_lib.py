@@ -64,11 +64,15 @@ def make_run_directory(root, conf):
     """create a temporary directory starting by `root`"""
     import tempfile
     if 'SLURM_JOB_ID' in os.environ:
+        # RDS directory on Cambridge's Research Computing Services
+        path = os.path.dirname(conf)
+        if path.endswith('todo'):
+            path = path[:-4]
         try:
-            # RDS directory on Cambridge's Research Computing Services
-            path = os.path.dirname(conf)
-            if path.endswith('todo'):
-                path = path[:-4]
+            return os.path.mkdir(os.path.join(path, root))
+        except FileExistsError:
+            pass
+        try:
             return tempfile.mkdtemp('', root+'-', path)
         except:
             pass
