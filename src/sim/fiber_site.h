@@ -112,10 +112,14 @@ public:
     void reinterpolate(real a, unsigned i) const { inter_=a; segix_=i; }
 
     /// update the Interpolation
-    void reinterpolate() const { //reinterpolate(hFiber->interpolate(hAbs)); }
+    void reinterpolate() const {
+#if 0
+        reinterpolate(hFiber->interpolate(hAbs));
+#else
         real a = std::max(hFiber->segmentationInv()*(hAbs-hFiber->abscissaM()), real(0));
         segix_ = std::min((unsigned)a, (unsigned)hFiber->lastSegment());
         inter_ = std::min(a-segix_, real(1));
+#endif
     }
 
     /// move to a different abscissa on the current fiber

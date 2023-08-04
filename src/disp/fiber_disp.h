@@ -238,7 +238,7 @@ public:
     /// hide filament with specified state
     unsigned hide_state;
     
-    /// hide filament which do not have specified mark
+    /// hide filament which do not have specified mark (default: disabled)
     unsigned show_marked;
 
     /// number of bits equal to `1` in the mask_bitfield

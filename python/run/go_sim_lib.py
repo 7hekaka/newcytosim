@@ -66,10 +66,12 @@ def make_run_directory(root, conf):
     if 'SLURM_JOB_ID' in os.environ:
         # RDS directory on Cambridge's Research Computing Services
         path = os.path.dirname(conf)
-        if path.endswith('todo'):
+        if path.endswith('/todo'):
             path = path[:-4]
         try:
-            return os.path.mkdir(os.path.join(path, root))
+            name = os.path.join(path, root)
+            os.mkdir(name)
+            return name
         except FileExistsError:
             pass
         try:
