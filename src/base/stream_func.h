@@ -29,10 +29,10 @@ namespace StreamFunc
     std::string marked_line(std::istream&, std::streampos, const char prefix[]);
     
     
-    /// extract line containing given `pos'
-    std::string extract_line(std::istream&, std::streampos pos, size_t&);
+    /// extract line containing given `pos`, preserving the current file position
+    std::string extract_line(std::istream&, std::streampos pos, size_t& line_nb);
     
-    /// extract line containing given `pos'
+    /// extract line containing given `pos`, preserving the current file position
     std::string extract_line(std::istream&, std::streampos pos);
     
     /// print line located at `pos`, with a line number

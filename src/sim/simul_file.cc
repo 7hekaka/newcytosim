@@ -458,7 +458,10 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
     InportLock lock(this);
     try
     {
+        VLOG("readObjects start at [" << in.peek() << "]\n");
         int res = readObjects(in, subset);
+        VLOG("readObjects end\n");
+
         in.unlock();
         if ( 0 == res )
         {
@@ -516,7 +519,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
     if ( tok == "section" )
     {
         iss >> section;
-        VLOG("-- section |" << section << "|\n");
+        VLOG("section <---|" << section << "|\n");
 #if 0
         // report size occupied by sections in file
         static std::string title;
@@ -609,10 +612,11 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
     // frame start
     else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )
         return 1;
-    //binary signature
+    // binary format signature
     else if ( tok == "binary" )
     {
         in.setEndianess(line.substr(7).c_str());
+        return 1;
     }
     // info line "#format 48 dim 2"
     else if ( tok == "format" )
@@ -630,6 +634,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                 Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
             in.vectorSize(d);
         }
+        return 1;
     }
     // time data "#time 1.2345"
     else if ( tok == "time" )
@@ -664,6 +669,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
             }
         }
 #endif
+        return 1;
     }
     //detect the mark at the end of the frame
     else if ( tok == "end" )
@@ -696,6 +702,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
 {
     ObjectSet * objset = nullptr;
     std::string section;
+    size_t nb_objects = 0;
     int has_frame = 0;
     int tag = 0, c = 0;
     int fat = 0;
@@ -704,17 +711,17 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
     while ( 1 )
     {
         do {
+            fpos_t pos;
+            bool has_pos = !in.get_pos(pos);
             c = in.get_char();
             if ( c == '#' )
             {
-                fpos_t pos;
-                bool has_pos = !in.get_pos(pos);
                 int h = readMetadata(in, section, objset, subset);
                 if ( h )
                 {
                     if ( h == 2 && has_frame )
                         return 0;
-                    if ( h == 1 && has_frame )
+                    if ( h == 1 && nb_objects > 0 )
                     {
                         // found another frame start without finishing current one?
                         if ( has_pos )
@@ -758,6 +765,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 assert_true( isupper(tag) || objset == findSetT(tag) );
                 objset->loadObject(in, tag, fat);
             }
+            ++nb_objects;
         }
         catch( Exception & e )
         {

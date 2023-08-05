@@ -156,7 +156,7 @@ Single * SingleSet::makeSingle(SingleProp const* P)
 void SingleSet::addFreeSingle(Single * obj)
 {
     assert_true(!obj->attached());
-    assert_true(!obj->objset());
+    assert_true(obj->objset()==nullptr || obj->objset()==this);
     obj->objset(this);
     fList.push_back(obj);
     inventory_.assign(obj);
