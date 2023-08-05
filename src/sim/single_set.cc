@@ -474,21 +474,27 @@ void SingleSet::writeF_skip(Outputter& out) const
     for ( SingleProp const* P : uniSingles )
     {
         PropertyID i = P->number();
-        sup = std::max(sup, i);
         if ( i < UNI_MAX )
+        {
+            sup = std::max(sup, i);
             cnt[i] = P->uni_counts;
+        }
     }
     for ( Single const* n=firstF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
-        if ( i < UNI_MAX &&  n->prop->fast_diffusion )
+        if ( i < UNI_MAX && n->prop->fast_diffusion )
             ++cnt[i];
         else
             n->write(out);
     }
-    out.write("\n#section single reheat");
-    for ( size_t i = 0; i < std::min(sup, UNI_MAX); ++i )
-        out.writeInt(cnt[i], ' ');
+    if ( sup > 0 )
+    {
+        assert_true( sup < UNI_MAX );
+        out.write("\n#section single reheat");
+        for ( size_t i = 0; i <= sup; ++i )
+            out.writeInt(cnt[i], ' ');
+    }
 }
 
 

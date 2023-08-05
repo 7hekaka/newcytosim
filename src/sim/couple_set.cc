@@ -260,7 +260,7 @@ Couple * CoupleSet::makeCouple(CoupleProp const* P)
 void CoupleSet::addFreeCouple(Couple * obj)
 {
     assert_true(!obj->attached());
-    assert_true(!obj->objset());
+    assert_true(obj->objset()==nullptr || obj->objset()==this);
     obj->objset(this);
     ffList.push_back(obj);
     inventory_.assign(obj);
@@ -514,13 +514,16 @@ void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
 {
     for ( size_t i = 1; i < n_cnt; ++i )
     {
-        Property * cp = simul_.properties.find("couple", i);
-        if ( cp )
+        if ( cnt[i] > 0 )
         {
-            CoupleProp * P = static_cast<CoupleProp*>(cp);
-            // renew pointers to 'confine_space'
-            P->complete(simul_);
-            makeCouples(P, cnt[i]);
+            Property * cp = simul_.properties.find("couple", i);
+            if ( cp )
+            {
+                CoupleProp * P = static_cast<CoupleProp*>(cp);
+                // renew pointers to 'confine_space'
+                P->complete(simul_);
+                makeCouples(P, cnt[i]);
+            }
         }
     }
 }
@@ -564,6 +567,12 @@ void CoupleSet::freeze()
 /** cnt[i] is the number of Couples of type `i` to be released */
 void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
 {
+#if 0
+    std::clog << "Couple::reheat";
+    for ( size_t n = 0; n < n_cnt; ++n )
+        std::clog << " " << cnt[n];
+    std::clog << "\n";
+#endif
     //std::clog << "Couple::reheat " << ice_.size() << "\n";
     Object * i = ice_.front();
     while ( i )
@@ -585,17 +594,12 @@ void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
             }
             else
             {
+                // place C on reserve
                 inventory_.unassign(C);
                 C->prop->reserves.push(C);
             }
         }
     }
-#if 0
-    std::clog << "Couple::reheat";
-    for ( size_t n = 0; n < n_cnt; ++n )
-        std::clog << " " << cnt[n];
-    std::clog << "\n";
-#endif
 }
 
 
@@ -640,7 +644,7 @@ void CoupleSet::writeFF_skip(Outputter& out) const
 {
     out.write("\n#section couple FF");
     writeRecords(out, ffList.size(), inventory_.highest());
-   
+    
     // count all the elements that are not written:
     const PropertyID UNI_MAX = 16;
     size_t cnt[UNI_MAX] = { 0 };
@@ -648,9 +652,11 @@ void CoupleSet::writeFF_skip(Outputter& out) const
     for ( CoupleProp const* P : uniCouples )
     {
         PropertyID i = P->number();
-        sup = std::max(sup, i);
         if ( i < UNI_MAX )
+        {
+            sup = std::max(sup, i);
             cnt[i] = P->uni_counts;
+        }
     }
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
@@ -660,9 +666,13 @@ void CoupleSet::writeFF_skip(Outputter& out) const
         else
             n->write(out);
     }
-    out.write("\n#section couple reheat");
-    for ( size_t i = 0; i < std::min(sup, UNI_MAX); ++i )
-        out.writeInt(cnt[i], ' ');
+    if ( sup > 0 )
+    {
+        assert_true( sup < UNI_MAX );
+        out.write("\n#section couple reheat");
+        for ( size_t i = 0; i <= sup; ++i )
+            out.writeInt(cnt[i], ' ');
+    }
 }
 
 void CoupleSet::writeSet(Outputter& out) const

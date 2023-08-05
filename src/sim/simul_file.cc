@@ -550,8 +550,8 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                     ++i;
                 if ( i > 0 )
                 {
-                    singles.reheat(cnt, 16);
-                    singles.makeSingles(cnt, 16);
+                    singles.reheat(cnt, i);
+                    singles.makeSingles(cnt, i);
                 }
 #if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
                 else
@@ -581,8 +581,8 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                     ++i;
                 if ( i > 0 )
                 {
-                    couples.reheat(cnt, 16);
-                    couples.makeCouples(cnt, 16);
+                    couples.reheat(cnt, i);
+                    couples.makeCouples(cnt, i);
                 }
 #if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
                 else
