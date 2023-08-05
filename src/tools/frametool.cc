@@ -136,33 +136,29 @@ public:
         i = 1;
         e = ~0UL;
 
-        int c = 0;
-        char * str;
+        char * str = nullptr;
         errno = 0;
         s = strtoul(arg, &str, 10);
         if ( errno ) goto finish;
-        if ( *str == ':' )
-        {
-            c = 1;
+        if ( *str != ':' )
+            e = s;
+        else {
             ++str;
+            if ( *str == 0 ) return;
             i = strtoul(str, &str, 10);
             if ( errno ) goto finish;
-            if ( *str == ':' )
+            if ( *str != ':' )
             {
+                e = i;
+                i = 1;
+            } else {
                 ++str;
                 if ( *str == 0 ) return;
-                c = 2;
                 e = strtoul(str, &str, 10);
                 if ( errno ) goto finish;
             }
         }
         if ( *str ) goto finish;
-
-        if ( c == 0 )
-            e = s;
-        if ( c == 1 )
-        { e = i; i = 1; }
-
         //fprintf(stderr, "frametool slice %lu:%lu:%lu\n", s, i, e);
         return;
     finish:
