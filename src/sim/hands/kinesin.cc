@@ -44,15 +44,11 @@ void Kinesin::stepUnloaded()
         int dir = ( nextAct <= nextBack ) - ( nextAct > nextBack );
 
         lati_t s = site() + dir * prop()->stride;
+        int out = outsideMP(s);
         
-        if ( aboveP(s) )
+        if ( out )
         {
-            if ( RNG.test_not(prop()->hold_growing_end[0]) )
-                return detach();
-        }
-        else if ( belowM(s) )
-        {
-            if ( RNG.test_not(prop()->hold_growing_end[1]) )
+            if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
         else if ( vacant(s) )
@@ -85,15 +81,11 @@ void Kinesin::stepLoaded(Vector const& force)
         int dir = ( nextAct <= nextBack ) - ( nextAct > nextBack );
 
         lati_t s = site() + dir * prop()->stride;
+        int out = outsideMP(s);
         
-        if ( aboveP(s) )
+        if ( out )
         {
-            if ( RNG.test_not(prop()->hold_growing_end[0]) )
-                return detach();
-        }
-        else if ( belowM(s) )
-        {
-            if ( RNG.test_not(prop()->hold_growing_end[1]) )
+            if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
         else if ( vacant(s) )

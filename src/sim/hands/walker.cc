@@ -57,15 +57,11 @@ void Walker::stepUnloaded()
             return detach();
         
         lati_t s = site() + prop()->stride;
+        int out = outsideMP(s);
         
-        if ( aboveP(s) )
+        if ( out )
         {
-            if ( RNG.test_not(prop()->hold_growing_end[0]) )
-                return detach();
-        }
-        else if ( belowM(s) )
-        {
-            if ( RNG.test_not(prop()->hold_growing_end[1]) )
+            if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
         else if ( vacant(s) )
@@ -102,15 +98,11 @@ void Walker::stepLoaded(Vector const& force)
             return detach();
 
         lati_t s = site() + prop()->stride;
-
-        if ( aboveP(s) )
+        int out = outsideMP(s);
+        
+        if ( out )
         {
-            if ( RNG.test_not(prop()->hold_growing_end[0]) )
-                return detach();
-        }
-        else if ( belowM(s) )
-        {
-            if ( RNG.test_not(prop()->hold_growing_end[1]) )
+            if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
         else if ( vacant(s) )
