@@ -40,7 +40,7 @@ public:
 #if FIBER_HAS_LATTICE
 
     /// true if given Lattice's site is outside Lattice's range
-    bool outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
+    int outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
     
     /// true if abscissa is below minus end
     bool belowM(lati_t s) const { return hLattice->belowM(s); }
@@ -56,7 +56,7 @@ public:
     /// converting site to abscissa when there is no lattice
     real abscissa_(lati_t s) const { return s * prop()->step_size + prop()->site_shift; }
 
-    bool outsideMP(lati_t s) const { return hFiber->outsideMP(abscissa_(s)); }
+    int outsideMP(lati_t s) const { return hFiber->outsideMP(abscissa_(s)); }
     
     /// true if abscissa is above abscissaM
     bool belowM(lati_t s) const { return hFiber->belowM(abscissa_(s)); }

@@ -252,20 +252,20 @@ public:
     /// true if `( abscissaM() <= a ) AND ( a <= abscissaP() )`
     bool betweenMP(const real a) const { return abscissaM() <= a + REAL_EPSILON && a <= abscissaP() + REAL_EPSILON; }
     
-    /// true if `(a < abscissaM() ) OR ( abscissaP() < a )`
-    bool outsideMP(const real a) const { return a < abscissaM() || abscissaP() < a; }
+    /// return 2 if site `i` is partly or entirely below the minus end, 1 if above the plus end
+    int outsideMP(const real a) const { return 2 * ( a < abscissaM() ) | ( abscissaP() < a ); }
     
     /// true if `a` is below the abscissa of minus end, and thus outside
-    bool belowM(const real a)    const { return a < abscissaM(); }
+    bool belowM(const real a) const { return a < abscissaM(); }
     
     /// true if `a` is above the abscissa of minus end
-    bool aboveM(const real a)    const { return abscissaM() <= a; }
+    bool aboveM(const real a) const { return abscissaM() <= a; }
 
     /// true if `a` is below the abscissa of plus end
-    bool belowP(const real a)    const { return a <= abscissaP(); }
+    bool belowP(const real a) const { return a <= abscissaP(); }
     
     /// true if `a` is above the abscissa of plus end, and thus outside
-    bool aboveP(const real a)    const { return abscissaP() < a; }
+    bool aboveP(const real a) const { return abscissaP() < a; }
 
     /// calculate the domain in which ab is located (near a FiberEnd, or central)
     FiberEnd whichEndDomain(real a, real lambda) const;

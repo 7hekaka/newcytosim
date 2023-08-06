@@ -297,8 +297,8 @@ public:
     /// true if site `i` is completely between Minus and Plus ends
     bool betweenMP(lati_t i) const { return (( laEntry <= i ) & ( i <= laFence )); }
     
-    /// true if site `i` is partly or entirely outside the range
-    bool outsideMP(lati_t i) const { return (( i < laEntry ) | ( laFence < i )); }
+    /// return 2 if site `i` is partly or entirely below the minus end, 1 if above the plus end
+    int outsideMP(lati_t i) const { return 2*( i < laEntry ) | ( laFence < i ); }
     
     /// true if site `i` is partly or entirely below the minus end
     bool belowM(lati_t i) const { return ( i < laEntry ); }
@@ -313,7 +313,7 @@ public:
      The range covered by site 'h' is [ abscissa(h), abscissa(h+1) ], and the
      abscissa of the center is abscissa(h+0.5).
      */
-    real    abscissa(const real s)    const { return s * laUnit; }
+    real abscissa(const real s) const { return s * laUnit; }
 
 #pragma mark - data access
 

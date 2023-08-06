@@ -199,7 +199,7 @@ public:
     bool aboveP() const { return hFiber->aboveP(hAbs); }
     
     /// true if abscissa is not within the fiber's boundaries
-    bool outsideMP() const { return hFiber->outsideMP(hAbs); }
+    int outsideMP() const { return hFiber->outsideMP(hAbs); }
     
     //--------------------------------------------------------------------------
     

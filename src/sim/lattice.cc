@@ -5,7 +5,7 @@
 
 /// write data within [inf, sup[ to file
 template <>
-void Lattice<uint8_t>::write_data(Outputter& out, lati_t inf, lati_t sup) const
+void Lattice<uint8_t>::write_data(Outputter& out, Lattice<uint8_t>::lati_t inf, Lattice<uint8_t>::lati_t sup) const
 {
     out.writeUInt16(0);
     out.writeUInt8(0);
