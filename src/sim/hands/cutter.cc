@@ -88,14 +88,14 @@ void Cutter::stepUnloaded()
     
     if ( a <= M )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[1]) )
             return detach();
         a = M;
     }
     
     if ( a >= P )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[0]) )
             return detach();
         a = P;
     }
@@ -126,14 +126,14 @@ void Cutter::stepLoaded(Vector const& force)
     
     if ( a <= M )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[1]) )
             return detach();
         a = M;
     }
     
     if ( a >= P )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[0]) )
             return detach();
         a = P;
     }

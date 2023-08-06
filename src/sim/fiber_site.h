@@ -185,12 +185,18 @@ public:
     
     /// distance to the closest fiber tip
     real distanceToNearestEnd() const;
+    
+    /// true if abscissa is below minus end
+    bool belowM() const { return hFiber->belowM(hAbs); }
 
-    /// true if abscissa is below abscissaP
+    /// true if abscissa is above minus end
+    bool aboveM() const { return hFiber->aboveM(hAbs); }
+
+    /// true if abscissa is below plus end
     bool belowP() const { return hFiber->belowP(hAbs); }
     
-    /// true if abscissa is above abscissaM
-    bool aboveM() const { return hFiber->aboveM(hAbs); }
+    /// true if abscissa is above plus end
+    bool aboveP() const { return hFiber->aboveP(hAbs); }
     
     /// true if abscissa is not within the fiber's boundaries
     bool outsideMP() const { return hFiber->outsideMP(hAbs); }

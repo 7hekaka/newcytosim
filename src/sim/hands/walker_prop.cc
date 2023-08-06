@@ -51,7 +51,7 @@ void WalkerProp::read(Glossary& glos)
         Cytosim::warn << "use `hold_growing_end` instead of `dangling_chance`\n";
     
 #if BACKWARD_COMPATIBILITY < 100
-    if ( glos.set(hold_growing_end,  "hold_fiber") )
+    if ( glos.set(hold_growing_end, 2, "hold_fiber") )
         Cytosim::warn << "you should use hand:hold_growing_end instead of hand:hold_fiber\n";
 #endif
 }

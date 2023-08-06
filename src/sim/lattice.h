@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University
 
 #ifndef LATTICE_H
 #define LATTICE_H
@@ -191,7 +191,7 @@ public:
     }
 
     /// Destructor
-    ~Lattice()    { deallocate(); }
+    ~Lattice() { deallocate(); }
     
     
     /// set distance betwen adjacent sites (the size of a site)
@@ -257,48 +257,54 @@ public:
     }
 
     /// index of site containing the minus end
-    lati_t  indexM() const { return laIndexM; }
+    lati_t indexM() const { return laIndexM; }
     
     /// index of site containing the plus end
-    lati_t  indexP() const { return laIndexP; }
+    lati_t indexP() const { return laIndexP; }
     
     /// index of lowest cell that is entirely within minus and plus ends
-    lati_t  entry()  const { return laEntry; }
+    lati_t entry()  const { return laEntry; }
     
     /// index of highest cell that is entirely within minus and plus ends
-    lati_t  fence()  const { return laFence; }
+    lati_t fence()  const { return laFence; }
 
     /// first valid index
-    lati_t  inf()    const { return laInf; }
+    lati_t inf()    const { return laInf; }
     
     /// one + last valid index
-    lati_t  sup()    const { return laSup; }
+    lati_t sup()    const { return laSup; }
 
     /// distance between adjacent sites
-    real    unit()   const { return laUnit; }
+    real   unit()   const { return laUnit; }
     
 #pragma mark - Index / Abscissa
 
     /// index of the site containing abscissa `a`
-    lati_t  index(real a)       const { return (lati_t)std::floor(a/laUnit); }
+    lati_t index(real a)       const { return (lati_t)std::floor(a/laUnit); }
     
     /// index of the site after the one containing abscissa `a`
-    lati_t  index_sup(real a)   const { return (lati_t)std::ceil(a/laUnit); }
+    lati_t index_sup(real a)   const { return (lati_t)std::ceil(a/laUnit); }
 
     /// index of the site after the one containing abscissa `a`
-    lati_t  index_round(real a) const { return (lati_t)round(a/laUnit); }
+    lati_t index_round(real a) const { return (lati_t)round(a/laUnit); }
 
-    /// true if index 'i' is covered by the lattice allocated range
-    bool    valid(lati_t i)     const { return (( laInf <= i ) & ( i < laSup )); }
+    /// true if site `i` is covered by the lattice allocated range
+    bool valid(lati_t i)     const { return (( laInf <= i ) & ( i < laSup )); }
     
-    /// true if index 'i' is not covered by the lattice allocated range
-    bool    invalid(lati_t i)   const { return (( i < laInf ) | ( laSup <= i )); }
+    /// true if site `i` is not covered by the lattice allocated range
+    bool invalid(lati_t i)   const { return (( i < laInf ) | ( laSup <= i )); }
     
-    /// true if index 'i' corresponds to a site that is completely between Minus and Plus ends
-    bool    betweenMP(lati_t i) const { return (( laEntry <= i ) & ( i <= laFence )); }
+    /// true if site `i` is completely between Minus and Plus ends
+    bool betweenMP(lati_t i) const { return (( laEntry <= i ) & ( i <= laFence )); }
     
-    /// true if index 'i' corresponds to a site that is partly or entirely outside the range
-    bool    outsideMP(lati_t i) const { return (( i < laEntry ) | ( laFence < i )); }
+    /// true if site `i` is partly or entirely outside the range
+    bool outsideMP(lati_t i) const { return (( i < laEntry ) | ( laFence < i )); }
+    
+    /// true if site `i` is partly or entirely below the minus end
+    bool belowM(lati_t i) const { return ( i < laEntry ); }
+    
+    /// true if site `i` is partly or entirely above the plus end
+    bool aboveP(lati_t i) const { return ( laFence < i ); }
 
     
     /// the site of index `h` covers the abscissa range `unit * h < s < unit * ( h + 1 )`
@@ -337,7 +343,7 @@ public:
     }
     
     /// set gradient of values from zero to `alpha`
-    void gradient(cell_t alpha)
+    void set_gradient(cell_t alpha)
     {
         cell_t val = alpha * laUnit;
         for ( lati_t s = laInf; s < laSup; ++s )

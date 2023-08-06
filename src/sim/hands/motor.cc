@@ -28,14 +28,14 @@ void Motor::stepUnloaded()
 
     if ( a < hFiber->abscissaM() )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[1]) )
             return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[0]) )
             return detach();
         a = hFiber->abscissaP();
     }
@@ -80,14 +80,14 @@ void Motor::stepLoaded(Vector const& force)
     
     if ( a < hFiber->abscissaM() )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[1]) )
             return detach();
         a = hFiber->abscissaM();
     }
     
     if ( a > hFiber->abscissaP() )
     {
-        if ( RNG.test_not(prop()->hold_growing_end) )
+        if ( RNG.test_not(prop()->hold_growing_end[0]) )
             return detach();
         a = hFiber->abscissaP();
     }

@@ -37,11 +37,37 @@ public:
     
     //--------------------------------------------------------------------------
 
-#if FIBER_HAS_LATTICE > 0
+#if FIBER_HAS_LATTICE
 
     /// true if given Lattice's site is outside Lattice's range
     bool outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
+    
+    /// true if abscissa is below minus end
+    bool belowM(lati_t s) const { return hLattice->belowM(s); }
+    
+    /// true if abscissa is above plus end
+    bool aboveP(lati_t s) const { return hLattice->aboveP(s); }
 
+#else
+    
+    /// ersatz function converting to site when there is no lattice
+    lati_t site() const { return (lati_t)std::nearbyint(hAbs/prop()->step_size); }
+    
+    /// converting site to abscissa when there is no lattice
+    real abscissa_(lati_t s) const { return s * prop()->step_size + prop()->site_shift; }
+
+    bool outsideMP(lati_t s) const { return hFiber->outsideMP(abscissa_(s)); }
+    
+    /// true if abscissa is above abscissaM
+    bool belowM(lati_t s) const { return hFiber->belowM(abscissa_(s)); }
+    
+    /// true if abscissa is below abscissaP
+    bool aboveP(lati_t s) const { return hFiber->aboveP(abscissa_(s)); }
+
+#endif
+    
+#if FIBER_HAS_LATTICE > 0
+    
     /// true if given Lattice's site has this footprint's bits set
     bool occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop()->footprint; }
 
@@ -56,11 +82,8 @@ public:
     
 #elif FIBER_HAS_LATTICE < 0
 
-    /// true if given Lattice's site is outside Lattice's range
-    bool outsideMP(lati_t s) const { return hLattice->outsideMP(s); }
-
     /// true if given Lattice's site is occupied
-    bool occupied(FiberLattice& lat, lati_t s) const { return lat.data(s) != 0.0; }
+    bool occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) != 0.0; }
 
     /// true if given Lattice's site is unoccupied
     bool vacant(lati_t s) const { return hLattice->data(s) == 0.0; }
@@ -73,8 +96,6 @@ public:
     
 #else
 
-    lati_t site() const { return (lati_t)std::nearbyint(hAbs/prop()->step_size); }
-    bool outsideMP(lati_t s) const { return fiber()->outsideMP((s+0.5)*prop()->step_size); }
     bool vacant(lati_t) const { return true; }
     void inc() const {}
     void dec() const {}

@@ -162,7 +162,8 @@ void HandProp::clear()
 #if NEW_BIND_ONLY_FREE_END
     bind_only_free_end = false;
 #endif
-    hold_growing_end   = 0;
+    hold_growing_end[0] = 0;
+    hold_growing_end[1] = 0;
     hold_shrinking_end[0] = 0;
     hold_shrinking_end[1] = 0;
 
@@ -179,7 +180,7 @@ void HandProp::read(Glossary& glos)
     glos.set(binding_key,   "binding_key", 0, "binding", 2);
     
 #if NEW_BINDING_LIMITS
-    glos.set(binding_limits, 2,  "binding_limits");
+    glos.set(binding_limits, 2, "binding_limits");
 #endif
     
     glos.set(unbinding_rate,  "unbinding_rate", 0, "unbinding", 0);
@@ -205,15 +206,15 @@ void HandProp::read(Glossary& glos)
                                                {"both_ends", BOTH_ENDS}});
 #endif
 #if BACKWARD_COMPATIBILITY < 50
-    glos.set(bind_only_end,      "bind_end", {{"off",       NO_END},
-                                              {"plus_end",  PLUS_END},
-                                              {"minus_end", MINUS_END},
-                                              {"both_ends", BOTH_ENDS}});
-    glos.set(bind_end_range,     "bind_end", 1);
+    glos.set(bind_only_end, "bind_end", {{"off",       NO_END},
+                                        {"plus_end",  PLUS_END},
+                                        {"minus_end", MINUS_END},
+                                        {"both_ends", BOTH_ENDS}});
+    glos.set(bind_end_range, "bind_end", 1);
 #endif
     
     
-    glos.set(hold_growing_end,   "hold_growing_end");
+    glos.set(hold_growing_end, 2, "hold_growing_end");
     glos.set(hold_shrinking_end, 2, "hold_shrinking_end");
 #if NEW_BIND_ONLY_FREE_END
     glos.set(bind_only_free_end, "bind_only_free_end");
@@ -221,11 +222,11 @@ void HandProp::read(Glossary& glos)
         Cytosim::warn << "hand:bind_only_free_end is only effective if bind_only_end is set!\n";
 #endif
     
-    glos.set(activity,           "activity");
+    glos.set(activity, "activity");
     if ( glos.set(display, "display") )
         display_fresh = true;
 
-#if BACKWARD_COMPATIBILITY < 100
+#if BACKWARD_COMPATIBILITY < 50
     if ( glos.set(hold_growing_end, "hold_growing_ends") )
         Cytosim::warn << "hand:hold_growing_ends was renamed hold_growing_end\n";
 #endif
@@ -251,12 +252,14 @@ void HandProp::complete(Simul const& sim)
     if ( unbinding_rate < 0 )
         throw InvalidParameter(name()+":unbinding_rate must be positive");
     
-    if ( hold_growing_end < 0 )
-        throw InvalidParameter(name()+":hold_growing_end must be >= 0");
-    
-    if ( hold_shrinking_end[0] < 0 )
+    if ( hold_growing_end[0] < 0 || 1 < hold_growing_end[0] )
+        throw InvalidParameter(name()+":hold_growing_end[0] must be >= 0");
+    if ( hold_growing_end[1] < 0 || 1 < hold_growing_end[1] )
+        throw InvalidParameter(name()+":hold_growing_end[1] must be >= 0");
+
+    if ( hold_shrinking_end[0] < 0 || 1 < hold_shrinking_end[0] )
         throw InvalidParameter(name()+":hold_shrinking_end[0] must be >= 0");
-    if ( hold_shrinking_end[1] < 0 )
+    if ( hold_shrinking_end[1] < 0 || 1 < hold_shrinking_end[0] )
         throw InvalidParameter(name()+":hold_shrinking_end[1] must be >= 0");
 
     if ( primed(sim) )
@@ -338,14 +341,14 @@ void HandProp::write_values(std::ostream& os) const
     write_value(os, "unbinding",          unbinding_rate, unbinding_force);
     
     write_value(os, "bind_also_end",      bind_also_end);
-    write_value(os, "hold_growing_end",   hold_growing_end);
+    write_value(os, "hold_growing_end",   hold_growing_end, 2);
     write_value(os, "hold_shrinking_end", hold_shrinking_end, 2);
     write_value(os, "bind_only_end",      bind_only_end, bind_end_range);
 #if NEW_BIND_ONLY_FREE_END
     write_value(os, "bind_only_free_end", bind_only_free_end);
 #endif
-    write_value(os, "display",            "("+display+")");
-    write_value(os, "activity",           activity);
+    write_value(os, "display", "("+display+")");
+    write_value(os, "activity", activity);
 }
 
 

@@ -87,11 +87,11 @@ private:
     /// target segmentation (copy of 'FiberProp::segmentation')
     real fnSegmentation;
     
-    /// abscissa of the minus-end (equal to zero initially)
-    real fnAbscissaM;
-    
     /// abscissa of the plus-end (equal to length initially)
     real fnAbscissaP;
+
+    /// abscissa of the minus-end (equal to zero initially)
+    real fnAbscissaM;
     
 #if CURVATURE_DEPENDENT_SEGMENTATION
     /// error due to the cutting at different steps
@@ -249,18 +249,24 @@ public:
     /// the sum of the distance between consecutive vertices (used for debugging)
     real contourLength()         const { return contourLength(pPos, nPoints); }
     
-    /// true if ( abscissaM() <= a ) AND ( a <= abscissaP() )
+    /// true if `( abscissaM() <= a ) AND ( a <= abscissaP() )`
     bool betweenMP(const real a) const { return abscissaM() <= a + REAL_EPSILON && a <= abscissaP() + REAL_EPSILON; }
     
-    /// true if ( a < abscissaM() ) OR ( abscissaP() < a )
+    /// true if `(a < abscissaM() ) OR ( abscissaP() < a )`
     bool outsideMP(const real a) const { return a < abscissaM() || abscissaP() < a; }
+    
+    /// true if `a` is below the abscissa of minus end, and thus outside
+    bool belowM(const real a)    const { return a < abscissaM(); }
+    
+    /// true if `a` is above the abscissa of minus end
+    bool aboveM(const real a)    const { return abscissaM() <= a; }
 
-    /// true if abscissa is smaller than abscissa of plus end
+    /// true if `a` is below the abscissa of plus end
     bool belowP(const real a)    const { return a <= abscissaP(); }
     
-    /// true if abscissa is greater than abscissa of minus end
-    bool aboveM(const real a)    const { return abscissaM() <= a; }
-    
+    /// true if `a` is above the abscissa of plus end, and thus outside
+    bool aboveP(const real a)    const { return abscissaP() < a; }
+
     /// calculate the domain in which ab is located (near a FiberEnd, or central)
     FiberEnd whichEndDomain(real a, real lambda) const;
     

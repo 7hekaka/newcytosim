@@ -167,16 +167,18 @@ public:
     bool bind_only_free_end;
 #endif
     
-    /// if false, the Hand will detach immediately upon reaching a growing or a static fiber end
+    /// detachment parameter, for cases when the hand reaches a growing or a static fiber end
     /**
-     A Hand may reach the tip of the fiber on which it is bound, because it has
-     moved, and `hold_growing_end` will determine the probability of detachment
-     in this case. A value of 0 leads to immediate detachment.
-     With a value of 1, the hand will remain attached.
+     A Hand may reach the tip of the fiber on which it is bound, because it has moved,
+     and `hold_growing_end` will determine the probability of detachment in this case.
+     - if `hold_growing_end == 0`, the hand will detach,
+     - if `hold_growing_end == 1`, the hand will be placed exactly at the fiber's end.
+     `hold_growing_end` is a probability that must be in [0, 1].
+     There are two values: [0] applies to the plus end, and [1] is for the minus end
      
      <em>default = 0</em>
      */
-    real hold_growing_end;
+    real hold_growing_end[2];
     
     
     /// detachment parameter, for cases when the Hand is reached by a shrinking fiber end
@@ -184,8 +186,8 @@ public:
      This determines detachment/no-detachment if a Hand is reached by a shrinking fiber end:
      - if `hold_shrinking_end == 0`, the hand will detach,
      - if `hold_shrinking_end == 1`, the hand will be relocated to track the end.
-     This is a probability that must be in [0, 1]. Values above 1 are equivalent to 1.
-     There are two values: [0] is for the plus end, and [1] is for the minus end
+     `hold_shrinking_end` is a probability that must be in [0, 1].
+     There are two values: [0] applies to the plus end, and [1] is for the minus end
      To set the hand to track shrinking minus end, use `hold_shrinking_end == 0, 1`
      <em>default = 0</em>
      */
