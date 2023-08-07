@@ -235,11 +235,11 @@ void Fiber::resetLattice()
         fLattice.clear();
         real unit = fLattice.unit();
     
-        for ( Hand * ha = fHands.front(); ha; ha = ha->next() )
+        for ( Hand * h = fHands.front(); h; h = h->next() )
         {
-            if ( ha->lattice() == lattice() )
+            if ( h->lattice() == lattice() )
             {
-                Digit* i = static_cast<Digit*>(ha);
+                Digit* i = static_cast<Digit*>(h);
                 i->inc();
                 i->moveTo(unit * i->site() + i->prop()->site_shift);
             }

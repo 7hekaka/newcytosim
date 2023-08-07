@@ -77,8 +77,9 @@ void HandList::detachAll()
     assert_true(haBack==nullptr);
 }
 
+
 /// qsort function comparing Hand::abscissa()
-static int compareAbscissa(const Hand* A, const Hand* B)
+static int compareHandAbscissa(const Hand* A, const Hand* B)
 {
     real a = A->abscissa();
     real b = B->abscissa();
@@ -92,7 +93,7 @@ static int compareAbscissa(const Hand* A, const Hand* B)
 void HandList::sort()
 {
     if ( haFront != haBack )
-        ::blinksort(haFront, haBack, compareAbscissa, haFront, haBack);
+        ::blinksort(haFront, haBack, compareHandAbscissa, haFront, haBack);
 }
 
 

@@ -328,12 +328,12 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
 void Fiber::flipHandsPolarity()
 {
     real C = abscissaM() + abscissaP();
-    Hand * ha = fHands.front();
-    while ( ha )
+    Hand * h = fHands.front();
+    while ( h )
     {
-        Hand * nx = ha->next();
-        ha->moveTo(C-ha->abscissa());
-        ha = nx;
+        Hand * x = h->next();
+        h->moveTo(C-h->abscissa());
+        h = x;
     }
 }
 
@@ -730,12 +730,12 @@ void Fiber::join(Fiber * fib)
 #endif
 
     // transfer all Hands
-    Hand * ha = fib->fHands.front();
-    while ( ha )
+    Hand * h = fib->fHands.front();
+    while ( h )
     {
-        Hand * nx = ha->next();
-        ha->relocate(this, ha->abscissa()+shift);
-        ha = nx;
+        Hand * x = h->next();
+        h->relocate(this, h->abscissa()+shift);
+        h = x;
     }
     delete(fib);
 

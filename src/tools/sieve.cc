@@ -61,6 +61,11 @@ int main(int argc, char* argv[])
     
     if ( arg.set(skip, "skip") )
        skip_set = simul.findSet(skip);
+    else if ( arg.has_key("skip") )
+    {
+        simul.prop.skip_free_single = 1;
+        simul.prop.skip_free_couple = 1;
+    }
     
     arg.set(dim, "dim");
     arg.set(binary, "binary");
