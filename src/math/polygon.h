@@ -36,14 +36,12 @@ public:
         void write(std::ostream& os) const
         {
             const int w = (int)os.width();
-            os << "Point2D(";
-            os << " " << std::fixed << std::setw(w) << xx;
-            os << " " << std::fixed << std::setw(w) << yy;
-            os << "}";
+            os << " P2{ " << std::fixed << std::setw(w) << xx;
+            os << " " << std::fixed << std::setw(w) << yy << "}";
         }
-    };
+     };
     
-    /// list of points. The array is allocated to hold index = 1+npts_
+    /// list of points. The array is allocated to hold index = 2+npts_
     Point2D* pts_;
     
     /// number of points
@@ -62,6 +60,9 @@ public:
     
     /// set number of points and allocate memory
     void allocate(size_t s);
+    
+    /// copy first two points to end of list
+    void wrap();
     
     /// set as regular polygon with `ord` sides (4 : square)
     void set(size_t ord, real radius, real angle = 0);
@@ -87,11 +88,8 @@ public:
     /// flip the order of the points
     void flip();
     
-    /// move all points by given amount
-    void translate(real dx, real dy);
-    
-    /// scale all points by given factors in X and Y
-    void scale(real sx, real sy);
+    /// move all points by given amount and scale
+    void transform(real dx, real dy, real sx, real sy);
     
     /// move all segments sideways, to uniformly increase the surface of polygon
     void inflate(real eps);

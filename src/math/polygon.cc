@@ -24,7 +24,7 @@ Polygon::~Polygon()
 void Polygon::allocate(size_t s)
 {
     delete[] pts_;
-    pts_  = new Point2D[s+1];
+    pts_  = new Point2D[s+2];
     npts_ = s;
 }
 
@@ -39,13 +39,13 @@ void Polygon::set(size_t ord, real rad, real ang)
         pts_[i].yy = rad * std::sin(ang);
         ang += a;
     }
-    pts_[ord] = pts_[0];
+    wrap();
 }
 
 
 void Polygon::setPoint(size_t i, real x, real y, long c)
 {
-    if (( pts_ != nullptr ) & ( i < npts_ ))
+    if ( pts_ && i < npts_ )
     {
         pts_[i].xx = x;
         pts_[i].yy = y;
@@ -99,7 +99,7 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
             ptr = end;
             errno = 0;
             k = strtol(ptr, &end, 10);
-            if ( errno | ( end == ptr ))
+            if ( errno || end == ptr )
                 k = 0;
         }
         
@@ -122,6 +122,7 @@ void Polygon::read(std::istream& in)
     in.clear();
     in.seekg(0);
     read(in, pts_, npts_);
+    wrap();
 }
 
 
@@ -138,7 +139,8 @@ void Polygon::read(std::string const& file)
     //std::clog << "reading polygon from " << file << '\n';
     
     read(in);
-    
+    in.close();
+
     if ( nbPoints() < 3 )
         throw InvalidParameter("polygon: too few points specified in `"+file+"'");
 }
@@ -174,26 +176,18 @@ void Polygon::flip()
         ++n;
         --p;
     }
+    wrap();
 }
 
 
-void Polygon::translate(real dx, real dy)
+void Polygon::transform(real sx, real sy, real dx, real dy)
 {
-    for ( size_t n = 0; n <= npts_; ++n )
+    for ( size_t n = 0; n < npts_; ++n )
     {
-        pts_[n].xx += dx;
-        pts_[n].yy += dy;
+        pts_[n].xx = sx * pts_[n].xx + dx;
+        pts_[n].yy = sy * pts_[n].yy + dy;
     }
-}
-
-
-void Polygon::scale(real sx, real sy)
-{
-    for ( size_t n = 0; n <= npts_; ++n )
-    {
-        pts_[n].xx *= sx;
-        pts_[n].yy *= sy;
-    }
+    wrap();
 }
 
 
@@ -248,14 +242,14 @@ void Polygon::inflate(real eps)
         pts_[n].xx = px;
         pts_[n].yy = py;
     }
-    
-    if ( npts_ > 1 )
-        pts_[npts_] = pts_[0];
+    wrap();
 }
 
 
 /**
- box[] = { xmin, xmax, ymin, ymax } over all points
+ box[] = { xmin, xmax, ymin, ymax }
+ 
+ result is undefined if ( npts == 0 ).
  */
 void Polygon::find_extremes(real box[4]) const
 {
@@ -265,13 +259,6 @@ void Polygon::find_extremes(real box[4]) const
         box[1] = pts_[0].xx;
         box[2] = pts_[0].yy;
         box[3] = pts_[0].yy;
-    }
-    else
-    {
-        box[0] = 0;
-        box[1] = 0;
-        box[2] = 0;
-        box[3] = 0;
     }
     
     for ( size_t i = 1; i < npts_; ++i )
@@ -283,6 +270,12 @@ void Polygon::find_extremes(real box[4]) const
     }
 }
 
+
+void Polygon::wrap()
+{
+    if ( npts_ > 1 ) pts_[npts_] = pts_[0];
+    if ( npts_ > 2 ) pts_[npts_+1] = pts_[1];
+}
 
 /**
  pre-calculate offset of successive points,
@@ -299,8 +292,6 @@ int Polygon::complete(real epsilon)
     int res = 0;
     if ( npts_ > 1 )
     {
-        pts_[npts_] = pts_[0];
-   
         size_t i = 0, n = 0, p = 0;
         do {
             real dx = 0, dy = 0, d = 1;
@@ -328,8 +319,7 @@ finish:
             npts_ = i;
             res = 1;
         }
-        
-        pts_[npts_] = pts_[0];
+        wrap();
     }
 
     return res;
@@ -368,17 +358,18 @@ real Polygon::surface() const
 int Polygon::inside(real xx, real yy, int edge, real threshold) const
 {
     int cross = 0;
-    
-    Point2D p1, p2 = pts_[0];
-    
-    //check all edges of polygon
-    for ( size_t i = 1; i <= npts_; ++i )
+        
+    // check sides of polygon against horizontal line from (xx, yy) to (+inf, yy)
+    for ( size_t i = 0; i < npts_; ++i )
     {
-        p1 = p2;
-        p2 = pts_[i];
+        const Point2D & p1 = pts_[i]; // not included in edge
+        const Point2D & p2 = pts_[i+1];
 
-        // check if edge cannot interesect with ray
-        if (((yy <= p1.yy) & (yy < p2.yy)) | ((yy >= p1.yy) & (yy > p2.yy)))
+        //p1.write(std::clog); p2.write(std::clog); std::clog << "\n";
+        // check if edge cannot intersect with ray
+        bool above = ( yy <= p1.yy) && ( yy < p2.yy );
+        bool below = ( yy >= p1.yy) && ( yy > p2.yy );
+        if ( above || below )
             continue;
         
         // ray may go through p2
@@ -387,9 +378,9 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
             // check for horizontal edge
             if ( p1.yy == p2.yy )
             {
-                if ((xx > p1.xx) & (xx > p2.xx))
-                    continue;
-                if ((xx < p1.xx) & (xx < p2.xx))
+                bool left = ( xx < p1.xx ) && ( xx < p2.xx );
+                bool right = ( xx > p1.xx ) && ( xx > p2.xx );
+                if ( left | right )
                     continue;
                 return edge;
             }
@@ -400,13 +391,15 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
             if ( xx == p2.xx )
                 return edge;
             
+            ++cross;
+
             // next vertex
             const Point2D& p3 = pts_[i+1];
          
             // check that p2 is not a corner
-            if (((p1.yy < yy) & (yy < p3.yy)) | ((p3.yy < yy) & (yy < p1.yy)))
-                ++cross;
-            
+            bool updown = ( p1.yy < yy ) && ( yy < p3.yy );
+            bool downup = ( p3.yy < yy ) && ( yy < p1.yy );
+            cross += updown | downup;
             continue;
         }
         
@@ -426,7 +419,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
         }
     }
     
-    //std::clog << " polygon::inside " << cross << " for " << xx << " " << yy << '\n';
+    //std::clog << " polygon::inside " << cross << " for (" << xx << " " << yy << ")\n";
     return ( cross & 1 );
 }
 
@@ -497,7 +490,7 @@ void Polygon::dump(std::ostream& os) const
 {
     const int W = 10;
     os << "polygon " << npts_ << "\n";
-    for ( size_t n = 0; n <= npts_; ++n )
+    for ( size_t n = 0; n < npts_; ++n )
     {
         os << " " << std::setw(W) << pts_[n].xx << " " << std::setw(W) << pts_[n].yy << " " << pts_[n].spot;
         os << " " << std::setw(W) << pts_[n].dx << " " << std::setw(W) << pts_[n].dy << "\n";
@@ -508,7 +501,7 @@ void Polygon::dump(std::ostream& os) const
 void Polygon::print(FILE * f) const
 {
     fprintf(f, "polygon %lu\n", npts_);
-    for ( size_t n = 0; n <= npts_; ++n )
+    for ( size_t n = 0; n < npts_; ++n )
     {
         fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].spot);
         fprintf(f, "  %10.2f %10.2f\n", pts_[n].dx, pts_[n].dy);
