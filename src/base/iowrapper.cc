@@ -627,9 +627,11 @@ void Outputter::writeFixed(const float x)
 {
     if ( binary_ )
     {
-        bool out = ( x < 0 || x > 1 );
-        uint16_t i = uint16_t(x * 65535.f);
-        if ( out || 1 != fwrite(&i, 2, 1, mFile) )
+        int32_t i = std::round( x * 65535.f );
+        uint16_t u = std::max(std::min(i, 65535), 0);
+        if ( u != i )
+            throw InvalidIO("writeFixed() out-of-range");
+        if ( 1 != fwrite(&u, 2, 1, mFile) )
             throw InvalidIO("writeFixed() failed");
     }
     else

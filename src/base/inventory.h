@@ -7,12 +7,12 @@
 #include "assert_macro.h"
 #include <ostream>
 
-/// Attributes and remember serial-numbers to Inventoried
+/// Attributes serial-numbers to Inventoried, and remember them in an list
 /**
 A Inventory assigns serial-numbers (of type ObjectID) to Inventoried, 
-and it records a pointer to these objects.
+and records a pointer to these objects in a table indexed by ObjectID.
  
-Pointers to the objects can be recovered from their 'number' in constant time.
+Pointers to the objects can be recovered from their 'ObjectID' in constant time.
 
 \author FJ Nedelec, August 2003.
 */
@@ -24,11 +24,11 @@ private:
     /**
      This stores pointers to the objects, at index 'i' such that
          record_[i]->identity() == i
-     Valid ObjectID are > 0, starting at 1
+     Valid ObjectID are > 0, starting at 1, up to alloca_
      */
     Inventoried ** record_;
     
-    /// size of memory allocated
+    /// size of memory allocated minus one
     size_t alloca_;
     
     /// lowest i > 0 for which `record_[i] != 0`
@@ -37,10 +37,10 @@ private:
     /// highest i > 0 for which `record_[i] != 0`
     ObjectID highest_;
     
-    /// memory allocation function
+    /// allocate memory to hold `size` objects
     void allocate(size_t size);
     
-    /// memory allocation function
+    /// release memory
     void release();
 
     /// Disabled copy constructor

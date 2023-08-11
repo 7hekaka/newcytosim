@@ -171,8 +171,9 @@ ObjectID Inventory::first_unassigned() const
 
 ObjectID Inventory::next_identity(ObjectID n) const
 {
-    assert_true(n < alloca_);
-    if ( record_[++n] )
+    ++n;
+    assert_true(n <= alloca_);
+    if ( record_[n] )
         return n;
     if ( ++n <= highest_ )
     {
@@ -221,7 +222,7 @@ Inventoried* Inventory::next(Inventoried const* i) const
     {
         while ( !record_[n] )
             ++n;
-        assert_true(n < alloca_);
+        assert_true(n <= alloca_);
         return record_[n];
     }
     return nullptr;
