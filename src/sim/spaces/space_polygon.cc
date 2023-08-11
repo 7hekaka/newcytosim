@@ -356,12 +356,14 @@ void SpacePolygon::draw3D() const
     const size_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     flute3 * flt = gym::mapBufferV3(2*nbp+2);
-    for ( size_t n = 0; n <= nbp; ++n )
+    for ( size_t i = 0; i < nbp; ++i )
     {
-        float X(pts[n].xx), Y(pts[n].yy);
-        flt[2*n  ] = { X, Y, -H };
-        flt[2*n+1] = { X, Y,  H };
+        float X(pts[i].xx), Y(pts[i].yy);
+        flt[2*i  ] = { X, Y, -H };
+        flt[2*i+1] = { X, Y,  H };
     }
+    flt[2*nbp+2] = flt[2*nbp  ];
+    flt[2*nbp+3] = flt[2*nbp+1];
     gym::unmapBufferV3();
     // display sides
     gym::drawTriangleStrip(0, 2*nbp+2);
