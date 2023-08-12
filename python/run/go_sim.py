@@ -219,7 +219,7 @@ class Gosimer:
         if self.njobs > 1:
             jobs = []
             for n in range(self.njobs):
-                j = Process(target=self.run_queue, args=(self.queue,))
+                j = Process(target=self.run_queue)
                 jobs.append(j)
                 j.start()
             # wait for completion of all jobs:
