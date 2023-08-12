@@ -11,11 +11,12 @@ set simul system
 set space cell
 {
     shape = rectangle
+    display = ( visible=3; )
 }
 
 new cell
 {
-    length = 80, 40
+    length = 60, 22
 }
 
 set fiber microtubule
@@ -32,7 +33,7 @@ set fiber microtubule
        
     min_length = 0.05
 
-    display = ( lines=6,2; points=10,0; plus_end=16, 2; )
+    display = ( lines=6,4; points=10,0; plus_end=16, 2; )
 }
 
 new 0 microtubule

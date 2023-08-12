@@ -413,10 +413,6 @@ void SingleSet::defrostStore()
 
 void SingleSet::freeze()
 {
-#ifdef MORE_ROBUST_READING
-    flag(aList, 7);
-    flag(fList, 7);
-#endif
     assert_true(ice_.empty());
     ice_.grab(aList);
     ice_.grab(fList);

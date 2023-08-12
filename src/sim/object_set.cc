@@ -415,9 +415,6 @@ void ObjectSet::flag(ObjectPool const& list, ObjectFlag f)
 void ObjectSet::freeze()
 {
     assert_true(ice_.empty());
-#ifdef MORE_ROBUST_READING
-    flag(pool_, 7);
-#endif
     ice_.grab(pool_);
 }
 
@@ -577,19 +574,10 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
             obj->setIdentity(0);
             obj = nullptr;
         }
-        else
-#ifdef MORE_ROBUST_READING
-            if ( obj->flag() )
-            {
-                obj->flag(0);
-                ice_.pop(obj);
-            }
-#else
-        if ( obj->objset() )
+        else if ( obj->objset() )
             ice_.pop(obj);
         else
             obj->objset(this);
-#endif
     }
     
     if ( !obj )

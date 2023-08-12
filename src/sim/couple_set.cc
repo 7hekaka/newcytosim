@@ -550,12 +550,6 @@ void CoupleSet::defrostStore()
 
 void CoupleSet::freeze()
 {
-#ifdef MORE_ROBUST_READING
-    flag(aaList, 7);
-    flag(faList, 7);
-    flag(afList, 7);
-    flag(ffList, 7);
-#endif
     assert_true(ice_.empty());
     ice_.grab(aaList);
     ice_.grab(faList);
