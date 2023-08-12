@@ -20,10 +20,9 @@ private:
     /// The dimensionality of vectors stored in the file
     size_t vecsize_;
     
-    /** if the state is stored in a binary format, binary_
-        is set to 1 or 2. with 2, byte order is swapped automatically
-        this occurs for example when reading a simulation calculated 
-        on PC from mac, or vice et versa.
+    /** if the state is stored in a binary format, binary_ is 1 or 2.
+        with 'binary_==2', byte order is swapped automatically
+        to allow reading/writing accross big- and little-endian machines.
         */
     int binary_;
     

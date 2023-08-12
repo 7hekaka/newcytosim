@@ -237,7 +237,7 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
     if ( in.binary() )
     {
 #if BACKWARD_COMPATIBILITY < 58
-        if ( in.formatID() < 58 )
+        if ( in.formatID() < 58 ) // 57 before 26.11.2022
         {
             char c = in.get_char();
             tag = c & LOW_BITS;
@@ -245,26 +245,24 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
                 id = in.readUInt32bin();
             else if ( c != Object::NULL_TAG )
                 id = in.readUInt16bin();
+            return id;
         }
-        else
 #endif
+        // binary format 58 (26.11.2022)
+        int c = in.get_char();
+        tag = c & LOW_BITS;
+        //assert_true(isalpha(tag));
+        if ( c & HIGH_BIT )
         {
-            // binary format 58 (26.11.2022)
-            int c = in.get_char();
-            tag = c & LOW_BITS;
-            //assert_true(isalpha(tag));
-            if ( c & HIGH_BIT )
-            {
-                ObjectID a = in.get_char();
-                ObjectID b = in.get_char();
-                id = ( a << 16 ) + ( b << 8 ) + ObjectID(in.get_char());
-            }
-            else if ( c != Object::NULL_TAG )
-            {
-                ObjectID a = in.get_char();
-                ObjectID b = in.get_char();
-                id = ( b << 8 ) + a;
-            }
+            ObjectID a = in.get_char();
+            ObjectID b = in.get_char();
+            id = ( a << 16 ) + ( b << 8 ) + ObjectID(in.get_char());
+        }
+        else if ( c != Object::NULL_TAG )
+        {
+            ObjectID a = in.get_char();
+            ObjectID b = in.get_char();
+            id = ( b << 8 ) + a;
         }
     }
     else
@@ -734,12 +732,12 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             if ( c == EOF )
                 return 1;
             tag = ( c & LOW_BITS );
-            fat = ( c & HIGH_BIT );
+            fat = ( c & HIGH_BIT ) + in.binary();
 #if BACKWARD_COMPATIBILITY < 50
             // detect fat header, formatID() < 50
             if ( c == '$' )
             {
-                fat = 1;
+                fat = 1 + in.binary();
                 tag = in.get_char();
             }
 #endif
@@ -761,8 +759,6 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             else
 #endif
             {
-                // check that we are using the correct ObjectSet:
-                assert_true( isupper(tag) || objset == findSetT(tag) );
                 objset->loadObject(in, tag, fat);
             }
             ++nb_objects;

@@ -466,47 +466,48 @@ void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list) const
 
 
 /**  read Object's mark in binary format. This should match Object::writeMarker() */
-static void readMarker(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+static void readMarker(Inputter& in, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+{
+    union { uint16_t u; uint8_t c[2]; } u16;
+
+    ix = in.get_char();
+    u16.c[0] = in.get_char();
+    u16.c[1] = in.get_char();
+    id = u16.u;
+}
+
+
+/**  read Object's mark in binary format. This should match Object::writeMarker() */
+static void readMarkerFat(Inputter& in, PropertyID& ix, ObjectID& id, ObjectMark& mk)
 {
     union { uint16_t u; uint8_t c[2]; } u16;
     union { uint32_t u; uint8_t c[4]; } u32;
-
-    if ( fat )
-    {
+    
 #if BACKWARD_COMPATIBILITY < 58
-        if ( in.formatID() < 58 ) // 26.11.2022
-        {
-            ix = in.readUInt16();
-            id = in.readUInt32();
-            mk = in.readUInt32();
-        }
-        else
-#endif
-        {
-            mk = in.get_char();
-            u16.c[0] = in.get_char();
-            u16.c[1] = in.get_char();
-            ix = u16.u;
-            u32.c[0] = in.get_char();
-            u32.c[1] = in.get_char();
-            u32.c[2] = in.get_char();
-            u32.c[3] = in.get_char();
-            id = u32.u;
-        }
+    if ( in.formatID() < 58 ) // 26.11.2022
+    {
+        ix = in.readUInt16();
+        id = in.readUInt32();
+        mk = in.readUInt32();
     }
     else
+#endif
     {
-        ix = in.get_char();
+        mk = in.get_char();
         u16.c[0] = in.get_char();
         u16.c[1] = in.get_char();
-        id = u16.u;
+        ix = u16.u;
+        u32.c[0] = in.get_char();
+        u32.c[1] = in.get_char();
+        u32.c[2] = in.get_char();
+        u32.c[3] = in.get_char();
+        id = u32.u;
     }
-    assert_true( id < 1<<24 );
 }
 
 
 /**  read Object's mark in text format. This should match Object::writeMarker() */
-static void readMarkerASCII(Inputter& in, bool fat, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+static void readMarkerASCII(Inputter& in, PropertyID& ix, ObjectID& id, ObjectMark& mk)
 {
     FILE * f = in.file();
     if ( 1 != fscanf(f, "%u", &ix) )
@@ -535,16 +536,18 @@ static void readMarkerASCII(Inputter& in, bool fat, PropertyID& ix, ObjectID& id
  
  If 'fat==true', read the larger Marker format
  */
-void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, bool fat)
+void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
 {
     PropertyID pid = 0;
     ObjectID id = 0;
     ObjectMark mk = 0;
     
-    if ( in.binary() )
-        readMarker(in, fat, pid, id, mk);
+    if ( !bin )
+        readMarkerASCII(in, pid, id, mk);
+    else if ( bin == 1 )
+        readMarker(in, pid, id, mk);
     else
-        readMarkerASCII(in, fat, pid, id, mk);
+        readMarkerFat(in, pid, id, mk);
 
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");

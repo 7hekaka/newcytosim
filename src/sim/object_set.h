@@ -211,7 +211,7 @@ public:
     ObjectList collect(Property const* p) const { return collect(match_property, p); }
 
     /// load one Object from file
-    void loadObject(Inputter&, ObjectTag tag, bool fat);
+    void loadObject(Inputter&, ObjectTag tag, int bin);
     
     /// write all Objects to file
     virtual void writeSet(Outputter&) const = 0;
