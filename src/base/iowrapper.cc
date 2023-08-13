@@ -623,23 +623,43 @@ void Outputter::writeUInt32(const unsigned n, char before)
 }
 
 
-void Outputter::writeFixed(const float x)
+void Outputter::writePositiveFixed(const float x)
 {
     if ( binary_ )
     {
         int32_t i = std::round( x * 65535.f );
         uint16_t u = std::max(std::min(i, 65535), 0);
         if ( u != i )
-            fprintf(stderr, "writeFixed(%f) out-of-range\n", x);
+            fprintf(stderr, "writePositiveFixed(%f) out-of-range\n", x);
         if ( 1 != fwrite(&u, 2, 1, mFile) )
-            throw InvalidIO("writeFixed() failed");
+            throw InvalidIO("writePositiveFixed() failed");
     }
     else
     {
         if ( 6 > fprintf(mFile, " %.6f", x) )
-            throw InvalidIO("writeFixed failed");
+            throw InvalidIO("writePositiveFixed failed");
     }
 }
+
+
+void Outputter::writeSignedFixed(const float x)
+{
+    if ( binary_ )
+    {
+        int32_t i = std::round( x * 32767.f );
+        int16_t u = std::max(std::min(i, 32767), -32768);
+        if ( u != i )
+            fprintf(stderr, "writeSignedFixed(%f) out-of-range\n", x);
+        if ( 1 != fwrite(&u, 2, 1, mFile) )
+            throw InvalidIO("writeSignedFixed() failed");
+    }
+    else
+    {
+        if ( 6 > fprintf(mFile, " %.6f", x) )
+            throw InvalidIO("writeSignedFixed failed");
+    }
+}
+
 
 /*
  Since the angle is within [-PI, PI], we can use 2 bytes and scale by 1024,

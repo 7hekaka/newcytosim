@@ -176,8 +176,10 @@ public:
     void writeUInt16Binary(unsigned);
 
     /// store float in [0, 1] using 2 bytes
-    void writeFixed(float);
-    
+    void writeSignedFixed(float);
+    /// store float in [-1, 1] using 2 bytes
+    void writePositiveFixed(float);
+
     /// store an angle in [-PI, PI] using 2 bytes
     void writeAngle(float);
     /// store `a` in [-PI, PI] and `b` in [0, PI], using 2 bytes for each
