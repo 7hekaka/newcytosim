@@ -19,7 +19,7 @@
  This makes the executable faster.
  Note that the value defined for NDEBUG is ignored: 0 or 1 have the same effects!
  */
-#define NDEBUG 1
+//#define NDEBUG 1
 
 
 /// strips the full pathname for a file name

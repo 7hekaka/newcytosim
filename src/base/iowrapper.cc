@@ -630,7 +630,7 @@ void Outputter::writeFixed(const float x)
         int32_t i = std::round( x * 65535.f );
         uint16_t u = std::max(std::min(i, 65535), 0);
         if ( u != i )
-            throw InvalidIO("writeFixed() out-of-range");
+            fprintf(stderr, "writeFixed(%f) out-of-range\n", x);
         if ( 1 != fwrite(&u, 2, 1, mFile) )
             throw InvalidIO("writeFixed() failed");
     }

@@ -110,6 +110,9 @@ public:
     
     /// Human friendly ouput
     void print(std::ostream&) const;
+    
+    /// debug checking
+    int bad() const;
 };
 
 

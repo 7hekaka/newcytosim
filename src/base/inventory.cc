@@ -29,7 +29,7 @@ void Inventory::allocate(size_t sz)
     ObjectID n = 0;
     for ( ; n <= alloca_; ++n )
         ptr[n] = record_[n];
-    for ( ; n < sz; ++n )
+    for ( ; n <= sz; ++n )
         ptr[n] = nullptr;
     
     delete[] record_;
@@ -82,13 +82,14 @@ void Inventory::assign(Inventoried * obj)
     }
     
     if ( n >= alloca_ )
-        allocate(n+1);
+        allocate(n);
     
     assert_true(!record_[n]);
     record_[n] = obj;
     //std::clog << "identity(" << obj << ") = " << n << "\n";
 
     lowest_ = std::min(lowest_, n);
+    //assert_false(bad());
 }
 
 
@@ -271,3 +272,22 @@ std::ostream& operator << (std::ostream& os, Inventory const& arg)
     return os;
 }
 
+
+int Inventory::bad() const
+{
+    if ( lowest_ < 1 ) return 1;
+    for ( ObjectID n = 0; n < lowest_ && n < alloca_; ++n )
+    {
+        if ( record_[n] ) return 2;
+    }
+    for ( ObjectID n = lowest_; n <= highest_; ++n )
+    {
+        Inventoried * i = record_[n];
+        if ( i && n != i->identity() ) return 4;
+    }
+    for ( ObjectID n = highest_+1; n <= alloca_; ++n )
+    {
+        if ( record_[n] ) return 8;
+    }
+    return 0;
+}

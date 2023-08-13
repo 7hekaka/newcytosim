@@ -563,6 +563,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
 
     if ( obj && update )
     {
+        assert_true(obj->property());
         /* check that property index has not changed: this can happen however, if
          objects are created/destroyed since the identity numbers are recycled */
         if ( obj->property()->number() != pid )
