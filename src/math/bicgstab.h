@@ -53,8 +53,6 @@ namespace LinearSolvers
         blas::xcopy(dim, r, 1, p, 1);
 #endif
         rho = blas::dot(dim, r, r);
-        real * best = nullptr;
-        real best_residual = 0;
         goto start;
         
         while ( ! monitor.finished(dim, r) )
@@ -160,8 +158,6 @@ namespace LinearSolvers
         blas::xcopy(dim, r, 1, p, 1);
 #endif
         rho = blas::dot(dim, r, r);
-        real * best = nullptr;
-        real best_residual = 0;
         goto start;
 
         while ( ! monitor.finished(dim, r) )
