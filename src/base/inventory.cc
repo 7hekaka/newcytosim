@@ -24,7 +24,7 @@ void Inventory::allocate(size_t sz)
     constexpr size_t chunk = 1024;
     sz = ( sz + chunk ) & ~( chunk -1 );
     
-    Inventoried ** ptr = new Inventoried*[sz];
+    Inventoried ** ptr = new Inventoried*[1+sz];
     
     ObjectID n = 0;
     for ( ; n <= alloca_; ++n )
@@ -34,7 +34,7 @@ void Inventory::allocate(size_t sz)
     
     delete[] record_;
     record_ = ptr;
-    alloca_ = sz-1;
+    alloca_ = sz;
     //std::clog << "Inventory::allocated(" << sz << ")\n";
 }
 
@@ -71,7 +71,7 @@ void Inventory::assign(Inventoried * obj)
     {
         n = ++highest_;
         obj->setIdentity(n);
-        //std::clog << "Inventory::assign(" << obj << " <- " << n << ")\n";
+        //std::clog << "identity(" << obj << ") <- " << n << "\n";
     }
     else
     {
@@ -86,7 +86,8 @@ void Inventory::assign(Inventoried * obj)
     
     assert_true(!record_[n]);
     record_[n] = obj;
-    
+    //std::clog << "identity(" << obj << ") = " << n << "\n";
+
     lowest_ = std::min(lowest_, n);
 }
 

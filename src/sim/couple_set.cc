@@ -499,6 +499,39 @@ void CoupleSet::erase()
 }
 
 
+void CoupleSet::detachAll()
+{
+    Object * i = aaList.front();
+    while ( i )
+    {
+        Couple * C = static_cast<Couple*>(i);
+        i = i->next();
+        C->hand1()->detachHand();
+        C->hand2()->detachHand();
+        ffList.push_back(C);
+    }
+    aaList.clear();
+    i = faList.front();
+    while ( i )
+    {
+        Couple * C = static_cast<Couple*>(i);
+        i = i->next();
+        C->hand2()->detachHand();
+        ffList.push_back(C);
+    }
+    faList.clear();
+    i = afList.front();
+    while ( i )
+    {
+        Couple * C = static_cast<Couple*>(i);
+        i = i->next();
+        C->hand1()->detachHand();
+        ffList.push_back(C);
+    }
+    afList.clear();
+}
+
+
 void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
 {
     while ( cnt-- > 0 )
@@ -599,7 +632,7 @@ void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
 
 void CoupleSet::reheat()
 {
-    size_t sup = all_reserved();
+    size_t sup = inventory_.capacity();
     size_t cnt[16] = { 0 };
     for ( int i = 0; i < 16; ++i ) cnt[i] = sup;
     reheat(cnt, 16);

@@ -365,6 +365,20 @@ void SingleSet::erase()
 }
 
 
+void SingleSet::detachAll()
+{
+    Object * i = aList.front();
+    while ( i )
+    {
+        Single * S = static_cast<Single*>(i);
+        i = i->next();
+        S->hand()->detachHand();
+        fList.push_back(S);
+    }
+    aList.clear();
+}
+
+
 void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
 {
     while ( cnt-- > 0 )
@@ -452,7 +466,7 @@ void SingleSet::reheat(size_t cnt[], size_t n_cnt)
 
 void SingleSet::reheat()
 {
-    size_t sup = all_reserved();
+    size_t sup = inventory_.capacity();
     size_t cnt[16] = { 0 };
     for ( int i = 0; i < 16; ++i ) cnt[i] = sup;
     reheat(cnt, 16);

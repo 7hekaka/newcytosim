@@ -25,27 +25,28 @@ void Cutter::cut()
     if ( prop()->selective == CUT_TOP_FIBER )
     {
         Hand const* h = otherHand();
-        if ( !h || !h->attached() )
-            return;
-        Vector P = pos();
-        Vector Q = h->pos();
+        if ( h && h->attached() )
+        {
+            Vector P = pos();
+            Vector Q = h->pos();
 #if ( 0 )
-        // using Z works only if the boundary is aligned in XY with cell on top
-        real PZ = P.ZZ;
-        real QZ = Q.ZZ;
+            // using Z works only if the boundary is aligned in XY with cell on top
+            real PZ = P.ZZ;
+            real QZ = Q.ZZ;
 #else
-        Vector PQ = 0.5 * ( P + Q );
-        Space const* spc = h->fiber()->prop->confine_space;
-        Vector prj = spc->project(PQ);  // on the edge
-        Vector dir = spc->normalToEdge(PQ);
-        // calculate distances to the edge:
-        real PZ = dot(prj-P, dir);
-        real QZ = dot(prj-Q, dir);
+            Vector PQ = 0.5 * ( P + Q );
+            Space const* spc = h->fiber()->prop->confine_space;
+            Vector prj = spc->project(PQ);  // on the edge
+            Vector dir = spc->normalToEdge(PQ);
+            // calculate distances to the edge:
+            real PZ = dot(prj-P, dir);
+            real QZ = dot(prj-Q, dir);
 #endif
-        // do not sever the fiber that is closest to the edge:
-        if ( PZ < QZ )
-            return;
-        std::clog << "selectively cutting crossing fiber at Z " << PZ << " over " << QZ << "\n";
+            // do not sever the fiber that is closest to the edge:
+            if ( PZ < QZ )
+                return;
+            std::clog << "selectively cutting crossing fiber at Z " << PZ << " over " << QZ << "\n";
+        }
     }
     /**
      Cutting the fiber can invalidate the FiberGrid used for attachment,

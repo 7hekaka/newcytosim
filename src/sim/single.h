@@ -28,7 +28,7 @@ class PointDisp;
  .
  
  However, two derived classes change this behavior:
- -# a Picket is fixed in position and do not diffuse,
+ -# a Picket is fixed in position and does not diffuse,
  -# a Wrist is attached to one vertex of a Mecable.
  .
  
@@ -64,6 +64,8 @@ protected:
     void afterAttachment(Hand const*);
     /// specialization of HandMonitor
     void beforeDetachment(Hand const*);
+    /// specialization of HandMonitor
+    Single const* single() const { return this; }
 
     /// the position of the foot
     Vector sPos;

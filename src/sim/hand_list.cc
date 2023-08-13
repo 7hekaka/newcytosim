@@ -67,7 +67,7 @@ void HandList::detachAll()
     while ( h )
     {
         Hand * n = h->next();
-        // need to update since upon detachment Hands will need their position:
+        // update since upon detachment Hands may need their position?
         //h->reinterpolate();
         // no need to update Lattice here:
         h->Hand::detach();

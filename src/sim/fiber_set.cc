@@ -698,6 +698,9 @@ void FiberSet::updateFibers() const
 }
 
 
+/**
+ ad-hoc function to cut fibers on each side of the system
+ */
 void FiberSet::shortenSpindle(real dL, real dR) const
 {
     Fiber * L = nullptr;

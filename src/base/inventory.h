@@ -72,8 +72,8 @@ public:
     /// current size of array
     size_t capacity() const { return alloca_; }
 
-    /// allocate to be ready to handle `cnt` references
-    void reserve(const size_t cnt) { if ( cnt > alloca_ ) allocate(cnt); }
+    /// allocate to handle references in [1, sup]
+    void reserve(const size_t sup) { if ( sup > alloca_ ) allocate(sup); }
     
     /// remember `obj`, assign a new ID if necessary
     void assign(Inventoried * obj);

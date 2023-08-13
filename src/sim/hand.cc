@@ -108,15 +108,18 @@ Vector Hand::unbindingPosition() const
 /** Used to transfer a bound Hand normally to a different fiber */
 void Hand::relocate(Fiber const* f, const real a)
 {
-    assert_true(f && hFiber);
-    hFiber->removeHand(this);
-    hFiber = f;
+    assert_true(f);
+    if ( hFiber != f )
+    {
+        if ( hFiber ) hFiber->removeHand(this);
+        f->addHand(this);
+        hFiber = f;
+    }
 #if FIBER_HAS_LATTICE
     if ( hLattice )
         hLattice = f->lattice();
 #endif
     hAbs = a;
-    f->addHand(this);
     reinterpolate(f->interpolate(a));
 }
 

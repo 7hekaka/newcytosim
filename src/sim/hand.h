@@ -110,9 +110,6 @@ public:
     
     /// move attached Hand to a different fiber, at the given abscissa
     void relocate(Fiber const* f, real a);
-    
-    /// move to a different fiber, at the same abscissa
-    void relocate(Fiber const* f) { relocate(f, abscissa()); }
 
     /// relocate to the specified tip of the current fiber
     void moveToEnd(FiberEnd);

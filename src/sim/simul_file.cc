@@ -101,6 +101,9 @@ void Simul::writeObjects(Outputter& out) const
     spheres.writeSet(out);
     singles.writeSet(out);
     couples.writeSet(out);
+#if NEW_COMPACT_STORAGE
+    fibers.writeAttachedHands(out);
+#endif
     organizers.writeSet(out);
     tubules.writeSet(out);
     //events.write(out);
@@ -472,8 +475,8 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
             primed_ = 0;
             prop.complete(*this);
         }
-        assert_false(couples.bad());
         assert_false(singles.bad());
+        assert_false(couples.bad());
         return res;
     }
     catch(Exception & e)
@@ -516,32 +519,37 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
     // section heading
     if ( tok == "section" )
     {
-        iss >> section;
+        iss >> section >> tok;
         VLOG("section <---|" << section << "|\n");
-#if 0
-        // report size occupied by sections in file
-        static std::string title;
-        static fpos_t old; fpos_t pos;
-        in.get_pos(pos);
-        std::clog << "-- size(" << title << ") " << pos-old << "\n";
-        title = section;
-        old = pos;
-#endif
         if ( section == "end" )
             return 0;
+        objset = findSet(section);
+        if ( !objset )
+            throw InvalidIO("unknown section |"+section+"|");
+        if ( subset && objset != subset )
+            in.skip_until("#section ");
+        else if ( section == "fiber" )
+        {
+            if ( tok == "H" )
+            {
+                singles.detachAll();
+                couples.detachAll();
+            }
+        }
         else if ( section == "single" )
         {
-            iss >> tok;
             if ( tok == "F" )
             {
-                // may skip unattached Singles
                 if ( prop.skip_free_single > 1 )
                     in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
-                int mod = 0;
-                iss >> mod;
-                if ( iss.good() && mod == 1 )
-                    singles.reheat();
+                if ( in.formatID() < 58 )
+                {
+                    int mod = 0;
+                    iss >> mod;
+                    if ( iss.good() && mod == 1 )
+                        singles.reheat();
+                }
 #endif
             }
             else if ( tok == "reheat" )
@@ -555,24 +563,25 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                     singles.makeSingles(cnt, i);
                 }
 #if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                else
+                else if ( in.formatID() < 60 )
                     singles.reheat();
 #endif
             }
         }
         else if ( section == "couple" )
         {
-            iss >> tok;
             if ( tok == "FF" )
             {
-                // may skip unattached Couples
                 if ( prop.skip_free_couple > 1 )
                     in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
-                int mod = 0;
-                iss >> mod;
-                if ( iss.good() && mod == 1 )
-                    couples.reheat();
+                if ( in.formatID() < 58 )
+                {
+                    int mod = 0;
+                    iss >> mod;
+                    if ( iss.good() && mod == 1 )
+                        couples.reheat();
+                }
 #endif
             }
             else if ( tok == "reheat" )
@@ -586,16 +595,11 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                     couples.makeCouples(cnt, i);
                 }
 #if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                else
+                else if ( in.formatID() < 60 )
                     couples.reheat();
 #endif
             }
         }
-        objset = findSet(section);
-        if ( !objset )
-            throw InvalidIO("unknown section |"+section+"|");
-        if ( subset && objset != subset )
-            in.skip_until("#section ");
     }
     // optional indication giving the number of objects in the section
     else if ( tok == "record" )
@@ -729,7 +733,17 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     has_frame = h;
                 }
             }
-            if ( c == EOF )
+            else if ( c == '%' )
+            {
+                c = in.get_char();
+                ObjectSet * set = findSetT(c);
+                if ( set )
+                    set->readMetaData(in, c);
+                else
+                    throw InvalidIO("unknown objset TAG |"+std::string(1,(char)tag)+"|");
+                continue;
+            }
+            else if ( c == EOF )
                 return 1;
             tag = ( c & LOW_BITS );
             fat = ( c & HIGH_BIT ) + in.binary();
@@ -744,7 +758,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
         } while ( !isalpha(tag) );
         
         assert_true( isalpha(tag) );
-        VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
+        //VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
 
         try
         {

@@ -67,7 +67,9 @@ protected:
     
     /// specialization of HandMonitor
     Hand const* otherHand(Hand const*) const;
-    
+    /// specialization of HandMonitor
+    Couple const* couple() const { return this; }
+
     /// true if both Hands are attached
     bool hasLink() const { return cHand1->attached() && cHand2->attached(); }
     /// stiffness of the interaction, if the Couple is bridging
@@ -262,12 +264,12 @@ public:
     Couple * prev() const { return static_cast<Couple*>(prevO); }
     
     //------------------------------ read/write --------------------------------
-    
-    /// a unique character identifying the Duo
-    static const ObjectTag TAG_DUO = 'y';
 
     /// a unique character identifying the class
     static const ObjectTag TAG = 'c';
+    
+    /// a unique character identifying the Duo
+    static const ObjectTag TAG_DUO = 'y';
     
     /// return unique character identifying the class
     ObjectTag tag() const { return TAG; }

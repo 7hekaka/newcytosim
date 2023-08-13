@@ -137,6 +137,9 @@ public:
     /// erase all Object and all Property
     void erase();
     
+    /// detach all Hands
+    void detachAll();
+
     /// number of unattached Simgles
     size_t sizeF() const { return fList.size(); }
     

@@ -442,7 +442,7 @@ Fiber* Fiber::severPoint(size_t pti)
     {
         Hand * x = h->next();
         if ( h->abscissa() > abs )
-            h->relocate(fib);
+            h->relocate(fib, h->abscissa());
         else
             h->reinterpolate();
         h = x;
@@ -510,7 +510,7 @@ Fiber* Fiber::severM(real dis1, real dis2)
     {
         Hand * x = h->next();
         if ( h->abscissa() >= dis2 )
-            h->relocate(fib);
+            h->relocate(fib, h->abscissa());
         else if ( h->abscissa() < dis1 )
             h->reinterpolate();
         else

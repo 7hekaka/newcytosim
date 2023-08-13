@@ -2210,11 +2210,6 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
  */
 void Chain::writeAngles(Outputter& out) const
 {
-#if 0
-    real e = length1() - length();
-    if ( abs_real(e) > 0.1 )
-        fprintf(stderr, "inaccurate length %f in f%x\n", e, identity());
-#endif
     //out.writeUInt32(signature());
     out.writeFloatBinary(length());
     //out.writeFloat(fnSegmentation);

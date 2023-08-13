@@ -27,7 +27,6 @@ void ObjectPool::push_front(Object * n)
 void ObjectPool::push_back(Object * n)
 {
     //std::clog << "ObjectPool: push_back " << n->reference() << "\n";
-    assert_true(n->set_);
     n->prev(backO);
     n->next(nullptr);
     if ( backO )
@@ -100,7 +99,6 @@ void ObjectPool::pop_front()
         frontO->prev(nullptr);
     else
         backO = nullptr;
-        
 }
 
 

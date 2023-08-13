@@ -122,9 +122,6 @@ public:
     /// remove object (should be a Couple)
     void unlink(Object *);
 
-    /// link unattached Couple into FF list
-    void addFF(Couple * C);
-
     /// reassign Couple to sublist following attachement of Hand 1
     void relinkA1(Couple *);
     /// reassign Couple to sublist following detachment of Hand 1
@@ -168,6 +165,9 @@ public:
     /// erase all Object and all Property
     void erase();
     
+    /// detach all Hands
+    void detachAll();
+
     /// mix order of elements
     void shuffle();
     
@@ -185,10 +185,10 @@ public:
     
     
     /// return pointer to the Object of given ID, or zero if not found
-    Couple * findID(ObjectID n)        const { return static_cast<Couple*>(inventory_.get(n)); }
+    Couple * findID(ObjectID n) const { return static_cast<Couple*>(inventory_.get(n)); }
     
     /// first Couple in inventory
-    Couple * firstID()                 const { return static_cast<Couple*>(inventory_.first()); }
+    Couple * firstID() const { return static_cast<Couple*>(inventory_.first()); }
     
     /// returns Couple immediately following 'obj' in inventory
     Couple * nextID(Couple const* obj) const { return static_cast<Couple*>(inventory_.next(obj)); }

@@ -79,7 +79,7 @@ protected:
 
 public:
     
-    /// unlink all objects and put them on 'ice', called before import
+    /// prepare all objects for reading                                   <
     virtual void freeze();
     
     /// delete objects that are still on 'ice' because they were not imported
@@ -136,7 +136,7 @@ public:
     /// link the object last in the list
     virtual void link(Object *);
     
-    /// link the object last in the list
+    /// unlink object
     virtual void unlink(Object *);
     
     /// remove Object
@@ -216,6 +216,9 @@ public:
     /// write all Objects to file
     virtual void writeSet(Outputter&) const = 0;
     
+    /// read meta data from file
+    virtual void readMetaData(Inputter&, int) {}
+
     /// print a summary of the content (nb of objects, class)
     virtual void report(std::ostream&) const = 0;
 

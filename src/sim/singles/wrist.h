@@ -10,6 +10,10 @@
 /**
  The Wrist is anchored to a Solid, on a position that is interpolated from the
  Solid's vertices. See class Interpolation4
+ 
+ The Wrist can be distinguished from other Solid using the `base()` function:
+ `Wrist::base()` returns the Mecable onto which the Wrist is based.
+ Otherwise, `Single::base()` returns nullptr
 
  @ingroup SingleGroup
  */
@@ -46,6 +50,12 @@ public:
     /// Object to which this is anchored
     Mecable const* base() const { return base_.mecable(); }
     
+    /// Object to which this is anchored
+    Interpolation4 const& interpolation() const { return base_; }
+    
+    /// Object to which this is anchored
+    Interpolation4& interpolation() { return base_; }
+
     /// attach at one Mecapoint
     void rebase(Mecable const* mec, size_t pti) { base_.set(mec, pti); }
     
