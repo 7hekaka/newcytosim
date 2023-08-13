@@ -150,12 +150,13 @@ public:
     /// position on the side of fiber used for sideInteractions
     virtual Vector sidePos() const { return sHand->pos(); }
     
+
     /// the Mecable to which this is anchored, or zero
     virtual Mecable const* base() const { return nullptr; }
-    
+
     /// detach from Mecable to which this is anchored
     virtual void unbase() {}
-
+    
     /// true if Single creates an interaction
     virtual bool hasLink() const { return false; }
     
@@ -211,6 +212,12 @@ public:
     /// write to file
     void write(Outputter&) const;
     
+    /// export anchoring data to file
+    virtual void writeBase(Outputter& out) const { ABORT_NOW("writeBase == 0"); }
+    
+    /// import anchoring data from file
+    virtual void readBase(Inputter& out, Simul& sim) { ABORT_NOW("readBase == 0"); }
+
     /// check validity
     virtual int invalid() const { return !sPos.valid(); }
 };

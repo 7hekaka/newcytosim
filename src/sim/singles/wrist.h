@@ -49,12 +49,6 @@ public:
     
     /// Object to which this is anchored
     Mecable const* base() const { return base_.mecable(); }
-    
-    /// Object to which this is anchored
-    Interpolation4 const& interpolation() const { return base_; }
-    
-    /// Object to which this is anchored
-    Interpolation4& interpolation() { return base_; }
 
     /// attach at one Mecapoint
     void rebase(Mecable const* mec, size_t pti) { base_.set(mec, pti); }
@@ -105,6 +99,12 @@ public:
     /// write to file
     void write(Outputter&) const;
     
+    /// export anchoring data to file
+    void writeBase(Outputter& out) const { return base_.write(out); }
+    
+    /// import anchoring data from file
+    void readBase(Inputter& in, Simul& sim) { return base_.read(in, sim); }
+
     /// check validity of base_
     int invalid() const { return base_.invalid(); }
 };
