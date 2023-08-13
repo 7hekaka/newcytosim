@@ -528,14 +528,6 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
             throw InvalidIO("unknown section |"+section+"|");
         if ( subset && objset != subset )
             in.skip_until("#section ");
-        else if ( section == "fiber" )
-        {
-            if ( tok == "H" )
-            {
-                singles.detachAll();
-                couples.detachAll();
-            }
-        }
         else if ( section == "single" )
         {
             if ( tok == "F" )
@@ -567,6 +559,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
                     singles.reheat();
 #endif
             }
+            return 0;
         }
         else if ( section == "couple" )
         {
@@ -600,6 +593,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
 #endif
             }
         }
+        return 0;
     }
     // optional indication giving the number of objects in the section
     else if ( tok == "record" )
@@ -610,6 +604,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
             if ( iss >> cnt >> sup_id )
                 objset->reserve(sup_id);
         }
+        return 0;
     }
     // frame start
     else if ( tok == "Cytosim" || tok == "cytosim" || tok == "frame" )

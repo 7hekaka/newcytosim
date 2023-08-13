@@ -82,6 +82,9 @@ public:
     void writeSet(Outputter&) const;
 
     //--------------------------
+    
+    /// return one sublist where Couple should be linked
+    ObjectPool& sublist(Single const* obj) { return obj->attached()?aList:fList; }
 
     /// add object
     void link(Object *);
@@ -140,7 +143,7 @@ public:
     /// detach all Hands
     void detachAll();
 
-    /// number of unattached Simgles
+    /// number of unattached Singles
     size_t sizeF() const { return fList.size(); }
     
     /// number of attached Singles
@@ -197,12 +200,12 @@ public:
 
     //--------------------------
 
+    /// prepare all objects before reading
+    void freeze();
+    
     /// move Singles into reserve lists, instead of deleting them
     void defrostStore();
 
-    /// unlink all objects before import
-    void freeze();
-    
     /// detach objects that were not updated during import
     void reheat(size_t cnt[], size_t n_cnt);
     

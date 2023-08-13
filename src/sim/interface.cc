@@ -866,7 +866,7 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     if ( pp )
     {
         ObjectList objs = set->collect(match_property, pp, cnt);
-        VLOG("-CUT " << objs.size() << " " << name " PLANE (" << n << ").x = " << -a);
+        VLOG("-CUT " << objs.size() << " " << name << " PLANE (" << n << ").x = " << -a);
         sim_->fibers.planarCut(objs, n, a, stateP, stateM, len);
     }
     else

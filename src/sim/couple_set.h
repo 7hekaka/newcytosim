@@ -264,12 +264,12 @@ public:
 
     //--------------------------
 
-    /// move Couples into reserve lists, instead of deleting them
-    void defrostStore();
-
     /// unlink all objects before import
     void freeze();
     
+    /// move Couples into reserve lists, instead of deleting them
+    void defrostStore();
+
     /// detach objects that were not updated during import
     void reheat(size_t cnt[], size_t n_cnt);
     
