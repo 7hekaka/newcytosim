@@ -54,7 +54,7 @@ def plot_fiber_length(P, N, name):
     plt.xlim(0, math.ceil(X))
     plt.ylim(0, math.ceil(max(M)))
     plt.xlabel('Frame', fontsize=fts)
-    plt.ylabel('Length (um)', fontsize=fts)
+    plt.ylabel(r'Length ($\mu m$)', fontsize=fts)
     plt.title('Fiber Length', fontsize=fts)
     plt.legend()
     fig.tight_layout()

@@ -73,7 +73,7 @@ def plot_data(X, Y, name):
     plt.xlim(0, math.ceil(max(X)/100)*100)
     plt.ylim(0, math.ceil(max(Y)))
     plt.xlabel('Time (s)', fontsize=fts)
-    plt.ylabel('Length (um)', fontsize=fts)
+    plt.ylabel(r'Length ($\mu m$)', fontsize=fts)
     plt.title('Spindle Length', fontsize=fts)
     plt.legend()
     fig.tight_layout()
