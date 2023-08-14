@@ -59,7 +59,7 @@ def plot_diameter(cdata, rdata):
     plt.plot(cdata[0], cdata[1], 'ko')
     plt.plot(rdata[0], rdata[1], 'b-', linewidth=4)
     plt.xlabel('Time (s)', fontsize=fts)
-    plt.ylabel('Diameter (um)', fontsize=fts)
+    plt.ylabel(r'Diameter ($\mu m$)', fontsize=fts)
     #plt.title('Closure', fontsize=fts)
     plt.tight_layout()
     #plt.xlim([-5, 5])

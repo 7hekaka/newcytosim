@@ -94,7 +94,7 @@ def main(args):
     os.chdir(cdir)
     # complete figure:
     #ax.set_xlim(0, 18)
-    ax.set_xlabel('Platelet size 2PI.R (um)')
+    ax.set_xlabel(r'Platelet size 2PI.R ($\mu m$)')
     lim = 1000*math.ceil(ax.get_ylim()[1]/1000)
     ax.set_ylim(0, lim)
     ax.set_ylabel('Radial push (pN)')

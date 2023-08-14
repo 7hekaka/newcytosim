@@ -42,7 +42,7 @@ def plot_histogram(time, data, scale, name):
     plt.xlim(0, max(scale))
     sup = 10 * math.ceil((min(Y)+max(Y))/10)
     plt.ylim(0, sup)
-    plt.xlabel('Length (um)', fontsize=fts)
+    plt.xlabel(r'Length ($\mu m$)', fontsize=fts)
     plt.ylabel('Count', fontsize=fts)
     plt.title('Length histogram', fontsize=fts)
     plt.legend()

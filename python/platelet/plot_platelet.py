@@ -66,11 +66,11 @@ def make_plots(arg):
     """
     T = [ d[0] for d in arg ]
     plot_data(T, [ d[1] for d in arg ], 'nb-microtubules')
-    plot_data(T, [ d[2] for d in arg ], 'total-polymer (um)')
+    plot_data(T, [ d[2] for d in arg ], r'total-polymer ($\mu m$)')
     plot_data(T, [-d[3] for d in arg ], 'ring-tension (pN)')
     plot_data(T, [ d[4] for d in arg ], 'radial-force (pN)')
-    plot_data(T, [ d[5] for d in arg ], 'ring-length (um)')
-    plot_data(T, [ d[6] for d in arg ], 'ring-radius (um)')
+    plot_data(T, [ d[5] for d in arg ], r'ring-length ($\mu m$)')
+    plot_data(T, [ d[6] for d in arg ], r'ring-radius ($\mu m$)')
 
     
 #------------------------------------------------------------------------
