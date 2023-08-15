@@ -9,21 +9,28 @@
 
 Inventory::Inventory()
 {
-    alloca_ = 31;
-    record_ = new Inventoried*[1+alloca_];
+    alloca_ = 30;
+    record_ = new Inventoried*[2+alloca_];
     lowest_ = ~0;
     highest_ = 0;
 
     for ( ObjectID n = 0; n <= alloca_; ++n )
         record_[n] = nullptr;
+    // place sentinel:
+    record_[1+alloca_] = nullptr;
 }
 
 
+// a sentinel with `nullptr` is placed at the end of the array
 void Inventory::allocate(size_t sz)
 {
     constexpr size_t chunk = 1024;
-    sz = ( sz + chunk ) & ~( chunk -1 );
+    // we want sz+1 to be a multiple of chunk:
+    sz = ( sz + 1 ) | ( chunk - 1 );
+    //for ( size_t s = 0; s < 32; ++s ) printf("%lu %lu\n", s, 1+((s+1)|(chunk-1)));
     
+    assert_true(sz > alloca_);
+    //std::clog << "Inventory::allocated("<<alloca_<<" --> "<<sz<<")\n";
     Inventoried ** ptr = new Inventoried*[1+sz];
     
     ObjectID n = 0;
@@ -31,11 +38,10 @@ void Inventory::allocate(size_t sz)
         ptr[n] = record_[n];
     for ( ; n <= sz; ++n )
         ptr[n] = nullptr;
-    
+
     delete[] record_;
     record_ = ptr;
-    alloca_ = sz;
-    //std::clog << "Inventory::allocated(" << sz << ")\n";
+    alloca_ = sz-1; // max Identity that can be handled
 }
 
 
@@ -76,15 +82,17 @@ void Inventory::assign(Inventoried * obj)
     else
     {
         // already allocated and registered
-        if ( n < alloca_ && record_[n] == obj )
+        if ( n <= alloca_ && record_[n] == obj )
             return;
         highest_ = std::max(highest_, n);
     }
-    
-    if ( n >= alloca_ )
+    assert_true(!record_[1+alloca_]);
+
+    if ( n > alloca_ )
         allocate(n);
     
     assert_true(!record_[n]);
+
     record_[n] = obj;
     //std::clog << "identity(" << obj << ") = " << n << "\n";
 
@@ -144,7 +152,7 @@ void Inventory::reassign()
         {
             while ( record_[nxt] )
                 ++nxt;
-            assert_true( nxt < alloca_ );
+            assert_true( nxt <= alloca_ );
             // move record from `inf` to `nxt`:
             record_[nxt] = record_[inf];
             record_[nxt]->setIdentity(nxt);
@@ -160,9 +168,10 @@ void Inventory::reassign()
 #pragma mark -
 
 
+/** This relies on the sentinel `nullptr` at [1+alloca_] */
 ObjectID Inventory::first_unassigned() const
 {
-    assert_true(!record_[alloca_]);
+    assert_true(!record_[1+alloca_]);
     ObjectID n = 1;
     while ( record_[n] )
         ++n;
@@ -179,6 +188,7 @@ ObjectID Inventory::next_identity(ObjectID n) const
         return n;
     if ( ++n <= highest_ )
     {
+        assert_true(!record_[1+alloca_]);
         while ( !record_[n] )
             ++n;
         return n;
@@ -200,7 +210,7 @@ Inventoried * Inventory::get(const ObjectID n) const
 
 Inventoried* Inventory::first() const
 {
-    if ( lowest_ < alloca_ )
+    if ( lowest_ <= alloca_ )
         return record_[lowest_];
     return nullptr;
 }
@@ -208,7 +218,7 @@ Inventoried* Inventory::first() const
 
 Inventoried* Inventory::last() const
 {
-    assert_true(highest_ < alloca_);
+    assert_true(highest_ <= alloca_);
     assert_true(0==highest_ || record_[highest_]);
     return record_[highest_];
 }
@@ -276,7 +286,7 @@ std::ostream& operator << (std::ostream& os, Inventory const& arg)
 int Inventory::bad() const
 {
     if ( lowest_ < 1 ) return 1;
-    for ( ObjectID n = 0; n < lowest_ && n < alloca_; ++n )
+    for ( ObjectID n = 0; n < lowest_ && n <= alloca_; ++n )
     {
         if ( record_[n] ) return 2;
     }
@@ -289,5 +299,6 @@ int Inventory::bad() const
     {
         if ( record_[n] ) return 8;
     }
+    if ( record_[alloca_+1] ) return 16;
     return 0;
 }

@@ -9,10 +9,12 @@
 
 /// Attributes serial-numbers to Inventoried, and remember them in an list
 /**
-A Inventory assigns serial-numbers (of type ObjectID) to Inventoried, 
-and records a pointer to these objects in a table indexed by ObjectID.
+ The Inventory assigns serial-numbers (of type ObjectID) to Inventoried,
+ and records a pointer to these objects in a table indexed by ObjectID.
  
-Pointers to the objects can be recovered from their 'ObjectID' in constant time.
+ This permits pointers to the objects to be recovered from their 'ObjectID' in constant time.
+ 
+ Note that a sentinel is placed at the end of the array, at [alloca_].
 
 \author FJ Nedelec, August 2003.
 */
@@ -37,7 +39,7 @@ private:
     /// highest i > 0 for which `record_[i] != 0`
     ObjectID highest_;
     
-    /// allocate memory to hold `size` objects
+    /// allocate memory to hold identities within [1, size]
     void allocate(size_t size);
     
     /// release memory
