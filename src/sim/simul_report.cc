@@ -133,8 +133,8 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
 void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt, int ver) const
 {
     std::streamsize p = 4;
-    opt.peek(p, "precision");
-    opt.peek(column_width, "column") || opt.peek(column_width, "width");
+    opt.set(p, "precision");
+    opt.set(column_width, "column") || opt.set(column_width, "width");
     
     // adjust floating-point notation:
     out.setf(std::ios_base::fixed, std::ios_base::floatfield);
