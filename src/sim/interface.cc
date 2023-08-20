@@ -359,8 +359,9 @@ bool all_points_inside(ObjectList const& objs, Space const* spc)
 ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
 {
     ObjectList objs;
-    long nb_trials = 1024;
-    opt.set(nb_trials, "nb_trials");
+    long max_trials = 1024;
+    opt.set(max_trials, "nb_trials");
+    long nb_trials = max_trials;
     Glossary::dict_type<PlacementType> keys{
         {"off",       PLACE_NOT},
 #if BACKWARD_COMPATIBILITY < 50
@@ -437,7 +438,8 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
     if ( objs.empty() )
     {
         std::string name = pp ? pp->name() : "object";
-        Cytosim::log << "could not place `" << name << "' after " << nb_trials << " trials\n";
+        if ( max_trials > 1 )
+            Cytosim::log << "could not place `" << name << "' after " << max_trials << " trials\n";
         return objs;
     }
 
