@@ -160,7 +160,7 @@ void CoupleSet::stepSkipUnattached()
 
     //size_t cnt = sizeFF();
     step_couples<&Couple::stepDiffusingDuo>(ffHead, ffOdd);
-    //printf(" free Couples %lu -> %lu\n", cnt, sizeFF());
+    //printf(" CoupleSet::stepSkipUnattached %lu -> %lu\n", cnt, sizeFF());
 
     step_couples<&Couple::stepAA>(firstAA(), aaOdd);
     if ( RNG.flip() )
