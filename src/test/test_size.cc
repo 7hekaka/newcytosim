@@ -68,13 +68,15 @@ int main(int argc, char* argv[])
         PRINT(Wrist);
         PRINT(WristLong);
         PRINT(Couple);
-        PRINT(CoupleLong);
+        PRINT(Crosslink);
         PRINT(Shackle);
-        PRINT(ShackleLong);
         PRINT(Bridge);
         PRINT(Duo);
-        PRINT(DuoLong);
         PRINT(Fork);
+        PRINT(CoupleLong);
+        PRINT(CrosslinkLong);
+        PRINT(ShackleLong);
+        PRINT(DuoLong);
     }
     else if ( x == 2 )
     {

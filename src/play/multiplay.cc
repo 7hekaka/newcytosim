@@ -360,7 +360,7 @@ int main(int argc, char *argv[])
 
     prepareDraw();
     glEnable(GL_SCISSOR_TEST);
-    while( !glfwWindowShouldClose(win) )
+    while ( !glfwWindowShouldClose(win) )
     {
         //usleep(100000);
         int refresh = 0;

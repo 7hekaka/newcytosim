@@ -250,18 +250,19 @@ int main(int argc, char *argv[])
     worker.start();
     GLFWwindow* win = initWindow(winW, winH);
 
-    while( !glfwWindowShouldClose(win) )
+    while ( !glfwWindowShouldClose(win) )
     {
         //usleep(100000);
         int refresh = 0;
         if ( worker.holding() && 0 == worker.trylock() )
         {
+            // data is now locked for this process
             ++refresh;
             drawBug(simul);
             if ( worker.holding() > 1 )
                 worker.restart();
-            worker.unlock();
-            worker.signal();
+            worker.unlock(); // release lock
+            worker.signal(); // permit other thread to resume
         }
         else if ( worker.dead() )
         {

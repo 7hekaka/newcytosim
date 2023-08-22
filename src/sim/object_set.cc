@@ -155,9 +155,9 @@ void ObjectSet::remove(Object * obj)
 {
     //std::clog << "ObjectSet::remove " <<  obj->reference() << '\n';
     assert_true( obj->objset() == this );
+    inventory_.unassign(obj);
     obj->objset(nullptr);
     unlink(obj);
-    inventory_.unassign(obj);
 }
 
 
