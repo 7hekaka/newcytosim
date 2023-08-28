@@ -6,12 +6,12 @@
 
 """
 compactify.py:
-    zip and compress 'run' directories found in specified path
+    zip and compress 'run' directories specified as arguments
     
 Usage:
-    compactify.py DIRECTORY [DIRECTORY2] ...
+    compactify.py run???? ...
     
-F. Nedelec, 04.02.2023, 14.05.2023
+F. Nedelec, 04.02.2023, 14.05.2023, 15.08.2023
 """
 
 import sys, os, subprocess, shutil
@@ -21,13 +21,18 @@ park = 'compacted'
 
 #------------------------------------------------------------------------
 
+def cleanup(path):
+    """remove log files"""
+    obj = [ path+'/log.txt', path+'/out.txt', path+'/err.txt', path+'/reduced' ]
+    for o in obj:
+        if os.path.isfile(o):
+            os.remove(o)
+
+
 def process(path):
-    """cleanup one directory"""
-    # remove log file:
-    obj = path+'/log.txt'
-    if os.path.isfile(obj):
-        os.remove(obj)
-    # Unzip object file:
+    """compress one directory"""
+    cleanup(path)
+    # Unzip object file if present:
     obj = path+'/objects.cmo.gz'
     if os.path.isfile(obj):
         subprocess.run(['gunzip', obj], check=True)
@@ -47,25 +52,20 @@ def main(args):
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
-        elif arg.endswith('*'):
-            import glob
-            paths.extend(glob.glob(arg))
         else:
             err.write("ignored '%s' on command line\n" % arg)
     if not paths:
         paths.append('.')
         err.write("Error: you must specify directories: compactify.py PATHS\n")
         return 2
+    try:
+        os.mkdir(park)
+    except FileExistsError:
+        pass
+    paths.remove(park)
     home = os.getcwd()
     for path in paths:
-        stuff = sorted(os.scandir(path), key=lambda e: e.name)
-        try:
-            os.mkdir(park)
-        except FileExistsError:
-            pass
-        for e in stuff:
-            if e.is_dir() and not e.name==park:
-                process(os.path.join(path, e.name))
+        process(path)
         os.chdir(home)
 
 #------------------------------------------------------------------------

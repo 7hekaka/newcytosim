@@ -11,7 +11,7 @@ shrink.py:
 Usage:
     shrink.py FILE1 [FILE2] ...
     
-F.J. Nedelec, 15--16.05.2023
+F.J. Nedelec, 15--16.05.2023, 28.08.2023
 """
 
 import sys, os, subprocess, shutil
@@ -42,7 +42,7 @@ def shrink(path):
     else:
         mes = ''
     stat = os.stat('red.cmo')
-    if stat.st_size > 10000 and red > 4:
+    if stat.st_size > 10240 and red > 4:
         #os.rename('objects.cmo', 'full.cmo')
         os.remove('objects.cmo')
         os.rename('red.cmo', 'objects.cmo')
@@ -50,36 +50,31 @@ def shrink(path):
             os.rename('red.mes', mes)
         print(f': reduced {red} frames')
     else:
-        print(': size(reduced.cmo) < 10000')
+        print(': size(reduced.cmo) < 10kB')
 
 
 def process(file, path):
     """cleanup one run"""
-    if not os.path.isdir(path):
-        try:
-            # unzip file:
-            subprocess.run(['tar', '-xzf', file], check=True)
-            print(f'{file} ---> {path}', end='')
-        except Exception as e:
-            print(type(e), e)
-            err.write('tar -xzf '+file+' failed!')
-            return
-    else:
-        print(path, end='')
     cnt = 0
     try:
-        # create sentinel file, failing if file already exists:
+        # create sentinel, failing if this file already exists:
         sentinel = os.path.join(path, 'reduced')
         fd = os.open(sentinel, os.O_CREAT|os.O_EXCL|os.O_WRONLY)
     except FileExistsError as e:
-        print(': already reduced?')
+        print(f'{path}: already reduced?')
         return
-    else:
-        cnt = nbFrames(os.path.join(path, 'objects.cmo'))
-        os.write(fd, f'{cnt}\n'.encode())
-        os.close(fd)
+    print(f'{path}', end=': ')
+    # Unzip object file if present:
+    obj = path+'/objects.cmo.gz'
+    if os.path.isfile(obj):
+        subprocess.run(['gunzip', obj], check=True)
+        print(f' gunzip ', end='')
+    # count frames:
+    cnt = nbFrames(os.path.join(path, 'objects.cmo'))
+    os.write(fd, f'{cnt}\n'.encode())
+    os.close(fd)
     if cnt > min_frames:
-        print(f': {cnt} frames', end='')
+        print(f'{cnt} frames', end='')
         cdir = os.getcwd()
         os.chdir(path)
         try:
@@ -89,7 +84,7 @@ def process(file, path):
                 f.write(type(e), str(e))
         os.chdir(cdir)
     else:
-        print(f': {cnt} frames')
+        print(f'{cnt} frames')
 
 
 #-------------------------------------------------------------------------------
@@ -113,7 +108,15 @@ def main(args):
         err.write("Error: you must specify paths or files: *.tarz or *.tar.gz\n")
         return 2
     for f in files:
-        process(f[0], f[1])
+        try:
+            # unzip file:
+            subprocess.run(['tar', '-xzf', f[0]], check=True)
+            print(f'{f[0]} ---> {f[1]}', end='')
+            process(f[0], f[1])
+        except Exception as e:
+            print(type(e), e)
+            err.write('tar -xzf '+file+' failed!')
+            return
     for d in paths:
         process('', d)
 
