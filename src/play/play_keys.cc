@@ -625,6 +625,11 @@ static void changeSize(FiberDisp* p, int inc)
     if ( p->line_style ) changeLineWidth(p, inc);
     if ( p->point_style ) changePointSize(p, inc);
     if ( p->speckle_style ) changeSpeckleSize(p, inc);
+    if ( p->style == 1 )
+    {
+        disp.bone_width = grained(disp.bone_width, inc);
+        flashText("display:bone_width=%0.2f", disp.bone_width);
+    }
 }
 
 //---------------------------------------------------------------------
@@ -688,12 +693,14 @@ static void shuffleFiberStyle(FiberDisp* p, int val)
     else if ( p->speckle_style )
     {
         p->speckle_style = 0;
-        flashText("%s:line_style = %i", n, p->line_style);
+        p->style = 1;
+        flashText("%s:style = %i, width = %.2f", n, p->style, disp.bone_width);
     }
     else
     {
+        p->style = 0;
         p->line_style = 1;
-        flashText("%s:line_style = %i", n, p->line_style);
+        flashText("%s:line_style = %i, width = %.2f", n, p->line_style, p->line_width);
     }
 }
 

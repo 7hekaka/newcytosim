@@ -1874,7 +1874,7 @@ void Display::drawFiber(Fiber const& fib)
 #endif
 
     if ( disp->style == 1 )
-        drawFiberBackbone(fib, prop->line_width); //fib.prop->disp->line_width);
+        drawFiberBackbone(fib, prop->bone_width);
     // if the Lattice was displayed, do not draw fancy styles:
     else if ( style && disp->style )
     {
