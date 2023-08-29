@@ -33,14 +33,14 @@ private:
     /// size of memory allocated minus one
     size_t alloca_;
     
-    /// lowest i > 0 for which `record_[i] != 0`
+    /// lowest i > 0 for which `record_[i] != nullptr`
     ObjectID lowest_;
     
-    /// highest i > 0 for which `record_[i] != 0`
+    /// highest given identity
     ObjectID highest_;
     
-    /// allocate memory to hold identities within [1, size]
-    void allocate(size_t size);
+    /// allocate memory to hold identities within [1, sup]
+    void allocate(size_t sup);
     
     /// release memory
     void release();
@@ -68,7 +68,7 @@ public:
     /// lowest assigned ID strictly greater than `n`
     ObjectID next_identity(ObjectID n) const;
     
-    /// the smallest unassigned ID
+    /// the smallest unassigned ID, or max if all are assigned
     ObjectID first_unassigned() const;
 
     /// current size of array
@@ -96,7 +96,7 @@ public:
     Inventoried * get(ObjectID) const;
     
     /// return object with given serial number
-    Inventoried * operator[](ObjectID n) const { assert_true(n<alloca_); return record_[n]; }
+    Inventoried * operator[](ObjectID n) const { assert_true(n<=alloca_); return record_[n]; }
 
     /// object with the smallest ID
     Inventoried * first() const;

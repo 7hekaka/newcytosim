@@ -21,27 +21,27 @@ Inventory::Inventory()
 }
 
 
-// a sentinel with `nullptr` is placed at the end of the array
-void Inventory::allocate(size_t sz)
+// a sentinel `nullptr` is placed at the end of the array
+void Inventory::allocate(size_t sup)
 {
     constexpr size_t chunk = 1024;
-    // we want sz+1 to be a multiple of chunk:
-    sz = ( sz + 1 ) | ( chunk - 1 );
+    // we want sup+1 to be a multiple of chunk:
+    sup = ( sup + 1 ) | ( chunk - 1 );
     //for ( size_t s = 0; s < 32; ++s ) printf("%lu %lu\n", s, 1+((s+1)|(chunk-1)));
     
-    assert_true(sz > alloca_);
+    assert_true(sup > alloca_);
     //std::clog << "Inventory::allocated("<<alloca_<<" --> "<<sz<<")\n";
-    Inventoried ** ptr = new Inventoried*[1+sz];
+    Inventoried ** ptr = new Inventoried*[1+sup];
     
     ObjectID n = 0;
     for ( ; n <= alloca_; ++n )
         ptr[n] = record_[n];
-    for ( ; n <= sz; ++n )
+    for ( ; n <= sup; ++n )
         ptr[n] = nullptr;
 
     delete[] record_;
     record_ = ptr;
-    alloca_ = sz-1; // max Identity that can be handled
+    alloca_ = sup-1; // max Identity that can be handled
 }
 
 
@@ -77,6 +77,7 @@ void Inventory::assign(Inventoried * obj)
     {
         n = ++highest_;
         obj->setIdentity(n);
+        //std::clog << "Inventory:highest <- " << n << "\n";
         //std::clog << "identity(" << obj << ") <- " << n << "\n";
     }
     else
@@ -101,6 +102,7 @@ void Inventory::assign(Inventoried * obj)
 }
 
 
+//
 void Inventory::unassign(const Inventoried * obj)
 {
     ObjectID n = obj->identity();
@@ -110,26 +112,17 @@ void Inventory::unassign(const Inventoried * obj)
     
     if ( n == lowest_ )
     {
-        if ( ++lowest_ <= highest_ )
+        assert_true(highest_ <= alloca_);
+        // find next valid identity:
+        for ( ++n; n <= highest_; ++n )
         {
-            assert_true(record_[highest_]);
-            while ( !record_[lowest_] )
-                ++lowest_;
+            if ( record_[n] )
+            {
+                lowest_ = n;
+                return;
+            }
         }
-        else
-        {
-            assert_true(n == highest_);
-            lowest_ = ~0U; // max unsigned value
-            highest_ = 0;
-        }
-    }
-    else if ( n == highest_ )
-    {
-        --highest_;
-        assert_true(lowest_ <= highest_);
-        assert_true(record_[lowest_]);
-        while ( !record_[highest_] )
-            --highest_;
+        lowest_ = ~0U; // max unsigned value
     }
 }
 
@@ -175,24 +168,20 @@ ObjectID Inventory::first_unassigned() const
     ObjectID n = 1;
     while ( record_[n] )
         ++n;
-    assert_true(n <= alloca_);
+    assert_true(n <= 1+alloca_);
+    if ( n == 1+alloca_ )
+        return ~0;
     return n;
 }
 
 
 ObjectID Inventory::next_identity(ObjectID n) const
 {
-    ++n;
     assert_true(n <= alloca_);
-    if ( record_[n] )
-        return n;
-    if ( ++n <= highest_ )
-    {
-        assert_true(!record_[1+alloca_]);
-        while ( !record_[n] )
-            ++n;
-        return n;
-    }
+    assert_true(highest_ <= alloca_);
+    for ( ++n; n <= highest_; ++n )
+        if ( record_[n] )
+            return n;
     return 0;
 }
 
@@ -226,17 +215,12 @@ Inventoried* Inventory::last() const
 
 Inventoried* Inventory::next(Inventoried const* i) const
 {
-    ObjectID n = i->identity() + 1;
+    ObjectID n = i->identity();
     assert_true(n <= alloca_);
-    if ( record_[n] )
-        return record_[n];
-    if ( ++n <= highest_ )
-    {
-        while ( !record_[n] )
-            ++n;
-        assert_true(n <= alloca_);
-        return record_[n];
-    }
+    assert_true(highest_ <= alloca_);
+    for ( ++n; n <= highest_; ++n )
+        if ( record_[n] )
+            return record_[n];
     return nullptr;
 }
 
@@ -299,6 +283,6 @@ int Inventory::bad() const
     {
         if ( record_[n] ) return 8;
     }
-    if ( record_[alloca_+1] ) return 16;
+    if ( record_[1+alloca_] ) return 16;
     return 0;
 }

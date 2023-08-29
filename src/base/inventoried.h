@@ -46,9 +46,6 @@ public:
     /// returns identity (strictly positive integer, unique within each class)
     ObjectID identity() const { return ID_; }
     
-    /// returns modifiable identity
-    ObjectID& identity() { return ID_; }
-    
     /// a random number that is likely to be unique
     ObjectSignature signature() const { return signature_; }
     
