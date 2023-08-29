@@ -500,6 +500,7 @@ void Display::preparePointDisp(T * p, PropertyList& alldisp, gym_color col)
     if ( p->display_fresh )
     {
         disp->read_string(p->display, p->name()+":display");
+        //std::clog << disp->color << "  " << p->name() << ":display (" << p->category() << ")\n";
         p->display_fresh = false;
     }
     
@@ -1917,7 +1918,7 @@ void Display::drawFiber(Fiber const& fib)
         || ( style==2 || style==3 ))
     {
         for ( size_t i = 0; i < fib.lastPoint(); ++i )
-            zObjects.push_back(zObject(&fib, i));
+            zObjects.emplace(&fib, i);
         style = 0;
     }
     else if ( style == 6 )
@@ -1925,7 +1926,7 @@ void Display::drawFiber(Fiber const& fib)
         // color according to the distance from the minus end
         for ( size_t i = 0; i < fib.lastPoint(); ++i )
             if ( color_by_distanceM(fib, i).visible() )
-                zObjects.push_back(zObject(&fib, i));
+                zObjects.emplace(&fib, i);
         style = 0;
     }
     else if ( style == 7 || ( style == 8 && fib.endStateP() == STATE_GREEN ))
@@ -1933,7 +1934,7 @@ void Display::drawFiber(Fiber const& fib)
         // color according to the distance from the plus end
         for ( size_t i = 0; i < fib.lastPoint(); ++i )
             if ( color_by_distanceP(fib, i+1).visible() )
-                zObjects.push_back(zObject(&fib, i));
+                zObjects.emplace(&fib, i);
         style = 0;
     }
 #endif
@@ -2265,7 +2266,7 @@ void Display::drawSolids(SolidSet const& set)
                 {
                     for ( size_t i = 0; i < sup; ++i )
                         if ( obj->radius(i) > 0 )
-                            zObjects.push_back(zObject(obj, i));
+                            zObjects.emplace(obj, i);
                 }
                 else
 #endif
@@ -2282,6 +2283,15 @@ void Display::drawSolids(SolidSet const& set)
 
 //------------------------------------------------------------------------------
 #pragma mark - Beads
+
+void drawVector(Vector pos, Vector vec, real a, real b, gym_color col, float rad)
+{
+    gym::color_both(col);
+    Vector A = pos - a * vec;
+    Vector B = pos + b * vec;
+    gle::drawArrow(A, B, rad);
+
+}
 
 void Display::drawBead(Bead const& obj)
 {
@@ -2337,6 +2347,8 @@ void Display::drawBeadT(Bead const& obj) const
     assert_true( disp->style & 1 );
     {
         gym_color col = bodyColorF(obj);
+        if ( disp->coloring && obj.mark() )
+            col = gym::bright_color(obj.mark());
 #if ( DIM > 2 )
         drawBeadS(obj.position(), obj.radius(), col, obj.mark());
 #else
@@ -2359,7 +2371,7 @@ void Display::drawBeads(BeadSet const& set)
             {
 #if ( DIM >= 3 )
                 if ( disp->color.transparent() )
-                    zObjects.push_back(zObject(obj));
+                    zObjects.emplace(obj);
                 else
 #endif
                     drawBeadT(*obj);
@@ -2446,7 +2458,7 @@ void Display::drawSpheres(SphereSet const& set)
                 drawSphere(*obj);
 #if ( DIM >= 3 )
             if ( disp->color.transparent() )
-                zObjects.push_back(zObject(obj));
+                zObjects.emplace(obj);
             else
 #endif
                 drawSphereT(*obj);
