@@ -53,7 +53,7 @@ void SliderProp::complete(Simul const& sim)
     if ( line_diffusion == 0 )
     {
         line_diffusion = movability * boltzmann(sim);
-        std::clog << name()+":diffusion <--- " << line_diffusion << "\n";
+        Cytosim::log << name()+":diffusion <--- " << line_diffusion << "\n";
     }
     
     /*
