@@ -1903,15 +1903,8 @@ void Fiber::setGlue(Single*& glue, const FiberEnd end, int mode)
 
 void Fiber::write(Outputter& out) const
 {
-#if !NEW_COMPACT_STORAGE
-    // normal way
     writeMarker(out, tag());
     Chain::write(out);
-#else
-    // compact format created on 23/06/2021
-    writeMarker(out, TAG_COMPACT);
-    Chain::writeAngles(out);
-#endif
 #if FIBER_HAS_BIRTHTIME || NEW_FIBER_SILHOUETTE
     writeMarker(out, TAG_FIBINFO);
     out.writeFloat(birthTime());

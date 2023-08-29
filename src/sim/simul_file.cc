@@ -101,9 +101,6 @@ void Simul::writeObjects(Outputter& out) const
     spheres.writeSet(out);
     singles.writeSet(out);
     couples.writeSet(out);
-#if NEW_COMPACT_STORAGE
-    fibers.writeAttachedHands(out);
-#endif
     organizers.writeSet(out);
     tubules.writeSet(out);
     //events.write(out);

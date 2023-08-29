@@ -147,18 +147,8 @@ void FiberSite::writeFiberSite(Outputter& out) const
         else
 #endif
         {
-#if !NEW_COMPACT_STORAGE
-            // normal way
             Object::writeReference(out, Fiber::TAG, hFiber->identity());
             out.writeFloat(hAbs);
-#else
-            // compact format created on 23/06/2021
-            // sacrificing precision to save a bit of space (29/06/2021)
-            Object::writeReference(out, Fiber::TAG_COMPACT, hFiber->identity());
-            // calculate relative position on fiber, which should be in [0, 1]:
-            real x = ( hAbs - hFiber->abscissaM() ) / ( hFiber->length() );
-            out.writeFixed(x); // 2 bytes
-#endif
         }
     }
     else

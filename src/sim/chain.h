@@ -17,11 +17,6 @@ class Glossary;
 /// include a normal used for fancy display of fibers as helices
 #define FIBER_HAS_NORMAL 0
 
-// enable compact storage of filaments based on Euler angle (23/06/2021)
-/** This makes the trajectory files smaller, at the expense of precision
- This option is normally not desired, expect to compress old simulations files */
-#define NEW_COMPACT_STORAGE 0
-
 
 /// Mecable with linear geometry
 /**
