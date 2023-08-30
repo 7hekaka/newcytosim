@@ -341,15 +341,16 @@ void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, r
 */
 void Mecafil::addRigidity(const real* X, real* Y) const
 {
-#if CHECK_RIGIDITY
-    // compare to default implementation:
-    real * tmp = new_real(DIM*nPoints);
-    copy_real(DIM*nPoints, Y, tmp);
-    add_rigidity0(DIM*(nPoints-2), X, iRigidity, tmp);
-#endif
     if ( nPoints > 3 )
     {
         const size_t nbt = nPoints - 2;  // number of triplets
+
+#if CHECK_RIGIDITY
+        // compare to default implementation:
+        real * tmp = new_real(DIM*nPoints);
+        copy_real(DIM*nPoints, Y, tmp);
+        add_rigidity0(nbt, X, iRigidity, tmp);
+#endif
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
         add_rigidityF(nbt, X, iRigidity, Y);
@@ -358,7 +359,14 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #elif ( DIM > 1 )
         add_rigidityF(nbt, X, iRigidity, Y);
 #endif
-    
+        
+#if CHECK_RIGIDITY
+        real err = blas::difference(DIM*nPoints, tmp, Y);
+        if ( err > 1.0e-6 )
+            printf("addRigidity(%u) error %e\n", nPoints, err);
+        free_real(tmp);
+#endif
+
 #if NEW_FIBER_LOOP
         if ( iRigidityLoop )
         {
@@ -378,16 +386,5 @@ void Mecafil::addRigidity(const real* X, real* Y) const
         //add_rigidityN(1, X, iRigidity, Y, iDir);
         add_rigidity(0, 1, 2, X, iRigidity, Y);
     }
-    
-#if CHECK_RIGIDITY
-    static size_t cnt = 0;
-    real err = blas::difference(DIM*nPoints, tmp, Y);
-    if ( err > 1.0e-6 || ++cnt > 100 )
-    {
-        cnt = 0;
-        printf("addRigidity(%lu) error %e\n", nPoints, err);
-    }
-    free_real(tmp);
-#endif
 }
 
