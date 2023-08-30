@@ -983,7 +983,7 @@ void Chain::getPoints(real const* ptr)
         real mov = std::sqrt(sumSquaredDistances(ptr));
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        std::cout << "\ncrude motion was applied to " << doc << " " << mov << '\n';
+        std::cout << "wild motion for " << doc << " " << mov << '\n';
         //copy_real(DIM*nPoints, ptr, pPos);
 #endif
     }
@@ -2056,7 +2056,7 @@ real Chain::projectedForceEnd(const FiberEnd end) const
 void Chain::briefdoc(std::ostream& os, real len, real con, real mn, real mx) const
 {
     std::streamsize p = os.precision(3);
-    os << " " << reference();
+    os << reference();
     os << "( seg " << segmentation() << ": " << mn << " +" << mx-mn;
     os << " len " << len << " " << std::showpos << con-len << std::noshowpos << " )";
     os.precision(p);
