@@ -972,7 +972,7 @@ void timeProject(UINT cnt, char const* str)
     randomize(NVAL, x, y, z, 1.0);
 
     FUNC(NSEG, force_, x);
-    VecPrint::edges(NVAL+2, x);
+    VecPrint::edges(NVAL+2, x, 4);
     print_floating_point_exceptions("");
 
     tick();
@@ -1065,10 +1065,10 @@ void testProjection(UINT cnt)
 #if REAL_IS_DOUBLE && defined(__AVX__)
     timeProject<projectForces_AVX>(cnt, "prAVX");
 #endif
-    timeProject<onlyDPTTS>(cnt, "dptts");
-    timeProject<onlyScale>(cnt, "scale");
-    timeProject<onlySCALE>(cnt, "SCALE");
-    timeProject<anisoProject>(cnt, "aniso");
+    timeProject<onlyDPTTS>(cnt, "*dptts");
+    timeProject<onlyScale>(cnt, "*scale");
+    timeProject<onlySCALE>(cnt, "*SCALE");
+    timeProject<anisoProject>(cnt, "*aniso");
 }
 
 void testProjectionDiff(UINT cnt)

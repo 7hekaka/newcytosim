@@ -147,11 +147,11 @@ void Mecafil::projectForces(const real* X, real* Y) const
 }
 
 
-void Mecafil::printProjection(std::ostream& os) const
+void Mecafil::printProjection(FILE * file) const
 {
     const size_t nbv = DIM * nbPoints();
     os << reference() << '\n';
-    VecPrint::full(os, nbv, nbv, iProj, nbv);
+    VecPrint::full(file, nbv, nbv, iProj, nbv);
 }
 
 

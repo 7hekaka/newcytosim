@@ -367,7 +367,7 @@ void Mecafil::computeTensions(const real* force)
 
 
 /** This extracts the matrix underlying the 'Mecafil::projectForces()' */
-void Mecafil::printProjection(std::ostream& os) const
+void Mecafil::printProjection(FILE * file) const
 {
     const size_t nbv = DIM * nbPoints();
     real * res = new_real(nbv*nbv);
@@ -384,8 +384,8 @@ void Mecafil::printProjection(std::ostream& os) const
     }
     free_real(dst);
     free_real(src);
-    os << "Mecafil:Projection  " << reference() << " (" << nbPoints() << ")\n";
-    VecPrint::full(os, nbv, nbv, res, nbv);
+    fprintf(file, " %s Projection ( %lu )\n", reference().c_str(), nbPoints());
+    VecPrint::full(file, nbv, nbv, res, nbv);
     free_real(res);
 }
 

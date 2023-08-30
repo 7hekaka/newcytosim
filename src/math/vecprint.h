@@ -2,18 +2,20 @@
 #ifndef VECPRINT_H
 #define VECPRINT_H
 
-#include <iostream>
-#include <iomanip>
+#include <cstdio>
 #include <cmath>
 
 
 /// Templated functions to print Vectors and Matrices with minimal formatting
+/** This is mostly used for debugging */
 namespace VecPrint
 {
     constexpr size_t SUP = 16UL;
+    /// default destination:
+    #define OUT stderr
     
     /// print 'len' components of 'vec[]' on a line
-    template< typename T >
+    template < typename T >
     void print(FILE* file, size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
         if ( !vec )
@@ -33,23 +35,23 @@ namespace VecPrint
     }
 
     /// print vector to stdout
-    template< typename T >
+    template < typename T >
     void print(size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
-        print(stdout, len, vec, digits, dim);
+        print(OUT, len, vec, digits, dim);
     }
     
     /// print vector to stdout
-    template< typename T >
+    template < typename T >
     void print(char const* msg, size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
-        printf("%6s ", msg);
-        print(stdout, len, vec, digits, dim);
-        printf("\n");
+        fprintf(OUT, "%6s ", msg);
+        print(OUT, len, vec, digits, dim);
+        putc('\n', OUT);
     }
 
     /// print up to 16 scalars from given vector, from the start
-    template< typename T >
+    template < typename T >
     void head(size_t len, const T* vec)
     {
         if ( len <= 16 )
@@ -61,16 +63,16 @@ namespace VecPrint
         }
     }
     
-    template< typename T >
+    template < typename T >
     void head(char const* msg, size_t len, const T* vec, int digits = 2)
     {
-        printf("%6s ", msg);
+        fprintf(OUT, "%6s ", msg);
         head(len, vec, digits);
-        printf("\n");
+        putc('\n', OUT);
     }
 
     /// print up to 16 scalars from given vector, taken from the edges
-    template< typename T >
+    template < typename T >
     void edges(size_t len, const T* vec, int digits = 2)
     {
         if ( len <= 16 )
@@ -78,115 +80,80 @@ namespace VecPrint
         else
         {
             print(8, vec, digits);
-            printf("...");
+            fprintf(OUT, "...");
             print(8, vec+len-8, digits);
         }
     }
     
-    template< typename T >
+    template < typename T >
     void edges(char const* msg, size_t len, const T* vec, int digits = 2)
     {
-        printf("%6s ", msg);
+        fprintf(OUT, "%6s ", msg);
         edges(len, vec, digits);
-        printf("\n");
+        putc('\n', OUT);
     }
-    
 
-    /// print 'len' components of 'vec[]' on a line
-    template< typename T >
-    std::ostream& print(std::ostream& os, size_t len, const T* vec, int digits = 2)
-    {
-        if ( !vec )
-            os << " null";
-        else if ( len == 0 )
-            os << " void";
-        else
-        {
-            char str[32], fmt[32];
-            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
-            for ( size_t i = 0; i < std::min(len, SUP); ++i )
-            {
-                snprintf(str, sizeof(str), fmt, vec[i]);
-                if ( i % 3 )
-                    os << str;
-                else
-                    os << " " << str;
-            }
-        }
-        os.flush();
-        return os;
-    }
-    
-    template< typename T >
+    template < typename T >
     void print(std::string const& msg, size_t len, const T* vec, int digits = 2)
     {
-        std::ostream & os = std::cout;
-        os << std::setw(6) << msg << " " << len << " ";
-        print(os, std::min(len, SUP), vec, digits);
-        std::endl(os);
+        fprintf(OUT, "%s %6i ", msg.c_str(), len);
+        print(OUT, std::min(len, SUP), vec, digits);
+        putc('\n', OUT);
     }
     
     /// print 'len' components of 'alpha * vec[]' on a line
-    template< typename T >
-    std::ostream& print(std::ostream& os, size_t len, const T* vec, int digits, T alpha)
+    template < typename T >
+    void print(FILE* file, size_t len, const T* vec, int digits, T alpha)
     {
         if ( !vec )
-            os << " null";
+            fprintf(file, " null");
         else if ( len == 0 )
-            os << " void";
+            fprintf(file, " void");
         else
         {
-            char str[32], fmt[32];
+            char fmt[32];
             snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+3, digits);
             for ( size_t i = 0; i < len; ++i )
             {
-                snprintf(str, sizeof(str), fmt, alpha*vec[i]);
-                if ( i % 3 )
-                    os << str;
-                else
-                    os << "  " << str;
+                fprintf(file, fmt, alpha*vec[i]);
+                if ( 0 == ( i % 3 ) )
+                    putc(' ', file);
             }
         }
-        os.flush();
-        return os;
+        fflush(file);
     }
 
 
     /// print 'len' components of 'vec[]' on separate lines
-    template< typename T >
-    std::ostream& dump(std::ostream& os, size_t len, const T* vec, int digits = 8)
+    template < typename T >
+    void dump(FILE* file, size_t len, const T* vec, int digits = 8)
     {
         if ( !vec )
-            os << " null";
-        else if ( len == 0 )
-            os << " void";
+            fprintf(file, " null");
+        else if ( len == 0  )
+            fprintf(file, " void");
         else
         {
-            char str[32], fmt[32];
-            snprintf(fmt, sizeof(fmt), " %%%i.%ie", 9, digits);
+            char fmt[32];
+            snprintf(fmt, sizeof(fmt), " %%%i.%ie\n", 9, digits);
             for ( size_t i = 0; i < len; ++i )
-            {
-                snprintf(str, sizeof(str), fmt, vec[i]);
-                os << str << '\n';
-            }
+                fprintf(file, fmt, vec[i]);
         }
-        os.flush();
-        return os;
+        fflush(file);
     }
     
     
     /// print matrix `mat[]` of size 'lin*col', and leading dimension `ldd` with precision 'digits'
-    template< typename T >
-    void full(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
+    template < typename T >
+    void full(FILE* file, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
     {
         if ( !mat )
-            os << " null";
-        else if ( lin == 0 || col == 0  )
-            os << " void";
-        else
+            fprintf(file, " null");
+        else if ( lin+col == 0  )
+            fprintf(file, " void");
         {
             const T threshold = std::pow(0.1, digits);
-            char str[32] = { 0 }, zer[32] = { 0 }, fmt[32] = " %4.0f";
+            char zer[32] = { 0 }, fmt[32] = " %4.0f";
             
             { // build format strings:
                 snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
@@ -206,115 +173,107 @@ namespace VecPrint
                 {
                     T val = mat[ii+ldd*jj];
                     if ( std::fabs(val) < threshold )
-                        os << zer;
+                        fputs(zer, file);
                     else
-                    {
-                        snprintf(str, sizeof(str), fmt, mat[ii+ldd*jj]);
-                        os << str;
-                    }
+                        fprintf(file, fmt, mat[ii+ldd*jj]);
                 }
-                os << '\n';
+                putc('\n', file);
             }
         }
-        //std::endl(os);
+        fflush(file);
     }
     
     
-    template< typename T >
+    template < typename T >
     void full(size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
     {
-        full(std::cout, lin, col, mat, ldd, digits);
+        full(OUT, lin, col, mat, ldd, digits);
     }
     
-    template< typename T >
+    template < typename T >
     void full(std::string const& msg, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 2)
     {
-        std::cout << msg << " " << lin << "x" << col << " :\n";
-        full(std::cout, std::min(lin, SUP), std::min(col, SUP), mat, ldd, digits);
+        fprintf(OUT, "%s %lux%lu :\n", msg.c_str(), lin, col);
+        full(OUT, std::min(lin, SUP), std::min(col, SUP), mat, ldd, digits);
     }
 
     /// print matrix in sparse format: line_index, column_index, value
-    template< typename T >
-    void sparse(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 8, T threshold = 0)
+    template < typename T >
+    void sparse(FILE * file, size_t lin, size_t col, const T* mat, size_t ldd, int digits = 8, T threshold = 0)
     {
         if ( !mat )
-            os << " null";
-        else if ( lin == 0 || col == 0  )
-            os << " void";
+            fprintf(file, " null");
+        else if ( lin+col == 0  )
+            fprintf(file, " void");
         else
         {
-            char str[64], fmt[64];
+            char fmt[64];
             snprintf(fmt, sizeof(fmt), " %%3i %%3i %%9.%if\n", digits);
             for (size_t ii = 0; ii < lin; ++ii )
                 for (size_t jj = 0; jj < col; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
                     if ( std::fabs(val) > threshold )
-                    {
-                        snprintf(str, sizeof(str), fmt, ii, jj, val);
-                        os << str;
-                    }
+                        fprintf(file, fmt, ii, jj, val);
                 }
         }
-        std::endl(os);
+        putc('\n', file);
     }
     
     
     /// print a matrix in sparse format, but adding `off` to all line and column indices
-    template< typename T >
-    void sparse_off(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, size_t off, int digits = 8)
+    template < typename T >
+    void sparse_off(FILE * file, size_t lin, size_t col, const T* mat, size_t ldd, size_t off, int digits = 8)
     {
         if ( !mat )
-            os << " null";
-        else if ( lin == 0 || col == 0  )
-            os << " void";
+            fprintf(file, " null");
+        else if ( lin+col == 0  )
+            fprintf(file, " void");
         else
         {
-            char str[32], fmt[32];
-            snprintf(fmt, sizeof(fmt), " %%9.%if\n", digits);
+            char fmt[32];
+            snprintf(fmt, sizeof(fmt), " %%3i %%3i  %%9.%if\n", digits);
             for (size_t ii = 0; ii < lin; ++ii )
                 for (size_t jj = 0; jj < col; ++jj )
-                {
-                    snprintf(str, sizeof(str), fmt, mat[ii+ldd*jj]);
-                    os << ii+off << " " << jj+off << str;
-                }
+                    fprintf(file, fmt, ii+off, jj+off, mat[ii+ldd*jj]);
         }
-        std::endl(os);
+        putc('\n', file);
     }
     
     /// print matrix `mat[]` of size lin*col, and leading dimension `ldd` in ASCII art...
-    template< typename T >
-    void image(std::ostream& os, size_t lin, size_t col, const T* mat, size_t ldd, T scale)
+    template < typename T >
+    void image(FILE * file, size_t lin, size_t col, const T* mat, size_t ldd, T scale)
     {
         if ( !mat )
-            os << " null";
-        else if ( lin == 0 || col == 0  )
-            os << " void";
+            fprintf(file, " null");
+        else if ( lin+col == 0  )
+            fprintf(file, " void");
         else
         {
-            char str[] = ".:+*O%#$";
+            char map[] = ".:+*O%#$";
             
             const T threshold = 0.01 * scale;
             for ( size_t ii = 0; ii < lin; ++ii )
             {
-                os << '|';
+                putc('|', file);
                 for ( size_t jj = 0; jj < col; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
                     if ( val != val )
-                        os << '@';
+                        putc('@', file);
                     else if ( val < threshold )
-                        os << ' ';
+                        putc(' ', file);
                     else
                     {
                         int x = std::max(7, 2+std::log10(std::fabs(val)/scale));
-                        os << str[x];
+                        putc(map[x], file);
                     }
                 }
-                os << "|\n";
+                putc('|', file);
+                putc('\n', file);
             }
         }
-        std::endl(os);
+        putc('\n', file);
     }
 }
 

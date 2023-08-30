@@ -966,7 +966,7 @@ void Fiber::prepareMecable()
 #else
     makeProjection();
 #endif
-    //printProjection(std::clog);
+    //printProjection(stderr);
 
     assert_true( iPointMobility >= 0 );
     

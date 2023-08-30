@@ -971,24 +971,22 @@ void Chain::getPoints(real const* ptr)
     real * mem = uptr.get();
 #endif
     
-    //printf("\n %u  /pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
-    //printf("\n %u  |ptr ", identity()); VecPrint::print(std::cerr, nPoints, ptr, 3);
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
     else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, mem, allocated()) )
 #endif
     {
+        //fprintf(stderr, "\n %u  / ", identity()); VecPrint::print(stderr, DIM*nPoints, pPos, 3);
+        //fprintf(stderr, "\n %u  L ", identity()); VecPrint::print(stderr, DIM*nPoints, ptr, 3);
         std::string doc = document(ptr);
-        real mov = sumDistances(ptr);
+        real mov = std::sqrt(sumSquaredDistances(ptr));
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        Cytosim::warn << "crude motion was applied to " << doc << " " << mov << '\n';
-        //copy_real(DIM*nbPoints(), ptr, pPos);
-        //Cytosim::warn << document(pPos) << '\n';
+        std::cout << "\ncrude motion was applied to " << doc << " " << mov << '\n';
+        //copy_real(DIM*nPoints, ptr, pPos);
 #endif
     }
-    
     //printf("\n %u  >pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
 }
 

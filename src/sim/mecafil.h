@@ -200,7 +200,7 @@ public:
     void projectForces(const real* X, real* Y) const;
     
     /// print projection matrix
-    void printProjection(std::ostream&) const;
+    void printProjection(FILE*) const;
 
     //--------------------- Rigidity
     

@@ -434,23 +434,23 @@ void Meca::exportSystem() const
     saveObjectID(f);
     fclose(f);
     
-    std::ofstream os("sol.txt");
-    VecPrint::dump(os, dimension(), vPTS);
-    os.close();
+    f = FilePath::open_file("sol.txt", "w");
+    VecPrint::dump(f, dimension(), vPTS);
+    fclose(f);
+
+    f = FilePath::open_file("rhs.txt", "w");
+    VecPrint::dump(f, dimension(), vRHS);
+    fclose(f);
     
-    os.open("rhs.txt");
-    VecPrint::dump(os, dimension(), vRHS);
+    std::ofstream os("full.txt");
+    mFUL.printSparse(os, 0);
     os.close();
-    
+
 #if USE_ISO_MATRIX
     os.open("iso.txt");
     mISO.printSparse(os, 0);
     os.close();
 #endif
-    
-    os.open("full.txt");
-    mFUL.printSparse(os, 0);
-    os.close();
         
     size_t alc = 0;
     for ( Mecable const* mec : mecables )
@@ -459,13 +459,13 @@ void Meca::exportSystem() const
     real * tmp1 = new_real(DIM*alc);
     real * tmp2 = new_real(DIM*DIM*alc*alc);
     
-    os.open("diag.txt");
+    f = FilePath::open_file("diag.txt", "w");
     
     for ( Mecable * mec : mecables )
     {
         const size_t bks = DIM * mec->nbPoints();
         extractBlock(mec, tmp2);
-        VecPrint::sparse_off(os, bks, bks, tmp2, bks, DIM*mec->matIndex());
+        VecPrint::sparse_off(f, bks, bks, tmp2, bks, DIM*mec->matIndex());
     }
     os.close();
     
