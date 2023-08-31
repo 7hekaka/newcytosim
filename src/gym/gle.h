@@ -73,6 +73,8 @@ namespace gle
     void discTop1();
     /// draw 2D disc of radius 1 at Z=1, with +Z as normal
     void discTop2();
+    /// draw 2D disc of radius 1 at Z=0.5, with +Z as normal
+    void discTopH();
     /// draw nice 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom1();
     /// draw 2D disc of radius 1 in XY plane, with -Z as normal
@@ -203,7 +205,7 @@ namespace gle
     /// display a cylinder of axis Z, radius 1 covering Z=[0, 1]
     inline void cylinder1() { closedTube2(); discTop2(); }
     /// display a cylinder of axis Z, radius 1 covering Z=[-0.5, 0.5]
-    inline void cylinderC() { closedTubeC(); discTop2(); }
+    inline void cylinderC() { closedTubeC(); discTopH(); }
     
     /// draw a 3-portion cylinder with a larger central section
     void barrel();

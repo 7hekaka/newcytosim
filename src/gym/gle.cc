@@ -1407,11 +1407,12 @@ namespace gle
         tubes_[23] = i+s; i += setDisc(ptr+i, 2, 0, 1);
         tubes_[24] = i+s; i += setDisc(ptr+i, 1, 1, 1);
         tubes_[25] = i+s; i += setDisc(ptr+i, 2, 1, 1);
-        tubes_[26] = i+s; i += setDisc(ptr+i, 1, 0, -1);
-        tubes_[27] = i+s; i += setDisc(ptr+i, 2, 0, -1);
-        tubes_[28] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
-        tubes_[29] = i+s; i += setRing(ptr+i, 2, M_SQRT2, 0, 1);
-        tubes_[30] = i+s; i += setRing(ptr+i, 2, 1.19, 0, 1);
+        tubes_[26] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
+        tubes_[27] = i+s; i += setDisc(ptr+i, 1, 0, -1);
+        tubes_[28] = i+s; i += setDisc(ptr+i, 2, 0, -1);
+        tubes_[29] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
+        tubes_[30] = i+s; i += setRing(ptr+i, 2, M_SQRT2, 0, 1);
+        tubes_[31] = i+s; i += setRing(ptr+i, 2, 1.19, 0, 1);
         size_t j = sizeTubeBuffers();
         assert_true( i <= j );
         return i;
@@ -1456,11 +1457,12 @@ namespace gle
     void disc2()         { doTubeStrip(tubes_[23], pi_twice/2); }
     void discTop1()      { doTubeStrip(tubes_[24], pi_twice); }
     void discTop2()      { doTubeStrip(tubes_[25], pi_twice/2); }
-    void discBottom1()   { doTubeStrip(tubes_[26], pi_twice); }
-    void discBottom2()   { doTubeStrip(tubes_[27], pi_twice/2); }
-    void discMid2()      { doTubeStrip(tubes_[28], pi_twice/2); }
-    void ring()          { doTubeStrip(tubes_[29], 2+pi_twice); }
-    void thin_ring()     { doTubeStrip(tubes_[30], 2+pi_twice); }
+    void discTopH()      { doTubeStrip(tubes_[26], pi_twice/2); }
+    void discBottom1()   { doTubeStrip(tubes_[27], pi_twice); }
+    void discBottom2()   { doTubeStrip(tubes_[28], pi_twice/2); }
+    void discMid2()      { doTubeStrip(tubes_[29], pi_twice/2); }
+    void ring()          { doTubeStrip(tubes_[30], 2+pi_twice); }
+    void thin_ring()     { doTubeStrip(tubes_[31], 2+pi_twice); }
 
     void stripedTube(float w) { gym::bindBufferV3N3(buf_[0]); gym::cleanup(1); gym::drawLines(w, tubes_[2], nbTrianglesTube(4)); }
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
