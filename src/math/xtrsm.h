@@ -1939,11 +1939,16 @@ inline void xswap(REAL* A, REAL* B)
 template < int ORD, typename REAL >
 void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
 {
+    /*
+     as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
+     and by shifting IPIV we fall back on the C-convention of zero-based array
+     */
+    --IPIV;
     if ( INCX == 1 )
     {
         for ( int I = K1; I <= K2; ++I )
         {
-            int P = IPIV[I-1];  // P is a one-based array index!
+            int P = IPIV[I];
             if ( P != I )
                 xswap<ORD>(A+ORD*I, A+ORD*P);
         }
@@ -1952,7 +1957,7 @@ void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
     {
         for ( int I = K1; I <= K2; ++I )
         {
-            int P = IPIV[INCX*I-1];  // P is a one-based array index!
+            int P = IPIV[INCX*I];
             if ( P != I )
                 xswap<ORD>(A+ORD*I, A+ORD*P);
         }
@@ -1962,7 +1967,7 @@ void iso_xlaswp(REAL* A, int K1, int K2, const int* IPIV, int INCX)
         int IX = 1 + ( 1 - K2 )*INCX;
         for ( int I = K2; I >= K1; --I )
         {
-            int P = IPIV[IX-1];  // P is a one-based array index!
+            int P = IPIV[IX];
             if ( P != I )
                 xswap<ORD>(A+ORD*I, A+ORD*P);
             IX += INCX;
@@ -1977,7 +1982,7 @@ void xlaswp1(REAL* A, int K1, int K2, const int* IPIV)
 {
     /*
      as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
-     but we can shift the pointers to directly use these one-based array indices
+     and by shifting IPIV we fall back on the C-convention of zero-based array
      */
     --A;
     --IPIV;
@@ -2003,7 +2008,7 @@ size_t count_swaps(int K1, int K2, const int* IPIV)
 {
     /*
      as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
-     but we can shift the pointers to directly use these one-based rray indices
+     and by shifting IPIV we fall back on the C-convention of zero-based array
      */
     --IPIV;
     size_t cnt = 0;
