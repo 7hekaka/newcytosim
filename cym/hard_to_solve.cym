@@ -1,0 +1,40 @@
+% Stability test script by Dennis Wörthmüller S. Dmitrieff, 30.08.2023
+% hard-to solve system with large timestep, low viscosity, short segmentation
+
+set simul system
+{
+    kT = 0.0042
+    time_step = 0.05
+    viscosity = 0.02
+    precondition = 0
+    verbose = 3
+}
+
+set space cell
+{
+    shape = circle
+}
+
+new cell
+{
+    radius = 3
+}
+
+set fiber actin
+{
+    rigidity = 0.1
+    segmentation = 0.05
+    confine = inside, 100
+    drag_radius = 0.0035
+    display = ( minus_end=4; point=2; line=0; )
+}
+
+new 4 actin
+{
+    length = 1.0
+}
+
+run 100000 system
+{   
+    nb_frames = 100
+}
