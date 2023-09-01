@@ -2,7 +2,6 @@
 
 #include <memory>
 #include "dim.h"
-#include "smath.h"
 #include "assert_macro.h"
 #include "chain.h"
 #include "iowrapper.h"
@@ -1346,18 +1345,25 @@ void Chain::join(Chain const* fib)
 //------------------------------------------------------------------------------
 #pragma mark -
 
+static real lengthSegmentSqr(const real a[])
+{
+    real x = square( a[DIM] - a[0] );
+    for( int i = 1; i < DIM; ++i )
+        x += square( a[DIM+i] - a[i] );
+    return x;
+}
 
 /**
  Returns the minimum and maximum distance between consecutive points, for 'cnt' segments
  */
-void Chain::segmentationMinMax(size_t cnt, real const* ptr, real& in, real& ax)
+void Chain::computeMinMax(size_t cnt, real const* ptr, real& in, real& ax)
 {
-    real x = sMath::distanceSqr<DIM>(ptr, ptr+DIM);
+    real x = lengthSegmentSqr(ptr);
     in = x;
     ax = x;
     for ( unsigned i = 1; i < cnt; ++i )
     {
-        x = sMath::distanceSqr<DIM>(ptr+DIM*i, ptr+DIM*(i+1));
+        x = lengthSegmentSqr(ptr+DIM*i);
         in = std::min(in, x);
         ax = std::max(ax, x);
     }
@@ -1368,12 +1374,10 @@ void Chain::segmentationMinMax(size_t cnt, real const* ptr, real& in, real& ax)
 /**
  Returns the average and variances of segment length
  */
-void Chain::segmentationVariance(real const* ptr, real& mean, real& variance) const
+void Chain::computeMeanVar(size_t cnt, real const* ptr, real off, real& mean, real& variance)
 {
     Vector vec;
-    const double off = segmentation(); // assumed mean
     double avg = 0, var = 0;
-    size_t cnt = nbSegments();
     for ( size_t n = 0; n < cnt; ++n )
     {
         vec.load_diff(ptr+DIM*n);
@@ -1382,7 +1386,7 @@ void Chain::segmentationVariance(real const* ptr, real& mean, real& variance) co
         var += r*r;
     }
     avg /= cnt;
-    variance = var - square(avg)*cnt;
+    variance = var - square(avg) * cnt;
     if ( cnt > 1 )
         variance /= real(cnt-1);
     mean = avg + off;
@@ -1397,7 +1401,7 @@ void Chain::segmentationVariance(real const* ptr, real& mean, real& variance) co
  
  curvature is ZERO if A, B and C are aligned
  */
-real curvature3(Vector const& A, Vector const& B, Vector const& C)
+static real curvature3(Vector const& A, Vector const& B, Vector const& C)
 {
     // cross-product = 2 * surface; hence S = 16 * surface^2
     real S = 4 * normSqr(cross( C - A, C - B ));
@@ -1414,14 +1418,14 @@ real curvature3(Vector const& A, Vector const& B, Vector const& C)
  
  Thank you, Serge to point this out!
  */
-real curvature3(Vector const& A, Vector const& B, Vector const& C, real seg)
+static real curvature3(Vector const& A, Vector const& B, Vector const& C, real seg)
 {
     real H = norm( A + C - 2 * B );  // 2 * height_of_triangle
     return H / ( seg * seg );
 }
 
 /**
- This returns 
+ This returns the curvature estimated at point `p`
  */
 real Chain::curvature(size_t p) const
 {
@@ -2086,7 +2090,7 @@ void Chain::document(std::ostream& os, real len, real con, real mn, real mx) con
 int Chain::checkLength(real const* ptr, std::ostream& os, real len) const
 {
     real mn, mx;
-    segmentationMinMax(nbSegments(), ptr, mn, mx);
+    computeMinMax(nbSegments(), ptr, mn, mx);
     real dev = ( mx - mn ) / segmentation();
     real con = contourLength(ptr, nPoints);
     real err = abs_real( con - len ) / ( con + len );
@@ -2104,7 +2108,7 @@ void Chain::document(std::ostream& os, real const* ptr) const
 {
     real mn, mx;
     real len = length();
-    segmentationMinMax(nbSegments(), ptr, mn, mx);
+    computeMinMax(nbSegments(), ptr, mn, mx);
     real con = contourLength(ptr, nPoints);
     briefdoc(os, len, con, mn, mx);
 }

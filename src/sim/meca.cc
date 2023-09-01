@@ -756,11 +756,6 @@ unsigned Meca::solve()
 
     //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dim, max_iter, tolerance_, precond);
 
-    /*
-     GMRES may converge faster than BCGGS, but has overheads and uses more memory
-     hence for very large systems, BCGGS is often advantageous.
-     */
-
     //------- call the iterative solver:
     if ( precond_ )
     {
@@ -778,6 +773,10 @@ unsigned Meca::solve()
     
     //fprintf(stderr, "    BCGS%u    count %4i  residual %.3e\n", precond, monitor.count(), monitor.residual());
 
+    /*
+     GMRES may converge faster than BCGGS, but has overheads and uses more memory
+     hence for very large systems, BCGGS is often advantageous.
+     */
 #if ( 0 )
     // enable this to compare with GMRES using different restart parameters
     for ( int RS : {8, 16, 32} )
@@ -927,6 +926,7 @@ unsigned Meca::solve()
             oss << " M " << std::setw(6) << ( cycles_ - factor - solve ) / cnt;
         }
         Cytosim::out << oss.str() << std::endl;
+        //std::clog << oss.str() << std::endl;
     }
     
     return monitor.count();

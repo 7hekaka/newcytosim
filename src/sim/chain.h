@@ -418,14 +418,14 @@ public:
     
     //--------------------- Info
     
+    /// calculate average and variance of the segment length
+    static void computeMeanVar(size_t cnt, real const* ptr, real, real&, real&);
+
     /// calculate the minimum and maximum segment length, for `cnt` segments
-    static void segmentationMinMax(size_t cnt, real const* ptr, real&, real&);
+    static void computeMinMax(size_t cnt, real const* ptr, real&, real&);
     
     /// calculate the minimum and maximum segment length
-    void segmentationMinMax(real& n, real& x) const { segmentationMinMax(nbSegments(), pPos, n, x); }
-
-    /// calculate average and variance of the segment length
-    void segmentationVariance(real const* ptr, real&, real&) const;
+    void segmentMinMax(real& n, real& x) const { computeMinMax(nbSegments(), pPos, n, x); }
 
     /// curvature calculated at joint `p`, where `0 < p < nbPoints()-1`
     real curvature(size_t p) const;

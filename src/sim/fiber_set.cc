@@ -865,7 +865,7 @@ void FiberSet::infoSegments(ObjectList const& objs, size_t& cnt, size_t& points,
             ++cnt;
             real n, x;
             points += fib->nbPoints();
-            fib->segmentationMinMax(n, x);
+            fib->segmentMinMax(n, x);
             mn = std::min(mn, n);
             mx = std::max(mx, x);
             n = abs_real(1.0 - n/fib->segmentation());

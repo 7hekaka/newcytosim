@@ -5,9 +5,10 @@ set simul system
 {
     kT = 0.0042
     time_step = 0.05
-    viscosity = 0.02
+    viscosity = 0.01
     precondition = 0
     verbose = 3
+    display = ( delay = 100; zoom = 0.75 )
 }
 
 set space cell
@@ -17,21 +18,23 @@ set space cell
 
 new cell
 {
-    radius = 3
+    radius = 1
 }
 
 set fiber actin
 {
     rigidity = 0.1
     segmentation = 0.05
-    confine = inside, 100
+    confine = inside, 1000
     drag_radius = 0.0035
     display = ( minus_end=4; point=2; line=0; )
 }
 
-new 4 actin
+new 1 actin
 {
     length = 1.0
+    position = 0.8 0 0
+    direction = 1 0 0 
 }
 
 run 100000 system
