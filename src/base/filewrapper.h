@@ -81,10 +81,7 @@ public:
     /// true if file is good for writing / reading
     bool good() const { return mFile && !ferror(mFile); }
 
-    /// return current reading position of file
-    //long pos() const { if ( mFile ) return ftell(mFile); else return 0; }
-
-    /// set `p` to current reading position of file
+    /// extract current reading position of file into `p`
     int get_pos(fpos_t& p) const { return fgetpos(mFile, &p); }
 
     /// change current reading position to `p`

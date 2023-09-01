@@ -701,13 +701,10 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
     int has_frame = 0;
     int tag = 0, c = 0;
     int fat = 0;
-    fresh_ = 1;
 
     while ( 1 )
     {
         do {
-            fpos_t pos;
-            bool has_pos = !in.get_pos(pos);
             c = in.get_char();
             if ( c == '#' )
             {
@@ -719,11 +716,11 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     if ( h == 1 && nb_objects > 0 )
                     {
                         // found another frame start without finishing current one?
-                        if ( has_pos )
-                            in.seek(pos);
                         return 2;
                     }
                     has_frame = h;
+                    if ( has_frame )
+                        fresh_ = 1;
                 }
             }
             else if ( c == '%' )
@@ -784,7 +781,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                 std::cerr << e.info() << " (section "+section+")\n";
         }
     }
-    return 2;
+    return 7;
 }
 
 
