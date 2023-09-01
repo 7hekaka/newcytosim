@@ -175,15 +175,6 @@ ObjectID FiberSite::readFiberSite(Inputter& in, Simul& sim)
                 hSite = hLattice->index(hAbs);
 #endif
         }
-        else if ( tag == Fiber::TAG_COMPACT )
-        {
-            real x = in.readFixed();
-            hAbs = x * hFiber->length() + hFiber->abscissaM();
-#if FIBER_HAS_LATTICE
-            if ( hLattice ) // set site to closest integral position
-                hSite = hLattice->index(hAbs);
-#endif
-        }
         else if ( tag == Fiber::TAG_LATTICE )
         {
 #if BACKWARD_COMPATIBILITY < 49
