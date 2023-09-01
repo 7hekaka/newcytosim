@@ -994,27 +994,6 @@ void Chain::getPoints(real const* ptr)
 }
 
 
-/**
- Flip all the points, such that minus_end becomes plus_end and vice-versa.
- This does not affects Abscissa and the abscissa of center thus stays as it is.
-*/
-void Chain::flipChainPolarity()
-{
-    size_t ii = 0;
-    size_t jj = lastPoint();
-    
-    while ( ii < jj )
-    {
-        Vector P(pPos+DIM*ii);
-        Vector Q(pPos+DIM*jj);
-        Q.store(pPos+DIM*ii);
-        P.store(pPos+DIM*jj);
-        ++ii;
-        --jj;
-    }
-}
-
-
 //========================================================================
 //=====================GROWING/SHRINKING==================================
 //========================================================================
@@ -1340,6 +1319,27 @@ void Chain::join(Chain const* fib)
     getPoints(tmp);
     free_real(tmp);
     updateFiber();
+}
+
+
+/**
+ Flip all the points, such that minus_end becomes plus_end and vice-versa.
+ This does not affects Abscissa and the abscissa of center thus stays as it is.
+*/
+void Chain::flipChainPolarity()
+{
+    size_t ii = 0;
+    size_t jj = lastPoint();
+    
+    while ( ii < jj )
+    {
+        Vector P(pPos+DIM*ii);
+        Vector Q(pPos+DIM*jj);
+        Q.store(pPos+DIM*ii);
+        P.store(pPos+DIM*jj);
+        ++ii;
+        --jj;
+    }
 }
 
 //------------------------------------------------------------------------------

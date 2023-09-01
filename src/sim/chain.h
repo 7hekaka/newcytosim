@@ -412,9 +412,6 @@ public:
     
     /// restore the distance between successive vertices
     void reshape() { getPoints(pPos); }
-
-    /// invert polarity (swap PLUS end MINUS ends in place)
-    void flipChainPolarity();
     
     //--------------------- Info
     
@@ -493,6 +490,9 @@ public:
     
     /// merge two fibers by attaching given Chain at the plus end of `this`
     void join(Chain const*);
+
+    /// invert polarity (swap PLUS end MINUS ends in place)
+    void flipChainPolarity();
 
     //---------------------
 
