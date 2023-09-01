@@ -267,220 +267,8 @@ Vector3 Chain::adjustedNormal(Vector3 const& d) const
 #endif
 }
 
-//===================================================================
-#pragma mark -
-
-/*
- This deals with Fiber having one segment only,
- for which the procedure is trivial
- */
-void Chain::reshape_two(const real* src, real* dst, real cut)
-{
-    real X = src[  DIM] - src[0];
-#if ( DIM == 1 )
-    real s = 0.5 - 0.5 * (cut/abs_real(X));
-#elif ( DIM == 2 )
-    real Y = src[1+DIM] - src[1];
-    real n = std::sqrt( X * X + Y * Y );
-    real s = 0.5 - 0.5 * (cut/n);
-#else
-    real Y = src[1+DIM] - src[1];
-    real Z = src[2+DIM] - src[2];
-    real n = std::sqrt( X * X + Y * Y + Z * Z );
-    real s = 0.5 - 0.5 * (cut/n);
-#endif
-    
-    dst[0    ] = src[0    ] + s * X;
-    dst[  DIM] = src[  DIM] - s * X;
-#if ( DIM > 1 )
-    dst[1    ] = src[1    ] + s * Y;
-    dst[1+DIM] = src[1+DIM] - s * Y;
-#endif
-#if ( DIM > 2 )
-    dst[2    ] = src[2    ] + s * Z;
-    dst[2+DIM] = src[2+DIM] - s * Z;
-#endif
-}
-
-
-/**
- Shorten segments to restore their length to 'cut'.
- We use a multidimensional Newton's method, to find iteratively the scalar
- coefficients that define the amount of displacement of each point.
- 
-     X[i] = vector of position
- 
- We note 'dif' the differences between consecutive points:  dif[i] = X[i+1] - X[i]
- Given one scalar per segment: A[i], the point is displaced as:
- 
-     Y[i] = X[i] + A[i] * dif[i] - A[i-1] * dif[i-1]
- 
- except for the first and last points, for which there is only one term:
- 
-     Y[0] = X[0] + A[  0] * dif[  0]
-     Y[L] = X[L] - A[L-1] * dif[L-1]
- 
- We want 'A[]' to restore the length of segments:
- 
-     ( Y[i+1] - Y[i] )^2 = cut^2
- 
- i.e. 'A[]' should fulfill a set of equations F[i] = 0, with:
- 
-     F[i] = ( Y[i+1] - Y[i] )^2 - cut^2
- 
- Note that:
- 
-     Y[i+1] - Y[i] = A[i+1] * dif[i+1] + (1-2*A[i]) * dif[i] + A[i-1] * dif[i-1]
- 
- Method: use all zeros as first guess for 'sca', and follow
- Newton's method to iteratively refine the multidimensional guess.
- 
- In practice, we calculate `A_new` from `A` using the relationship:
- 
-     J(A) * ( A_new - A ) = -F(A)
- 
- Where J is the Jacobian matrix: J[i,j] = dF[i] / dA[j]
- 
- For this problem, J is square and tri-diagonal but not symmetric,
- and must be recalculated at each iteration. A factor 2 can be factorized:
-
-     A_new = A - 1/2 inv(K).F(A)
- 
- Where J = 2 * K
-
- externally provided memory `mem[]` should be allocated to hold `5*chk` reals
- FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
- */
-
-int Chain::reshape_calculate(const size_t ns, real target,
-                             real const* mag, real const* pri, real const* sec,
-                             real* mem, size_t chk)
-{
-    real * mul = mem;
-    real * rhs = mem+chk;
-    real * dia = mem+chk*2;
-    real * low = mem+chk*3;
-    real * upe = mem+chk*4;
-    
-    real err, err0 = 0;
-    /*
-     Perform here the first iteration of Newton's method:
-     the formula is the same as below, with all `mul` equal to zero, and thus 'vec == dif'
-     The system is symmetric definite positive, and we can use a faster factorization
-     */
-    for ( size_t i = 0; i < ns; ++i )
-    {
-        mul[i] = mag[i] - target;
-        dia[i] = mag[i] * 4;
-        low[i] = pri[i] * (-2);  //accessing pri[ns-1], but not used
-        err0 += abs_real(mul[i]);  // calculating the 1-norm
-    }
-    
-    int info = 0;
-    lapack::xpttrf(ns, dia, low, &info);
-    if ( info ) {
-        std::cerr << " reshape_local (pttrf) failed " << info << '\n';
-        return 1;
-    }
-    lapack::xptts2(ns, 1, dia, low, mul, ns);
-#if ( 0 )
-    printf("\n    err0 %20.16f", err0);
-    printf(" mul "); VecPrint::head(ns, mul, 3);
-#endif
-    if ( err0 < ns * REAL_EPSILON )
-        return 0;
-    size_t cnt = 0;
-    while ( ++cnt < 8 )
-    {
-        constexpr real d = -2;
-        assert_true( ns > 1 );
-        // set the matrix elements and RHS of system,
-        {
-            real b = 1 - 2 * mul[0], c = mul[1];
-            //vec = b*dif[i] + c*dif[i+1];
-            real D = b * mag[0] + c * pri[0];
-            real U = b * pri[0] + c * mag[1];
-            rhs[0] = b * D + c * U - target;
-            dia[0] = d * D;
-            upe[0] = U;
-        }
-        err = abs_real(rhs[0]);
-        for( size_t i = 1; i+1 < ns; ++i )
-        {
-            real a = mul[i-1];
-            real b = 1 - 2 * mul[i];
-            real c = mul[i+1];
-            /*
-             vec = a*dif[i-1] + b*dif[i] + c*dif[i+1];
-             rhs = vec.normSqr() - target;
-             low = derivate(rhs, mul[i-1])
-             dia = derivate(rhs, mul[i]);
-             upe = derivate(rhs, mul[i+1);
-             */
-            real L = a * mag[i-1] + b * pri[i-1] + c * sec[i-1];
-            real D = a * pri[i-1] + b * mag[i  ] + c * pri[i  ];
-            real U = a * sec[i-1] + b * pri[i  ] + c * mag[i+1];
-
-            rhs[i] = a * L + b * D + c * U - target;
-            low[i] = L;
-            dia[i] = d * D;
-            upe[i] = U;
-            err += abs_real(rhs[i]);
-        }
-        {
-            real a = mul[ns-2];
-            real b = 1 - 2 * mul[ns-1];
-            //vec = a*dif[ns-2] + b*dif[ns-1];
-            real L = a * mag[ns-2] + b * pri[ns-2];
-            real D = a * pri[ns-2] + b * mag[ns-1];
-            rhs[ns-1] = a * L + b * D - target;
-            low[ns-1] = L;
-            dia[ns-1] = d * D;
-            err += abs_real(rhs[ns-1]);
-        }
-        //printf("\n %3lu err %20.16f norm(rhs) %8.5e", cnt, err, blas::nrm2(ns, rhs));
-        
-        if ( err < ns * REAL_EPSILON )
-            return 0;
-        if ( err > err0 )
-        {
-            //printf("  rhs"); VecPrint::head(ns, rhs, 3);
-            return 3;
-        }
-#if ( 0 )
-        printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
-        printf("\n L"); VecPrint::head(ns-1, low+1, 3);
-        printf("\n D"); VecPrint::head(ns  , dia, 3);
-        printf("\n_U"); VecPrint::head(ns-1, upe, 3);
-        //printf("\n rhs "); VecPrint::head(ns, rhs, 6);
-#endif
-#if ( 0 )
-        real asy = 0, sup = 0;
-        for ( size_t i = 0; i < ns-1; ++i )
-        {
-            sup = std::max(sup, abs_real(low[i+1]+upe[i]));
-            asy += abs_real(low[i+1]-upe[i]);
-        }
-        printf("\n %3i diff(low-upe) %12.6f", cnt, 2*asy/sup);
-#endif
-        lapack::xgtsv(ns, 1, low+1, dia, upe, rhs, ns, &info);
-        if ( info )
-        {
-            std::cerr << " reshape_local (dgtsv) failed " << info << '\n';
-            return 2;
-        }
-        
-        // update result following Newton's iteration
-        for ( size_t u = 0; u < ns; ++u )
-            mul[u] -= 0.5 * rhs[u];
-        
-        //printf(" >mul"); VecPrint::head(ns, mul, 3);
-    }
-    //printf("\n   >> err %20.16f", err);
-    //printf("\n   >>mul "); VecPrint::print(ns, mul, 3);
-    return ( err < err0 );
-}
-
+//==============================================================================
+#pragma mark - UNUSED OLDER RESHAPE CODE
 
 /// old version (2018)
 int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
@@ -669,16 +457,258 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
         for ( size_t u = 0; u < ns; ++u )
             sca[u] -= 0.5 * val[u];
     }
-
 #if ( 0 )
     printf("\n%2i err %e", cnt, err);
     printf("\n%2i sca  ", cnt); VecPrint::print(ns, sca, 3);
     printf("\n");
 #endif
-    
     return 4;
 }
 
+
+/**
+ Apply correction (old version)
+ */
+void Chain::reshape_apply_alt(const size_t nbs, const real* src,
+                              const real* mul, real* dst)
+{
+    assert_true( nbs > 1 );
+    real nxt[DIM];
+    
+    for ( int d = 0; d < DIM; ++d )
+        nxt[d] = src[d];
+    
+    for ( size_t i = 0; i < nbs; ++i )
+    {
+        for ( int d = 0; d < DIM; ++d )
+        {
+            real x = mul[i] * ( src[DIM+DIM*i+d] - src[DIM*i+d] );
+            dst[DIM*i+d] = nxt[d] + x;
+            nxt[d] = src[DIM*(i+1)+d] - x;
+        }
+    }
+    
+    for ( int d = 0; d < DIM; ++d )
+        dst[DIM*nbs+d] = nxt[d];
+}
+
+
+
+//==============================================================================
+#pragma mark -
+
+/*
+ This deals with Fiber having one segment only,
+ for which the procedure is straightforward
+ */
+void Chain::reshape_two(const real* src, real* dst, real cut)
+{
+    real X = src[  DIM] - src[0];
+#if ( DIM == 1 )
+    real s = 0.5 - 0.5 * (cut/abs_real(X));
+#elif ( DIM == 2 )
+    real Y = src[1+DIM] - src[1];
+    real n = std::sqrt( X * X + Y * Y );
+    real s = 0.5 - 0.5 * (cut/n);
+#else
+    real Y = src[1+DIM] - src[1];
+    real Z = src[2+DIM] - src[2];
+    real n = std::sqrt( X * X + Y * Y + Z * Z );
+    real s = 0.5 - 0.5 * (cut/n);
+#endif
+    
+    dst[0    ] = src[0    ] + s * X;
+    dst[  DIM] = src[  DIM] - s * X;
+#if ( DIM > 1 )
+    dst[1    ] = src[1    ] + s * Y;
+    dst[1+DIM] = src[1+DIM] - s * Y;
+#endif
+#if ( DIM > 2 )
+    dst[2    ] = src[2    ] + s * Z;
+    dst[2+DIM] = src[2+DIM] - s * Z;
+#endif
+}
+
+
+/**
+ Shorten segments to restore their length to 'cut'.
+ We use a multidimensional Newton's method, to find iteratively the scalar
+ coefficients that define the amount of displacement of each point.
+ 
+     X[i] = vector of position
+ 
+ We note 'dif' the differences between consecutive points:  dif[i] = X[i+1] - X[i]
+ Given one scalar per segment: A[i], the point is displaced as:
+ 
+     Y[i] = X[i] + A[i] * dif[i] - A[i-1] * dif[i-1]
+ 
+ except for the first and last points, for which there is only one term:
+ 
+     Y[0] = X[0] + A[  0] * dif[  0]
+     Y[L] = X[L] - A[L-1] * dif[L-1]
+ 
+ We want 'A[]' to restore the length of segments:
+ 
+     ( Y[i+1] - Y[i] )^2 = cut^2
+ 
+ i.e. 'A[]' should fulfill a set of equations F[i] = 0, with:
+ 
+     F[i] = ( Y[i+1] - Y[i] )^2 - cut^2
+ 
+ Note that:
+ 
+     Y[i+1] - Y[i] = A[i+1] * dif[i+1] + (1-2*A[i]) * dif[i] + A[i-1] * dif[i-1]
+ 
+ Method: use all zeros as first guess for 'sca', and follow
+ Newton's method to iteratively refine the multidimensional guess.
+ 
+ In practice, we calculate `A_new` from `A` using the relationship:
+ 
+     J(A) * ( A_new - A ) = -F(A)
+ 
+ Where J is the Jacobian matrix: J[i,j] = dF[i] / dA[j]
+ 
+ For this problem, J is square and tri-diagonal but not symmetric,
+ and must be recalculated at each iteration. A factor 2 can be factorized:
+
+     A_new = A - 1/2 inv(K).F(A)
+ 
+ Where J = 2 * K
+
+ externally provided memory `mem[]` should be allocated to hold `5*chk` reals
+ FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
+ */
+
+int Chain::reshape_calculate(const size_t ns, real target,
+                             real const* mag, real const* pri, real const* sec,
+                             real* mem, size_t chk)
+{
+    real * mul = mem;
+    real * rhs = mem+chk;
+    real * dia = mem+chk*2;
+    real * low = mem+chk*3;
+    real * upe = mem+chk*4;
+    constexpr real two = -2;
+    real err, err0 = 0;
+    const real tol = DIM * ns * REAL_EPSILON;
+    /*
+     Perform here the first iteration of Newton's method:
+     the formula is the same as below, with `mul == 0`, and thus 'vec == dif'
+     The system is symmetric definite positive, and we can use a faster factorization
+     The matrix is multiplied by -2, to yield a -0.5 in the update: mul[] -= 0.5 * rhs[]
+     */
+    for ( size_t i = 0; i < ns; ++i )
+    {
+        mul[i] = mag[i] - target;
+        dia[i] = mag[i] * 4;
+        low[i] = pri[i] * two;  //accessing pri[ns-1], but not used
+        err0 += abs_real(mul[i]);  // calculating the 1-norm
+    }
+    
+    int info = 0;
+    lapack::xpttrf(ns, dia, low, &info);
+    if ( info ) {
+        fprintf(stderr, " reshape_local (dpttrf) failed %i\n", info);
+        return 1;
+    }
+    lapack::xptts2(ns, 1, dia, low, mul, ns);
+    if ( err0 < tol )
+        return 0;
+    size_t cnt = 0;
+    //fprintf(stderr, "\n %3lu err %20.16f norm(rhs) %8.5e\n", cnt, err0, blas::nrm2(ns, mul));
+
+    while ( ++cnt <= 8 )
+    {
+        assert_true( ns > 1 );
+        // set the matrix elements and RHS of system,
+        {
+            real b = mul[0] * 2 - 1, c = mul[1];
+            //vec = c*dif[i+1] - b*dif[i];
+            real D = c * pri[0] - b * mag[0];
+            real U = c * mag[1] - b * pri[0];
+            rhs[0] = c * U - b * D - target;
+            dia[0] = D * two;
+            upe[0] = U;
+        }
+        err = abs_real(rhs[0]);
+        for( size_t i = 1; i+1 < ns; ++i )
+        {
+            real a = mul[i-1];
+            real b = mul[i] * 2 - 1;
+            real c = mul[i+1];
+            /*
+             vec = a*dif[i-1] - b*dif[i] + c*dif[i+1];
+             rhs = vec.normSqr() - target;
+             low = derivate(rhs, mul[i-1])
+             dia = derivate(rhs, mul[i]);
+             upe = derivate(rhs, mul[i+1);
+             */
+            real L = a * mag[i-1] - b * pri[i-1] + c * sec[i-1];
+            real D = a * pri[i-1] - b * mag[i  ] + c * pri[i  ];
+            real U = a * sec[i-1] - b * pri[i  ] + c * mag[i+1];
+
+            rhs[i] = a * L - b * D + c * U - target;
+            low[i] = L;
+            dia[i] = D * two;
+            upe[i] = U;
+            err += abs_real(rhs[i]);
+        }
+        {
+            real a = mul[ns-2];
+            real b = mul[ns-1] * 2 - 1;
+            //vec = a * dif[ns-2] - b * dif[ns-1];
+            real L = a * mag[ns-2] - b * pri[ns-2];
+            real D = a * pri[ns-2] - b * mag[ns-1];
+            rhs[ns-1] = a * L - b * D - target;
+            low[ns-1] = L;
+            dia[ns-1] = D * two;
+            err += abs_real(rhs[ns-1]);
+        }
+        //fprintf(stderr, " %3lu err %20.16f norm(rhs) %8.5e", cnt, err, blas::nrm2(ns, rhs));
+        //VecPrint::head("> rhs", ns, rhs, 3);
+
+        if ( err < tol )
+            return 0; // all good!
+        if ( err > err0 )
+        {
+            // the solution is worse than before...
+            //VecPrint::head("> mul", ns, mul, 3);
+            //fprintf(stderr, "\n         %20.16f", tol);
+            return ( err > 128 * tol );
+        }
+        err0 = err;
+#if ( 0 )
+        printf("\n diff(L,U) = %f", blas::difference(ns-1, upe, low+1));
+        printf("\n L"); VecPrint::head(ns-1, low+1, 3);
+        printf("\n D"); VecPrint::head(ns  , dia, 3);
+        printf("\n_U"); VecPrint::head(ns-1, upe, 3);
+        //printf("\n rhs "); VecPrint::head(ns, rhs, 6);
+#endif
+#if ( 0 )
+        real asy = 0, sup = 0;
+        for ( size_t i = 0; i < ns-1; ++i )
+        {
+            sup = std::max(sup, abs_real(low[i+1]+upe[i]));
+            asy += abs_real(low[i+1]-upe[i]);
+        }
+        printf("\n %3i diff(low-upe) %12.6f", cnt, 2*asy/sup);
+#endif
+        lapack::xgtsv(ns, 1, low+1, dia, upe, rhs, ns, &info);
+        if ( info )
+        {
+            fprintf(stderr, " reshape_local (dgtsv) failed %i\n", info);
+            return 2;
+        }
+        
+        // update result following Newton's iteration
+        //blas::xaxpy(ns, -0.5, rhs, 1, mul, 1);
+        for ( size_t u = 0; u < ns; ++u )
+            mul[u] -= 0.5 * rhs[u];
+    }
+    //printf("\n   >> err %20.16f", err);
+    //printf("\n   >>mul "); VecPrint::print(ns, mul, 3);
+    return ( err > err0 );
+}
 
 
 /**
@@ -694,7 +724,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
  
  */
 void Chain::reshape_apply(const size_t nbs, const real* src,
-                          const real * sca, real* dst)
+                          const real * mul, real* dst)
 {
     assert_true( nbs > 1 );
     Vector B(src);
@@ -703,40 +733,13 @@ void Chain::reshape_apply(const size_t nbs, const real* src,
     for ( size_t i = 0; i < nbs; ++i )
     {
         Vector C(src+DIM*(i+1));
-        Vector add = sca[i] * ( C - B );
+        Vector add = mul[i] * ( C - B );
         (nxt+add).store(dst+DIM*i);
         nxt = C - add;
         B = C;
     }
     
     nxt.store(dst+DIM*nbs);
-}
-
-
-/**
- Apply correction (old version)
- */
-void Chain::reshape_apply_alt(const size_t nbs, const real* dif, const real* src,
-                              const real* sca, real* dst)
-{
-    assert_true( nbs > 1 );
-    real nxt[DIM];
-    
-    for ( int d = 0; d < DIM; ++d )
-        nxt[d] = src[d];
-    
-    for ( size_t i = 0; i < nbs; ++i )
-    {
-        for ( int d = 0; d < DIM; ++d )
-        {
-            real x = sca[i] * dif[DIM*i+d];
-            dst[DIM*i+d] = nxt[d] + x;
-            nxt[d] = src[DIM*(i+1)+d] - x;
-        }
-    }
-    
-    for ( int d = 0; d < DIM; ++d )
-        dst[DIM*nbs+d] = nxt[d];
 }
 
 
@@ -750,7 +753,6 @@ void Chain::reshape_apply_alt(const size_t nbs, const real* dif, const real* src
 int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
                          real cut, real* mem, size_t mem_size)
 {
-    int res;
     assert_true( nbs > 1 );
 
     // alias some of the memory provided for the work:
@@ -759,7 +761,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     real * sec = mem + mem_size * 7;
     
     // rescale factor to make matrix elements close to 1:
-    real alpha = 1.0 / ( cut * cut );
+    const real alpha = 1.0 / ( cut * cut );
     // calculate terms using 'dif[]':
     Vector A, B, C;
     A.load_diff(src);
@@ -781,29 +783,30 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     sec[nbs-2] = 0;
     sec[nbs-1] = 0;
 #if ( 0 )
-    printf("\n mag "); VecPrint::print(nbs, mag, 3);
-    printf("\n pri "); VecPrint::print(nbs, pri, 3);
-    printf("\n sec "); VecPrint::print(nbs, sec, 3);
+    VecPrint::print("mag", nbs, mag, 3);
+    VecPrint::print("pri", nbs, pri, 3);
+    VecPrint::print("sec", nbs, sec, 3);
 #endif
-    res = reshape_calculate(nbs, 1.0, mag, pri, sec, mem, mem_size);
+    int res = reshape_calculate(nbs, 1.0, mag, pri, sec, mem, mem_size);
     
 #if ( 0 )
+    const real beta = 1.0 / cut;
     real * dif = new_real(mem_size*DIM);
     // calculate differences
     for ( size_t p = 0; p < DIM*nbs; ++p )
-        dif[p] = src[p+DIM] - src[p];
+        dif[p] = ( src[p+DIM] - src[p] ) * beta;
     for ( size_t p = 0; p < DIM; ++p )
         dif[DIM*nbs+p] = 0;
 
     // checking against older code
-    copy_real(nbs, mem, mag);
+    copy_real(nbs, mem, sec);
     res = reshape_calculate_alt(nbs, 1.0, dif, mem, mem_size);
-    real errS = blas::difference(nbs, mem, mag);
-    if ( abs_real(errS) > 1e-8 )
+    real ERR = blas::difference(nbs, mem, sec);
+    if ( abs_real(ERR) > 1e-8 )
     {
-        printf("\n Chain:err scalar %20.16f", errS);
-        printf("\n mul "); VecPrint::print(nbs, mag, 3);
-        printf("\nLmul "); VecPrint::print(nbs, mem, 3);
+        fprintf(stderr, "Chain:reshape scalar %20.16f:\n", ERR);
+        VecPrint::print("/ mul", nbs, sec, 3);
+        VecPrint::print("L mul", nbs, mem, 3);
     }
 #endif
 
@@ -813,14 +816,14 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
         reshape_apply(nbs, src, mem, dst);
 #if ( 0 )
         // checking against older code
-        reshape_apply_alt(nbs, dif, src, mem, mag);
+        reshape_apply_alt(nbs, src, sec, mag);
         //projectForcesD_(nbs, dif, src, mem, mag);  // similar calculation!
         size_t nbv = DIM*nbs+DIM;
-        real errP = blas::difference(nbv, mag, dst);
-        //printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
-        if ( abs_real(errP) > 1e-8 )
+        real DIF = blas::difference(nbv, mag, dst);
+        //printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, ERR, DIF);
+        if ( abs_real(DIF) > 1e-8 )
         {
-            printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, errS, errP);
+            printf("\n Chain:reshape errors %6lu : %20.16f %20.16f", nbs, ERR, DIF);
             printf("\n pts "); VecPrint::print(nbv, dst, 2);
             printf("\nLpts "); VecPrint::print(nbv, mag, 2);
         }
@@ -937,7 +940,7 @@ void Chain::getPoints(real const* ptr)
 #endif
     constexpr size_t NVEC = 8;
 #if 0
-    // use here static memory
+    // using static memory
     // Attention: this only works if using a single thread
     static size_t alc = 0;
     static real* mem = nullptr;
@@ -949,7 +952,7 @@ void Chain::getPoints(real const* ptr)
         mem = new_real(alc*NVEC);
     }
 #else
-    // use here thread-local static memory
+    // using per-thread static memory
     thread_local static size_t alc = 0;
     
     auto delete_real = [](real * x)
@@ -970,24 +973,25 @@ void Chain::getPoints(real const* ptr)
     }
     real * mem = uptr.get();
 #endif
-    
+
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
     else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, mem, allocated()) )
 #endif
     {
-        //fprintf(stderr, "\n %u  / ", identity()); VecPrint::print(stderr, DIM*nPoints, pPos, 3);
-        //fprintf(stderr, "\n %u  L ", identity()); VecPrint::print(stderr, DIM*nPoints, ptr, 3);
+        //VecPrint::print("/ ", DIM*nPoints, pPos, 2);
+        //VecPrint::print("L ", DIM*nPoints, ptr, 2);
         std::string doc = document(ptr);
         real mov = std::sqrt(sumSquaredDistances(ptr));
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        std::cout << "wild motion for " << doc << " " << mov << '\n';
+        std::cout << " wild motion for " << doc << " " << mov << '\n';
         //copy_real(DIM*nPoints, ptr, pPos);
 #endif
     }
-    //printf("\n %u  >pos ", identity()); VecPrint::print(std::cerr, nPoints, pPos, 3);
+    //document(std::clog, ptr);
+    //fprintf(stderr, "\n %u  >pos ", identity()); VecPrint::print(nPoints, pPos, 3);
 }
 
 
@@ -1344,14 +1348,14 @@ void Chain::join(Chain const* fib)
 
 
 /**
- Returns the minimum and maximum distance between consecutive points
+ Returns the minimum and maximum distance between consecutive points, for 'cnt' segments
  */
-void Chain::segmentationMinMax(real const* ptr, real& in, real& ax) const
+void Chain::segmentationMinMax(size_t cnt, real const* ptr, real& in, real& ax)
 {
     real x = sMath::distanceSqr<DIM>(ptr, ptr+DIM);
     in = x;
     ax = x;
-    for ( unsigned i = 1; i < lastPoint(); ++i )
+    for ( unsigned i = 1; i < cnt; ++i )
     {
         x = sMath::distanceSqr<DIM>(ptr+DIM*i, ptr+DIM*(i+1));
         in = std::min(in, x);
@@ -2082,7 +2086,7 @@ void Chain::document(std::ostream& os, real len, real con, real mn, real mx) con
 int Chain::checkLength(real const* ptr, std::ostream& os, real len) const
 {
     real mn, mx;
-    segmentationMinMax(ptr, mn, mx);
+    segmentationMinMax(nbSegments(), ptr, mn, mx);
     real dev = ( mx - mn ) / segmentation();
     real con = contourLength(ptr, nPoints);
     real err = abs_real( con - len ) / ( con + len );
@@ -2096,11 +2100,11 @@ int Chain::checkLength(real const* ptr, std::ostream& os, real len) const
 /**
  Prints info on the length of Segments, which can be useful for debugging
  */
-void Chain::document(real const* ptr, std::ostream& os) const
+void Chain::document(std::ostream& os, real const* ptr) const
 {
     real mn, mx;
     real len = length();
-    segmentationMinMax(ptr, mn, mx);
+    segmentationMinMax(nbSegments(), ptr, mn, mx);
     real con = contourLength(ptr, nPoints);
     briefdoc(os, len, con, mn, mx);
 }
@@ -2109,7 +2113,7 @@ void Chain::document(real const* ptr, std::ostream& os) const
 std::string Chain::document(real const* ptr) const
 {
     std::ostringstream ss;
-    document(ptr, ss);
+    document(ss, ptr);
     return ss.str();
 }
 

@@ -10,7 +10,7 @@
 /** This is mostly used for debugging */
 namespace VecPrint
 {
-    constexpr size_t SUP = 16UL;
+    constexpr size_t SUP = 12UL;
     /// default destination:
     #define OUT stderr
     
@@ -25,11 +25,11 @@ namespace VecPrint
         else
         {
             char fmt[32];
-            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
+            snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+3, digits);
             for ( size_t i = 0; i < len; ++i )
             {
                 fprintf(file, fmt, vec[i]);
-                if ( dim && ( dim-1 == i % dim )) putc(39, file);
+                if ( dim & ( 0 == (i+1) % dim )) putc(39, file);
             }
         }
     }
@@ -52,13 +52,13 @@ namespace VecPrint
 
     /// print up to 16 scalars from given vector, from the start
     template < typename T >
-    void head(size_t len, const T* vec)
+    void head(size_t len, const T* vec, int digits)
     {
-        if ( len <= 16 )
-            print(len, vec, 3);
+        if ( len <= SUP )
+            print(len, vec, digits);
         else
         {
-            print(std::min(16UL, len), vec, 3);
+            print(std::min(SUP, len), vec, digits);
             printf("...");
         }
     }
@@ -75,13 +75,13 @@ namespace VecPrint
     template < typename T >
     void edges(size_t len, const T* vec, int digits = 2)
     {
-        if ( len <= 16 )
+        if ( len <= SUP )
             print(len, vec, digits);
         else
         {
-            print(8, vec, digits);
+            print(SUP/2, vec, digits);
             fprintf(OUT, "...");
-            print(8, vec+len-8, digits);
+            print(SUP/2, vec+len-8, digits);
         }
     }
     

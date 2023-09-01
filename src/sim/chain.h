@@ -132,7 +132,7 @@ protected:
     static void reshape_global(size_t, const real*, real*, real cut);
 
     /// apply the forces movements needed to the distance between two points
-    static void reshape_apply_alt(size_t, const real*, const real*, const real*, real*);
+    static void reshape_apply_alt(size_t, const real*, const real*, real*);
 
     /// (old) iterative method to restore the distance between successive vertices
     static int reshape_calculate_alt(size_t, real, const real*, real*, size_t);
@@ -418,11 +418,11 @@ public:
     
     //--------------------- Info
     
-    /// calculate the minimum and maximum segment length
-    void segmentationMinMax(real const* ptr, real&, real&) const;
+    /// calculate the minimum and maximum segment length, for `cnt` segments
+    static void segmentationMinMax(size_t cnt, real const* ptr, real&, real&);
     
     /// calculate the minimum and maximum segment length
-    void segmentationMinMax(real& n, real& x) const { segmentationMinMax(pPos, n, x); }
+    void segmentationMinMax(real& n, real& x) const { segmentationMinMax(nbSegments(), pPos, n, x); }
 
     /// calculate average and variance of the segment length
     void segmentationVariance(real const* ptr, real&, real&) const;
@@ -503,7 +503,7 @@ public:
     void document(std::ostream&, real, real, real, real) const;
     
     /// print info such as length and segmentation
-    void document(real const* ptr, std::ostream&) const;
+    void document(std::ostream&, real const* ptr) const;
     
     /// return string with info such as length and segmentation
     std::string document(real const* ptr) const;
