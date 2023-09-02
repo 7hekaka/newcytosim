@@ -524,6 +524,10 @@ Fiber* Fiber::severM(real dis1, real dis2)
 }
 
 
+/**
+ cut fiber at abscissa `[abs1, abs2]`, deleting any section shorter than `min`.
+ @return section `[ abs2 - plus end ]`, which can be `this`
+ */
 Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
 {
     assert_true( abs1 <= abs2 );
@@ -532,12 +536,12 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
     //std::clog << "cut " << reference() << "  " << M << " | " << abs1 << "  " << abs2 << " | " << P;
     real lenM = abs1 - M;
     real lenP = P - abs2;
-    // consider the shortest section remaining:
     if ( lenM < lenP )
     {
+        // shortest section on the minus end:
         if ( lenM < min )
         {
-            if ( lenP > REAL_EPSILON )
+            if ( lenP > min )
             {
                 cutM(abs2-M);
                 //std::clog << " chopped " << abs2-M << " from minus end\n";
@@ -552,9 +556,10 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
     }
     else
     {
+        // shortest section on the plus end:
         if ( lenP < min )
         {
-            if ( lenM > REAL_EPSILON )
+            if ( lenM > min )
             {
                 cutP(P-abs1);
                 //std::clog << " chopped " << P-abs1 << " from plus end\n";
@@ -582,7 +587,12 @@ void Fiber::severNow(const real abs1, const real abs2, const real min_len,
         // a section near the plus end was removed
         setEndStateP(stateP);
     }
-    else if ( frag != this )
+    else if ( frag == this )
+    {
+        // a section near the minus end was removed
+        setEndStateM(stateM);
+    }
+    else
     {
         // old plus end converves its state:
         frag->setEndStateP(endStateP());
@@ -599,12 +609,6 @@ void Fiber::severNow(const real abs1, const real abs2, const real min_len,
         Cytosim::log << " remaining " << length() << "\n";
         //Cytosim::log << " at X = " << frag->posEndM().XX << '\n';
 #endif
-    }
-    else
-    {
-        assert_true( frag == this );
-        // a section near the minus end was removed
-        setEndStateM(stateM);
     }
 }
 
