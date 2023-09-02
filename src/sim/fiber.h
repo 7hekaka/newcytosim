@@ -152,8 +152,8 @@ protected:
     /// cut fiber at distance `abs` from the minus end; returns section `[ abs - plus end ]`
     Fiber * severM(real abs1, real abs2);
 
-    /// calculate the edges of the cut around `a` (arguments used for input/output)
-    virtual void findSeverEdges(real& a, real& b);
+    /// calculate the edges for a cut of width `w` around `a` (arguments used for input/output)
+    virtual void findSeverEdges(real& a, real& w);
 
     /// cut fiber at abscissa `[abs1, ab2]`; returns section `[ abs - plus end ]`
     Fiber * severNow(real abs1, real abs2, const real min);

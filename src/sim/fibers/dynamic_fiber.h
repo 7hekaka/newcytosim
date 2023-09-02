@@ -168,8 +168,8 @@ public:
     /// Stochastic simulation
     void step();
     
-    /// calculate the edges of the cut around `a` (arguments used for input/output)
-    void findSeverEdges(real& a, real& b);
+    /// calculate the edges for a cut of width `w` around `a` (arguments used for input/output)
+    void findSeverEdges(real& a, real& w);
 
     //--------------------------------------------------------------------------
     

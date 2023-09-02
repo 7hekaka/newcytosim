@@ -434,12 +434,17 @@ int DynamicFiber::stepPlusEndStabilized(real factor)
 //------------------------------------------------------------------------------
 #pragma mark -
 
+/**
+ calculate the edges for a cut
+  - input: central abscissa `a`, width `w`
+  - output: lowest abscissa `a`, highest abscissa `b`
+ */
 void DynamicFiber::findSeverEdges(real& a, real& b)
 {
     const real uni = prop()->unit_length;
-    real w = b * 0.5;
-    b = uni * std::ceil((a+w)/uni);
-    a = uni * std::floor((a-w)/uni);
+    real h = b * 0.5;
+    b = uni * std::ceil((a+h)/uni);
+    a = uni * std::floor((a-h)/uni);
 }
 
 

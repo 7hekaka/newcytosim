@@ -608,12 +608,16 @@ void Fiber::severNow(const real abs1, const real abs2, const real min_len,
     }
 }
 
-
-void Fiber::findSeverEdges(real& a, real& b)
+/**
+ calculate the edges for a cut
+  - input: central abscissa `a`, width `w`
+  - output: lowest abscissa `a`, highest abscissa `b`
+ */
+void Fiber::findSeverEdges(real& a, real& w)
 {
-    real w = b * 0.5;
-    b = a + w;
-    a = a - w;
+    real h = w * 0.5;
+    w = a + h;
+    a = a - h;
 }
 
 
@@ -668,7 +672,7 @@ size_t Fiber::hasKink(const real max_cosine) const
  - any fragment shorter than `min_length` is deleted
  */
 void Fiber::planarCut(Vector const& n, const real a,
-                       state_t stateP, state_t stateM, real min_len)
+                      state_t stateP, state_t stateM, real min_len)
 {
     Array<real> cuts;
     /*
