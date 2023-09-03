@@ -236,7 +236,7 @@ public:
     virtual void join(Fiber *);
     
     /// implements some growth/shrinkage at the ends as part of a simulation step
-    bool updateLength(real, real, bool = true);
+    bool updateLength(real, real, bool split = true);
     
     /// update Lattice and Mesh ranges
     void updateRange(Field*);

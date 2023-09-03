@@ -1140,7 +1140,7 @@ public:
     /**
      Attention: the result is a rotation only if `norm(axis)==1` and `c*c + s*s == 1`
      but the values of 'c' and 's' can be scaled to obtain a matrix where the
-     rotation components is also scaling. Vectors along the axis remain unchanged
+     rotated components are also scaled. Vectors along the axis remain unchanged
      */
     static Matrix33 rotationAroundAxis(const Vector3& axis, const real c, const real s)
     {

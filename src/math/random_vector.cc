@@ -117,15 +117,14 @@ Vector2 Vector2::randB(const real n)
 Vector2 Vector2::randOrthoU(const real len) const
 {
     real s = RNG.sflip(len) / std::sqrt( XX * XX + YY * YY );
-    return Vector2(-YY, XX, 0) * s;
+    return Vector2(-YY, XX) * s;
 }
 
-
+/** this assumes norm(*this) == 1 **/
 Vector2 Vector2::randOrthoB(const real len) const
 {
-    // this assumes norm(*this) == 1
     real s = RNG.sreal() * len;
-    return Vector2(-YY, XX, 0) * s;
+    return Vector2(-YY, XX) * s;
 }
 
 //------------------------------------------------------------------------------
@@ -263,19 +262,16 @@ Vector3 Vector3::randOrthoU(const real len) const
     real n = normSqr();
     if ( n > REAL_EPSILON )
     {
+        n = std::sqrt(n);
         const Vector2 V = Vector2::randU();
-        Vector3 x, y, z = *this / std::sqrt(n);
-        z.orthonormal(x, y, len);
-        return x * V.XX + y * V.YY;
+        return orthogonal(n, len * V.XX, len * V.YY);
     }
     return randU(len);
 }
 
 #else
 
-/**
- This method is less efficient
- */
+/** This method is less efficient */
 Vector3 Vector3::randOrthoU(const real len) const
 {
     const Vector2 V = Vector2::randU();
@@ -286,13 +282,11 @@ Vector3 Vector3::randOrthoU(const real len) const
 
 #endif
 
+/** this assumes norm(*this) == 1 **/
 Vector3 Vector3::randOrthoB(const real len) const
 {
-    //this assumes norm(*this) == 1
     const Vector2 V = Vector2::randB();
-    Vector3 x, y;
-    orthonormal(x, y);
-    return x * ( len * V.XX ) + y * ( len * V.YY );
+    return orthogonal(1.0, len * V.XX, len * V.YY);
 }
 
 //------------------------------------------------------------------------------

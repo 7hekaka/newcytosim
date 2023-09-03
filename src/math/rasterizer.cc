@@ -523,9 +523,7 @@ void Rasterizer::paintHexagonalPrism(void (*paint)(int, int, int, int, void*), v
 {
     Vector3 A, B, C;
     Vector3 PQ = ( Q - P ) * iPQ;
-    
     PQ.orthonormal(A, C, radius);
-        
     PQ *= radius;
 
     // build the vertices of the Hexagon

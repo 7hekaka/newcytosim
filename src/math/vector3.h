@@ -607,6 +607,23 @@ public:
     }
     
     /**
+     Given: N = norm(this), (C, S) = random numbers in [-1, 1],
+     @return a vector orthogonal to this, of norm `C^2 + S^2`
+     
+     Derived from `Building an Orthonormal Basis, Revisited`,
+     Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
+     */
+    Vector3 orthogonal(real N, real C, real S) const
+    {
+        assert_small(normSqr() - N);
+        N = std::copysign(N, ZZ);
+        real a = YY / ( ZZ + N );
+        real b = YY * a;
+        real c = XX * a;
+        return Vector3(S*c-C*(ZZ+b), S*(b-N)+C*c, S*YY+C*XX);
+    }
+
+    /**
      Set vectors 'E' and 'F' to build an orthonormal basis (this, E, F),
      assuming that 'norm(*this) == 1'
      
@@ -616,7 +633,7 @@ public:
     void orthonormal(real E[3], real F[3]) const
     {
 #if 0
-        if ( abs_real(normSqr() - 1.0) > 0.01 )
+        if ( abs_real(1.0 - normSqr()) > 0.01 )
         {
             // this should not happen...
             E = orthogonal(1);
@@ -625,7 +642,7 @@ public:
             return;
         }
 #else
-        assert_small(normSqr() - 1.0);
+        assert_small(1.0 - normSqr());
 #endif
         real s = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
@@ -653,7 +670,7 @@ public:
     void orthonormal(Vector3& E, Vector3& F, real N) const
     {
 #if 0
-        if ( abs_real(normSqr() - 1.0) > 0.01 )
+        if ( abs_real(1.0 - normSqr()) > 0.01 )
         {
             // this should not happen...
             E = orthogonal(1);
@@ -662,7 +679,7 @@ public:
             return;
         }
 #else
-        assert_small(normSqr() - 1.0);
+        assert_small(1.0 - normSqr());
 #endif
         real s = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
@@ -673,7 +690,7 @@ public:
         // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
         E.set(-N * ZZ - b, c, N * XX);
         F.set(s * c, s * b - N, s * nY);
-        // for an inverted basis, use F.set(c, b - s * N, nY);
+        // if you do not mind an inverted basis, use F.set(c, b - s * N, nY);
         //printf("orthonormal %+9.6f %+9.6f %+9.6f :", dot(*this, E), dot(*this, F), dot(E, F));
         //printf(" %+9.6f %+9.6f %+9.6f\n", normSqr(), dot(E, E), dot(F, F));
     }
@@ -696,15 +713,38 @@ public:
         // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
         E.set(-ZZ-b, c, XX);
         F.set(s*c, s*b-N, s*YY);
-        // for an inverted basis, use F.set(c, b - s*N, YY);
+        // if you do not mind an inverted basis, use F.set(c, b - s*N, YY);
+    }
+
+
+    /**
+     Set 'E' and 'F' to build a basis (this, E, F), with norm(E) = norm(F) = N
+     assuming that 'norm(*this) == S'
+     
+     Derived from `Building an Orthonormal Basis, Revisited`,
+     Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
+     */
+    void orthonormal(real L, Vector3& E, Vector3& F, real N) const
+    {
+        assert_small(normSqr() - L);
+        real s = std::copysign(real(1.0), ZZ);
+        // optimized version by Marc B. Reynolds
+        real nY = N * YY;
+        real a = nY / ( ZZ + s );
+        real b = YY * a;
+        real c = XX * a;
+        // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
+        E.set(-N * ZZ - b, c, N * XX);
+        F.set(s * c, s * b - N, s * nY);
+        // if you do not mind an inverted basis, use F.set(c, b - s*N, YY);
     }
 
     /// rotate `vec` around `*this`, by angle defined by cosine and sine
     /**
      It is assumed that norm(*this)==1
-     The result is a unit Vector orthogonal to *this, of norm `c*c + s*s`
+     The result is a Vector orthogonal to *this, of norm `C^2 + S^2`
      */
-    Vector3 rotateOrtho(Vector3 const& vec, real c, real s)
+    Vector3 rotateOrtho(Vector3 const& vec, real C, real S)
     {
         // set two orthogonal vector to 'd' defining an orientated basis
         Vector3 ex, ey;
@@ -717,7 +757,7 @@ public:
         x = x * n;
         y = y * n;
         // rotated vector:
-        return ( c * x - s * y ) * ex + ( s * x + c * y ) * ey;
+        return ( C * x - S * y ) * ex + ( S * x + C * y ) * ey;
     }
     
     /// convert from cartesian to spherical coordinates ( r, theta, phi )

@@ -108,7 +108,11 @@ void Fiber::step()
 }
 
 
-
+/**
+ if `split == true` the increments may be only partially fulfilled,
+ whereas if `split == false`, they will be implemented or not but never changed
+ @returns false if the fiber should be deleted
+ */
 bool Fiber::updateLength(real addM, real addP, bool split)
 {
     //std::clog << reference() << " P " << addP << " M " << addM << " len " << length() << "\n";
@@ -524,10 +528,6 @@ Fiber* Fiber::severM(real dis1, real dis2)
 }
 
 
-/**
- cut fiber at abscissa `[abs1, abs2]`, deleting any section shorter than `min`.
- @return section `[ abs2 - plus end ]`, which can be `this`
- */
 Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
 {
     assert_true( abs1 <= abs2 );
@@ -1346,12 +1346,16 @@ void Fiber::updateFiber()
     {
         Hand * x = h->next();
         assert_true(h->fiber()==this);
+        const real abs = h->abscissa();
         // this is equivalent to h->reinterpolate():
-        real a = std::max(iS*h->abscissa()-SM, real(0));
+        real a = std::max(iS*abs-SM, real(0));
         unsigned i = std::min((unsigned)a, L);
         h->reinterpolate(std::min(a-i, real(1)), i);
-        // must iterate ahead, because `checkFiberRange` may lead to detachment:
-        h->checkFiberRange(M, P);
+        // Attention: `handleDisassembly()` may lead to detachment:
+        if ( abs < M )
+            h->handleDisassemblyM();
+        else if ( abs > P )
+            h->handleDisassemblyP();
         h = x;
     }
 }
