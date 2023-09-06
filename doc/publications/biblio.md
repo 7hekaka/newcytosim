@@ -11,12 +11,14 @@
 
 2023
 
+- [Nonaffine Mechanics of Entangled Networks Inspired by Intermediate Filaments](https://doi.org/10.1103/PhysRevLett.131.058101)
 - [Microtubule competition and cell growth recenter the nucleus after anaphase in fission yeast](https://doi.org/10.1091/mbc.E23-01-0034)
 - [Reduction of cortical pulling at mitotic entry facilitates aster centration](https://doi.org/10.1101/2023.03.21.533625)
 - [Self-organization of microtubules: complexity analysis of emergent patterns](https://arxiv.org/abs/2305.00539)
 
 2022
 
+- [Self-assembly of pericentriolar material in interphase cells lacking centrioles](https://doi.org/10.7554/eLife.77892)
 - [The architecture of the actin network can balance the pushing forces produced by growing microtubules.](https://www.biorxiv.org/content/10.1101/2022.01.21.476947v1)
 - [Thermodynamic Control of Activity Patterns in Cytoskeletal Networks](https://doi.org/10.1103/PhysRevLett.129.128002)
 - [Emergence of flagella-like oscillations in single microtubules driven by collective dynein transport](https://www.biorxiv.org/content/10.1101/2022.09.11.507451v1)
@@ -24,6 +26,7 @@
 
 2021
 
+- [Mechanical competition alters the cellular interpretation of an endogenous genetic program](https://doi.org/10.1083/jcb.202104107)
 - [Self-organized optimal packing of kinesin-5-driven microtubule asters scales with cell size](https://doi.org/10.1242/jcs.257543)
 - [Effect of plant tubulin kinetic diversification on microtubule lengths](https://www.biorxiv.org/content/10.1101/2021.05.11.443582v1)
 - [Dynein self-organizes while translocating the centrosome in T cells](https://www.molbiolcell.org/doi/abs/10.1091/mbc.E20-10-0668)
