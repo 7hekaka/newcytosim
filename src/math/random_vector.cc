@@ -215,7 +215,7 @@ Vector3 Vector3::randU()
         RNG.sreal4(x, y, z, t);
         d = ( x*x + y*y ) + ( z*z + t*t );
     } while ( d > 1.0 );
-    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), x*x-y*y-z*z+t*t) / d;
+    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), (x*x-y*y)+(t*t-z*z)) / d;
 }
 
 Vector3 Vector3::randU(const real n)
@@ -225,7 +225,7 @@ Vector3 Vector3::randU(const real n)
         RNG.sreal4(x, y, z, t);
         d = ( x*x + y*y ) + ( z*z + t*t );
     } while ( d > 1.0 );
-    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), x*x-y*y-z*z+t*t) * (n/d);
+    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), (x*x-y*y)+(t*t-z*z)) * (n/d);
 }
 
 #endif
