@@ -578,7 +578,7 @@ void Chain::reshape_two(const real* src, real* dst, real cut)
  FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
  */
 
-int Chain::reshape_calculate(const size_t ns, real target,
+int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
                              real const* mag, real const* pri, real const* sec,
                              real* mem, size_t chk)
 {
@@ -616,7 +616,7 @@ int Chain::reshape_calculate(const size_t ns, real target,
     size_t cnt = 0;
     //fprintf(stderr, "\n %3lu err %20.16f norm(rhs) %8.5e\n", cnt, err0, blas::nrm2(ns, mul));
 
-    while ( ++cnt <= 8 )
+    while ( ++cnt <= max_iter )
     {
         assert_true( ns > 1 );
         // set the matrix elements and RHS of system,
@@ -711,7 +711,7 @@ int Chain::reshape_calculate(const size_t ns, real target,
 
 
 /**
- Apply correction of magnitude 'sca' along the segment directions:
+ Apply correction of magnitude 'mul' along the segment directions:
  
  except for the edges, this is:
  P[i] <- P[i] + sca[i] * ( P[i+1] - P[i] ) - sca[i-1] * ( P[i] - P[i-1] )
@@ -721,24 +721,25 @@ int Chain::reshape_calculate(const size_t ns, real target,
  
  The code is similar to projectForcesD(), with an additional difference
  
+ Note that if 'src == dst', the result are still correct
  */
 void Chain::reshape_apply(const size_t nbs, const real* src,
                           const real * mul, real* dst)
 {
     assert_true( nbs > 1 );
-    Vector B(src);
-    Vector nxt(B);
+    Vector A(src);
+    Vector B = A;
 
     for ( size_t i = 0; i < nbs; ++i )
     {
         Vector C(src+DIM*(i+1));
         Vector add = mul[i] * ( C - B );
-        (nxt+add).store(dst+DIM*i);
-        nxt = C - add;
+        (A+add).store(dst+DIM*i);
+        A = C - add;
         B = C;
     }
     
-    nxt.store(dst+DIM*nbs);
+    A.store(dst+DIM*nbs);
 }
 
 
@@ -750,7 +751,7 @@ void Chain::reshape_apply(const size_t nbs, const real* src,
  `mem` should be allocated to hold 8 * mem_size
  */
 int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
-                         real cut, real* mem, size_t mem_size)
+                         real cut, size_t max_iter, real* mem, size_t mem_size)
 {
     assert_true( nbs > 1 );
 
@@ -786,7 +787,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     VecPrint::print("pri", nbs, pri, 3);
     VecPrint::print("sec", nbs, sec, 3);
 #endif
-    int res = reshape_calculate(nbs, 1.0, mag, pri, sec, mem, mem_size);
+    int res = reshape_calculate(nbs, 1.0, max_iter, mag, pri, sec, mem, mem_size);
     
 #if ( 0 )
     const real beta = 1.0 / cut;
@@ -976,7 +977,7 @@ void Chain::getPoints(real const* ptr)
 #if ( DIM > 1 )
     if ( nPoints == 2 )
         reshape_two(ptr, pPos, fnCut);
-    else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, mem, allocated()) )
+    else if ( reshape_local(nbSegments(), ptr, pPos, fnCut, 16, mem, allocated()) )
 #endif
     {
         //VecPrint::print("/ ", DIM*nPoints, pPos, 2);
@@ -1164,13 +1165,37 @@ void Chain::growP(const real delta)
             movePoint(p, ( a * p ) * dp1);
             --p;
         }
+        //printf("+ %12.6f\n", dirEndP().norm());
     }
     else if ( delta < 0 )
     {
+        real seg = segmentation();
+        real len = seg + delta / ns; // future segmentation
+#if 1
         for ( size_t p = ns ; p > 0 ; --p )
             movePoint(p, ( a * p ) * diffPoints(p-1));
+#else
+        a = delta;
+        real cosine = 1;
+        Vector dif = diffPoints(ns-1);
+        for ( size_t p = ns ; p > 1 ; --p )
+        {
+            movePoint(p, dif * ( a / seg ));
+            Vector nxt = diffPoints(p-2);
+            cosine = dot(nxt, dif) * ( iCut * iCut );
+            printf(" %8.5f", a);
+            a = -std::sqrt(len*len-square(seg+a)*(1.0-square(cosine))) + (seg+a)*cosine;
+            dif = nxt;
+        }
+        printf(" %8.5f\n", a);
+        movePoint(1, dif * ( a / seg ));
+#endif
+#if 0
+        for ( size_t n = 0; n < ns; ++n )
+            printf(" %8.5f", diffPoints(n).norm()/len);
+        printf(" - \n");
+#endif
     }
-    
     cDeltaP = delta;
     fnAbscissaP += delta;
     setSegmentation(length()/ns);
@@ -2173,8 +2198,8 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     if ( nPoints < 2 )
         throw InvalidIO("invalid fiber with 0 or 1 point");
 
-    bool delta = ( fnAbscissaP > fnAbscissaM );
-    if ( delta )
+    bool valid = ( fnAbscissaP > fnAbscissaM );
+    if ( valid )
     {
         cDeltaM = +fnAbscissaM;
         cDeltaP = -fnAbscissaP;
@@ -2183,7 +2208,7 @@ void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
     fnAbscissaM = abs;
     fnAbscissaP = abs + len;
     
-    if ( delta )
+    if ( valid )
     {
         cDeltaM -= fnAbscissaM;
         cDeltaP += fnAbscissaP;

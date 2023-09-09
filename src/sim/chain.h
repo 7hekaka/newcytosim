@@ -131,7 +131,7 @@ protected:
     /// oldest method to restore the distance between successive vertices
     static void reshape_global(size_t, const real*, real*, real cut);
 
-    /// apply the forces movements needed to the distance between two points
+    /// (old) apply the forces movements needed to the distance between two points
     static void reshape_apply_alt(size_t, const real*, const real*, real*);
 
     /// (old) iterative method to restore the distance between successive vertices
@@ -140,14 +140,14 @@ protected:
     /// (old) iterative method to restore the distance between successive vertices
     static int reshape_calculate_old(size_t, real, const real*, real*, size_t);
 
-    /// (old) apply the forces movements needed to the distance between two points
+    /// apply the forces movements needed to the distance between two points
     static void reshape_apply(size_t, const real*, const real*, real*);
 
     /// iterative method to restore the distance between successive vertices
-    static int reshape_calculate(size_t, real, real const*, real const*, real const*, real*, size_t);
+    static int reshape_calculate(size_t, real, size_t max_iter, real const*, real const*, real const*, real*, size_t);
 
     /// iterative method to restore the distance between successive vertices
-    static int reshape_local(size_t, const real*, real*, real cut, real* tmp, size_t);
+    static int reshape_local(size_t, const real*, real*, real cut, size_t max_iter, real* tmp, size_t);
 
     /// change segmentation
     void setSegmentation(real c) { fnCut = std::max(c, REAL_EPSILON); iCut = real(1) / fnCut; }

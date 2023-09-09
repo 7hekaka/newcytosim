@@ -200,6 +200,8 @@ bool Fiber::updateLength(real addM, real addP, bool split)
             }
         }
     }
+    if ( needUpdate )
+        getPoints(pPos);
     return true;
 }
 
