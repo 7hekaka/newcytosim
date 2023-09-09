@@ -174,7 +174,7 @@ Note that `frametool objects.cmo` will tell you how many frames are contained in
 3. Copy `objects.cmi` in a new directory. Also copy `properties.cmp` and rename it `properties.cmi`.
 Start the `sim` with a new config file, containing these instructions:
 
-           read properties.cmi
+		read properties.cmi
 		import all objects.cmi
 		
 		run 1000000 system
