@@ -253,14 +253,14 @@ void HandProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":unbinding_rate must be positive");
     
     if ( hold_growing_end[0] < 0 || 1 < hold_growing_end[0] )
-        throw InvalidParameter(name()+":hold_growing_end[0] must be >= 0");
+        throw InvalidParameter(name()+":hold_growing_end[0] must be in [0, 1]");
     if ( hold_growing_end[1] < 0 || 1 < hold_growing_end[1] )
-        throw InvalidParameter(name()+":hold_growing_end[1] must be >= 0");
+        throw InvalidParameter(name()+":hold_growing_end[1] must be in [0, 1]");
 
     if ( hold_shrinking_end[0] < 0 || 1 < hold_shrinking_end[0] )
-        throw InvalidParameter(name()+":hold_shrinking_end[0] must be >= 0");
-    if ( hold_shrinking_end[1] < 0 || 1 < hold_shrinking_end[0] )
-        throw InvalidParameter(name()+":hold_shrinking_end[1] must be >= 0");
+        throw InvalidParameter(name()+":hold_shrinking_end[0] must be in [0, 1]");
+    if ( hold_shrinking_end[1] < 0 || 1 < hold_shrinking_end[1] )
+        throw InvalidParameter(name()+":hold_shrinking_end[1] must be in [0, 1]");
 
     if ( primed(sim) )
     {
