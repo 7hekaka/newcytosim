@@ -21,7 +21,7 @@ static real surface_cylinder(real rad, real len)
 }
 
 /// surface of a cylinder of given radius, length, with rounded edges
-static real surface_cylinder(real rad, real len, real edg)
+static real surface_smooth_cylinder(real rad, real len, real edg)
 {
     real RE = rad - edg;
     real LE = len - 2 * edg;
@@ -73,7 +73,7 @@ void SpaceCylinderZ::resize(Glossary& opt)
     if ( opt.set(suf, "surface") )
     {
         // The surface is affine with 'len' = S + ( len - 2*edg ) * L;
-        real S = surface_cylinder(rad, 2*edg, edg);
+        real S = surface_smooth_cylinder(rad, 2*edg, edg);
         real L = ( 2 * M_PI ) * rad;
         if ( suf < S )
             throw InvalidParameter("cylinderZ:surface must be > "+std::to_string(S));
@@ -164,7 +164,7 @@ Vector SpaceCylinderZ::normalToEdge(Vector const& pos) const
 real SpaceCylinderZ::surface() const
 {
 #if SMOOTH_CYLINDER
-    return surface_cylinder(radius_, top_-bot_, edge_);
+    return surface_smooth_cylinder(radius_, top_-bot_, edge_);
 #else
     return surface_cylinder(radius_, top_-bot_);
 #endif

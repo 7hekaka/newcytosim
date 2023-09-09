@@ -205,7 +205,7 @@ public:
     /// draw Fiber plus end
     virtual void drawFiberEndPlus(Fiber const&, int style, float size) const;
     
-    /// draw Fiber plus end
+    /// draw fresh assembly near the plus ends, using white stripes
     void drawFiberGrowth(Fiber const&, float size) const;
 
     /// draw Fiber linear features

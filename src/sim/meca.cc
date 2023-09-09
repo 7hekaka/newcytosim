@@ -858,7 +858,7 @@ unsigned Meca::solve()
 
         // stop if the solver did not converge:
         if ( resid > M_SQRT2 * tolerance_ )
-            throw Exception("no convergence, residual ", resid, " achieved ", resid/tolerance_);
+            throw Exception("no convergence, residual ", resid, " achieved fraction ", resid/tolerance_);
     }
 
     //printf("\n   /sol "); VecPrint::print(std::cerr, dim, vSOL, 3);
