@@ -822,6 +822,7 @@ void Display::drawFiberEndMinus(Fiber const& fib, int style, float size) const
         case 5: gle::drawArrowTail(fib.posEndM(), fib.dirEndM(), rad); break;
         case 6: drawObject(fib.posEndM(), -fib.dirEndM(), rad, gle::cube); break;
         case 7: gle::drawCylinder(fib.posEndM(), -fib.dirEndM(), rad); break;
+        case 8: drawObject(fib.posEndM(), fib.dirEndM(), rad, gle::hemisphere2); break;
     }
 }
 
@@ -851,6 +852,7 @@ void Display::drawFiberEndPlus(Fiber const& fib, int style, float size) const
         case 5: gle::drawArrowTail(fib.posEndP(), -fib.dirEndP(), rad); break;
         case 6: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cube); break;
         case 7: gle::drawCylinder(fib.posEndP(), fib.dirEndP(), rad); break;
+        case 8: drawObject(fib.posEndP(),-fib.dirEndP(), rad, gle::hemisphere2); break;
     }
 }
 

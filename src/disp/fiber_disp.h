@@ -142,11 +142,14 @@ public:
      
      Possible end_style:
      - 0 : hide,
-     - 1 : display a disc/sphere,
-     - 2 : display a cone,
-     - 3 : display a disc,
-     - 4 : draw arrowhead,
-     - 5 : draw arrowhead in the reversed direction
+     - 1 : disc/sphere,
+     - 2 : cone,
+     - 3 : cylinder centered on the fiber end,
+     - 4 : arrow fins,
+     - 5 : arrow fins in the reversed direction
+     - 6 : cube
+     - 7 : cylinder aligned with the fiber end
+     - 8 : hemisphere
      .
      */
     int end_style[2];
