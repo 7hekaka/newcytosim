@@ -20,14 +20,14 @@ static const char hexadecimal_digit[] = "0123456789ABCDEF";
  */
 void gym_color::hexadecimal(char * str) const
 {
-    uint32_t n = rgba();
     *str++ = '0';
     *str++ = 'x';
-    while ( n )
+    for ( int i = 0; i < 4; ++i )
     {
-        uint32_t d = ( n >> 28 );
-        *str++ = hexadecimal_digit[d];
-        n <<= 4;
+        uint8_t d = uint8_t(255*col_[i]);
+        if ( i == 3 && d == 255 ) break;
+        *str++ = hexadecimal_digit[d&15];
+        *str++ = hexadecimal_digit[d>>4];
     }
     *str = 0;
 }
