@@ -29,7 +29,8 @@ namespace VecPrint
             for ( size_t i = 0; i < len; ++i )
             {
                 fprintf(file, fmt, vec[i]);
-                if ( dim & ( 0 == (i+1) % dim )) putc(39, file);
+                if ( dim && ( 0 == (i+1) % dim ))
+                    putc(39, file);
             }
         }
     }
