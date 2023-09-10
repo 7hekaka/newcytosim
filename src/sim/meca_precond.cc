@@ -818,7 +818,6 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
     
 #if CHOUCROUTE && REAL_IS_DOUBLE
     convert_to_floats(bks*bks, blk, (float*)mec->pblock());
-    free_real(blk);
 #endif
 }
 
