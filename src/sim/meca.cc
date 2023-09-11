@@ -749,9 +749,9 @@ unsigned Meca::solve()
      With exact arithmetic, biConjugate Gradient should converge within a number
      of iterations equal to the size of the linear system, with each BCGGS
      iteration involving 2 matrix-vector multiplications.
-     Here we set the limit to half of the theoretical maximum:
+     Here we set the limit to the theoretical maximum:
      */
-    size_t max_iter = dim;
+    size_t max_iter = 2 * dim;
     LinearSolvers::Monitor monitor(max_iter, tolerance_);
 
     //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dim, max_iter, tolerance_, precond);
@@ -759,8 +759,6 @@ unsigned Meca::solve()
     //------- call the iterative solver:
     if ( precond_ )
     {
-        // change initial condition to be `P * RHS`:
-        precondition(vRHS, vSOL);
         LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         //fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator_, mH, mV, temporary_);
