@@ -676,11 +676,12 @@ static void triangle(unsigned i[3], unsigned a, unsigned b, unsigned c)
     i[2] = c;
 }
 
-/** The faces are draw in order of increasing Z */
+/**
+ This extends a half icosahedron by adding rows of equilateral triangles
+ The faces are draw in order of increasing Z */
 void Tesselator::buildCylinder(unsigned div, int make)
 {
     div = std::max(div, 1U);
-    //setGeometry(CYLINDER, 16, 40, 25, div);
     setGeometry(CYLINDER, 21, 55, 35, div);
 
     const FLOAT Z = std::sqrt(0.2);
@@ -688,8 +689,8 @@ void Tesselator::buildCylinder(unsigned div, int make)
     const FLOAT S = std::sin(M_PI/2.5);
     const FLOAT D = C*C - S*S;
     const FLOAT T = C*S + C*S;
-    const FLOAT H = 3 * Z;
-    const FLOAT W = 5 * Z;
+    const FLOAT H = 3 * Z; // first row added
+    const FLOAT W = 5 * Z; // second row added
 
     // Vertices for half-icosahedron & tubular extension
     FLOAT vex[21][3] = {
@@ -725,6 +726,7 @@ void Tesselator::buildCylinder(unsigned div, int make)
         {0,  5,  1},
     };
     int f = 5;
+    // every row adds 10 triangles
     for ( unsigned x : { 0, 5, 10 } )
     {
         for ( unsigned i = 1; i <= 5; ++i )
@@ -772,7 +774,13 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     
     const FLOAT P = M_PI/10.;
     const FLOAT D = M_PI/2.5;
-    const FLOAT A[5] = {P, P+D, P+D*2, P+D*3, P+D*4};
+    FLOAT C[5], S[5];
+    for ( int i = 0; i < 5; ++i )
+    {
+        FLOAT a = P + D*i;
+        C[i] = std::cos(a);
+        S[i] = std::sin(a);
+    }
 
     const FLOAT Z = std::sqrt(0.2);
     const FLOAT H = std::sqrt(1 + Z*Z);
@@ -780,16 +788,16 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     // Twelve vertices of icosahedron
     FLOAT ico[12][3] = {
         { 0,  0, -H},
-        {std::cos(A[0]),-std::sin(A[0]), -Z},
-        {std::cos(A[1]),-std::sin(A[1]), -Z},
-        {std::cos(A[2]),-std::sin(A[2]), -Z},
-        {std::cos(A[3]),-std::sin(A[3]), -Z},
-        {std::cos(A[4]),-std::sin(A[4]), -Z},
-        {-std::cos(A[3]), std::sin(A[3]), Z},
-        {-std::cos(A[4]), std::sin(A[4]), Z},
-        {-std::cos(A[0]), std::sin(A[0]), Z},
-        {-std::cos(A[1]), std::sin(A[1]), Z},
-        {-std::cos(A[2]), std::sin(A[2]), Z},
+        { C[0],-S[0], -Z},
+        { C[1],-S[1], -Z},
+        { C[2],-S[2], -Z},
+        { C[3],-S[3], -Z},
+        { C[4],-S[4], -Z},
+        {-C[3], S[3],  Z},
+        {-C[4], S[4],  Z},
+        {-C[0], S[0],  Z},
+        {-C[1], S[1],  Z},
+        {-C[2], S[2],  Z},
         { 0,  0,  H}
     };
     
