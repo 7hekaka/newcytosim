@@ -182,13 +182,13 @@ void scale_(size_t num, float* ptr, float X, float Y, float Z)
 
 /** This transforms the sphere into a 'pin'-like smooth surface */
 template < typename FLOAT >
-static void dropletify_(size_t num, FLOAT* ptr, float Z)
+static void dropletify_(size_t num, FLOAT* ptr)
 {
     const FLOAT m = 0.75f;
     for ( unsigned n = 0; n < num; ++n )
     {
-        FLOAT H = ptr[3*n+2];
-        FLOAT W = 0.5f * ( 1.f + std::tanh(-m*H) );
+        FLOAT Z = ptr[3*n+2];
+        FLOAT W = 0.5f * ( 1.f + std::tanh(-m*Z) );
         ptr[3*n  ] *= W;
         ptr[3*n+1] *= W;
     }
@@ -249,17 +249,6 @@ void Tesselator::sortVertices()
     delete[] per;
 }
 
-
-
-void Tesselator::dropletify(float* ptr, float Z)
-{
-    dropletify_(num_vertices_, ptr, Z);
-}
-
-void Tesselator::dropletify(double* ptr, double Z)
-{
-    dropletify_(num_vertices_, ptr, Z);
-}
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -1040,7 +1029,7 @@ void Tesselator::store_vertices(float * vec) const
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectCylinder(vec+3*n);
         if ( kind_ == DROPLET )
-            dropletify_(num_vertices_, vec, 3);
+            dropletify_(num_vertices_, vec);
     }
     else
     {
@@ -1066,7 +1055,7 @@ void Tesselator::store_vertices(double * vec) const
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectCylinder(vec+3*n);
         if ( kind_ == DROPLET )
-            dropletify_(num_vertices_, vec, 3);
+            dropletify_(num_vertices_, vec);
     }
     else
     {
