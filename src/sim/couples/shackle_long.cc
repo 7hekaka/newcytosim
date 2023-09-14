@@ -39,7 +39,7 @@ Torque ShackleLong::calcArm(Interpolation const& pt, Vector const& pos, real len
     if ( n > REAL_EPSILON )
         return off * ( len / n );
     else
-        return pt.diff().randOrthoU(len);
+        return pt.dir().randOrthoU(len);
 #else
     return std::copysign(len, cross(off, pt.diff()));
 #endif

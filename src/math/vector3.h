@@ -608,7 +608,7 @@ public:
     
     /**
      Given: N = norm(this), (C, S) = random numbers in [-1, 1],
-     @return a vector orthogonal to this, of norm `C^2 + S^2`
+     @return a vector orthogonal to *this, of norm `C^2 + S^2`
      
      Derived from `Building an Orthonormal Basis, Revisited`,
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
@@ -1099,10 +1099,10 @@ public:
     void addRand(real s);
     
     
-    /// a vector orthogonal to *this, with `norm == n`, chosen randomly and uniformly
+    /// a vector of norm n, orthogonal to *this, assuming `norm(*this)==1`
     Vector3 randOrthoU(real n) const;
     
-    /// a vector orthogonal to *this, with `norm <= n`, assuming `norm(*this)==1`
+    /// a vector of norm <= n, orthogonal to *this, assuming `norm(*this)==1`
     Vector3 randOrthoB(real n) const;
     
     

@@ -120,14 +120,14 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     if ( n1 > REAL_EPSILON )
         mArm1 = off1 * ( len / n1 );
     else
-        mArm1 = pt1.diff().randOrthoU(len);
+        mArm1 = pt1.dir().randOrthoU(len);
     
     Vector off2 = cross(dir, pt2.diff());
     real n2 = off2.norm();
     if ( n2 > REAL_EPSILON )
         mArm2 = off2 * ( len / n2 );
     else
-        mArm2 = pt1.diff().randOrthoU(len);
+        mArm2 = pt1.dir().randOrthoU(len);
 
     //mArm1 = cross(pt1.diff(), dir).normalized(len);
     //mArm2 = cross(dir, pt2.diff()).normalized(len);

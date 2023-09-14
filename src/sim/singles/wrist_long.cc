@@ -105,7 +105,7 @@ Torque WristLong::calcArm(Interpolation const& itp, Vector const& pos, real len)
     if ( n > REAL_EPSILON )
         return off * ( len / n );
     else
-        return itp.diff().randOrthoU(len);
+        return itp.dir().randOrthoU(len);
 #else
     return std::copysign(len, cross(off, itp.diff()));
 #endif
