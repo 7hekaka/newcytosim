@@ -1,6 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University.
 
 #include <sys/time.h>
+#include <iostream>
 
 #include "real.h"
 #include "timer.h"

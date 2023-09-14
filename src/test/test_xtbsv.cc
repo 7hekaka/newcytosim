@@ -2,6 +2,7 @@
 // FJN 30.06.2020
 
 #include <sys/time.h>
+#include <iostream>
 #include <limits>
 
 #define DIM 3

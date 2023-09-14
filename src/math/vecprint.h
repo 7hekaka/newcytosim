@@ -4,6 +4,7 @@
 
 #include <cstdio>
 #include <cmath>
+#include <string>
 
 
 /// Templated functions to print Vectors and Matrices with minimal formatting
