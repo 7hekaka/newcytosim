@@ -162,6 +162,7 @@ namespace LinearSolvers
 
         while ( ! monitor.finished(dim, r) )
         {
+            //fprintf(stderr, "BCGSP %4i res %14.9f\n", monitor.count(), monitor.residual());
             rho_old = rho;
             rho = blas::dot(dim, r0, r);
             
@@ -237,7 +238,7 @@ namespace LinearSolvers
         monitor.finished(dim, r);
         fprintf(stderr, "[BCGSP %4i res %14.9f %14.9f]", monitor.count(), est, monitor.residual());
 #endif
-        //fprintf(stderr, "(BCGS %4i res %10.7f %10.7f)", monitor.count(), est, monitor.residual());
+        //fprintf(stderr, "BCGSP %4i res %14.9f - end\n", monitor.count(), monitor.residual());
         allocator.release();
     }
     

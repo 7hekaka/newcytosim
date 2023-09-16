@@ -1437,22 +1437,22 @@ void Solid::prepareMecable()
 
 real Solid::addBrownianForces(real const* rnd, real alpha, real* rhs) const
 {
-    // equivalent drag coefficient for one point:
-    const real drag = prop->viscosity * soDrag / (real)nPoints;
+    // mobility of entire Solid
+    const real drag = prop->viscosity * soDrag;
 
     if ( std::isinf(drag) )
         return INFINITY;
     
-    // amplitude of Brownian motion
-    const real b = std::sqrt( alpha * drag );
+    // amplitude of Brownian motion, scaled as it is added to every points:
+    const real b = std::sqrt( alpha * drag / (real)nPoints );
 
     // noise is equally distributed over all points:
     for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
         rhs[jj] += b * rnd[jj];
     
-    //std::clog << reference() << " drag " << drag << "   " << b/drag << "\n";
-    // typical displacement of a point due to Brownian motion:
-    return b / drag;
+    //std::clog << reference() << " drag " << b << " " << drag << "   " << std::sqrt(nPoints)*b/drag << "\n";
+    // typical displacement of one point due to Brownian motion:
+    return std::sqrt( alpha / drag );
 }
 
 

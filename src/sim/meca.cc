@@ -551,9 +551,12 @@ real Meca::residualNorm() const
     real * tmp = allocator_.bind(0);
     multiply(vSOL, tmp);
     blas::xsub(dim, vRHS, tmp);
-    //fprintf(stderr, "\n- "); VecPrint::print(stderr, dim, tmp, 4);
     real res = blas::nrm8(dim, tmp);
-    //fprintf(stderr, " R %f\n", res);
+#if 0
+    blas::xscal(dim, 1.0/res, tmp, 1);
+    fprintf(stderr, "\n: "); VecPrint::print(stderr, dim, tmp, 2);
+    fprintf(stderr, " R %f\n", res);
+#endif
     return res;
 }
 
@@ -754,7 +757,7 @@ unsigned Meca::solve()
     size_t max_iter = 2 * dim;
     LinearSolvers::Monitor monitor(max_iter, tolerance_);
 
-    //fprintf(stderr, "System size %6lu  limit %6lu  tolerance %f precondition %i\n", dim, max_iter, tolerance_, precond);
+    //fprintf(stderr, "\nSystem size %6lu  limit %6lu  tolerance %f\n", dim, max_iter, tolerance_);
 
     //------- call the iterative solver:
     if ( precond_ )
@@ -810,7 +813,7 @@ unsigned Meca::solve()
         
         // in case the solver did not converge, try again:
         monitor.reset();
-        zero_real(dim, vSOL);
+        //zero_real(dim, vSOL);
         if ( precond_ )
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         else
@@ -855,7 +858,7 @@ unsigned Meca::solve()
         }
 
         // stop if the solver did not converge:
-        if ( resid > M_SQRT2 * tolerance_ )
+        if ( resid > 2 * tolerance_ )
             throw Exception("no convergence, residual ", resid, " achieved fraction ", resid/tolerance_);
     }
 
