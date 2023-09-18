@@ -41,7 +41,7 @@ public:
     bool valid() const { return (mec_!=nullptr) & (pti_<mec_->nbPoints()); }
     
     /// Index of point in object
-    size_t point() const { return pti_; }
+    unsigned point() const { return pti_; }
         
     /// Position of the point-of-interest in space
     Vector pos() const { return mec_->posPoint(pti_); }

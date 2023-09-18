@@ -131,7 +131,7 @@ namespace {
     gym_color color_by_grid(Fiber const& fib, size_t seg)
     {
         Map<DIM> const& map = fib.simul().visibleMap();
-        Vector w = fib.midPoint(seg, 0.5);
+        Vector w = fib.midPoint(seg);
         size_t i = map.index(w);
         return gym::alt_color(i);
     }

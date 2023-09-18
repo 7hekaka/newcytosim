@@ -445,7 +445,7 @@ public:
     /// link in the cell containing the middle of the segment
     void add(Fiber const* fib, size_t inx, real rad, real rge)
     {
-        Vector w = fib->midPoint(inx, 0.5);
+        Vector w = fib->midPoint(inx);
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(w).emplace(fib, inx, rad, rge, w);
 #else
@@ -469,7 +469,7 @@ public:
     /// link in the cell containing the middle of the segment:
     void add_modulo(Fiber const* fib, size_t inx, real rad, real rge)
     {
-        Vector w = fib->midPoint(inx, 0.5);
+        Vector w = fib->midPoint(inx);
         modulo->fold(w);
         size_t c = direct_index(w);
         //assert_true( c == pGrid.index(w) );

@@ -1230,7 +1230,7 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
             continue;
         for ( size_t p = 0; p < fib->nbSegments(); ++p )
         {
-            Vector pos = fib->midPoint(p, 0.5);
+            Vector pos = fib->midPoint(p);
             Vector dir = fib->dirSegment(p);
             Vector nor = spc->normalToEdge(pos);
             Vector tan = cross(eZ, nor);

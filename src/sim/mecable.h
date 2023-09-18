@@ -19,7 +19,7 @@ class Space;
 /**
  Add correction terms to the projection in constrainted dynamics
  The effect is to stabilize fibers under traction, at some modest CPU cost.
- Set ADD_PROJECTION_DIFF = 2 to enable validation codes in makeProjectionDiff()
+ Set ADD_PROJECTION_DIFF = 7 to enable validation codes in makeProjectionDiff()
 */
 #define ADD_PROJECTION_DIFF 1
 
@@ -210,6 +210,13 @@ public:
         assert_true( A == 0 || P+1 < nPoints );
         //assert_true( 0 <= A && A <= 1 );
         return Vector::interpolated(pPos+DIM*P, A, pPos+DIM*P+DIM);
+    }
+    
+    /// intermediate position between P and P+1 = 0.5 * ( P + Q )
+    Vector midPoint(const size_t P) const
+    {
+        assert_true( P+1 < nPoints );
+        return 0.5 * ( Vector(pPos+DIM*P) + Vector(pPos+DIM*P+DIM) );
     }
 
     /// Calculate intermediate position = P + a * ( Q - P )

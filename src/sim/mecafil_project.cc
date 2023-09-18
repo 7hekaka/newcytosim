@@ -530,7 +530,7 @@ void Mecafil::addProjectionDiff(const real* X, real* Y) const
 
 #endif
 
-#if ADD_PROJECTION_DIFF == 2
+#if ADD_PROJECTION_DIFF == 7
 
 /** This is the debug pathway */
 void Mecafil::makeProjectionDiff(const real* force)

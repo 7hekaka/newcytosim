@@ -423,7 +423,7 @@ public:
     void add(Fiber const* fib, size_t inx, real rad, real rge, real sup) const
     {
         // link in cell containing the middle of the segment
-        Vector w = fib->midPoint(inx, 0.5);
+        Vector w = fib->midPoint(inx);
 #if ( NUM_STERIC_PANES <= 1 )
         locus_list(w).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
 #else

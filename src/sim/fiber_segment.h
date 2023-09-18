@@ -72,7 +72,7 @@ public:
     Vector pos(real c)  const { return fib_->midPoint(pti_, c); }
     
     /// that is [ pos2() + pos1() ] / 2
-    Vector middle()     const { return fib_->midPoint(pti_, 0.5); }
+    Vector middle()     const { return fib_->midPoint(pti_); }
 
     /// that is pos2() - pos1()
     Vector diff()       const { return fib_->diffPoints(pti_); }
