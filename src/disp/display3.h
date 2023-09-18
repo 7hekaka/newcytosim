@@ -71,7 +71,7 @@ public:
     void drawFiberLines(Fiber const&, int style) const;
     
     /// draw one segment of a Fiber
-    void drawFiberSegmentT(Fiber const&, size_t) const;
+    void drawFiberSegmentT(Fiber const&, unsigned) const;
 
     /// display lattice subtance using color
     void drawFiberLattice1(Fiber const&, VisibleLattice const&, float rad) const;

@@ -64,7 +64,7 @@ public:
     real depth() const { return depth_; }
     
     /// set depth relative to given axis
-    void depth(Vector const& axis) { depth_ = dot(point_.pos(), axis); }
+    void calculate_depth(Vector const& axis);
     
     /// display object
     void draw(Display const*) const;
@@ -109,13 +109,13 @@ protected:
 private:
     
     /// set default value of FiberProp
-    void prepareFiberDisp(FiberProp*, PropertyList&, gym_color);
+    void initFiberDisp(FiberProp*, PropertyList&, gym_color);
     
     /// set values of fiber's LineDisp
-    void prepareLineDisp(Fiber const*, FiberDisp const*, LineDisp*);
+    void initLineDisp(Fiber const*, FiberDisp const*, LineDisp*);
     
     template < typename T >
-    void preparePointDisp(T * prop, PropertyList&, gym_color);
+    void initPointDisp(T * prop, PropertyList&, gym_color);
     
     /// draw translucent objects after depth-sorting
     void drawTransparentObjects(Array<zObject>&);
@@ -212,7 +212,7 @@ public:
     virtual void drawFiberLines(Fiber const&, int style) const;
     
     /// draw one segment of a Fiber (used to display transparent fibers)
-    virtual void drawFiberSegmentT(Fiber const&, size_t) const;
+    virtual void drawFiberSegmentT(Fiber const&, unsigned) const;
     
     /// Using triangles to draw a broken line with thickness `2*rad`
     void drawFiberWide(Fiber const& fib, float rad) const;
@@ -289,7 +289,7 @@ public:
     void drawSolid(Solid const&);
     
     /// draw translucent elements of a Solid
-    void drawSolidT(Solid const&, size_t) const;
+    void drawSolidT(Solid const&, unsigned) const;
 
     /// draw the Solids
     void drawSolids(SolidSet const&);

@@ -296,7 +296,7 @@ void Display::drawTiled(Simul const& sim, int tile)
 /**
  Create a FiberDisp for this Property if necessary
  */
-void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gym_color col)
+void Display::initFiberDisp(FiberProp* fp, PropertyList& alldisp, gym_color col)
 {
     FiberDisp *& disp = fp->disp;
     
@@ -337,7 +337,7 @@ void Display::prepareFiberDisp(FiberProp* fp, PropertyList& alldisp, gym_color c
 /**
  set LineDisp for given Fiber
  */
-void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * self)
+void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * self)
 {
     bool hide = false;
     assert_true(fib->prop);
@@ -391,18 +391,25 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
     self->end_color[0] = col;
     self->end_color[1] = col;
 #else
-    // colors of ends for non-dynamic filaments:
+    // use colors of non-dynamic ends:
     self->end_color[0] = disp->end_colors[0];
     self->end_color[1] = disp->end_colors[0];
 #endif
     
+#if ( 0 )
     // For dynamic Fibers, change colors of tips according to state:
     if ( fib->endStateP() > 0 )
         self->end_color[0] = disp->end_colors[std::min(fib->endStateP(),5U)];
-    
     if ( fib->endStateM() > 0 )
         self->end_color[1] = disp->end_colors[std::min(fib->endStateM(),5U)];
-
+#else
+    // For dynamic Fibers, change colors of tips according to state:
+    if ( fib->freshAssemblyP() > 0 )
+        self->end_color[0] = disp->end_colors[std::min(fib->endStateP(),5U)];
+    if ( fib->freshAssemblyM() > 0 )
+        self->end_color[1] = disp->end_colors[std::min(fib->endStateM(),5U)];
+#endif
+    
     // hide right or left-pointing fibers:
     if (( disp->hide & 1 )  &&  dot(fib->diffPoints(0), Vector(disp->hide_axis)) < 0 )
         hide = true;
@@ -470,7 +477,7 @@ void Display::prepareLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp
  Create a PointDisp for this Property if necessary
  */
 template < typename T >
-void Display::preparePointDisp(T * p, PropertyList& alldisp, gym_color col)
+void Display::initPointDisp(T * p, PropertyList& alldisp, gym_color col)
 {
     PointDisp *& disp = p->disp;
     
@@ -527,7 +534,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
     for ( Fiber * fib = fibers.first(); fib; fib = fib->next() )
     {
         fib->disp = &allLineDisp[i++];
-        prepareLineDisp(fib, fib->prop->disp, fib->disp);
+        initLineDisp(fib, fib->prop->disp, fib->disp);
     }
     assert_true( i <= numLineDisp );
 }
@@ -551,7 +558,7 @@ void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
     prep_flag = 0;
     // create a FiberDisp for each FiberProp:
     for ( Property* p : plist )
-        prepareFiberDisp(static_cast<FiberProp*>(p), alldisp, gym::get_color(idx++));
+        initFiberDisp(static_cast<FiberProp*>(p), alldisp, gym::get_color(idx++));
 
     // create a LineDisp for each Fiber:
     attributeLineDisp(sim.fibers);
@@ -588,20 +595,20 @@ void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
     
     //create a PointDisp for each HandProp:
     for ( Property * i : sim.properties.find_all("hand") )
-        preparePointDisp(static_cast<HandProp*>(i), alldisp, gym::get_color(idx++));
+        initPointDisp(static_cast<HandProp*>(i), alldisp, gym::get_color(idx++));
     
     //create a PointDisp for each SphereProp:
     for ( Property * i : sim.properties.find_all("sphere") )
-        preparePointDisp(static_cast<SphereProp*>(i), alldisp, gym::bright_color(idx++));
+        initPointDisp(static_cast<SphereProp*>(i), alldisp, gym::bright_color(idx++));
     
     //create a PointDisp for each SolidProp:
     for ( Property * i : sim.properties.find_all("solid", "bead") )
-        preparePointDisp(static_cast<SolidProp*>(i), alldisp, gym::bright_color(idx++));
+        initPointDisp(static_cast<SolidProp*>(i), alldisp, gym::bright_color(idx++));
     
     //create a PointDisp for each SpaceProp:
     gym_color col(DIM==3?0x00000044:0xAAAAAAFF);
     for ( Property * i : sim.properties.find_all("space") )
-        preparePointDisp(static_cast<SpaceProp*>(i), alldisp, col);
+        initPointDisp(static_cast<SpaceProp*>(i), alldisp, col);
 }
 
 
@@ -857,6 +864,7 @@ void Display::drawFiberEndPlus(Fiber const& fib, int style, float size) const
 }
 
 
+/// draw fresh assembly near the plus ends, using white stripes
 void Display::drawFiberGrowth(Fiber const& fib, float size) const
 {
     if ( fib.freshAssemblyM() > 0 )
@@ -974,7 +982,7 @@ void Display::drawFiberLines(Fiber const& fib, const int style) const
 }
 
 
-void Display::drawFiberSegmentT(Fiber const& fib, size_t inx) const
+void Display::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const int style = disp->line_style;
@@ -1916,8 +1924,7 @@ void Display::drawFiber(Fiber const& fib)
     /*
      Handle styles in 3D that are using transparency to draw fiber's segments
      */
-    if (( style==1 && fib.disp->color.transparent())
-        || ( style==2 || style==3 ))
+    if (( style==1 && fib.disp->color.transparent()) || ( style==2 || style==3 ))
     {
         for ( size_t i = 0; i < fib.lastPoint(); ++i )
             zObjects.emplace(&fib, i);
@@ -1943,6 +1950,22 @@ void Display::drawFiber(Fiber const& fib)
 
     if ( style )
         drawFiberLines(fib, style);
+    
+    if ( disp->end_style[0] )
+    {
+        gym::color_load(fib.disp->end_color[0]);
+        //gym::color_load(fib.disp->color);
+        gym::color_back(disp->back_color);
+        drawFiberEndPlus(fib, disp->end_style[0], disp->end_size[0]);
+    }
+
+    if ( disp->end_style[1] )
+    {
+        gym::color_load(fib.disp->end_color[1]);
+        //gym::color_load(fib.disp->color);
+        gym::color_back(disp->back_color);
+        drawFiberEndMinus(fib, disp->end_style[1], disp->end_size[1]);
+    }
 
     if ( disp->growth_style )
         drawFiberGrowth(fib, disp->line_width);
@@ -1954,29 +1977,13 @@ void Display::drawFiber(Fiber const& fib)
         drawFiberSpeckles(fib);
 
     // draw other fiber elements only if fiber is fully visible:
-    //if ( fib.disp->visible > 0 )
+    if ( fib.disp->visible > 0 )
     {
         if ( disp->label_style )
         {
             drawFiberLabels(fib, disp->label_style, fib.disp->color);
         }
-        
-        if ( disp->end_style[1] )
-        {
-            gym::color_load(fib.disp->end_color[1]);
-            //gym::color_load(fib.disp->color);
-            gym::color_back(disp->back_color);
-            drawFiberEndMinus(fib, disp->end_style[1], disp->end_size[1]);
-        }
-        
-        if ( disp->end_style[0] )
-        {
-            gym::color_load(fib.disp->end_color[0]);
-            //gym::color_load(fib.disp->color);
-            gym::color_back(disp->back_color);
-            drawFiberEndPlus(fib, disp->end_style[0], disp->end_size[0]);
-        }
-        
+
         if ( disp->force_style )
         {
             drawFiberForces(fib, disp->force_scale, pixwidth(disp->point_size));
@@ -2206,7 +2213,7 @@ void Display::drawSolid(Solid const& obj)
 /**
  Display a semi-transparent disc / sphere
  */
-void Display::drawSolidT(Solid const& obj, size_t inx) const
+void Display::drawSolidT(Solid const& obj, unsigned inx) const
 {
     Vector X = obj.posP(inx);
     // using clipping planes to cleanup overlapping Spheres
@@ -2540,6 +2547,18 @@ void Display::drawOrganizers(OrganizerSet const& set)
 //------------------------------------------------------------------------------
 #pragma mark - Display of transparent objects sorted by decreasing depth
 
+
+/// set depth relative to given axis
+void zObject::calculate_depth(Vector const& axis)
+{
+    Mecable const * mec = point_.mecable();
+    if ( mec->tag() == Fiber::TAG && point_.point() < mec->lastPoint() )
+        depth_ = dot(mec->midPoint(point_.point()), axis);
+    else
+        depth_ = dot(point_.pos(), axis);
+}
+
+
 #if ( DIM >= 3 )
 
 /// display sub-part `inx` of object `obj`
@@ -2588,7 +2607,7 @@ static int compareZObject(const void * A, const void * B)
 void Display::drawTransparentObjects(Array<zObject>& list)
 {
     for ( zObject & i : list )
-        i.depth(depthAxis);
+        i.calculate_depth(depthAxis);
     
     // depth-sort objects:
     list.sort(compareZObject);

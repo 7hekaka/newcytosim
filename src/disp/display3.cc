@@ -502,7 +502,7 @@ void Display3::drawFiberLines(Fiber const& fib, int style) const
 
 
 // displays segment 'inx' with transparency
-void Display3::drawFiberSegmentT(Fiber const& fib, size_t inx) const
+void Display3::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
 {
     FiberDisp const*const disp = fib.prop->disp;
     const int style = disp->line_style;
