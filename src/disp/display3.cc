@@ -385,9 +385,9 @@ void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
         if ( abs <= 0 )
         {
             real len = (nxt-pos).norm();
-            gym::stretchAlignZ1(pos, rad, (nxt-pos)/len, 0.75*rad);
-            gle::hemisphere4();
-            gym::scale(1, 1, len/(0.75*rad));
+            gym::stretchAlignZ1(pos, rad, (nxt-pos)/len, rad);
+            gle::dome();
+            gym::scale(1, 1, len/rad);
         }
         else
         {

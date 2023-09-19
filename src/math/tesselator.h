@@ -32,7 +32,7 @@ public:
 
     /// starting shapes
     enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3,
-        ICOSAHEDRONX=4, HEMISPHERE=5, CYLINDER=6, DICE=7, DROPLET=8 };
+        ICOSAHEDRONX=4, HEMISPHERE=5, DOME=6, CYLINDER=7, DICE=8, DROPLET=9 };
     
     /// One of the vertex of the unrefined template model
     struct Apex
@@ -156,6 +156,7 @@ public:
     void buildIcosahedronX(unsigned div, int make = 1);
     void buildCylinder(unsigned div, int make = 1);
     void buildHemisphere(unsigned div, int make = 1);
+    void buildDome(unsigned div, int make = 1);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
     void buildDroplet(unsigned div, int make = 1);
 

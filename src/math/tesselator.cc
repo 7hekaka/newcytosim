@@ -180,6 +180,19 @@ void scale_(size_t num, float* ptr, float X, float Y, float Z)
 }
 
 
+/** This scales the 3D points by (X, Y, Z) */
+template < typename FLOAT >
+static void scale_(size_t num, FLOAT* ptr, FLOAT X, FLOAT Y, FLOAT Z)
+{
+    for ( unsigned n = 0; n < num; ++n )
+    {
+        ptr[3*n  ] *= X;
+        ptr[3*n+1] *= Y;
+        ptr[3*n+2] *= Z;
+    }
+}
+
+
 /** This transforms the sphere into a 'pin'-like smooth surface */
 template < typename FLOAT >
 static void dropletify_(size_t num, FLOAT* ptr)
@@ -478,6 +491,7 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case ICOSAHEDRON: buildIcosahedron(div, make); break;
         case ICOSAHEDRONX: buildIcosahedronX(div, make); break;
         case HEMISPHERE: buildHemisphere(div, make); break;
+        case DOME: buildDome(div, make); break;
         case CYLINDER: buildCylinder(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
         case DROPLET: buildDroplet(div, make); break;
@@ -846,6 +860,14 @@ void Tesselator::buildHemisphere(unsigned div, int make)
 }
 
 
+void Tesselator::buildDome(unsigned div, int make)
+{
+    div = std::max(div, 1U);
+    buildHemisphere(div, make);
+    kind_ = DOME;
+}
+
+
 /**
  This divides the edges by 'div' and the 6 square faces bi 'vid'
  */
@@ -1043,6 +1065,8 @@ void Tesselator::store_vertices(float * vec) const
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectSphere(vec+3*n);
+        if ( kind_ == DOME )
+            scale_(num_vertices_, vec, 1., 1., 0.75);
     }
 }
 
@@ -1069,6 +1093,8 @@ void Tesselator::store_vertices(double * vec) const
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectSphere(vec+3*n);
+        if ( kind_ == DOME )
+            scale_(num_vertices_, vec, 1., 1., 0.75);
     }
 }
 

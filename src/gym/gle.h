@@ -246,8 +246,6 @@ namespace gle
     void hemisphere1();
     /// draw a nice half-sphere of radius 1 in Z < 0
     void hemisphere2();
-    /// draw half a sphere of radius 1 in Z < 0
-    void hemisphere4();
     /// draw a flattened dome of radius 1 in Z < 0
     void dome();
 

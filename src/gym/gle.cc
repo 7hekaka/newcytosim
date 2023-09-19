@@ -1536,8 +1536,7 @@ namespace gle
     
     void hemisphere1() { drawIcoBuffer(ico_pts_[4], ico_idx_[4], ico_cnt_[4]); }
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
-    void hemisphere4() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
-    void dome() { gym::scale(1,1,0.75); drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
+    void dome() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
 
     void droplet() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
     
@@ -1574,7 +1573,7 @@ namespace gle
 
         ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
-        ico[6].buildHemisphere(finesse/2);
+        ico[6].buildDome(finesse/2);
         ico[7].buildDroplet(finesse/2);
         
         size_t f = 32; // for setIcoidBuffer
