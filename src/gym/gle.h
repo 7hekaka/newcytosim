@@ -164,11 +164,11 @@ namespace gle
     /// draw an open tube along Z, of radius 1 covering Z [-epsilon, 1]
     void tubeE();
     
-    /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
+    /// draw a very nice tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube1();
-    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
+    /// draw a nice tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube2();
-    /// draw a nicer tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
+    /// draw a tube along Z, of diameter 1 and length 1.5, Z=[-4, 256]
     void longTube4();
     /// draw a nice tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube1();
@@ -177,11 +177,11 @@ namespace gle
     /// draw a rough tube along Z, of diameter 1 with Z=[-256, 0]
     void halfTube4();
     /// draw a tube along Z, of diameter 1 with Z=[-0.5, 0.5], closed at Z=0
-    void closedTubeC();
+    void shutTubeC();
     /// draw a tube along Z, of diameter 1 with Z=[-256, 0], closed at Z=0
-    void closedTube2();
+    void shutTube2();
     /// draw a rough tube along Z, of diameter 1 with Z=[-256, 0], closed at Z=0
-    void closedLongTube4();
+    void shutLongTube4();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void hexTube();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
@@ -203,9 +203,9 @@ namespace gle
     void truncatedCone();
 
     /// display a cylinder of axis Z, radius 1 covering Z=[0, 1]
-    inline void cylinder1() { closedTube2(); discTop2(); }
+    inline void cylinder1() { shutTube2(); discTop2(); }
     /// display a cylinder of axis Z, radius 1 covering Z=[-0.5, 0.5]
-    inline void cylinderC() { closedTubeC(); discTopH(); }
+    inline void cylinderC() { shutTubeC(); discTopH(); }
     
     /// draw a 3-portion cylinder with a larger central section
     void barrel();
@@ -278,8 +278,8 @@ namespace gle
     inline void capedTube() { halfTube4(); dome(); }
     //inline void capedTube() { halfTube2(); discBottom2(); }
     /// primitive used to draw the plus ends of fibers
-    inline void endedTube() { closedLongTube4(); }
-    //inline void endedTube() { halfTube4(); discBottom2(); }
+    inline void endedTube() { shutLongTube4(); }
+    //inline void endedTube() { halfTube2(); hemisphere(); }
 
     //------------------------------------------------------------------------------
     #pragma mark -

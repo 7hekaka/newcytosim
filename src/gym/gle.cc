@@ -1443,9 +1443,9 @@ namespace gle
     void halfTube2()     { doTubeStrip(tubes_[11], nbTrianglesTube(2)); }
     void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
     
-    void closedTubeC()    { doTubeStrip(tubes_[13], nbTrianglesTubeClosed(2)); }
-    void closedTube2()    { doTubeStrip(tubes_[14], nbTrianglesTubeClosed(2)); }
-    void closedLongTube4(){ doTubeStrip(tubes_[15], nbTrianglesTubeClosed(4)); }
+    void shutTubeC()     { doTubeStrip(tubes_[13], nbTrianglesTubeClosed(2)); }
+    void shutTube2()     { doTubeStrip(tubes_[14], nbTrianglesTubeClosed(2)); }
+    void shutLongTube4() { doTubeStrip(tubes_[15], nbTrianglesTubeClosed(4)); }
 
     void cone1()         { doTubeStrip(tubes_[16], nbTrianglesTubeClosed(1)); }
     void cone2()         { doTubeStrip(tubes_[17], nbTrianglesTubeClosed(2)); }
