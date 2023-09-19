@@ -262,7 +262,7 @@ public:
     virtual real pointMobility() const = 0;
     
     /// Add Brownian noise terms to a force vector (alpha = kT / timestep)
-    virtual real addBrownianForces(real const* rnd, real alpha, real* rhs) const { return INFINITY; }
+    virtual real addBrownianForces(real const* fce, real alpha, real* rhs) const { return INFINITY; }
     
     /// add the interactions (for example due to confinements)
     virtual void setInteractions(Meca&) const {}

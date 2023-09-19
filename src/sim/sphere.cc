@@ -359,12 +359,13 @@ void Sphere::setInteractions(Meca& meca) const
 
 //------------------------------------------------------------------------------
 
-real Sphere::addBrownianForces(real const* rnd, real alpha, real* res) const
+real Sphere::addBrownianForces(real const* fce, real alpha, real* rhs) const
 {
     real bT = 0;
     if ( ! std::isinf(spDrag) )
         bT = std::sqrt( alpha * spDrag );
     
+    // magnitude of diffusion of surface points:
     real bS = 0;
     if ( prop->point_mobility > 0 )
         bS = std::sqrt( alpha / prop->point_mobility );
@@ -372,68 +373,75 @@ real Sphere::addBrownianForces(real const* rnd, real alpha, real* res) const
     Vector F(0, 0, 0);
     Torque T(nullTorque);
 
+    // position of center:
     real cx = pPos[0];
     real cy = pPos[1];
     real cz = pPos[2];
 
     /*
-     Add random forces to the surface points, and calculate the resulting force
-     and momentum in F and T. They will be subtracted from the reference points.
+     Stage 1: add random forces to the surface points, calculating resulting force
+     and torque in F and T. This will be subtracted in stage 3.
      */
     for ( size_t p = nbRefPoints; p < nPoints; ++p )
     {
-        real * rhs = res + DIM * p;
+        real * res = rhs + DIM * p;
         real * pos = pPos + DIM * p;
-        Vector fp = bS * Vector(rnd+DIM*p);
+        Vector fp = bS * Vector(res);
         
         F += fp;
         
-        rhs[0] += fp.XX;
-        
+        res[0] = fce[DIM*p+0] + fp.XX;
 #if   ( DIM == 2 )
-        rhs[1] += fp.YY;
+        res[1] = fce[DIM*p+1] + fp.YY;
         T += cross(Vector(pos[0]-cx, pos[1]-cy), fp);
 #elif ( DIM >= 3 )
-        rhs[1] += fp.YY;
-        rhs[2] += fp.ZZ;
+        res[1] = fce[DIM*p+1] + fp.YY;
+        res[2] = fce[DIM*p+2] + fp.ZZ;
         T += cross(Vector(pos[0]-cx, pos[1]-cy, pos[2]-cz), fp);
 #endif
     }
 
     /*
-     The Torque is distributed to reference points fixed on the surface of the Sphere.
-     In 2D, there is one point, and the coefficient is therefore 1.
-     in 3D, there are 3 points, but always one is parallel to the axis of the torque,
+     Stage 2: The Torque is distributed to reference points on the surface of the Sphere.
+     In 2D, there is one such point, and the coefficient is therefore 1.
+     in 3D, there are 3 reference points, but always one is parallel to the axis of the torque,
      and the decomposition over these 3 points gives a factor 2.
      */
-    T /= - ( DIM - 1 ) * spRadius * spRadius;
+    T /= ( DIM - 1 ) * spRadius * spRadius;
     Vector R = cross(Vector(cx,cy,cz), T);
 
     for ( size_t p = 1; p < nbRefPoints; ++p )
     {
-        real * rhs = res + DIM * p;
+        real * res = rhs + DIM * p;
         real const* pos = pPos + DIM * p;
-        Vector fp = bT * Vector(rnd+p);
+        Vector fp = bT * Vector(res);
+        assert_true( fce[DIM*p+0] == 0 );
 #if   ( DIM == 2 )
-        rhs[0] += R.XX - T * pos[1] + fp.XX;
-        rhs[1] += R.YY + T * pos[0] + fp.YY;
-        F += fp + cross(T, Vector(pos[0]-cx, pos[1]-cy));
+        assert_true( fce[DIM*p+1] == 0 );
+        res[0] = fp.XX - R.XX + T * pos[1];
+        res[1] = fp.YY - R.YY - T * pos[0];
+        F += fp + cross(Vector(pos[0]-cx, pos[1]-cy), T);
 #elif ( DIM >= 3 )
-        rhs[0] += R.XX + T.YY * pos[2] - T.ZZ * pos[1] + fp.XX;
-        rhs[1] += R.YY + T.ZZ * pos[0] - T.XX * pos[2] + fp.YY;
-        rhs[2] += R.ZZ + T.XX * pos[1] - T.YY * pos[0] + fp.ZZ;
-        F += fp + cross(T, Vector(pos[0]-cx, pos[1]-cy, pos[2]-cz));
+        assert_true( fce[DIM*p+1] == 0 );
+        assert_true( fce[DIM*p+2] == 0 );
+        res[0] = fp.XX - R.XX - T.YY * pos[2] + T.ZZ * pos[1];
+        res[1] = fp.YY - R.YY - T.ZZ * pos[0] + T.XX * pos[2];
+        res[2] = fp.ZZ - R.ZZ - T.XX * pos[1] + T.YY * pos[0];
+        F += fp + cross(Vector(pos[0]-cx, pos[1]-cy, pos[2]-cz), T);
 #endif
     }
     
-    // center of the sphere:
+    /*
+     Stage 3: add random displacement to the center of the sphere, but subtract
+     the force generated in stage 1, such as to not overestimate diffusion
+     */
 #if   ( DIM == 2 )
-    res[0] -= F.XX + bT * rnd[0];
-    res[1] -= F.YY + bT * rnd[1];
+    rhs[0] = bT * rhs[0] - F.XX;
+    rhs[1] = bT * rhs[1] - F.YY;
 #elif ( DIM >= 3 )
-    res[0] -= F.XX + bT * rnd[0];
-    res[1] -= F.YY + bT * rnd[1];
-    res[2] -= F.ZZ + bT * rnd[2];
+    rhs[0] = bT * rhs[0] - F.XX;
+    rhs[1] = bT * rhs[1] - F.YY;
+    rhs[2] = bT * rhs[2] - F.ZZ;
 #endif
 
     return std::max(bT/spDrag, bS*prop->point_mobility);

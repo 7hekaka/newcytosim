@@ -97,7 +97,6 @@ Meca::Meca()
     vPTS = nullptr;
     vSOL = nullptr;
     vBAS = nullptr;
-    vRND = nullptr;
     vRHS = nullptr;
     vFOR = nullptr;
     vTMP = nullptr;
@@ -134,9 +133,8 @@ void Meca::allocate(size_t alc)
         allocate_vector(alc, vPTS, 1);
         allocate_vector(alc, vSOL, 1);
         allocate_vector(alc, vBAS, 0);
-        allocate_vector(alc, vRND, 1);
+        vFOR = vSOL; //allocate_vector(alc, vFOR, 1);
         allocate_vector(alc, vRHS, 1);
-        vFOR = vRHS; //allocate_vector(alc, vFOR, 1);
         //allocate_vector(alc, vTMP, 0);
         //std::clog << "Meca::allocate(" << allocated_ << ")\n";
     }
@@ -149,9 +147,8 @@ void Meca::release()
     free_vector(vPTS);
     free_vector(vSOL);
     free_vector(vBAS);
-    free_vector(vRND);
-    free_vector(vRHS);
     //free_vector(vFOR);
+    free_vector(vRHS);
     //free_vector(vTMP);
 }
 
@@ -504,16 +501,16 @@ This updates the right-hand-side:
  
     rhs <- tau * Projection * ( rhs + alpha * rnd )
  
- Also prepare Projection diff is requested
+ Also prepares ProjectionDiff if the feature is enabled
 
  Vector 'rnd' is input, a set of independent Gaussian random numbers
  Vector 'rhs' is both input and output.
 */
-real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* rhs)
+real brownian1(Mecable* mec, real const* fce, const real alpha, real tau, real* rhs)
 {
-    real n = mec->addBrownianForces(rnd, alpha, rhs);
+    real n = mec->addBrownianForces(fce, alpha, rhs);
 
-#if ADD_PROJECTION_DIFF == 2
+#if ADD_PROJECTION_DIFF == 7
     /* This uses the force to calculate the Lagrange multipliers */
     mec->makeProjectionDiff(rhs);
 #endif
@@ -540,6 +537,31 @@ real brownian1(Mecable* mec, real const* rnd, const real alpha, real tau, real* 
     return n;
 }
 
+
+
+/*
+ Change the vector of noise, and recalculate the RHS of the system.
+ This is a fail-safe option in case of failed convergence... outside the normal path
+ */
+void Meca::renewBrownianForces()
+{
+    // calculate elastic forces in vFOR:
+    calculateForces(vPTS, vBAS, vFOR);
+    
+#if SEPARATE_RIGIDITY_TERMS
+    addAllRigidity(vPTS, vFOR);
+#endif
+
+    //fprintf(stderr, "\n/"); VecPrint::print(stderr, dimension(), vRHS, 2, DIM);
+    RNG.gauss_set(vRHS, dimension());
+
+    for ( Mecable * mec : mecables )
+    {
+        const size_t inx = DIM * mec->matIndex();
+        brownian1(mec, vFOR+inx, alpha_, tau_, vRHS+inx);
+    }
+    //fprintf(stderr, "\nL"); VecPrint::print(stderr, dimension(), vRHS, 2, DIM);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Solve & Apply
@@ -619,9 +641,9 @@ real Meca::residualNorm() const
  
  The outline of the calculation is:
  
-     'vRND' <- calibrated Gaussian random terms ~N(0,1)
-     'vFOR' <- F = M * Xold + B
-     'vRHS' <- set right-hand-side: time_step * mobP * F + vRND
+     'vFOR' <- F = M * Xold + B (elastic force components)
+     'vRHS' <- calibrated Gaussian random terms ~N(0,1)
+     'vRHS' <- time_step * mobP * F + scale * vRHS (elastic forces+noise)
      Solve the linear system ( I - time_step * mob * P * M ) * vSOL = vRHS
      'vSOL' <- solution to the linear system of equations
      'vPTS' <- calculate new positions: 'Xnew = vPTS + vSOL'
@@ -642,18 +664,18 @@ unsigned Meca::solve()
 
     prepareMatrices();
     
-    // calculate external forces in vRHS:
-    calculateForces(vPTS, vBAS, vRHS);
+    // calculate elastic forces in vFOR:
+    calculateForces(vPTS, vBAS, vFOR);
     
 #if SEPARATE_RIGIDITY_TERMS
-    addAllRigidity(vPTS, vRHS);
+    addAllRigidity(vPTS, vFOR);
 #endif
     
     /*
-     Fill `vRND` with Gaussian random numbers
-     This operation can be done in parallel, in a separate thread
+     Fill `vRHS` with Gaussian random numbers
+     This operation could be done in parallel, in a separate thread
      */
-    RNG.gauss_set(vRND, dim);
+    RNG.gauss_set(vRHS, dim);
     
     /*
      Add Brownian motions to 'vRHS', and calculate vRHS by multiplying by mobilities.
@@ -670,7 +692,9 @@ unsigned Meca::solve()
 
     /*
      Add Brownian contributions and calculate Minimum value of it
-      vRHS <- vRHS + mobility_coefficient * vRND
+      at entry, vRHS contains Gaussian random numbers
+      vRHS <- vFOR + brownian_scale * vRHS
+     the `brownian_scale` is calculated from the Mecable's mobility
       vRHS <- tau * P * vRHS:
      */
     #pragma omp parallel num_threads(NUM_THREADS)
@@ -680,7 +704,7 @@ unsigned Meca::solve()
         for ( Mecable * mec : mecables )
         {
             const size_t inx = DIM * mec->matIndex();
-            real n = brownian1(mec, vRND+inx, alpha_, tau_, vRHS+inx);
+            real n = brownian1(mec, vFOR+inx, alpha_, tau_, vRHS+inx);
             local = std::min(local, n);
             //printf("thread %i min: %f\n", omp_get_thread_num(), local);
         }
@@ -772,8 +796,6 @@ unsigned Meca::solve()
         //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
     }
     
-    //fprintf(stderr, "    BCGS%u    count %4i  residual %.3e\n", precond, monitor.count(), monitor.residual());
-
     /*
      GMRES may converge faster than BCGGS, but has overheads and uses more memory
      hence for very large systems, BCGGS is often advantageous.
@@ -805,6 +827,8 @@ unsigned Meca::solve()
 #endif
     
     real resid = residualNorm();
+    //fprintf(stderr, " BCGS%u %4i resid %.3e (%.3e)\n", precond_, monitor.count(), resid, monitor.residual());
+    
     if ( resid > tolerance_ )
     {
         doNotify = 1;
@@ -827,6 +851,7 @@ unsigned Meca::solve()
             // recalculate solution:
             monitor.reset();
             zero_real(dim, vSOL);
+            renewBrownianForces();
             if ( precond_ )
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
             else
@@ -948,20 +973,22 @@ void Meca::apply()
          are appropriate for example to calculate the effect of force on assembly.
          */
         calculateForces(vPTS, vBAS, vFOR);
-        
+        /*
+         It is unclear if we should add Brownian values to the force returned to Mecables:
+         The Brownian components will scale like sqrt( kT * drag_coefficient / time_step ),
+         So it will be large for small time_step and large objects. They are not added.
+         */
+
         #pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
             const size_t off = DIM * mec->matIndex();
-            //fprintf(stderr, "\n  /"); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+off, 2, DIM);
-            mec->addBrownianForces(vRND+off, alpha_, vFOR+off);
-            //fprintf(stderr, "\n  L"); VecPrint::print(stderr, DIM*mec->nbPoints(), vFOR+off, 2, DIM);
+            const size_t len = DIM * mec->nbPoints();
             if ( 1 )
             {
                 // check validity of results:
-                const size_t dim = DIM * mec->nbPoints();
-                size_t a = has_nan(dim, vPTS+off);
-                size_t b = has_nan(dim, vFOR+off);
+                size_t a = has_nan(len, vPTS+off);
+                size_t b = has_nan(len, vFOR+off);
                 //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
                 if ( a | b )
                 {
@@ -976,7 +1003,7 @@ void Meca::apply()
     }
     else
     {
-        // if !ready_, the result is not usable
+        // if `ready_ == false`, the results are not usable
         //printf("superfluous call to Meca::apply()\n");
     }
 }

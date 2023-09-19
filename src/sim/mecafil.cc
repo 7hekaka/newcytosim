@@ -95,14 +95,16 @@ void Mecafil::allocateMecable(const size_t nbp)
 #pragma mark -
 
 /**
+ On entry, rhs[] should contain unit Brownian random numbers, and fce[] the forces
+ On exit, rhs[] is updated to include Brownian components: rhs <- b * random() + fce
  The argument should be: alpha = 2 * kT / timestep;
  */
-real Mecafil::addBrownianForces(real const* rnd, real alpha, real* rhs) const
+real Mecafil::addBrownianForces(real const* fce, real alpha, real* rhs) const
 {
     real b = std::sqrt( alpha / iPointMobility );
 
-    for ( size_t jj = 0; jj < DIM*nPoints; ++jj )
-        rhs[jj] += b * rnd[jj];
+    for ( size_t j = 0; j < DIM*nPoints; ++j )
+        rhs[j] = b * rhs[j] + fce[j];
     
     return b * iPointMobility;
 }

@@ -175,7 +175,7 @@ public:
     size_t nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
 
     /// add contribution of Brownian forces
-    real addBrownianForces(real const* rnd, real, real* rhs) const;
+    real addBrownianForces(real const* fce, real, real* rhs) const;
     
     /// Stochastic simulation
     void step();

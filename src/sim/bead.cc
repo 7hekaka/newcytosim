@@ -97,13 +97,13 @@ void Bead::setInteractions(Meca& meca) const
 }
 
 
-real Bead::addBrownianForces(real const* rnd, real alpha, real* rhs) const
+real Bead::addBrownianForces(real const* fce, real alpha, real* rhs) const
 {
     // Brownian amplitude:
     real b = std::sqrt( alpha * paDrag );
 
     for ( size_t d = 0; d < DIM; ++d )
-        rhs[d] += b * rnd[d];
+        rhs[d] = b * rhs[d] + fce[d];
     
     //the amplitude is needed in Meca
     return b / paDrag;

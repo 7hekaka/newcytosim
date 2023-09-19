@@ -110,7 +110,7 @@ public:
     void projectForces(const real* X, real* Y) const;
     
     /// add contribution of Brownian forces
-    real addBrownianForces(real const* rnd, real, real* rhs) const;
+    real addBrownianForces(real const* fce, real, real* rhs) const;
 
     /// add the interactions due to confinement
     void setInteractions(Meca&) const;

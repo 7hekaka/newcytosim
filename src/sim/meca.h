@@ -187,7 +187,6 @@ private:
     real * vPTS;         ///< coordinates of Mecable points
     real * vSOL;         ///< coordinates after the dynamics has been solved
     real * vBAS;         ///< part of the force that is independent of positions
-    real * vRND;         ///< vector of Gaussian random numbers
     real * vRHS;         ///< right hand side of the dynamic system
     real * vFOR;         ///< the calculated forces, with Brownian components
     real * vTMP;         ///< intermediate of calculus
@@ -307,6 +306,9 @@ private:
     /// calculate the linear part of forces:  Y <- B + ( mISO + mFUL ) * X
     void calculateForces(const real* X, const real* B, real* Y) const;
 
+    /// redraw new values of the noise, and update system's RHS
+    void renewBrownianForces();
+    
     /// add forces due to bending elasticity
     void addAllRigidity(const real* X, real* Y) const;
     
