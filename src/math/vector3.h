@@ -608,14 +608,14 @@ public:
     
     /**
      Given: N = norm(this), (C, S) = random numbers in [-1, 1],
-     @return a vector orthogonal to *this, of norm `C^2 + S^2`
+     @return a vector orthogonal to *this, of norm `N * ( C^2 + S^2 )`
      
      Derived from `Building an Orthonormal Basis, Revisited`,
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
      */
     Vector3 orthogonal(real N, real C, real S) const
     {
-        assert_small(normSqr() - N);
+        assert_small(norm()/N - 1.0);
         N = std::copysign(N, ZZ);
         real a = YY / ( ZZ + N );
         real b = YY * a;
@@ -704,7 +704,7 @@ public:
      */
     void orthonormal(real N, Vector3& E, Vector3& F) const
     {
-        assert_small(normSqr() - N);
+        assert_small(norm()/N - 1.0);
         real s = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
         real a = YY / ( ZZ + s * N );
@@ -718,27 +718,27 @@ public:
 
 
     /**
-     Set 'E' and 'F' to build a basis (this, E, F), with norm(E) = norm(F) = N
-     assuming that 'norm(*this) == S'
+     Set 'E' and 'F' to build a basis (this, E, F), with norm(E) = norm(F) = NoL*L
+     assuming that 'norm(*this) == L'
      
      Derived from `Building an Orthonormal Basis, Revisited`,
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
-     */
-    void orthonormal(real L, Vector3& E, Vector3& F, real N) const
+   */
+    void orthonormal(real L, Vector3& E, Vector3& F, real NoL) const
     {
-        assert_small(normSqr() - L);
+        assert_small(norm()/L - 1.0);
         real s = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
-        real nY = N * YY;
-        real a = nY / ( ZZ + s );
+        real nY = NoL * YY;
+        real a = nY / ( ZZ + s * L );
         real b = YY * a;
         real c = XX * a;
         // below normSqr(F) = normSqr(this) + a*a*(normSqr(this)-s*s)
-        E.set(-N * ZZ - b, c, N * XX);
-        F.set(s * c, s * b - N, s * nY);
+        E.set(-NoL*ZZ-b, c, NoL*XX);
+        F.set(s*c, s*b-L*NoL, s*nY);
         // if you do not mind an inverted basis, use F.set(c, b - s*N, YY);
     }
-
+    
     /// rotate `vec` around `*this`, by angle defined by cosine and sine
     /**
      It is assumed that norm(*this)==1
