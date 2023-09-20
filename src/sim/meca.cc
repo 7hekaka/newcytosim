@@ -561,6 +561,7 @@ void Meca::renewBrownianForces()
         brownian1(mec, vFOR+inx, alpha_, tau_, vRHS+inx);
     }
     //fprintf(stderr, "\nL"); VecPrint::print(stderr, dimension(), vRHS, 2, DIM);
+    //fprintf(stderr, "\n");
 }
 
 //------------------------------------------------------------------------------
@@ -827,7 +828,7 @@ unsigned Meca::solve()
 #endif
     
     real resid = residualNorm();
-    //fprintf(stderr, " BCGS%u %4i resid %.3e (%.3e)\n", precond_, monitor.count(), resid, monitor.residual());
+    //fprintf(stderr, "bCGS%u %4i resid %.3e (%.3e)\n", precond_, monitor.count(), resid, monitor.residual());
     
     if ( resid > tolerance_ )
     {
@@ -850,8 +851,8 @@ unsigned Meca::solve()
         {
             // recalculate solution:
             monitor.reset();
-            zero_real(dim, vSOL);
             renewBrownianForces();
+            zero_real(dim, vSOL);
             if ( precond_ )
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
             else
