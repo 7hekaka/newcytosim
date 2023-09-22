@@ -139,6 +139,7 @@ def getImages(path, format):
     if tool and os.access(tool[0], os.X_OK):
         makeImagesUnzip(format)
         images = [os.path.join(tmp_dir, s) for s in os.listdir(tmp_dir)]
+        images = sorted(images)
     else:
         # search for images already made:
         import glob
