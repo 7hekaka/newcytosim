@@ -60,13 +60,13 @@ private:
     void uniRefill(CoupleProp const*, size_t cnt);
 
     /// attach Hand1 of Couple from `can` on locations specified in `loc`
-    void uniAttach1(Array<FiberSite>& loc, CoupleReserve& can);
+    void uniAttach1(Array<FiberSite>& loc, CoupleStock& can);
     
     /// attach Hand2 of Couple from `can` on locations specified in `loc`
-    void uniAttach2(Array<FiberSite>& loc, CoupleReserve& can);
+    void uniAttach2(Array<FiberSite>& loc, CoupleStock& can);
     
     /// attach both Hands of `nb` Couple at crossing points specified by arguments 1 & 2
-    void uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleReserve&, size_t nb);
+    void uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleStock&, size_t nb);
 
     /// `fast_diffusion` attachment assuming that free Couples are uniformly distributed
     void uniAttach(FiberSet const&);
@@ -214,10 +214,10 @@ public:
     void uniPrepare(PropertyList const& properties);
     
     /// total count in reserves
-    size_t countReserves() const;
+    size_t countStocks() const;
 
     /// print number of elements in each reserve bin
-    void infoReserves(std::ostream& os) const;
+    void infoStocks(std::ostream& os) const;
 
     //--------------------------
 
@@ -225,7 +225,7 @@ public:
     void equilibrateSym(FiberSet const&, CoupleProp const*, size_t);
 
     /// distribute Couples of given class on the fibers to approximate an equilibrated state
-    void equilibrate(FiberSet const&, CoupleProp const*, CoupleReserve&, size_t);
+    void equilibrate(FiberSet const&, CoupleProp const*, CoupleStock&, size_t);
     
     /// distribute all Couple on the fibers to approximate an equilibrated state
     void equilibrate(FiberSet const&, CoupleProp const*);
@@ -234,7 +234,7 @@ public:
     void equilibrate();
 
     /// distribute Couples on filament intersections
-    void bindToIntersections(FiberSet const&, CoupleReserve&, PropertyList const&);
+    void bindToIntersections(FiberSet const&, CoupleStock&, PropertyList const&);
     
     /// distribute Couples on filament intersections
     void bindToIntersections(CoupleProp const*);

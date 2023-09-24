@@ -39,7 +39,7 @@ void Duo::deactivate()
 void Duo::recycle()
 {
     objset()->remove(this);
-    prop()->reserves.push(this);
+    prop()->stocks.push(this);
 }
 
 //------------------------------------------------------------------------------

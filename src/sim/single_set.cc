@@ -61,7 +61,7 @@ void SingleSet::uniStepCollect(Single * obj)
         {
             fList.pop(obj);
             inventory_.unassign(obj);
-            P->reserves.push(obj);
+            P->stocks.push(obj);
             ++P->uni_counts;
         }
         else
@@ -102,7 +102,7 @@ void SingleSet::step()
     }
 #if 0
     ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + countReserves() ) )
+    if ( h > 4096 && h > 2 * ( size() + countStocks() ) )
     {
         uniRelax();
         inventory_.reassign();
@@ -144,9 +144,9 @@ Property* SingleSet::newProperty(const std::string& cat, const std::string& nom,
 /// pick from reserves if possible:
 Single * SingleSet::makeSingle(SingleProp const* P)
 {
-    Single * S = P->reserves.head();
+    Single * S = P->stocks.head();
     if ( S )
-        P->reserves.pop();
+        P->stocks.pop();
     else
         S = P->newSingle();
     return S;
@@ -355,7 +355,7 @@ void SingleSet::erase()
     for ( Property const* i : simul_.properties.find_all("single") )
     {
         SingleProp const * P = static_cast<SingleProp const*>(i);
-        P->reserves.erase();
+        P->stocks.erase();
         P->uni_counts = 0;
     }
 
@@ -416,9 +416,9 @@ void SingleSet::defrostStore()
         Single * S = static_cast<Single*>(i);
         inventory_.unassign(S);
         S->hand()->detachHand();
-        S->prop->reserves.push(S);
+        S->prop->stocks.push(S);
     }
-    //infoReserves(std::clog);
+    //infoStocks(std::clog);
 }
 
 //------------------------------------------------------------------------------
@@ -457,7 +457,7 @@ void SingleSet::reheat(size_t cnt[], size_t n_cnt)
             else
             {
                 inventory_.unassign(S);
-                S->prop->reserves.push(S);
+                S->prop->stocks.push(S);
             }
         }
     }
@@ -734,23 +734,23 @@ void SingleSet::deleteInvalidWrists()
 #pragma mark - Fast Diffusion
 
 
-size_t SingleSet::countReserves() const
+size_t SingleSet::countStocks() const
 {
     size_t res = 0;
     for ( Property const* i : simul_.properties.find_all("single") )
-        res += static_cast<SingleProp const*>(i)->reserves.size();
+        res += static_cast<SingleProp const*>(i)->stocks.size();
     return res;
 }
 
 
-void SingleSet::infoReserves(std::ostream& os) const
+void SingleSet::infoStocks(std::ostream& os) const
 {
-    os << "  Single:reserves";
+    os << "  Single:stocks";
     for ( Property const* i : simul_.properties.find_all("single") )
     {
         SingleProp const * P = static_cast<SingleProp const*>(i);
         size_t cnt = count(match_property, P);
-        os << " " << P->number() << ": " << cnt << " ( " << P->reserves.size() << " " << P->uni_counts << " )";
+        os << " " << P->number() << ": " << cnt << " ( " << P->stocks.size() << " " << P->uni_counts << " )";
     }
     os << "\n";
 }
@@ -758,7 +758,7 @@ void SingleSet::infoReserves(std::ostream& os) const
 
 void SingleSet::uniRefill(SingleProp const* sip, size_t cnt)
 {
-    SingleReserve & can = sip->reserves;
+    SingleStock & can = sip->stocks;
     for ( size_t i = can.size(); i < cnt; ++i )
         can.push(sip->newSingle());
 }
@@ -768,7 +768,7 @@ void SingleSet::uniRefill(SingleProp const* sip, size_t cnt)
  Attach exactly one Single from `can` to each site in `loc`.
  If `can` is not large enough, a subset of `loc` is selected.
  */
-void SingleSet::uniAttach(Array<FiberSite>& loc, SingleReserve& can)
+void SingleSet::uniAttach(Array<FiberSite>& loc, SingleStock& can)
 {
     // crop list to match available number of candidates:
     loc.shuffle_truncate(can.size());
@@ -842,10 +842,10 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 {
     Array<FiberSite> loc(128, 128);
     
-    // uniform attachment for the reserves:
+    // uniform attachment for selected classes:
     for ( SingleProp const* P : uniSingles )
     {
-        SingleReserve& can = P->reserves;
+        SingleStock& can = P->stocks;
         
         // assuming (or not) a fixed number of diffusing molecules
         bool fixed = ( P->fast_reservoir > 0 );

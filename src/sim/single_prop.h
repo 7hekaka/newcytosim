@@ -6,7 +6,7 @@
 #include "vector.h"
 #include "property.h"
 #include "hand_prop.h"
-#include "reserve_list.h"
+#include "freezer.h"
 
 class Mecable;
 class Single;
@@ -17,7 +17,7 @@ class Space;
 #define NEW_ANCHOR_STIFFNESS 1
 
 /// to hold unused Couples
-typedef ReserveList<Single> SingleReserve;
+typedef Freezer<Single> SingleStock;
 
 /// Property for Single
 /**
@@ -116,7 +116,7 @@ public:
     mutable size_t uni_counts;
 
     /// a list to hold Couple made with this Property
-    mutable SingleReserve reserves;
+    mutable SingleStock stocks;
 
 protected:
     

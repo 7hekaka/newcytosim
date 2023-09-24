@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
-#ifndef RESERVE_LIST_H
-#define RESERVE_LIST_H
+#ifndef FREEZER_H
+#define FREEZER_H
 
 
 /// holds a list of Single/Couple with identical Property.
@@ -11,7 +11,7 @@
  The Reserve list are used to buffer creation/deletion of Single/Couple.
  */
 template < typename OBJECT >
-class ReserveList
+class Freezer
 {
     /// Pointer to first member in list
     OBJECT * head_;
@@ -21,7 +21,7 @@ class ReserveList
 public:
     
     /// constructor
-    ReserveList() : head_(nullptr), count_(0) { }
+    Freezer() : head_(nullptr), count_(0) { }
     
     /// number of objects stored
     size_t size() const { return count_; }

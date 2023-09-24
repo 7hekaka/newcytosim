@@ -5,13 +5,13 @@
 #include "real.h"
 #include "property.h"
 #include "hand_prop.h"
-#include "reserve_list.h"
+#include "freezer.h"
 
 class Couple;
 class Space;
 
 /// to hold unused Couples
-typedef ReserveList<Couple> CoupleReserve;
+typedef Freezer<Couple> CoupleStock;
 
 
 /// Property for Couple
@@ -180,7 +180,7 @@ public:
     mutable size_t uni_counts;
 
     /// a list to hold Couple made with this Property
-    mutable CoupleReserve reserves;
+    mutable CoupleStock stocks;
 
 protected:
     

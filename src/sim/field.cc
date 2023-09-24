@@ -438,11 +438,11 @@ void Field::step(FiberSet& fibers)
     if ( prop->full_diffusion > 0 )
     {
         real D = prop->full_diffusion * tau / ( prop->step * prop->step );
-        real B = prop->boundary_value * cellVolume();
 #if ( DIM > 1 )
         laplacian(mGrid, field, dup, prop->field_periodic);
         blas::xaxpy(nbc, -D, dup, 1, field, 1);
 #else
+        real B = prop->boundary_value * cellVolume();
         diffuseX(mGrid, field, D, B, prop->field_periodic);
         diffuseY(mGrid, field, D, B, prop->field_periodic);
 #endif

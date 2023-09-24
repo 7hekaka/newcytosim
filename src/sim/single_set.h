@@ -42,7 +42,7 @@ private:
     void uniRefill(SingleProp const*, size_t cnt);
 
     /// attach Singles from `can` on locations specified in `loc`
-    void uniAttach(Array<FiberSite>& can, SingleReserve& loc);
+    void uniAttach(Array<FiberSite>& can, SingleStock& loc);
     
     /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
     void uniAttach(FiberSet const&);
@@ -176,10 +176,10 @@ public:
     void uniPrepare(PropertyList const& properties);
 
     /// total count in reserves
-    size_t countReserves() const;
+    size_t countStocks() const;
     
     /// print number of elements in each reserve bin
-    void infoReserves(std::ostream& os) const;
+    void infoStocks(std::ostream& os) const;
 
     //--------------------------
     
