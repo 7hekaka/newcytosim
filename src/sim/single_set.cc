@@ -102,7 +102,7 @@ void SingleSet::step()
     }
 #if 0
     ObjectID h = inventory_.highest();
-    if ( h > 4096 && h > 2 * ( size() + all_reserved() ) )
+    if ( h > 4096 && h > 2 * ( size() + countReserves() ) )
     {
         uniRelax();
         inventory_.reassign();
@@ -734,7 +734,7 @@ void SingleSet::deleteInvalidWrists()
 #pragma mark - Fast Diffusion
 
 
-size_t SingleSet::all_reserved() const
+size_t SingleSet::countReserves() const
 {
     size_t res = 0;
     for ( Property const* i : simul_.properties.find_all("single") )

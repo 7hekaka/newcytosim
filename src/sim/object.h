@@ -124,10 +124,10 @@ public:
     /// the previous Object in the list, or zero if this is first
     Object * prev() const { return prevO; }
     
-    /// set next Object
+    /// set pointer to next Object
     void next(Object* n) { nextO = n; }
     
-    /// set previous Object
+    /// set pointer to previous Object
     void prev(Object* n) { prevO = n; }
 
     //--------------------------

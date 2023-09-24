@@ -30,7 +30,7 @@ void Inventory::allocate(size_t sup)
     //for ( size_t s = 0; s < 32; ++s ) printf("%lu %lu\n", s, 1+((s+1)|(chunk-1)));
     
     assert_true(sup > alloca_);
-    //std::clog << "Inventory::allocated("<<alloca_<<" --> "<<sz<<")\n";
+    //std::clog << this << "::allocated(" << alloca_ << " --> " << 1+sup << ")\n";
     Inventoried ** ptr = new Inventoried*[1+sup];
     
     ObjectID n = 0;
@@ -59,6 +59,8 @@ void Inventory::clear()
 {
     for ( ObjectID n = lowest_; n <= highest_; ++n )
         record_[n] = nullptr;
+    for ( ObjectID n = highest_; n <= alloca_; ++n )
+        record_[n] = nullptr;
     lowest_ = ~0;
     highest_ = 0;
 }
@@ -77,7 +79,7 @@ void Inventory::assign(Inventoried * obj)
     {
         n = ++highest_;
         obj->setIdentity(n);
-        //std::clog << "Inventory:highest <- " << n << "\n";
+        //std::clog << this << ":highest <- " << n << "\n";
         //std::clog << "identity(" << obj << ") <- " << n << "\n";
     }
     else
@@ -95,7 +97,7 @@ void Inventory::assign(Inventoried * obj)
     assert_true(!record_[n]);
 
     record_[n] = obj;
-    //std::clog << "identity(" << obj << ") = " << n << "\n";
+    //std::clog << highest_ << "  identity(" << obj << ") = " << n << "\n";
 
     lowest_ = std::min(lowest_, n);
     //assert_false(bad());
@@ -190,8 +192,9 @@ Inventoried * Inventory::get(const ObjectID n) const
 {
     if ( n <= highest_ )
     {
-        assert_true(!record_[n] || record_[n]->identity()==n );
-        return record_[n];
+        Inventoried * rec = record_[n];
+        assert_true(!rec || rec->identity()==n );
+        return rec;
     }
     return nullptr;
 }

@@ -14,9 +14,9 @@
  
  This permits pointers to the objects to be recovered from their 'ObjectID' in constant time.
  
- Note that a sentinel is placed at the end of the array, at [alloca_].
+ Note that a nullptr is placed at the end of the array, at [1+alloca_] as sentinel.
 
-\author FJ Nedelec, August 2003.
+\author FJN, August 2003--2023.
 */
 class Inventory
 {

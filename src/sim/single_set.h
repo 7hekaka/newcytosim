@@ -176,7 +176,7 @@ public:
     void uniPrepare(PropertyList const& properties);
 
     /// total count in reserves
-    size_t all_reserved() const;
+    size_t countReserves() const;
     
     /// print number of elements in each reserve bin
     void infoReserves(std::ostream& os) const;

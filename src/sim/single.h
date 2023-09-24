@@ -180,6 +180,9 @@ public:
     /// set next element
     void next(Single * x) { nextO = x; }
 
+    /// set previous element
+    void prev(Single * x) { prevO = x; }
+
     /// a static_cast<> of Object::next()
     Single * next() const { return static_cast<Single*>(nextO); }
     

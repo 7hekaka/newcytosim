@@ -58,6 +58,7 @@ public:
         }
     }
     
+    /// count number of objects in list
     size_t recount() const
     {
         size_t res = 0;
