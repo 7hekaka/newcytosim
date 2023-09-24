@@ -277,7 +277,7 @@ void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
  */
 void PointDisp::makePixelmaps(unsigned sampling, unsigned dim)
 {
-    float col[4] = {1,1,1,1};
+    //float col[4] = {1,1,1,1};
     for ( int i = 0; i < 3; ++i )
     {
         uint8_t * pix = pixels_ + i * pixSize * pixSize * 4;
