@@ -55,13 +55,13 @@ public:
     
     Isometry()
     {
-        rot = MatrixD::identity();
+        rot = MatrixD::one();
         mov.reset();
     }
 
     Isometry(Vector const& v)
     {
-        rot = MatrixD::identity();
+        rot = MatrixD::one();
         mov = v;
     }
 
@@ -79,7 +79,7 @@ public:
     void reset()
     {
         mov.reset();
-        rot = MatrixD::identity();
+        rot = MatrixD::one();
     }
 
     void inverse()

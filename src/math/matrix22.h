@@ -808,7 +808,7 @@ public:
     }
 
     /// identity matrix
-    static Matrix22 identity()
+    static Matrix22 one()
     {
         return Matrix22(0, 1);
     }

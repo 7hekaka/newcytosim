@@ -28,7 +28,7 @@ void timerFunction(int value)
 {
     real s, h = stiff * time_step;
     Matrix22 I, P, D, C;
-    I = Matrix22::identity();
+    I = Matrix22::one();
     real xn = px.norm();
     Vector2 pxn = px.normalized();
     

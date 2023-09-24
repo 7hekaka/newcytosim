@@ -378,7 +378,7 @@ public:
     }
     
     /// identity matrix
-    static Matrix11 identity()
+    static Matrix11 one()
     {
         return Matrix11(1);
     }

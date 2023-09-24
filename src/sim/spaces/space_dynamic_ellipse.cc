@@ -34,8 +34,8 @@ SpaceDynamicEllipse::SpaceDynamicEllipse(SpaceDynamicProp const* p)
         throw InvalidParameter("dynamic_ellipse is not usable in 1D");
     
     pressure = 0;
-    mat = MatrixD::identity();
-    inv = MatrixD::identity();
+    mat = MatrixD::one();
+    inv = MatrixD::one();
     
     reset_forces();
     rad_forces.set(0,0,0);

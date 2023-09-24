@@ -11,7 +11,7 @@
 /// calculate a distance to the subspace of rotations = maxNorm( M'*M - Id )
 real deviation(Matrix33 const& mat)
 {
-    Matrix33 mm = mat.transposed() * mat - Matrix33::identity();
+    Matrix33 mm = mat.transposed() * mat - Matrix33::one();
     return mm.norm_inf();
 }
 
@@ -87,7 +87,7 @@ void test1()
     
     printf("----------------------- identity -------------------------\n");
 
-    mat = Matrix33::identity();
+    mat = Matrix33::one();
     mat.print(stdout);
     q.setFromMatrix3(mat.data());
     q.println(stdout);

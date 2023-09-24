@@ -809,7 +809,7 @@ public:
     }
     
     /// identity matrix
-    static Matrix33sym identity()
+    static Matrix33sym one()
     {
         return Matrix33sym(0, 1);
     }

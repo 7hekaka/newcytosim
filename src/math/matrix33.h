@@ -975,7 +975,7 @@ public:
     }
     
     /// identity matrix
-    static Matrix33 identity()
+    static Matrix33 one()
     {
         return Matrix33(0, 1);
     }

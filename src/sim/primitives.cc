@@ -938,7 +938,7 @@ Rotation Cytosim::readRotation(std::istream& is)
     if ( tok == "random" )
         return Rotation::randomRotation();
     else if ( tok == "identity" || tok == "off" || tok == "none" )
-        return Rotation::identity();
+        return Rotation::one();
     else if ( tok == "align111" )
         return Rotation::align111();
     else if ( tok == "angle" )
