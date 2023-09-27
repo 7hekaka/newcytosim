@@ -218,7 +218,7 @@ inline static real norm_inf(size_t cnt, real const* a, real const* b)
 {
     real s = 0;
     for ( size_t u = 0; u < cnt; ++u )
-        std::max(s, std::fabs( a[u] - b[u] ));
+        s = std::max(s, std::fabs(a[u]-b[u]));
     return s;
 }
 
