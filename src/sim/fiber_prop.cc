@@ -537,8 +537,8 @@ void FiberProp::read(Glossary& glos)
     glos.set(steric_range,  "steric", 2);
     glos.set(steric_radius, "steric_radius");
     glos.set(steric_range,  "steric_range");
+    glos.set(field, "field");
 #if FIBER_HAS_GLUE
-    glos.set(field,       "field");
     glos.set(glue,        "glue");
     glos.set(glue_single, "glue", 1);
 #endif

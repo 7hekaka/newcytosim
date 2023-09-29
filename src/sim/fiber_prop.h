@@ -284,7 +284,7 @@ public:
     /// extra radius of attractive steric interaction (also known as `steric[2]`)
     real steric_range;
     
-    /// name of field
+    /// name of field associated with the fiber
     std::string field;
     
     /// type of glue (interaction between fiber plus end and Space)
