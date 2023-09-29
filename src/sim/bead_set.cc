@@ -22,7 +22,7 @@ void BeadSet::step()
         while ( nextCreation <= 0 )
         {
             nextCreation += RNG.exponential();
-            Vector pos = B->position() + Vector::randB(B->radius());
+            Vector pos = B->position() + Vector::randU(B->radius());
             if ( B->prop->source_couple )
             {
                 Couple * C = simul_.couples.addCouple(B->prop->source_couple, pos);

@@ -1,4 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
+
 #include "solid_set.h"
 #include "solid_prop.h"
 #include "iowrapper.h"
@@ -21,7 +22,7 @@ void SolidSet::step()
         {
             nextCreation += RNG.exponential();
             // we only consider creation on the first point!
-            Vector pos = B->posPoint(0) + Vector::randB(B->radius(0));
+            Vector pos = B->posPoint(0) + Vector::randU(B->radius(0));
             if ( B->prop->source_couple )
             {
                 Couple * C = simul_.couples.addCouple(B->prop->source_couple, pos);
