@@ -1705,7 +1705,7 @@ namespace gle
         flute3 * flu = gym::mapBufferV3(2*pi_twice);
         size_t cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
         gym::unmapBufferV3();
-        gym::drawLineStrip(3, 0, cnt);
+        gym::drawLineStrip(4, 0, cnt);
     }
 
     /** The path followed by the seam of a tennis ball */
@@ -1720,15 +1720,15 @@ namespace gle
     void baseball()
     {
         gym::color_front(1,1,1);
-        sphere2();
+        sphere1();
         gym::color_front(1,0,0);
-        baseballSeamCurve(1, 1.5);
+        baseballSeamCurve(1, 2);
     }
 
     void tennisball()
     {
         gym::color_front(1,1,0);
-        sphere2();
+        sphere1();
         gym::color_front(1,1,1);
         tennisballSeamCurve(1.02, 1);
     }

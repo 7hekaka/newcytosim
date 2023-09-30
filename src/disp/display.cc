@@ -147,11 +147,14 @@ static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color 
     gym::transScale(X, obj.radius(inx));
 #endif
     if ( flip ) glFrontFace(GL_CW);
+#if 1
     gym::color_front(col, 1.0);
     gle::sphere1();
     gym::color_front(bak);
     gle::footballPentagons();
-    //gle::baseballSeamCurve(1.01, 1);
+#else
+    gle::baseball();
+#endif
     if ( flip ) glFrontFace(GL_CCW);
 }
 
