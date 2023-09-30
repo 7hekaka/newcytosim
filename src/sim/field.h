@@ -266,6 +266,7 @@ public:
     {
         if ( mGrid.hasCells() && prop->save )
         {
+            writeMarker(out, Field::TAG);
             out.writeUInt16(DIM);
             for ( size_t d = 0; d < DIM; ++d )
             {
