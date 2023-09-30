@@ -377,10 +377,10 @@ int main(int argc, char* argv[])
     
     if ( mode != SAVE_NOTHING && style == OFFSCREEN )
     {
-        view.resize();
-        const int W = view.width() * view.magnify;
-        const int H = view.height() * view.magnify;
-        
+        view.resize(view.magnify);
+        const int W = view.width();
+        const int H = view.height();
+
         if ( OffScreen::openContext() )
         {
             std::cerr << "Failed to create off-screen context\n";

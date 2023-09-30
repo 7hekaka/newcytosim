@@ -222,8 +222,8 @@ void Player::setPixelSize(View& view)
     float mag = view.magnify;
     float pix = view.pixelSize() / mag;
     /*
-     if `disp.point_value` is set, line widths and point sizes are to be understood
-     in 'real' units, and by default, they are understood as number of pixels.
+     if `disp.point_value` is set, widths of lines and point sizes are understood to
+     be specified in 'real' units, while by default, they are understood in pixels.
      */
     if ( disp.point_value > 0 )
         mag = disp.point_value / pix;

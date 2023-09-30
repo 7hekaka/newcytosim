@@ -77,7 +77,7 @@ public:
     void window(int w) { window_ = w; }
     
     /// adjust viewport size to window_size[]
-    void resize();
+    void resize(int);
 
     /// handle window resize events
     void reshape(int, int);
