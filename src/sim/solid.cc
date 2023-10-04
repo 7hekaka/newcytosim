@@ -34,11 +34,11 @@ void Solid::step()
 
 #if NEW_SOLID_HAS_TWIN
 /** Old way of linking Twins before 25.03.2023*/
-void Solid::oldLinkTwins(Meca& meca, real stiff) const
+void Solid::oldLinkTwins(Meca& meca, real stiff, real separation) const
 {
     real R0 = radius(0);
     constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-    const real sep = std::max(real(0), prop->twin_separation/2-R0*(1+Q));
+    const real sep = std::max(real(0), separation/2-R0*(1+Q));
     // Linking the 3 points forming the first triad
     size_t off = matIndex();
     // X = 1 contributes to a distance R*sqrt(DIM) along the X-axis
@@ -80,32 +80,20 @@ void Solid::setInteractions(Meca& meca) const
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin )
     {
-        const unsigned POLE = std::min(DIM+1, nPoints-1); // index of 4th point
-        real stiff = prop->twin_stiffness;
-        if ( stiff > 0 )
+        const size_t off = DIM+1; // index of point to be linked
+        for ( unsigned POLE = 0; POLE+off < nPoints; POLE += off+1 )
         {
-            meca.addLink(Mecapoint(this, POLE), Mecapoint(soTwin, POLE), stiff);
-            //oldLinkTwins(meca, prop->twin_stiffness);
-        }
-        stiff = prop->twin_torque_stiffness;
-        if ( stiff > 0 && POLE > 0 )
-        {
-            size_t ii = matIndex(), jj = soTwin->matIndex();
-            meca.addTorque4(ii, ii+POLE, jj+POLE, jj, stiff);
-        }
-        // add clamp to the plane X = +/- sep:
-        stiff = prop->twin_metastiff;
-        if ( stiff > 0 && POLE >= DIM )
-        {
-            real R0 = radius(0);
-            constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-            const real sep = std::max(real(0), prop->twin_separation/2-R0*(1+Q));
-            for ( int i = 1; i <= DIM; ++i )
+            const real stiff = prop->twin_stiffness;
+            if ( stiff > 0 )
             {
-                real X = copysign(sep, *addrPoint(i));
-                // this adds an link with the midplane at X = 0
-                meca.addPointClampX(Mecapoint(this, i), X, stiff);
-                meca.addPointClampX(Mecapoint(soTwin, i), -X, stiff);
+                meca.addLink(Mecapoint(this, POLE+off), Mecapoint(soTwin, POLE+off), stiff);
+                //oldLinkTwins(meca, prop->twin_stiffness, prop->twin_separation);
+            }
+            const real torque = prop->twin_torque_stiffness;
+            if ( stiff > 0 && POLE > 0 )
+            {
+                size_t ii = matIndex(), jj = soTwin->matIndex();
+                meca.addTorque4(ii, ii+POLE, jj+POLE, jj, torque);
             }
         }
     }
@@ -279,7 +267,7 @@ void Solid::release()
 #pragma mark - Build
 
 
-void Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+size_t Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
     size_t inx = 0;
@@ -311,6 +299,7 @@ void Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, S
         while ( opt.set(str, var, ++inx) )
             sim.singles.makeWrists(objs, this, fip, nbp, str);
     }
+    return nbp;
 }
 
 
@@ -372,7 +361,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
 }
 
 
-void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
     // get sphere radius:
@@ -457,10 +446,11 @@ void Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Si
             }
         }
     }
+    return ref;
 }
 
 
-void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
     real rad = 0;
@@ -483,9 +473,6 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
     size_t ref = addSphere(cen, std::fabs(rad));
     addTriad(rad);
     rad = std::fabs(rad);
-    
-    if ( opt.has_key("twin") )
-        rotateTriad(ref, Rotation::align111());
 
 #if ( DIM > 2 )
     real sep = 1.0, dev = 0.0;
@@ -582,6 +569,7 @@ void Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, 
             }
         }
     }
+    return ref;
 }
 
 
@@ -636,6 +624,72 @@ Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var,
     }
     return F;
 }
+
+
+/* 2023: twin solid to represent Kinetochore pairs */
+void Solid::buildTwin(ObjectList& objs, Glossary& opt, std::string const& str, Simul& sim)
+{
+#if NEW_SOLID_HAS_TWIN
+    real rad = radius(0);
+    real sep = 0;
+    opt.set(sep, "twin", 1);
+    sep = std::max(rad, sep/2-rad);
+    //addPoint(Vector(sep, 0, 0));
+    if ( str == "mirror" )
+    {
+        // translate to bring plate to origin:
+        ObjectSet::translateObjects(objs, Vector(-sep, 0, 0));
+        if ( !soTwin )
+        {
+            // create a twin Solid that is the mirror image of *this:
+            Solid * S = new Solid(prop);
+            S->soTwin = this;
+            objs.append(S->build(opt, sim));
+        }
+    }
+    else
+    {
+        Solid * S = sim.pickSolid(str);
+        if ( !S )
+            std::cerr << " INCIDENT: could not find twin Solid `" << str << "'\n";
+        else if ( S->nbPoints() <= DIM )
+            throw InvalidParameter("Solid's twin lacks sufficient points");
+    }
+    /* 01.2023: Michelin's chromosomes: overlapping spheres outline a silhouette */
+    real len = 2, chi = 0.5; // length, relative position of chiasma
+    if ( opt.set(len, "chromosome") )
+    {
+        real RAD = 0.200; // upper radius limit reached away from chiasma
+        // chiasma set as second argument
+        opt.set(chi, "chromosome", 1);
+        opt.set(RAD, "chromosome", 2);
+        for ( int i = 0; i < 18; ++i )
+        {
+            real y = ( i / 17.0 ) * len - chi; // in [-chi, len-chi]
+            if ( abs_real(y) > rad )
+            {
+                real T = 0.5 * std::tanh(5.0*abs_real(y)-M_SQRT2) + 0.5; // in [0, 1]
+                real R = rad + ( RAD - rad ) * T; // in [R0, R1]
+                real X = sep + ( RAD - sep ) * T; // in [sep, R1];
+                addSphere(Vector(-std::max(X,R), y, 0), R);
+                /* Could add chromokinesins here */
+                //addTriad(R);
+            }
+        }
+    }
+    if ( soTwin )
+    {
+        // flip 'S' (X -> -X) resulting in the twins being mirror-images
+        ObjectSet::rotateObjects(objs, Rotation::flipX());
+    }
+    
+    if ( nbPoints() % (DIM+2) )
+        throw InvalidParameter("missing handle point in solid::twin");
+#else
+    throw InvalidParameter("Solid's twin code is not enabled");
+#endif
+}
+
 
 /**
  @ingroup NewObject
@@ -742,36 +796,41 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     if ( opt.has_key("point0") || opt.has_key("sphere0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
     
-    // parameter 'point###' will add a point, with Single attached
-    size_t inp = 1;
-    std::string var = "point1";
-    while ( opt.has_key(var) )
+    bool more = true;
+    std::string var = "";
+    for ( size_t inp = 1; more; ++inp)
     {
-        makePoint(objs, opt, var, sim);
-        var = "point" + std::to_string(++inp);
+        more = false;
+        // parameter 'sphere###' will add a sphere, with Singles on their surface
+        var = "sphere" + std::to_string(inp);
+        if ( opt.has_key(var) )
+        {
+            size_t ref = makeSphere(objs, opt, var, sim);
+            if ( opt.has_key("twin") )
+                rotateTriad(ref, Rotation::align111());
+            more = true;
+        }
+        
+        // parameter 'ball###' will add a sphere, with Singles in their volume
+        var = "ball" + std::to_string(inp);
+        if ( opt.has_key(var) )
+        {
+            makeBall(objs, opt, var, sim);
+            more = true;
+        }
+        
+        // parameter 'point###' will add a point, with Single attached
+        var = "point" + std::to_string(inp);
+        if ( opt.has_key(var) )
+        {
+            makePoint(objs, opt, var, sim);
+            more = true;
+        }
     }
-
-    // parameter 'sphere###' will add a sphere, with Singles on their surface
-    inp = 1;
-    var = "sphere1";
-    while ( opt.has_key(var) )
-    {
-        makeSphere(objs, opt, var, sim);
-        var = "sphere" + std::to_string(++inp);
-    }
-    
-    // parameter 'ball###' will add a sphere, with Singles in their volume
-    inp = 1;
-    var = "ball1";
-    while ( opt.has_key(var) )
-    {
-        makeBall(objs, opt, var, sim);
-        var = "ball" + std::to_string(++inp);
-    }
-
+         
 #if BACKWARD_COMPATIBILITY < 100
     /* distribute Singles over all points. Deprecated, since 03.2017 */
-    inp = 0;
+    size_t inp = 0;
     while ( opt.set(str, "anchor", inp++) )
         sim.singles.makeWrists(objs, this, 0, nPoints, str);
 #endif
@@ -814,64 +873,9 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 
     objs.push_back(this);
 
-    if ( opt.set(str, "twin") )
-    {
-#if NEW_SOLID_HAS_TWIN
-        real rad = radius(0);
-        real sep = std::max(rad, prop->twin_separation/2-rad);
-        addPoint(Vector(sep, 0, 0));
-        if ( str == "mirror" )
-        {
-            // translate to bring plate to origin:
-            ObjectSet::translateObjects(objs, Vector(-sep, 0, 0));
-            if ( !soTwin )
-            {
-                // create a twin Solid that is the mirror image of *this:
-                Solid * S = new Solid(prop);
-                S->soTwin = this;
-                objs.append(S->build(opt, sim));
-            }
-        }
-        else
-        {
-            Solid * S = sim.pickSolid(str);
-            if ( !S )
-                std::cerr << " INCIDENT: could not find twin Solid `" << str << "'\n";
-            else if ( S->nbPoints() <= DIM )
-                throw InvalidParameter("Solid's twin lacks sufficient points");
-        }
-        /* 01.2023: Michelin's chromosomes: overlapping spheres outline a silhouette */
-        real len = 2, chi = 0.5; // length, relative position of chiasma
-        if ( opt.set(len, "chromosome") )
-        {
-            real RAD = 0.200; // upper radius limit reached away from chiasma
-            // chiasma set as second argument
-            opt.set(chi, "chromosome", 1);
-            opt.set(RAD, "chromosome", 2);
-            for ( int i = 0; i < 18; ++i )
-            {
-                real y = ( i / 17.0 ) * len - chi; // in [-chi, len-chi]
-                if ( abs_real(y) > rad )
-                {
-                    real T = 0.5 * std::tanh(5.0*abs_real(y)-M_SQRT2) + 0.5; // in [0, 1]
-                    real R = rad + ( RAD - rad ) * T; // in [R0, R1]
-                    real X = sep + ( RAD - sep ) * T; // in [sep, R1];
-                    addSphere(Vector(-std::max(X,R), y, 0), R);
-                    /* Could add chromokinesins here */
-                    //addTriad(R);
-                }
-            }
-        }
-        if ( soTwin )
-        {
-            // flip 'S' (X -> -X) resulting in the twins being mirror-images
-            ObjectSet::rotateObjects(objs, Rotation::flipX());
-        }
-#else
-        if ( str != "off" )
-            throw InvalidParameter("Solid's twin code is not enabled");
-#endif
-    }
+    if ( opt.set(str, "twin") && str != "off" )
+        buildTwin(objs, opt, str, sim);
+    
     fixShape();
     return objs;
 }

@@ -6,23 +6,24 @@
 
 set simul system
 {
-    viscosity = 1
-    time_step = 0.002
+    viscosity = 0.1
+    time_step = 0.001
     steric = 1, 1111, 222
+    precondition = 6
     verbose = 0
-    kT = 0.0041
 }
 
 set system display
 {
-    size=2560,768; 
-    point_value=0.01; 
+    size= 1280, 512;
+    point_value=0.01;
     point_size=0.5; 
     line_width=1; 
     zoom=2;
     style=3;
     magic_key1 = x, (set kinetochore {twin_stiffness=0})
     label = (Press 'x' to delete cohesins!)
+    back_color = black
 }
 
 set space cell
@@ -43,7 +44,7 @@ set fiber microtubule
 {
     rigidity = 20
     segmentation = 0.5
-    steric = 1, 0.030, 0.020
+    steric = 1, 0.025, 0.015
     confine = inside, 77, cell
     
     activity = dynamic
@@ -51,9 +52,9 @@ set fiber microtubule
     growing_speed = 0.210
     shrinking_speed = -0.42, -0.04
     hydrolysis_rate = 1.0
-    growing_force = 5
-    total_polymer = 4000
-    display = ( color=0xFFFFFF88; line_width=2.5; style=2; coloring=2; plus_end=7, 7; )
+    growing_force = 10
+    total_polymer = 300
+    display = ( color=0xFFFFFF88; line_width=2.5; style=2; coloring=2; )
 }
 
 % ---------------------- AMPLIFICATION ------------------------
@@ -84,7 +85,7 @@ set couple augmin
     stiffness = 100
     activity = duo
     vulnerable = 0
-    deactivation = 1, delete
+    deactivation = 2, delete
     trans_activated = 1
     length = 0.050
     diffusion = 0.02
@@ -168,7 +169,7 @@ set solid kinetochore
     twin_stiffness = 100, 10
     twin_metastiff = 0
     twin_separation = 0.5
-    display = ( coloring=1; color=0x00FFFFFF; size=2; style=5; )
+    display = ( coloring=1; color=0x00FFFF44; size=2; style=5; )
 }
 
 % ---------------------- CUTTING ------------------------
@@ -193,17 +194,21 @@ new 0 augmin
 new 0 katanin
 
 
-new 1 kinetochore
+new kinetochore
 {
-    sphere1 = 0 0 0, 0.100, corona -0.84 -0.4 -0.4, corona -0.4 -0.84 -0.4, corona -0.4 -0.4 -0.84
-    point1 = 0.2 0 0
+    sphere1 = 0 -0.1 0, 0.070, corona -0.2 -0.7 -0.7, corona -0.7 -0.2 -0.7, corona -0.7 -0.7 -0.2
+    point1 = 0.1 -0.1 0
+    
+    sphere2 = 0 +0.1 0, 0.070, corona -0.1 -0.7 -0.7, corona -0.7 -0.1 -0.7, corona -0.7 -0.7 -0.1
+    point2 = 0.1 0.1 0
+    
     position = 0 0 0
     direction = 1 0 0
-    twin = mirror
+    twin = mirror, 0.5
 }
 
-run 5000000 system
+run 500000 system
 {
-    nb_frames = 100
+    nb_frames = 1000
 }
 

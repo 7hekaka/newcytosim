@@ -81,7 +81,7 @@ private:
     Solid * soTwin;
     
     /// former way of linking Twins (25.03.2023)
-    void oldLinkTwins(Meca&, real) const;
+    void oldLinkTwins(Meca&, real, real) const;
 #endif
     
     /// the number of points when fixShape() was last called, used for verifications.
@@ -99,13 +99,13 @@ private:
     void reset();
 
     /// part of build()
-    void makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
+    size_t makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    void makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
+    size_t makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    void makeBall(ObjectList&, Glossary&, std::string const&, Simul&);
+    size_t makeBall(ObjectList&, Glossary&, std::string const&, Simul&);
 
     /// part of build()
     void makeWrist(ObjectList&, Glossary&, std::string const&, Simul&);
@@ -115,6 +115,9 @@ private:
 
     /// part of build()
     void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref, std::string const&);
+
+    /// part of build()
+    void buildTwin(ObjectList&, Glossary&, std::string const&, Simul&);
 
 public:
     

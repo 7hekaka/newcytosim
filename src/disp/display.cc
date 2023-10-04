@@ -2093,6 +2093,24 @@ void Display::drawSolid(Solid const& obj)
 #if NEW_SOLID_HAS_TWIN
     // display links between twin solids
     Solid const* twi = obj.twin();
+    if ( twi && ( obj.prop->twin_stiffness > 0 ) && ( disp->style & 6 ) )
+    {
+        gym_color lor = bodyColorF(*twi).mix(col);
+        real rad = M_SQRT2 * pixscale(disp->size);
+        gym::ref_view();
+        gym::enableLighting();
+        gym::color_both(lor, 1);
+        for ( size_t inx = DIM+1; inx < obj.nbPoints(); inx += DIM+2 )
+        {
+            gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), rad);
+            gle::hexTube();
+        }
+    }
+#endif
+
+#if OLD_SOLID_HAS_TWIN
+    // display links between twin solids
+    Solid const* twi = obj.twin();
     if ( twi && ( disp->style & 6 ) && disp->perceptible )
     {
         gym_color lor = bodyColorF(*twi);
@@ -2261,17 +2279,18 @@ void Display::drawSolids(SolidSet const& set)
                 if ( disp->style & 4 ) sup = 1;
 #if ( DIM >= 3 )
 #if NEW_SOLID_HAS_TWIN
-                const size_t inx = 0;
-                Solid const* twi = obj->twin();
-                if ( twi && obj->radius(inx) > 0 && obj->nbPoints() > inx + 3 )
+                Solid const * twi = obj->twin();
+                if ( twi )
                 {
-                    gym::enableLighting();
-                    //real len = std::sqrt(obj->twinTensionSqr());
-                    gym_color black(0,0,0,1);
-                    gym_color tcol = bodyColorF(*twi);
-                    gym_color scol = tcol.tweak(obj->signature());
-                    drawFootball(*obj, inx, scol, black, true);
-                    drawFootball(*twi, inx, tcol, black, false);
+                    for ( size_t inx = 0; inx < obj->nbPoints(); inx += DIM+2 )
+                    {
+                        gym::enableLighting();
+                        gym_color black(0,0,0,1);
+                        gym_color tcol = bodyColorF(*twi);
+                        gym_color scol = tcol.tweak(obj->signature());
+                        drawFootball(*obj, inx, scol, black, true);
+                        drawFootball(*twi, inx, tcol, black, false);
+                    }
                 }
 #endif
                 if ( disp->color.transparent() )

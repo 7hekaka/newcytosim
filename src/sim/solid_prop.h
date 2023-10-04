@@ -103,8 +103,6 @@ public:
 #if NEW_SOLID_HAS_TWIN
     real twin_stiffness;
     real twin_torque_stiffness;
-    real twin_metastiff;
-    real twin_separation;
 #endif
     
     /// display string (see @ref PointDispPar)
