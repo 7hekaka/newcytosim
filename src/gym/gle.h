@@ -181,7 +181,7 @@ namespace gle
     /// draw a tube along Z, of diameter 1 with Z=[-256, 0], closed at Z=0
     void shutTube2();
     /// draw a rough tube along Z, of diameter 1 with Z=[-256, 0], closed at Z=0
-    void shutLongTube4();
+    void shutLongTube2();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
     void hexTube();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 1]
@@ -195,8 +195,6 @@ namespace gle
     void cone1();
     /// display a nicer cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone2();
-    /// display a rough cone of axis Z, radius 1 at Z=0, summit at Z=1
-    void cone4();
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
     void longCone();
     /// display an open cone directed along Z, of radius 1 at Z=0
@@ -271,12 +269,12 @@ namespace gle
     /// draw lines on the surface of a tube
     void stripedTube(float width);
     /// primitive used to draw the central segments of fibers
-    inline void innerTube() { longTube4(); }
+    inline void innerTube() { longTube2(); }
     /// primitive used to draw the minus ends of fibers
-    inline void capedTube() { halfTube4(); dome(); }
+    inline void capedTube() { halfTube2(); dome(); }
     //inline void capedTube() { halfTube2(); discBottom2(); }
     /// primitive used to draw the plus ends of fibers
-    inline void endedTube() { shutLongTube4(); }
+    inline void endedTube() { shutLongTube2(); }
     //inline void endedTube() { halfTube2(); hemisphere(); }
 
     //------------------------------------------------------------------------------

@@ -27,16 +27,16 @@ namespace gle
     /// vertex buffer objects for static draw
     GLuint buf_[4] = { 0 };
 
-    /// offset for objects data stored in buffers
+    /// offset for object's data stored in buffers
     size_t tubes_[32] = { 0 };
 
-    /// offset for objects data stored in buffers
+    /// offset for object's data stored in buffers
     size_t cubes_[12] = { 0 };
     
-    /// offset for objects data stored in buffers
+    /// offset for object's data stored in buffers
     size_t blobs_[4] = { 0 };
     
-    /// offset for objects data stored in buffers
+    /// offset for object's data stored in buffers
     size_t discs_[6] = { 0 };
 
     /// index of first vertex in buffer object
@@ -1241,7 +1241,7 @@ namespace gle
 
     inline size_t nbTrianglesTubeClosed(size_t inc)
     {
-        return 4 + 2 * (( pi_once + pi_twice ) / inc);
+        return 2 + 2 * (( pi_once + pi_twice ) / inc);
     }
 
     /// set triangle strip for a tube of radius 1 at Z=B, and R at Z=T, closed at Z=B
@@ -1249,32 +1249,32 @@ namespace gle
     size_t setClosedTube(flute6* flu, size_t inc, float B, float T, float R)
     {
         const float H(T-B), W(R-1);
-        const float z = std::copysign(1.f, H);
-        const float tg(z/sqrtf(H*H+W*W));
-        const float x(tg*H);
-        const float y(tg*R);
+        const float Z = std::copysign(1.f, H);
+        const float tg(Z/sqrtf(H*H+W*W));
+        const float X(tg*H);
+        const float Y(tg*R);
         size_t i = 0;
-        size_t p = pi_once;
-        // bottom plate, from PI to 2*PI:
-        flu[i++] = { -1, 0, B, 0, 0, -z };
-        while ( p <= pi_twice - inc )
-        {
-            float C = cos_(p), S = sin_(p);
-            flu[i++] = { C,-S, B, 0, 0, -z };
-            flu[i++] = { C, S, B, 0, 0, -z };
-            p += inc;
-        }
-        // sides, from 2*PI to 0:
-        flu[i++] = { 1, 0, B, x, 0, y };
+        size_t p = pi_once - inc;
+        // bottom disc, from PI to 2*PI:
+        flu[i++] = { -1, 0, B, 0, 0, -Z };
         while ( p >= inc )
         {
             float C = cos_(p), S = sin_(p);
-            flu[i++] = { C,   S,   B, x*C, x*S, y };
-            flu[i++] = { C*R, S*R, T, x*C, x*S, y };
+            flu[i++] = { C, S, B, 0, 0, -Z };
+            flu[i++] = { C,-S, B, 0, 0, -Z };
             p -= inc;
         }
-        flu[i++] = { 1, 0, B, x, 0, y };
-        flu[i++] = { R, 0, T, x, 0, y };
+        // sides, from 2*PI to 0:
+        flu[i++] = { 1, 0, B, X, 0, Y };
+        while ( p <= pi_twice - inc )
+        {
+            float C = cos_(p), S = sin_(p);
+            flu[i++] = { C*R, S*R, T, X*C, X*S, Y };
+            flu[i++] = { C,   S,   B, X*C, X*S, Y };
+            p += inc;
+        }
+        flu[i++] = { R, 0, T, X, 0, Y };
+        flu[i++] = { 1, 0, B, X, 0, Y };
         size_t j = nbTrianglesTubeClosed(inc);
         assert_true( i == j );
         return i;
@@ -1368,7 +1368,7 @@ namespace gle
 
     static size_t sizeTubeBuffers()
     {
-        return 2 + 32 * pi_twice;  // this is empirical!
+        return 36 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)
@@ -1393,13 +1393,12 @@ namespace gle
         tubes_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
         tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
         
-        tubes_[13] = i+s; i += setClosedTube(ptr+i, 2, -0.5, 0.5, 1);
+        tubes_[13] = i+s; i += setClosedTube(ptr+i, 1, -0.5, 0.5, 1);
         tubes_[14] = i+s; i += setClosedTube(ptr+i, 2, 0, 1, 1);
-        tubes_[15] = i+s; i += setClosedTube(ptr+i, 4, 0, T, 1);
+        tubes_[15] = i+s; i += setClosedTube(ptr+i, 2, 0, T, 1);
 
         tubes_[16] = i+s; i += setClosedTube(ptr+i, 1, 0, 1, 0); // cone1
         tubes_[17] = i+s; i += setClosedTube(ptr+i, 2, 0, 1, 0); // cone2
-        tubes_[18] = i+s; i += setClosedTube(ptr+i, 4, 0, 1, 0); // cone4
         tubes_[19] = i+s; i += setClosedTube(ptr+i, 2, -1, 2, 0); // longCone
         tubes_[20] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
 
@@ -1443,13 +1442,12 @@ namespace gle
     void halfTube2()     { doTubeStrip(tubes_[11], nbTrianglesTube(2)); }
     void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
     
-    void shutTubeC()     { doTubeStrip(tubes_[13], nbTrianglesTubeClosed(2)); }
+    void shutTubeC()     { doTubeStrip(tubes_[13], nbTrianglesTubeClosed(1)); }
     void shutTube2()     { doTubeStrip(tubes_[14], nbTrianglesTubeClosed(2)); }
-    void shutLongTube4() { doTubeStrip(tubes_[15], nbTrianglesTubeClosed(4)); }
+    void shutLongTube2() { doTubeStrip(tubes_[15], nbTrianglesTubeClosed(2)); }
 
     void cone1()         { doTubeStrip(tubes_[16], nbTrianglesTubeClosed(1)); }
     void cone2()         { doTubeStrip(tubes_[17], nbTrianglesTubeClosed(2)); }
-    void cone4()         { doTubeStrip(tubes_[18], nbTrianglesTubeClosed(4)); }
     void longCone()      { doTubeStrip(tubes_[19], nbTrianglesTubeClosed(2)); }
     void truncatedCone() { doTubeStrip(tubes_[20], nbTrianglesTube(2)); }
 
@@ -1566,15 +1564,15 @@ namespace gle
     void setBuffers()
     {
         Tesselator ico[8];
-        ico[0].buildIcosahedron(finesse*4);
-        ico[1].buildIcosahedron(finesse*2);
-        ico[2].buildIcosahedron(finesse);
-        ico[3].buildIcosahedron(finesse/2);
+        ico[0].buildIcosahedron(finesse*8);
+        ico[1].buildIcosahedron(finesse*4);
+        ico[2].buildIcosahedron(finesse*2);
+        ico[3].buildIcosahedron(finesse);
 
         ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
-        ico[6].buildDome(finesse/2);
-        ico[7].buildDroplet(finesse/2);
+        ico[6].buildDome(finesse);
+        ico[7].buildDroplet(finesse);
         
         size_t f = 32; // for setIcoidBuffer
         size_t s = 12;
