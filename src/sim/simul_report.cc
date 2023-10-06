@@ -1607,7 +1607,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
                     FiberSegment soc(fox, jj);
                     real abs1, abs2;
                     real dis2 = seg.shortestDistanceSqr(soc, abs1, abs2);
-                    if (( dis2 < sup ) & seg.within(abs1) & soc.within(abs2))
+                    if (( dis2 < sup ) && seg.within(abs1) && soc.within(abs2))
                     {
                         ++cnt;
                         Vector pos1 = seg.pos(abs1/seg.len());

@@ -12,7 +12,7 @@
 #include <cstring>
 
 /**
- Assertions are used extensively to check the validity of the arguments.
+ Assertions are used extensively to check the validity of data and function arguments.
  Defining NDEBUG disables:
     - the standard assert() macro and,
     - the custom assert_true() and assert_false() macros defined below.

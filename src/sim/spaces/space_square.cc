@@ -76,11 +76,11 @@ bool SpaceSquare::inside(Vector const& W) const
 #if ( DIM == 1 )
     return abs_real(W.XX) <= half_[0];
 #elif ( DIM == 2 )
-    return (abs_real(W.XX) <= half_[0]) &
+    return (abs_real(W.XX) <= half_[0]) &&
            (abs_real(W.YY) <= half_[1]);
 #else
-    return (abs_real(W.XX) <= half_[0]) &
-           (abs_real(W.YY) <= half_[1]) &
+    return (abs_real(W.XX) <= half_[0]) &&
+           (abs_real(W.YY) <= half_[1]) &&
            (abs_real(W.ZZ) <= half_[2]);
 #endif
 }

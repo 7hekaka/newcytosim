@@ -383,10 +383,10 @@ static inline bool not_adjacentLL(FatLocus const* a, FatLocus const* b)
 {
 #if FIBER_HAS_FAMILY
     return (( a->seg_.fiber()->family_ != b->seg_.fiber()->family_ )
-            || (( a->seg_.point() > 1 + b->seg_.point() ) | ( b->seg_.point() > 1 + a->seg_.point() )));
+            || (( a->seg_.point() > 1 + b->seg_.point() ) || ( b->seg_.point() > 1 + a->seg_.point() )));
 #else
     return (( a->seg_.fiber() != b->seg_.fiber() )
-            || (( a->seg_.point() > 1 + b->seg_.point() ) | ( b->seg_.point() > 1 + a->seg_.point() )));
+            || (( a->seg_.point() > 1 + b->seg_.point() ) || ( b->seg_.point() > 1 + a->seg_.point() )));
 #endif
     // we cannot use abs() above because `FatLocus::point()` is unsigned
 }

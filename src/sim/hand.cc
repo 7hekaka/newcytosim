@@ -244,8 +244,8 @@ void Hand::attach(FiberSite const& s)
 
     locate(s.fiber(), s.abscissa());
 #if FIBER_HAS_LATTICE
-    hLattice = s.lattice();
     hSite = s.site();
+    hLattice = s.lattice();
     //std::clog << "offset " << s.abscissa() -  hLattice->unit() * hSite << "\n";
 #endif
 #if 0

@@ -158,7 +158,7 @@ void Tubule::salute(Buddy const* guy)
     if ( guy == bone_ )
     {
         assert_true(bone_);
-        if (( bone_->freshAssemblyP() != 0 ) | ( bone_->freshAssemblyM() != 0 ))
+        if (( bone_->freshAssemblyP() != 0 ) || ( bone_->freshAssemblyM() != 0 ))
         {
             // copy the growth exhibited from `bone_`
             real aP = bone_->abscissaP();
@@ -439,7 +439,6 @@ void Tubule::write(Outputter& out) const
 
 void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    
     ObjectTag g;
     size_t n = in.readUInt16()-1;
     Object * w = sim.readReference(in, g);

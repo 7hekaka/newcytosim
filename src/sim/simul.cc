@@ -401,7 +401,7 @@ void Simul::rename(std::string const& arg)
 {
     if ( prop.name() != arg )
     {
-        if ( arg == "display" | isCategory(arg) )
+        if ( arg == "display" || isCategory(arg) )
             throw InvalidSyntax("`"+arg+"' is a reserved keyword");
         if ( prop.name().size() )
             throw InvalidSyntax("Simul `"+prop.name()+"' already defined");
@@ -526,7 +526,7 @@ Property* Simul::makeProperty(const std::string& cat, const std::string& nom, Gl
     
     /* We do not permit using a class name to name a property,
      as this is tempting, but would create confusion in the config file */
-    if ( nom == "display" | isCategory(nom) )
+    if ( nom == "display" || isCategory(nom) )
         throw InvalidSyntax("`"+nom+"' is a reserved keyword");
 
     if ( cat == "simul" )

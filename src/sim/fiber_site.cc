@@ -10,12 +10,12 @@ FiberSite::FiberSite(Fiber const* f, real a)
 : hFiber(f), hAbs(a)
 {
     assert_true(f);
-#if FIBER_HAS_LATTICE
-    hLattice = f->lattice();
-    hSite = 0;
-#endif
     inter_ = 0;
     segix_ = 0;
+#if FIBER_HAS_LATTICE
+    hSite = 0;
+    hLattice = f->lattice();
+#endif
     //reinterpolate();
 }
 
@@ -27,6 +27,7 @@ void FiberSite::clear()
     segix_ = 0;
     hFiber = nullptr;
 #if FIBER_HAS_LATTICE
+    hSite = 0;
     hLattice = nullptr;
 #endif
 }

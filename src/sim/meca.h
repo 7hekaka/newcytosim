@@ -640,7 +640,7 @@ public:
 
     /// Link of stiffness `weight` and resting length `arm1+arm2`, on the sides of both fibers
     void addSideSideLink2D(Interpolation const&, real arm1, Interpolation const&, real arm2, real weight);
-    
+
     /// Link of stiffness `weight` and resting length `arm1+arm2`, on the sides of both fibers
     void addSideSideLink(Interpolation const&, Torque const& arm1, Interpolation const&, Torque const& arm2, real weight);
 

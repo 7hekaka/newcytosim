@@ -123,7 +123,7 @@ void Parser::parse_set(std::istream& is)
             throw InvalidParameter("unexpected syntax");
         blok = Tokenizer::get_block(is, '{', true);
 
-        if ( name == "display" | para == "display" )
+        if ( name == "display" || para == "display" )
         {
             opt.define("display", blok);
             change_simul_property(opt);

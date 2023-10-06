@@ -1437,7 +1437,7 @@ void Meca::addLink(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
     
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     const real cc0 = -ptA.coef0();
@@ -2294,7 +2294,7 @@ void Meca::addLongLink(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
 
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form B-A:
@@ -2385,7 +2385,7 @@ void Meca::addLongLink4(Interpolation const& ptA,
     const size_t ii4 = inx+2;
     const size_t ii5 = inx+3;
 
-    if ( any_equal(ii0, ii2, ii3, ii4, ii5) | any_equal(ii1, ii2, ii3, ii4, ii5) )
+    if ( any_equal(ii0, ii2, ii3, ii4, ii5) || any_equal(ii1, ii2, ii3, ii4, ii5) )
         return;
     
     // coefficients to form -A:
@@ -2727,7 +2727,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
     
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     const real ee = -arm/ptA.len(),  we = weight * ee;
@@ -2823,7 +2823,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
 
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     //coefficients to form A-B:
@@ -2977,7 +2977,7 @@ void Meca::addSideSideLink2D(Interpolation const& ptA, const real armA,
     size_t ia1 = ptA.matIndex1(), ia2 = ptA.matIndex2();
     size_t ib1 = ptB.matIndex1(), ib2 = ptB.matIndex2();
     
-    if ( any_equal(ia1, ib1, ib2) | any_equal(ia2, ib1, ib2) )
+    if ( any_equal(ia1, ib1, ib2) || any_equal(ia2, ib1, ib2) )
         return;
 
     const real ca1 =  ptA.coef0(), ca2 =  ptA.coef1();
@@ -3067,7 +3067,7 @@ void Meca::addSideSideLink(Interpolation const& ptA, Torque const& armA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
  
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
 
     //coefficients to form A-B:
@@ -3200,7 +3200,7 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, MatrixBlock const& R,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
  
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
 
     //coefficients to form A-B:
@@ -3398,7 +3398,7 @@ void Meca::addSlidingLink(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
     
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     //coefficients to form A-B:
@@ -3776,7 +3776,7 @@ void Meca::addSideSlidingLinkS(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
     
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form A-B
@@ -3877,7 +3877,7 @@ void Meca::addSideSlidingLink2D(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
     
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form A-B
@@ -3967,7 +3967,7 @@ void Meca::addSideSlidingLink3D(Interpolation const& ptA,
     const size_t ii2 = ptB.matIndex1();
     const size_t ii3 = ptB.matIndex2();
     
-    if ( any_equal(ii0, ii2, ii3) | any_equal(ii1, ii2, ii3) )
+    if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
     // coefficients to form A-B
