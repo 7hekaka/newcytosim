@@ -16,6 +16,7 @@ Digit::Digit(DigitProp const* p, HandMonitor* h)
 {
 }
 
+
 /**
  This sets 'sit.site()' which is thus modified in a meaningful way!
  */
@@ -24,7 +25,7 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
     if ( Hand::attachmentAllowed(sit) )
     {
 #if FIBER_HAS_LATTICE
-        FiberLattice* lat = sit.fiber()->lattice();
+        FiberLattice * lat = const_cast<FiberLattice*>(sit.lattice());
         
         if ( !lat->ready() )
             throw InvalidParameter("a lattice was not defined for `"+sit.fiber()->prop->name()+"'");
@@ -46,12 +47,12 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
             else
                 return false;
         }
-        
-        if ( occupied(lat, s) )
+
+        if ( sit.occupied(s, prop()->footprint) )
             return false;
         
         // adjust to match selected lattice site:
-        sit.engageLattice(lat, s, prop()->site_shift);
+        sit.engageLattice(s, prop()->site_shift);
 #endif
         return true;
     }
@@ -97,8 +98,7 @@ void Digit::hop(lati_t s)
 //------------------------------------------------------------------------------
 
 /**
- Try to move `n` sites in the PLUS_END direction,
- stopping if any intermediate position is already occupied.
+ Try to move `n` sites towards the plus end, stopping before any already occupied site.
  */
 void Digit::crawlP(const int n)
 {
@@ -118,9 +118,7 @@ void Digit::crawlP(const int n)
 
 
 /**
- Try to move `n` sites in the minus end direction,
- stopping if any intermediate position is already occupied.
-
+ Try to move `n` sites towards the minus end, stopping before any already occupied site.
  */
 void Digit::crawlM(const int n)
 {

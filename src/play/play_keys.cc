@@ -535,7 +535,7 @@ static void changeLatticeStyle(FiberDisp* p, int)
     p->lattice_style = ( 1 + p->lattice_style ) % 5;
     flashText("%s: lattice_style=%i", p->name_str(), p->lattice_style);
 #else
-    flashText("Warning: cannot display fiber:lattice");
+    flashText("Warning: no fiber:lattice support");
 #endif
 }
 

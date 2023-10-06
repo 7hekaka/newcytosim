@@ -11,7 +11,7 @@ FiberSite::FiberSite(Fiber const* f, real a)
 {
     assert_true(f);
 #if FIBER_HAS_LATTICE
-    hLattice = nullptr;
+    hLattice = f->lattice();
     hSite = 0;
 #endif
     inter_ = 0;

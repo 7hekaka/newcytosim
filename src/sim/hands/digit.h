@@ -65,13 +65,9 @@ public:
     bool aboveP(lati_t s) const { return hFiber->aboveP(abscissa_(s)); }
 
 #endif
-    
 #if FIBER_HAS_LATTICE > 0
-    
-    /// true if given Lattice's site has this footprint's bits set
-    bool occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) & prop()->footprint; }
 
-    /// true if given Lattice's site is unoccupied (check all footprint bits equal to 1)
+    /// true if none of the Lattice's site bits matches the footprint
     bool vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop()->footprint); }
 
     /// flip footprint bits on current site
@@ -82,10 +78,7 @@ public:
     
 #elif FIBER_HAS_LATTICE < 0
 
-    /// true if given Lattice's site is occupied
-    bool occupied(FiberLattice* lat, lati_t s) const { return lat->data(s) != 0.0; }
-
-    /// true if given Lattice's site is unoccupied
+    /// true if given Lattice's site is zero
     bool vacant(lati_t s) const { return hLattice->data(s) == 0.0; }
 
     /// add 1.0 to Lattice's site
@@ -101,7 +94,7 @@ public:
     void dec() const {}
     
 #endif
-    
+
     /// check if attachement is possible according to properties
     bool attachmentAllowed(FiberSite&) const;
 

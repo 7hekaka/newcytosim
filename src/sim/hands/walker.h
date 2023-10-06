@@ -16,7 +16,8 @@
  
  As defined in Hand, detachment increases exponentially with force.
 
- The Digit will use the Lattice and will not step into an occupied site.
+ The Digit will use the Lattice and will not step into a site,
+ if this site already has a Hand bound with a overlapping `footprint`.
  
  See Examples and the @ref WalkerPar.
  @ingroup HandGroup 

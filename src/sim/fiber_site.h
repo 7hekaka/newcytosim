@@ -85,13 +85,12 @@ public:
     lati_t site() const { return hSite; }
     
     /// set FiberSite at index `s` with an abscissa `off` within the site
-    void engageLattice(FiberLattice* l, lati_t s, real off)
+    void engageLattice(lati_t s, real off)
     {
-        hLattice = l;
-        hSite    = s;
-        hAbs     = l->unit() * s + off;
-        //assert_true(hFiber->abscissaM() < hAbs + REAL_EPSILON);
-        //assert_true(hAbs < hFiber->abscissaP() + REAL_EPSILON);
+        hAbs = hLattice->unit() * s + off;
+        hSite = s;
+        assert_true(hFiber->abscissaM() < hAbs + REAL_EPSILON);
+        assert_true(hAbs < hFiber->abscissaP() + REAL_EPSILON);
     }
 
 #else
@@ -100,6 +99,18 @@ public:
     FiberLattice* lattice() const { return nullptr; }
 
 #endif
+#if FIBER_HAS_LATTICE > 0
+    
+    /// true if given Lattice's site has this footprint's bits set
+    bool occupied(lati_t s, FiberLattice::cell_t fp) const { return hLattice->data(s) & fp; }
+    
+#elif FIBER_HAS_LATTICE < 0
+
+    /// true if given Lattice's site is not zero
+    bool occupied(lati_t s, FiberLattice::cell_t) const { return hLattice->data(s) != 0.0; }
+    
+#endif
+
     //--------------------------------------------------------------------------
 
     /// return the interpolation
