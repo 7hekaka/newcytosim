@@ -139,7 +139,7 @@ void SpaceDynamicDisc::write(Outputter& out) const
 }
 
 
-void SpaceDynamicDisc::setLengths(const real len[])
+void SpaceDynamicDisc::setLengths(const real len[8])
 {
     radius_ = len[0];
     force_  = len[1];

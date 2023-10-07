@@ -396,7 +396,7 @@ void SpaceTee::write(Outputter& out) const
 }
 
 
-void SpaceTee::setLengths(const real len[])
+void SpaceTee::setLengths(const real len[8])
 {
     tLength    = len[0];
     tRadius    = len[1];

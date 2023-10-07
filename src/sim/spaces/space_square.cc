@@ -237,7 +237,7 @@ void SpaceSquare::write(Outputter& out) const
 }
 
 
-void SpaceSquare::setLengths(const real len[])
+void SpaceSquare::setLengths(const real len[8])
 {
     half_[0] = len[0];
     half_[1] = len[1];

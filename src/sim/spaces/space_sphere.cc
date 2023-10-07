@@ -118,7 +118,7 @@ void SpaceSphere::write(Outputter& out) const
 }
 
 
-void SpaceSphere::setLengths(const real len[])
+void SpaceSphere::setLengths(const real len[8])
 {
     radius_ = len[0];
 }

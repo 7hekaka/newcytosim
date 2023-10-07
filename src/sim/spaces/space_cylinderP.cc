@@ -184,7 +184,7 @@ void SpaceCylinderP::write(Outputter& out) const
 }
 
 
-void SpaceCylinderP::setLengths(const real len[])
+void SpaceCylinderP::setLengths(const real len[8])
 {
     half_ = len[0];
     radius_ = len[1];

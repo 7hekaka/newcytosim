@@ -230,7 +230,7 @@ void SpaceCapsule::write(Outputter& out) const
 }
 
 
-void SpaceCapsule::setLengths(const real len[])
+void SpaceCapsule::setLengths(const real len[8])
 {
     half_ = len[0];
     radius_ = len[1];

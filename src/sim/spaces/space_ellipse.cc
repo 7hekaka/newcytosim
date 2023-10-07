@@ -199,7 +199,7 @@ void SpaceEllipse::write(Outputter& out) const
     out.writeFloat(thickness_);
 }
 
-void SpaceEllipse::setLengths(const real len[])
+void SpaceEllipse::setLengths(const real len[8])
 {
     radius_[0] = len[0];
     radius_[1] = len[1];

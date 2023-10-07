@@ -525,7 +525,7 @@ void SpaceCylinderZ::write(Outputter& out) const
 }
 
 
-void SpaceCylinderZ::setLengths(const real len[])
+void SpaceCylinderZ::setLengths(const real len[8])
 {
     radius_ = len[0];
     bot_    = len[1];

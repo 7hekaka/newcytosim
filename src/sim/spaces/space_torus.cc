@@ -96,7 +96,7 @@ void SpaceTorus::write(Outputter& out) const
 }
 
 
-void SpaceTorus::setLengths(const real len[])
+void SpaceTorus::setLengths(const real len[8])
 {
     bCurve = len[0];
     bRadius = len[2];

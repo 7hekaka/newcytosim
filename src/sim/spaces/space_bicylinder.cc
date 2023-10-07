@@ -217,7 +217,7 @@ void SpaceBicylinder::write(Outputter& out) const
 }
 
 
-void SpaceBicylinder::setLengths(const real len[])
+void SpaceBicylinder::setLengths(const real len[8])
 {
     radius_ = len[0];
     radius_ = len[1];

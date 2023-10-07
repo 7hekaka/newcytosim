@@ -191,7 +191,7 @@ void SpaceDisc::write(Outputter& out) const
 }
 
 
-void SpaceDisc::setLengths(const real len[])
+void SpaceDisc::setLengths(const real len[8])
 {
     radius_ = len[0];
     bot_    = len[1];

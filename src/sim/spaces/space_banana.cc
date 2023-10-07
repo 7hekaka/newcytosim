@@ -136,7 +136,7 @@ void SpaceBanana::write(Outputter& out) const
 }
 
 
-void SpaceBanana::setLengths(const real len[])
+void SpaceBanana::setLengths(const real len[8])
 {
     bLength = len[0];
     bRadius = len[1];

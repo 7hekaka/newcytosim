@@ -283,7 +283,7 @@ void SpacePolygon::write(Outputter& out) const
 }
 
 
-void SpacePolygon::setLengths(const real len[])
+void SpacePolygon::setLengths(const real len[8])
 {
     height_ = len[0];
 }

@@ -154,7 +154,7 @@ void SpaceRing::write(Outputter& out) const
 }
 
 
-void SpaceRing::setLengths(const real len[])
+void SpaceRing::setLengths(const real len[8])
 {
     half_ = len[0];
     radius_ = len[1];
