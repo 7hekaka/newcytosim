@@ -18,10 +18,10 @@ namespace SaveImage
     int saveEntireImage(const char* name, const char format[], int downsample=1);
 
     /// save a region of the current buffer in a new file called 'name'. Returns error-code
-    int saveImage(const char* name, const char format[], const int viewport[], int downsample=1);
+    int saveImage(const char* name, const char format[], const int viewport[4], int downsample=1);
     
     /// save a region of the current depth buffer in a new PNG file called 'name'. Returns error-code
-    int saveDepthBuffer(const char* name, const int viewport[]);
+    int saveDepthBuffer(const char* name, const int viewport[4]);
 
      /// save an image with higher resolution (this is better than saveCompositeImage)
     int saveMagnifiedImage(int mag, const char* name, const char format[], uint32_t width, uint32_t height, void (*display)(int, void *), void* arg, int downsample);
