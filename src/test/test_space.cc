@@ -111,8 +111,9 @@ void generatePoints(real len)
     
     if ( points_around_mouse )
     {
+        Vector m(mouse);
         for ( size_t i = 0; i <= n_pts; ++i )
-            point[i] = mouse + thickness * Vector::randB();
+            point[i] = m + thickness * Vector::randB();
     }
     else if ( points_on_edges )
     {
