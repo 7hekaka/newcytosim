@@ -681,6 +681,7 @@ void Solid::buildTwin(ObjectList& objs, Glossary& opt, std::string const& str, S
     {
         // flip 'S' (X -> -X) resulting in the twins being mirror-images
         ObjectSet::rotateObjects(objs, Rotation::flipX());
+        fixShape();
     }
     
     if ( nbPoints() % (DIM+2) )
@@ -835,7 +836,7 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
         sim.singles.makeWrists(objs, this, 0, nPoints, str);
 #endif
 #if BACKWARD_COMPATIBILITY < 100
-    /* Anchor Single to intermediate positions between two vertices */
+    /* Anchor Single interpolated between two vertices, deprecated 24.11.2022 */
     inp = 1;
     var = "anchor1";
     while ( opt.has_key(var) )
@@ -876,7 +877,6 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     if ( opt.set(str, "twin") && str != "off" )
         buildTwin(objs, opt, str, sim);
     
-    fixShape();
     return objs;
 }
 

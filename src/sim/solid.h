@@ -58,9 +58,6 @@ private:
     /// matrix containing the reduced momentum of inertia for 3D
     Matrix33 soMomentum;
 #endif
-
-    /// the mean of the the points weighted by their drag coefficients
-    Vector soCenter;
     
     /// the dimensions used in Stokes' law to calculate overall mobility
     real * soRadius;
@@ -68,6 +65,9 @@ private:
     /// array to store the reference shape of the solid, as coordinates
     real * soShape;
     
+    /// the mean of the the points weighted by their drag coefficients
+    Vector soCenter;
+
     /// the reduced total (all points summed) drag coefficient for translation
     real soDrag;
     
@@ -85,7 +85,7 @@ private:
 #endif
     
     /// the number of points when fixShape() was last called, used for verifications.
-    unsigned soAmount;
+    SIZE_T soAmount;
     
 #if NEW_SOLID_CLAMP
     /// position of clamp
@@ -161,6 +161,9 @@ public:
     
     /// The mobility of a model vertex ( speed = mobility * point_force )
     real pointMobility() const { return nbPoints() / dragCoefficient(); }
+    
+    /// Number of distance constraints applied to the movements of vertices
+    size_t nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
 
     /// add the interactions due to confinement
     void setInteractions(Meca&) const;
@@ -173,9 +176,6 @@ public:
     
     /// calculates the speed of points in Y, for the forces given in X
     void projectForces0(const real* X, real* Y) const;
-    
-    /// Number of distance constraints applied to the movements of vertices
-    size_t nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
 
     /// add contribution of Brownian forces
     real addBrownianForces(real const* fce, real, real* rhs) const;

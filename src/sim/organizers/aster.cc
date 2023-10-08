@@ -292,14 +292,14 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
             sol = new Solid(p);
             ObjectList list = sol->build(opt, sim);
             objs.append(list);
-            //std::clog << "Aster::makeSolid() created solid " << sol->reference() << "\n";
+            //std::clog << "Aster::makeSolid() made " << sol->reference() << "\n";
         }
         else
         {
             sol = sim.pickSolid(spec);
             if ( sol )
             {
-                //std::clog << "Aster created on solid " << sol->reference() << "\n";
+                //std::clog << "Aster found solid " << sol->reference() << "\n";
                 // add Solid to return list, so that its position can be adjusted
                 objs.push_back(sol);
                 //std::clog << " aster:solid at " << sol->position() << '\n';
