@@ -29,10 +29,9 @@ class Wrist;
  the distance between any two points is constant.  
 
  A snapshot of the current geometry is saved in soShape[] by fixShape().
- This configuration is reapplied to the current points by reshape(). 
- reshape() however find the best isometric transformation of soShape[] 
- into the current configuration to maintain the current position and the
- current orientation of the object.
+ This configuration is reapplied to the current points by reshape(),
+ finding the best isometric transformation of soShape[] into the current configuration,
+ thus maintaining the current position and orientation of the solid.
  
  \par Viscous Drag:
  
@@ -98,6 +97,10 @@ private:
     /// reset private variables
     void reset();
 
+    void reshape1D(real const*);
+    void reshape2D(real const*);
+    void reshape3D(real const*);
+    
     /// part of build()
     size_t makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
     
@@ -193,9 +196,6 @@ public:
     
     /// scale current shape to match the reference set in fixShape()
     void rescale();
-    
-    /// restore the reference shape in the place and orientation of the current one
-    void reshape();
     
     /// change coordinate values
     void getPoints(real const*);

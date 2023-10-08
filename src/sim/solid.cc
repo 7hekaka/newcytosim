@@ -17,11 +17,8 @@
 #include "singles/wrist.h"
 #include "lapack.h"
 #include "print_color.h"
-
-#if ( DIM >= 3 )
-#   include "quaternion.h"
-#   include "matrix33.h"
-#endif
+#include "quaternion.h"
+#include "matrix33.h"
 
 //------------------------------------------------------------------------------
 #pragma mark - Step
@@ -1041,14 +1038,13 @@ Vector Solid::centroid() const
     if ( sum < REAL_EPSILON )
         throw InvalidParameter("cannot calculate centroid of a Solid without drag sphere");
     
-    res /= sum;
-    return res;
+    return res / sum;
 }
 
 
 /**
   
- @return the principal component vectors
+ @return a vector aligned with the principal component of the spheres in the Solid
 
  */
 Vector Solid::orientation() const
@@ -1107,7 +1103,7 @@ Vector Solid::orientation() const
 /**
  fixShape() copies the current shape in the array soShape[],
  and calculates the moment of inertia of the ensemble of points.
- The reference soShape[] is used by 'reshape()', and 'rescale()'.
+ The reference soShape[] is used by 'reshape()'.
  */
 void Solid::fixShape()
 {
@@ -1135,9 +1131,9 @@ void Solid::fixShape()
 
 
 /**
- The function rescale the reference shape soShape[], that was specified last time fixShape() was called.
- If axis==-1 (default), then all dimensions are scaled uniformly.
- The next call to reshape() will then apply the new reference to the current shape.
+ The function rescale the reference shape `soShape[]`, calculated when fixShape() was called.
+ The i-th dimension is scaled according to `mag[i]`.
+ Note that `reshape()` should be called to apply the new reference to the current shape.
  */
 void Solid::scaleShape(const real mag[DIM])
 {
@@ -1157,7 +1153,7 @@ void Solid::scaleShape(const real mag[DIM])
 
 /**
  Rescale the current cloud of points around its center of gravity,
- to recover the same 'size' as the reference soShape[]. 
+ to recover the same 'size' as stored in `soVariance`.
  Size is measured as sum( ( x - g )^2 ).
  */
 void Solid::rescale()
@@ -1187,92 +1183,93 @@ void Solid::rescale()
 
 /**
  reshape() finds the best isometric transformation = rotation + translation
- to bring the reference (soShape[]) onto the current shape (Mecable::pPos[]),
- and then replaces pPos[] by the transformed soShape[]. 
- This restores the shape of the cloud of point which is stored in soShape[],
- into the current position and orientation of the object.
+ to bring `shap[]` onto `Mecable::pPos[]`, and replaces pPos[] by the transformed shap[].
+ This restores the shape of the cloud of points given in shap[], into the current
+ position and orientation of the object.
  The best translation is the ones that conserves the center of gravity,
- The best rotation is obtained differently in 2D and 3D, and is unique.
+ The best rotation is obtained differently in 2D and 3D, but it is unique,
+ except for special cases.
 
  @todo: store the rotation and translation calculated by reshape()
 */
 
-#if ( DIM == 1 )
-
-void Solid::reshape()
-{    
+void Solid::reshape1D(real const* shap)
+{
+    assert_true( DIM == 1 );
     assert_true( soAmount == nPoints );
          
-    real cc = 0, a = 0;
+    real X = 0, C = 0;
     for ( size_t i = 0; i < nPoints; ++i )
     {
-        a  += pPos[i] * soShape[i];
-        cc += pPos[i];
+        C += pPos[i] * shap[i];
+        X += pPos[i];
     }
     
-    cc /= real( nPoints );
-    real s = a / abs_real(a);
+    X /= real( nPoints );
+    C /= abs_real(C);
     
     for ( size_t i = 0; i < nPoints; ++i )
-        pPos[i] = s * soShape[i] + cc;
+        pPos[i] = C * shap[i] + X;
 }
 
-#elif ( DIM == 2 )
-
-void Solid::reshape()
-{    
-    assert_true( soAmount == nPoints );
-
-    Vector avg = Mecable::position();
-    
-    /*
-     The best rotation is obtained by simple math on the cross products
-     and vector products of soShape[] and pPos[]: (see it on paper)
-    */
-    
-    real a = 0, b = 0;
-    
-    for ( size_t i = 0; i < nPoints; ++i )
-    {
-        a += pPos[DIM*i] * soShape[DIM*i  ] + pPos[DIM*i+1] * soShape[DIM*i+1];
-        b += soShape[DIM*i] * pPos[DIM*i+1] - soShape[DIM*i+1] * pPos[DIM*i  ];
-    }
-    
-    real n = std::sqrt( a*a + b*b );
-    
-    // cosine and sine of the rotation:
-    real c = 1, s = 0;
-    if ( n > REAL_EPSILON ) {
-        c = a / n;
-        s = b / n;
-    }
-    
-    //printf(" n %8.3f, c %8.3f, s %8.3f norm = %8.3f\n", n, c, s, c*c + s*s);
-    
-    // apply transformation = rotation + translation:
-    
-    for ( size_t i = 0; i < nPoints; ++i )
-    {
-        pPos[DIM*i  ] = c * soShape[DIM*i] - s * soShape[DIM*i+1] + avg.XX;
-        pPos[DIM*i+1] = s * soShape[DIM*i] + c * soShape[DIM*i+1] + avg.YY;
-    }
-}
-
-#elif ( DIM >= 3 )
 
 /**
- We follow the procedure described by Berthold K.P. Horn in
+ In 2D, the best rotation is obtained by simple math on the cross products
+ and vector products of shap[] and pPos[]: (see it on paper)
+*/
+void Solid::reshape2D(real const* shap)
+{
+    assert_true( DIM == 2 );
+    assert_true( soAmount == nPoints );
+    
+    real X = 0, Y = 0;
+    real C = 0, S = 0;
+    
+    for ( size_t i = 0; i < nPoints; ++i )
+    {
+        X += pPos[0+DIM*i];
+        Y += pPos[1+DIM*i];
+        C += pPos[DIM*i] * shap[0+DIM*i] + pPos[1+DIM*i] * shap[1+DIM*i];
+        S += shap[DIM*i] * pPos[1+DIM*i] - shap[1+DIM*i] * pPos[0+DIM*i];
+    }
+    X /= nPoints;
+    Y /= nPoints;
+    
+    real n = std::sqrt( C*C + S*S );
+    // cosine and sine of the rotation:
+    if ( n > REAL_EPSILON ) {
+        C = C / n;
+        S = S / n;
+    }
+    else {
+        C = 1;
+        S = 0;
+    }
+    //printf(" n %8.3f, c %8.3f, s %8.3f norm = %8.3f\n", n, C, S, C*S + S*S);
+    
+    // apply transformation = rotation + translation:
+    for ( size_t i = 0; i < nPoints; ++i )
+    {
+        pPos[DIM*i  ] = C * shap[DIM*i] - S * shap[DIM*i+1] + X;
+        pPos[DIM*i+1] = S * shap[DIM*i] + C * shap[DIM*i+1] + Y;
+    }
+}
+
+
+/**
+ In 3D, we follow the procedure described by Berthold K.P. Horn in
  "Closed-form solution of absolute orientation using unit quaternions"
  Journal of the optical society of America A, Vol 4, Page 629, April 1987
 */
-void Solid::reshape()
+void Solid::reshape3D(real const* shap)
 {
+    assert_true( DIM == 3 );
     assert_true( soAmount == nPoints );
-    Vector avg = Mecable::position();
+    Vector3 avg(Mecable::position());
     
     Matrix33 S(0,0);
     for ( size_t i = 0; i < nPoints; ++i )
-        S.addOuterProduct(soShape+DIM*i, pPos+DIM*i);
+        S.addOuterProduct(shap+DIM*i, pPos+DIM*i);
     
     // rescale matrix to keep its magnitude in range
     real alpha = S.diagonal().abs().e_sum();
@@ -1325,26 +1322,24 @@ void Solid::reshape()
             // measure remaining error:
             real dev = 0;
             for ( size_t i = 0; i < nPoints; ++i )
-                dev += distanceSqr(avg+S*Vector3(soShape+DIM*i), pPos+DIM*i);
+                dev += distanceSqr(avg+S*Vector3(shap+DIM*i), pPos+DIM*i);
             printf("%s error %6.4f :", reference().c_str(), dev);
             printf(" eigenvalue %6.2f ", val[0]); quat.println();
         }
 
         // apply rotation + translation:
         for ( size_t i = 0; i < nPoints; ++i )
-            (avg+S*Vector3(soShape+DIM*i)).store(pPos+DIM*i);
+            (avg+S*Vector3(shap+DIM*i)).store(pPos+DIM*i);
     }
     else
     {
         // apply translation:
         for ( size_t i = 0; i < nPoints; ++i )
-            (avg+Vector3(soShape+DIM*i)).store(pPos+DIM*i);
+            (avg+Vector3(shap+DIM*i)).store(pPos+DIM*i);
         
         printf("Solid::reshape(): lapack::xsyevx() failed with code %i\n", info);
     }
 }
-#endif
-
 
 /**
  
@@ -1362,8 +1357,13 @@ void Solid::getPoints(real const* ptr)
     // for one point, nothing should be done
     if ( nPoints < 2 )
         return;
-    
-    reshape();
+#if ( DIM >= 3 )
+    reshape3D(soShape);
+#elif ( DIM == 2 )
+    reshape2D(soShape);
+#else
+    reshape1D(soShape);
+#endif
 }
 
 
