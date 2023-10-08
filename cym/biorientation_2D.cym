@@ -11,7 +11,7 @@ set simul system
     steric = 1, 1111, 222
     precondition = 6
     verbose = 0
-    dim = 3
+    dim = 2
 }
 
 set system display
@@ -20,7 +20,7 @@ set system display
     point_value=0.01;
     point_size=0.5; 
     line_width=1; 
-    zoom=2;
+    zoom=4;
     style=3;
     magic_key1 = x, (set kinetochore {twin_stiffness=0})
     label = (Press 'x' to delete cohesins!)
@@ -197,10 +197,10 @@ new 0 katanin
 
 new kinetochore
 {
-    sphere1 = 0 -0.1 0, 0.070, corona -0.2 -0.7 -0.7, corona -0.7 -0.2 -0.7, corona -0.7 -0.7 -0.2
+    sphere1 = 0 -0.1 0, 0.070, corona -0.5 -0.9, corona -0.9 -0.5
     point1 = 0.1 -0.1 0
     
-    sphere2 = 0 +0.1 0, 0.070, corona -0.1 -0.7 -0.7, corona -0.7 -0.1 -0.7, corona -0.7 -0.7 -0.1
+    sphere2 = 0 +0.1 0, 0.070, corona -0.5 -0.9, corona -0.9 -0.5
     point2 = 0.1 0.1 0
     
     position = 0 0 0
