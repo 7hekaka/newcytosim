@@ -179,26 +179,27 @@ void StreamFunc::mark_line(std::ostream& os, std::istream& is, std::streampos po
 
     // get the line containing 'pos'
     std::string line;
-    while ( is.good()  &&  is.tellg() <= pos )
+    while ( is.good() && is.tellg() <= pos )
     {
         isp = is.tellg();
         std::getline(is, line);
     }
-    std::streamoff off = pos - isp;
+    size_t off = pos - isp;
     // reset stream
     is.clear();
     is.seekg(sos);
 
     std::string sub;
-    std::streamoff i = 0;
-    while ( i < off )
+    for ( size_t i = 0; i < line.size(); ++i )
     {
-        int c = line[i++];
+        int c = line[i];
         if ( c == 0 )
             break;
-        sub.push_back(isspace(c)?(char)c:' ');
+        if ( i == off )
+            sub.push_back('^');
+        else
+            sub.push_back(isspace(c)?(char)c:' ');
     }
-    sub.push_back('^');
     //sub.append(" ("+std::string(1, is.peek())+")");
     os << '\n' << prefix << " " << line;
     os << '\n' << prefix << " " << sub;

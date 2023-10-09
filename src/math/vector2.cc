@@ -7,9 +7,17 @@
  */
 static void eatOneZero(std::istream& is)
 {
-    if ( is.good() )
+    std::streampos isp = is.tellg();
+    while ( isspace(is.peek()) )
+        is.get();
+    if ( is.fail() )
     {
-        std::streampos isp = is.tellg();
+        // restore initial state:
+        is.seekg(isp);
+        is.clear();
+    }
+    else if ( is.peek() == '0' )
+    {
         real Z = 0;
         is >> Z;
         if ( is.fail() || Z != 0 )
