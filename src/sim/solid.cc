@@ -87,10 +87,11 @@ void Solid::setInteractions(Meca& meca) const
                 //oldLinkTwins(meca, prop->twin_stiffness, prop->twin_separation);
             }
             const real torque = prop->twin_torque_stiffness;
-            if ( stiff > 0 && POLE > 0 )
+            if ( torque > 0 )
             {
-                size_t ii = matIndex(), jj = soTwin->matIndex();
-                meca.addTorque4(ii, ii+POLE, jj+POLE, jj, torque);
+                size_t ii = POLE + matIndex();
+                size_t jj = POLE + soTwin->matIndex();
+                meca.addTorque4(ii, ii+off, jj+off, jj, torque);
             }
         }
     }
