@@ -23,6 +23,7 @@
 - [Thermodynamic Control of Activity Patterns in Cytoskeletal Networks](https://doi.org/10.1103/PhysRevLett.129.128002)
 - [Emergence of flagella-like oscillations in single microtubules driven by collective dynein transport](https://www.biorxiv.org/content/10.1101/2022.09.11.507451v1)
 - [Slack-taut transition and emergent stiffness in bioinspired entangled filament networks](https://doi.org/10.48550/arXiv.2206.04043)
+- [β-heavy-spectrin stabilizes the constricting contractile ring during cytokinesis](https://doi.org/10.1083/jcb.202202024)
 
 2021
 
@@ -63,7 +64,7 @@
 - [Microrheology of Actin Networks](https://webthesis.biblio.polito.it/9576/1/tesi.pdf)
 - [Mechanical positioning of multiple nuclei in muscle cells](https://doi.org/10.1371/journal.pcbi.1006208)
 - [Role of External Forcing in Directional Instability of Microtubule Transport](http://dr.iiserpune.ac.in:8080/xmlui/handle/123456789/987)
-- [Entropy production rate is maximized in non- contractile actomyosin](http://dx.doi.org/10.1038/s41467-018-07413-5)
+- [Entropy production rate is maximized in non-contractile actomyosin](http://dx.doi.org/10.1038/s41467-018-07413-5)
 - [Evolutionary mechanisms of asymmetric spindle positioning in nematode embyos](http://dr.iiserpune.ac.in:8080/xmlui/handle/123456789/1007)
 - [Role of External Forcing in Directional Instability of Microtubule Transport]()
 
