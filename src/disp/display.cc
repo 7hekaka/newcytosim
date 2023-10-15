@@ -1169,7 +1169,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
 #pragma mark - Lattice
 
 /**
- This style uses one vertex for each site, positionned at the center of the range
+ Draw lattice using one vertex for each site, positionned at the center of the range
  OpenGL will interpolate the colors, and each site will be covered by a gradient.
  */
 void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, float rad) const
@@ -1236,7 +1236,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
 
 
 /**
- This style, uses two vertices for each site, positionned at the extremity of the range,
+ Draw lattice using two vertices for each site, at both extremities of the range,
  and each site is entirely covered by the color corresponding to the value.
  */
 void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, float rad) const
@@ -1251,8 +1251,8 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
     FiberDisp const*const disp = fib.prop->disp;
     gym_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
-    size_t cnt = 2 * ( sup - inf );
-    flute4D* flu = gym::mapBufferC4VD(cnt+4);
+    size_t cnt = 2 + 2 * ( sup - inf );
+    flute4D* flu = gym::mapBufferC4VD(cnt);
     flute4D* ptr = flu;
     
     if ( inf == sup )
@@ -1281,21 +1281,22 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
         c = lattice_color(col, facM*lat.data(inf));
         *ptr++ = {c, fib.posEndM()};
 
-        for ( auto h = inf+1; h < sup; ++h )
+        Vector P;
+        for ( auto h = inf+1; h <= sup; ++h )
         {
-            Vector P = fib.pos(uni*h);
+            P = fib.pos(uni*h);
             ptr[0] = {c, P};
             c = lattice_color(col, fac*lat.data(h));
             ptr[1] = {c, P};
             ptr += 2;
         }
         
-        // the terminal site may be truncated
+        // the terminal site may be truncated, so we change its color:
         c = lattice_color(col, facP*lat.data(sup));
-        ptr[0] = {c, fib.pos(uni*sup)};
-        ptr[1] = {c, fib.posEndP()};
-        ptr += 2;
+        ptr[-1] = {c, P};
+        *ptr++ = {c, fib.posEndP()};
     }
+    assert_true(ptr-flu<=cnt);
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLines(rad, 0, ptr-flu);
