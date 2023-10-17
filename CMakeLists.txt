@@ -46,7 +46,6 @@ else()
 endif()
 
 # static linking preferred here:
-find_package(BLAS)
 find_library(BLAS_LIB libblas.a blas BLAS_LIBRARIES PATHS ~/lib REQUIRED)
 if(BLAS_LIB)
     message(">>>>>> BLAS: ${BLAS_LIB}")
