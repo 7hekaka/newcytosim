@@ -2,19 +2,19 @@
 #
 # compare.py
 #
-# copyright F. Nedelec, December 14th 2007, 14.03.2018; 4.8.2020
+# copyright F. Nedelec, 14.12.2007, 14.03.2018; 4.8.2020, 18.10.2023
 
 """
 compare.py
-    Compare files from two root directories
+    Compare source files contained in two root directories
 Usage:
     compare.py root1 root2 [opendiff]
 """
 
-from __future__ import print_function
-import sys, os, shutil, time, subprocess, tempfile
+import sys, os, shutil, time, tempfile
+import difflib, subprocess
 
-exe = "diff"
+mode="diff"
 diff="diff --side-by-side -W200 -p --suppress-common-lines"
 
 
@@ -29,37 +29,34 @@ def print_spacer(arg):
 
 def compareFiles(fileL, fileR):
     if not os.path.isfile(fileL):
-        return print("only RIGHT %s" % fileR)
+        return print("missing < %s" % fileL)
     if not os.path.isfile(fileR):
-        return print("only LEFT  %s" % fileL)
+        return print("missing > %s" % fileR)
     #print("compare %s %s" % (fileL, fileR))
-    comp  = os.popen(diff+" -q "+fileL+" "+fileR)
-    empty = ( len(comp.read()) == 0 )
+    comp = os.popen(diff+" "+fileL+" "+fileR)
+    difLR = comp.read()
     comp.close()
-    if not empty:
-        if exe == 'diff':
-            file = os.path.basename(fileL);
-            print_spacer(file)
-            comp = os.popen(diff+" "+fileL+" "+fileR)
-            for line in comp:
+    if difLR:
+        if mode == 'diff':
+            print_spacer(os.path.basename(fileL))
+            for line in difLR:
                 print(line, end='')
-            comp.close()
             
             sys.stdout.write(chr(27)+"[33;1m")
-            print("This was `%20s`" % file, end='')
-            ans = input('Action? (return/left/right/open/q) >'+chr(27)+'[0m')
+            print("This was `%s`" % os.path.basename(fileL), end=':')
+            ans = input(' (return/left/right/open/q) ?>'+chr(27)+'[0m')
             
             if ans == "left" or ans == "l":
                 shutil.copyfile(fileL, fileR)
             elif ans == "right" or ans == "r":
                 shutil.copyfile(fileR, fileL)
             elif ans == "swap":
-                fid, file = tempfile.mkstemp('.txt', 'temp', '', True)
+                fid, tmp = tempfile.mkstemp('.txt', 'temp', '', True)
                 print(os.getcwd(), os.path.isfile(file))
                 os.close(fid);
-                os.rename(fileL, file)
+                os.rename(fileL, tmp)
                 os.rename(fileR, fileL)
-                os.rename(file, fileR)
+                os.rename(tmp, fileR)
             elif ans == "open":
                 os.system("opendiff "+fileL+" "+fileR+"&")
             elif ans == "q":
@@ -105,11 +102,11 @@ def process_dir(roots, pathL, files):
             fileR = os.path.join(pathR, file)
             compareFiles(fileL, fileR)
 
-#------------------------------------------------------------------------
+#------------------------------------------------------------------------------
 
 def main(args):
     """main"""
-    global exe
+    global mode
     if len(args) < 2:
         print("Error: you must specify two root directories!")
         sys.exit()
@@ -124,7 +121,7 @@ def main(args):
     #parse command-line arguments:    
     for arg in args[2:]:
         if arg == 'opendiff':
-            exe=arg
+            mode=arg
         else:
             print("unknown argument '%s'" % arg)
             sys.exit()
@@ -140,6 +137,4 @@ if __name__ == "__main__":
         print(__doc__)
     else:
         main(sys.argv[1:])
-
-
 
