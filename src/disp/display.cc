@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright Cambridge University 2021
 
+#include "smath.h"
 #include "display.h"
 #include "organizer.h"
 #include "property_list.h"
@@ -1337,10 +1338,37 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
 }
 
 
+/**
+ Display the value of each site in the lattice, in binary form if integers are used
+ */
+void Display::drawFiberLatticeValues(Fiber const& fib, VisibleLattice const& lat) const
+{
+    char str[66] = { 0 };
+    const real uni = lat.unit();
+    const auto inf = lat.indexM();
+    const auto sup = lat.indexP();
+    
+    gym::ref_view();
+    gym::color(fib.disp->color);
+    gym::disableLighting();
+    gym::disableAlphaTest();
+    real abs = (inf+0.25) * uni - fib.abscissaM();
+    for ( auto h = inf; h <= sup; ++h, abs += uni )
+    {
+#if FIBER_HAS_LATTICE > 0
+        sMath::binary_representation(str, sizeof(str), 4, lat.data(h));
+#else
+        snprintf(str, sizeof(str), "%.3f", lat.data(h));
+#endif
+        drawText(fib.posM(abs), str);
+    }
+    gym::restoreAlphaTest();
+}
+
+
 void Display::drawFiberLabels(Fiber const& fib, int style, gym_color const& col) const
 {
-    char str[32];
-    
+    char str[32] = { 0 };
     gym::ref_view();
     gym::color(col);
     gym::disableLighting();
@@ -1878,7 +1906,9 @@ void Display::drawFiber(Fiber const& fib)
                 case 3:
                     return drawFiberLattice3(fib, *lat, rad);
                 case 4:
-                    return drawFiberLatticeEdges(fib, *lat, rad);
+                    drawFiberLatticeEdges(fib, *lat, rad); break;
+                case 5:
+                    drawFiberLatticeValues(fib, *lat); break;
                 default:
                     std::clog << "Unexpected value of fiber:lattice_style\n";
             }

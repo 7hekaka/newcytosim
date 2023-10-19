@@ -369,6 +369,31 @@ namespace sMath
     }
     
     
+    /// convert numerical value to a binary representation with 0/1s
+    template < typename T >
+    void binary_representation(char str[], size_t len, size_t wid, T val, char end = 0)
+    {
+        char * s = str;
+        size_t i = 0;
+        for ( ; val && i+1 < len; ++i )
+        {
+            *str++ = ( val & 1 ? '1' : '0' );
+            val >>= 1;
+        }
+        for ( ; i+1 < len && i < wid; ++i )
+            *str++ = '0';
+        // swap order of characters in string:
+        char t, * e = str - 1;
+        while ( s < e )
+        {
+            t = *s;
+            *s++ = *e;
+            *e-- = t;
+        }
+        *str = end;
+    }
+
+    
     /* Find the nullpoint of a monotonously increasing function */
     inline real find_root(real (*func)(real), real a, real b)
     {

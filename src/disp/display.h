@@ -120,7 +120,7 @@ private:
     /// draw translucent objects after depth-sorting
     void drawTransparentObjects(Array<zObject>&);
 
-    /// draw text at position
+    /// draw text at given position
     void drawText(Vector const&, const char[]) const;
     
 public:
@@ -252,6 +252,9 @@ public:
 
     /// display lattice cell edges
     virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, float rad) const;
+
+    /// display lattice cell edges
+    virtual void drawFiberLatticeValues(Fiber const&, VisibleLattice const&) const;
 
     /// display Labels for a Fiber
     void drawFiberLabels(Fiber const&, int style, gym_color const&) const;
