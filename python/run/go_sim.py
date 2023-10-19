@@ -40,7 +40,7 @@ S. Dmitrieff 07.2022
 """
 
 # Loading modules on the compute-cluster may fail for unexpected reasons.
-# The long time.sleep() prevents zoombie nodes from accepting further LSF jobs
+# The long time.sleep() prevents zoombie nodes from accepting further jobs
 
 try:
     import os, sys, shutil, time

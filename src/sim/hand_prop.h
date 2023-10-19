@@ -176,7 +176,7 @@ public:
      `hold_growing_end` is a probability that must be in [0, 1].
      There are two values: [0] applies to the plus end, and [1] is for the minus end
      
-     <em>default = 0</em>
+     <em>default = 0, 0</em>
      */
     real hold_growing_end[2];
     
@@ -189,7 +189,7 @@ public:
      `hold_shrinking_end` is a probability that must be in [0, 1].
      There are two values: [0] applies to the plus end, and [1] is for the minus end
      To set the hand to track shrinking minus end, use `hold_shrinking_end == 0, 1`
-     <em>default = 0</em>
+     <em>default = 0, 0</em>
      */
     real hold_shrinking_end[2];
     
