@@ -1,6 +1,12 @@
 # Projects done with Cytosim
 
-[Additional references here](biblio.md)
+This is a list of some selected work from the Nedelec group using Cytosim.  
+[Additional references from other research groups](biblio.md)
+
+
+[Microtubule overlaps produced by diffusible crosslinkers](https://doi.org/10.1016/j.cub.2019.05.049)  
+<img src="data/overlap.png" alt="overlap" style="width:512px;"/>
+
 
 [Microtubule organization by mitotic motors](https://doi.org/10.1016/j.cell.2018.09.029)  
 <img src="data/nematics.png" alt="nematic" style="width:512px;"/>
@@ -52,4 +58,31 @@
 
 [Regulation of spindle length in C.elegans](https://doi.org/10.1016/j.devcel.2018.04.022)  
 <img src="data/spindle_length.png" alt="spindle" style="width:512px;"/>
+
+
+[Effects of spatial dimensionality and steric interactions on microtubule-motor self-organization.]
+(https://doi.org/10.1088/1478-3975/ab0fb1)
+<img src="data/rickman2019.png" alt="network" style="width:512px;"/>
+
+[Mitotic spindle design principles]
+(https://doi.org/10.7554/eLife.03398)  
+<img src="data/pombe_spindle.png" alt="network" style="width:512px;"/>
+
+[Formation of the microtubule marginal band in blood platelets]
+(http://dx.doi.org/10.1073/pnas.1618041114)  
+<img src="data/platelet.png" alt="platelet" style="width:512px;"/>
+
+
+[Mitotic spindle positionning](https://doi.org/10.1016/j.cell.2007.03.027)  
+<img src="data/celegans_spindle.png" alt="network" style="width:512px;"/>
+
+
+[Chromosome capture](https://doi.org/10.1016/j.cub.2014.05.019)  
+<img src="data/capture.png" alt="capture" style="width:512px;"/>
+
+
+[Karyogamy](http://www.genesdev.org/cgi/doi/10.1101/gad.206318.112)  
+<img src="data/karyogamy.png" alt="capture" style="width:512px;"/>
+
+
 
