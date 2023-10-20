@@ -20,7 +20,7 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 <img src="data/patterns.png" alt="pattern" style="width:512px;"/>
 
 
-[Mitotic spindle organization](http://www.sciencedirect.com/science/article/pii/S0006349508705137)  
+[Mitotic spindle organization](https://doi.org/10.1083/jcb.201006076)  
 <img src="data/spindle.png" alt="spindle" style="width:512px;"/>
 
 
@@ -85,4 +85,5 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 <img src="data/karyogamy.png" alt="capture" style="width:512px;"/>
 
 
-
+[Interactions of microtubule asters](https://doi.org/10.1083/jcb.200202051)  
+<img src="data/asters.png" alt="spindle" style="width:512px;"/>

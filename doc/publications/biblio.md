@@ -11,6 +11,7 @@
 
 2023
 
+- [Kinetic trapping organizes actin filaments within liquid-like protein droplets](https://doi.org/10.1101/2023.05.26.542517)
 - [Liquid-like condensates mediate competition between actin branching and bundling](https://doi.org/10.1101/2023.06.23.546267)
 - [Nonaffine Mechanics of Entangled Networks Inspired by Intermediate Filaments](https://doi.org/10.1103/PhysRevLett.131.058101)
 - [Microtubule competition and cell growth recenter the nucleus after anaphase in fission yeast](https://doi.org/10.1091/mbc.E23-01-0034)
@@ -57,7 +58,7 @@
 - [Spherical spindle shape promotes perpendicular cortical orientation by preventing isometric cortical pulling on both spindle poles during C. elegans female meiosis](http://dx.doi.org/10.1242/dev.178863)[preprin](https://www.biorxiv.org/content/10.1101/596510v1)  
 - [Collective effects of yeast cytoplasmic dynein based microtubule transport](http://dx.doi.org/10.1039/c8sm01434e)  
 - [Prospects for Declarative Mathematical Modeling of Complex Biological Systems](https://arxiv.org/pdf/1804.11044.pdf)  
-- [Visualization of myosin II filament dynamics in remodeling acto-myosin networks with interferometric scattering microscopy](https://www.biorxiv.org/content/10.1101/199778v4)  
+- [Myosin II filament dynamics in actin networks revealed with interferometric scattering microscopy](https://www.biorxiv.org/content/10.1101/199778v4)  
 - [Centrosome-nuclear envelope tethering and microtubule motor-based pulling forces collaborate in centrosome positioning during mitotic entry](https://www.biorxiv.org/content/10.1101/442368v1)  
 
 2018
