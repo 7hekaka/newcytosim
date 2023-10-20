@@ -161,6 +161,9 @@ public:
     /// display frame-per-seconds
     void drawFPS(size_t) const;
 
+    /// draw bottom-left label
+    void drawLabel() const;
+    
     /// display scale bar, info text, etc.
     void drawInteractiveFeatures() const;
     

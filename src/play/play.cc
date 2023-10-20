@@ -71,7 +71,7 @@ void drawMag(View& view)
 
 
 /**
- calls drawSystem() if data can be accessed by current thread
+ calls prepareDisplay() and drawSystem()
  */
 int drawSimul(View& view)
 {
@@ -86,6 +86,13 @@ int drawSimul(View& view)
     return 0;
 }
 
+
+int drawSimulWithLabel(View& view)
+{
+    drawSimul(view);
+    view.drawLabel();
+    return 0;
+}
 
 /**
  call drawSimul() if data can be accessed by current thread
@@ -425,7 +432,7 @@ int main(int argc, char* argv[])
                 // only save requested frames:
                 if ( worker.currentFrame() == frm )
                 {
-                    drawSimul(view);
+                    drawSimulWithLabel(view);
                     if ( multi )
                         blitBuffers(multi, fbo, W, H);
                     player.saveView(frm, prop.downsample);
