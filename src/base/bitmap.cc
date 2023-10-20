@@ -151,16 +151,16 @@ class BitMap
 
     /**
      set bytes[] at ( colum = x, line = y ) to specified color, assuming corresponding
-     bits are zero.
-     argument `x` should be specified in bits: `BitsPerPixel` * pixel_X_coordinate
-     argument `y` should be speicifed in bytes: `BytesPerRow` * pixel_Y_coordinate
+     bits are zero:
+      `x` should be specified in bits: `BitsPerPixel` * pixel_X_coordinate
+      `y` should be specified in bytes: `BytesPerRow` * pixel_Y_coordinate
     */
     void set_byte(uint32_t x, uint32_t y, uint8_t color)
     {
         uint32_t i = y + x / 8;
-        constexpr uint8_t mask = ( 1 << depth ) - 1;
-        constexpr uint8_t top = depth * ( 8 / depth - 1 );
-        int s = top - x & 7;
+        const uint8_t mask = (uint8_t)(( 1 << depth ) - 1);
+        const uint8_t top = depth * ( 8 / depth - 1 );
+        int s = top - ( x & 7 );
         bytes[i] = (bytes[i] & ~( mask << s )) | (( color & mask ) << s );
     }
 
@@ -222,16 +222,21 @@ public:
 #if 0
 int main()
 {
+    const uint32_t depth = 4;
     uint32_t W=1024, H=512;
-    BitMap<4> bmap(W, H);
+    BitMap<depth> bmap(W, H);
     bmap.clear();
 
     /* paint a disc */
+    size_t sup = ( 1 << depth ) - 1;
     size_t radius_square = W * W / 4;
     for ( size_t j = 0; j < W; ++j )
     for ( size_t i = 0; i < H; ++i )
-        if ( i * i + j * j < radius_square )
-            bmap.set(i, j, 15);
+    {
+        ssize_t y = j - 400;
+        size_t rr = ( i * i + y * y ) * sup / radius_square;
+        bmap.set(i, j, rr);
+    }
     
     FILE *f = fopen("circle.bmp", "wb");
     bmap.save(f);
