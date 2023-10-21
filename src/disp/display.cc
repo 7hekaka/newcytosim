@@ -2409,8 +2409,6 @@ void Display::drawBeadT(Bead const& obj) const
     assert_true( disp->style & 1 );
     {
         gym_color col = bodyColorF(obj);
-        if ( disp->coloring && obj.mark() )
-            col = gym::bright_color(obj.mark());
 #if ( DIM > 2 )
         drawBeadS(obj.position(), obj.radius(), col, obj.mark());
 #else

@@ -552,7 +552,7 @@ void Space::drawSection(int dim, real pos, size_t cnt, float width) const
 
 void Space::drawSection(int, real, size_t, float width) const
 {
-    //you will get this output if objects for play was not compiled properly:
+    //you will get this output if objects for play were not compiled properly:
     //DISPLAY should be defined on the compiler command, with: -DDISPLAY
     printf("dummy Space::drawSection()");
 }

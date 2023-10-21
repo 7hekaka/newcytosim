@@ -182,6 +182,8 @@ namespace {
     gym_color bodyColorF(T const& obj)
     {
         PointDisp const* disp = obj.prop->disp;
+        if ( disp->coloring && obj.mark() )
+            return gym::bright_color(obj.mark()).match_a(disp->color);
         switch ( disp->coloring )
         {
             case 1: return gym::bright_color(obj.signature()).match_a(disp->color);
