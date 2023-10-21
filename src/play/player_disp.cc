@@ -196,7 +196,7 @@ void Player::autoFocus(Simul const& sim, View& view) const
         {
             Vector pos(0,0,0);
             for ( Solid const* B=sim.solids.first(); B; B=B->next() )
-                pos += B->posPoint(0);
+                pos += B->position();
             view.move_shift(Vector3(pos)*(1.0/cnt));
         }
     }
