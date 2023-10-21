@@ -19,6 +19,8 @@
  * - backtrace_symbols()
  * .
  * provided by <execinfo.h>
+ *
+ * Note that you may need to compile with `-g -rdynamic` to enable this
  */
 void print_backtrace(int out)
 {
@@ -30,8 +32,8 @@ void print_backtrace(int out)
         return;
     }
 #if ( 1 )
-    size_t n_ptr = 512;
-    char * ptr = (char*)malloc(n_ptr);
+    size_t len = 512;
+    char * ptr = (char*)malloc(len);
     char** buf = backtrace_symbols(buffer, size);
 
     ssize_t __attribute__((unused)) u;
@@ -55,7 +57,7 @@ void print_backtrace(int out)
             while ( *end && *end != ' ' )
                 ++end;
             *end = 0;
-            ptr = abi::__cxa_demangle(str, ptr, &n_ptr, &status);
+            ptr = abi::__cxa_demangle(str, ptr, &len, &status);
             *end = ' ';
         }
         if ( status == 0 )
