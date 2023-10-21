@@ -161,15 +161,15 @@ void View::openDisplay()
         gym::openDepthMask();
         gym::restoreDepthTest();
     }
+    
+    if ( axes )
+        gle::drawAxes(axes_size, axes);
 }
 
 
 void View::closeDisplay() const
 {
     endClipping();
-    
-    if ( axes )
-        gle::drawAxes(axes_size, axes);
     
     if ( scalebar )
         drawScaleBar(scalebar, scalebar_length, scalebar_color);
