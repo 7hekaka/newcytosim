@@ -280,9 +280,6 @@ size_t Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var,
         real rad = 0;
         opt.set(rad, var, inx+1);
         
-        if ( rad < 0 )
-            throw InvalidParameter("radius of solid:sphere must be >= 0");
-        
         size_t fip = nPoints;
         str = opt.value(var, inx);
         // add 'nbp' points:
@@ -380,9 +377,9 @@ size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, 
     // get position of center:
     Vector cen = Cytosim::findPosition(opt.value(var, 0), nullptr);
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, std::fabs(rad));
+    size_t ref = addSphere(cen, rad);
     addTriad(rad);
-    rad = std::fabs(rad);
+    rad = abs_real(rad);
 
 #if ( DIM > 2 )
     real sep = 1.0;
@@ -462,15 +459,13 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
     }
     else
         opt.set(rad, var, 1);
-    if ( std::fabs(rad) < REAL_EPSILON )
-        throw InvalidParameter("radius of solid:sphere must be > 0");
 
     // get position of center:
     Vector cen = Cytosim::findPosition(opt.value(var, 0), nullptr);
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, std::fabs(rad));
+    size_t ref = addSphere(cen, rad);
     addTriad(rad);
-    rad = std::fabs(rad);
+    rad = abs_real(rad);
 
 #if ( DIM > 2 )
     real sep = 1.0, dev = 0.0;
@@ -683,7 +678,7 @@ void Solid::buildTwin(ObjectList& objs, Glossary& opt, std::string const& str, S
     }
     
     if ( nbPoints() % (DIM+2) )
-        throw InvalidParameter("missing handle point in solid::twin");
+        ;//throw InvalidParameter("missing handle point in solid::twin");
 #else
     throw InvalidParameter("Solid's twin code is not enabled");
 #endif
@@ -884,9 +879,6 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 
 size_t Solid::addSphere(Vector const& vec, real rad)
 {
-    if ( rad < 0 )
-        throw InvalidParameter("solid:sphere's radius must be >= 0");
-
     size_t inx = addPoint(vec);
     soRadius[inx] = rad;
     //std::clog << "addSphere(" << vec << ", " << rad << ") for " << reference() << " index " << inx << "\n";

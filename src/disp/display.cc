@@ -137,6 +137,7 @@ inline void drawMonomer(Vector3 const& pos, float rad)
 
 static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color bak, bool flip)
 {
+    assert_true(inx+DIM < obj.nbPoints());
     Vector X = obj.posP(inx);
 #if ( DIM >= 3 )
     Vector A = obj.posP(inx+1) - X;
@@ -2313,7 +2314,7 @@ void Display::drawSolids(SolidSet const& set)
                 Solid const * twi = obj->twin();
                 if ( twi )
                 {
-                    for ( size_t inx = 0; inx < obj->nbPoints(); inx += DIM+2 )
+                    for ( size_t inx = 0; inx+DIM < obj->nbPoints(); inx += DIM+2 )
                     {
                         gym::enableLighting();
                         gym_color black(0,0,0,1);

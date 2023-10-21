@@ -218,7 +218,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// radius of the sphere around point `i`
-    real radius(const size_t i) const { return soRadius[i]; }
+    real radius(const size_t i) const { return abs_real(soRadius[i]); }
     
     /// sum of all sphere's radius
     real sumRadius() const;
