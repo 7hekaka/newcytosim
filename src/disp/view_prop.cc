@@ -186,11 +186,11 @@ void ViewProp::write_values(std::ostream& os) const
     write_value(os, "axes",          axes, axes_size);
     write_value(os, "fog",           fog_type, fog_param, fog_color);
     write_value(os, "floor",         floor_radius, floor_tile, floor_height, floor_color);
+    
     for ( int k = 0; k < NB_CLIP_PLANES; ++k )
     {
         std::string var = "clip_plane" + std::to_string(k);
         write_value(os, var, clip_plane_mode[k], Vector3(clip_plane[k]), clip_plane[k].ZZ);
     }
 }
-
 

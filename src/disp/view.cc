@@ -615,12 +615,12 @@ void View::sliceView(int mode) const
         case 4: {
             real thk = view_scale * 0.1;
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk);
-            gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk);
+            gym::enableClipPlane(1,-V.XX,-V.YY,-V.ZZ, thk);
         } break;
         case 5: {
             real thk = view_scale * 0.02;
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, thk);
-            gym::enableClipPlane(3,-V.XX,-V.YY,-V.ZZ, thk);
+            gym::enableClipPlane(1,-V.XX,-V.YY,-V.ZZ, thk);
         } break;
         case 6:
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, 0);

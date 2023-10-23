@@ -120,7 +120,7 @@ namespace gym
 #pragma mark - Clip Planes
     
     /// enable
-    inline void enableClipPlane(unsigned i)
+    inline void enableClipPlane(int i)
     {
 #ifdef GL_VERSION_2_1
         glEnable(GL_CLIP_PLANE0+i);
@@ -128,7 +128,7 @@ namespace gym
     }
     
     /// disable clip plane
-    inline void disableClipPlane(unsigned i)
+    inline void disableClipPlane(int i)
     {
 #ifdef GL_VERSION_2_1
         glDisable(GL_CLIP_PLANE0+i);
@@ -136,9 +136,9 @@ namespace gym
     }
     
     /// define clipping equation
-    void setClipPlane(unsigned, double, double, double, double);
+    void setClipPlane(int, double, double, double, double);
     
-    inline void enableClipPlane(unsigned i, double X, double Y, double Z, double S)
+    inline void enableClipPlane(int i, double X, double Y, double Z, double S)
     {
         setClipPlane(i, X, Y, Z, S);
         enableClipPlane(i);

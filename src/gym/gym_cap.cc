@@ -15,7 +15,7 @@ GLboolean gym::alpha_ = 0;
 //-----------------------------------------------------------------------
 #pragma mark - Clip Planes
 
-void gym::setClipPlane(unsigned glp, double X, double Y, double Z, double S)
+void gym::setClipPlane(int glp, double X, double Y, double Z, double S)
 {
 #ifdef GL_VERSION_2_1
     GLdouble eq[4] = { X, Y, Z, S };
