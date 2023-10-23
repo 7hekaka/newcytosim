@@ -175,7 +175,7 @@ void SingleProp::complete(Simul const& sim)
         {
             // this condition may occur when the Property is created before the Space
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
+                throw InvalidParameter(name()+":confine_space `"+confine_label+"' was not found");
         }
     }
 

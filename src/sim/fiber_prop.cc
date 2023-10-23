@@ -579,7 +579,7 @@ void FiberProp::complete(Simul const& sim)
     else
     {
         if ( confine != CONFINE_OFF && primed(sim) )
-            throw InvalidParameter(name()+":confine_label `"+confine_label+"' was not found");
+            throw InvalidParameter(name()+":confine_space `"+confine_label+"' was not found");
         // this condition occur when the Property is created before the Space
     }
     
