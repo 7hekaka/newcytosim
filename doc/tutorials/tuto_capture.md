@@ -61,7 +61,7 @@ Let's see what this files contains.
 	set hand nucleator
 	{
 	    activity = nucleate;
-	    nucleate = 1, microtubule, { length = 3; };
+	    nucleate = 1, microtubule, { length = 3; plus_end = grow; };
 	    unbinding = 0, 3;
 	    display = ( color = green; size = 5; );
 	}
@@ -117,9 +117,9 @@ Let's see what this files contains.
 
 	new 22 chromosome
 	{
-	    point0 = center, 0.8;
-	    point1 = +0.8 0 0, 0, kinetochore;
-	    point2 = -0.8 0 0, 0, kinetochore;
+	    point1 = center, 0.8;
+	    point2 = +0.8 0 0, 0, kinetochore;
+	    point3 = -0.8 0 0, 0, kinetochore;
 	    position = sphere 35;
 	}
 	
