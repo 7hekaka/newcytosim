@@ -1,5 +1,7 @@
 # Tutorial: Chromosome Capture
 
+This is unfinished!
+
 Author: XXX (XX.09.2018)
 
 
@@ -15,6 +17,21 @@ The configuration is directly taken from:
 
 We will start with [this configuration file](data/capture.cym).
 Let's see what this files contains.
+
+# Code
+
+Important: this simulation used two custom features, that are disabled by default in the code:
+
+	NEW_LENGTH_DEPENDENT_CATASTROPHE
+
+	NEW_RADIAL_FLOW
+
+These compile switches should be set to 1, and the code needs to be recompiled: `make clean; make`
+
+	#define NEW_LENGTH_DEPENDENT_CATASTROPHE 1
+
+	#define NEW_RADIAL_FLOW 1
+
 
 # Setup
 
@@ -61,7 +78,7 @@ Let's see what this files contains.
 	set hand nucleator
 	{
 	    activity = nucleate;
-	    nucleate = 1, microtubule, { length = 3; plus_end = grow; };
+	    nucleate = 1, microtubule, ( length = 3; plus_end = grow; );
 	    unbinding = 0, 3;
 	    display = ( color = green; size = 5; );
 	}
