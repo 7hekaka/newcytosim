@@ -88,7 +88,7 @@ def main(args):
     if os.access(tool, os.X_OK):
         tool = os.path.abspath(tool)
     else:
-        err.write("Error: you must specify an executable on the command line\n")
+        sys.stderr.write("Error: you must specify an executable on the command line\n")
         sys.exit()
 
     njobs = 1
@@ -104,7 +104,7 @@ def main(args):
         elif key == 'njobs' or key == 'jobs':
             njobs = int(val)
         else:
-            err.write("Ignored`"+arg+"' on the command line\n")
+            sys.stderr.write("Ignored`"+arg+"' on the command line\n")
     
     if not files:
         print("You must specify config files!")
