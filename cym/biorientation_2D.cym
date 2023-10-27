@@ -168,9 +168,7 @@ set solid kinetochore
     steric = 1
     source = 1, augmin
     twin_stiffness = 100, 10
-    twin_metastiff = 0
-    twin_separation = 0.5
-    display = ( coloring=1; color=0x00FFFF44; size=2; style=5; )
+    display = ( coloring=1; color=0x00FFFF44; size=2; style=1; )
 }
 
 % ---------------------- CUTTING ------------------------
@@ -199,9 +197,6 @@ new kinetochore
 {
     sphere1 = 0 -0.1 0, 0.070, corona -0.5 -0.9, corona -0.9 -0.5
     point1 = 0.1 -0.1 0
-    
-    sphere2 = 0 +0.1 0, 0.070, corona -0.5 -0.9, corona -0.9 -0.5
-    point2 = 0.1 0.1 0
     
     position = 0 0 0
     direction = 1 0 0

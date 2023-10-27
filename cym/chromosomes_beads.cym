@@ -45,7 +45,6 @@ set solid kinetochore
 {
     steric = 1
     twin_stiffness = 500
-    twin_metastiff = 10
     display = ( coloring=1; size=2; style=5; )
 }
 

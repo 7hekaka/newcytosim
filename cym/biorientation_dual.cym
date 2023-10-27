@@ -168,8 +168,6 @@ set solid kinetochore
     steric = 1
     source = 1, augmin
     twin_stiffness = 100, 10
-    twin_metastiff = 0
-    twin_separation = 0.5
     display = ( coloring=1; color=0x00FFFF44; size=2; style=5; )
 }
 
