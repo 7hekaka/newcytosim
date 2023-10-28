@@ -164,10 +164,10 @@ public:
     void drawSystem(View&);
     
     /// export current viewport to image file 'filename'
-    int saveView(const char* filename, const char* format, int downsample) const;
+    int saveView(View const&, const char* filename, const char* format, int downsample) const;
 
     /// export current viewport to an image file
-    int saveView(size_t indx, int downsample) const;
+    int saveView(View const&, size_t indx, int downsample) const;
     
     /// save high-resolution image of the current scene to 'filename'
     int saveScene(int mag, const char* filename, const char* format, int downsample);

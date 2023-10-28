@@ -357,9 +357,9 @@ void Player::drawSystem(View& view)
         {
             prop.saved_image_time = t;
             if ( goLive )
-                saveView(prop.image_index++, prop.downsample);
+                saveView(view, prop.image_index++, prop.downsample);
             else
-                saveView(worker.currentFrame(), prop.downsample);
+                saveView(view, worker.currentFrame(), prop.downsample);
             // exit if this was the last image requested:
             if ( --prop.save_images == 0 && ( prop.auto_exit & 2 ))
             {
@@ -379,9 +379,8 @@ void Player::drawSystem(View& view)
  in the format specified by 'PlayerProp::image_format',
  in the current working directory
  */
-int Player::saveView(const char* filename, const char* format, int downsample) const
+int Player::saveView(View const& view, const char* filename, const char* format, int downsample) const
 {
-    View& view = glApp::currentView();
     GLint vp[4] = { 0 };
     view.copyViewport(vp);
     //printf("Player::viewport %ix%i\n", vp[2], vp[3]);
@@ -425,11 +424,11 @@ void fixFileName(char str[], size_t len, const char format[], size_t indx)
     
 /**
  Save image from the current OpenGL back buffer,
- in the format specified by 'PlayerProp::image_format',
+ in the format specified by `PlayerProp::image_format`,
  in the folder specified in `PlayerProp::image_dir`.
- The file name is derived from `PlayerProp::image_name` by including 'indx'.
+ The file name is derived from `PlayerProp::image_name` by including `indx`.
  */
-int Player::saveView(size_t indx, int downsample) const
+int Player::saveView(View const& view, size_t indx, int downsample) const
 {
     char str[1024] = { 0 };
     char const* name = prop.image_name.c_str();
@@ -437,7 +436,7 @@ int Player::saveView(size_t indx, int downsample) const
     strncpy(str, name, sizeof(str));
     fixFileName(str, sizeof(str), format, indx);
     int cwd = FilePath::change_dir(prop.image_dir, true);
-    int err = saveView(str, format, downsample);
+    int err = saveView(view, str, format, downsample);
     FilePath::change_dir(cwd);
     return err;
 }

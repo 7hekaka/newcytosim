@@ -24,7 +24,7 @@ DisplayProp& disp = player.disp;
 
 int drawSimul(View& view);
 
-/// create a player suitable for command-line offscreen rendering only
+/// create a player capable of command-line offscreen rendering only
 #define HEADLESS_PLAYER 0
 
 #if HEADLESS_PLAYER
@@ -418,7 +418,7 @@ int main(int argc, char* argv[])
                     drawSimul(view);
                     if ( multi )
                         blitBuffers(multi, fbo, W, H);
-                    player.saveView(frm++, prop.downsample);
+                    player.saveView(view, frm++, prop.downsample);
                     s = 0;
                 }
             } while ( 0 == worker.loadNextFrame() );
@@ -435,7 +435,7 @@ int main(int argc, char* argv[])
                     drawSimulWithLabel(view);
                     if ( multi )
                         blitBuffers(multi, fbo, W, H);
-                    player.saveView(frm, prop.downsample);
+                    player.saveView(view, frm, prop.downsample);
                 }
             } while ( arg.set(frm, "frame", ++inx) );
         }

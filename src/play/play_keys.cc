@@ -835,13 +835,14 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
 
 #if PLAY_CAN_WRITE
-        case 'y':
+        case 'y': {
+            View const& view = glApp::currentView();
             // save current image, without decorations
-            player.drawSystem(glApp::currentView());
-            player.saveView(prop.image_index++, 1);
+            player.drawSystem(view);
+            player.saveView(view, prop.image_index++, 1);
             // with over sampling and downsampling to get super-resolution:
             //player.saveScene(3, "image", prop.image_index++, 3);
-            return;
+        } return;
             
         case 'Y':
             // start player to save all images in file
