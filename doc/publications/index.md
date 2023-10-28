@@ -64,22 +64,25 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 [Formation of the microtubule marginal band in blood platelets](http://dx.doi.org/10.1073/pnas.1618041114)  
 <img src="data/platelet.png" alt="platelet" width="512"/>
 
-
 [Mitotic spindle positionning](https://doi.org/10.1016/j.cell.2007.03.027)  
 <img src="data/celegans_spindle.png" alt="celegans_spindle" width="512"/>
-
 
 [Chromosome capture](https://doi.org/10.1016/j.cub.2014.05.019)  
 <img src="data/capture.png" alt="capture" width="512"/>
 
-
 [Karyogamy](http://www.genesdev.org/cgi/doi/10.1101/gad.206318.112)  
 <img src="data/karyogamy.png" alt="karyogamy" width="512"/>
-
 
 [Self organization in confined space](http://www.cell.com/current-biology/abstract/S0960-9822(09)01025-2)  
 <img src="data/droplets.png" alt="droplets" width="512"/>
 
-
 [Interactions of microtubule asters](https://doi.org/10.1083/jcb.200202051)  
 <img src="data/asters.png" alt="asters" width="512"/>
+
+[Properties determining Self organization of Microtubules and Motors](https://doi.org/10.1126/science.1059758)  
+<img src="data/self_organization.png" alt="self_organization" width="512"/>
+
+[Self organization of Microtubules and Motors](https://www.nature.com/articles/38532)  
+<img src="data/vortex.png" alt="vertex" width="512"/>
+
+
