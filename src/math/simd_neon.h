@@ -1,5 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
-// Started on Monday 5 June 2018, which was a very nice day in Strasbourg
+// SIMD for the ARM architecture; Split from simd.h on 12.08.2022
 
 
 /// Vector holding 2 double precision floats
