@@ -128,9 +128,9 @@ inline std::ostream& operator << (std::ostream& os, Isometry const& iso)
 #if ( DIM > 2 )
     real angle = iso.rot.rotationAngle();
     Vector axis = iso.rot.rotationAxis();
-    os << "Isometry { " << iso.mov << " | " << angle << " axis " << axis << " }";
+    os << "Iso { " << iso.mov << " | " << angle << " axis " << axis << " }";
 #else
-    os << "Isometry { " << iso.mov << " | " << iso.rot << " }";
+    os << "Iso { " << iso.mov << " | " << iso.rot << " }";
 #endif
     return os;
 }

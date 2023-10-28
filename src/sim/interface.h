@@ -36,7 +36,7 @@ private:
     /// read the specification of position and orientation of an object
     Isometry read_placement(Glossary&);
     
-    /// return position and orientation of an object, with verification of 'placement'
+    /// set position and orientation of an object, according to 'placement'
     bool find_placement(Isometry&, Glossary&, int placement);
     
 protected:
