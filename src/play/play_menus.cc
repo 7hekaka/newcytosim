@@ -173,7 +173,7 @@ static int buildMenuDisplay()
     gym::addSubMenu("Fibers",  m1);
     gym::addSubMenu("Couple",  m2);
     
-    View & view = glApp::currentView();
+    View const& view = glApp::currentView();
     gym::addMenuEntry("Toggle fullscreen mode (f)", 4);
     gym::addMenuEntry(disp.tile?"Non-tiled Display":"Tiled Display", 3);
     gym::addMenuEntry(view.track_fibers?"stop tracking":"Track Fibers", 6);
@@ -393,8 +393,8 @@ static void processMenuExport(int item)
     switch (item)
     {
         case 0: return;
-        case 1: player.saveView(prop.image_index++, 1); return;
-        case 2: player.saveView(prop.image_index++, 2); return;
+        case 1: player.saveView(glApp::currentView(), prop.image_index++, 1); return;
+        case 2: player.saveView(glApp::currentView(), prop.image_index++, 2); return;
         case 3: player.saveScene(3, "image", prop.image_index++, 3); return;
         case 4: player.saveScene(6, "image", prop.image_index++, 3); return;
         case 5: player.saveScene(6, "image", prop.image_index++, 2); return;

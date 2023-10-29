@@ -141,7 +141,7 @@ void View::clearPixels()
 }
 
 
-void View::openDisplay()
+void View::openDisplay() const
 {
     adjust();
     loadView();

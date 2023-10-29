@@ -150,7 +150,7 @@ public:
     void setDrawMagFunc(void (*f)(View&)) { if (f) drawMagFunc = f; }
 
     /// clear pixels and set clipping planes and fog parameters
-    void openDisplay();
+    void openDisplay() const;
     
     /// unset clipping planes and fog parameters, display axes and scale bar
     void closeDisplay() const;

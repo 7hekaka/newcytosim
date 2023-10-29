@@ -343,7 +343,7 @@ void Player::readDisplayString(View& view, std::string const& str)
 /**
  Display the full Scene for export, skipping some features
  */
-void Player::drawSystem(View& view)
+void Player::drawSystem(View const& view)
 {
     CHECK_GL_ERROR("drawSystem");
     view.openDisplay();
