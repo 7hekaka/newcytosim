@@ -63,10 +63,10 @@ namespace gym
     void mat_mulvec(float[4], const float[16], const float[4]);
 
     /// multiply matrices
-    void mat_mul(float[16], const float[16], const float[16]);
+    void mat_multiply(float[16], const float[16], const float[16]);
     
     /// multiply matrices: out = out x B */
-    void mat_mul(float[16], const float[16]);
+    void mat_multiply(float[16], const float[16]);
 
     /// scale matrix, like glScale()
     void mat_scale(float[16], float X, float Y, float Z);

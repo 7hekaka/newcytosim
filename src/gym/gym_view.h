@@ -59,7 +59,7 @@ namespace gym
 #pragma mark - Modifying the current view
 
     /// multiply current matrix by 'mat'
-    inline void apply(const float mat[16]) { gym::mat_mul(mvp_, ref_, mat); load(); }
+    inline void apply(const float mat[16]) { gym::mat_multiply(mvp_, ref_, mat); load(); }
     
     /// translate current view
     inline void translate(float x, float y, float z) { gym::mat_translate(mvp_, x, y, z); load(); }

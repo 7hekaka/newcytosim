@@ -538,7 +538,7 @@ void View::setPickProjection(float X, float Y, float W, float H) const
 {
     float mat[16];
     gym::mat_pick(mat, X, Y, W, H, viewport_);
-    gym::mat_mul(mat, projection_);
+    gym::mat_multiply(mat, projection_);
     gym::set_projection(mat);
 }
 

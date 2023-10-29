@@ -96,21 +96,22 @@ void gym::mat_pick(float M[16], float cx, float cy, float dx, float dy, const in
 }
 
 
+/** out <- M x in */
 void gym::mat_mulvec(float out[4], const float M[16], const float in[4])
 {
     for ( int i = 0; i < 4; ++i )
         out[i] = in[0] * M[i] + in[1] * M[4+i] + in[2] * M[8+i] + in[3] * M[12+i];
 }
 
-/** Attention: M = A x B */
-void gym::mat_mul(float M[16], const float A[16], const float B[16])
+/** Attention: M <- A x B */
+void gym::mat_multiply(float M[16], const float A[16], const float B[16])
 {
     for ( int i = 0; i < 4; ++i )
         mat_mulvec(M+4*i, A, B+4*i);
 }
 
-/** Attention: M = out x B */
-void gym::mat_mul(float M[16], const float B[16])
+/** Attention: M <- M x B */
+void gym::mat_multiply(float M[16], const float B[16])
 {
     float tmp[16];
     mat_copy(tmp, M);
@@ -263,7 +264,7 @@ int gym::mat4x4_inverse(float T[16], const float M[16])
     for (int i = 0; i < 16; i++)
         T[i] = T[i] * det;
     
-    //float R[16]; mat_mul(R, T, M); mat_print(stdout, R);
+    //float R[16]; mat_multiply(R, T, M); mat_print(stdout, R);
     return 0;
 }
 
@@ -307,7 +308,7 @@ int gym::unproject(float winx, float winy, float winz,
     float in[4];
     float out[4];
     
-    gym::mat_mul(mat, projMatrix, modelMatrix);
+    gym::mat_multiply(mat, projMatrix, modelMatrix);
     
     if ( gym::mat4x4_inverse(inv, mat) )
         return 1;
