@@ -4,6 +4,9 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 [Additional references from other research groups](biblio.md)
 
 
+[Detailed protocol to use Cytosim](https://arxiv.org/abs/2205.13852)  
+<img src="data/jove.png" alt="jove" width="512"/>
+
 [Microtubule overlaps produced by diffusible crosslinkers](https://doi.org/10.1016/j.cub.2019.05.049)  
 <img src="data/overlap.png" alt="overlap" width="512"/>
 

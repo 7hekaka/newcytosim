@@ -4,6 +4,8 @@
 
 - [Preconfig: A Versatile Configuration File Generator for Varying Parameters](http://doi.org/10.5334/jors.156)  
 
+- [Detailed protocol to use Cytosim](https://arxiv.org/abs/2205.13852)  
+
 
 # Cytosim used in other groups
 
