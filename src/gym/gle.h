@@ -5,6 +5,7 @@
 
 #include "real.h"
 #include "gym_color.h"
+#include "gym_flute.h"
 
 class Vector1;
 class Vector2;
@@ -38,20 +39,20 @@ namespace gle
     /// access to precomputed sine
     inline float sin_(size_t n) { return circle_[1+2*n]; }
 
-    /// initialize the arrays
-    void initialize();
-    
-    /// release requested memory
-    void quit();
-
     /// calculate sine and cosine
     void set_arc(size_t cnt, float CS[], double rad, double start, double delta, float cx, float cy);
 
     /// calculate sine and cosine for a circular arc
     void compute_arc(size_t cnt, float CS[], double rad, double start, double angle, float cx, float cy);
 
-    /// initialize more buffer objects
-    void setBuffers();
+    /// initialize buffer object
+    size_t setExplodedCube(flute6*, float, float, float, float, float, float);
+
+    /// initialize the arrays
+    void initialize();
+    
+    /// release requested memory
+    void quit();
 
     //------------------------------------------------------------------------------
 #pragma mark -

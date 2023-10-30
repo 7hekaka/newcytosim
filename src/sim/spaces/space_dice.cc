@@ -327,10 +327,9 @@ void SpaceDice::draw3D() const
     const float Y(half_[1] - edge_);
     const float Z(half_[2] - edge_);
     
-    Tesselator mesh;
-    mesh.buildDice(X, Y, Z, edge_, gle::finesse, 1, 1);
-    
 #if 1
+    Tesselator mesh;
+    mesh.buildDice(X, Y, Z, edge_, 2*gle::finesse, 1, 1);
     size_t cnt = mesh.num_vertices();
     flute3 * fl3 = gym::mapBufferV3(cnt);
     mesh.store_vertices((float*)fl3);
@@ -346,48 +345,19 @@ void SpaceDice::draw3D() const
     glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_SHORT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    gym::cleanup(1);
 #endif
 
 #if 1
-    // that is just to get the normals right
+    // this gets the normals right on the planar surfaces
     const float XR(half_[0]);
     const float YR(half_[1]);
     const float ZR(half_[2]);
-    flute6* flu = gym::mapBufferV3N3(6*24);
-    flu[0] = {+XR, Y,-Z, +1,0,0};
-    flu[1] = { XR, Y, Z, +1,0,0};
-    flu[2] = { XR,-Y,-Z, +1,0,0};
-    flu[3] = { XR,-Y, Z, +1,0,0};
-    flu[4] = {-XR,-Y,-Z, -1,0,0};
-    flu[5] = {-XR,-Y, Z, -1,0,0};
-    flu[6] = {-XR, Y,-Z, -1,0,0};
-    flu[7] = {-XR, Y, Z, -1,0,0};
-    flu[8] = { X, YR,-Z, 0,+1,0};
-    flu[9] = {-X, YR,-Z, 0,+1,0};
-    flu[10] = { X, YR, Z, 0,+1,0};
-    flu[11] = {-X, YR, Z, 0,+1,0};
-    flu[12] = {+X,-YR, Z, 0,-1,0};
-    flu[13] = {-X,-YR, Z, 0,-1,0};
-    flu[14] = { X,-YR,-Z, 0,-1,0};
-    flu[15] = {-X,-YR,-Z, 0,-1,0};
-    flu[16] = { X, Y, ZR, 0,0,+1};
-    flu[17] = {-X, Y, ZR, 0,0,+1};
-    flu[18] = { X,-Y, ZR, 0,0,+1};
-    flu[19] = {-X,-Y, ZR, 0,0,+1};
-    flu[20] = { X, Y,-ZR, 0,0,-1};
-    flu[21] = { X,-Y,-ZR, 0,0,-1};
-    flu[22] = {-X, Y,-ZR, 0,0,-1};
-    flu[23] = {-X,-Y,-ZR, 0,0,-1};
+    flute6* flu = gym::mapBufferV3N3(36);
+    gle::setExplodedCube(flu, X, Y, Z, XR, YR, ZR);
     gym::unmapBufferV3N3();
-    gym::drawTriangleStrip( 0, 4);
-    gym::drawTriangleStrip( 4, 4);
-    gym::drawTriangleStrip( 8, 4);
-    gym::drawTriangleStrip(12, 4);
-    gym::drawTriangleStrip(16, 4);
-    gym::drawTriangleStrip(20, 4);
+    gym::drawTriangles(0, 36);
 #endif
-    gym::cleanup();
+    gym::cleanup(1);
 }
 
 #else

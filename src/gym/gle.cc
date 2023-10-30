@@ -52,51 +52,6 @@ namespace gle
     size_t icoid_idx_ = 0;
     /// number of faces in icosahedrons
     size_t icoid_cnt_ = 0;
-
-    void initBuffers()
-    {
-        glGenBuffers(2, buf_);
-        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        setBuffers();
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-    
-    void initialize()
-    {
-        CHECK_GL_ERROR("before gle:initialize()");
-#ifndef __APPLE__
-        //need to initialize GLEW on Linux
-        const GLenum err = glewInit();
-        if ( GLEW_OK != err )
-        {
-            /* Problem: glewInit failed, something is seriously wrong. */
-            fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-            exit(1);
-        }
-#endif
-        // circle_[] covers 2 revolutions = 4 * PI
-        set_arc(2*pi_twice, circle_, 1, 0, 2*M_PI/pi_twice, 0, 0);
-
-        if ( !glIsBuffer(buf_[0]) )
-        {
-            initBuffers();
-            gym::initStreams();
-            CHECK_GL_ERROR("gle:initBuffers()");
-            std::atexit(quit);
-        }
-    }
-    
-    void quit()
-    {
-        // The system will release all GPU resources, so this is not necessary
-        /*
-        glDeleteBuffers(2, buf_);
-        for (int i=0; i<4; ++i) buf_[i] = 0;
-        releaseStreams();
-        */
-    }
     
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle
@@ -317,6 +272,51 @@ namespace gle
         return 36;
     }
     
+    /// set triangles for exploded cube where faces are translated outward
+    size_t setExplodedCube(flute6* flt, float X, float Y, float Z, float XR, float YR, float ZR)
+    {
+        // bottom plate
+        flt[0] = { X, Y,-ZR, 0, 0,-1};
+        flt[1] = {-X,-Y,-ZR, 0, 0,-1};
+        flt[2] = {-X, Y,-ZR, 0, 0,-1};
+        flt[3] = { X, Y,-ZR, 0, 0,-1};
+        flt[4] = { X,-Y,-ZR, 0, 0,-1};
+        flt[5] = {-X,-Y,-ZR, 0, 0,-1};
+        // top plate
+        flt[6] = {-X, Y, ZR, 0, 0, 1};
+        flt[7] = {-X,-Y, ZR, 0, 0, 1};
+        flt[8] = { X,-Y, ZR, 0, 0, 1};
+        flt[9] = { X, Y, ZR, 0, 0, 1};
+        flt[10] = {-X, Y, ZR, 0, 0, 1};
+        flt[11] = { X,-Y, ZR, 0, 0, 1};
+        // sides
+        flt[12] = { XR, Y, Z, 1, 0, 0};
+        flt[13] = { XR,-Y,-Z, 1, 0, 0};
+        flt[14] = { XR, Y,-Z, 1, 0, 0};
+        flt[15] = { XR,-Y,-Z, 1, 0, 0};
+        flt[16] = { XR, Y, Z, 1, 0, 0};
+        flt[17] = { XR,-Y, Z, 1, 0, 0};
+        flt[18] = { X, YR, Z, 0, 1, 0};
+        flt[19] = { X, YR,-Z, 0, 1, 0};
+        flt[20] = {-X, YR,-Z, 0, 1, 0};
+        flt[21] = { X, YR, Z, 0, 1, 0};
+        flt[22] = {-X, YR,-Z, 0, 1, 0};
+        flt[23] = {-X, YR, Z, 0, 1, 0};
+        flt[24] = {-XR,-Y,-Z,-1, 0, 0};
+        flt[25] = {-XR,-Y, Z,-1, 0, 0};
+        flt[26] = {-XR, Y, Z,-1, 0, 0};
+        flt[27] = {-XR,-Y,-Z,-1, 0, 0};
+        flt[28] = {-XR, Y, Z,-1, 0, 0};
+        flt[29] = {-XR, Y,-Z,-1, 0, 0};
+        flt[30] = { X,-YR, Z, 0,-1, 0};
+        flt[31] = {-X,-YR,-Z, 0,-1, 0};
+        flt[32] = { X,-YR,-Z, 0,-1, 0};
+        flt[33] = { X,-YR, Z, 0,-1, 0};
+        flt[34] = {-X,-YR, Z, 0,-1, 0};
+        flt[35] = {-X,-YR,-Z, 0,-1, 0};
+        return 36;
+    }
+
     /// Cube is made of 4 linestrips of 4 points each
     size_t setCubeEdges(flute3* flt, float X, float Y, float Z)
     {
@@ -1597,7 +1597,7 @@ namespace gle
     // this draws without loading/initializing the buffer
     void icoidF() { glDrawElements(GL_TRIANGLE_STRIP, icoid_cnt_, GL_UNSIGNED_SHORT, (void*)(icoid_idx_*sizeof(GLshort))); }
     
-    void setBuffers()
+    void createBuffers()
     {
         Tesselator ico[8];
         ico[0].buildIcosahedron(finesse*8);
@@ -1669,7 +1669,51 @@ namespace gle
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }
 
+    void initBuffers()
+    {
+        glGenBuffers(2, buf_);
+        glBindBuffer(GL_ARRAY_BUFFER, buf_[0]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+        gle::createBuffers();
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
     
+    void initialize()
+    {
+        CHECK_GL_ERROR("before gle:initialize()");
+#ifndef __APPLE__
+        //need to initialize GLEW on Linux
+        const GLenum err = glewInit();
+        if ( GLEW_OK != err )
+        {
+            /* Problem: glewInit failed, something is seriously wrong. */
+            fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+            exit(1);
+        }
+#endif
+        // circle_[] covers 2 revolutions = 4 * PI
+        set_arc(2*pi_twice, circle_, 1, 0, 2*M_PI/pi_twice, 0, 0);
+
+        if ( !glIsBuffer(buf_[0]) )
+        {
+            initBuffers();
+            gym::initStreams();
+            CHECK_GL_ERROR("gle:initBuffers()");
+            std::atexit(quit);
+        }
+    }
+    
+    void quit()
+    {
+        // The system will release all GPU resources, so this is not necessary
+        /*
+        glDeleteBuffers(2, buf_);
+        for (int i=0; i<4; ++i) buf_[i] = 0;
+        releaseStreams();
+        */
+    }
+
     //-----------------------------------------------------------------------
     #pragma mark - Sphere decorations
 
