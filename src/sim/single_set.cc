@@ -141,7 +141,7 @@ Property* SingleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-/// pick from reserves if possible:
+/// pick from reserves if possible
 Single * SingleSet::makeSingle(SingleProp const* P)
 {
     Single * S = P->stocks.head();
@@ -413,8 +413,8 @@ void SingleSet::defrostStore()
     while (( i = ice_.front() ))
     {
         ice_.pop_front();
+        inventory_.unassign(i);
         Single * S = static_cast<Single*>(i);
-        inventory_.unassign(S);
         S->hand()->detachHand();
         S->prop->stocks.push(S);
     }
@@ -528,11 +528,10 @@ void SingleSet::writeSet(Outputter& out) const
 
 int SingleSet::bad() const
 {
-    int code = fList.bad() | aList.bad();
+    if ( fList.bad() ) return 1;
+    if ( aList.bad() ) return 2;
 
-    if ( code )
-        return code;
-    
+    int code = 0;
     Single * obj;
     for ( obj = firstF(); obj ; obj=obj->next() )
     {

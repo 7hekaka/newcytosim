@@ -245,7 +245,7 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-/// pick from reserves if possible:
+/// pick from reserves if possible
 Couple * CoupleSet::makeCouple(CoupleProp const* P)
 {
     Couple * C = P->stocks.head();
@@ -808,18 +808,20 @@ void CoupleSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector
 
 int CoupleSet::bad() const
 {
-    int code = ffList.bad() | afList.bad() | faList.bad() | aaList.bad();
-    if ( code )
-        return code;
+    if ( ffList.bad() ) return 1;
+    if ( afList.bad() ) return 2;
+    if ( faList.bad() ) return 3;
+    if ( aaList.bad() ) return 4;
 
+    int code = 0;
     Couple * obj;
-    for ( obj=firstFF(); obj ; obj = obj->next() )
+    for ( obj=firstFF(); obj ; obj=obj->next() )
     {
         if ( obj->attached1() || obj->attached2() )
             code |= 8;
     }
     
-    for ( obj=firstAF(); obj ; obj = obj->next() )
+    for ( obj=firstAF(); obj ; obj=obj->next() )
     {
         if ( !obj->attached1() || obj->attached2() )
             code |= 16;
@@ -829,7 +831,7 @@ int CoupleSet::bad() const
             code |= 128;
     }
     
-    for ( obj=firstFA(); obj ; obj = obj->next() )
+    for ( obj=firstFA(); obj ; obj=obj->next() )
     {
         if ( obj->attached1() || !obj->attached2() )
             code |= 32;
@@ -839,7 +841,7 @@ int CoupleSet::bad() const
             code |= 128;
     }
     
-    for ( obj=firstAA(); obj ; obj = obj->next() )
+    for ( obj=firstAA(); obj ; obj=obj->next() )
     {
         if ( !obj->attached1() || !obj->attached2() )
             code |= 64;
