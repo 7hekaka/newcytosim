@@ -76,6 +76,9 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 [Karyogamy](http://www.genesdev.org/cgi/doi/10.1101/gad.206318.112)  
 <img src="data/karyogamy.png" alt="karyogamy" width="512"/>
 
+[Spindle pole focussing](https://doi.org/10.1083/jcb.200505107)  
+<img src="data/focusing.png" alt="focusing" width="512"/>
+
 [Self organization in confined space](http://www.cell.com/current-biology/abstract/S0960-9822(09)01025-2)  
 <img src="data/droplets.png" alt="droplets" width="512"/>
 
