@@ -1448,63 +1448,66 @@ namespace gle
         return i;
     }
 
-    inline void doTubeStrip(size_t start, size_t cnt)
+    inline void doTubeStrip(size_t inx, size_t cnt)
     {
         gym::bindBufferV3N3(buf_[0]);
-        gym::drawTriangleStrip(start, cnt);
+        gym::drawTriangleStrip(tubes_[inx], cnt);
         gym::cleanup();
     }
     
     // using Vertex Buffer Objects
-    void tube1()         { doTubeStrip(tubes_[0], nbTrianglesTube(1)); }
-    void tube2()         { doTubeStrip(tubes_[1], nbTrianglesTube(2)); }
-    void tube4()         { doTubeStrip(tubes_[2], nbTrianglesTube(4)); }
-    void tube8()         { doTubeStrip(tubes_[3], nbTrianglesTube(8)); }
+    void tube1()         { doTubeStrip(0, nbTrianglesTube(1)); }
+    void tube2()         { doTubeStrip(1, nbTrianglesTube(2)); }
+    void tube4()         { doTubeStrip(2, nbTrianglesTube(4)); }
+    void tube8()         { doTubeStrip(3, nbTrianglesTube(8)); }
 
-    void tubeS()         { doTubeStrip(tubes_[4], nbTrianglesTube(4)); }
-    void tubeM()         { doTubeStrip(tubes_[5], nbTrianglesTube(4)); }
-    void tubeE()         { doTubeStrip(tubes_[6], nbTrianglesTube(4)); }
+    void tubeS()         { doTubeStrip(4, nbTrianglesTube(4)); }
+    void tubeM()         { doTubeStrip(5, nbTrianglesTube(4)); }
+    void tubeE()         { doTubeStrip(6, nbTrianglesTube(4)); }
     
-    void longTube1()     { doTubeStrip(tubes_[7], nbTrianglesTube(1)); }
-    void longTube2()     { doTubeStrip(tubes_[8], nbTrianglesTube(2)); }
-    void longTube4()     { doTubeStrip(tubes_[9], nbTrianglesTube(4)); }
+    void longTube1()     { doTubeStrip(7, nbTrianglesTube(1)); }
+    void longTube2()     { doTubeStrip(8, nbTrianglesTube(2)); }
+    void longTube4()     { doTubeStrip(9, nbTrianglesTube(4)); }
     
-    void halfTube1()     { doTubeStrip(tubes_[10], nbTrianglesTube(1)); }
-    void halfTube2()     { doTubeStrip(tubes_[11], nbTrianglesTube(2)); }
-    void halfTube4()     { doTubeStrip(tubes_[12], nbTrianglesTube(4)); }
+    void halfTube1()     { doTubeStrip(10, nbTrianglesTube(1)); }
+    void halfTube2()     { doTubeStrip(11, nbTrianglesTube(2)); }
+    void halfTube4()     { doTubeStrip(12, nbTrianglesTube(4)); }
     
-    void shutTubeC()     { doTubeStrip(tubes_[13], nbTrianglesTubeClosed(1)); }
-    void shutTube2()     { doTubeStrip(tubes_[14], nbTrianglesTubeClosed(2)); }
-    void shutLongTube2() { doTubeStrip(tubes_[15], nbTrianglesTubeClosed(2)); }
+    void shutTubeC()     { doTubeStrip(13, nbTrianglesTubeClosed(1)); }
+    void shutTube2()     { doTubeStrip(14, nbTrianglesTubeClosed(2)); }
+    void shutLongTube2() { doTubeStrip(15, nbTrianglesTubeClosed(2)); }
 
-    void cone1()         { doTubeStrip(tubes_[16], nbTrianglesTubeClosed(1)); }
-    void cone2()         { doTubeStrip(tubes_[17], nbTrianglesTubeClosed(2)); }
-    void longCone()      { doTubeStrip(tubes_[19], nbTrianglesTubeClosed(2)); }
-    void truncatedCone() { doTubeStrip(tubes_[20], nbTrianglesTube(2)); }
+    void cone1()         { doTubeStrip(16, nbTrianglesTubeClosed(1)); }
+    void cone2()         { doTubeStrip(17, nbTrianglesTubeClosed(2)); }
+    void longCone()      { doTubeStrip(19, nbTrianglesTubeClosed(2)); }
+    void truncatedCone() { doTubeStrip(20, nbTrianglesTube(2)); }
 
-    void disc1()         { doTubeStrip(tubes_[22], pi_twice); }
-    void disc2()         { doTubeStrip(tubes_[23], pi_twice/2); }
-    void discTop1()      { doTubeStrip(tubes_[24], pi_twice); }
-    void discTop2()      { doTubeStrip(tubes_[25], pi_twice/2); }
-    void discTopH()      { doTubeStrip(tubes_[26], pi_twice/2); }
-    void discBottom1()   { doTubeStrip(tubes_[27], pi_twice); }
-    void discBottom2()   { doTubeStrip(tubes_[28], pi_twice/2); }
-    void discMid2()      { doTubeStrip(tubes_[29], pi_twice/2); }
-    void ring()          { doTubeStrip(tubes_[30], 2+pi_twice); }
-    void thin_ring()     { doTubeStrip(tubes_[31], 2+pi_twice); }
+    void disc1()         { doTubeStrip(22, pi_twice); }
+    void disc2()         { doTubeStrip(23, pi_twice/2); }
+    void discTop1()      { doTubeStrip(24, pi_twice); }
+    void discTop2()      { doTubeStrip(25, pi_twice/2); }
+    void discTopH()      { doTubeStrip(26, pi_twice/2); }
+    void discBottom1()   { doTubeStrip(27, pi_twice); }
+    void discBottom2()   { doTubeStrip(28, pi_twice/2); }
+    void discMid2()      { doTubeStrip(29, pi_twice/2); }
+    void ring()          { doTubeStrip(30, 2+pi_twice); }
+    void thin_ring()     { doTubeStrip(31, 2+pi_twice); }
 
-    void stripedTube(float w) { gym::bindBufferV3N3(buf_[0]); gym::cleanup(1); gym::drawLines(w, tubes_[2], nbTrianglesTube(4)); }
-    void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
-    void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
-    void dottedCircle(float w) { gym::bindBufferV2(buf_[0]); gym::drawPoints(w, discs_[1], 1+pi_twice/2); }
-    void square1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 5); }
+    inline void bindBufferV2() { gym::bindBufferV2(buf_[0]); }
+    inline void bindBufferV3N3() { gym::bindBufferV3N3(buf_[0]); }
+    
+    void stripedTube(float w) { bindBufferV3N3(); gym::cleanup(1); gym::drawLines(w, tubes_[2], nbTrianglesTube(4)); }
+    void circle1(float w) { bindBufferV2(); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
+    void circle2(float w) { bindBufferV2(); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
+    void dottedCircle(float w) { bindBufferV2(); gym::drawPoints(w, discs_[1], 1+pi_twice/2); }
+    void square1(float w) { bindBufferV2(); gym::drawLineStrip(w, discs_[2], 5); }
 
     void circle(float R, float w) { gym::scale(R); circle1(w); gym::pull_ref(); }
 
-    void strokeCapsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[4], 15); }
-    void paintCapsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[5], 15); }
-    void strokeCross(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[6], 12); }
-    void paintCross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[7], 12); }
+    void strokeCapsule(float w) { bindBufferV2(); gym::drawLineStrip(w, discs_[4], 15); }
+    void paintCapsule() { bindBufferV2(); gym::drawTriangleStrip(discs_[5], 15); }
+    void strokeCross(float w) { bindBufferV2(); gym::drawLineStrip(w, discs_[6], 12); }
+    void paintCross() { bindBufferV2(); gym::drawTriangleStrip(discs_[7], 12); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres made from refined Icosahedrons
