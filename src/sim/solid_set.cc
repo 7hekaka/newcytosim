@@ -10,27 +10,27 @@
 void SolidSet::step()
 {
 #if ( 0 )
-    for ( Solid * B = first(); B; B = B->next() )
-        B->step();
+    for ( Solid * S = first(); S; S = S->next() )
+        S->step();
 #endif
 #if NEW_SOLID_MAKE_COUPLE
     static float nextCreation = RNG.exponential();
-    for ( Solid * B = first(); B; B = B->next() )
+    for ( Solid * S = first(); S; S = S->next() )
     {
-        nextCreation -= B->prop->source_rate_dt;
+        nextCreation -= S->prop->source_rate_dt;
         while ( nextCreation <= 0 )
         {
             nextCreation += RNG.exponential();
             // we only consider creation on the first point!
-            Vector pos = B->posPoint(0) + Vector::randU(B->radius(0));
-            if ( B->prop->source_couple )
+            Vector pos = S->posPoint(0) + Vector::randU(S->radius(0));
+            if ( S->prop->source_couple )
             {
-                Couple * C = simul_.couples.addCouple(B->prop->source_couple, pos);
+                Couple * C = simul_.couples.addCouple(S->prop->source_couple, pos);
                 C->activate();
             }
             else
             {
-                simul_.singles.addSingle(B->prop->source_single, pos);
+                simul_.singles.addSingle(S->prop->source_single, pos);
             }
         }
     }

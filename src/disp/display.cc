@@ -2125,7 +2125,7 @@ void Display::drawSolid(Solid const& obj)
 #if NEW_SOLID_HAS_TWIN
     // display links between twin solids
     Solid const* twi = obj.twin();
-    if ( twi && ( obj.prop->twin_stiffness > 0 ) && ( disp->style & 6 ) )
+    if ( twi && ( obj.prop->twin_stiffness > 0 ) )
     {
         gym_color lor = bodyColorF(*twi).mix(col);
         real rad = M_SQRT2 * pixscale(disp->size);
