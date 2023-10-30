@@ -56,6 +56,8 @@ namespace gle
     //------------------------------------------------------------------------------
 #pragma mark -
 
+    /// draw 2D square ranging [-1, 1]
+    void square1(float stroke_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal
     void circle1(float stroke_width);
     /// draw 2D circle of radius 1 in XY plane, with +Z as normal, fewer points
@@ -130,8 +132,15 @@ namespace gle
     void needle();
     /// draw a Cube of side 2
     void cube();
+    /// draw a smaller cube
+    void smallCube();
+    /// draw top and bottom faces of a cube
+    void cubeFaces();
     /// draw a Cube of side 2
-    void wireCube(float);
+    void cubeEdges(float);
+    /// draw vertical edges of a cube
+    void cubeVerticalEdges(float);
+
     /// draw a Cube of side 1
     void cuboid();
     /// draw a stellated octahedron

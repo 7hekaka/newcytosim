@@ -63,6 +63,9 @@ namespace gym
     
     /// translate current view
     inline void translate(float x, float y, float z) { gym::mat_translate(mvp_, x, y, z); load(); }
+    
+    /// translate current view, but do not load
+    inline void shift(float x, float y, float z) { gym::mat_translate(mvp_, x, y, z); }
 
     /// scale current view
     inline void scale(float S) { gym::mat_scale(mvp_, S, S, S); load(); }

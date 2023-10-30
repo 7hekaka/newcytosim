@@ -302,6 +302,7 @@ void SpaceStrip::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 
+#include "gle.h"
 #include "gym_flute.h"
 #include "gym_draw.h"
 #include "gym_view.h"
@@ -333,30 +334,16 @@ void SpaceStrip::draw3D() const
     const float Y((DIM>1) ? half_[1] : 1);
     const float T(top_);
     const float B(bot_);
-
-    flute3 * flu = gym::mapBufferV3(8);
-    flu[0] = {-X, Y, B};
-    flu[1] = {-X, Y, T};
-    flu[2] = {-X,-Y, B};
-    flu[3] = {-X,-Y, T};
-    flu[4] = { X, Y, B};
-    flu[5] = { X, Y, T};
-    flu[6] = { X,-Y, B};
-    flu[7] = { X,-Y, T};
-    gym::unmapBufferV3();
+    gym::shift(0, 0, 0.5*(B+T));
+    gym::scale(X, Y, 0.5*(T-B));
     // draw top and bottom faces:
     gym::enableLighting();
-    gym::rebindBufferV3(2, 0);
-    gym::drawTriangleStrip(0, 4);
-    gym::rebindBufferV3(2, 1);
-    gym::drawTriangleStrip(0, 4);
+    gle::cubeFaces();
     // draw vertical edges:
     gym::disableLighting();
     gym::enableLineStipple(0x000F);
-    gym::rebindBufferV3(1, 0);
-    gym::drawLines(WIDTH, 0, 8);
+    gle::cubeVerticalEdges(WIDTH);
     gym::disableLineStipple();
-    gym::cleanup();
 }
 
 #else

@@ -30,14 +30,14 @@ namespace gle
     /// offset for object's data stored in buffers
     size_t tubes_[32] = { 0 };
 
-    /// offset for object's data stored in buffers
+    /// offset for object's data with 6 floats / vertex
     size_t cubes_[12] = { 0 };
     
-    /// offset for object's data stored in buffers
+    /// offset for object's data with 3 floats / vertex
     size_t blobs_[4] = { 0 };
     
     /// offset for object's data stored in buffers
-    size_t discs_[6] = { 0 };
+    size_t discs_[8] = { 0 };
 
     /// index of first vertex in buffer object
     size_t ico_pts_[8] = { 0 };
@@ -272,68 +272,82 @@ namespace gle
     }
 
     
-    /// Cube is made of 12 triangles = 36 vertices
-    size_t setCube(flute6* flt, float R)
+    /// A cube made of 12 triangles with normals = 36 vertices
+    size_t setCubeFaces(flute6* flt, float X, float Y, float Z)
     {
-        flt[0] = { R, R, R, 1, 0, 0};
-        flt[1] = { R,-R,-R, 1, 0, 0};
-        flt[2] = { R, R,-R, 1, 0, 0};
-        flt[3] = { R,-R,-R, 1, 0, 0};
-        flt[4] = { R, R, R, 1, 0, 0};
-        flt[5] = { R,-R, R, 1, 0, 0};
-        flt[6] = { R, R, R, 0, 1, 0};
-        flt[7] = { R, R,-R, 0, 1, 0};
-        flt[8] = {-R, R,-R, 0, 1, 0};
-        flt[9] = { R, R, R, 0, 1, 0};
-        flt[10] = {-R, R,-R, 0, 1, 0};
-        flt[11] = {-R, R, R, 0, 1, 0};
-        flt[12] = {-R, R, R, 0, 0, 1};
-        flt[13] = {-R,-R, R, 0, 0, 1};
-        flt[14] = { R,-R, R, 0, 0, 1};
-        flt[15] = { R, R, R, 0, 0, 1};
-        flt[16] = {-R, R, R, 0, 0, 1};
-        flt[17] = { R,-R, R, 0, 0, 1};
-        flt[18] = {-R,-R,-R,-1, 0, 0};
-        flt[19] = {-R,-R, R,-1, 0, 0};
-        flt[20] = {-R, R, R,-1, 0, 0};
-        flt[21] = {-R,-R,-R,-1, 0, 0};
-        flt[22] = {-R, R, R,-1, 0, 0};
-        flt[23] = {-R, R,-R,-1, 0, 0};
-        flt[24] = { R,-R, R, 0,-1, 0};
-        flt[25] = {-R,-R,-R, 0,-1, 0};
-        flt[26] = { R,-R,-R, 0,-1, 0};
-        flt[27] = { R,-R, R, 0,-1, 0};
-        flt[28] = {-R,-R, R, 0,-1, 0};
-        flt[29] = {-R,-R,-R, 0,-1, 0};
-        flt[30] = { R, R,-R, 0, 0,-1};
-        flt[31] = {-R,-R,-R, 0, 0,-1};
-        flt[32] = {-R, R,-R, 0, 0,-1};
-        flt[33] = { R, R,-R, 0, 0,-1};
-        flt[34] = { R,-R,-R, 0, 0,-1};
-        flt[35] = {-R,-R,-R, 0, 0,-1};
+        // bottom plate
+        flt[0] = { X, Y,-Z, 0, 0,-1};
+        flt[1] = {-X,-Y,-Z, 0, 0,-1};
+        flt[2] = {-X, Y,-Z, 0, 0,-1};
+        flt[3] = { X, Y,-Z, 0, 0,-1};
+        flt[4] = { X,-Y,-Z, 0, 0,-1};
+        flt[5] = {-X,-Y,-Z, 0, 0,-1};
+        // top plate
+        flt[6] = {-X, Y, Z, 0, 0, 1};
+        flt[7] = {-X,-Y, Z, 0, 0, 1};
+        flt[8] = { X,-Y, Z, 0, 0, 1};
+        flt[9] = { X, Y, Z, 0, 0, 1};
+        flt[10] = {-X, Y, Z, 0, 0, 1};
+        flt[11] = { X,-Y, Z, 0, 0, 1};
+        // sides
+        flt[12] = { X, Y, Z, 1, 0, 0};
+        flt[13] = { X,-Y,-Z, 1, 0, 0};
+        flt[14] = { X, Y,-Z, 1, 0, 0};
+        flt[15] = { X,-Y,-Z, 1, 0, 0};
+        flt[16] = { X, Y, Z, 1, 0, 0};
+        flt[17] = { X,-Y, Z, 1, 0, 0};
+        flt[18] = { X, Y, Z, 0, 1, 0};
+        flt[19] = { X, Y,-Z, 0, 1, 0};
+        flt[20] = {-X, Y,-Z, 0, 1, 0};
+        flt[21] = { X, Y, Z, 0, 1, 0};
+        flt[22] = {-X, Y,-Z, 0, 1, 0};
+        flt[23] = {-X, Y, Z, 0, 1, 0};
+        flt[24] = {-X,-Y,-Z,-1, 0, 0};
+        flt[25] = {-X,-Y, Z,-1, 0, 0};
+        flt[26] = {-X, Y, Z,-1, 0, 0};
+        flt[27] = {-X,-Y,-Z,-1, 0, 0};
+        flt[28] = {-X, Y, Z,-1, 0, 0};
+        flt[29] = {-X, Y,-Z,-1, 0, 0};
+        flt[30] = { X,-Y, Z, 0,-1, 0};
+        flt[31] = {-X,-Y,-Z, 0,-1, 0};
+        flt[32] = { X,-Y,-Z, 0,-1, 0};
+        flt[33] = { X,-Y, Z, 0,-1, 0};
+        flt[34] = {-X,-Y, Z, 0,-1, 0};
+        flt[35] = {-X,-Y,-Z, 0,-1, 0};
         return 36;
     }
     
     /// Cube is made of 4 linestrips of 4 points each
-    size_t setWireCube(flute3* flt, float R)
+    size_t setCubeEdges(flute3* flt, float X, float Y, float Z)
     {
-        flt[0] = {-R,-R, R};
-        flt[1] = { R,-R, R};
-        flt[2] = { R,-R,-R};
-        flt[3] = {-R,-R,-R};
-        flt[4] = { R,-R, R};
-        flt[5] = { R, R, R};
-        flt[6] = { R, R,-R};
-        flt[7] = { R,-R,-R};
-        flt[8] = { R, R, R};
-        flt[9] = {-R, R, R};
-        flt[10] = {-R, R,-R};
-        flt[11] = { R, R,-R};
-        flt[12] = {-R, R, R};
-        flt[13] = {-R,-R, R};
-        flt[14] = {-R,-R,-R};
-        flt[15] = {-R, R,-R};
-        return 16;
+        // vertical edges
+        flt[0] = { X, Y, -Z};
+        flt[1] = { X, Y,  Z};
+        flt[2] = { X,-Y, -Z};
+        flt[3] = { X,-Y,  Z};
+        flt[4] = {-X,-Y, -Z};
+        flt[5] = {-X,-Y,  Z};
+        flt[6] = {-X, Y, -Z};
+        flt[7] = {-X, Y,  Z};
+        // top plate
+        flt[8] = { X, Y, Z};
+        flt[9] = {-X, Y, Z};
+        flt[10] = { X,-Y, Z};
+        flt[11] = {-X,-Y, Z};
+        flt[12] = { X, Y, Z};
+        flt[13] = { X,-Y, Z};
+        flt[14] = {-X, Y, Z};
+        flt[15] = {-X,-Y, Z};
+        // bottom plate
+        flt[16] = { X, Y, -Z};
+        flt[17] = {-X, Y, -Z};
+        flt[18] = { X,-Y, -Z};
+        flt[19] = {-X,-Y, -Z};
+        flt[20] = { X, Y, -Z};
+        flt[21] = { X,-Y, -Z};
+        flt[22] = {-X, Y, -Z};
+        flt[23] = {-X,-Y, -Z};
+        return 24;
     }
     
     /// Octahedron is made of 8 triangles and 24 vertices
@@ -884,7 +898,7 @@ namespace gle
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12 + 12 + 36 + 60 + 45 + 36 + 3 * 22 + 16 + 12*8 );
+        return ( 12*2 + 36 + 60 + 45 + 36*2 + 22*3 + 12*8 );
     }
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori)
@@ -895,19 +909,19 @@ namespace gle
         cubes_[2] = i+s; i += setOctahedron(ptr+i);
         cubes_[3] = i+s; i += setIcosahedron(ptr+i);
         cubes_[4] = i+s; i += setArrowTail(ptr+i);
-        cubes_[5] = i+s; i += setCube(ptr+i, 0.5773502692f);
-        cubes_[6] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
-        cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
-        cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
-        cubes_[9] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
-        cubes_[10] = i+s; i += setWireCube((flute3*)(ptr+i), 0.5773502692f);
+        cubes_[5] = i+s; i += setCubeFaces(ptr+i, 1.0f, 1.0f, 1.0f);
+        cubes_[6] = i+s; i += setCubeFaces(ptr+i, 0.57735f, 0.57735f, 0.57735f);
+        cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
+        cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
+        cubes_[9] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
+        cubes_[10] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
         assert_true( i <= sizeCubeBuffers() );
         return i;
     }
     
     static size_t sizeBlobBuffers()
     {
-        return ( 54 + 54 + 16 );
+        return ( 54 + 54 + 16 + 24 );
     }
 
     size_t setBlobBuffers(flute3* ptr, flute3* const ori)
@@ -916,6 +930,7 @@ namespace gle
         blobs_[0] = i+s; i += setBlob(ptr+i);
         blobs_[1] = i+s; i += setPin(ptr+i);
         blobs_[2] = i+s; i += setCuboid(ptr+i, 1.0);
+        blobs_[3] = i+s; i += setCubeEdges(ptr+i, 1.0f, 1.0f, 1.0f);
         assert_true( i <= sizeBlobBuffers() );
         return i;
     }
@@ -927,15 +942,18 @@ namespace gle
         gym::cleanup();
     }
     
-    void wireCube(float width)
+    void cubeEdges(float width)
     {
-        gym::bindBufferV3(buf_[0], 6*cubes_[10]);
-        gym::drawLineStrip(width, 0, 4);
-        gym::drawLineStrip(4, 4);
-        gym::drawLineStrip(8, 4);
-        gym::drawLineStrip(12, 4);
+        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
+        gym::drawLines(width, 0, 24);
     }
     
+    void cubeVerticalEdges(float width)
+    {
+        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
+        gym::drawLines(width, 0, 8);
+    }
+
     void doVNTriangleStrip(GLsizei start, GLsizei cnt)
     {
         gym::bindBufferV3N3(buf_[0]);
@@ -970,21 +988,33 @@ namespace gle
     
     void arrowTail() { doVNTriangles(cubes_[4], 45); }
     void cube()      { doVNTriangles(cubes_[5], 36); }
-    
-    void hexTube()      { doVNTriangleStrip(cubes_[6], 22); }
-    void thinTube()     { doVNTriangleStrip(cubes_[7], 22); }
-    void thinLongTube() { doVNTriangleStrip(cubes_[8], 22); }
+    void cubeFaces() { doVNTriangles(cubes_[5], 12); }
+    void smallCube() { doVNTriangles(cubes_[6], 36); }
+
+    void hexTube()      { doVNTriangleStrip(cubes_[7], 22); }
+    void thinTube()     { doVNTriangleStrip(cubes_[8], 22); }
+    void thinLongTube() { doVNTriangleStrip(cubes_[9], 22); }
 
     void blob()   { doTriangleStrip(blobs_[0], 54); }
     void needle() { doTriangleStrip(blobs_[1], 54); }
     void cuboid() { doTriangleStrip(blobs_[2], 14); }
     //void icoidS() { doTriangleStrip(blobs_[3], 32); }
     
-    void footballPentagons() { doVNTriangleStrip(cubes_[9], 8*12); }
+    void footballPentagons() { doVNTriangleStrip(cubes_[10], 8*12); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D Circle
     
+    size_t setSquare(flute2* flu, float X, float Y)
+    {
+        flu[0] = { X, Y};
+        flu[1] = {-X, Y};
+        flu[2] = {-X,-Y};
+        flu[3] = { X,-Y};
+        flu[4] = { X, Y};
+        return 5;
+    }
+
     size_t setCircle(flute2* flu, size_t inc, float R)
     {
         size_t i = 0;
@@ -1103,10 +1133,11 @@ namespace gle
         size_t i = 0, s = ptr - ori;
         discs_[0] = i+s; i += setCircle(ptr+i, 1, 1);
         discs_[1] = i+s; i += setCircle(ptr+i, 2, 1);
-        discs_[2] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
-        discs_[3] = i+s; i += setCapsulePaint(ptr+i, 0.75);
-        discs_[4] = i+s; i += setCrossStroke(ptr+i);
-        discs_[5] = i+s; i += setCrossPaint(ptr+i);
+        discs_[2] = i+s; i += setSquare(ptr+i, 1, 1);
+        discs_[4] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
+        discs_[5] = i+s; i += setCapsulePaint(ptr+i, 0.75);
+        discs_[6] = i+s; i += setCrossStroke(ptr+i);
+        discs_[7] = i+s; i += setCrossPaint(ptr+i);
         assert_true( i <= sizeCircBuffers() );
         return i;
     }
@@ -1123,7 +1154,7 @@ namespace gle
             ptr += 2;
         }
         gym::unmapBufferV2();
-        assert_true( ptr-buf <= 2*pi_twice+2 );
+        assert_true( size_t(ptr-buf) <= 2*pi_twice+2 );
         gym::drawTriangleStrip(0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1149,7 +1180,7 @@ namespace gle
         }
         *ptr++ = { L-rad, 0 };
         gym::unmapBufferV2();
-        assert_true( ptr-buf <= pi_twice+4 );
+        assert_true( size_t(ptr-buf) <= pi_twice+4 );
         gym::drawTriangleStrip(0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1164,7 +1195,7 @@ namespace gle
             *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
         *ptr++ = { L, rad };
         gym::unmapBufferV2();
-        assert_true( ptr-buf <= pi_twice+4 );
+        assert_true( size_t(ptr-buf) <= pi_twice+4 );
         gym::drawLineStrip(width, 0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1206,7 +1237,7 @@ namespace gle
         }
         *ptr++ = { L-rad, 0 };
         gym::unmapBufferV2();
-        assert_true( ptr-buf <= 2*pi_twice+4 );
+        assert_true( size_t(ptr-buf) <= 2*pi_twice+4 );
         gym::drawTriangleStrip(0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1231,7 +1262,7 @@ namespace gle
             *ptr++ = { F*cos_(j) - X, F*sin_(j) + G };
         *ptr++ = { L, rad };
         gym::unmapBufferV2();
-        assert_true( ptr-buf <= 2*pi_twice+8 );
+        assert_true( size_t(ptr-buf) <= 2*pi_twice+8 );
         gym::drawLineStrip(width, 0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1466,12 +1497,14 @@ namespace gle
     void circle1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
     void circle2(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
     void dottedCircle(float w) { gym::bindBufferV2(buf_[0]); gym::drawPoints(w, discs_[1], 1+pi_twice/2); }
+    void square1(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 5); }
+
     void circle(float R, float w) { gym::scale(R); circle1(w); gym::pull_ref(); }
 
-    void strokeCapsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[2], 15); }
-    void paintCapsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[3], 15); }
-    void strokeCross(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[4], 12); }
-    void paintCross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[5], 12); }
+    void strokeCapsule(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[4], 15); }
+    void paintCapsule() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[5], 15); }
+    void strokeCross(float w) { gym::bindBufferV2(buf_[0]); gym::drawLineStrip(w, discs_[6], 12); }
+    void paintCross() { gym::bindBufferV2(buf_[0]); gym::drawTriangleStrip(discs_[7], 12); }
 
     //-----------------------------------------------------------------------
 #pragma mark - Spheres made from refined Icosahedrons
@@ -1895,7 +1928,7 @@ namespace gle
         flu[2] = { cB, BX, -rB };
         flu[3] = { cB, BX,  rB };
         gym::unmapBufferC4V2();
-        gym::drawTriangleStrip( 0, 4);
+        gym::drawTriangleStrip(0, 4);
         gym::cleanup();
     }
     
@@ -2180,7 +2213,7 @@ namespace gle
     {
         gym::stretchAlignZ(A, B, R);
         tube1();
-        gym::translate(0, 0, 1-3*R);
+        gym::shift(0, 0, 1-3*R);
         gym::scale(3.0, 3.0, 6*R);
         cone2();
     }
@@ -2189,7 +2222,7 @@ namespace gle
     {
         gym::stretchAlignZ(A, B, R);
         tube1();
-        gym::translate(0, 0, 1-3*R);
+        gym::shift(0, 0, 1-3*R);
         gym::scale(3.0, 3.0, 6*R);
         cone2();
     }
@@ -2234,10 +2267,10 @@ namespace gle
                     gym::rotateZ(0, -1);
                     break;
             }
-            gym::translate(0, 0, 8*R);
+            gym::shift(0, 0, 8*R);
             gym::scale(1.5*R, 1.5*R, 3*R);
             cone2();
-            gym::translate(0, 0, -2.4);
+            gym::shift(0, 0, -2.4);
             gym::scale(0.26, 0.26, 2.4);
             tube1();
         }

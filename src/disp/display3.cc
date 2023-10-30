@@ -1173,7 +1173,7 @@ void Display3::drawCoupleBside(Couple const* cx) const
         gle::blob();
         gym::translate(0, 0,Lr-Z);
         gle::cuboid();
-        gym::translate(0, 0,-Lr);
+        gym::shift(0, 0,-Lr);
         gym::scale(iLr, iLr, Lr);
         gle::hexTube();
     }

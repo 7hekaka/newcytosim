@@ -256,41 +256,22 @@ void SpaceSquare::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 
-#include "gym_flute.h"
-#include "gym_draw.h"
+#include "gle.h"
 #include "gym_view.h"
 #include "gym_cap.h"
 
 void SpaceSquare::drawEdges(float width) const
 {
-    const float X(half_[0]);
-    const float Y((DIM>1) ? half_[1] : 1);
-    const float T((DIM>2) ? half_[2] : 0);
-    const float B(-T);
-
-    flute3 * flu = gym::mapBufferV3(10);
-    flu[0] = { X, Y, B};
-    flu[1] = { X, Y, T};
-    flu[2] = { X,-Y, B};
-    flu[3] = { X,-Y, T};
-    flu[4] = {-X,-Y, B};
-    flu[5] = {-X,-Y, T};
-    flu[6] = {-X, Y, B};
-    flu[7] = {-X, Y, T};
-    flu[8] = { X, Y, B};
-    flu[9] = { X, Y, T};
-    gym::unmapBufferV3();
 #if ( DIM > 2 )
     gym::disableLighting();
-    gym::drawLines(width, 0, 8);
-    gym::rebindBufferV3(2, 0);
-    gym::drawLineStrip(width, 0, 5);
-    gym::rebindBufferV3(2, 1);
-    gym::drawLineStrip(width, 0, 5);
+    gle::cubeEdges(width);
     gym::restoreLighting();
 #else
-    gym::rebindBufferV3(2, 0);
-    gym::drawLineStrip(width, 0, 5);
+    const float X(half_[0]);
+    const float Y(half_[1]);
+    const float Z((DIM>2) ? half_[2] : 0);
+    gym::scale(X, Y, Z);
+    gle::square1(width);
 #endif
 }
 
@@ -299,42 +280,9 @@ void SpaceSquare::drawFaces() const
 #if ( DIM > 2 )
     const float X(half_[0]);
     const float Y(half_[1]);
-    const float T((DIM>2) ? half_[2] : 0);
-    const float B(-T);
-
-    flute3 * flu = gym::mapBufferV3(24);
-    flu[0] = { X, Y, B};
-    flu[1] = { X, Y, T};
-    flu[2] = { X,-Y, B};
-    flu[3] = { X,-Y, T};
-    flu[4] = {-X,-Y, B};
-    flu[5] = {-X,-Y, T};
-    flu[6] = {-X, Y, B};
-    flu[7] = {-X, Y, T};
-    flu[8] = { X, Y, B};
-    flu[9] = {-X, Y, B};
-    flu[10] = { X, Y, T};
-    flu[11] = {-X, Y, T};
-    flu[12] = { X,-Y, T};
-    flu[13] = {-X,-Y, T};
-    flu[14] = { X,-Y, B};
-    flu[15] = {-X,-Y, B};
-    flu[16] = { X, Y, T};
-    flu[17] = {-X, Y, T};
-    flu[18] = { X,-Y, T};
-    flu[19] = {-X,-Y, T};
-    flu[20] = { X, Y, B};
-    flu[21] = { X,-Y, B};
-    flu[22] = {-X, Y, B};
-    flu[23] = {-X,-Y, B};
-    gym::unmapBufferV3();
-    gym::drawTriangleStrip( 0, 4);
-    gym::drawTriangleStrip( 4, 4);
-    gym::drawTriangleStrip( 8, 4);
-    gym::drawTriangleStrip(12, 4);
-    gym::drawTriangleStrip(16, 4);
-    gym::drawTriangleStrip(20, 4);
-    gym::cleanup();
+    const float Z((DIM>2) ? half_[2] : 0);
+    gym::scale(X, Y, Z);
+    gle::cube();
 #endif
 }
 

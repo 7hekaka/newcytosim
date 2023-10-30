@@ -121,6 +121,7 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 
+#include "gle.h"
 #include "gym_flute.h"
 #include "gym_draw.h"
 #include "gym_view.h"
@@ -149,32 +150,16 @@ void SpacePeriodic::draw2D(float width) const
 // draw periodic edges of the box
 void SpacePeriodic::draw3D() const
 {
-    const float WIDTH = 2;
     const float X(half_[0]);
     const float Y((DIM>1) ? half_[1] : 1);
-    const float T((DIM>2) ? half_[2] : 0);
-    const float B(-T);
+    const float Z((DIM>2) ? half_[2] : 0);
 
-    flute3 * flu = gym::mapBufferV3(10);
-    flu[0] = { X, Y, B};
-    flu[1] = { X, Y, T};
-    flu[2] = { X,-Y, B};
-    flu[3] = { X,-Y, T};
-    flu[4] = {-X,-Y, B};
-    flu[5] = {-X,-Y, T};
-    flu[6] = {-X, Y, B};
-    flu[7] = {-X, Y, T};
-    flu[8] = { X, Y, B};
-    flu[9] = { X, Y, T};
-    gym::unmapBufferV3();
+    gym::scale(X, Y, Z);
     gym::disableLighting();
     gym::enableLineStipple(0x000F);
-    gym::drawLines(WIDTH, 0, 8);
-    gym::rebindBufferV3(2, 0);
-    gym::drawLineStrip(WIDTH, 0, 5);
-    gym::rebindBufferV3(2, 1);
-    gym::drawLineStrip(WIDTH, 0, 5);
+    gle::cubeEdges(2);
     gym::disableLineStipple();
+    gym::restoreLighting();
 }
 
 #else

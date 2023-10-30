@@ -68,7 +68,7 @@ int display(View& view)
         gym::scale(1.732f);
         // transparent cube
         gym::color_both(1, 1, 1, 0.5);
-        gle::wireCube(1);
+        gle::cubeEdges(1);
         gym::closeDepthMask();
         gym::enableLighting();
         gym::color_both(1, 1, 1, 0.1);
