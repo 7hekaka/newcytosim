@@ -4,6 +4,7 @@ Cytosim Todo List
 
 - check diffusion of a looped filament
 - Display parameter such as 'tile': command line do not overwrite
+- biased movements of short filaments with sterics
 
 # Essential
 
@@ -35,7 +36,7 @@ Cytosim Todo List
   - non-linear cutting from lattice?
   - saturating transport on lattice: convection stalls above a certain concentration
 
-# v2022
+# v2024
 
 - use 'hpp' for C++ header files
 - use 'cpp' extension for C++ code file
@@ -52,7 +53,6 @@ Cytosim Todo List
 - Find a solution for 'confine = type, stiff, space' and 'confine = type, space' in Single.
 
 - add generic classes that can be customized: OpenFiber, OpenHand, OpenCouple, OpenSingle...
-- fix SpaceBeads: list of beads not set correctly after a read state.cym
 - binding_range warnings are not necessary for long Couples
 
 
@@ -92,7 +92,7 @@ test write / read systematically on all cym files
 - reading Single can be pooled since the Unattached and Attached Singles are stored apart
 - reduce Solid::addTriad() to add 2 points in 2D and 3 in 3D, as this is sufficient
 - Solid degree of freedom in linear system reduced to 5 in 3D, as this is sufficient
-- SparMatSymStruct Matrices can be structured as blocks corresponding to each Mecable (1.9.2022).
+- SparMatMatSym Matrices can be structured as blocks corresponding to each Mecable (1.9.2022).
 	+ this would speed up block addressing: 
 	+ Need to create a tuple of indices {mecaindex, pointindex}, to use as argument of add_block()
 	+ Updating the matrix can be done in parallel if Mecablocks are independent
@@ -100,10 +100,10 @@ test write / read systematically on all cym files
 	+ this will also permit vecMul parallelization per diagonal, using two output vectors:
         each sub-diagonal of blocks can be treated in parallel using multiple threads
 	+ todo: vecMul() takes two output vectors; SparmatSymBlock becomes rectangular
-- parallel matrix-vector with two output vector
+- parallel matrix-vector using SparMatMatSym with two output vector
 - new Matrix33x2 two implement two consecutive blocks:
     consecutive 3x3 blocks can be handled simultaneously with SIMD vec2 operations
-- Store Mecable vertices as XXXXXXYYYYYYZZZZZZ to improve vectorization
+- Store Mecable vertices as XXXXXX...YYYYYY...ZZZZZZ... to improve vectorization?
 - use VAS = Vector Array Stride; MVL = Meca Vector Length
 - implement IDRS to replace BICGSTAB - convergence in matlab seems better
   http://ta.twi.tudelft.nl/nw/users/gijzen/IDR.html
@@ -203,9 +203,10 @@ https://github.com/TNG/boost-python-examples
 
 # Misc:
 
+- FlightSimulator to control Cytosim's display via pipe
 - Slider to change parameter value:
    - setup by a command in config.cym: slider actin:rigidity { range = 0, 1; }
    can be done with ImGui?
 
 
-FJ Nedelec, 2022
+FJ Nedelec, 2023

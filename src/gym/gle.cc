@@ -107,7 +107,7 @@ namespace gle
     }
 
     //-----------------------------------------------------------------------
-    #pragma mark - Some 3D objects
+    #pragma mark - Some 3D objects: Cubes, Octahedron, Icosahedron...
 
     /// function callback
     using drawCall = flute6* (*)(flute6*, size_t, float const*, float const*);
@@ -736,8 +736,6 @@ namespace gle
         }
         return i;
     }
-
-    //-----------------------------------------------------------------------
     
     /// this only sets vertices, skipping normals
     size_t setCuboid(flute3* flu, float R)
@@ -759,6 +757,90 @@ namespace gle
         flu[13] = {U, U, R};
         return 14;
     }
+    
+    //-----------------------------------------------------------------------
+    
+    static size_t sizeCubeBuffers()
+    {
+        return ( 12*2 + 36 + 60 + 45 + 36*2 + 22*3 + 12*8 );
+    }
+    
+    size_t setCubeBuffers(flute6* ptr, flute6* const ori)
+    {
+        size_t i = 0, s = ptr - ori;
+        cubes_[0] = i+s; i += setTetrahedron(ptr);
+        cubes_[1] = i+s; i += invTetrahedron(ptr+i);
+        cubes_[2] = i+s; i += setOctahedron(ptr+i);
+        cubes_[3] = i+s; i += setIcosahedron(ptr+i);
+        cubes_[4] = i+s; i += setArrowTail(ptr+i);
+        cubes_[5] = i+s; i += setCubeFaces(ptr+i, 1.0f, 1.0f, 1.0f);
+        cubes_[6] = i+s; i += setCubeFaces(ptr+i, 0.57735f, 0.57735f, 0.57735f);
+        cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
+        cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
+        cubes_[9] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
+        cubes_[10] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
+        assert_true( i <= sizeCubeBuffers() );
+        return i;
+    }
+    
+    void cubeEdges(float width)
+    {
+        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
+        gym::drawLines(width, 0, 24);
+        gym::cleanup(1);
+    }
+    
+    void cubeVerticalEdges(float width)
+    {
+        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
+        gym::drawLines(width, 0, 8);
+        gym::cleanup(1);
+    }
+
+    void doCubeTriangles(size_t inx, GLsizei cnt)
+    {
+        gym::bindBufferV3N3(buf_[0]);
+        gym::drawTriangles(cubes_[inx], cnt);
+        gym::cleanup(1);
+    }
+
+    void doCubeStrip(size_t inx, GLsizei cnt)
+    {
+        gym::bindBufferV3N3(buf_[0]);
+        gym::drawTriangleStrip(cubes_[inx], cnt);
+        gym::cleanup(1);
+    }
+
+    void tetrahedron() { doCubeTriangles(0, 12); }
+    void upsideTetra() { doCubeTriangles(1, 12); }
+    void star()        { doCubeTriangles(0, 24); } // union of 2 tetrahedrons
+
+    void octahedron()  { doCubeTriangles(2+6, 24); }
+    void invPyramid()  { doCubeTriangles(2, 18); }
+    void pyramid()     { doCubeTriangles(2+18, 18); }
+    void icosahedron() { doCubeTriangles(3, 60); }
+    
+    void arrowTail() { doCubeTriangles(4, 45); }
+    void cube()      { doCubeTriangles(5, 36); }
+    void cubeFaces() { doCubeTriangles(5, 12); }
+    void smallCube() { doCubeTriangles(6, 36); }
+
+    void hexTube()      { doCubeStrip(7, 22); }
+    void thinTube()     { doCubeStrip(8, 22); }
+    void thinLongTube() { doCubeStrip(9, 22); }
+    void footballPentagons() { doCubeStrip(10, 8*12); }
+    
+    void ICOSAHEDRON()
+    {
+        flute6* tmp = gym::mapBufferV3N3(60);
+        setIcosahedron(tmp);
+        gym::unmapBufferV3N3();
+        gym::drawTriangles(0, 60);
+        gym::cleanup(1);
+    }
+
+    //-----------------------------------------------------------------------
+    #pragma mark - Blobs = 3D objects without normals
 
     size_t makeBlob(flute3* flu)
     {
@@ -893,32 +975,7 @@ namespace gle
     void nothing()
     {
     }
-    
-    //-----------------------------------------------------------------------
-    
-    static size_t sizeCubeBuffers()
-    {
-        return ( 12*2 + 36 + 60 + 45 + 36*2 + 22*3 + 12*8 );
-    }
-    
-    size_t setCubeBuffers(flute6* ptr, flute6* const ori)
-    {
-        size_t i = 0, s = ptr - ori;
-        cubes_[0] = i+s; i += setTetrahedron(ptr);
-        cubes_[1] = i+s; i += invTetrahedron(ptr+i);
-        cubes_[2] = i+s; i += setOctahedron(ptr+i);
-        cubes_[3] = i+s; i += setIcosahedron(ptr+i);
-        cubes_[4] = i+s; i += setArrowTail(ptr+i);
-        cubes_[5] = i+s; i += setCubeFaces(ptr+i, 1.0f, 1.0f, 1.0f);
-        cubes_[6] = i+s; i += setCubeFaces(ptr+i, 0.57735f, 0.57735f, 0.57735f);
-        cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
-        cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
-        cubes_[9] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
-        cubes_[10] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
-        assert_true( i <= sizeCubeBuffers() );
-        return i;
-    }
-    
+
     static size_t sizeBlobBuffers()
     {
         return ( 54 + 54 + 16 + 24 );
@@ -935,72 +992,17 @@ namespace gle
         return i;
     }
 
-    void doVNTriangles(GLsizei start, GLsizei cnt)
-    {
-        gym::bindBufferV3N3(buf_[0]);
-        gym::drawTriangles(start, cnt);
-        gym::cleanup();
-    }
-    
-    void cubeEdges(float width)
-    {
-        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
-        gym::drawLines(width, 0, 24);
-    }
-    
-    void cubeVerticalEdges(float width)
-    {
-        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
-        gym::drawLines(width, 0, 8);
-    }
-
-    void doVNTriangleStrip(GLsizei start, GLsizei cnt)
-    {
-        gym::bindBufferV3N3(buf_[0]);
-        gym::drawTriangleStrip(start, cnt);
-        gym::cleanup();
-    }
-
-    void doTriangleStrip(GLsizei start, GLsizei cnt)
+    void doBlobStrip(size_t inx, GLsizei cnt)
     {
         gym::bindBufferV3N0(buf_[0], 0);
-        gym::drawTriangleStrip(start, cnt);
-        gym::cleanup();
-    }
-    
-    void ICOSAHEDRON()
-    {
-        flute6* tmp = gym::mapBufferV3N3(60);
-        setIcosahedron(tmp);
-        gym::unmapBufferV3N3();
-        gym::drawTriangles(0, 60);
-        gym::cleanup();
+        gym::drawTriangleStrip(blobs_[inx], cnt);
+        gym::cleanup(1);
     }
 
-    void tetrahedron() { doVNTriangles(cubes_[0], 12); }
-    void upsideTetra() { doVNTriangles(cubes_[1], 12); }
-    void star()        { doVNTriangles(cubes_[0], 24); } // union of 2 tetrahedrons
-
-    void octahedron()  { doVNTriangles(cubes_[2]+6, 24); }
-    void invPyramid()  { doVNTriangles(cubes_[2], 18); }
-    void pyramid()     { doVNTriangles(cubes_[2]+18, 18); }
-    void icosahedron() { doVNTriangles(cubes_[3], 60); }
-    
-    void arrowTail() { doVNTriangles(cubes_[4], 45); }
-    void cube()      { doVNTriangles(cubes_[5], 36); }
-    void cubeFaces() { doVNTriangles(cubes_[5], 12); }
-    void smallCube() { doVNTriangles(cubes_[6], 36); }
-
-    void hexTube()      { doVNTriangleStrip(cubes_[7], 22); }
-    void thinTube()     { doVNTriangleStrip(cubes_[8], 22); }
-    void thinLongTube() { doVNTriangleStrip(cubes_[9], 22); }
-
-    void blob()   { doTriangleStrip(blobs_[0], 54); }
-    void needle() { doTriangleStrip(blobs_[1], 54); }
-    void cuboid() { doTriangleStrip(blobs_[2], 14); }
-    //void icoidS() { doTriangleStrip(blobs_[3], 32); }
-    
-    void footballPentagons() { doVNTriangleStrip(cubes_[10], 8*12); }
+    void blob()   { doBlobStrip(0, 54); }
+    void needle() { doBlobStrip(1, 54); }
+    void cuboid() { doBlobStrip(2, 14); }
+    //void icoidS() { doBlobStrip(3, 32); }
 
     //-----------------------------------------------------------------------
     #pragma mark - 2D Circle
