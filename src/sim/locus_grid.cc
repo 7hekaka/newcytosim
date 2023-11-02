@@ -130,7 +130,8 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
     
     // determine projection of `aa` on segment `bb`:
     real ab2 = INFINITY;
-    real abs = bb.segment().projectPoint0(aa.cen(), ab2);
+    FiberSegment seg = bb.segment();
+    real abs = seg.projectPoint0(aa.cen(), ab2);
     
     if ( 0 <= abs )
     {
@@ -138,7 +139,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
         {
             // the point projects inside the segment
             if ( below(ab2, ran) )
-                meca_.addSideSlidingLink(bb.segment(), abs, aa.vertex1(), ran, push_);
+                meca_.addSideSlidingLink(seg, abs, aa.vertex1(), ran, push_);
         }
         else
         {
@@ -278,7 +279,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
         /*
          bb.vertex1() projects inside segment 'aa'
          */
-        meca_.addSideSlidingLink(aa.segment(), abs, bb.vertex1(), ran, push_);
+        meca_.addSideSlidingLink(seg, abs, bb.vertex1(), ran, push_);
     }
     else if ( abs < 0 )
     {

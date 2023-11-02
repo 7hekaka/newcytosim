@@ -230,7 +230,7 @@ void Tubule::setInteractionsA(Meca& meca) const
         {
             real alpha = len * fil_[n]->segmentationInv();
             Vector leg = mat.vecmul(( cen - fil_[n]->posPoint(i) ).normalized(alpha));
-            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(fil_[n+1],i), leg, stiff);
+            meca.addSideLink(fil_[n], i, 0, Mecapoint(fil_[n+1],i), leg, stiff);
         }
     }
 
@@ -244,7 +244,7 @@ void Tubule::setInteractionsA(Meca& meca) const
     {
         real alpha = len * fil_[n]->segmentationInv();
         Vector leg = mat.vecmul(( cen - fil_[n]->posPoint(e) ).normalized(alpha));
-        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(fil_[n+1],e), leg, stiff);
+        meca.addSideLink(fil_[n], e-1, 1, Mecapoint(fil_[n+1],e), leg, stiff);
     }
 #endif
 }
@@ -294,9 +294,9 @@ void Tubule::setInteractions(Meca& meca) const
             real alpha = len * fil_[n]->segmentationInv();
             Vector leg = ( cen - fil_[n]->posPoint(i) ).normalized(alpha);
             // orthoradial beams:
-            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(fil_[n+1],i), mat.vecmul(leg), stiffL);
+            meca.addSideLink(fil_[n], i, 0, Mecapoint(fil_[n+1],i), mat.vecmul(leg), stiffL);
             // radial spoke:
-            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(bone_,i), beta*cross(dir,leg), stiffR);
+            meca.addSideLink(fil_[n], i, 0, Mecapoint(bone_,i), beta*cross(dir,leg), stiffR);
             // twist stiffness
             meca.addTorque4(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffR);
         }
@@ -308,8 +308,8 @@ void Tubule::setInteractions(Meca& meca) const
     {
         real alpha = len * fil_[n]->segmentationInv();
         Vector leg = ( cen - fil_[n]->posPoint(e) ).normalized(alpha);
-        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(fil_[n+1],e), mat.vecmul(leg), stiffL);
-        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(bone_,e), beta*cross(dir,leg), stiffR);
+        meca.addSideLink(fil_[n], e-1, 1, Mecapoint(fil_[n+1],e), mat.vecmul(leg), stiffL);
+        meca.addSideLink(fil_[n], e-1, 1, Mecapoint(bone_,e), beta*cross(dir,leg), stiffR);
     }
 #endif
 }
@@ -354,7 +354,7 @@ void Tubule::setInteractionsC(Meca& meca) const
         {
             real alpha = len * fil_[n]->segmentationInv();
             Vector leg = ( 2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(alpha);
-            meca.addSideLink(FiberSegment(fil_[n],i), 0, Mecapoint(fil_[n+1],i), leg, stiffL);
+            meca.addSideLink(fil_[n], i, 0, Mecapoint(fil_[n+1],i), leg, stiffL);
             meca.addTorque3(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), Mecapoint(fil_[n+2],i), mat, stiffA);
             meca.addTorque4(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), stiffT);
         }
@@ -370,7 +370,7 @@ void Tubule::setInteractionsC(Meca& meca) const
     {
         real alpha = len * fil_[n]->segmentationInv();
         Vector leg = (2*cen - fil_[n]->posPoint(e) - fil_[n+1]->posPoint(e)).normalized(alpha);
-        meca.addSideLink(FiberSegment(fil_[n],e-1), 1, Mecapoint(fil_[n+1],e), leg, stiffL);
+        meca.addSideLink(fil_[n], e-1, 1, Mecapoint(fil_[n+1],e), leg, stiffL);
     }
 #endif
 }
@@ -406,7 +406,7 @@ void Tubule::setInteractionsD(Meca& meca) const
             mat = Rotation::rotationAroundAxis(fib->dirSegment(i), C, S);
             // rotate direction of previous protofilament pair:
             Vector leg = mat.vecmul(fib->posPoint(i) - fil_[n]->posPoint(i)).normalized(alpha);
-            meca.addSideLink(FiberSegment(fib,i), 0, Mecapoint(fil_[n+2],i), leg, stiffL);
+            meca.addSideLink(fib, i, 0, Mecapoint(fil_[n+2],i), leg, stiffL);
             // orthoradial links with bending stiffness
             //meca.addTorque(Mecapoint(fil_[n],i), Mecapoint(fil_[n+1],i), Mecapoint(fil_[n+2],i), 1.0, stiffL);
             // twist stiffness
@@ -416,7 +416,7 @@ void Tubule::setInteractionsD(Meca& meca) const
         // use the same rotation matrix for the last point:
         //mat = Rotation::rotationAroundAxis(fib->dirSegment(e-1), C, S);
         Vector leg = mat.vecmul(fib->posPoint(e) - fil_[n]->posPoint(e)).normalized(alpha);
-        meca.addSideLink(FiberSegment(fib,e-1), 1, Mecapoint(fil_[n+2],e), leg, stiffL);
+        meca.addSideLink(fib, e-1, 1, Mecapoint(fil_[n+2],e), leg, stiffL);
     }
 #endif
 }

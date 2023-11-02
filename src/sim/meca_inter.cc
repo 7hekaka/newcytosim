@@ -2634,7 +2634,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
  This is a specialized version of addSideLink3D(), without Modulo
  `leg` is already normalized to include the Fiber's segmentation
  */
-void Meca::addSideLink(FiberSegment const& segA, real alpha,
+void Meca::addSideLink(Fiber const* fibA, size_t segA, real alpha,
                        Mecapoint const& ptB,
                        Torque const& leg,
                        const real weight)
@@ -2642,7 +2642,7 @@ void Meca::addSideLink(FiberSegment const& segA, real alpha,
     assert_true( weight >= 0 );
     
     // indices:
-    const size_t ii0 = segA.matIndex0();
+    const size_t ii0 = fibA->matIndex() + segA;
     const size_t ii1 = ii0 + 1;
     const size_t ii2 = ptB.matIndex0();
     assert_true( ii0 != ii2 );
@@ -3725,7 +3725,7 @@ void Meca::addSideSlidingLink(FiberSegment const& segA, real abs,
 {
 #if ( DIM == 1 )
     
-    throw Exception("Meca::addSideLink is meaningless in 1D");
+    throw Exception("Meca::addSideSlidingLink is meaningless in 1D");
     
 #elif ( DIM == 2 )
     
