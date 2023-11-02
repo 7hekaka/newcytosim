@@ -14,6 +14,9 @@
 #include "singles/wrist.h"
 #include "singles/wrist_long.h"
 #include "couples/couple_long.h"
+#include "couples/couple.h"
+#include "couples/crosslink.h"
+#include "couples/crosslink_long.h"
 #include "couples/shackle.h"
 #include "couples/shackle_long.h"
 #include "couples/bridge.h"
@@ -71,8 +74,8 @@ int main(int argc, char* argv[])
         PRINT(Crosslink);
         PRINT(Shackle);
         PRINT(Bridge);
-        PRINT(Duo);
         PRINT(Fork);
+        PRINT(Duo);
         PRINT(CoupleLong);
         PRINT(CrosslinkLong);
         PRINT(ShackleLong);
