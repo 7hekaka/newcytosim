@@ -1083,7 +1083,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
 void Fiber::setInteractions(Meca& meca) const
 {
 #if NEW_SQUEEZE_FORCE
-    if ( prop->squeeze )
+    if ( prop->squeeze_mode )
     {
         // implements a radial force in the YZ-plane: force = -F * tanh(yz/R)
         // derivative: -4F / R * ( exp(-u) + exp(u) )^2  with u = yz/R

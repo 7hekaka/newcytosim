@@ -33,19 +33,23 @@ void Cutter::cut()
             // using Z works only if the boundary is aligned in XY with cell on top
             real PZ = P.ZZ;
             real QZ = Q.ZZ;
-#else
-            Vector PQ = 0.5 * ( P + Q );
-            Space const* spc = h->fiber()->prop->confine_space;
-            Vector prj = spc->project(PQ);  // on the edge
-            Vector dir = spc->normalToEdge(PQ);
-            // calculate distances to the edge:
-            real PZ = dot(prj-P, dir);
-            real QZ = dot(prj-Q, dir);
-#endif
             // do not sever the fiber that is closest to the edge:
             if ( PZ < QZ )
                 return;
             std::clog << "selectively cutting crossing fiber at Z " << PZ << " over " << QZ << "\n";
+#else
+            Vector PQ = 0.5 * ( P + Q );
+            Space const* spc = h->fiber()->prop->confine_space;
+            Vector prj = spc->project(PQ);  // on the edge
+            Vector dir = spc->normalToEdge(PQ); // directed outward
+            // calculate distances to the edge:
+            real PZ = dot(prj-P, dir);
+            real QZ = dot(prj-Q, dir);
+            // do not sever the fiber that is closest to the edge:
+            if ( PZ < QZ )
+                return;
+            std::clog << "selectively cutting crossing fiber at D " << PZ << " over " << QZ << "\n";
+#endif
         }
     }
     /**

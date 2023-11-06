@@ -47,7 +47,7 @@
  
  @ref HandGroup
  
- `activity`        | Class         | Parameters         | Property     |
+ `activity`        | Class         | Parameters         | Property
  ------------------|---------------|--------------------|---------------
  `bind` (default)  | Hand          | @ref HandPar       | HandProp
  `move`            | Motor         | @ref MotorPar      | MotorProp
@@ -63,15 +63,15 @@
  
  <h2>Digital Hands:</h2>
  
- `activity`        | Class         | Parameters         | Property     |
+ `activity`        | Class         | Parameters         | Property
  ------------------|---------------|--------------------|---------------
  `digit`           | Digit         | @ref DigitPar      | DigitProp
  `walk`            | Walker        | @ref WalkerPar     | WalkerProp
- `kinesin`*        | Kinesin       | @ref KinesinPar    | KinesinProp
- `dynein`*         | Dynein        | @ref DyneinPar     | DyneinProp
- `myosin`*         | Myosin        | @ref MyosinPar     | MyosinProp
+ `kinesin`+        | Kinesin       | @ref KinesinPar    | KinesinProp
+ `dynein`+         | Dynein        | @ref DyneinPar     | DyneinProp
+ `myosin`+         | Myosin        | @ref MyosinPar     | MyosinProp
  
- * Unfinished classes.
+ + Unfinished classes.
  
  Example:
 

@@ -332,7 +332,7 @@ public:
     
 #if NEW_SQUEEZE_FORCE
     /// add a force toward the X-axis
-    int squeeze;
+    int squeeze_mode;
     /// max norm of squeezing force (set as \c squeeze[1])
     real squeeze_force;
     /// range below which squeezing is linear (set as \c squeeze[2])
