@@ -1,11 +1,8 @@
 # Articles describing Cytosim and related work
 
 - [Collective Langevin Dynamics of Flexible Cytoskeletal Fibers](http://dx.doi.org/10.1088/1367-2630/9/11/427)  
-
 - [Preconfig: A Versatile Configuration File Generator for Varying Parameters](http://doi.org/10.5334/jors.156)  
-
 - [Detailed protocol to use Cytosim](https://arxiv.org/abs/2205.13852)  
-
 
 # Cytosim used in other groups
 
