@@ -386,8 +386,8 @@ int main(int argc, char* argv[])
             file = openFile("link", frame);
             for( Couple const* cop = couples.firstID(); cop; cop = couples.nextID(cop) )
             {
-                Fiber * f1 = cop->fiber1();
-                Fiber * f2 = cop->fiber2();
+                Fiber const* f1 = cop->fiber1();
+                Fiber const* f2 = cop->fiber2();
                 if ( f1 && f2 && ( selected==0 || ( f1->prop==selected && f2->prop==selected )))
                     drawLink(cop);
             }
