@@ -96,7 +96,8 @@ private:
     int  autoCutCnt;
     
     /// reset auto variables
-    void clearAutoCounters(bool=false);
+    void resetAutoCounters();
+    void clearAutoCounters();
 #endif
 #if FIBER_HAS_NORMAL
     /// vector orthogonal to backbone at the origin, used for display only

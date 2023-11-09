@@ -57,7 +57,7 @@ Chain::Chain()
     unconstrainLength = false;
 #endif
 #if CURVATURE_DEPENDENT_SEGMENTATION
-    clearAutoCounters(1);
+    resetAutoCounters();
 #endif
     fnAbscissaM = 0;
     fnAbscissaP = 0;
@@ -1656,17 +1656,20 @@ void Chain::resegment(size_t ns)
 
 /** number of time steps between each attempt to remove/add a point
  also number of states over which curvature information is averaged */
-const int RECUT_PERIOD = 8;
-const real RECUT_PRECISION = 0.025;
+const int RECUT_PERIOD = 16;
+const real RECUT_PRECISION = 0.02;
 
-void Chain::clearAutoCounters(bool mode)
+// set different 'seeds' to desynchronize the adjustSegmentation()
+void Chain::resetAutoCounters()
 {
     autoCutVal = 0;
-    // set different 'seeds' to desynchronize the adjustSegmentation()
-    if ( mode )
-        autoCutCnt = -(int)RNG.pint32(RECUT_PERIOD);
-    else
-        autoCutCnt = 0;
+    autoCutCnt = -(int)RNG.pint32(RECUT_PERIOD);
+}
+
+void Chain::clearAutoCounters()
+{
+    autoCutVal = 0;
+    autoCutCnt = 0;
 }
 
 /**
@@ -1677,7 +1680,7 @@ void Chain::clearAutoCounters(bool mode)
 void Chain::adjustSegmentation()
 {
     LOG_ONCE("adjustSegmentation() is using the fiber curvature\n");
-    const real upLimit = 16.0 * fnSegmentation;
+    const real upLimit = 8.0 * fnSegmentation;
     const size_t nbs = nbSegments();
     real len = length();
     
