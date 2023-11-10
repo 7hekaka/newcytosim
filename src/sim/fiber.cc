@@ -1090,7 +1090,7 @@ void Fiber::setInteractions(Meca& meca) const
         const real F = prop->squeeze_force;
         const real R = prop->squeeze_range;
         // if squeze == 2, force applies only to minus-end
-        const size_t end = ( prop->squeeze > 1 ) ? 1 : nPoints;
+        const size_t end = ( prop->squeeze_mode > 1 ) ? 1 : nPoints;
         for ( size_t i = 0; i < end; ++i )
         {
             Vector P = posP(i);
