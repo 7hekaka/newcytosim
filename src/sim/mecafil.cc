@@ -60,10 +60,10 @@ void Mecafil::allocateMecable(const size_t nbp)
 {
     size_t add = ADD_PROJECTION_DIFF ? 3 : 2;
     size_t top = NEW_ANISOTROPIC_FIBER_DRAG ? 3*DIM+1 : DIM+2;
-    real* ptr = Mecable::allocateMemory(nbp, add+top);
+    real * ptr = Mecable::allocateMemory(nbp, add+top);
     /*
-     if Mecable::allocateMecable() allocated memory, it will return the 
-     size of the new array, and we allocate the same size for other arrays.
+     if Mecable::allocateMecable() allocated memory, it will return a
+     non-zero pointer, with extra memory usable for pointers here.
      */
     if ( ptr )
     {
@@ -128,11 +128,11 @@ void Mecafil::storeDirections()
      we assume here that successive points are correctly separated by 'segmentation',
      such that we can normalize the vector simply by dividing by 'segmentation'
      */
-    const real val = 1.0 / segmentation();
+    const real alpha = 1.0 / segmentation();
     const size_t end = DIM * lastPoint();
     #pragma omp simd
     for ( size_t i = 0; i < end; ++i )
-        iDir[i] = val * ( pPos[i+DIM] - pPos[i] );
+        iDir[i] = alpha * ( pPos[i+DIM] - pPos[i] );
 #else
     for ( size_t p = 0; p < lastPoint(); ++p )
         normalize(diffPoints(p)).store(iDir+DIM*p);

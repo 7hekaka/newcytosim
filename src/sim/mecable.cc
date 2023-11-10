@@ -82,7 +82,7 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
 
 /**
  allocateMecable(N) ensures that the object can hold `nbp` vertices
- returns: pointer to new memory allocated, or nullptr if no allocation was necessary
+ @returns pointer to new memory allocated, or nullptr if no allocation was necessary
  some extra space is allowed in 3D to allow for AVX overspill
  */
 real* Mecable::allocateMemory(const size_t nbp, size_t add)
