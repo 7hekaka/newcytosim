@@ -310,6 +310,7 @@ void Player::drawCytosim()
             simul.drawLinks();
             gym::disableLineStipple();
             gym::restoreLighting();
+            gym::cleanup();
             CHECK_GL_ERROR("Simul::drawLinks()");
         }
 #endif

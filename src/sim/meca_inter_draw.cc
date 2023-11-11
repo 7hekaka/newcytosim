@@ -11,8 +11,8 @@
 #define DRAW_LINK(PT, ...)\
 { if ( drawLinks ) drawLink(gym::bright_color(PT.mecable()->signature()), PT.pos(), __VA_ARGS__); }
 
-constexpr float LINK_WIDTH = 6;
-constexpr float LINK_SIZE = 8;
+constexpr float LINE_WIDTH = 2;
+constexpr float POINT_SIZE = 5;
 
 
 /// Display link between 2 positions
@@ -23,7 +23,7 @@ void drawLink(gym_color const& col, Vector const& a, Vector const& b)
     flu[1] = { col, b };
     gym::unmapBufferC4VD();
     gym::enableLineStipple(0xFFFF);
-    gym::drawLines(LINK_WIDTH, 0, 2);
+    gym::drawLines(LINE_WIDTH, 0, 2);
 }
 
 /// Display link between 2 positions, with resting length `len`
@@ -38,12 +38,12 @@ void drawLink(gym_color const& col, Vector const& a, Vector const& ab, real len)
     flu[3] = { col, b };
     gym::unmapBufferC4VD();
     gym::enableLineStipple(0x3333);
-    gym::drawLines(LINK_WIDTH, 1, 2);
+    gym::drawLines(LINE_WIDTH, 1, 2);
     gym::enableLineStipple(0xFFFF);
-    gym::drawLines(LINK_WIDTH, 0, 2);
-    gym::drawLines(LINK_WIDTH, 2, 2);
-    gym::drawPoints(LINK_SIZE, 0, 1);
-    gym::drawPoints(LINK_SIZE, 3, 1);
+    gym::drawLines(LINE_WIDTH, 0, 2);
+    gym::drawLines(LINE_WIDTH, 2, 2);
+    gym::drawPoints(POINT_SIZE, 0, 1);
+    gym::drawPoints(POINT_SIZE, 3, 1);
 }
 
 /// Display link between 3 positions
@@ -58,10 +58,10 @@ void drawLink(gym_color const& col, Vector const& a, Vector const& ab, Vector c)
     flu[2] = { col, c };
     gym::unmapBufferC4VD();
     gym::enableLineStipple(0x7310);
-    gym::drawLines(LINK_WIDTH, 0, 2);
+    gym::drawLines(LINE_WIDTH, 0, 2);
     gym::enableLineStipple(0x5555);
-    gym::drawLines(LINK_WIDTH, 1, 2);
-    gym::drawPoints(LINK_SIZE, 1, 1);
+    gym::drawLines(LINE_WIDTH, 1, 2);
+    gym::drawPoints(POINT_SIZE, 1, 1);
 }
 
 /// Display link between 4 positions
@@ -76,8 +76,8 @@ void drawLink(gym_color const& col, Vector const& a, Vector const& ab, Vector co
     flu[3] = { col, d };
     gym::unmapBufferC4VD();
     gym::enableLineStipple(0x7171);
-    gym::drawLines(LINK_WIDTH, 0, 4);
+    gym::drawLines(LINE_WIDTH, 0, 4);
     gym::enableLineStipple(0xFFFF);
-    gym::drawLines(LINK_WIDTH, 1, 2);
-    gym::drawPoints(LINK_SIZE, 1, 2);
+    gym::drawLines(LINE_WIDTH, 1, 2);
+    gym::drawPoints(POINT_SIZE, 1, 2);
 }

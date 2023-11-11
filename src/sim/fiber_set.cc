@@ -15,8 +15,6 @@
 #include "simul.h"
 #include "cymdef.h"
 
-//#include "vecprint.h"
-
 //------------------------------------------------------------------------------
 
 /**
@@ -1139,7 +1137,6 @@ int FiberSet::infoComponents(ObjectList const& objs,
     // calculate two largest eigenvalues in 3D, one in 2D:
     lapack::xsyevx('V','I','L', DIM, M, 3, 0, 0, 2, DIM, REAL_EPSILON,
                    &nbv, val, vec, 3, work, 32, iwork, ifail, &info);
-    //VecPrint::full(3, 3, vec);
 
 #if ( DIM > 2 )
     real u = sign_real(vec[3]);
