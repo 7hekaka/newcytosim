@@ -81,9 +81,6 @@ private:
 #if ADD_PROJECTION_DIFF
     /// vector for the correction to the projection of size (nbPoints-1)
     real * iJJtJF;
-    
-    /// true if not all elements of iJJtJF[] are null
-    bool useProjectionDiff;
 #endif
 protected:
     
@@ -188,9 +185,6 @@ public:
     
     /// add projection correction matrix
     void addProjectionDiff(real*) const;
-
-    /// true if addProjectionDiff() does something
-    bool hasProjectionDiff() const { return useProjectionDiff; }
 #endif
     
     /// add displacements due to the Brownian motion to rhs[]

@@ -362,6 +362,9 @@ public:
     //--------------------------------------------------------------------------
     
 #if ADD_PROJECTION_DIFF
+    /// true if projectionDiff is used
+    bool useProjectionDiff;
+
     /// set terms derived from the Projection operator, from the given forces
     virtual void makeProjectionDiff(const real* force) {}
     
@@ -370,9 +373,9 @@ public:
     
     /// add terms from projection correction matrix: mat <- diffP
     virtual void addProjectionDiff(real* mat) const {}
-
+    
     /// true if addProjectionDiff() does something
-    virtual bool hasProjectionDiff() const { return false; }
+    bool hasProjectionDiff() const { return useProjectionDiff; }
 #endif
     
     //--------------------------------------------------------------------------
