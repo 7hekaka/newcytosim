@@ -284,6 +284,9 @@ public:
     
     /// to store info relating the Solid
     static const ObjectTag TAG_SOLID = 'D';
+    
+    /// to store the clamp stiffness and position
+    static const ObjectTag TAG_CLAMP = 'C';
 
     /// return unique character identifying the class
     ObjectTag tag() const { return TAG; }

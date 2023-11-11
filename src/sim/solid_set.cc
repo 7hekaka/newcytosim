@@ -122,6 +122,8 @@ void SolidSet::writeSet(Outputter& out) const
         out.write("\n#section "+title());
         writeObjects(out, pool_);
 #if NEW_SOLID_HAS_TWIN
+        /* All twins must be writen after all Solid, to make sure
+         we find the references when they are read back */
         for ( Object const* n=pool_.front(); n; n=n->next() )
             static_cast<Solid const*>(n)->writeTwin(out);
 #endif

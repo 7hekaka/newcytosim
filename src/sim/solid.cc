@@ -1720,6 +1720,11 @@ void Solid::write(Outputter& out) const
         out.writeSoftSpace();
         out.writeFloat(soRadius[p]);
     }
+#if NEW_SOLID_CLAMP
+    writeMarker(out, TAG_CLAMP);
+    out.writeFloat(clamp_stiff);
+    out.writeFloats(clamp_place, DIM, '\n');
+#endif
 }
 
 #if NEW_SOLID_HAS_TWIN
@@ -1765,6 +1770,17 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
         soTwin = sim.solids.findID(id);
         if ( id && !soTwin )
             std::clog << "Warning: could not find Solid twin " << id << "\n";
+#endif
+    }
+    else if ( tag == TAG_CLAMP )
+    {
+#if NEW_SOLID_CLAMP
+        clamp_stiff = in.readFloat();
+        in.readFloats(clamp_place, DIM);
+#else
+        Vector tmp;
+        in.readFloat();
+        in.readFloats(tmp, DIM);
 #endif
     }
 }
