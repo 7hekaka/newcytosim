@@ -21,6 +21,7 @@ void add_rigidity2(const size_t nbt, const real* X, const real rigid, real* Y)
 #endif
     
     real * yv = Y;
+    const real two = 2.0;
     const real*const end = X + DIM*(nbt+1);
     
     const real* xv = X+DIM;
@@ -29,18 +30,18 @@ void add_rigidity2(const size_t nbt, const real* X, const real rigid, real* Y)
         real d0 = xv[DIM] - xv[0];
         real f0 = rigid * ( d0 - dx );
         dx = d0;
-        yv[0    ] -=    f0;
-        yv[DIM  ] += f0+f0;
-        yv[DIM*2] -=    f0;
+        yv[0    ] -= f0;
+        yv[DIM  ] += f0 * two;
+        yv[DIM*2] -= f0;
         ++yv;
         ++xv;
         
         real d1 = xv[DIM] - xv[0];
         real f1 = rigid * ( d1 - dy );
         dy = d1;
-        yv[0    ] -=    f1;
-        yv[DIM  ] += f1+f1;
-        yv[DIM*2] -=    f1;
+        yv[0    ] -= f1;
+        yv[DIM  ] += f1 * two;
+        yv[DIM*2] -= f1;
         ++yv;
         ++xv;
         
@@ -48,9 +49,9 @@ void add_rigidity2(const size_t nbt, const real* X, const real rigid, real* Y)
         real d2 = xv[DIM] - xv[0];
         real f2 = rigid * ( d2 - dz );
         dz = d2;
-        Y[0    ] -=    f2;
-        Y[DIM  ] += f2*f2;
-        Y[DIM*2] -=    f2;
+        Y[0    ] -= f2;
+        Y[DIM  ] += f2 * two;
+        Y[DIM*2] -= f2;
         ++yv;
         ++xv;
 #endif

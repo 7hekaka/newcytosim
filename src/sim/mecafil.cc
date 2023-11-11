@@ -228,11 +228,11 @@ void Mecafil::getForces(const real* ptr)
 void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 {
     const real R2 = 2.0 * R1;
-    const real TWO = 2.0;
+    const real two = 2.0;
     #pragma omp simd
     for ( size_t jj = 0; jj < DIM*nbt; ++jj )
     {
-        real f = ( X[jj+DIM*2] + X[jj] ) - TWO * X[jj+DIM];
+        real f = ( X[jj+DIM*2] + X[jj] ) - two * X[jj+DIM];
         Y[jj      ] -= f * R1;
         Y[jj+DIM  ] += f * R2;
         Y[jj+DIM*2] -= f * R1;
@@ -270,17 +270,18 @@ inline void add_rigidityF(const size_t nbt, const real* X, const real R1, real* 
 }
 
 /// In this version for 2D, the loop has dependencies preventing unrolling
-inline void add_rigidity2D(const size_t nbt, const real* X, const real R1, real* Y)
+inline void add_rigidity2D(const size_t nbp, const real* X, const real R1, real* Y)
 {
     real fx = 0;
     real fy = 0;
     real y0 = Y[0];
     real y1 = Y[1];
-    size_t end = DIM * nbt;
+    const real two = 2.0;
+    size_t end = DIM * ( nbp - 2 );
     for ( size_t jj = 0; jj < end; jj += DIM )
     {
-        real gx = ( X[jj+4] + X[jj+0] ) - 2 * X[jj+2];
-        real gy = ( X[jj+5] + X[jj+1] ) - 2 * X[jj+3];
+        real gx = ( X[jj+4] + X[jj+0] ) - two * X[jj+2];
+        real gy = ( X[jj+5] + X[jj+1] ) - two * X[jj+3];
         real rx = fx - gx;
         real ry = fy - gy;
         Y[jj  ] = y0 + R1 * rx;
@@ -297,7 +298,7 @@ inline void add_rigidity2D(const size_t nbt, const real* X, const real R1, real*
 }
 
 /// In this version for 3D, the loop has dependencies preventing unrolling
-inline void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
+inline void add_rigidity3D(const size_t nbp, const real* X, const real R1, real* Y)
 {
     real fx = 0;
     real fy = 0;
@@ -305,12 +306,13 @@ inline void add_rigidity3D(const size_t nbt, const real* X, const real R1, real*
     real y0 = Y[0];
     real y1 = Y[1];
     real y2 = Y[2];
-    size_t end = DIM * nbt;
+    const real two = 2.0;
+    size_t end = DIM * ( nbp - 2 );
     for ( size_t jj = 0; jj < end; jj += DIM )
     {
-        real gx = ( X[jj+6] + X[jj+0] ) - 2 * X[jj+3];
-        real gy = ( X[jj+7] + X[jj+1] ) - 2 * X[jj+4];
-        real gz = ( X[jj+8] + X[jj+2] ) - 2 * X[jj+5];
+        real gx = ( X[jj+6] + X[jj+0] ) - two * X[jj+3];
+        real gy = ( X[jj+7] + X[jj+1] ) - two * X[jj+4];
+        real gz = ( X[jj+8] + X[jj+2] ) - two * X[jj+5];
         real rx = fx - gx;
         real ry = fy - gy;
         real rz = fz - gz;
@@ -407,9 +409,9 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 {
 #if ( DIM >= 3 )
     //add_rigidityF(nPoints-2, X, iRigidity, Y);
-    add_rigidity3D(nPoints-2, X, iRigidity, Y);
+    add_rigidity3D(nPoints, X, iRigidity, Y);
 #elif ( DIM == 2 )
-    add_rigidity2D(nPoints-2, X, iRigidity, Y);
+    add_rigidity2D(nPoints, X, iRigidity, Y);
 #endif
     
 #if NEW_FIBER_LOOP

@@ -99,11 +99,12 @@ void add_rigidity2D(const size_t nbt, const real* X, const real R1, real* Y)
     real fy = 0;
     real y0 = Y[0];
     real y1 = Y[1];
+    const real two = 2.0;
     size_t end = DIM * nbt;
     for ( size_t jj = 0; jj < end; jj += DIM )
     {
-        real gx = ( X[jj+4] + X[jj+0] ) - 2 * X[jj+2];
-        real gy = ( X[jj+5] + X[jj+1] ) - 2 * X[jj+3];
+        real gx = ( X[jj+4] + X[jj+0] ) - two * X[jj+2];
+        real gy = ( X[jj+5] + X[jj+1] ) - two * X[jj+3];
         real rx = fx - gx;
         real ry = fy - gy;
         Y[jj  ] = y0 + R1 * rx;
@@ -128,12 +129,13 @@ void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
     real y0 = Y[0];
     real y1 = Y[1];
     real y2 = Y[2];
+    const real two = 2.0;
     size_t end = DIM * nbt;
     for ( size_t jj = 0; jj < end; jj += DIM )
     {
-        real gx = ( X[jj+6] + X[jj+0] ) - 2 * X[jj+3];
-        real gy = ( X[jj+7] + X[jj+1] ) - 2 * X[jj+4];
-        real gz = ( X[jj+8] + X[jj+2] ) - 2 * X[jj+5];
+        real gx = ( X[jj+6] + X[jj+0] ) - two * X[jj+3];
+        real gy = ( X[jj+7] + X[jj+1] ) - two * X[jj+4];
+        real gz = ( X[jj+8] + X[jj+2] ) - two * X[jj+5];
         real rx = fx - gx;
         real ry = fy - gy;
         real rz = fz - gz;
