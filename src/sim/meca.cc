@@ -401,12 +401,13 @@ void Meca::readyMecables()
         mec->putPoints(vPTS+DIM*mec->matIndex());
         mec->prepareMecable();
 #if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
-        if ( mec->hasRigidity() )
+        real jR = mec->jointRigidity();
+        if ( jR )
         {
 #   if USE_ISO_MATRIX
-            addBendingRigidityMatrix(mISO, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addBendingRigidityMatrix(mISO, mec->matIndex(), mec->nbPoints(), jR);
 #   else
-            addBendingRigidityBlockMatrix<DIM>(mFUL, mec->matIndex(), mec->nbPoints(), mec->fiberRigidity());
+            addBendingRigidityBlockMatrix<DIM>(mFUL, mec->matIndex(), mec->nbPoints(), jR);
 #   endif
         }
 #endif

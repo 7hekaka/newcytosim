@@ -360,12 +360,12 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t l
     const size_t nbp = mec->nbPoints();
 
     const real beta = -tau_ * mec->pointMobility();
-    
-    if ( mec->hasRigidity() )
+    real jR = mec->jointRigidity();
+    if ( jR )
     {
         if ( ldd != 3 )
             zero_real(ldd*nbp, res);
-        setBendingRigidity<1>(res, ldd-1, nbp, beta*mec->fiberRigidity());
+        setBendingRigidity<1>(res, ldd-1, nbp, beta*jR);
     }
     else
         zero_real(ldd*nbp, res);
@@ -407,9 +407,10 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
     
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
-    if ( mec->hasRigidity() )
+    real jR = mec->jointRigidity();
+    if ( jR )
         //addBendingRigidityLower<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
-        addBendingRigidity<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
+        addBendingRigidity<1>(res, nbp, mec->nbPoints(), jR);
 #endif
 #if USE_ISO_MATRIX
     mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp, 1, 1);
@@ -451,9 +452,10 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
     
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
-    if ( mec->hasRigidity() )
+    real jR = mec->jointRigidity();
+    if ( jR )
     {
-        setBendingRigidity<DIM>(res, ldd-1, nbp, beta*mec->fiberRigidity());
+        setBendingRigidity<DIM>(res, ldd-1, nbp, beta*jR);
         //VecPrint::full("Rigidity block ", bks, bks, res, bks, 0);
     }
 #endif
@@ -490,9 +492,10 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
     
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
-    if ( mec->hasRigidity() )
+    real jR = mec->jointRigidity();
+    if ( jR )
     {
-        addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
+        addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), jR);
         //VecPrint::full("Rigidity block", bks, bks, res, bks, 0);
     }
 #endif
@@ -535,9 +538,10 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
-    if ( mec->hasRigidity() )
+    real jR = mec->jointRigidity();
+    if ( jR )
     {
-        addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), mec->fiberRigidity());
+        addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), jR);
         //VecPrint::full("Rigidity block", bks, bks, res, bks, 0);
     }
 #endif

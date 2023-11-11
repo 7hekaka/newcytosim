@@ -197,12 +197,9 @@ public:
     void printProjection(FILE*) const;
 
     //--------------------- Rigidity
-    
-    /// return fiber rigidity
-    int hasRigidity() const { return ( nPoints > 2 ) & ( iRigidity > 0 ); }
 
     /// return fiber rigidity
-    real fiberRigidity() const { return iRigidity; }
+    real jointRigidity() const { return ( nPoints > 2 ) ? iRigidity : 0; }
 
     /// add the rigidity force corresponding to configuration X into vector Y
     void addRigidity(const real* X, real* Y) const;

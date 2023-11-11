@@ -325,12 +325,9 @@ public:
     virtual void getForces(const real* ptr) { pForce = ptr; }
     
     //--------------------------------------------------------------------------
-    
-    /// return type of fiber rigidity { 0 : none, 1: fiber }
-    virtual int hasRigidity() const { return 0; }
 
-    /// return fiber rigidity
-    virtual real fiberRigidity() const { return 0; }
+    /// return coefficient for filament's bending elasticity
+    virtual real jointRigidity() const { return 0; }
 
     /// Add rigidity terms Y <- Y + Rigidity * X
     /**
