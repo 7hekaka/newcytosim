@@ -240,32 +240,96 @@ void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 }
 
 /*
- This is an optimized implementation
+ This is an optimized implementation, but it does not work for 'nbt < 2'!
  */
-void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
+inline void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
     assert_true(nbt > 1);
     const real R2 = R1 * 2;
     const real R4 = R1 * 4;
-    const real SIX = 6.0;
+    const real six = 6.0;
     
-    const size_t end = DIM*nbt;
+    const size_t end = DIM * nbt;
     // in the general case all values can be computed independently:
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] = Y[i] + R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * (SIX*X[i] + ((X-DIM*2)[i]+(X+DIM*2)[i]));
+        Y[i] = Y[i] + R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * (six*X[i] + ((X-DIM*2)[i]+(X+DIM*2)[i]));
 
     // special cases at the edges:
-    real      * Z = Y + DIM*nbt;
-    real const* E = X + DIM*(nbt+1);
+    real      * Z = Y + end;
+    real const* E = X + end;
+    X += DIM;
     #pragma omp simd
     for ( size_t d = 0; d < DIM; ++d )
     {
-        Y[d+DIM] -= R1 * ((X+DIM)[d]+(X+DIM*3)[d]) + R4 * ((X+DIM)[d]-(X+DIM*2)[d]) - R2 * X[d];
-        Z[d    ] -= R1 * ((E-DIM)[d]+(E-DIM*3)[d]) + R4 * ((E-DIM)[d]-(E-DIM*2)[d]) - R2 * E[d];
-        Y[d    ] -= R1 * ((X+DIM*2)[d]+X[d]) - R2 * (X+DIM)[d];
-        Z[d+DIM] -= R1 * ((E-DIM*2)[d]+E[d]) - R2 * (E-DIM)[d];
+        Y[d+DIM] -= R1 * (X[d]+(X+DIM*2)[d]) + R4 * (X[d]-(X+DIM)[d]) - R2 * (X-DIM)[d];
+        Z[d    ] -= R1 * (E[d]+(E-DIM*2)[d]) + R4 * (E[d]-(E-DIM)[d]) - R2 * (E+DIM)[d];
+        Y[d    ] -= R1 * ((X+DIM)[d]+(X-DIM)[d]) - R2 * X[d];
+        Z[d+DIM] -= R1 * ((E-DIM)[d]+(E+DIM)[d]) - R2 * E[d];
     }
+}
+
+/// In this version for 2D, the loop has dependencies preventing unrolling
+inline void add_rigidity2D(const size_t nbt, const real* X, const real R1, real* Y)
+{
+    real fx = 0;
+    real fy = 0;
+    real y0 = Y[0];
+    real y1 = Y[1];
+    size_t end = DIM * nbt;
+    for ( size_t jj = 0; jj < end; jj += DIM )
+    {
+        real gx = ( X[jj+4] + X[jj+0] ) - 2 * X[jj+2];
+        real gy = ( X[jj+5] + X[jj+1] ) - 2 * X[jj+3];
+        real rx = fx - gx;
+        real ry = fy - gy;
+        Y[jj  ] = y0 + R1 * rx;
+        Y[jj+1] = y1 + R1 * ry;
+        y0 = Y[jj+2] - R1 * rx;
+        y1 = Y[jj+3] - R1 * ry;
+        fx = gx;
+        fy = gy;
+    }
+    Y[end  ] = y0 + R1 * fx;
+    Y[end+1] = y1 + R1 * fy;
+    Y[end+2] -= R1 * fx;
+    Y[end+3] -= R1 * fy;
+}
+
+/// In this version for 3D, the loop has dependencies preventing unrolling
+inline void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
+{
+    real fx = 0;
+    real fy = 0;
+    real fz = 0;
+    real y0 = Y[0];
+    real y1 = Y[1];
+    real y2 = Y[2];
+    size_t end = DIM * nbt;
+    for ( size_t jj = 0; jj < end; jj += DIM )
+    {
+        real gx = ( X[jj+6] + X[jj+0] ) - 2 * X[jj+3];
+        real gy = ( X[jj+7] + X[jj+1] ) - 2 * X[jj+4];
+        real gz = ( X[jj+8] + X[jj+2] ) - 2 * X[jj+5];
+        real rx = fx - gx;
+        real ry = fy - gy;
+        real rz = fz - gz;
+        Y[jj  ] = y0 + R1 * rx;
+        Y[jj+1] = y1 + R1 * ry;
+        Y[jj+2] = y2 + R1 * rz;
+        y0 = Y[jj+3] - R1 * rx;
+        y1 = Y[jj+4] - R1 * ry;
+        y2 = Y[jj+5] - R1 * rz;
+        fx = gx;
+        fy = gy;
+        fz = gz;
+    }
+    Y[end  ] = y0 + R1 * fx;
+    Y[end+1] = y1 + R1 * fy;
+    Y[end+2] = y2 + R1 * fz;
+    Y[end+3] -= R1 * fx;
+    Y[end+4] -= R1 * fy;
+    Y[end+5] -= R1 * fz;
 }
 
 /**
@@ -335,42 +399,21 @@ void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, r
 
 //------------------------------------------------------------------------------
 
-#define CHECK_RIGIDITY 0
-
 /**
  calculates the second-derivative of point's coordinates,
  scale by the rigidity term, and add to vector Y
 */
 void Mecafil::addRigidity(const real* X, real* Y) const
 {
-    if ( nPoints > 3 )
-    {
-        const size_t nbt = nPoints - 2;  // number of triplets
-
-#if CHECK_RIGIDITY
-        // compare to default implementation:
-        real * tmp = new_real(DIM*nPoints);
-        copy_real(DIM*nPoints, Y, tmp);
-        add_rigidity0(nbt, X, iRigidity, tmp);
+#if ( DIM >= 3 )
+    //add_rigidityF(nPoints-2, X, iRigidity, Y);
+    add_rigidity3D(nPoints-2, X, iRigidity, Y);
+#elif ( DIM == 2 )
+    add_rigidity2D(nPoints-2, X, iRigidity, Y);
 #endif
-
-#if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
-        add_rigidityF(nbt, X, iRigidity, Y);
-#elif ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__SSE3__)
-        add_rigidity2D_SSE(nbt, X, iRigidity, Y);
-#elif ( DIM > 1 )
-        add_rigidityF(nbt, X, iRigidity, Y);
-#endif
-        
-#if CHECK_RIGIDITY
-        real err = blas::difference(DIM*nPoints, tmp, Y);
-        if ( err > 1.0e-6 )
-            printf("addRigidity(%u) error %e\n", nPoints, err);
-        free_real(tmp);
-#endif
-
+    
 #if NEW_FIBER_LOOP
-        if ( iRigidityLoop )
+        if ( iRigidityLoop && ( nPoints > 3 ))
         {
             /*
              With Serge DMITRIEFF:
@@ -382,11 +425,5 @@ void Mecafil::addRigidity(const real* X, real* Y) const
             add_rigidity(L, L+1, 0, X, iRigidity, Y);
         }
 #endif
-    }
-    else if ( nPoints > 2 )
-    {
-        //add_rigidityN(1, X, iRigidity, Y, iDir);
-        add_rigidity(0, 1, 2, X, iRigidity, Y);
-    }
 }
 

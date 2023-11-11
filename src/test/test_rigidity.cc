@@ -13,10 +13,8 @@
 
 #define FOR 4
 
-/// number of segments:
-const size_t NSEG = 127;
-const size_t NVAL = FOR * ( NSEG + 1 );
-const size_t ALOC = NVAL + 8;
+const size_t MSEG = 64;
+const size_t ALOC = ( MSEG + 1 ) * DIM;
 
 real * vP = nullptr;
 real * vX = nullptr, * vY = nullptr, * vZ = nullptr;
@@ -25,7 +23,7 @@ real * vX = nullptr, * vY = nullptr, * vZ = nullptr;
 
 void setFilament(size_t nbs, real* ptr, real seg, real persistence_length)
 {
-    nbs = std::min(nbs, NSEG);
+    nbs = std::min(nbs, MSEG);
     real sigma = std::sqrt(2.0*seg/persistence_length);
     
     Vector pos(0,0,0);
@@ -44,7 +42,7 @@ void setFilament(size_t nbs, real* ptr, real seg, real persistence_length)
 
 void new_reals(real*& p, real*& x, real*& y, real*& z, real mag)
 {
-    p = new_real(NVAL);
+    p = new_real(ALOC);
     x = new_real(ALOC);
     y = new_real(ALOC);
     z = new_real(ALOC);
@@ -83,83 +81,78 @@ void free_reals(real* p, real* x, real* y, real* z)
 void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 {
     const real R2 = 2.0 * R1;
-    const real TWO = 2.0;
+    const real two = 2.0;
     #pragma omp simd
     for ( size_t jj = 0; jj < DIM*nbt; ++jj )
     {
-        real f = ( X[jj+DIM*2] + X[jj] ) - TWO * X[jj+DIM];
+        real f = ( X[jj+DIM*2] + X[jj] ) - two * X[jj+DIM];
         Y[jj      ] -= f * R1;
         Y[jj+DIM  ] += f * R2;
         Y[jj+DIM*2] -= f * R1;
     }
 }
 
-/*
- This an implementation for 2D
- */
+/// In this version for 2D, the loop has dependencies preventing unrolling
 void add_rigidity2D(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    const real R2 = 2.0 * R1;
-    const real TWO = 2.0;
     real fx = 0;
     real fy = 0;
     real y0 = Y[0];
     real y1 = Y[1];
-    for ( size_t jj = 0; jj < DIM*nbt; jj += DIM )
+    size_t end = DIM * nbt;
+    for ( size_t jj = 0; jj < end; jj += DIM )
     {
-        real gx = ( X[jj+4] + X[jj+0] ) - TWO * X[jj+2];
-        real gy = ( X[jj+5] + X[jj+1] ) - TWO * X[jj+3];
-        Y[jj  ] = y0 + R1 * ( fx-gx );
-        Y[jj+1] = y1 + R1 * ( fy-gy );
-        y0 = Y[jj+2] - R1 * ( fx-gx );
-        y1 = Y[jj+3] - R1 * ( fy-gy );
+        real gx = ( X[jj+4] + X[jj+0] ) - 2 * X[jj+2];
+        real gy = ( X[jj+5] + X[jj+1] ) - 2 * X[jj+3];
+        real rx = fx - gx;
+        real ry = fy - gy;
+        Y[jj  ] = y0 + R1 * rx;
+        Y[jj+1] = y1 + R1 * ry;
+        y0 = Y[jj+2] - R1 * rx;
+        y1 = Y[jj+3] - R1 * ry;
         fx = gx;
         fy = gy;
     }
-    Y[DIM*nbt  ] = y0 + R1 * fx;
-    Y[DIM*nbt+1] = y1 + R1 * fy;
-    Y[DIM*nbt+2] -= R1 * fx;
-    Y[DIM*nbt+3] -= R1 * fy;
+    Y[end  ] = y0 + R1 * fx;
+    Y[end+1] = y1 + R1 * fy;
+    Y[end+2] -= R1 * fx;
+    Y[end+3] -= R1 * fy;
 }
 
-/*
- In this version for 2D or 3D, the loop is unrolled, pointers are used,
- and ( a0 -2*a1 + a2 ) is replaced by (a2-a1)-(a1-a0).
- */
+/// In this version for 3D, the loop has dependencies preventing unrolling
 void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    const real R2 = 2.0 * R1;
-    const real TWO = 2.0;
     real fx = 0;
     real fy = 0;
     real fz = 0;
     real y0 = Y[0];
     real y1 = Y[1];
     real y2 = Y[2];
-    for ( size_t jj = 0; jj < DIM*nbt; jj += DIM )
+    size_t end = DIM * nbt;
+    for ( size_t jj = 0; jj < end; jj += DIM )
     {
-        real gx = ( X[jj+6] + X[jj+0] ) - TWO * X[jj+3];
-        real gy = ( X[jj+7] + X[jj+1] ) - TWO * X[jj+4];
-        real gz = ( X[jj+8] + X[jj+2] ) - TWO * X[jj+5];
-        fx -= gx;
-        fy -= gy;
-        fz -= gz;
-        Y[jj  ] = y0 + R1 * fx;
-        Y[jj+1] = y1 + R1 * fy;
-        Y[jj+2] = y2 + R1 * fz;
-        y0 = Y[jj+3] - R1 * fx;
-        y1 = Y[jj+4] - R1 * fy;
-        y2 = Y[jj+5] - R1 * fz;
+        real gx = ( X[jj+6] + X[jj+0] ) - 2 * X[jj+3];
+        real gy = ( X[jj+7] + X[jj+1] ) - 2 * X[jj+4];
+        real gz = ( X[jj+8] + X[jj+2] ) - 2 * X[jj+5];
+        real rx = fx - gx;
+        real ry = fy - gy;
+        real rz = fz - gz;
+        Y[jj  ] = y0 + R1 * rx;
+        Y[jj+1] = y1 + R1 * ry;
+        Y[jj+2] = y2 + R1 * rz;
+        y0 = Y[jj+3] - R1 * rx;
+        y1 = Y[jj+4] - R1 * ry;
+        y2 = Y[jj+5] - R1 * rz;
         fx = gx;
         fy = gy;
         fz = gz;
     }
-    Y[DIM*nbt  ] = y0 + R1 * fx;
-    Y[DIM*nbt+1] = y1 + R1 * fy;
-    Y[DIM*nbt+2] = y2 + R1 * fz;
-    Y[DIM*nbt+3] -= R1 * fx;
-    Y[DIM*nbt+4] -= R1 * fy;
-    Y[DIM*nbt+5] -= R1 * fz;
+    Y[end  ] = y0 + R1 * fx;
+    Y[end+1] = y1 + R1 * fy;
+    Y[end+2] = y2 + R1 * fz;
+    Y[end+3] -= R1 * fx;
+    Y[end+4] -= R1 * fy;
+    Y[end+5] -= R1 * fz;
 }
 
 #if REAL_IS_DOUBLE && USE_SIMD
@@ -292,7 +285,7 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
 
 void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    const real SIX = 6.0;
+    const real six = 6.0;
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
 /*
@@ -308,10 +301,10 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
         return;
     }
 */
-    const size_t end = DIM * nbt;
+    const int end = DIM * nbt;
     #pragma omp simd
-    for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (SIX*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
+    for ( int i = DIM*2; i < end; ++i )
+        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (six*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
     
     // special cases near the edges:
     real      * Z = Y + DIM * nbt;
@@ -329,7 +322,7 @@ void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 /// only valid if ( nbt > DIM )
 void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    const real SIX = 6.0;
+    const real six = 6.0;
     const real R4 = R1 * 4;
     const real R2 = R1 * 2;
 
@@ -337,7 +330,7 @@ void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
     {
-        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (SIX*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
+        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (six*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
     }
     
     // special cases near the edges:
@@ -384,9 +377,9 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
 #pragma mark - TEST Rigidity
 
 template < void (*FUNC)(const size_t, const real*, real, real*) >
-void testRigidity(size_t cnt, char const* str)
+void testRigidity(size_t nbp, size_t cnt, char const* str)
 {
-    const size_t nbt = NSEG - 1;
+    const size_t nbt = nbp - 2;
     const real alpha = 64.0;
     
     zero_real(ALOC, vX);
@@ -395,10 +388,11 @@ void testRigidity(size_t cnt, char const* str)
     
     FUNC(nbt, vP, alpha, vX);
     VecPrint::edges(DIM*nbt, vX);
-    std::cout << " |";
-    VecPrint::print(DIM, vX+NVAL);
+    fprintf(stderr, " |");
+    VecPrint::print(DIM, vX+DIM*nbp);
     add_rigidity0(nbt, vP, alpha, vY);
     real err = blas::difference(DIM*(nbt+2), vX, vY);
+    fprintf(stderr, " |");
 
     tick();
     for ( size_t i=0; i<cnt; ++i )
@@ -415,23 +409,23 @@ void testRigidity(size_t cnt, char const* str)
 }
 
 
-void test(size_t cnt)
+void test(size_t nbp, size_t cnt)
 {
-    testRigidity<add_rigidity0>(cnt, "0  ");
+    testRigidity<add_rigidity0>(nbp, cnt, "0  ");
 #if ( DIM == 2 )
-    testRigidity<add_rigidity2D>(cnt, "2D ");
+    testRigidity<add_rigidity2D>(nbp, cnt, "2D ");
 #else
-    testRigidity<add_rigidity3D>(cnt, "3D ");
+    testRigidity<add_rigidity3D>(nbp, cnt, "3D ");
 #endif
-    testRigidity<add_rigidityF>(cnt, "F  ");
-    testRigidity<add_rigidityG>(cnt, "G  ");
-    testRigidity<add_rigidity4>(cnt, "4  ");
+    testRigidity<add_rigidityF>(nbp, cnt, "F  ");
+    //testRigidity<add_rigidityG>(nbp, cnt, "G  ");
+    //testRigidity<add_rigidity4>(nbp, cnt, "4  ");
 #if USE_SIMD & ( DIM == 2 ) & REAL_IS_DOUBLE
-    testRigidity<add_rigidity2D_SSO>(cnt, "SSO");
-    testRigidity<add_rigidity2D_SSE>(cnt, "SSE");
+    testRigidity<add_rigidity2D_SSO>(nbp, cnt, "SSO");
+    testRigidity<add_rigidity2D_SSE>(nbp, cnt, "SSE");
 #endif
 #if defined(__AVX__) & ( DIM == 2 ) & REAL_IS_DOUBLE
-    testRigidity<add_rigidity2D_AVX>(cnt, "AVX");
+    testRigidity<add_rigidity2D_AVX>(nbp, cnt, "AVX");
 #endif
 }
 
@@ -443,9 +437,12 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     new_reals(vP, vX, vY, vZ, 1.0);
-    setFilament(NSEG, vP, 0.1, 17.0);
-    std::cout << "addRigidity " << DIM << "D,  " << NSEG;
-    std::cout << " segments,   " << __VERSION__ << "\n";
-    test(1<<20);
+    for ( int i : { 2, 3, 5, 7, 10, 12, 15, 30, 45 } )
+    {
+        setFilament(i, vP, 0.1, 17.0);
+        std::cout << "addRigidity " << DIM << "D,  ";
+        std::cout << i << " segments,   " << __VERSION__ << "\n";
+        test(i, 1<<21);
+    }
     free_reals(vP, vX, vY, vZ);
 }
