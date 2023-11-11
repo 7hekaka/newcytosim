@@ -833,19 +833,18 @@ unsigned Meca::solve()
     if ( resid > tolerance_ )
     {
         doNotify = 1;
-        Cytosim::out("Failed with size %lu precond %i flag %u count %4u residual %.3e (%.3e)",
+        Cytosim::out("Failed size %lu precond %i flag %u count %4u residual %.3e (%.3e)",
             dim, precond_, monitor.flag(), monitor.count(), resid, monitor.residual());
         
-        // in case the solver did not converge, try again:
+        // in case the solver did not converge, continue with same method/vectors:
         monitor.reset();
-        //zero_real(dim, vSOL);
         if ( precond_ )
             LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         else
             LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         
         resid = residualNorm();
-        Cytosim::out(" --> restarted: count %4i residual %.3e\n", monitor.count(), resid);
+        Cytosim::out(" --> prolong: count %4i residual %.3e\n", monitor.count(), resid);
         
         if ( resid > tolerance_ )
         {
