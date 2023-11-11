@@ -133,12 +133,12 @@ void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
     size_t end = DIM * nbt;
     for ( size_t jj = 0; jj < end; jj += DIM )
     {
-        real gx = ( X[jj+6] + X[jj+0] ) - two * X[jj+3];
-        real gy = ( X[jj+7] + X[jj+1] ) - two * X[jj+4];
-        real gz = ( X[jj+8] + X[jj+2] ) - two * X[jj+5];
-        real rx = fx - gx;
-        real ry = fy - gy;
-        real rz = fz - gz;
+        real gx = two * X[jj+3] - ( X[jj+6] + X[jj+0] );
+        real gy = two * X[jj+4] - ( X[jj+7] + X[jj+1] );
+        real gz = two * X[jj+5] - ( X[jj+8] + X[jj+2] );
+        real rx = gx - fx;
+        real ry = gy - fy;
+        real rz = gz - fz;
         Y[jj  ] = y0 + R1 * rx;
         Y[jj+1] = y1 + R1 * ry;
         Y[jj+2] = y2 + R1 * rz;
@@ -149,12 +149,12 @@ void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
         fy = gy;
         fz = gz;
     }
-    Y[end  ] = y0 + R1 * fx;
-    Y[end+1] = y1 + R1 * fy;
-    Y[end+2] = y2 + R1 * fz;
-    Y[end+3] -= R1 * fx;
-    Y[end+4] -= R1 * fy;
-    Y[end+5] -= R1 * fz;
+    Y[end  ] = y0 - R1 * fx;
+    Y[end+1] = y1 - R1 * fy;
+    Y[end+2] = y2 - R1 * fz;
+    Y[end+3] += R1 * fx;
+    Y[end+4] += R1 * fy;
+    Y[end+5] += R1 * fz;
 }
 
 #if REAL_IS_DOUBLE && USE_SIMD
