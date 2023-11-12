@@ -992,6 +992,8 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     long frames = 0;
     bool prune = true;
     bool binary = true;
+    bool has_code = false;
+    std::string code;
     
 #if BACKWARD_COMPATIBILITY < 50
     // check if 'event' is specified within the 'run' command,
@@ -1011,6 +1013,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     opt.set(prune,  "prune");
     opt.set(binary, "binary");
     opt.set(frames, "nb_frames");
+    has_code = opt.set(code, "nb_frames", 1);
     
     do_write &= ( frames > 0 );
     sim_->prepare();
@@ -1057,6 +1060,8 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
         if ( do_write )
         {
             sim_->relax();
+            if ( has_code )
+                sim_->evaluate(code);
             sim_->writeObjects(sim_->prop.system_file, true, binary);
             reportCPUtime(sim_->time());
             sim_->sMeca.doNotify = 2;  // to print convergence parameters
