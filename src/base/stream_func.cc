@@ -301,7 +301,7 @@ void StreamFunc::print_line(std::ostream& os, std::istream& is, std::streampos p
 {
     size_t cnt;
     std::string line = extract_line(is, pos, cnt);
-    os << "line" << std::setw(INDENT-5) << cnt << " | " << line << '\n';
+    os << "@   " << std::setw(INDENT-5) << cnt << " | " << line << '\n';
 }
 
 

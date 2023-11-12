@@ -836,7 +836,12 @@ template <>
 void Glossary::set_value(std::string& var, key_type const& key, std::string const& val)
 {
     //var = Tokenizer::trim(val);
-    var = val;
+    // strip double quotes, ASCII(") == 34:
+    if ( val.size() > 3 && val.front() == 34 && val.back() == 34 )
+        var = val.substr(1, val.size()-2);
+    else
+        var = val;
+
     VLOG2("Glossary:SET STR   " << key << " = |" << var << "|\n");
 }
 
