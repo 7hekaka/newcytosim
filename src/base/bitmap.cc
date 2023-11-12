@@ -204,6 +204,13 @@ public:
         set_byte(uint32_t(depth)*j, BPR*(height-1-i), color);
     }
     
+    // matrix convention: i = line, with 0 at the top of the image
+    void set_if(uint32_t i, uint32_t j, uint8_t color = 1)
+    {
+        if (( i < height ) & ( j < width ))
+            set_byte(uint32_t(depth)*j, BPR*(height-1-i), color);
+    }
+
     // x = horizontal, y = vertical, with 0 at the bottom of the image
     void flipset(uint32_t x, uint32_t y, uint8_t color)
     {

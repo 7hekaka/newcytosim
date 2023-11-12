@@ -183,7 +183,7 @@ void Simul::solve()
 #if 0
     if ( sMeca.nbMecables() > 2 )
     {
-        sMeca.saveMatrixBitmaps("b_");
+        sMeca.saveMatrixBitmaps("b_", 0);
         // experimental RCM ordering (29.7.2022):
         sMeca.reorderMecables();
         setAllInteractions(sMeca);

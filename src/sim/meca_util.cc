@@ -812,18 +812,13 @@ static void markMatrix(BitMap<1>& bmap, size_t sup, MATRIX const& mat)
 
 
 /// add vertical and horizontal lines to indicate mecables indices
-static void markMecables(BitMap<1>& bmap, Array<Mecable*> const& mecs)
+static void markMecables(BitMap<1>& bmap, size_t sup, Array<Mecable*> const& mecs)
 {
     for ( Mecable * mec : mecs )
     {
         size_t i = mec->matIndex();
-        size_t s = i + mec->nbPoints() - 1;
-        for ( size_t j = i+1; j < s; ++j )
-        {
-            bmap.set(i, j, 1);
-            bmap.set(j, s, 1);
-        }
-        bmap.set(i, s, 1);
+        for ( size_t j = 1; j < 4; ++j )
+            bmap.set_if(i-j-1, i+j, 1);
     }
 }
 
@@ -836,14 +831,14 @@ static void saveMatrixBitmap(MATRIX& mat, Array<Mecable*> mecs, size_t nbv, cons
         if ( !ferror(f) ) {
             bmap.clear();
             markMatrix(bmap, nbv, mat);
-            markMecables(bmap, mecs);
+            markMecables(bmap, nbv, mecs);
             bmap.save(f);
         }
         fclose(f);
     }
 }
 
-void Meca::saveMatrixBitmaps(const char prefix[]) const
+void Meca::saveMatrixBitmaps(const char prefix[], size_t inc) const
 {
     static size_t cnt = 0;
     char str[64] = { 0 };
@@ -856,6 +851,6 @@ void Meca::saveMatrixBitmaps(const char prefix[]) const
     snprintf(str, sizeof(str), "%sful%08lu.bmp", prefix, cnt);
     saveMatrixBitmap(mFUL, mecables, nbVertices(), str);
 #endif
-    ++cnt;
+    cnt += inc;
 }
 

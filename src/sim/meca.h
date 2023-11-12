@@ -788,7 +788,7 @@ public:
     void flagClusters() const;
     
     /// export bitmap images to reveal the matrices' sparsity patterns
-    void saveMatrixBitmaps(const char[]) const;
+    void saveMatrixBitmaps(const char[], size_t inc = 1) const;
     
     /// save image of connectivity between Mecables
     void saveConnectivityBitmap() const;
