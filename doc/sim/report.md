@@ -7,7 +7,8 @@ You can extract formatted data from Cytosim in two different ways:
 
 Both methods produce nearly identical formatted text output with selected data,
 such as the coordinates of the filaments, their state or length, etc.
- 
+The command computes the report `on the fly`, as the simulation is being calculated. The executable does it after then simulation is completed.
+
 # The report command
 
 The command `report` can be called from the config file.
@@ -28,7 +29,7 @@ A `star` sends the reports to the standard output (i.e. the terminal):
 
 Parameters can be specified:
 
-	report fiber:end_state { verbose=0; }
+	report fiber:end_state states.txt { verbose=0; }
 
 ## Recurrent reports  
 
@@ -108,7 +109,7 @@ For more info, please check:
  
 # The framewise report executable
 
-The executable `reportF` is similar to `report`, excepts that it sends the report of each frame into a different file. Hence,
+The executable `reportF` is similar to `report`, except that it will put the report of each frame into a different file. Hence,
 
 	reportF fiber:points
 
@@ -125,7 +126,7 @@ will create multiple files:
 
 There are many options to `report` and the list below may not be accurate. 
 Please, try them out to see what information you can obtain.
-It is relatively easy to extend the report functions, declared in `src/sim/simul.h` and defined in `src/sim/simul_report.cc` to output something specific for a project. 
+It is relatively easy to extend the report functions, which are defined in `src/sim/simul_report.cc` and declared in `src/sim/simul.h`, to output something specific for a project. 
 
 
  WHAT            | Output
