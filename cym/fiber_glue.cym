@@ -11,7 +11,7 @@ set simul system
 {
     time_step = 0.01
     viscosity = 0.1
-    display = { delay=4; }
+    display = ( delay=4; )
 }
 
 set space cell
@@ -30,7 +30,7 @@ set hand strong_hand
     unbinding_force = 1e6
     hold_growing_end = 1
     hold_shrinking_end = 1
-    display = { size=8 }
+    display = ( size=8 )
 }
 
 set single cortical_glue
@@ -57,7 +57,7 @@ set fiber microtubule
     rebirth_rate    = 1
     min_length      = 0.5
     
-    display = { line=8, 2; point=1; speckles=7, 2, 0.25; tension_scale=-10 }
+    display = ( line=8, 2; point=1; speckles=7, 2, 0.25; tension_scale=-10 )
 }
 
 set solid core

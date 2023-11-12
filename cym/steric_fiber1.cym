@@ -9,7 +9,7 @@ set simul system
     kT = 0.0042
     steric = 1, 500
     
-    display = { point_value=0.01; window_size=1000, 800; }
+    display = ( point_value=0.01; window_size=1000, 800; )
 }
 
 set space cell
@@ -28,7 +28,7 @@ set fiber filament
     confine = inside, 100
     segmentation = 0.25
     steric = 1, 0.05
-    display = { line_width=6; tension_scale=10 }
+    display = ( line_width=6; tension_scale=10 )
 }
 
 

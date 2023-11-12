@@ -33,7 +33,7 @@ set fiber microtubule
     rigidity = 30
     segmentation = 1.5
     confine = inside, 100
-    display = { line_width=1; }
+    display = ( line_width=1; )
 }
 
 set hand kinesin
@@ -48,7 +48,7 @@ set hand kinesin
     stall_force = 5
     
     hold_growing_end = 1
-    display = { size=8 }
+    display = ( size=8 )
 }
 
 set couple complex

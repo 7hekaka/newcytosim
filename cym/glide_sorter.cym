@@ -18,13 +18,13 @@ set simul system
     viscosity = 0.02
     time_step = 0.005
 %    random_seed = 87 
-    display = {
+    display = (
         tile = 1, 1;
         zoom = 0.5;
         style = 2;
         delay = 10;
         point_size = 6
-    }
+    )
     precondition = 0
 }
 
@@ -32,7 +32,7 @@ set fiber microtubule
 {
     rigidity = 10        %taxol-stabilized microtubule are more flexible
     segmentation = 0.5
-    display = { line_width = 10; plus_end=24, 2; }
+    display = ( line_width = 10; plus_end=24, 2; )
 }
 
 set hand kinesin
@@ -45,10 +45,10 @@ set hand kinesin
     
     activity = move
     unloaded_speed = 1
-    display = {
+    display = (
         color = 0xE69F00FF;
         size = 5
-    }
+    )
 }
 
 set hand anti_kinesin
@@ -61,10 +61,10 @@ set hand anti_kinesin
     
     activity = move
     unloaded_speed = -1
-    display = {
+    display = (
         size = 5
         color = 0x0072B2FF;
-    }
+    )
 }
 
 set single graftedK

@@ -22,7 +22,7 @@ set fiber microtubule
     segmentation = 1
     confine = inside, 100
 
-    display = { line_width=3; }
+    display = ( line_width=3; )
 }
 
 set solid core

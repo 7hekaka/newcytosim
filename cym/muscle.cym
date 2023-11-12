@@ -24,7 +24,7 @@ set fiber actin
     rigidity = 5
     segmentation = 0.2
     binding_key = 1
-    display = { color=blue; interval=1.0; line_width=4; }
+    display = ( color=blue; interval=1.0; line_width=4; )
 }
 
 set solid core
@@ -71,7 +71,7 @@ set fiber myosin_filament
     rigidity = 5
     segmentation = 0.2
     binding_key = 2
-    display = { color=orange; interval=1.0; line_width=1; }
+    display = ( color=orange; interval=1.0; line_width=1; )
 }
 
 set hand myosin_base
@@ -82,7 +82,7 @@ set hand myosin_base
     unbinding_force = inf
     binding_key = 2
 
-    display = { color=red, red; size=5 }
+    display = ( color=red, red; size=5 )
 }
 
 set hand myosin_motor
@@ -97,7 +97,7 @@ set hand myosin_motor
     unloaded_speed = -0.5
     stall_force = 6
 
-    display = { color=white; size=5 }
+    display = ( color=white; size=5 )
 }
 
 set couple myosin

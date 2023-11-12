@@ -16,19 +16,19 @@ set simul system
     viscosity = 0.01
     time_step = 0.0025
     precondition = 0
-    display = {
+    display = (
         style = 2;
         delay = 10;
         point_size = 10
         period = 4
-    }
+    )
 }
 
 set fiber microtubule
 {
     rigidity = 10
     segmentation = 0.5
-    display = { line_width = 10; plus_end=24, 2; }
+    display = ( line_width = 10; plus_end=24, 2; )
 }
 
 set hand kinesin
@@ -41,10 +41,10 @@ set hand kinesin
     
     activity = move
     unloaded_speed = 1
-    display = {
+    display = (
         color = 0xE69F00FF;
         size = 5
-    }
+    )
 }
 
 set single graftedK
@@ -63,7 +63,7 @@ set hand slider
     activity = slide
     mobility = 1
     stiffness = 20
-    display = { width=3; size=6; color=blue }
+    display = ( width=3; size=6; color=blue )
 }
 
 set single graftedS

@@ -43,7 +43,7 @@ set hand eg5_motor
     unloaded_speed = 0.05
     stall_force = 6
 
-    display = { color=0xFFA50033; size=5 }
+    display = ( color=0xFFA50033; size=5 )
 }
 
 set couple eg5
@@ -73,7 +73,7 @@ set fiber filament
     growing_force  = 5
     zone_radius = 10
     
-    display = { color=0xFFFFFFAA; interval=1.0; line_width=1; end_size=4,4 }
+    display = ( color=0xFFFFFFAA; interval=1.0; line_width=1; end_size=4,4 )
 }
 
 set hand activator
@@ -82,7 +82,7 @@ set hand activator
     binding_range = 0.05
     unbinding_rate = 1
     unbinding_force = 3
-    display = { size=8; color=green; }
+    display = ( size=8; color=green; )
 }
 
 set hand nucleator
@@ -93,7 +93,7 @@ set hand nucleator
 
     activity = nucleate
     nucleate = 1, filament, ( length=0.05 )
-    display = { size=8; color=white; }
+    display = ( size=8; color=white; )
 }
 
 set couple gamma

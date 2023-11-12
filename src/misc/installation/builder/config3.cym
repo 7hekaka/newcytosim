@@ -35,7 +35,7 @@ set hand nucleator
     unbinding = 0, 3
     activity = nucleate
     nucleate = 1.0, filament, ( length=0.1; plus_end=grow; )
-    display = { size=7; color=gray; }
+    display = ( size=7; color=gray; )
 }
 
 set single protein

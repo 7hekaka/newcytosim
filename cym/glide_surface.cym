@@ -23,7 +23,7 @@ set fiber microtubule
     %taxol-stabilized microtubule are more flexible 
     rigidity = 10
     segmentation = 0.3
-    display = { line_width=6 }
+    display = ( line_width=6 )
     confine = inside, 100
 }
 
@@ -38,7 +38,7 @@ set hand kinesin
     unloaded_speed = 0.6
     stall_force = 6
 
-    display = { color=0x0000FF99; size=6 }
+    display = ( color=0x0000FF99; size=6 )
 }
 
 set hand dynein
@@ -52,7 +52,7 @@ set hand dynein
     unloaded_speed = -0.6
     stall_force = 6
 
-    display = { color=0xFF990099; size=6 }
+    display = ( color=0xFF990099; size=6 )
 }
 
 set single gKinesin

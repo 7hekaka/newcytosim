@@ -106,7 +106,7 @@ new 12 chromosome
 set solid core
 {
     viscosity = inf                   % immobilized!
-    display = { color=0x00880044; }
+    display = ( color=0x00880044; )
 }
 
 set aster star

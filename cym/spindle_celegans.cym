@@ -10,14 +10,14 @@ set simul system
     kT = 0.0042            %% 25 C
     viscosity = 1          %% viscosity inside embryo 
     steric = 0             %% no interaction (faster)
-    display = { line_width=3; couple_select=0; single_select=3; point_size=5;}
+    display = ( line_width=3; couple_select=0; single_select=3; point_size=5; )
 }
 
 
 set space cell
 {
     shape = circle
-    display = { visible=0; }
+    display = ( visible=0; )
 }
 
 new cell
@@ -28,7 +28,7 @@ new cell
 set space plate
 {
     shape = ellipse
-    display = { color=0xFFFFFF22; visible=2; }
+    display = ( color=0xFFFFFF22; visible=2; )
 }
 
 new plate
@@ -57,7 +57,7 @@ set fiber microtubule
     rescue_rate = 0.5                   
 
     total_polymer = inf              %% illimite
-    display = { color=blue; line=1; }
+    display = ( color=blue; line=1; )
 }
 
 
@@ -120,7 +120,7 @@ new 0 DNA
 set solid core
 {
     viscosity = 200       %% controlle la mobilite des poles
-    display = { color=0x00880044; }
+    display = ( color=0x00880044; )
 }
 
 set aster star

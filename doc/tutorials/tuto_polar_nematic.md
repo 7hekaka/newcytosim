@@ -107,7 +107,7 @@ In the simulation above the microtubules will disappear once they have undergone
         unbinding = 0, 3
         activity = nucleate
         nucleate = 100, microtubule, ( length = 1; plus_end = 1; )
-        display = { visible = 0;}
+        display = ( visible = 0; )
     }
 
     set single creator

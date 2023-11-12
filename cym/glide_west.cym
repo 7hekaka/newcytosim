@@ -6,14 +6,14 @@ set simul system
     dim = 2
     viscosity = 0.01
     time_step = 0.005
-    display = {
+    display = (
         tile = 1, 1;
         zoom = 0.5;
         style = 2;
         delay = 10;
         point_size = 6
         window_size=1000,600
-    }
+    )
 }
 
 set space slide
@@ -30,7 +30,7 @@ set fiber microtubule
 {
     rigidity = 20
     segmentation = 0.5
-    display = { line_width = 10; plus_end=24, 2; }
+    display = ( line_width = 10; plus_end=24, 2; )
 }
 
 set hand kinesin
@@ -43,10 +43,10 @@ set hand kinesin
     activity = move
     unloaded_speed = 1
     stall_force = 6
-    display = {
+    display = (
         color = 0xE69F00FF;
         size = 5
-    }
+    )
 }
 
 set hand anti_kinesin
@@ -59,10 +59,10 @@ set hand anti_kinesin
     activity = move
     unloaded_speed = -1
     stall_force = 6
-    display = {
+    display = (
         size = 5
         color = 0x0072B2FF;
-    }
+    )
 }
 
 set single graftedK

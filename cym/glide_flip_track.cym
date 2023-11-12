@@ -5,13 +5,13 @@ set simul system
     dim = 2
     viscosity = 0.01
     time_step = 0.0025
-    display = {
+    display = (
         style = 2;
         delay = 10;
         point_size = 8
         tile = 1, 1
         zoom = 0.5
-    }
+    )
     precondition = 0
 }
 
@@ -29,7 +29,7 @@ set fiber microtubule
 {
     rigidity = 10
     segmentation = 0.5
-    display = { line_width = 10; plus_end=24, 2; }
+    display = ( line_width = 10; plus_end=24, 2; )
 }
 
 set hand fast
@@ -42,10 +42,10 @@ set hand fast
     
     activity = move
     unloaded_speed = 1
-    display = {
+    display = (
         color = 0xE69F00FF;
         size = 5
-    }
+    )
 }
 
 set hand slow
@@ -58,11 +58,10 @@ set hand slow
     
     activity = move
     unloaded_speed = 0.1
-    display = {
+    display = (
         color = 0x0072B2FF;
         size = 5
-    }
-
+    )
 }
 
 set single graftedF

@@ -10,20 +10,20 @@ set simul system
     kT = 0.0042            % 25 C
     viscosity = 1          % viscosity inside embryo 
     steric = 0             % no interaction (faster)
-    display = { line_width=3; couple_select=0; single_select=3; point_size=5; back_color=darker_gray;}
+    display = ( line_width=3; couple_select=0; single_select=3; point_size=5; back_color=darker_gray; )
 }
 
 
 set space cell
 {
     shape = sphere
-    display = { color=blue, black; back_color=black; visible=2; }
+    display = ( color=blue, black; back_color=black; visible=2; )
 }
 
 set space plate
 {
     shape = ellipse
-    display = { color=0xFFFFFF22; visible=0; }
+    display = ( color=0xFFFFFF22; visible=0; )
 }
 
 new cell
@@ -58,7 +58,7 @@ set fiber filament
     rescue_rate = 0.5                   
 
     total_polymer = inf              % illimite
-    display = { color=white; line=1; }
+    display = ( color=white; line=1; )
 }
 
 
@@ -94,7 +94,7 @@ new 3333 grafted
 set solid core
 {
     viscosity = 200       % controlle la mobilite des poles
-    display = { color=0x00880044; }
+    display = ( color=0x00880044; )
 }
 
 set aster star

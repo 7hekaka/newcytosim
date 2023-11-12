@@ -10,7 +10,7 @@ set simul system
     steric = 1, 1000
     kT = 0.0002
     
-    display = { delay=8; point_value=0.01; window_size=1000, 800; tile=2 }
+    display = ( delay=8; point_value=0.01; window_size=1000, 800; tile=2 )
 }
 
 set space cell
@@ -34,7 +34,7 @@ set fiber filament
     growing_speed = 0.2
     total_polymer = 250
 
-    display = { line=6,2; tension_scale=4 }
+    display = ( line=6,2; tension_scale=4 )
 }
 
 

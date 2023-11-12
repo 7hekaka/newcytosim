@@ -42,7 +42,7 @@ set hand nucl
     unbinding_force = 5
     hold_shrinking_end = 1
     hold_growing_end = 1
-    display = { size=5; color=white; }
+    display = ( size=5; color=white; )
     
     activity = nucleate
     nucleate = 0.8, actin, ( length=0.1; direction=tangent; plus_end=grow; )
@@ -64,7 +64,7 @@ set hand myosin
     binding_range = 0.02
     unbinding_rate = 0.1
     unbinding_force = 3
-    display = { color=green; }
+    display = ( color=green; )
     
     activity = move
     unloaded_speed = -0.1

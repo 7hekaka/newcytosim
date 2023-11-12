@@ -32,7 +32,7 @@ set fiber microtubule
     rebirth_rate = 10
     persistent = 1
 
-    display = { line_width=3; }
+    display = ( line_width=3; )
 }
 
 set solid core
