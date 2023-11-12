@@ -1846,43 +1846,48 @@ namespace gle
     
     /**
      Draw a surface of revolution around the Z-axis.
-     The surface goes from Z to Z_max, and its radius is
-     given by the function `radius`(z) provided as argument.
+     The surface goes from Z = [ B, T ] with increments dZ, and its radius is
+     given by the function `radius`(Z) provided as argument.
      */
-    void drawRevolution(float (*radius)(float), float Z, float T, float dZ)
+    void drawRevolution(float (*radius)(float), float B, const float T, float dZ)
     {
-        float R = radius(Z);
-        while ( Z < T )
+        size_t cnt = 2 * ( 2 + pi_twice ) * ( 1 + std::ceil(( T - B ) / dZ));
+        flute6 * flu = gym::mapBufferV3N3(cnt+4);
+        flute6 * ptr = flu;
+
+        float Z = B, R, Q = radius(B);
+        while ( B < T )
         {
-            float Y = Z;
-            float Q = R;
             Z += dZ;
             R = radius(Z);
             
             float dR = ( R - Q ) / dZ;
             float dN = 1.0f / sqrtf( 1 + dR * dR );
-            dR = dR * dN;
+            dR = -dR * dN;
             
-            flute6 * flu = gym::mapBufferV3N3(2+2*pi_twice);
-            flute6 * ptr = flu;
             for ( size_t n = 0; n <= pi_twice; ++n )
             {
                 float S = sin_(n), C = cos_(n);
-                ptr[0] = {R*C, R*S, Z, dN*C, dN*S,-dR};
-                ptr[1] = {Q*C, Q*S, Y, dN*C, dN*S,-dR};
+                ptr[0] = {R*C, R*S, Z, dN*C, dN*S, dR};
+                ptr[1] = {Q*C, Q*S, B, dN*C, dN*S, dR};
                 ptr += 2;
             }
-            gym::unmapBufferV3N3();
-            gym::drawTriangleStrip(0, ptr-flu);
-            gym::cleanup();
+            ptr[0] = {Q, 0, B, dN, dN, dR};
+            ptr[1] = {R, 0, Z, dN, dN, dR};
+            ptr += 2;
+            B = Z;
+            Q = R;
         }
+        gym::unmapBufferV3N3();
+        gym::drawTriangleStrip(0, ptr-flu);
+        gym::cleanup();
     }
 
     /// some volume of revolution with axis along Z
     float dumbbellRadius(float z) { return sinf(M_PI*z) * (1.3f+cosf(2*M_PI*z)); }
     float barrelRadius(float z) { return sinf(M_PI*z); }
     void dumbbell() { drawRevolution(dumbbellRadius, 0, 1, 0.0625); }
-    void barrel() { drawRevolution(barrelRadius, 0, 1, 0.0625); }
+    void barrel() { drawRevolution(barrelRadius, 0, 1, 0.025); }
 
     void dualPassBarrel() { gym::dualPass(barrel); }
 

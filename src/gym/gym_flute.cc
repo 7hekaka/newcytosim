@@ -54,7 +54,7 @@ namespace gym
         glBindBuffer(GL_ARRAY_BUFFER, nextStream());
         glBufferData(GL_ARRAY_BUFFER, cnt*Q, nullptr, GL_STREAM_DRAW);
         void* ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-        assert_true(ptr);
+        assert_true(ptr||cnt==0);
         return (float*)ptr;
     }
     
