@@ -44,9 +44,9 @@ This can be done with `DIM=2` or `DIM=3`.
 
 This should run all the config files into a separate subfolder:
 	
-	run_actin
-	run_amplify
-	run_arp23
+	_actin
+	_amplify
+	_arp23
 	...
 
 Each subfolder should contain the usual cytosim output, and in addition:  
@@ -80,7 +80,7 @@ Example of an error that can be ignored:
 This is a simulation that is specifically built for 3D, and the code compiled in 2D will bail out.
 
 
-In case of errors, the files in each subfolder `run_*` can be examined:  
+In case of errors, the files in each subfolder `_*` can be examined:  
 
 - standard output `out.txt` and standard error `err.txt`
 - and the log file `messages.out`
@@ -94,20 +94,20 @@ This can be automated using our python script `scan.py`:
 
 For a 3D simulation, first generate an image for each subfolder:
 
-	scan.py 'play3 image frame=10000' run*
+	scan.py 'play3 image frame=10000' _*
 
 For a 2D simulation:
 
-	scan.py 'play2 image frame=10000' run*
+	scan.py 'play2 image frame=10000' _*
  	
 Possibly convert the images using [ImageMagick](https://imagemagick.org/):
 
-	for d in run_*/image*ppm; do convert $d image.png; done
+	for d in _*/image*ppm; do convert $d image.png; done
 
 
 It may help to build a HTML summary page, using our script `make_page.py`:
 
-	make_page.py tile=6 width=256 run_*
+	make_page.py tile=6 width=256 _*
 
 Open and examine the results
 
@@ -145,4 +145,5 @@ Possibly two series of tests need to be performed:
 
 ### About this file
 
-FJN 4.09.2020
+FJN 13.11.2023
+

@@ -39,7 +39,7 @@ def live(tool, file):
 def execute(tool, file, verbose):
     """run test in separate directory"""
     name = os.path.split(file)[1]
-    wdir = 'run_'+name.partition('.')[0];
+    wdir = '_' + name.partition('.')[0];
     try:
         os.mkdir(wdir)
     except OSError:
