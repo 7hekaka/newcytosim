@@ -78,7 +78,8 @@ void Solid::setInteractions(Meca& meca) const
     if ( soTwin )
     {
         const size_t off = DIM+1; // index of point to be linked
-        for ( unsigned POLE = 0; POLE+off < nPoints; POLE += off+1 )
+        const size_t sup = std::min(nPoints-off, off+1); // last point to be linked
+        for ( size_t POLE = 0; POLE <= sup; POLE += off+1 )
         {
             const real stiff = prop->twin_stiffness;
             if ( stiff > 0 )

@@ -2132,7 +2132,9 @@ void Display::drawSolid(Solid const& obj)
         gym::ref_view();
         gym::enableLighting();
         gym::color_both(lor, 1);
-        for ( size_t inx = DIM+1; inx < obj.nbPoints(); inx += DIM+2 )
+        const size_t off = DIM+1; // index of point to be linked
+        const size_t sup = std::min(obj.nbPoints()-off, 2*off+1); // last point to be linked
+        for ( size_t inx = off; inx <= sup; inx += off+1 )
         {
             gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), rad);
             gle::hexTube();
