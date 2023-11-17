@@ -36,21 +36,21 @@ inline void print_vector(int num, real const* vec)
     if ( num > 12 )
     {
         VecPrint::print(6, vec, 3);
-        fprintf(stdout, "...");
+        fprintf(stderr, "...");
         VecPrint::print(6, vec+num-6, 3);
-        fprintf(stdout, " |");
+        fprintf(stderr, " |");
         VecPrint::print(2, vec+num, 1);
     }
     else
     {
         VecPrint::print(num, vec, 3);
-        fprintf(stdout, " |");
+        fprintf(stderr, " |");
         VecPrint::print(2, vec+num, 1);
     }
     real sum = vec[0];
     for ( int i = 1; i < num; ++i )
         sum += vec[i];
-    printf("  sum %+18.16f ", sum);
+    fprintf(stderr, "  sum %+18.16f ", sum);
 }
 
 void nan_spill(real * dst)
@@ -559,12 +559,14 @@ void getrs6(int N, real const* B, int LDB, real* Y)
 
 void getrs7(int N, real const* B, int LDB, real* Y)
 {
+#if USE_SIMD
     // Apply row interchanges to the right hand side.
     xlaswp1(Y, 1, N, pivot);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_3D_SSE(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1C_3D_SSE(N, (float*)B, LDB, Y);
+#endif
 }
 
 /// convert doubles to floats
