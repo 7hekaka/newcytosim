@@ -14,7 +14,7 @@
 Duo::Duo(DuoProp const* p, Vector const& w)
 : Couple(p, w), active_(0)
 {
-    countdown_ = 0;
+    countdown_ = -1;
     if ( p->fast_diffusion )
         throw InvalidParameter("`fast_diffusion` is incompatible with `activity=duo`");
 }
@@ -58,10 +58,10 @@ void Duo::stepFF()
     // activity
     if ( active_ )
     {
-        assert_true(countdown_ > 0);
+        assert_true(countdown_ >= 0);
         // spontaneous de-activation:
         countdown_ -= prop()->deactivation_rate_dt;
-        if ( countdown_ <= 0 )
+        if ( countdown_ < 0 )
         {
             deactivate();
             // test fraction of time when it is inactive:
@@ -86,7 +86,7 @@ void Duo::stepFF()
 void Duo::tryDeactivate()
 {
     countdown_ -= prop()->deactivation_rate_dt;
-    if ( countdown_ <= 0 )
+    if ( countdown_ < 0 )
         deactivate();
 }
 
