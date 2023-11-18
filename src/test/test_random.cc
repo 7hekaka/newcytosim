@@ -207,33 +207,39 @@ void check_flip()
 
 
 template < typename REAL >
-void check_random(const char str[], size_t cnt, REAL off, REAL (Random::*FUNC)())
+void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)())
 {
     REAL ix = INFINITY, iy = INFINITY, iz = INFINITY, it = INFINITY;
-    REAL avg = 0, var = 0;
+    real avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
-        REAL x = (RNG.*FUNC)() - off;
-        REAL y = (RNG.*FUNC)() - off;
-        REAL z = (RNG.*FUNC)() - off;
-        REAL t = (RNG.*FUNC)() - off;
+        REAL x = (RNG.*FUNC)();
+        REAL y = (RNG.*FUNC)();
+        REAL z = (RNG.*FUNC)();
+        REAL t = (RNG.*FUNC)();
         ix = std::min(ix, x);
         iy = std::min(iy, y);
         iz = std::min(iz, z);
         it = std::min(it, t);
-        avg += x + y + z + t;
+        x -= off;
+        y -= off;
+        z -= off;
+        t -= off;
+        avg += ( x + y ) + ( z + t );
         var += x*x + y*y + z*z + t*t;
+        //printf("%12.8f  %12.8f  %12.8f  %12.8f\n", x, y, z, t);
+
     }
-    ix = std::min(std::min(ix, iz), std::min(ix, iz));
+    ix = std::min(std::min(ix, iy), std::min(iz, it));
     cnt *= 4;
     if ( cnt > 0 )
     {
         avg /= cnt;
-        var -= square(avg)*cnt;
+        var -= square(avg) * cnt;
     }
     if ( cnt > 1 )
         var /= real(cnt-1);
-    printf("%-16s  avg: %12.8f  var: %12.8f  min: %20.12e\n", str, avg+off, var, ix+off);
+    printf("%-16s  avg: %12.8f  var: %12.8f  min: %20.12e  off: %.4f\n", str, avg+off, var, ix, off);
 }
 
 
@@ -339,10 +345,10 @@ int main(int argc, char* argv[])
             break;
             
         case 1:
-            check_random<float>("EXPONENTIAL", 1<<26, 1.0, &Random::exponential);
-            check_random<real>("UNIFORM [0,1]", 1<<20, 0.5, &Random::preal);
-            check_random<real>("UNIFORM [-1,1]", 1<<20, 0.0, &Random::sreal);
-            check_random<real>("GAUSSIAN", 1<<20, 0.0, &Random::gauss);
+            check_random<real>("UNIFORM [0, 1]", 1<<22, 0.5, &Random::preal);
+            check_random<real>("UNIFORM [-1,1]", 1<<22, 0.0, &Random::sreal);
+            check_random<float>("EXPONENTIAL", 1<<22, 1.0, &Random::exponential);
+            check_random<real>("GAUSSIAN", 1<<22, 0.0, &Random::gauss);
             break;
 
         case 2:
