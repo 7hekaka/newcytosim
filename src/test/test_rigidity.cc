@@ -99,25 +99,27 @@ void add_rigidity2D(const size_t nbt, const real* X, const real R1, real* Y)
     real fy = 0;
     real y0 = Y[0];
     real y1 = Y[1];
-    const real two = 2.0;
-    size_t end = DIM * nbt;
-    for ( size_t jj = 0; jj < end; jj += DIM )
+    const real two = -2.0;
+    real const*const end = X + DIM * nbt;
+    while ( X < end )
     {
-        real gx = ( X[jj+4] + X[jj+0] ) - two * X[jj+2];
-        real gy = ( X[jj+5] + X[jj+1] ) - two * X[jj+3];
+        real gx = X[2] * two + ( X[4] + X[0] );
+        real gy = X[3] * two + ( X[5] + X[1] );
+        X += DIM;
         real rx = fx - gx;
         real ry = fy - gy;
-        Y[jj  ] = y0 + R1 * rx;
-        Y[jj+1] = y1 + R1 * ry;
-        y0 = Y[jj+2] - R1 * rx;
-        y1 = Y[jj+3] - R1 * ry;
         fx = gx;
         fy = gy;
+        Y[0] = y0 + R1 * rx;
+        Y[1] = y1 + R1 * ry;
+        y0 = Y[2] - R1 * rx;
+        y1 = Y[3] - R1 * ry;
+        Y += DIM;
     }
-    Y[end  ] = y0 + R1 * fx;
-    Y[end+1] = y1 + R1 * fy;
-    Y[end+2] -= R1 * fx;
-    Y[end+3] -= R1 * fy;
+    Y[0] = R1 * fx + y0;
+    Y[1] = R1 * fy + y1;
+    Y[2] -= R1 * fx;
+    Y[3] -= R1 * fy;
 }
 
 /// In this version for 3D, the loop has dependencies preventing unrolling
@@ -129,32 +131,34 @@ void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
     real y0 = Y[0];
     real y1 = Y[1];
     real y2 = Y[2];
-    const real two = 2.0;
-    size_t end = DIM * nbt;
-    for ( size_t jj = 0; jj < end; jj += DIM )
+    const real two = -2.0;
+    real const*const end = X + DIM * nbt;
+    while ( X < end )
     {
-        real gx = two * X[jj+3] - ( X[jj+6] + X[jj+0] );
-        real gy = two * X[jj+4] - ( X[jj+7] + X[jj+1] );
-        real gz = two * X[jj+5] - ( X[jj+8] + X[jj+2] );
-        real rx = gx - fx;
-        real ry = gy - fy;
-        real rz = gz - fz;
-        Y[jj  ] = y0 + R1 * rx;
-        Y[jj+1] = y1 + R1 * ry;
-        Y[jj+2] = y2 + R1 * rz;
-        y0 = Y[jj+3] - R1 * rx;
-        y1 = Y[jj+4] - R1 * ry;
-        y2 = Y[jj+5] - R1 * rz;
+        real gx = X[3] * two + ( X[6] + X[0] );
+        real gy = X[4] * two + ( X[7] + X[1] );
+        real gz = X[5] * two + ( X[8] + X[2] );
+        X += DIM;
+        real rx = fx - gx;
+        real ry = fy - gy;
+        real rz = fz - gz;
         fx = gx;
         fy = gy;
         fz = gz;
+        Y[0] = y0 + R1 * rx;
+        Y[1] = y1 + R1 * ry;
+        Y[2] = y2 + R1 * rz;
+        y0 = Y[3] - R1 * rx;
+        y1 = Y[4] - R1 * ry;
+        y2 = Y[5] - R1 * rz;
+        Y += DIM;
     }
-    Y[end  ] = y0 - R1 * fx;
-    Y[end+1] = y1 - R1 * fy;
-    Y[end+2] = y2 - R1 * fz;
-    Y[end+3] += R1 * fx;
-    Y[end+4] += R1 * fy;
-    Y[end+5] += R1 * fz;
+    Y[0] = R1 * fx + y0;
+    Y[1] = R1 * fy + y1;
+    Y[2] = R1 * fz + y2;
+    Y[3] -= R1 * fx;
+    Y[4] -= R1 * fy;
+    Y[5] -= R1 * fz;
 }
 
 #if REAL_IS_DOUBLE && USE_SIMD
