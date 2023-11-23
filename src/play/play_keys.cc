@@ -836,7 +836,6 @@ void processKey(unsigned char key, int modifiers = 0)
 
 #if PLAY_CAN_WRITE
         case 'y': {
-            View const& view = glApp::currentView();
             // save current image, without decorations
             player.drawSystem(view);
             player.saveView(view, prop.image_index++, 1);
@@ -1134,7 +1133,7 @@ void processKey(unsigned char key, int modifiers = 0)
 
         case '3':
             if ( altKeyDown || shiftKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 1);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, shiftKeyDown);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, 1);
             break;
@@ -1159,7 +1158,7 @@ void processKey(unsigned char key, int modifiers = 0)
   
         case '5':
             if ( altKeyDown || shiftKeyDown )
-                shufflePointDispVisible(player.allSphereDisp(), 7);
+                shufflePointDispVisible(player.allSphereDisp(), shiftKeyDown);
             else
                 setPointDisp(player.allVisibleSphereDisp(), changeStyle, 0);
             break;
@@ -1216,7 +1215,7 @@ void processKey(unsigned char key, int modifiers = 0)
 
         case '0':
             if ( altKeyDown || shiftKeyDown )
-                setPointDispVisible(player.allHandDisp(), 1);
+                setPointDispVisible(player.allHandDisp(), shiftKeyDown);
             else
                 shufflePointDispVisible(player.allHandDisp(), 1);
             break;
