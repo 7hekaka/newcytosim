@@ -329,18 +329,16 @@ void View::drawFPS(size_t arg) const
 
 void View::drawLabel() const
 {
-    if ( label != "off" )
-    {
-        int W = width(), H = height();
-        //set pixel coordinate system:
-        gym::disableDepthTest();
-        gym::disableAlphaTest();
-        gym::one_view(W, H);
-        placeText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
-        gym::restoreDepthTest();
-        gym::restoreAlphaTest();
-        gym::restoreLighting();
-    }
+    int W = width(), H = height();
+    //set pixel coordinate system:
+    gym::disableLighting();
+    gym::disableAlphaTest();
+    gym::disableDepthTest();
+    gym::one_view(W, H);
+    placeText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
+    gym::restoreDepthTest();
+    gym::restoreAlphaTest();
+    gym::restoreLighting();
 }
 
 

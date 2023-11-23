@@ -90,7 +90,8 @@ int drawSimul(View& view)
 int drawSimulWithLabel(View& view)
 {
     drawSimul(view);
-    view.drawLabel();
+    if ( view.label != "off" )
+        view.drawLabel();
     return 0;
 }
 
