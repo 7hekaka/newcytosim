@@ -7,10 +7,10 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 [Detailed protocol to use Cytosim](https://arxiv.org/abs/2205.13852)  
 <img src="data/jove.png" alt="jove" width="512"/>
 
-[The cell cycle controls spindle architecture in Arabidopsis by modulating the augmin pathway](https://www.biorxiv.org/content/10.1101/2023.11.14.567058v1)  
+[Spindle assembly in plants](https://www.biorxiv.org/content/10.1101/2023.11.14.567058v1)  
 <img src="data/spindle_root.png" alt="spindle_root.png" width="512"/>
 
-[Branched microtubule nucleation and dynein transport organize RanGTP asters in Xenopus laevis egg extract ](https://www.molbiolcell.org/doi/10.1091/mbc.E23-10-0407)  
+[aster formation in Xenopus laevis egg extract ](https://www.molbiolcell.org/doi/10.1091/mbc.E23-10-0407)  
 <img src="data/ran_asters.png" alt="ran_asters" width="512"/>
 
 [Microtubule overlaps produced by diffusible crosslinkers](https://doi.org/10.1016/j.cub.2019.05.049)  
@@ -70,8 +70,14 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 [Mitotic spindle positionning](https://doi.org/10.1016/j.cell.2007.03.027)  
 <img src="data/celegans_spindle.png" alt="celegans_spindle" width="512"/>
 
-[Chromosome capture](https://doi.org/10.1016/j.cub.2014.05.019)  
+[Chromosome capture](https://rupress.org/jcb/article/217/8/2661/39451/F-Actin-nucleated-on-chromosomes-coordinates-their)  
 <img src="data/capture.png" alt="capture" width="512"/>
+
+[disassembly-driven contraction of F-actin network](https://doi.org/10.1016/j.cub.2014.05.019)  
+<img src="data/disassembling_network.png" alt="disassembling_network" width="512"/>
+
+[Nucleus breakdown in starfish oocytes](https://doi.org/10.1016/j.cub.2014.05.019)  
+<img src="data/nuclear_breakdown.png" alt="nuclear_breakdown" width="512"/>
 
 [Nucleus positionning in myotubes](https://doi.org/10.1016/j.cub.2017.08.031)  
 <img src="data/myotubes.png" alt="myotubes" width="512"/>
@@ -93,6 +99,9 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 
 [Properties determining Self organization of Microtubules and Motors](https://doi.org/10.1126/science.1059758)  
 <img src="data/self_organization.png" alt="self_organization" width="512"/>
+
+[Motor concentration](https://journals.aps.org/prl/abstract/10.1103/PhysRevLett.86.3192)  
+<img src="data/concentration.png" alt="concentration.png" width="512"/>
 
 [Self organization of Microtubules and Motors](https://www.nature.com/articles/38532)  
 <img src="data/vortex.png" alt="vertex" width="512"/>
