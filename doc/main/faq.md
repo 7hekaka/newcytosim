@@ -4,7 +4,7 @@
 <summary>
 **Can I buy Cytosim?**
 </summary>
-Cytosim is a free software and also an Open Source project [hosted on GitLab](https://gitlab.com/f.nedelec/cytosim).
+Cytosim is a free software and also an Open Source project [hosted on GitLab](https://gitlab.com/f-nedelec/cytosim).
 </details>
 
 

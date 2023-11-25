@@ -38,7 +38,7 @@ After all packages are selected press 'Next' to install Cygwin.
 
 Once you open Cygwin, download Cytosim using the command:
 
- 	git clone https://gitlab.com/f.nedelec/cytosim.git cytosim 
+ 	git clone https://gitlab.com/f-nedelec/cytosim.git cytosim 
 
 Compile from within the Cygwin terminal, which will use the toolchain (`gcc` and `make`) provided by cygwin. 
 The MACHINE should be automatically selected (in case of trouble, set `MACHINE:=cygwin` in `makefile.inc`). You may disable PNG suppprt by setting `HAS_PNG:=0`. The procedure is the same as on other platforms (enter `make`). If you experience trouble, please let us know.
