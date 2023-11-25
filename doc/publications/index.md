@@ -7,6 +7,12 @@ This is a list of some selected work from the Nedelec group using Cytosim.
 [Detailed protocol to use Cytosim](https://arxiv.org/abs/2205.13852)  
 <img src="data/jove.png" alt="jove" width="512"/>
 
+[The cell cycle controls spindle architecture in Arabidopsis by modulating the augmin pathway](https://www.biorxiv.org/content/10.1101/2023.11.14.567058v1)  
+<img src="data/spindle_root.png" alt="spindle_root.png" width="512"/>
+
+[Branched microtubule nucleation and dynein transport organize RanGTP asters in Xenopus laevis egg extract ](https://www.molbiolcell.org/doi/10.1091/mbc.E23-10-0407)  
+<img src="data/ran_asters.png" alt="ran_asters" width="512"/>
+
 [Microtubule overlaps produced by diffusible crosslinkers](https://doi.org/10.1016/j.cub.2019.05.049)  
 <img src="data/overlap.png" alt="overlap" width="512"/>
 
