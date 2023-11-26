@@ -36,7 +36,6 @@
 - [Crowder and Surface Effects on Self-organization of Microtubules](https://arxiv.org/abs/2009.04669)[PDF](https://arxiv.org/pdf/2009.04669.pdf)
 - [Actin crosslinker competition and sorting drive emergent GUV size-dependent actin network architecture](https://doi.org/10.1038/s42003-021-02653-6)
 - [Actin force generation in vesicle formation: mechanistic insights from cryo- electron tomography](https://doi.org/10.1101/2021.06.28.450262)
-- [Thermodynamic Control of Activity Patterns in Cytoskeletal Networks](https://arxiv.org/pdf/2111.08677.pdf)
 - [Plastin and spectrin cooperate to stabilize the actomyosin cortex during cytokinesis](https://doi.org/10.1016/j.cub.2021.09.055)
 
 2020
