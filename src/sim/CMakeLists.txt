@@ -135,13 +135,13 @@ list(TRANSFORM SOURCES_CYTOSIM PREPEND "${PROJECT_SOURCE_DIR}/src/sim/")
 list(TRANSFORM SOURCES_WITH_DISPLAY PREPEND "${PROJECT_SOURCE_DIR}/src/sim/")
 
 
+set(SIM_INCLUDES math base sim "${ALL_SIM_SRC_DIR}")
+list(TRANSFORM SIM_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
+
+add_library(${SIM_LIBRARY} STATIC ${SOURCES_CYTOSIM})
+target_include_directories(${SIM_LIBRARY} PUBLIC "${SIM_INCLUDES}" )
+
 if(MAKE_SIM)
-
-    set(SIM_INCLUDES math base sim "${ALL_SIM_SRC_DIR}")
-    list(TRANSFORM SIM_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
-
-    add_library(${SIM_LIBRARY} STATIC ${SOURCES_CYTOSIM})
-    target_include_directories(${SIM_LIBRARY} PUBLIC "${SIM_INCLUDES}" )
 
     add_executable(${SIM_TARGET} "${PROJECT_SOURCE_DIR}/src/sim/sim.cc")
     include_directories(PUBLIC "${SIM_INCLUDES}" )
