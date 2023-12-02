@@ -312,7 +312,7 @@ public:
     /// display a scale bar vertical or horizontal
     void drawScaleHV(float, float, float, void (*func)(float*, int cnt, float, float, float)) const;
     
-    /// display a scale bar vertical or horizontal
+    /// display crossed scale bars
     void drawScaleX(float) const;
 
     /// display a scale bar (mode is vertical, horizontal, centered)

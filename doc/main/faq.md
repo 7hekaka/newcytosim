@@ -1323,7 +1323,7 @@ You can already define different classes of filaments with different rigidity.
 You could make the rigidity dependent on some thing else, with a rigidity defined for each filament at each time point.
 You would just need to plug in the value instead of `iRigidity`.
 
-That`s crazy but for fun you could do this:
+That is crazy but for fun you could do this:
 
 	#include "object_set.h"
 	#include "simul.h"
