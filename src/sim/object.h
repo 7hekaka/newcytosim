@@ -71,8 +71,8 @@ private:
 
 public:
     
-    /// Object::NULL_TAG = 'v' is the 'void' pointer
-    static const ObjectTag NULL_TAG = 'v';
+    /// Object::NULL_TAG is the 'void' pointer
+    static const ObjectTag NULL_TAG = '!';
     
     /// build a reference string by concatenating (tag, property_number, ObjectID)
     static std::string make_reference(ObjectTag, unsigned, ObjectID);

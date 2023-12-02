@@ -386,10 +386,13 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case        Tubule::TAG: return &tubules;
         case         Event::TAG: return &events;
         case Organizer::NUCLEUS_TAG: return &organizers;
-        case Organizer::BUNDLE_TAG:  return &organizers;
-        case Organizer::FAKE_TAG:    return &organizers;
-        case Organizer::ASTER_TAG:   return &organizers;
-        case   Object::NULL_TAG: return nullptr;
+        case  Organizer::BUNDLE_TAG: return &organizers;
+        case    Organizer::FAKE_TAG: return &organizers;
+        case   Organizer::ASTER_TAG: return &organizers;
+#if BACKWARD_COMPATIBILITY < 60
+        case 'v': return &fibers; // NULL_TAG before 2/12/2023
+#endif
+        case Object::NULL_TAG: return nullptr;
     }
     return nullptr;
 }

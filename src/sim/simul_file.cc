@@ -20,6 +20,7 @@
  
  History of changes in file format:
 
+ - 60: 2/12/2023 NULL_TAG changed from 'v' to '!'
  - 59: 11/01/2023 Chain::birth_time moved to Fiber
  - 58: 26/11/2022 References written on 2 or 4 bytes
  - ??: 11/06/2021 References written always on 4 bytes with tag+identity
@@ -166,7 +167,7 @@ static ObjectID readObjectID_old(Inputter& in, ObjectTag& tag)
     }
 #endif
     
-    if ( tag == Object::NULL_TAG )
+    if ( tag == 'v' ) // NULL_TAG before 2.12.2023
         return 0;
     
     ObjectID id = 0;
@@ -244,7 +245,7 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
             tag = c & LOW_BITS;
             if ( c & HIGH_BIT )
                 id = in.readUInt32bin();
-            else if ( c != Object::NULL_TAG )
+            else if ( c != 'v' ) // NULL_TAG before 2.12.2023
                 id = in.readUInt16bin();
             return id;
         }
@@ -261,6 +262,10 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         }
         else if ( c != Object::NULL_TAG )
         {
+#if BACKWARD_COMPATIBILITY < 60
+            if ( in.formatID() < 60 && c == 'v') // NULL_TAG before 2.12.2023
+                return 0;
+#endif
             ObjectID a = in.get_char();
             ObjectID b = in.get_char();
             id = ( b << 8 ) + a;
@@ -271,6 +276,10 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         do
             tag = in.get_char();
         while ( tag == ' ' );
+#if BACKWARD_COMPATIBILITY < 60
+        if ( in.formatID() < 60 && tag == 'v') // NULL_TAG before 2.12.2023
+            return 0;
+#endif
         if ( tag != Object::NULL_TAG )
             id = in.readUInt();
     }
@@ -295,6 +304,10 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag, ObjectID& id)
     {
         case Object::NULL_TAG:
             break;
+#if BACKWARD_COMPATIBILITY < 60
+        case 'v': // NULL_TAG before 2.12.2023
+            break;
+#endif
 #if BACKWARD_COMPATIBILITY < 57
         case 'l': // LATTICE_TAG was 'l' before 23/06/2021
             tag = Fiber::LATTICE_TAG;
