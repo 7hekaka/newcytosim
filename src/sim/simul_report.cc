@@ -2238,7 +2238,9 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
 {
     constexpr size_t SUP = 128;
     
-    size_t free[SUP+1] = { 0 }, bound[SUP+1] = { 0 }, based[SUP+1] = { 0 };
+    size_t free[SUP+1] = { 0 };
+    size_t bound[SUP+1] = { 0 };
+    size_t based[SUP+1] = { 0 };
     
     for ( Single const* i = singles.firstF(); i ; i = i->next() )
     {
@@ -2264,9 +2266,9 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
     
     out << COM << ljust("single", 2, 2);
     out << SEP << "total";
+    out << SEP << "based";
     out << SEP << "free";
     out << SEP << "bound";
-    out << SEP << "based";
     
     for ( Property const* i : properties.find_all("single") )
     {
@@ -2277,9 +2279,9 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
         if ( x < SUP )
         {
             out << SEP << free[x] + bound[x];
+            out << SEP << based[x];
             out << SEP << free[x];
             out << SEP << bound[x];
-            out << SEP << based[x];
         }
         else
             out << SEP << " out-of-range ";
