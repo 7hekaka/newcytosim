@@ -59,7 +59,7 @@ public:
     //------------------------------ read/write --------------------------------
     
     /// return unique character identifying the class
-    ObjectTag tag() const { return TAG_BUNDLE; }
+    ObjectTag tag() const { return BUNDLE_TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

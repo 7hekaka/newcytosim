@@ -450,19 +450,19 @@ public:
     static const ObjectTag TAG = 'f';
     
     /// identifies angle data format
-    static const ObjectTag TAG_COMPACT = 'g';
+    static const ObjectTag COMPACT_TAG = 'g';
     
     /// identifies Age and Chiasma info (must be upper case as this is meta-data)
-    static const ObjectTag TAG_FIBINFO = 'G';
+    static const ObjectTag FIBINFO_TAG = 'G';
 
     /// identifies data for dynamic ends of fibers (must be upper case)
-    static const ObjectTag TAG_DYNAMIC = 'F';
+    static const ObjectTag DYNAMIC_TAG = 'F';
     
     /// identifies FiberLattice data (was 'l' before 23/06/2021; must be upper case)
-    static const ObjectTag TAG_LATTICE = 'T';
+    static const ObjectTag LATTICE_TAG = 'T';
     
     /// identifies Lattice<real> data (was 'L' before 23/06/2021; must be upper case)
-    static const ObjectTag TAG_FIBMESH = 'M';
+    static const ObjectTag FIBMESH_TAG = 'M';
 
     /// return unique character identifying the class
     ObjectTag tag() const { return TAG; }

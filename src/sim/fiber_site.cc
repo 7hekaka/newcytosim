@@ -141,7 +141,7 @@ void FiberSite::writeFiberSite(Outputter& out) const
 #if FIBER_HAS_LATTICE
         if ( hLattice )
         {
-            Object::writeReference(out, Fiber::TAG_LATTICE, hFiber->identity());
+            Object::writeReference(out, Fiber::LATTICE_TAG, hFiber->identity());
             // in older format, `hAbs` was written here
             out.writeInt32(hSite);
         }
@@ -176,7 +176,7 @@ ObjectID FiberSite::readFiberSite(Inputter& in, Simul& sim)
                 hSite = hLattice->index(hAbs);
 #endif
         }
-        else if ( tag == Fiber::TAG_LATTICE )
+        else if ( tag == Fiber::LATTICE_TAG )
         {
 #if BACKWARD_COMPATIBILITY < 49
             if ( in.formatID() < 49 )

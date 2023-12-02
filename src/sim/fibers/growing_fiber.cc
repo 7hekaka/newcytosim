@@ -105,7 +105,7 @@ void GrowingFiber::write(Outputter& out) const
     Fiber::write(out);
 
     // since states are constant, we write growth rates:
-    writeMarker(out, TAG_DYNAMIC);
+    writeMarker(out, DYNAMIC_TAG);
     if ( mStateM == STATE_GREEN )
         out.writeFloat(cDeltaM);
     else
@@ -147,7 +147,7 @@ void GrowingFiber::readEndStates(Inputter& in)
 
 void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    if ( tag == TAG_DYNAMIC )
+    if ( tag == DYNAMIC_TAG )
         readEndStates(in);
     else
     {

@@ -266,7 +266,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// return unique character identifying the class
-    ObjectTag tag() const { return Organizer::TAG_ASTER; }
+    ObjectTag tag() const { return Organizer::ASTER_TAG; }
 
     /// return associated Property
     Property const* property() const { return prop; }
@@ -274,7 +274,7 @@ public:
     /// convert pointer to Aster* if the conversion seems valid; returns 0 otherwise
     static Aster* toAster(Object * obj)
     {
-        if ( obj  &&  obj->tag() == Organizer::TAG_ASTER )
+        if ( obj  &&  obj->tag() == Organizer::ASTER_TAG )
             return static_cast<Aster*>(obj);
         return nullptr;
     }

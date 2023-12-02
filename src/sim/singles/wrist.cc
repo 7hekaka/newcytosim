@@ -90,7 +90,7 @@ void Wrist::setInteractions(Meca& meca) const
 
 void Wrist::write(Outputter& out) const
 {
-    writeMarker(out, TAG_WRIST);
+    writeMarker(out, WRIST_TAG);
     sHand->writeHand(out);
     base_.write(out);
 }

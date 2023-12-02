@@ -369,14 +369,14 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
     switch( tag )
     {
         case        Couple::TAG: return &couples;
-        case    Couple::TAG_DUO: return &couples;
+        case    Couple::DUO_TAG: return &couples;
         case        Single::TAG: return &singles;
-        case  Single::TAG_WRIST: return &singles;
+        case  Single::WRIST_TAG: return &singles;
         case         Fiber::TAG: return &fibers;
-        case Fiber::TAG_COMPACT: return &fibers;
+        case Fiber::COMPACT_TAG: return &fibers;
 #if BACKWARD_COMPATIBILITY < 57
-        case 'l': return &fibers; // TAG_LATTICE before 23/06/2021
-        case 'L': return &fibers; // TAG_FIBMESH before 23/06/2021
+        case 'l': return &fibers; // LATTICE_TAG before 23/06/2021
+        case 'L': return &fibers; // FIBMESH_TAG before 23/06/2021
 #endif
         case          Bead::TAG: return &beads;
         case         Solid::TAG: return &solids;
@@ -385,10 +385,10 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case         Space::TAG: return &spaces;
         case        Tubule::TAG: return &tubules;
         case         Event::TAG: return &events;
-        case Organizer::TAG_NUCLEUS: return &organizers;
-        case Organizer::TAG_BUNDLE:  return &organizers;
-        case Organizer::TAG_FAKE:    return &organizers;
-        case Organizer::TAG_ASTER:   return &organizers;
+        case Organizer::NUCLEUS_TAG: return &organizers;
+        case Organizer::BUNDLE_TAG:  return &organizers;
+        case Organizer::FAKE_TAG:    return &organizers;
+        case Organizer::ASTER_TAG:   return &organizers;
         case   Object::NULL_TAG: return nullptr;
     }
     return nullptr;

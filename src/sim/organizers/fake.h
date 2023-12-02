@@ -61,7 +61,7 @@ public:
     bool getLink(size_t, Vector&, Vector&) const;
     
     /// return unique character identifying the class
-    ObjectTag tag() const { return TAG_FAKE; }
+    ObjectTag tag() const { return FAKE_TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

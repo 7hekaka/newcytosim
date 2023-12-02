@@ -16,17 +16,17 @@ class Outputter;
 class ObjectSet;
 class Display;
 
-/// Type for unique class identifier used to read/write objects from file
+/// Type for unique class identifier used to store objects in file
 typedef unsigned char ObjectTag;
 
-/// Type used to mark objects
+/// Integer type used to mark objects
 typedef unsigned int ObjectMark;
 
-/// Type used to flag objects
+/// Interger type used to flag objects
 typedef unsigned int ObjectFlag;
 
 
-/// used to address the highest bit which is not used by ASCII codes
+/// the highest bit that is not used by ASCII codes
 constexpr uint8_t HIGH_BIT = 128;
 /// bit mask for those bits which are used by ASCII codes
 constexpr uint8_t LOW_BITS = 127;

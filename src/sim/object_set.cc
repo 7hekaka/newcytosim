@@ -558,7 +558,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
     /*
      A lowercase TAG indicates a new object, while uppercase describes some
      information that is associated to an already constructed object.
-     TAG_LATTICE = 'l' for backward compatibility with format 56 (before 23/06/2021)
+     LATTICE_TAG = 'l' for backward compatibility with format 56 (before 23/06/2021)
      */
     bool update = ( islower(tag) && tag != 'l' );
 

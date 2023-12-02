@@ -522,7 +522,7 @@ void DynamicFiber::write(Outputter& out) const
     long addM = std::lround(cDeltaM/prop()->unit_length);
     long addP = std::lround(cDeltaP/prop()->unit_length);
     // write variables describing the dynamic state of the ends:
-    writeMarker(out, TAG_DYNAMIC);
+    writeMarker(out, DYNAMIC_TAG);
     out.writeUInt8(unitM[0]);
     out.writeUInt8(unitM[1]);
     out.writeInt16(addM);
@@ -559,7 +559,7 @@ void DynamicFiber::readEndStates(Inputter& in)
 
 void DynamicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    if ( tag == TAG_DYNAMIC )
+    if ( tag == DYNAMIC_TAG )
         readEndStates(in);
     else
     {

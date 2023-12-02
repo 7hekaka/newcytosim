@@ -222,7 +222,7 @@ void Duo::setInteractions(Meca& meca) const
 
 void Duo::write(Outputter& out) const
 {
-    writeMarker(out, Couple::TAG_DUO);
+    writeMarker(out, Couple::DUO_TAG);
     out.writeUInt8(active_);
     cHand1->writeHand(out);
     cHand2->writeHand(out);
@@ -233,7 +233,7 @@ void Duo::write(Outputter& out) const
 
 void Duo::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    if ( tag == Couple::TAG_DUO )
+    if ( tag == Couple::DUO_TAG )
         active_ = in.readUInt8();
     else
         active_ = 1;

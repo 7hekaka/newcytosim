@@ -272,7 +272,7 @@ public:
     static const ObjectTag TAG = 'c';
     
     /// a unique character identifying the Duo
-    static const ObjectTag TAG_DUO = 'y';
+    static const ObjectTag DUO_TAG = 'y';
     
     /// return unique character identifying the class
     ObjectTag tag() const { return TAG; }

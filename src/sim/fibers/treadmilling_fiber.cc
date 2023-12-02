@@ -98,7 +98,7 @@ void TreadmillingFiber::write(Outputter& out) const
     Fiber::write(out);
 
     // write variables describing the dynamic state of the ends:
-    writeMarker(out, TAG_DYNAMIC);
+    writeMarker(out, DYNAMIC_TAG);
     out.writeUInt16(mStateM);
     out.writeUInt16(0);
     out.writeUInt16(mStateP);
@@ -128,7 +128,7 @@ void TreadmillingFiber::readEndStates(Inputter& in)
 void TreadmillingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     //std::clog << " TreadmillingFiber::read(" << tag << ")\n";
-    if ( tag == TAG_DYNAMIC )
+    if ( tag == DYNAMIC_TAG )
         readEndStates(in);
     else
     {

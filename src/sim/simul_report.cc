@@ -1939,7 +1939,7 @@ void Simul::reportAster(std::ostream& out) const
     
     for ( Organizer const* obj=organizers.first(); obj; obj=obj->next() )
     {
-        if ( obj->tag() == Organizer::TAG_ASTER )
+        if ( obj->tag() == Organizer::ASTER_TAG )
         {
             out << LIN << obj->property()->number();
             out << SEP << obj->identity();

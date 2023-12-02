@@ -2568,7 +2568,7 @@ void Display::drawOrganizer(Organizer const& obj) const
      This display the Solid connecting two Aster as a spindle.
      Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
-    if ( disp->style & 1 && obj.tag() == Organizer::TAG_FAKE )
+    if ( disp->style & 1 && obj.tag() == Organizer::FAKE_TAG )
     {
         if ( sol && sol->nbPoints() >= 4 )
         {

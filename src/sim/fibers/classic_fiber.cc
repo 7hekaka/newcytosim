@@ -203,7 +203,7 @@ void ClassicFiber::write(Outputter& out) const
     Fiber::write(out);
     
     // write variables describing the dynamic state of the ends, using 8 bytes:
-    writeMarker(out, TAG_DYNAMIC);
+    writeMarker(out, DYNAMIC_TAG);
     out.writeUInt16(mStateM);
     out.writeUInt16(0);
     out.writeUInt16(mStateP);
@@ -246,7 +246,7 @@ void ClassicFiber::readEndStates(Inputter& in)
 
 void ClassicFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    if ( tag == TAG_DYNAMIC )
+    if ( tag == DYNAMIC_TAG )
         readEndStates(in);
     else
     {

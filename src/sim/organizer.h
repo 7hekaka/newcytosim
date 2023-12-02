@@ -113,10 +113,10 @@ public:
     //--------------------------------------------------------------------------
     
     /// character identifying each class
-    static const ObjectTag TAG_ASTER = 'a';
-    static const ObjectTag TAG_BUNDLE = 'u';
-    static const ObjectTag TAG_NUCLEUS = 'n';
-    static const ObjectTag TAG_FAKE = 'k';
+    static const ObjectTag ASTER_TAG = 'a';
+    static const ObjectTag BUNDLE_TAG = 'u';
+    static const ObjectTag NUCLEUS_TAG = 'n';
+    static const ObjectTag FAKE_TAG = 'k';
     
     //--------------------------------------------------------------------------
 

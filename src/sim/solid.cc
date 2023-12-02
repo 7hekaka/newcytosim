@@ -1722,7 +1722,7 @@ void Solid::write(Outputter& out) const
         out.writeFloat(soRadius[p]);
     }
 #if NEW_SOLID_CLAMP
-    writeMarker(out, TAG_CLAMP);
+    writeMarker(out, CLAMP_TAG);
     out.writeFloat(clamp_stiff);
     out.writeFloats(clamp_place, DIM, '\n');
 #endif
@@ -1731,7 +1731,7 @@ void Solid::write(Outputter& out) const
 #if NEW_SOLID_HAS_TWIN
 void Solid::writeTwin(Outputter& out) const
 {
-    writeMarker(out, TAG_SOLID);
+    writeMarker(out, SOLID_TAG);
     if ( soTwin )
         out.writeUInt32(soTwin->identity());
     else
@@ -1762,7 +1762,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
         fixShape();
     }
-    else if ( tag == TAG_SOLID )
+    else if ( tag == SOLID_TAG )
     {
         ObjectID id = in.readUInt32();
         in.readFloat();
@@ -1773,7 +1773,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
             std::clog << "Warning: could not find Solid twin " << id << "\n";
 #endif
     }
-    else if ( tag == TAG_CLAMP )
+    else if ( tag == CLAMP_TAG )
     {
 #if NEW_SOLID_CLAMP
         clamp_stiff = in.readFloat();

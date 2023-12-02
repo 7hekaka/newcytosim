@@ -91,7 +91,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// return unique character identifying the class
-    ObjectTag tag() const { return TAG_WRIST; }
+    ObjectTag tag() const { return WRIST_TAG; }
     
     /// read from file
     void read(Inputter&, Simul&, ObjectTag);

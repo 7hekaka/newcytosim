@@ -68,7 +68,7 @@ public:
     //------------------------------ read/write --------------------------------
     
     /// return unique character identifying the class
-    ObjectTag tag() const { return TAG_NUCLEUS; }
+    ObjectTag tag() const { return NUCLEUS_TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

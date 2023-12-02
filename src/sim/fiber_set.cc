@@ -165,7 +165,7 @@ Fiber * FiberSet::newFiber(ObjectList& objs, FiberProp const* fip, std::string c
  */
 Object * FiberSet::newObject(const ObjectTag tag, PropertyID pid)
 {
-    if ( tag == Fiber::TAG || tag == Fiber::TAG_COMPACT )
+    if ( tag == Fiber::TAG || tag == Fiber::COMPACT_TAG )
     {
         FiberProp const* fp = simul_.findProperty<FiberProp>("fiber", pid);
         Fiber * obj = fp->newFiber();

@@ -223,7 +223,7 @@ static ObjectID readObjectID_old(Inputter& in, ObjectTag& tag)
                 throw InvalidIO("readReference (compatibility) failed");
             }
             else
-            in.unget(h);
+            in.unget_char(h);
         }
 #endif
     }
@@ -296,12 +296,12 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag, ObjectID& id)
         case Object::NULL_TAG:
             break;
 #if BACKWARD_COMPATIBILITY < 57
-        case 'l': // TAG_LATTICE was 'l' before 23/06/2021
-            tag = Fiber::TAG_LATTICE;
+        case 'l': // LATTICE_TAG was 'l' before 23/06/2021
+            tag = Fiber::LATTICE_TAG;
 #endif
         case Fiber::TAG:
-        case Fiber::TAG_COMPACT:
-        case Fiber::TAG_LATTICE:
+        case Fiber::COMPACT_TAG:
+        case Fiber::LATTICE_TAG:
             fib = fibers.findID(id);
             if ( !fib )
                 std::clog << "unknown fiber ID " << id << " (" << tag << ")\n";

@@ -1920,7 +1920,7 @@ void Fiber::write(Outputter& out) const
     writeMarker(out, tag());
     Chain::write(out);
 #if FIBER_HAS_BIRTHTIME || NEW_FIBER_SILHOUETTE
-    writeMarker(out, TAG_FIBINFO);
+    writeMarker(out, FIBINFO_TAG);
     out.writeFloat(birthTime());
     out.writeFloat(chiasma());
     out.writeFloat(0.0);
@@ -1933,7 +1933,7 @@ void Fiber::write(Outputter& out) const
      */
     if ( prop->save_lattice && fLattice.data() )
     {
-        writeMarker(out, TAG_LATTICE);
+        writeMarker(out, LATTICE_TAG);
         // fLattice.write(out);
         // only write information corresponding to actual Fiber abscissa range:
         fLattice.write(out, fLattice.indexM(), fLattice.indexP()+1);
@@ -1942,7 +1942,7 @@ void Fiber::write(Outputter& out) const
 #if FIBER_HAS_MESH
     if ( fMesh.data() )
     {
-        writeMarker(out, TAG_FIBMESH);
+        writeMarker(out, FIBMESH_TAG);
         // fMesh.write(out);
         // only write information corresponding to actual Fiber abscissa range:
         fMesh.write(out, fMesh.indexM(), fMesh.indexP()+1);
@@ -1954,11 +1954,11 @@ void Fiber::write(Outputter& out) const
 void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
 #if BACKWARD_COMPATIBILITY < 57
-    // before 23/06/2021, TAG_LATTICE was 'l' and TAG_FIBMESH was 'L'
+    // before 23/06/2021, LATTICE_TAG was 'l' and FIBMESH_TAG was 'L'
     if ( in.formatID() < 57 )
     {
-        if ( tag == 'l' ) tag = TAG_LATTICE;
-        if ( tag == 'L' ) tag = TAG_FIBMESH;
+        if ( tag == 'l' ) tag = LATTICE_TAG;
+        if ( tag == 'L' ) tag = FIBMESH_TAG;
     }
 #endif
     //std::clog << " Fiber::read(" << tag << ")\n";
@@ -1978,7 +1978,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         fGlue = nullptr;
 #endif
     }
-    else if ( tag == TAG_COMPACT )
+    else if ( tag == COMPACT_TAG )
     {
         Chain::readAngles(in, sim, tag);
         updateRange(nullptr);
@@ -1986,7 +1986,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         fGlue = nullptr;
 #endif
     }
-    else if ( tag == TAG_LATTICE )
+    else if ( tag == LATTICE_TAG )
     {
 #if FIBER_HAS_LATTICE
         fLattice.read(in);
@@ -1997,7 +1997,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         const_cast<FiberProp*>(prop)->lattice_unit = dummy.unit();
 #endif
     }
-    else if ( tag == TAG_FIBMESH )
+    else if ( tag == FIBMESH_TAG )
     {
 #if FIBER_HAS_MESH
         fMesh.read(in);
@@ -2009,7 +2009,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
     }
 #if BACKWARD_COMPATIBILITY < 100
-    else if ( tag == TAG_DYNAMIC )
+    else if ( tag == DYNAMIC_TAG )
     {
         static bool virgin = true;
         // that is for Fiber class we do not know...
@@ -2028,7 +2028,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         }
     }
 #endif
-    else if ( tag == TAG_FIBINFO )
+    else if ( tag == FIBINFO_TAG )
     {
         birthTime(in.readFloat());
         chiasma(in.readFloat());
