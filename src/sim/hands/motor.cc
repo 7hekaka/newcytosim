@@ -6,7 +6,7 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "hand_monitor.h"
-
+#include "messages.h"
 
 Motor::Motor(MotorProp const* p, HandMonitor* h)
 : Hand(p, h)

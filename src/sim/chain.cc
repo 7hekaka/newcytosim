@@ -261,7 +261,7 @@ Vector3 Chain::adjustedNormal(Vector3 const& d) const
         fnNormal = d.orthogonal(fnNormal, 1.0);
     return fnNormal;
 #else
-    LOG_ONCE("WARNIGN: Cytosim was compiled without FIBER_HAS_NORMAL\n");
+    LOG_ONCE("WARNING: Cytosim was compiled without FIBER_HAS_NORMAL\n");
     return d.orthogonal();
 #endif
 }
