@@ -238,8 +238,16 @@ void Fiber::resetLattice()
             if ( h->lattice() == lattice() )
             {
                 Digit* i = static_cast<Digit*>(h);
-                i->inc();
-                i->moveTo(unit * i->site() + i->prop()->site_shift);
+                FiberSite::lati_t s = i->site();
+                if ( i->vacant(s) )
+                {
+                    i->inc();
+                    i->moveTo(unit * s + i->prop()->site_shift);
+                }
+                else
+                {
+                    std::cerr << "doubly occupied site? " << reference() << " @ " << s << '\n';
+                }
             }
         }
     }
