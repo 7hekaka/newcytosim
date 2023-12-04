@@ -77,7 +77,7 @@ To make `play` install the OpenGL developer libraries and FreeGLUT or OpenGLUT.
 
 ### Windows
 
-Native compilation on Windows is a Herculean task. We thus recommend installing Cygwin, which emulates a Linux-like environment. A fresh installation of Cygwin is recommended to ensure that all required reference libraries are installed.  
+Native compilation on Windows can be complicated. We thus recommend installing Cygwin, which emulates a Linux-like environment. A fresh installation of Cygwin is recommended to ensure that all required reference libraries are installed.  
 You will need a compiler, the X window system, BLAS/LAPACK and GLUT.  
 Please, [refer to the dedicated page](cygwin.md).
 

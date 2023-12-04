@@ -2000,7 +2000,7 @@ void Simul::reportBeadSingles(std::ostream& out) const
 void Simul::reportSolidPosition(std::ostream& out, Property const* sel) const
 {
     out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("cen");
-    out << SEP << repeatXYZ("point0") << SEP << repeatXYZ("point1");
+    out << SEP << repeatXYZ("point1") << SEP << repeatXYZ("point2");
         
     for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
@@ -2073,7 +2073,7 @@ void Simul::reportSolidHands(std::ostream& out, Property const* sel) const
 void Simul::reportSpherePosition(std::ostream& out, Property const* sel) const
 {
     out << COM << "class" << SEP << "identity";
-    out << SEP << repeatXYZ("point0") << SEP << repeatXYZ("point1");
+    out << SEP << repeatXYZ("center") << SEP << repeatXYZ("point2");
         
     for ( Sphere const* obj=spheres.first(); obj; obj=obj->next() )
     {
