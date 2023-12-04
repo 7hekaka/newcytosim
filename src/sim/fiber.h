@@ -200,6 +200,9 @@ public:
     /// constructor
     Fiber(FiberProp const*);
     
+    /// mark for deletion
+    void adieu();
+    
     /// destructor
     virtual ~Fiber();
 

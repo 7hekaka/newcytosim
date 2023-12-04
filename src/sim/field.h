@@ -125,6 +125,7 @@ public:
     ~Field()
     {
         free_real(fiTMP);
+        prop = nullptr;
     }
     
     /// initialize with squares of size 'step'

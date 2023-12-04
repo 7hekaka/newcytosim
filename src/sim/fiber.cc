@@ -38,8 +38,7 @@ void Fiber::step()
     if ( hasKink(0) )
     {
         LOG_ONCE("DELETE_KINKED_FIBERS\n");
-        prop = nullptr; // flag object to be deleted
-        return;
+        return adieu();
     }
 #endif
 
@@ -54,8 +53,7 @@ void Fiber::step()
     // delete self if shorter than 'FiberProp::min_length'
     if ( length() < prop->min_length && ! prop->persistent )
     {
-        prop = nullptr; // flag object to be deleted
-        return;
+        return adieu();
     }
     
     if ( needUpdate )
@@ -154,7 +152,7 @@ bool Fiber::updateLength(real addM, real addP, bool split)
         {
             if ( !prop->persistent )
             {
-                prop = nullptr; // flag object to be deleted
+                adieu();
                 return false;
             }
             else
@@ -274,7 +272,8 @@ Vector Fiber::displayPosM(real ab) const
 
 #endif
 
-Fiber::~Fiber()
+/// do some cleanup and set prop=nullptr
+void Fiber::adieu()
 {
     assert_false(fHands.bad(this));
     //std::clog << reference() << " deleted\n";
@@ -289,9 +288,16 @@ Fiber::~Fiber()
     delete(fGlue);
     fGlue = nullptr;
 #endif
+    
     prop = nullptr;
 }
 
+
+Fiber::~Fiber()
+{
+    if ( prop )
+        adieu();
+}
 
 real Fiber::projectPoint(Vector const& w, real & dis) const
 {
@@ -551,7 +557,7 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
             else
             {
                 //std::clog << " removed entirely\n";
-                prop = nullptr;
+                adieu();
             }
             return this;
         }
@@ -569,7 +575,7 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
             else
             {
                 //std::clog << " removed entirely\n";
-                prop = nullptr;
+                adieu();
             }
             return nullptr;
         }
