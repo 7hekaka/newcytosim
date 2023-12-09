@@ -11,7 +11,6 @@ set(SOURCES_GYM
     gym_vect.cc
     gym_draw.cc
     gym_flute.cc
-    gym_flute_dim.cc
     gym_check.cc
     gym_menu.cc
     gym_zoo.cc

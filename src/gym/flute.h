@@ -11,6 +11,16 @@
 //#include "vector3.h"
 
 
+/// accessory class to pack 1D vertex data
+struct flute1
+{
+    float xy[2];
+    flute1() : xy{0, 0} {}
+    flute1(float x) : xy{x, 0} {}
+    void operator = (const float v[1]) { xy[0] = v[0]; xy[1] = 0.f; }
+    void operator = (const double v[1]) { xy[0] = float(v[0]); xy[1] = 0.f; }
+};
+
 /// accessory class to pack 2D vertex data
 struct flute2
 {
@@ -86,6 +96,17 @@ struct flute4
     flute4(float x, float y, float z, float t) : xyz{x, y, z, t} {}
     flute4(const float c[4]) : xyz{c[0], c[1], c[2], c[3]} {}
     //flute4(double x, double y, double z, double t) : xyz{float(x), float(y), float(z), float(t)} {}
+};
+
+
+/// accessory class to pack 1D vertex and color data together
+struct flute5
+{
+    float xyz[6];
+    flute5() : xyz{0, 0, 0, 0, 0, 0} {}
+    flute5(float const c[4], const float d[1]) : xyz{c[0], c[1], c[2], c[3], d[0], 0.f} {}
+    flute5(float const c[4], const double d[1]) : xyz{c[0], c[1], c[2], c[3], float(d[0]), 0.f} {}
+    void setY(float y) { xyz[5] = y; }
 };
 
 

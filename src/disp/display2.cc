@@ -239,9 +239,6 @@ void Display2::drawCoupleB(Couple const* cx) const
         gym::ref_view();
         flute4D* flu = gym::mapBufferC4VD(4);
 #if DIM < 2
-        flu[0] = { pd1->color, float(p1.XX), 0.f };
-        flu[1] = { pd2->color, float(p2.XX), 0.f };
-#elif 0
         flu[0] = { pd1->color, p1 };
         flu[1] = { pd2->color, p2 };
 #else

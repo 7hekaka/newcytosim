@@ -1,6 +1,6 @@
 # cytosim/src/gym/makefile.inc   Copyright Cambridge University 2022
 
-OBJ_GYM := gym_menu.o gym_flat.o gym_flute.o gym_flute_dim.o gym_matrix.o\
+OBJ_GYM := gym_menu.o gym_flat.o gym_flute.o gym_matrix.o\
            gym_view.o gym_vect.o gym_draw.o gym_check.o gym_image.o gym_zoo.o\
            gym_cap.o gym_color.o gym_color_list.o gle.o tesselator.o
 

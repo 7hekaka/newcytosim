@@ -156,13 +156,6 @@ inline void shiftVertex(flute4D * ptr, flute4D * qrt, const Fiber* fib)
 #endif
 }
 
-inline void shiftVertex(flute4D * ptr, float y)
-{
-#if ENABLE_EXPLODED_DISPLAY
-    ptr->setY(y);
-#endif
-}
-
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -185,7 +178,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
             }
         }
         assert_true( size_t(ptr-flu) <= cnt );
-        gym::unmapBufferC4VD(0);
+        gym::unmapBufferC4VD();
         gym::drawPoints(pointSize, 0, ptr-flu);
     }
     gym::cleanup();
@@ -221,7 +214,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
         }
     }
     assert_true( size_t(ptr-flu) <= cnt );
-    gym::unmapBufferC4VD(0);
+    gym::unmapBufferC4VD();
 
     if ( prop->link_width > 0 )
     {
@@ -272,7 +265,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
         }
     }
     assert_true( size_t(ptr-flu) <= cnt );
-    gym::unmapBufferC4VD(0);
+    gym::unmapBufferC4VD();
     gym::drawPoints(pointSize, 0, ptr-flu);
     // display inactive Couples with square dots:
     gym::drawSquarePoints(0.25*pointSize, end-flu, cnt-(end-flu));
@@ -323,7 +316,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
         }
     }
     assert_true( size_t(ptr-flu) <= cnt );
-    gym::unmapBufferC4VD(0);
+    gym::unmapBufferC4VD();
     gym::drawPoints(pointSize, 0, ptr-flu);
     gym::cleanup();
 }
@@ -358,7 +351,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
             }
         }
         assert_true( size_t(ptr-flu) <= cnt );
-        gym::unmapBufferC4VD(0);
+        gym::unmapBufferC4VD();
         gym::drawPoints(pointSize, 0, ptr-flu);
         gym::cleanup();
     }
@@ -409,7 +402,7 @@ void Display1::drawCouplesB1(CoupleSet const& set) const
 #endif
     }
     assert_true( size_t(ptr-flu) <= cnt );
-    gym::unmapBufferC4VD(0);
+    gym::unmapBufferC4VD();
     
     if ( prop->link_width > 0 )
     {
@@ -445,7 +438,7 @@ void Display1::drawCouplesB0(CoupleSet const& set) const
         ptr += 2;
     }
     assert_true( size_t(ptr-flu) <= cnt );
-    gym::unmapBufferC4VD(1);
+    gym::unmapBufferC4VD();
     if ( prop->link_width > 0 )
         gym::drawLines(linkWidth, 0, ptr-flu);
     if ( prop->point_size > 0 )

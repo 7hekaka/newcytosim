@@ -1983,7 +1983,7 @@ void Display::drawFiber(Fiber const& fib)
     }
 #endif
 
-    if ( style )
+    if ( style && fib.prop->disp->line_width > 0 )
         drawFiberLines(fib, style);
     
     if ( disp->end_style[0] )
