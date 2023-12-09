@@ -501,8 +501,8 @@ void Space::read(Inputter& in, Simul&, ObjectTag)
 
 #ifdef DISPLAY
 
-#include "gym_flute.h"
 #include "gym_draw.h"
+#include "gym_flute.h"
 #include "gym_flute_dim.h"
 
 

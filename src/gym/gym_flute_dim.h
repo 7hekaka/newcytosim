@@ -3,7 +3,6 @@
 #ifndef GYM_FLUTE_DIM_H
 #define GYM_FLUTE_DIM_H
 
-#include "gym_flute.h"
 #include "dim.h"
 
 /*
