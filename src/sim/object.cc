@@ -104,7 +104,7 @@ std::string Object::reference() const
  */
 void Object::writeReference(Outputter& out, ObjectTag g, ObjectID id)
 {
-    assert_true(isalpha(g));
+    assert_true(isalpha(g) || g==NULL_TAG);
 
     if ( out.binary() )
     {
