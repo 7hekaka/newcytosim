@@ -1,23 +1,23 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
 /**
- 'Frametool' is a simple utility that can read and extract frames in
+ `Frametool` is a simple utility that can read and extract frames in
  Cytosim's trajectory files, usually called "objects.cmo".
  
- It only uses the START and END tags of frames, and will copy verbatim
- all the data contained between these tags.
+ `Frametool` only recognizes the START and END tags of frames, and will copy
+ all the data contained between these tags verbatim.
  
- 'Frametool' can extract frames from the file, by dropping off ones,
- or at a regular interval, using a slice: start:period:end
+ It can be used to extract one frame from the file, or multiple frames,
+ specified using their indiced: start:period:end
 
- You can reduce the file size by half by dropping every odd frame:
+ A typical use case is to reduce the file by dropping every odd frame:
  > frametool objects.cmo 0:2: > o.cmo
  > mv o.cmo objects.cmo
  
- Another tool 'sieve' can be used to read/write object-files,
- allowing finer manipulation of the simulation frames.
+ Another tool `sieve` can be used to read/write object-files,
+ allowing for a finer manipulation of the simulation frames.
  
- FJN, last updated 11.06.2021
+ FJN, last updated 12.12.2023
 */
 
 #include <errno.h>
