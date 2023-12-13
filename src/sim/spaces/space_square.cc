@@ -91,11 +91,11 @@ bool SpaceSquare::allInside(Vector const& W, const real rad) const
 #if ( DIM == 1 )
     return std::max(rad-W.XX, W.XX+rad) <= half_[0];
 #elif ( DIM == 2 )
-    return (std::max(rad-W.XX, W.XX+rad) <= half_[0]) &
+    return (std::max(rad-W.XX, W.XX+rad) <= half_[0]) &&
            (std::max(rad-W.YY, W.YY+rad) <= half_[1]);
 #else
-    return (std::max(rad-W.XX, W.XX+rad) <= half_[0]) &
-           (std::max(rad-W.YY, W.YY+rad) <= half_[1]) &
+    return (std::max(rad-W.XX, W.XX+rad) <= half_[0]) &&
+           (std::max(rad-W.YY, W.YY+rad) <= half_[1]) &&
            (std::max(rad-W.ZZ, W.ZZ+rad) <= half_[2]);
 #endif
 
