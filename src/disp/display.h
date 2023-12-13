@@ -164,7 +164,7 @@ public:
     /// scale from size into OpenGL line width (pixel) units
     float pixwidth(float w) const { return std::max(w * unitValue, 0.125f); }
     
-    /// return vector orthogonal to `dir` and to the view depth axis
+    /// return a vector of norm `rad`, orthogonal to both `dir` and the depth axis of the current view
     Vector inViewPlane(Vector const& dir, const real rad) const
     {
 #if ( DIM == 3 )
