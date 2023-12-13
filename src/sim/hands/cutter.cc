@@ -36,7 +36,7 @@ void Cutter::cut()
             // do not sever the fiber that is closest to the edge:
             if ( PZ < QZ )
                 return;
-            std::clog << "selectively cutting crossing fiber at Z " << PZ << " over " << QZ << "\n";
+            std::clog << "cutting " << h->fiber()->reference() << " crossing at Z " << PZ << " over " << QZ << "\n";
 #else
             Vector PQ = 0.5 * ( P + Q );
             Space const* spc = h->fiber()->prop->confine_space;
@@ -48,7 +48,7 @@ void Cutter::cut()
             // do not sever the fiber that is closest to the edge:
             if ( PZ < QZ )
                 return;
-            std::clog << "selectively cutting crossing fiber at D " << PZ << " over " << QZ << "\n";
+            std::clog << "cutting " << h->fiber()->reference() << " crossing at D " << PZ << " over " << QZ << "\n";
 #endif
         }
     }
