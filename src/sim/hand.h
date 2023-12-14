@@ -151,14 +151,14 @@ public:
     /// this is called when the attachment point is below the minus end
     virtual void handleDisassemblyP();
 
-        
+
     /// check abscissa against fiber edge, and calls handle functions if necessary.
     void checkFiberRange(real absM, real absP);
 
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
     void attach(Fiber const* f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
     
-    /// attach at the given end of Fiber (this calls attach(FiberSite))
+    /// attach at the specified end of given Fiber
     void attachEnd(Fiber const* f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
 
     /// detach, without updating Monitor

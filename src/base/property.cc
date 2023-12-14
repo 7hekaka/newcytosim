@@ -11,13 +11,13 @@
 
 Property::Property(const std::string& n) : name_(n), number_(0)
 {
-    //std::clog << "new Property `" << mName << "'\n";
+    //std::clog << "new Property `" << name_ << "'\n";
 }
 
 
 Property::~Property()
 {
-    //std::clog << "del Property `" << mName << "'\n";
+    //std::clog << "del Property `" << name_ << "'\n";
 }
 
 

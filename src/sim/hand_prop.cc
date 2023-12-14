@@ -145,20 +145,20 @@ Hand * HandProp::newHand(HandMonitor* m) const
 //------------------------------------------------------------------------------
 void HandProp::clear()
 {
-    binding_rate       = 0;
-    binding_range      = 0;
-    binding_key        = ~0U;  //all bits at 1
+    binding_rate  = 0;
+    binding_range = 0;
+    binding_key   = ~0U;  //all bits at 1
 #if NEW_BINDING_LIMITS
     binding_limits[0]  = -INFINITY;
     binding_limits[1]  = INFINITY;
 #endif
-    unbinding_rate     = 0;
-    unbinding_force    = INFINITY;
+    unbinding_rate  = 0;
+    unbinding_force = INFINITY;
     unbinding_force_inv = 0;
 
-    bind_also_end      = NO_END;
-    bind_only_end      = NO_END;
-    bind_end_range     = 0;
+    bind_also_end  = NO_END;
+    bind_only_end  = NO_END;
+    bind_end_range = 0;
 #if NEW_BIND_ONLY_FREE_END
     bind_only_free_end = false;
 #endif
@@ -167,9 +167,9 @@ void HandProp::clear()
     hold_shrinking_end[0] = 0;
     hold_shrinking_end[1] = 0;
 
-    activity           = "bind";
-    display            = "";
-    display_fresh      = false;
+    activity = "bind";
+    display  = "";
+    display_fresh = false;
 }
 
 
