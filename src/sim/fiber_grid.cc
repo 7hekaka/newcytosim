@@ -296,12 +296,12 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
                 FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
                 if ( ha.attachmentAllowed(sit) )
                 {
-                    targets.emplace(sit, abs);
-                    //std::clog << "   target " << sit << " at " << dis << " nm\n";
+                    targets.emplace(sit, dis);
+                    //std::clog << "   target " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
                 }
-                //else std::clog << "   forbid " << sit << " at " << dis << " nm\n";
+                //else std::clog << "      xxx " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
             }
-            //else std::clog << "   beyond " << seg << " at " << dis << " nm\n";
+            //else std::clog << "      far " << seg << " at " << 1000*std::sqrt(dis) << " nm\n";
         }
     }
     
