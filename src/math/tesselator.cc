@@ -201,9 +201,10 @@ static void dropletify_(size_t num, FLOAT* ptr)
     for ( unsigned n = 0; n < num; ++n )
     {
         FLOAT Z = ptr[3*n+2];
-        FLOAT W = 0.5f * ( 1.f + std::tanh(-m*Z) );
+        FLOAT W = 0.75f * ( 1.f + std::tanh(-m*Z) );
         ptr[3*n  ] *= W;
         ptr[3*n+1] *= W;
+        ptr[3*n+2] *= 1.5;
     }
 }
 
