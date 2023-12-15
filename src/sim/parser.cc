@@ -812,7 +812,7 @@ void Parser::parse_run(std::istream& is)
         
         if ( opt.empty() )
             execute_run(sec);
-        else
+        else if ( sec > 0 )
             execute_run(sec, opt, do_write);
 
         check_warnings(opt, is, ipos);

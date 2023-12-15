@@ -1310,7 +1310,7 @@ void Fiber::updateRange(Field* field)
 
 /**
  Update all bound Hands, allowing them to detach if they are out of range
- // this is equivalent to calling `h->reinterpolate()` for all Hands
+ this should be equivalent to calling `h->reinterpolate()` for all Hands
  */
 void Fiber::updateHands() const
 {
