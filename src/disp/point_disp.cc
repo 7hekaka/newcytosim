@@ -347,14 +347,14 @@ void PointDisp::makePixelmaps(unsigned sampling)
     gym::translate_scale(0.5*dim, 0.5*dim, 0, 0.5*dim*sizeX/pixSize);
 
     gym::disableLighting();
-    gym::disableBlending();
     gym::disableAlphaTest();
     gym::disableDepthTest();
+    gym::disableBlending();
     //gym::printCaps("P");
     makePixelmaps(sampling, dim);
+    gym::restoreBlending();
     gym::restoreDepthTest();
     gym::restoreAlphaTest();
-    gym::restoreBlending();
     gym::restoreLighting();
 
     if ( buf )

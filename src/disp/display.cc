@@ -1350,9 +1350,33 @@ void Display::drawFiberLatticeValues(Fiber const& fib, VisibleLattice const& lat
     const auto sup = lat.indexP();
     
     gym::ref_view();
-    gym::color(fib.disp->color);
     gym::disableLighting();
     gym::disableAlphaTest();
+    gym::color(fib.disp->color);
+    real abs = (inf+0.25) * uni - fib.abscissaM();
+    for ( auto h = inf; h <= sup; ++h, abs += uni )
+    {
+        snprintf(str, sizeof(str), "%.3f", lat.data(h));
+        drawText(fib.posM(abs), str);
+    }
+    gym::restoreAlphaTest();
+}
+
+
+/**
+ Display the value of each site in the lattice, in binary form if integers are used
+ */
+void Display::drawFiberLatticeBits(Fiber const& fib, FiberLattice const& lat) const
+{
+    char str[66] = { 0 };
+    const real uni = lat.unit();
+    const auto inf = lat.indexM();
+    const auto sup = lat.indexP();
+    
+    gym::ref_view();
+    gym::disableLighting();
+    gym::disableAlphaTest();
+    gym::color(fib.disp->color);
     real abs = (inf+0.25) * uni - fib.abscissaM();
     for ( auto h = inf; h <= sup; ++h, abs += uni )
     {
@@ -1371,9 +1395,9 @@ void Display::drawFiberLabels(Fiber const& fib, int style, gym_color const& col)
 {
     char str[32] = { 0 };
     gym::ref_view();
-    gym::color(col);
     gym::disableLighting();
     gym::disableAlphaTest();
+    gym::color(col);
     if ( style & 1 )
     {
         // draw fiber identity and vertex indices
@@ -1910,6 +1934,10 @@ void Display::drawFiber(Fiber const& fib)
                     drawFiberLatticeEdges(fib, *lat, rad); break;
                 case 5:
                     drawFiberLatticeValues(fib, *lat); break;
+#if FIBER_HAS_LATTICE
+                case 6:
+                    drawFiberLatticeBits(fib, *fib.lattice()); break;
+#endif
                 default:
                     std::clog << "Unexpected value of fiber:lattice_style\n";
             }

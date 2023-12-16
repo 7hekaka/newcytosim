@@ -179,8 +179,8 @@ void drawEdges()
 
 void namePoints(float scale)
 {
-    gym::disableAlphaTest();
     gym::disableLighting();
+    gym::disableAlphaTest();
     char tmp[128];
     for ( unsigned i=0; i < ico->num_vertices(); ++i )
     {
@@ -197,8 +197,8 @@ void namePoints(float scale)
         gym::face_view(ptr[0], ptr[1], ptr[2]);
         fgStrokeString(0, 0, scale, 1, tmp, 2);
     }
-    gym::restoreLighting();
     gym::restoreAlphaTest();
+    gym::restoreLighting();
     gym::load_ref();
 }
 

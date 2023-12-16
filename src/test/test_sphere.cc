@@ -120,8 +120,8 @@ void drawVertices()
 
 void nameVertices(float scale)
 {
-    gym::disableAlphaTest();
     gym::disableLighting();
+    gym::disableAlphaTest();
     char tmp[32] = { 0 };
     for ( size_t i=0; i < front->nbPoints(); ++i )
     {
@@ -130,8 +130,8 @@ void nameVertices(float scale)
         gym::face_view(ptr[0], ptr[1], ptr[2]);
         fgStrokeString(0, 0, scale, 1, tmp, 1);
     }
-    gym::restoreLighting();
     gym::restoreAlphaTest();
+    gym::restoreLighting();
     gym::load_ref();
 }
 

@@ -288,9 +288,9 @@ void View::placeText(int position, FontType font, const float color[4],
  */
 void View::drawText(Vector3 const& vec, const float color[4], const char text[], const float offset, FontType font) const
 {
-    gym::disableDepthTest();
-    gym::disableAlphaTest();
     gym::disableLighting();
+    gym::disableAlphaTest();
+    gym::disableDepthTest();
     gym::face_view(vec.XX, vec.YY, vec.ZZ);
 #if 0
     int H = fgFontHeight(font);
@@ -300,9 +300,9 @@ void View::drawText(Vector3 const& vec, const float color[4], const char text[],
     gym::color(color);
     fgStrokeString(0, 0, pixelSize(), 1, text, 1);
 #endif
-    gym::restoreLighting();
-    gym::restoreAlphaTest();
     gym::restoreDepthTest();
+    gym::restoreAlphaTest();
+    gym::restoreLighting();
 }
 
 //------------------------------------------------------------------------------
@@ -356,8 +356,8 @@ void View::drawInteractiveFeatures() const
         gle::strokeCuboid(mROI[0], mROI[1], 1);
     }
     //set pixel coordinate system:
-    gym::disableDepthTest();
     gym::disableAlphaTest();
+    gym::disableDepthTest();
     gym::one_view(W, H);
 
     if ( draw_memo && memo.size() )

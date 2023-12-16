@@ -256,6 +256,9 @@ public:
     /// display lattice cell edges
     virtual void drawFiberLatticeValues(Fiber const&, VisibleLattice const&) const;
 
+    /// display lattice cell edges
+    virtual void drawFiberLatticeBits(Fiber const&, FiberLattice const&) const;
+
     /// display Labels for a Fiber
     void drawFiberLabels(Fiber const&, int style, gym_color const&) const;
     
