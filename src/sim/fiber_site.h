@@ -84,11 +84,14 @@ public:
     /// index of Lattice's site
     lati_t site() const { return hSite; }
     
+    /// set abscissa
+    void setAbscissa(real a) { hAbs = a; }
+
     /// set FiberSite at index `s` with an abscissa `off` within the site
     void engageLattice(lati_t s, real off)
     {
-        hAbs = hLattice->unit() * s + off;
         hSite = s;
+        hAbs = hLattice->unit() * s + off;
         assert_true(hFiber->abscissaM() < hAbs + REAL_EPSILON);
         assert_true(hAbs < hFiber->abscissaP() + REAL_EPSILON);
     }
@@ -132,9 +135,6 @@ public:
         inter_ = std::min(a-segix_, real(1));
 #endif
     }
-
-    /// set abscissa
-    void setAbscissa(real a) { hAbs = a; reinterpolate(); }
     
     /// continuous movement to given abscissa on the current fiber
     void moveTo(real a) { hAbs = a; reinterpolate(); assert_true(!hLattice); }

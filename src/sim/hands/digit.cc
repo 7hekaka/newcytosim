@@ -247,7 +247,7 @@ void Fiber::resetLattice()
                 if ( i->vacant(s) )
                 {
                     i->inc();
-                    //i->setAbscissa(uni * s + i->prop()->site_shift);
+                    i->setAbscissa(uni * s + i->prop()->site_shift);
                 }
                 else
                 {
