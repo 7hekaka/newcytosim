@@ -137,7 +137,7 @@ public:
     }
     
     /// continuous movement to given abscissa on the current fiber
-    void moveTo(real a) { hAbs = a; reinterpolate(); assert_true(!hLattice); }
+    void moveTo(real a) { hAbs = a; reinterpolate(); assert_true(nullptr==lattice()); }
 
     /// relocate to minus end of current fiber
     void relocateM();
