@@ -1402,18 +1402,7 @@ void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx)
 #if FIBER_HAS_LATTICE
     FiberLattice const& lat = fLattice;
     if ( lat.data() )
-    {
-        const auto sup = lat.indexP();
-        for ( auto i = lat.indexM(); i <= sup; ++i )
-        {
-            ++cnt;
-            vac += ( lat.data(i) == 0 );
-            sum += lat.data(i);
-            real x = lat.data(i);
-            mn = std::min(mn, x);
-            mx = std::max(mx, x);
-        }
-    }
+        lat.info(cnt, vac, sum, mn, mx, 0);
 #endif
 }
 
@@ -1685,23 +1674,14 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
 
 #endif
 
-void Fiber::infoMesh(real& len, size_t& cnt, real& sm, real& mn, real& mx, bool density) const
+void Fiber::infoMesh(real& len, size_t& cnt, size_t& vac, real& sm, real& mn, real& mx, bool density) const
 {
 #if FIBER_HAS_MESH
     Lattice<real> const& lat = fMesh;
     if ( lat.data() )
     {
         len += length();
-        const real scale = ( density ? 1.0/lat.unit() : 1.0 );
-        const auto sup = lat.indexP();
-        for ( auto i = lat.indexM(); i <= sup; ++i )
-        {
-            ++cnt;
-            sm += lat.data(i);
-            real x = lat.data(i) * scale;
-            mn = std::min(mn, x);
-            mx = std::max(mx, x);
-        }
+        lat.info(cnt, vac, sm, mn, mx, density);
     }
 #endif
 }

@@ -369,7 +369,7 @@ namespace sMath
     }
     
     
-    /// convert numerical value to a binary representation with 0/1s
+    /// set binary representation of integer 'val' with 0/1s, using 'wid' characters
     template < typename T >
     void binary_representation(char str[], size_t len, size_t wid, T val, char end = 0)
     {

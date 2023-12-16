@@ -411,7 +411,7 @@ public:
     void cutFiberMesh(Lattice<real>&);
 
     /// find minium, maximum and sum of mesh values
-    void infoMesh(real& len, size_t&, real& sm, real& mn, real& mx, bool density) const;
+    void infoMesh(real& len, size_t&, size_t&, real& sm, real& mn, real& mx, bool density) const;
 
     /// lattice to be displayed
     VisibleLattice const* visibleLattice() const;

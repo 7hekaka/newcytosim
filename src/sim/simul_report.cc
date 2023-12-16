@@ -867,8 +867,8 @@ void Simul::reportFiberLattice(std::ostream& out, Property const* sel) const
     out << SEP << vac;
     out << SEP << std::setprecision(4) << sum / (real)cnt;
     out << SEP << std::setprecision(4) << sum / (real)(cnt-vac);
-    out << SEP << std::fixed << std::setprecision(6) << mn;
-    out << SEP << std::fixed << std::setprecision(6) << mx;
+    out << SEP << std::fixed << std::setprecision(2) << mn;
+    out << SEP << std::fixed << std::setprecision(2) << mx;
     out.precision(p);
 }
 
@@ -881,13 +881,13 @@ void Simul::reportFiberMeshAverage(std::ostream& out, bool density, Property con
     out << COM << ljust("class", 2, 2) << SEP << "total";
     out << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
     
-    size_t cnt = 0;
+    size_t cnt = 0, vac = 0;
     real len = 0, sum = 0, mn = INFINITY, mx = -INFINITY;
     
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
         if ( !sel || sel == fib->prop )
-            fib->infoMesh(len, cnt, sum, mn, mx, density);
+            fib->infoMesh(len, cnt, vac, sum, mn, mx, density);
     }
     
     std::streamsize p = out.precision();
@@ -910,11 +910,11 @@ void Simul::reportFiberMesh(std::ostream& out, bool density, Property const* sel
     
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        size_t cnt = 0;
+        size_t cnt = 0, vac = 0;
         real len = 0, sum = 0, mn = INFINITY, mx = -INFINITY;
         if ( !sel || sel == fib->prop )
         {
-            fib->infoMesh(len, cnt, sum, mn, mx, density);
+            fib->infoMesh(len, cnt, vac, sum, mn, mx, density);
             std::streamsize p = out.precision();
             out << LIN << ljust(fib->reference(), 2);
             out << SEP << sum;

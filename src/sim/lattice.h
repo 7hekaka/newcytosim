@@ -564,7 +564,29 @@ public:
                 laCell[s] = in.readFloat();
         }
     }
+    
+    #pragma mark - doc
 
+    /// quantification
+    void info(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx, bool density) const
+    {
+        const real scale = ( density ? 1.0/unit() : 1.0 );
+        const auto sup = indexP();
+        for ( auto i = indexM(); i <= sup; ++i )
+        {
+            ++cnt;
+            if ( data(i) == 0 )
+                ++vac;
+            else
+            {
+                sum += data(i);
+                real x = data(i) * scale;
+                mn = std::min(mn, x);
+                mx = std::max(mx, x);
+            }
+        }
+    }
+    
     /// printout
     void dump(FILE *f)
     {
