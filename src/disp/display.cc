@@ -1356,7 +1356,7 @@ void Display::drawFiberLatticeValues(Fiber const& fib, VisibleLattice const& lat
     real abs = (inf+0.25) * uni - fib.abscissaM();
     for ( auto h = inf; h <= sup; ++h, abs += uni )
     {
-        snprintf(str, sizeof(str), "%.3f", lat.data(h));
+        snprintf(str, sizeof(str), "%.3f", real(lat.data(h)));
         drawText(fib.posM(abs), str);
     }
     gym::restoreAlphaTest();
