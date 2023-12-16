@@ -67,6 +67,11 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
 void Digit::attach(FiberSite const& sit)
 {
     Hand::attach(sit);
+#if FIBER_HAS_LATTICE
+    hSite = sit.site();
+    hLattice = sit.lattice();
+    //std::clog << "offset " << sit.abscissa() - hLattice->unit()*hSite - prop()->site_shift << "\n";
+#endif
     inc();
 }
 
@@ -231,7 +236,7 @@ void Fiber::resetLattice()
     if ( fLattice.data() )
     {
         fLattice.clear();
-        real unit = fLattice.unit();
+        real uni = fLattice.unit();
     
         for ( Hand * h = fHands.front(); h; h = h->next() )
         {
@@ -242,7 +247,7 @@ void Fiber::resetLattice()
                 if ( i->vacant(s) )
                 {
                     i->inc();
-                    i->moveTo(unit * s + i->prop()->site_shift);
+                    //i->setAbscissa(uni * s + i->prop()->site_shift);
                 }
                 else
                 {

@@ -133,8 +133,11 @@ public:
 #endif
     }
 
-    /// move to a different abscissa on the current fiber
-    void moveTo(real a) { hAbs = a; reinterpolate(); }
+    /// set abscissa
+    void setAbscissa(real a) { hAbs = a; reinterpolate(); }
+    
+    /// continuous movement to given abscissa on the current fiber
+    void moveTo(real a) { hAbs = a; reinterpolate(); assert_true(!hLattice); }
 
     /// relocate to minus end of current fiber
     void relocateM();

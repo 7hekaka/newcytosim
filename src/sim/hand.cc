@@ -243,17 +243,12 @@ void Hand::attach(FiberSite const& s)
     assert_true(!hFiber);
 
     locate(s.fiber(), s.abscissa());
-#if FIBER_HAS_LATTICE
-    hSite = s.site();
-    hLattice = s.lattice();
-    //std::clog << "offset " << s.abscissa() -  hLattice->unit() * hSite << "\n";
-#endif
 #if 0
     Hand const* h = otherHand();
     if ( h && h->attached() )
     {
         real x = dot( h->pos() - s.pos(), s.dirFiber());
-        std::clog << "attach " << s << " dis " << x << "\n";
+        std::clog << "attach " << s << " at " << x << " um\n";
     }
 #endif
 }
