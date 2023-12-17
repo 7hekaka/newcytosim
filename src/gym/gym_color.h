@@ -213,7 +213,7 @@ public:
     
 #pragma mark -
     
-    bool  visible()      const { return ( alpha_() > 0 ); }
+    bool  visible()      const { return ( alpha_() > 0.0078125 ); }
     bool  invisible()    const { return ( alpha_() == 0 ); }
     bool  opaque()       const { return ( alpha_() == 255 ); }
     bool  transparent()  const { return ( alpha_() < 255 ); }

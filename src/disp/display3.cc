@@ -600,10 +600,11 @@ void Display3::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
     gym::disableClipPlane(4);
     gym::disableClipPlane(5);
 #else
-    gym::stretchAlignZ(A, B, rad);
-    gle::tube4();
+    gym::transAlignZ(A, rad, B-A);
     if ( inx == 0 )
         gle::dome();
+    gym::scale(1, 1, fib.segmentation()/rad);
+    gle::tube4();
     if ( inx == fib.lastSegment() )
         gle::discTop2();
 #endif
