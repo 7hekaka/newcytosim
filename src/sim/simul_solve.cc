@@ -167,7 +167,7 @@ void Simul::setAllInteractions(Meca& meca) const
 
 #pragma mark -
 
-void Simul::solve()
+void Simul::solve_meca()
 {
 #if ( 0 )
     ObjectFlag sup = fibers.inventory_.highest();

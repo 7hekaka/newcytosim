@@ -163,7 +163,7 @@ public:
     /// perform basic initialization; register callbacks
     void initialize(Glossary&);
     
-    /// ready the engine for a subsequent call to `step()` and `solve()`
+    /// ready the engine for a subsequent call to `step` and `solve`
     void prepare();
     
     /// perform one Monte-Carlo step, corresponding to the time step
@@ -197,7 +197,7 @@ public:
     int primed() const { return primed_; }
 
     
-    /// call setInteractions(Meca) for all objects (this is called before `solve()`
+    /// call setInteractions(Meca) for all objects (this is called before `solve`
     void setAllInteractions(Meca&) const;
 
     /// display Meca's links
@@ -207,7 +207,7 @@ public:
     void foldPositions() const;
 
     /// simulate the mechanics of the system and move Mecables accordingly
-    void solve();
+    void solve_meca();
     
     /// calculate forces given the current positions
     void solve_force();
@@ -215,7 +215,7 @@ public:
     /// solve mechanical system and calculate forces but do not apply movements
     void solve_half();
 
-    /// replace coordinates of Mecables by the ones calculated in solve()
+    /// replace coordinates of Mecables by the ones calculated in `solve`
     void apply() const { sMeca.apply(); }
     
     /// like 'solve' but automatically selects the fastest preconditionning method

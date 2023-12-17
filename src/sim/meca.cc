@@ -365,7 +365,7 @@ void Meca::setSomeInteractions()
 #endif
 
 /**
- Allocate and reset matrices and vectors necessary for Meca::solve(),
+ Allocate and reset matrices and vectors necessary for `Meca::solve`,
  copy coordinates of Mecables into vPTS[]
  */
 void Meca::readyMecables()
@@ -586,7 +586,7 @@ real Meca::residualNorm() const
 
 
 /**
- Meca::solve() solves the equation of motion with all Mecables:
+ `Meca::solve` solves the equation of motion with all Mecables:
  
      drag * ( Xnew - Xold ) / time_step = P * Force + Noise
  
@@ -961,7 +961,7 @@ unsigned Meca::solve()
 
 
 /**
- This transfers coordinates calculated in Meca::solve() back to the Mecables
+ This transfers coordinates calculated in `Meca::solve` back to the Mecables
  It also calculates the corresponding Forces and transfer them back.
  */
 void Meca::apply()

@@ -193,7 +193,7 @@ private:
     
     //--------------------------------------------------------------------------
 
-    /// working memory allocator for BCGS and GMRES used in solve()
+    /// working memory allocator for BCGS and GMRES
     LinearSolvers::Allocator allocator_;
     
     /// secondary memory allocator for GMRES
@@ -721,7 +721,7 @@ public:
     /// call setInteractions(Meca) for registered mecables
     void setSomeInteractions();
 
-    /// Allocate the memory necessary to solve(). This must be called after the last add()
+    /// Allocate the memory necessary to `solve`. This must be called after the last addMecable
     void getReady(Simul const&);
     
     /// Calculate motion of all Mecables in the system; returns number of step of the iterative solver

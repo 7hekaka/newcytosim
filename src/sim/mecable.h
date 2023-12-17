@@ -60,7 +60,7 @@ private:
     /// Array containing force-coordinates which is allocated in Meca
     real const* pForce;
 
-    /// Matrix block used for preconditionning in Meca::solve()
+    /// Matrix block used for preconditionning in Meca
     real * pBlock;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
@@ -242,7 +242,7 @@ public:
     /// free allocated memory
     void release();
     
-    /// prepare the Mecable to solve the mechanics in Meca::solve()
+    /// prepare the Mecable to solve the mechanics in Meca
     /**
      This should prepare necessary variables to solve the system:
      - set rigidity coefficients, for addRigidity() to work properly
@@ -318,7 +318,7 @@ public:
 #endif
     //--------------------------------------------------------------------------
     
-    /// returns the force on point `p` calculated at the previous Meca::solve()
+    /// returns the force on point `p` calculated at the previous Meca's solve
     Vector netForce(const size_t p) const;
     
     /// replace current forces by the ones provided as argument

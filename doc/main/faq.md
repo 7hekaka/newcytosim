@@ -1070,7 +1070,7 @@ Convergence issues would be indicated by a value of ‘count’ that becomes lar
 </summary>
 
 In ‘interface.cc’ within ‘execute_run()’ cytosim prints CPU information when a frame is saved.
-Cytosim alternates ’step()’ and ’solve()’ and you can easily add a bunch of printf() to report more detailed CPU time information.
+Cytosim alternates `step` and `solve` and you can easily add a bunch of printf() to report more detailed CPU time information.
 You can do this at every time step, for example, by changing ‘execute_run’ in this way:
 
         hold();
@@ -1083,7 +1083,7 @@ You can do this at every time step, for example, by changing ‘execute_run’ i
         double c_step = double(clock() - clk) / CLOCKS_PER_SEC;
         clk = clock();
 
-        simul.solve();
+        simul.solve_meca();
         
         double c_solve = double(clock() - clk) / CLOCKS_PER_SEC;
         Cytosim::log("CPU  %6i  step %10.3fs  solve  %10.3fs\n", sss, c_step, c_solve);

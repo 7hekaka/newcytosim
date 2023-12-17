@@ -837,7 +837,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 /**
  The response of this method to a sudden perpendicular force is not ideal:
  For example, a force applied to the bottom of a vertical fibers leads
- to a 'L' configuration after one step of `solve()`.
+ to a 'L' configuration after one step of `Meca::solve`.
  reshape() reduces the bottom leg of the 'L', by translating the entire vertical portion
  of the fiber, irrespective of the length of this section.
  */

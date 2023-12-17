@@ -1046,7 +1046,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
         switch ( solve )
         {
             case 0: step_simul<&Simul::solve_not>(); break;
-            case 1: step_simul<&Simul::solve>(); break;
+            case 1: step_simul<&Simul::solve_meca>(); break;
             case 2: step_simul<&Simul::solve_auto>(); break;
             case 3: step_simul<&Simul::solve_force>(); break;
             case 4: step_simul<&Simul::solve_uniaxial>(); break;
@@ -1095,7 +1095,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
 
 
 /**
- Advance simulation, without any option, by alternating step() and solve()
+ Advance simulation, without any option, by alternating `step` and `solve`
 */
 void Interface::execute_run(real sec)
 {
@@ -1107,7 +1107,7 @@ void Interface::execute_run(real sec)
     while ( sim_->incomplete() )
     {
         hold();
-        sim_->solve();
+        sim_->solve_meca();
         sim_->step();
     }
     

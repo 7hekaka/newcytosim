@@ -21,7 +21,7 @@
  by editing this file.
  
  Calculations might be faster in single precision, but the iterative solver used
- in Meca::solve() (the conjugate-gradient method) may fail in adverse conditions.
+ in `Meca::solve` (the conjugate-gradient method) may fail in adverse conditions.
  Much of the code was optimized for double precision but not for single precision.
  
  It is safer, and STRONGLY ADVISED therefore, to use double precision!
