@@ -504,8 +504,10 @@ This updates the right-hand-side:
  
  Also prepares ProjectionDiff if the feature is enabled
 
- Vector 'rnd' is input, a set of independent Gaussian random numbers
- Vector 'rhs' is both input and output.
+ Vector 'fce' is input
+ Vector 'rhs' is both input and output:
+ - on entry, it should contain a set of independent Gaussian random numbers
+ - on exit, it will return the result
 */
 real brownian1(Mecable* mec, real const* fce, const real alpha, real tau, real* rhs)
 {
@@ -543,16 +545,21 @@ real brownian1(Mecable* mec, real const* fce, const real alpha, real tau, real* 
 /*
  Change the vector of noise, and recalculate the RHS of the system.
  This is a fail-safe option in case of failed convergence... outside the normal path
+ 
+ recalculating vFOR, because it is equal to vSOL and therefore erased in `solve`.
  */
 void Meca::renewBrownianForces()
 {
-    // calculate elastic forces in vFOR:
-    calculateForces(vPTS, vBAS, vFOR);
-    
+    if ( vSOL == vFOR )
+    {
+        // calculate elastic forces in vFOR:
+        calculateForces(vPTS, vBAS, vFOR);
+        
 #if SEPARATE_RIGIDITY_TERMS
-    addAllRigidity(vPTS, vFOR);
+        addAllRigidity(vPTS, vFOR);
 #endif
-
+    }
+    
     //fprintf(stderr, "\n/"); VecPrint::print(stderr, dimension(), vRHS, 2, DIM);
     RNG.gauss_set(vRHS, dimension());
 
@@ -693,11 +700,11 @@ unsigned Meca::solve()
     real noiseLevel = INFINITY;
 
     /*
-     Add Brownian contributions and calculate Minimum value of it
-      at entry, vRHS contains Gaussian random numbers
-      vRHS <- vFOR + brownian_scale * vRHS
+     Add Brownian contributions and estimate the magnitude of the noise
+     on entry, vRHS contains Gaussian random numbers.
+              vRHS <- vFOR + brownian_scale * vRHS
      the `brownian_scale` is calculated from the Mecable's mobility
-      vRHS <- tau * P * vRHS:
+              vRHS <- tau * P * vRHS:
      */
     #pragma omp parallel num_threads(NUM_THREADS)
     {
@@ -735,7 +742,7 @@ unsigned Meca::solve()
      The method is quite inefficient, since we have constructed the stiffness matrix,
      which is not necessary for this explicit scheme. Force would be sufficient.
      */
-    blas::xadd(dim, vRHS, vPTS);
+    copy_real(dim, vRHS, vSOL);
     ready_ = 1;
     return 1;
 #endif
@@ -923,8 +930,6 @@ unsigned Meca::solve()
 #endif
     
     ready_ = 1;
-    //add the solution (the displacement) to update the Mecable's vertices
-    blas::xadd(dim, vSOL, vPTS);
     
     // report on the matrix type and size, sparsity, and the number of iterations
     if (( 0 < doNotify ) || ( verbose_ & 1 ))
@@ -968,6 +973,9 @@ void Meca::apply()
 {
     if ( ready_ )
     {
+        // add calculated displacement to obtain vertices positions:
+        blas::xadd(dimension(), vSOL, vPTS);
+
         /*
          Re-calculate forces with the new coordinates, excluding bending elasticity.
          In this way the forces returned to the fibers do not sum-up to zero, and
