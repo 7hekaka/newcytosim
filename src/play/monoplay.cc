@@ -211,7 +211,7 @@ GLFWwindow * initWindow(int W, int H)
 
 
 /* draw System */
-void drawBug(Simul const& sim)
+void drawCytosim(Simul const& sim)
 {
     view.openDisplay();
     display.setParameters(view.pixelSize(), 1, view.depthAxis());
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
         {
             // data is now locked for this process
             ++refresh;
-            drawBug(simul);
+            drawCytosim(simul);
             if ( worker.holding() > 1 )
                 worker.restart();
             worker.unlock(); // release lock

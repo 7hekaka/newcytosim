@@ -264,7 +264,7 @@ inline void selectPanel(int x, int y)
 
 
 /* draw System */
-void drawBug(Simul const& sim)
+void drawCytosim(Simul const& sim)
 {
     display.setParameters(view.pixelSize(), 1, view.depthAxis());
     display.prepareDrawing(sim, allDisp);
@@ -372,7 +372,7 @@ int main(int argc, char *argv[])
             {
                 ++refresh;
                 selectPanel(x, y);
-                drawBug(simul[i]);
+                drawCytosim(simul[i]);
                 if ( worker[i].holding() > 1 )
                     worker[i].restart();
                 worker[i].unlock();
