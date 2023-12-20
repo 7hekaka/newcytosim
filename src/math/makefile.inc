@@ -13,7 +13,7 @@ OBJ_MATH_DIM1 := $(OBJ_MATH_DIM:%.o=build/%D1.o)
 OBJ_MATH_DIM2 := $(OBJ_MATH_DIM:%.o=build/%D2.o)
 OBJ_MATH_DIM3 := $(OBJ_MATH_DIM:%.o=build/%D3.o)
 
-OBJ_MATH_ALL := $(addprefix build/, $(OBJ_MATH) SFMT.o)
+OBJ_MATH_NODIM := $(addprefix build/, $(OBJ_MATH) SFMT.o)
 
 #----------------------------rules----------------------------------------------
 
@@ -37,19 +37,19 @@ $(OBJ_MATH_DIM3): build/%D3.o: %.cc %.h | build
 	$(COMPILE) $(INC_BM) -DDIM=3 -c $< -o $@
 
 
-cytomath.a: $(OBJ_MATH_ALL) $(OBJ_MATH_DIM0) | build lib
+cytomath.a: $(OBJ_MATH_NODIM) $(OBJ_MATH_DIM0) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytomathD1.a: $(OBJ_MATH_ALL) $(OBJ_MATH_DIM1) | build lib
+cytomathD1.a: $(OBJ_MATH_NODIM) $(OBJ_MATH_DIM1) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytomathD2.a: $(OBJ_MATH_ALL) $(OBJ_MATH_DIM2) | build lib
+cytomathD2.a: $(OBJ_MATH_NODIM) $(OBJ_MATH_DIM2) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytomathD3.a: $(OBJ_MATH_ALL) $(OBJ_MATH_DIM3) | build lib
+cytomathD3.a: $(OBJ_MATH_NODIM) $(OBJ_MATH_DIM3) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
