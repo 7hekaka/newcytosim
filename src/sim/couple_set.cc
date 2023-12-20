@@ -157,7 +157,7 @@ void CoupleSet::stepSkipUnattached()
     bool const faOdd = faList.size() & 1;
     bool const afOdd = afList.size() & 1;
     bool const ffOdd = ffList.size() & 1;
-
+    
     //size_t cnt = sizeFF();
     step_couples<&Couple::stepDiffusingDuo>(ffHead, ffOdd);
     //printf(" CoupleSet::stepSkipUnattached %lu -> %lu\n", cnt, sizeFF());
