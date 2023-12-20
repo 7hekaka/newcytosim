@@ -198,10 +198,7 @@ GLFWwindow * initWindow(int W, int H)
     //gladLoadGL(glfwGetProcAddress);
     glfwSwapInterval(1);
 
-    unsigned char pixels[16 * 16 * 4];
-    memset(pixels, 0xaf, sizeof(pixels));
-    GLFWimage image { 16, 16, pixels };
-    GLFWcursor * cursor = glfwCreateCursor(&image, 0, 0);
+    GLFWcursor * cursor = glfwCreateStandardCursor(GLFW_CROSSHAIR_CURSOR);
     glfwSetCursor(win, cursor);
 
     gle::initialize();
