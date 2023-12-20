@@ -101,37 +101,37 @@ bin3/sim: sim.cc cytolibD3.a cytomathD3.a cytobase.a | bin3
 
 #--- libraries:
 
-cytolib.a: $(OBJ_CYTOLIB:%.o=build/%.o) | lib
+cytolib.a: $(OBJ_CYTOLIB:%.o=build/%.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibD1.a: $(OBJ_CYTOLIB:%.o=build/%D1.o) | lib
+cytolibD1.a: $(OBJ_CYTOLIB:%.o=build/%D1.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibD2.a: $(OBJ_CYTOLIB:%.o=build/%D2.o) | lib
+cytolibD2.a: $(OBJ_CYTOLIB:%.o=build/%D2.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibD3.a: $(OBJ_CYTOLIB:%.o=build/%D3.o) | lib
+cytolibD3.a: $(OBJ_CYTOLIB:%.o=build/%D3.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
 #--- libraries with graphical code enabled
 
-cytolibG.a: $(OBJ_CYTOLIBG:%.o=build/%.o) | lib
+cytolibG.a: $(OBJ_CYTOLIBG:%.o=build/%.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibGD1.a: $(OBJ_CYTOLIBG:%.o=build/%D1.o) | lib
+cytolibGD1.a: $(OBJ_CYTOLIBG:%.o=build/%D1.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibGD2.a: $(OBJ_CYTOLIBG:%.o=build/%D2.o) | lib
+cytolibGD2.a: $(OBJ_CYTOLIBG:%.o=build/%D2.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
-cytolibGD3.a: $(OBJ_CYTOLIBG:%.o=build/%D3.o) | lib
+cytolibGD3.a: $(OBJ_CYTOLIBG:%.o=build/%D3.o) | build lib
 	$(LIBTOOL) lib/$@ $^
 	$(DONE)
 
