@@ -17,12 +17,14 @@
 #include <new>
 
 /**
- It is possible to select double or single precision throughout Cytosim
- by editing this file.
+ It is possible to select double or single precision throughout Cytosim here
  
- Calculations might be faster in single precision, but the iterative solver used
- in `Meca::solve` (the conjugate-gradient method) may fail in adverse conditions.
- Much of the code was optimized for double precision but not for single precision.
+ Calculations might be faster in single precision, but the conjugate-gradient method
+ used in `Meca::solve` may not converge in some adverse conditions. Futhermore,
+ most of the code was optimized for double precision rather than single precision.
+ 
+ However, single precision is prefectly appropriate for replay/display purpose,
+ since trajectory files are stored/read and OpenGL runs in single precision.
  
  It is safer, and STRONGLY ADVISED therefore, to use double precision!
 */
@@ -224,6 +226,7 @@ inline static real norm_inf(size_t cnt, real const* a, real const* b)
 
 //----------------------------------- DEBUG ------------------------------------
 
+/// count number of Not-A-Number values in `ptr[]` of size `cnt`
 inline static size_t has_nan(size_t cnt, real const* ptr)
 {
     size_t res = 0;
