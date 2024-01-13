@@ -1276,10 +1276,12 @@ void Interface::execute_report(std::string const& name, std::string const& what,
 
 void Interface::execute_call(std::string& str, Glossary& opt)
 {
-    if ( str == "equilibrate" )
+    if ( str == "couple:equilibrate" )
         sim_->couples.equilibrate();
-    else if ( str == "connect" )
+    else if ( str == "couple:connect" )
         sim_->couples.bindToIntersections();
+    else if ( str == "single:equilibrate" )
+        sim_->singles.equilibrate();
     else if ( str == "custom0" )
         sim_->custom0(opt);
     else if ( str == "custom1" )

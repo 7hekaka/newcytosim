@@ -167,6 +167,9 @@ public:
     /// cleanup at end of simulation period
     void relax() { uniRelax(); }
     
+    /// attach Single to nearby fibers to approximate an equilibrated state
+    void equilibrate();
+
     /// bring all objects to centered image using periodic boundary conditions
     void foldPositions(Modulo const*) const;
     

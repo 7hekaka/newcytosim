@@ -73,7 +73,7 @@ void SingleSet::uniStepCollect(Single * obj)
 
 /**
 SingleSet::step() must call the appropriate Single::step() exactly once
-for each Single: either stepF() or stepAA().
+for each Single: either stepF() or stepA().
 
 The Singles are stored in two lists, and are automatically transferred
 from one list to the other if their Hands bind or unbind. The code relies
@@ -901,6 +901,66 @@ void SingleSet::uniRelax()
     {
         makeSingles(P, P->uni_counts);
         P->uni_counts = 0;
+    }
+}
+
+
+//------------------------------------------------------------------------------
+#pragma mark - Equilibration
+
+/**
+ Attach all unbound Single to nearby Fibers, to approximate an equilibrated state,
+ as defined by the ratio of binding to unbinding rates of the Hand
+ */
+void SingleSet::equilibrate()
+{
+    // distribute Fibers over a grid preparing for binding of Hands:
+    FiberSet const& fibers = simul_.fibers;
+    const real range = simul_.maxBindingRange();
+
+    // initialize Grid
+    FiberGrid & grid = simul_.fiberGrid;
+    if ( ! grid.hasGrid() )
+    {
+        Space const* spc = simul_.spaces.master();
+        if ( spc )
+            simul_.setFiberGrid(spc, simul_.prop.binding_grid_step);
+        else
+            throw InvalidSyntax("A space must be defined first!");
+    }
+    grid.paintGrid(fibers.first(), nullptr, range);
+
+    FiberGrid::SegmentList list;
+    // equilibrate unattached Singles:
+    Single *nxt, *obj = firstF();
+    
+    while ( obj )
+    {
+        nxt = obj->next();
+        Vector pos = obj->position();
+        HandProp const* hp = obj->prop->hand_prop;
+        real sup = square(hp->binding_range);
+        // probability of finding hand in the bound state at equilibrium:
+        const real prob = hp->binding_rate / ( hp->binding_rate + hp->unbinding_rate );
+        
+        // check all segments within grid cell
+        for ( FiberSegment const& seg : simul_.fiberGrid.nearbySegments(pos) )
+        {
+            real dis = INFINITY;
+            real abs = seg.projectPoint(pos, dis);
+            if ( dis < sup && RNG.test(prob) )
+            {
+                // ATTENTION: convert `abs` relative to the segment to Fiber's abscissa
+                FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
+                if ( obj->hand()->attachmentAllowed(sit) )
+                {
+                    obj->hand()->attach(sit);
+                    //std::clog << "   bind " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
+                    break;
+                }
+            }
+        }
+        obj = nxt;
     }
 }
 

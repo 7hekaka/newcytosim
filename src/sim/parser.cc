@@ -802,7 +802,7 @@ void Parser::parse_run(std::istream& is)
         // instead of `nb_steps', user can specify a duration in seconds:
         if ( opt.set(sec, "duration", "time") )
         {
-            if ( sec <= 0 )
+            if ( sec < 0 )
                 throw InvalidParameter("duration must be >= 0'");
             opt.clear("duration");
             opt.clear("time");
@@ -1076,7 +1076,7 @@ void Parser::parse_write(std::istream& is)
 void Parser::parse_call(std::istream& is)
 {
     std::streampos ipos = is.tellg();
-    std::string str = Tokenizer::get_symbol(is);
+    std::string str = Tokenizer::get_polysymbol(is);
     
     if ( str.empty() )
         throw InvalidSyntax("missing function name after 'call'");

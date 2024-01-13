@@ -1100,7 +1100,7 @@ void CoupleSet::uniRelax()
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Direct Equilibration of bound/unbound Couples
+#pragma mark - Equilibration
 
 
 void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleProp const* cop, size_t total)

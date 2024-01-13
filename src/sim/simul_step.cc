@@ -160,7 +160,7 @@ void Simul::step()
     else
 #endif
     {
-        // distribute Fibers over a grid for binding of Hands:
+        // distribute Fibers over a grid preparing for binding of Hands:
         const real range = maxBindingRange();
         fiberGrid.paintGrid(fibers.first(), nullptr, range);
         

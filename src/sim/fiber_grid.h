@@ -112,8 +112,11 @@ public:
     /// given a position, find nearby Fiber segments and test attachement of the provided Hand
     void tryToAttach(Vector const&, Hand&) const;
 
+    /// return all Fiber segments located in cell grid at specified position
+    SegmentList nearbySegments(Vector const& vec) const { return fGrid.icell(fGrid.index(vec, 0.5)); }
+
     /// return all Fiber segments located near P, within distance squared, except those belonging to `exclude`
-    SegmentList  nearbySegments(Vector const&, real disSqr, Fiber const* exclude = nullptr) const;
+    SegmentList nearbySegments(Vector const&, real disSqr, Fiber const* exclude = nullptr) const;
     
     /// Among the segments closer than grid:range, return the closest one
     FiberSegment closestSegment(Vector const&) const;
