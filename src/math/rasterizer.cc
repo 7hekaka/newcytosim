@@ -139,69 +139,65 @@ static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
 
 #if ( 0 )
     // print polygon:
-    std::clog << '\n' << zz << " ";
     for ( size_t n = 0; n < n_pts; ++n )
         pts[n].print(std::clog);
+    std::clog << " " << zz << '\n';
 #endif
-    
-    size_t iR = 0;
-    size_t iL = n_pts;
-
-    VEC R = pts[0];
-    VEC L = pts[0];
   
-    Rasterizer::FLOAT xxR = 0, yyR = 0, dxR = 0;
-    Rasterizer::FLOAT xxL = 0, yyL = 0, dxL = 0;
+    Rasterizer::FLOAT xxR = pts[0].XX, yyR = pts[0].YY, dxR = 0;
+    Rasterizer::FLOAT xxL = pts[0].XX, yyL = pts[0].YY, dxL = 0;
 
     // start on the line just above the bottom point
-    int yy = (int)std::ceil(R.YY);
-    
-    while ( true )
+    int yy = (int)std::ceil(pts[0].YY);
+        
+    size_t iR = 1;
+    size_t iL = n_pts-1;
+
+    VEC R = pts[iR];
+    VEC L = pts[iL];
+
+    while ( iR <= iL )
     {
-        // find next point on right side:
-        if ( R.YY <= yy )
-        {
-            do {
-                if ( ++iR > iL )
-                    return;
-                xxR = R.XX;
-                yyR = R.YY;
-                R = pts[iR];
-            } while ( R.YY <= yy );
-            
-            dxR = ( R.XX - xxR ) / ( R.YY - yyR );
-            xxR += dxR * ( yy - yyR );
-        }
-        
-        // find next point on left side:
-        if ( L.YY <= yy )
-        {
-            do {
-                if ( --iL < iR )
-                    return;
-                xxL = L.XX;
-                yyL = L.YY;
-                L = pts[iL];
-            } while ( L.YY <= yy );
-            
-            dxL = ( L.XX - xxL ) / ( L.YY - yyL );
-            xxL += dxL * ( yy - yyL );
-        }
-        
         // index of the last line without changing edges:
-        int yym = (int)std::floor(std::min(L.YY, R.YY));
+        int top = (int)std::floor(std::min(L.YY, R.YY));
         
-        for ( ; yy <= yym; ++yy )
+        dxR = ( R.XX - xxR ) / ( R.YY - yyR );
+        xxR += dxR * ( yy - yyR );
+        
+        dxL = ( L.XX - xxL ) / ( L.YY - yyL );
+        xxL += dxL * ( yy - yyL );
+        
+        for ( ; yy <= top; ++yy )
         {
             int inf = (int) std::ceil(xxL);
             int sup = (int)std::floor(xxR);
-            if ( inf <= sup )
-            {
-                // draw the horizontal line:
-                paint(inf, sup, yy, zz, arg);
-            }
+            paint(inf, sup, yy, zz, arg);
             xxL += dxL;
             xxR += dxR;
+        }
+        
+        // update point on right edge:
+        while ( R.YY <= yy )
+        {
+            //printf("R%i ", yy);
+            if ( ++iR > iL )
+                return;
+            xxR = R.XX;
+            yyR = R.YY;
+            yyL = yy;
+            R = pts[iR];
+        }
+        
+        // update point on left edge:
+        while ( L.YY <= yy )
+        {
+            //printf("L%i ", yy);
+            if ( --iL < iR )
+                return;
+            xxL = L.XX;
+            yyL = L.YY;
+            yyR = yy;
+            L = pts[iL];
         }
     }
 }
@@ -428,9 +424,9 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
         }
         
         // the edges of the convex solid polygon should not intersect,
-        // so we can take the convex hull only once here:
-        bool need_hull = true;
-        size_t nbp; //number of points in the hull.
+        // so we can take the convex hull only once in principle:
+        size_t nbp = convexHull(nbl, xy); //number of points in the hull.
+        bool need_hull = ( nbp != nbl );
         
         for ( ; zz < zzn; ++zz )
         {
@@ -439,7 +435,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
                 //make the convex hull of the points from xy[]:
                 nbp = convexHull(nbl, xy);
                 //printf("zz %3i : nbp = %i\n", zz, nbp);
-                
+
                 //in the particular case where some points overlap, we might
                 //loose them, in which case we need to redo the hull later
                 need_hull = ( nbp != nbl );
