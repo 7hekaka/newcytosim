@@ -188,43 +188,37 @@ public:
     /// access to cell for ORD==1
     CELL & icell1D(const int x) const
     {
-        assert_true( MAP::pack1D(x) < MAP::mNbCells );
         return gCell[MAP::pack1D(x)];
     }
     
     /// access to cell for ORD==2
     CELL & icell2D(const int x, const int y) const
     {
-        assert_true( MAP::pack2D(x,y) < MAP::mNbCells );
         return gCell[MAP::pack2D(x,y)];
     }
     
     /// access to cell for ORD==3
     CELL & icell3D(const int x, const int y, const int z) const
     {
-        assert_true( MAP::pack3D(x,y,z) < MAP::mNbCells );
         return gCell[MAP::pack3D(x,y,z)];
     }
     
     /// access to cell for ORD==1
-    CELL & cell1D(const real x) const
+    CELL & icell1D_clamped(const int x) const
     {
-        assert_true( MAP::index1D(x) < MAP::mNbCells );
-        return gCell[MAP::index1D(x)];
+        return gCell[MAP::pack1D_clamped(x)];
     }
     
     /// access to cell for ORD==2
-    CELL & cell2D(const real x, const real y) const
+    CELL & icell2D_clamped(const int x, const int y) const
     {
-        assert_true( MAP::index2D(x,y) < MAP::mNbCells );
-        return gCell[MAP::index2D(x,y)];
+        return gCell[MAP::pack2D_clamped(x,y)];
     }
     
     /// access to cell for ORD==3
-    CELL & cell3D(const real x, const real y, const real z) const
+    CELL & icell3D_clamped(const int x, const int y, const int z) const
     {
-        assert_true( MAP::index3D(x,y,z) < MAP::mNbCells );
-        return gCell[MAP::index3D(x,y,z)];
+        return gCell[MAP::pack3D_clamped(x,y,z)];
     }
 
     //-----------------------------------------------------------------------
@@ -244,8 +238,8 @@ public:
             real a = MAP::map(d, w[d]) + 0.5;
             int ia = (int)std::floor(a);
             a     -= ia;
-            int  l = MAP::imagei(d, ia-1);
-            int  u = MAP::imagei(d, ia  );
+            int  l = MAP::ind_(d, ia-1);
+            int  u = MAP::ind_(d, ia  );
             
             if ( nb == 0 )
             {
@@ -293,8 +287,8 @@ public:
         
         ax -= ix;
         
-        size_t lx = MAP::imagei(0, ix-1);
-        size_t ux = MAP::imagei(0, ix  );
+        size_t lx = MAP::ind_(0, ix-1);
+        size_t ux = MAP::ind_(0, ix  );
         
         return gCell[lx] + ax * ( gCell[ux] - gCell[lx] );
     }
@@ -319,11 +313,11 @@ public:
         ax -= ix;
         ay -= iy;
         
-        size_t lx = MAP::imagei(0, ix-1);
-        size_t ux = MAP::imagei(0, ix  );
+        size_t lx = MAP::ind_(0, ix-1);
+        size_t ux = MAP::ind_(0, ix  );
         
-        size_t ly = MAP::imagei(1, iy-1) * MAP::breadth(0);
-        size_t uy = MAP::imagei(1, iy  ) * MAP::breadth(0);
+        size_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
+        size_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
         
         //sum weighted cells to get interpolation
         CELL  rl = gCell[lx+ly] + ay * ( gCell[lx+uy] - gCell[lx+ly] );
@@ -356,14 +350,14 @@ public:
         ay -= iy;
         az -= iz;
 
-        size_t lx = MAP::imagei(0, ix-1);
-        size_t ux = MAP::imagei(0, ix  );
+        size_t lx = MAP::ind_(0, ix-1);
+        size_t ux = MAP::ind_(0, ix  );
         
-        size_t ly = MAP::imagei(1, iy-1) * MAP::breadth(0);
-        size_t uy = MAP::imagei(1, iy  ) * MAP::breadth(0);
+        size_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
+        size_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
         
-        size_t lz = MAP::imagei(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
-        size_t uz = MAP::imagei(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
+        size_t lz = MAP::ind_(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
+        size_t uz = MAP::ind_(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
 
         CELL * cul = gCell + (uy+lz), rul = cul[lx] + ( cul[ux] - cul[lx] ) * ax;
         CELL * cuu = gCell + (uy+uz), ruu = cuu[lx] + ( cuu[ux] - cuu[lx] ) * ax;

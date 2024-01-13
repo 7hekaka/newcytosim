@@ -120,14 +120,14 @@ void paintCell(const int x_inf, const int x_sup, const int y, const int z, void 
     //printf("paint %p in (%i to %i, %i, %i)\n", seg, x_inf, x_sup, y, z);
 
 #if   ( DIM == 1 )
-    FiberGrid::SegmentList * list = & grid->icell1D(x_inf);
-    FiberGrid::SegmentList * last = & grid->icell1D(x_sup);
+    FiberGrid::SegmentList * list = & grid->icell1D_clamped(x_inf);
+    FiberGrid::SegmentList * last = & grid->icell1D_clamped(x_sup);
 #elif ( DIM == 2 )
-    FiberGrid::SegmentList * list = & grid->icell2D(x_inf, y);
-    FiberGrid::SegmentList * last = & grid->icell2D(x_sup, y);
+    FiberGrid::SegmentList * list = & grid->icell2D_clamped(x_inf, y);
+    FiberGrid::SegmentList * last = & grid->icell2D_clamped(x_sup, y);
 #else
-    FiberGrid::SegmentList * list = & grid->icell3D(x_inf, y, z);
-    FiberGrid::SegmentList * last = & grid->icell3D(x_sup, y, z);
+    FiberGrid::SegmentList * list = & grid->icell3D_clamped(x_inf, y, z);
+    FiberGrid::SegmentList * last = & grid->icell3D_clamped(x_sup, y, z);
 #endif
     
     // Since all the lists are independent, they can be updated in parallel

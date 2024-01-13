@@ -140,7 +140,7 @@ protected:
 protected:
     
     /// return closest integer to `c` in the segment [ 0, s-1 ]
-    static inline size_t imagei_periodic(size_t s, long c)
+    static inline size_t image_(size_t s, long c)
     {
         ///@todo use remainder() function for branchless code?
         while ( c <  0 ) c += s;
@@ -149,21 +149,21 @@ protected:
         return u;
     }
 
-    static inline size_t imagei_clamped(size_t s, long c)
+    static inline size_t clamp_(size_t s, long c)
     {
         return std::min((size_t)std::max(0L, c), s-1);
         //return c <= 0 ? 0 : ( c >= s ? s-1 : c );
     }
     
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
-    inline size_t imagei(const int d, long c) const
+    inline size_t ind_(const int d, long c) const
     {
 #if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
-            return imagei_periodic(mDim[d], c);
+            return image_(mDim[d], c);
         else
 #endif
-            return imagei_clamped(mDim[d], c);
+            return clamp_(mDim[d], c);
     }
 
 
@@ -417,7 +417,7 @@ public:
     void bringInside(int coord[ORD]) const
     {
         for ( int d = 0; d < ORD; ++d )
-            coord[d] = imagei(d, coord[d]);
+            coord[d] = ind_(d, coord[d]);
     }
     
     /// conversion from index to coordinates
@@ -467,10 +467,10 @@ public:
     /// conversion from coordinates to index
     size_t pack(const int coord[ORD]) const
     {
-        size_t inx = imagei(ORD-1, coord[ORD-1]);
+        size_t inx = ind_(ORD-1, coord[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
-            inx = mDim[d] * inx + imagei(d, coord[d]);
+            inx = mDim[d] * inx + ind_(d, coord[d]);
         
         return inx;
     }
@@ -510,7 +510,7 @@ public:
             c   /= mDim[d];
         }
 
-        s[dim] = imagei(dim, s[dim]+1);
+        s[dim] = ind_(dim, s[dim]+1);
 
         c = s[ORD-1];
         for ( int d = ORD-2; d >= 0; --d )
@@ -521,41 +521,59 @@ public:
     /// convert coordinate to array index, if ORD==1
     size_t pack1D(const int x) const
     {
-        return imagei(0, x);
+        return ind_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==2
     size_t pack2D(const int x, const int y) const
     {
-        return imagei(0, x) + mDim[0]*imagei(1, y);
+        return ind_(0, x) + mDim[0]*ind_(1, y);
     }
     
     /// convert coordinate to array index, if ORD==3
     size_t pack3D(const int x, const int y, const int z) const
     {
-        return imagei(0, x) + mDim[0]*( imagei(1, y) + mDim[1]*imagei(2, z) );
+        return ind_(0, x) + mDim[0]*( ind_(1, y) + mDim[1]*ind_(2, z) );
+    }
+    
+    /// convert coordinate to array index, if ORD==1
+    size_t pack1D_clamped(const int x) const
+    {
+        return clamp_(0, x);
+    }
+    
+    /// convert coordinate to array index, if ORD==2
+    size_t pack2D_clamped(const int x, const int y) const
+    {
+        return clamp_(0, x) + mDim[0]*clamp_(1, y);
+    }
+    
+    /// convert coordinate to array index, if ORD==3
+    size_t pack3D_clamped(const int x, const int y, const int z) const
+    {
+        return clamp_(0, x) + mDim[0]*( clamp_(1, y) + mDim[1]*clamp_(2, z) );
     }
 
     
     /// return index of cell corresponding to position (x), if ORD==1
     size_t index1D(const real x) const
     {
-        return imagei(0, map(0, x));
+        return ind_(0, map(0, x));
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
     size_t index2D(const real x, const real y) const
     {
-        return imagei(0, map(0, x))
-               + mDim[0] * imagei(1, map(1, y));
+        return ind_(0, map(0, x))
+               + mDim[0] * ind_(1, map(1, y));
     }
     
     /// return index of cell corresponding to position (x, y, z), if ORD==3
     size_t index3D(const real x, const real y, const real z) const
     {
-        return imagei(0, map(0, x))
-               + mDim[0]*( imagei(1, map(1, y))
-               + mDim[1]*  imagei(2, map(2, z)) );
+        return ind_(0, map(0, x))
+               + mDim[0]*( ind_(1, map(1, y))
+               + mDim[1]*  ind_(2, map(2, z)) );
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
@@ -563,16 +581,16 @@ public:
     {
         assert_true( map(0, x) < mDim[0] );
         // clamping is necessary for semi-periodic condition
-        size_t Y = imagei_clamped(mDim[1], map(1, y));
+        size_t Y = clamp_(mDim[1], map(1, y));
         return (size_t)map(0, x) + mDim[0]*Y;
     }
 
     /// return index of cell corresponding to position (x, y, z), if ORD==3
     size_t direct_index3D(const real x, const real y, const real z) const
     {
-        // clamping is necessary for semi-periodic condition
-        size_t Y = imagei_clamped(mDim[1], map(1, y));
-        size_t Z = imagei_clamped(mDim[2], map(2, z));
+        // periodic may occurr in X with semi-periodic condition
+        size_t Y = clamp_(mDim[1], map(1, y));
+        size_t Z = clamp_(mDim[2], map(2, z));
         return map(0, x) + mDim[0] * ( Y + mDim[1] * Z );
     }
 

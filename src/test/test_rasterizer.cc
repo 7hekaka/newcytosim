@@ -14,6 +14,7 @@
 
 #include "gym_flute.h"
 #include "gym_draw.h"
+#include "gym_view.h"
 
 // select between 2D or 3D mode:
 #define FLAT_RASTERIZER 0
@@ -46,14 +47,14 @@ extern bool rasterizer_draws;
 
 //------------------------------------------------------------------------------
 
-void drawPoints(size_t N, const Vector P[], float size)
+void drawDots(size_t N, const Vector P[], float size, gym_color col)
 {
-    gym_color col(1, 0, 1);
+    gym::ref_view();
     flute8 * flu = gym::mapBufferC4V4(N);
-    size_t i = 0;
+    size_t i = 1;
+    flu[0] = { col.mix(gym_color(1,1,1,1)), P[0] };
     for ( ; i < N; ++i )
         flu[i] = { col, P[i] };
-    flu[0] = { gym_color(0, 1, 0), P[0] };
     gym::unmapBufferC4V4();
     gym::drawPoints(size, 0, i);
     gym::cleanup();
@@ -94,14 +95,14 @@ void clearHits()
 
 void punch(int x_inf, int x_sup, int y, int z, void*)
 {
-    if ( x_sup < x_inf )
-        printf("inverted order x = %i %i at y = %i\n", x_inf, x_sup, y);
-    
+    //printf(" { %i %i %i } ", x_inf, x_sup, y);
     if ( std::abs(y) > SIZE ) return;
     if ( std::abs(z) > SIZE ) return;
     
     for ( int x = x_inf; x <= x_sup; ++x )
     {
+        //printf(" { %i %i }", x, y);
+
         if ( -SIZE <= x && x <= SIZE )
         {
 #if FLAT_RASTERIZER
@@ -142,17 +143,16 @@ void rasterize(Vector P, Vector Q, void (func)(int, int, int, int, void*))
 //------------------------------------------------------------------------------
 
 /// check if 'x' is within distance 'radius' from segment [pq]
-bool inCylinder(Vector const& P, Vector const& Q, Vector const& X)
+int inCylinder(Vector const& P, Vector const& Q, Vector const& X)
 {
     const Vector PQ = Q - P;
-    const real PQn = PQ.norm();
-    real abs = dot(PQ, X-P) / PQn;
-    if ( abs <   0-radius ) return false;
-    if ( abs > PQn+radius ) return false;
-    abs /= PQn;
+    const real len = PQ.norm();
+    const Vector PX = X - P;
+    real abs = dot(PQ, PX) / len;
+    abs /= len;
     if ( abs < 0 ) abs = 0;
     if ( abs > 1 ) abs = 1;
-    return ( X-P-PQ*abs ).normSqr() <= radius * radius;
+    return ( PX - PQ*abs ).normSqr() <= radius * radius;
 }
 
 
@@ -168,7 +168,9 @@ bool checkPoint(Vector const& P, Vector const& Q, int i, int j, int k)
 #endif
     
     if ( ht != in )
-        drawPoints(1, &V, 5);
+    {
+        drawDots(1, &V, 7, gym_color(1,0,0));
+    }
     
     return ( ht != in );
 }
@@ -285,7 +287,7 @@ int display(View& view)
     drawGrid();
     drawGridPoints();
 #endif
-    drawPoints(n_pts, pts, 16);
+    drawDots(n_pts, pts, 16, gym_color(1,0,1));
     
 #if FLAT_RASTERIZER
     if ( n_pts > 2 )
