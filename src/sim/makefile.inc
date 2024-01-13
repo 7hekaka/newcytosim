@@ -57,10 +57,10 @@ OBJ_SIM := primitives.o mecable.o object.o object_pool.o object_set.o\
            simul_prop.o simul.o simul_part.o interface.o parser.o
 
 # objects needed to load/run Cytosim
-OBJ_RUN := sim_thread.o frame_reader.o
+OBJ_READ := sim_thread.o frame_reader.o
 
 OBJ_CYTOLIB:=$(OBJ_SPACE) $(OBJ_HAND) $(OBJ_DIGIT) $(OBJ_FIBER)\
-             $(OBJ_SINGLE) $(OBJ_COUPLE) $(OBJ_ASTER) $(OBJ_SIM) $(OBJ_RUN)
+             $(OBJ_SINGLE) $(OBJ_COUPLE) $(OBJ_ASTER) $(OBJ_SIM) $(OBJ_READ)
 
 # objects containing graphical code under the DISPLAY keyword:
 OBJ_SIMDISP:=$(OBJ_SPACE) field.o fiber_grid.o point_grid.o
@@ -164,7 +164,7 @@ $(OBJ_ASTER:%.o=build/%.o): build/%.o: %.cc %.h | build
 $(OBJ_SIM:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -c $< -o $@
 
-$(OBJ_RUN:%.o=build/%.o): build/%.o: %.cc %.h | build
+$(OBJ_READ:%.o=build/%.o): build/%.o: %.cc %.h | build
 	$(COMPILE) $(INC_BMS) -c $< -o $@
 
 #------------targets with 'DIM' defined in makefile-----------------------------
