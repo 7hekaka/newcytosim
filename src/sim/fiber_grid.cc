@@ -382,6 +382,12 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 
 #endif
 
+
+FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& vec) const
+{
+    return fGrid.icell(fGrid.index(vec, 0.5));
+}
+
 /**
  This function is limited to the range given in paintGrid();
  */

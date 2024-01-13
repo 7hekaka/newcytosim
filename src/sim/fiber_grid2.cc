@@ -7,11 +7,8 @@
  It is useful to get a ground truth and evaluate more advanced methods.
  */
 
-
-typedef std::vector <FiberSegment> SegmentVector;
-
 /// a list containing all segments, as a global variable
-SegmentVector allSegments;
+FiberGrid::SegmentList allSegments;
 
 
 size_t FiberGrid::setGrid(Space const*, real)
@@ -53,7 +50,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real)
     for ( const Fiber * f = first ; f != last ; f=f->next() )
     {
         for ( size_t s = 0; s < f->nbSegments(); ++s )
-            allSegments.emplace_back(f, s);
+            allSegments.emplace(f, s);
     }
 }
 
@@ -91,6 +88,12 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
             }
         }
     }
+}
+
+
+FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& vec) const
+{
+    return allSegments;
 }
 
 

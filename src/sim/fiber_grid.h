@@ -113,7 +113,7 @@ public:
     void tryToAttach(Vector const&, Hand&) const;
 
     /// return all Fiber segments located in cell grid at specified position
-    SegmentList nearbySegments(Vector const& vec) const { return fGrid.icell(fGrid.index(vec, 0.5)); }
+    SegmentList nearbySegments(Vector const& vec) const;
 
     /// return all Fiber segments located near P, within distance squared, except those belonging to `exclude`
     SegmentList nearbySegments(Vector const&, real disSqr, Fiber const* exclude = nullptr) const;
