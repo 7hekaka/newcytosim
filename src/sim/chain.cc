@@ -986,7 +986,7 @@ void Chain::getPoints(real const* ptr)
         real mov = std::sqrt(sumSquaredDistances(ptr));
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        std::cout << " wild motion for " << doc << " " << mov << '\n';
+        std::cerr << " wild motion for " << doc << " " << mov << '\n';
         //copy_real(DIM*nPoints, ptr, pPos);
 #endif
     }
