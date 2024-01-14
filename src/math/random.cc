@@ -5,7 +5,6 @@
 #include <iostream>
 #include <cstdlib>
 #include <climits>
-#include <sys/time.h>
 #include <cstring>
 #include <ctime>
 #include <random>
@@ -70,55 +69,25 @@ Random::~Random()
 
 void Random::seed(const uint32_t s)
 {
-    //printf("Random:%p:seed(%i)\n", this, s);
+    //printf("Random:%p:seed(%u)\n", this, s);
     sfmt_init_gen_rand(&twister_, s);
     refill();
 }
 
-/**
- Get a uint32_t from t and c
- Better than uint32_t(x) in case x is floating point in [0,1]
- Based on code by Lawrence Kirby (fred@genesis.demon.co.uk)
- */
-uint32_t hash(long t, int32_t c)
-{
-    uint32_t h1 = 0;
-    unsigned char* p = (unsigned char*) &t;
-    for ( size_t i = 0; i < sizeof(t); ++i )
-    {
-        h1 *= UCHAR_MAX + 2U;
-        h1 += p[i];
-    }
-    uint32_t h2 = 0;
-    p = (unsigned char*) &c;
-    for ( size_t j = 0; j < sizeof(c); ++j )
-    {
-        h2 *= UCHAR_MAX + 2U;
-        h2 += p[j];
-    }
-    return h1 ^ h2;
-}
 
-
-uint32_t Random::seed()
+void Random::seed()
 {
-    uint32_t s = 0;
-    // read system source if available:
+    uint32_t s = 7;
     try {
+        // read system source if available:
         std::random_device rd;
         s = rd();
+        //std::cerr << "random device ---> seed " << s << '\n';
     }
     catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
-        // use clock otherwise
-        struct timeval now;
-        gettimeofday(&now, nullptr);
-        s = hash(now.tv_sec, now.tv_usec);
     }
-    if ( s == 0 )
-        s = 1;
     seed(s);
-    return s;
 }
 
 
@@ -408,42 +377,6 @@ uint32_t Random::pint32_slow(const uint32_t n)
         i = URAND32() & used;  // toss unused bits to shorten search
     while ( i > n );
     return i;
-}
-
-
-/**
- returns a random integer with exactly `b` bits equal to `1`,
- but randomly positionned.
- */
-uint32_t Random::distributed_bits(unsigned b)
-{
-    uint32_t n = 0;
-    if ( b < 16 )
-    {
-        while ( b > 0 )
-        {
-            uint32_t x = 1 << ( URAND32() & 31 );
-            if (!( n & x ))
-            {
-                n |= x;
-                --b;
-            }
-        }
-    }
-    else
-    {
-        n = ~0U;
-        while ( b < 32 )
-        {
-            uint32_t x = 1 << ( URAND32() & 31 );
-            if ( n & x )
-            {
-                n ^= x;
-                ++b;
-            }
-        }
-    }
-    return n;
 }
 
 

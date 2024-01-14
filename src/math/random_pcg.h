@@ -27,3 +27,32 @@ inline uint64_t pcg32_init(uint64_t seed)
     (void)pcg32(state);
     return state;
 }
+
+
+/**
+ FJN's function to distribute bits
+ returns a random integer with exactly `b` bits equal to `1`, randomly positionned.
+ */
+inline uint32_t distribute_bits(unsigned b, uint64_t& state)
+{
+    if ( b > 16 )
+    {
+        if ( b > 31 )
+            return ~0U;
+        return ~distribute_bits(32-b, state);
+    }
+    uint32_t t, i = 0;
+    while ( b > 0 )
+    {
+        uint32_t s = pcg32(state);
+        uint32_t x = 1 << ( s & 31 );
+        if (!( i & x ))
+        {
+            i |= x;
+            --b;
+        }
+        if ( t == s ) break;
+        t = s;
+    }
+    return i;
+}

@@ -2,8 +2,9 @@
 
 #include "fiber_disp.h"
 #include "glossary.h"
-#include "random.h"
+#include "random_pcg.h"
 
+extern uint64_t pcg32_state;
 
 // this controls compatibility in display parameter, which is not critical
 #define BACKWARD_COMPATIBLE 1
@@ -152,7 +153,7 @@ void FiberDisp::read(Glossary& glos)
     glos.set(show_marked, "show_marked");
 
     if ( glos.set(mask, "mask") )
-        mask_bitfield = RNG.distributed_bits(mask);
+        mask_bitfield = distribute_bits(mask, pcg32_state);
     glos.set(mask_bitfield, "mask", 1);
     
     glos.set(length_scale,  "length_scale");

@@ -240,7 +240,8 @@ int main(int argc, char *argv[])
         arg.set(P, "period");
         arg.set(winW, "size") && ( arg.set(winH, "size", 1) || ( winH = winW ));
         worker.period(P);
-        simul.initialize(arg);
+        simul.prop.read(arg);
+        simul.initCytosim();
         arg.print_warnings(std::cerr, 1, "\n");
     }
     

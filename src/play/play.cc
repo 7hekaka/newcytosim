@@ -10,12 +10,16 @@
 #include "splash.h"
 #include "print_color.h"
 #include "signal_handlers.h"
+#include "random_pcg.h"
 
 #include "gle.h"
 #include "player.h"
 #include "view.h"
 
 Player player;
+
+extern uint32_t get_random_seed();
+uint64_t pcg32_state = 0;
 
 SimThread& worker = player.worker;
 Simul&      simul = player.simul;
@@ -305,8 +309,9 @@ int main(int argc, char* argv[])
 
     try
     {
+        pcg32_state = get_random_seed();
         has_frame = arg.set(frm, "frame");
-        simul.initialize(arg);
+        simul.initCytosim();
     }
     catch( Exception & e )
     {

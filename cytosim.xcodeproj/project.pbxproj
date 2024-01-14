@@ -1052,6 +1052,7 @@
 		BBE9D38E158500BA00FF944A /* space_ring.h in Headers */ = {isa = PBXBuildFile; fileRef = BBE9D38C158500BA00FF944A /* space_ring.h */; };
 		BBEB846412FF339500F9D717 /* fork.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEB846212FF339500F9D717 /* fork.cc */; };
 		BBEB846512FF339500F9D717 /* fork.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEB846312FF339500F9D717 /* fork.h */; };
+		BBEEF5D12B5403A6005E29EA /* random_splitmix64.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEEF5D02B5403A6005E29EA /* random_splitmix64.cc */; };
 		BBEF3A87118318AE000F2EED /* backtrace.h in Headers */ = {isa = PBXBuildFile; fileRef = BBEF3A85118318AE000F2EED /* backtrace.h */; };
 		BBEF3A88118318AE000F2EED /* backtrace.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEF3A86118318AE000F2EED /* backtrace.cc */; };
 		BBF0386018BCF7A3002E8568 /* splash.h in Headers */ = {isa = PBXBuildFile; fileRef = BBF0385F18BCF7A3002E8568 /* splash.h */; };
@@ -1938,8 +1939,8 @@
 		BB73588F05B98DA3006956D5 /* matsym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matsym.cc; path = src/math/matsym.cc; sourceTree = SOURCE_ROOT; };
 		BB73589005B98DA3006956D5 /* matsym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = matsym.h; path = src/math/matsym.h; sourceTree = SOURCE_ROOT; };
 		BB73589A05B98DA3006956D5 /* spherical_code.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = spherical_code.h; path = src/math/spherical_code.h; sourceTree = SOURCE_ROOT; };
-		BB73589C05B98DA3006956D5 /* random.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = random.cc; path = src/math/random.cc; sourceTree = SOURCE_ROOT; };
-		BB73589D05B98DA3006956D5 /* random.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = random.h; path = src/math/random.h; sourceTree = SOURCE_ROOT; };
+		BB73589C05B98DA3006956D5 /* random.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; path = random.cc; sourceTree = "<group>"; };
+		BB73589D05B98DA3006956D5 /* random.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; path = random.h; sourceTree = "<group>"; };
 		BB73589E05B98DA3006956D5 /* rasterizer.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = rasterizer.cc; path = src/math/rasterizer.cc; sourceTree = SOURCE_ROOT; };
 		BB73589F05B98DA3006956D5 /* rasterizer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = rasterizer.h; path = src/math/rasterizer.h; sourceTree = SOURCE_ROOT; };
 		BB7358A505B98DA3006956D5 /* smath.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = smath.h; path = src/math/smath.h; sourceTree = SOURCE_ROOT; };
@@ -2262,13 +2263,13 @@
 		BBE4269714437BA4003795C4 /* treadmilling_fiber_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = treadmilling_fiber_prop.h; path = fibers/treadmilling_fiber_prop.h; sourceTree = "<group>"; };
 		BBE4269814437BA4003795C4 /* treadmilling_fiber.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = treadmilling_fiber.cc; path = fibers/treadmilling_fiber.cc; sourceTree = "<group>"; };
 		BBE4269914437BA4003795C4 /* treadmilling_fiber.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = treadmilling_fiber.h; path = fibers/treadmilling_fiber.h; sourceTree = "<group>"; };
-		BBE447CD2064697D0058ADAC /* SFMT-avx2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SFMT-avx2.h"; path = "src/math/SFMT-avx2.h"; sourceTree = SOURCE_ROOT; };
-		BBE447CE2064697D0058ADAC /* SFMT-params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SFMT-params.h"; path = "src/math/SFMT-params.h"; sourceTree = SOURCE_ROOT; };
-		BBE447CF2064697D0058ADAC /* SFMT-params19937.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SFMT-params19937.h"; path = "src/math/SFMT-params19937.h"; sourceTree = SOURCE_ROOT; };
-		BBE447D02064697D0058ADAC /* SFMT-sse2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SFMT-sse2.h"; path = "src/math/SFMT-sse2.h"; sourceTree = SOURCE_ROOT; };
-		BBE447D12064697D0058ADAC /* SFMT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = SFMT.c; path = src/math/SFMT.c; sourceTree = SOURCE_ROOT; };
-		BBE447D22064697D0058ADAC /* SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = SFMT.h; path = src/math/SFMT.h; sourceTree = SOURCE_ROOT; };
-		BBE447D920646A420058ADAC /* SFMT-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "SFMT-common.h"; path = "src/math/SFMT-common.h"; sourceTree = SOURCE_ROOT; };
+		BBE447CD2064697D0058ADAC /* SFMT-avx2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-avx2.h"; sourceTree = "<group>"; };
+		BBE447CE2064697D0058ADAC /* SFMT-params.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-params.h"; sourceTree = "<group>"; };
+		BBE447CF2064697D0058ADAC /* SFMT-params19937.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-params19937.h"; sourceTree = "<group>"; };
+		BBE447D02064697D0058ADAC /* SFMT-sse2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-sse2.h"; sourceTree = "<group>"; };
+		BBE447D12064697D0058ADAC /* SFMT.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = SFMT.c; sourceTree = "<group>"; };
+		BBE447D22064697D0058ADAC /* SFMT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SFMT.h; sourceTree = "<group>"; };
+		BBE447D920646A420058ADAC /* SFMT-common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "SFMT-common.h"; sourceTree = "<group>"; };
 		BBE4B5E913E04D2400CBE163 /* space_periodic.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_periodic.cc; path = src/sim/spaces/space_periodic.cc; sourceTree = SOURCE_ROOT; };
 		BBE4B5EA13E04D2400CBE163 /* space_periodic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_periodic.h; path = src/sim/spaces/space_periodic.h; sourceTree = SOURCE_ROOT; };
 		BBE60B940EE9684000FFAB27 /* field_values.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = field_values.h; path = src/sim/field_values.h; sourceTree = SOURCE_ROOT; };
@@ -2282,6 +2283,8 @@
 		BBEB846212FF339500F9D717 /* fork.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fork.cc; path = couples/fork.cc; sourceTree = "<group>"; };
 		BBEB846312FF339500F9D717 /* fork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fork.h; path = couples/fork.h; sourceTree = "<group>"; };
 		BBEEC85B16E5D891006C1C6E /* micimage.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = micimage.cc; sourceTree = "<group>"; };
+		BBEEF5D02B5403A6005E29EA /* random_splitmix64.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = random_splitmix64.cc; sourceTree = "<group>"; };
+		BBEEF5D62B542550005E29EA /* random_seed.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = random_seed.cc; sourceTree = "<group>"; };
 		BBEF3A85118318AE000F2EED /* backtrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = backtrace.h; sourceTree = "<group>"; };
 		BBEF3A86118318AE000F2EED /* backtrace.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = backtrace.cc; sourceTree = "<group>"; };
 		BBF0385F18BCF7A3002E8568 /* splash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = splash.h; path = src/sim/splash.h; sourceTree = SOURCE_ROOT; };
@@ -3869,8 +3872,10 @@
 			children = (
 				BB73589D05B98DA3006956D5 /* random.h */,
 				BB73589C05B98DA3006956D5 /* random.cc */,
+				BBEEF5D62B542550005E29EA /* random_seed.cc */,
 				BB901AD925B02E3B005FB57F /* random_simd.cc */,
 				BBA4C2172920EFC90069A220 /* random_pcg.h */,
+				BBEEF5D02B5403A6005E29EA /* random_splitmix64.cc */,
 				BBE447D920646A420058ADAC /* SFMT-common.h */,
 				BBE447CE2064697D0058ADAC /* SFMT-params.h */,
 				BBE447CF2064697D0058ADAC /* SFMT-params19937.h */,
@@ -3880,7 +3885,8 @@
 				BBE447D22064697D0058ADAC /* SFMT.h */,
 			);
 			name = random;
-			sourceTree = "<group>";
+			path = src/math;
+			sourceTree = SOURCE_ROOT;
 		};
 		BBEB846112FF338100F9D717 /* Fork */ = {
 			isa = PBXGroup;
@@ -5696,6 +5702,7 @@
 				BB7191A00EF1CD9900CED9E2 /* sparmat.cc in Sources */,
 				BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */,
 				BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */,
+				BBEEF5D12B5403A6005E29EA /* random_splitmix64.cc in Sources */,
 				BB7191A90EF1CD9900CED9E2 /* spherical_code.cc in Sources */,
 				BB7191AA0EF1CD9900CED9E2 /* random.cc in Sources */,
 				BB9D87B01E76BBB800DD0F00 /* sparmatsym2.cc in Sources */,

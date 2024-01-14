@@ -123,8 +123,9 @@ int main(int argc, char* argv[])
     
     Simul simul;
     try {
-        simul.initialize(arg);
+        simul.prop.read(arg);
         arg.print_warnings(cerr, 1, " on command line\n");
+        simul.initCytosim();
         time_t sec = TimeDate::seconds_since_1970();
         // read and execute default config file:
         Parser(&simul, 1, 1, 1, 1, 1).readConfig();

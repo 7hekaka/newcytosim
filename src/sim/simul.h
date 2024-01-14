@@ -161,7 +161,7 @@ public:
     //----------------------------- SIMULATING ---------------------------------
    
     /// perform basic initialization; register callbacks
-    void initialize(Glossary&);
+    void initCytosim();
     
     /// ready the engine for a subsequent call to `step` and `solve`
     void prepare();

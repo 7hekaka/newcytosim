@@ -19,6 +19,7 @@
 
 const char Simul::TRAJECTORY[] = "objects.cmo";
 
+#include "../math/random_seed.cc"
 #include "simul_step.cc"
 #include "simul_file.cc"
 #include "simul_custom.cc"
@@ -62,12 +63,20 @@ Simul::~Simul()
 #pragma mark -
 
 /**
- This will initialize the simulation by registering callbacks.
- Simul::prepare() must still be called before any Simul::step()
+ This will initialize the Random number generator
  */
-void Simul::initialize(Glossary & glos)
+void Simul::initCytosim()
 {
-    prop.read(glos);
+    // initialize the random number generator:
+    if ( !RNG.seeded() )
+    {
+        if ( prop.random_seed )
+            RNG.seed(prop.random_seed);
+        else {
+            prop.random_seed = get_random_seed();
+            RNG.seed(prop.random_seed);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

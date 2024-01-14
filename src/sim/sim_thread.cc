@@ -116,6 +116,7 @@ void SimThread::run()
     assert_true( isWorker() );
     while ( 1 )
     {
+        sim_->initCytosim();
         std::string filename = simulProp().config_file;
         if ( config_code )
         {

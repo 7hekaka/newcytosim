@@ -144,15 +144,6 @@ void SimulProp::splash(std::ostream& os) const
  */
 void SimulProp::complete(Simul const& sim)
 {
-    // initialize the random number generator:
-    if ( !RNG.seeded() )
-    {
-        if ( random_seed )
-            RNG.seed(random_seed);
-        else
-            random_seed = RNG.seed();
-    }
-
     if ( time_step < 0 )
         throw InvalidParameter("simul:time_step must be > 0");
 
