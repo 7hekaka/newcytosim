@@ -41,7 +41,7 @@ inline uint32_t distribute_bits(unsigned b, uint64_t& state)
             return ~0U;
         return ~distribute_bits(32-b, state);
     }
-    uint32_t t, i = 0;
+    uint32_t i = 0;
     while ( b > 0 )
     {
         uint32_t s = pcg32(state);
@@ -51,8 +51,6 @@ inline uint32_t distribute_bits(unsigned b, uint64_t& state)
             i |= x;
             --b;
         }
-        if ( t == s ) break;
-        t = s;
     }
     return i;
 }

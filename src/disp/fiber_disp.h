@@ -244,9 +244,9 @@ public:
     /// hide filament which do not have specified mark (default: disabled)
     unsigned show_marked;
 
-    /// number of bits equal to `1` in the mask_bitfield
+    /// number of bits equal to `1` in the mask bitfield
     /**
-     This parameter can be used to hide a fraction of the fiber.
+     This parameter can be used to hide a fraction of the fibers.
      Each fiber will be visible with a probability `1/2^mask`.
      `mask_bitfield' is set randomly with `mask` bits set to 1, 
      When the parameter is read.
@@ -255,10 +255,10 @@ public:
     
     /// selection bitfield used to hide some fibers (known as `mask[1]`)
     /**
-     `mask_bitfield` is a 32-bitfield that is compared to the signature of the object,
+     A 32-bitfield is compared to the signature of the object,
      itself a random bitfield. The Object is hidden if the result is non-zero.
-     So if `mask_bitfield` has many 1s, fewer filaments will be visible.
-     Note that `mask_bitfield' is set randomly if `mask` is given.
+     So if the mask bitfield has many 1s, fewer filaments will be visible.
+     Note that `mask_bitfield' is set automatically if `mask` is given.
      */
     unsigned mask_bitfield;
     
