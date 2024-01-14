@@ -21,6 +21,10 @@
 #include "glfw.h"
 #include "gle.h"
 
+#include "random_pcg.h"
+extern uint32_t get_random_seed();
+uint64_t pcg32_state;
+
 // size of window (updated if window is resized)
 int winW = 1024;
 int winH = 1024;
@@ -227,6 +231,9 @@ int main(int argc, char *argv[])
 {
     Simul simul;
     SimThread worker(&simul);
+    
+    simul.initCytosim();
+    pcg32_state = get_random_seed();
 
     //parse the command line:
     Glossary arg;
@@ -234,19 +241,18 @@ int main(int argc, char *argv[])
         return 1;
     if ( !arg.empty() )
     {
+        simul.prop.read(arg);
         view.read(arg);
         disp.read(arg);
         unsigned P = 1;
         arg.set(P, "period");
-        arg.set(winW, "size") && ( arg.set(winH, "size", 1) || ( winH = winW ));
         worker.period(P);
-        simul.prop.read(arg);
-        simul.initCytosim();
+        arg.set(winW, "size") && ( arg.set(winH, "size", 1) || ( winH = winW ));
         arg.print_warnings(std::cerr, 1, "\n");
     }
-    
-    worker.start();
+
     GLFWwindow* win = initWindow(winW, winH);
+    worker.start();
 
     while ( !glfwWindowShouldClose(win) )
     {
