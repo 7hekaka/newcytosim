@@ -102,6 +102,7 @@ struct PaintJob
 {
     FiberGrid::grid_type * grid;
     FiberSegment segment;
+    PaintJob(FiberGrid::grid_type* g, Fiber const* f) { grid=g; segment.set(f, 0); }
 };
 
 
@@ -213,8 +214,8 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
         // skip any Fiber on which binding is disabled:
         if ( 0 == fib->prop->binding_key )
             continue;
-        PaintJob job;
-        job.grid = &fGrid;
+        
+        PaintJob job(&fGrid, fib);
         Vector P, Q = fib->posP(0);
         const real iPQ = 1.0 / fib->segmentation();
 
@@ -222,7 +223,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
         {
             P = Q;
             Q = fib->posP(n);
-            job.segment.set(fib, n-1);
+            job.segment.point(n-1);
 
 #if ( DIM == 1 )
             Rasterizer::paintThickLine1D(paint, &job, P, Q, width, offset, deltas);

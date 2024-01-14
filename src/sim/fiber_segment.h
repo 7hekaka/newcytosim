@@ -42,8 +42,11 @@ public:
     Fiber const* fiber() const { return fib_; }
     
     /// index of segment
-    size_t point()      const { return pti_; }
+    size_t point() const { return pti_; }
     
+    /// setter
+    void point(size_t p) { pti_ = p; }
+
     /// Index of segment's first vertex in the isotropic matrix (Meca::mISO)
     size_t matIndex0()  const { return fib_->matIndex() + pti_; }
 
