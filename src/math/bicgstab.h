@@ -10,6 +10,8 @@
 #include "monitor.h"
 
 
+#define BICGSTAB_USES_BLAS 0
+
 /// assumes that vector 'sol' is zero initially
 #define BCGS_ZERO_INITIALIZED 0
 
@@ -79,12 +81,7 @@ namespace LinearSolvers
             beta = ( rho / rho_old ) * ( alpha / omega );
             // p = r + beta * ( p - omega * v )
             blas::xaxpy(dim, -omega, v, 1, p, 1);
-#if ( 1 )
             blas::xpay(dim, r, beta, p);
-#else
-            blas::xscal(dim, beta, p, 1);
-            blas::xaxpy(dim, 1.0, r, 1, p, 1);
-#endif
 
         start:
             
@@ -130,7 +127,8 @@ namespace LinearSolvers
     void BCGSP(const LinearOperator& mat, const real* rhs, real* sol,
                Monitor& monitor, Allocator& allocator)
     {
-        double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0, delta;
+        double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
+        double delta, upsilon;
         
         const int dim = mat.dimension();
         allocator.allocate(dim, 7);
@@ -150,14 +148,28 @@ namespace LinearSolvers
         blas::xcopy(dim, rhs, 1, p, 1);
 #else
         mat.multiply(sol, r0);                  // r0 = MAT * sol
+#if BICGSTAB_USES_BLAS
         blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
         blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * sol
         if ( monitor.finished(dim, r) )
             return;
         blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
         blas::xcopy(dim, r, 1, p, 1);
-#endif
         rho = blas::dot(dim, r, r);
+#else
+        rho = 0;
+        for ( int i = 0; i < dim; ++i )
+        {
+            real x = rhs[i] - r0[i];
+            rho += x * x;
+            r0[i] = x;
+            r[i] = x;
+            p[i] = x;
+        }
+        if ( monitor.finished(dim, r) )
+            return;
+#endif
+#endif
         goto start;
 
         while ( ! monitor.finished(dim, r) )
@@ -183,12 +195,13 @@ namespace LinearSolvers
             
             beta = ( rho * alpha ) / ( rho_old * omega );
             // p = r + beta * ( p - omega * v )
+#if BICGSTAB_USES_BLAS
             blas::xaxpy(dim, -omega, v, 1, p, 1);  // p = p - omega * v
-#if ( 1 )
             blas::xpay(dim, r, beta, p);           // p = r + beta * p
 #else
-            blas::xscal(dim, beta, p, 1);          // p = beta * p
-            blas::xaxpy(dim, 1.0, r, 1, p, 1);     // p = r + p
+            upsilon = beta * omega;
+            for ( int i = 0; i < dim; ++i )
+                p[i] = r[i] + beta * p[i] - upsilon * v[i];
 #endif
         start:
             
@@ -204,9 +217,16 @@ namespace LinearSolvers
             }
             
             alpha = rho / delta;
+#if BICGSTAB_USES_BLAS
             blas::xaxpy(dim, -alpha,    v, 1,   r, 1); // r = r - alpha * v;
             blas::xaxpy(dim,  alpha, phat, 1, sol, 1); // x = x + alpha * phat;
-
+#else
+            for ( int i = 0; i < dim; ++i )
+            {
+                r[i] -= alpha * v[i];
+                sol[i] += alpha * phat[i];
+            }
+#endif
             mat.precondition(r, shat);             // shat = PC * r
             mat.multiply(shat, t);                 // t = MAT * PC * r
 
@@ -223,9 +243,16 @@ namespace LinearSolvers
                     monitor.finish(3, dim, r);
                     break;
                 }
-                
+#if BICGSTAB_USES_BLAS
                 blas::xaxpy(dim,  omega, shat, 1, sol, 1); // x = x + omega * shat
                 blas::xaxpy(dim, -omega,    t, 1,   r, 1); // r = r - omega * t
+#else
+                for ( int i = 0; i < dim; ++i )
+                {
+                    sol[i] += omega * shat[i];
+                    r[i] -= omega * t[i];
+                }
+#endif
             }
             else
                 omega = 0.0;
