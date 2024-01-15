@@ -101,7 +101,7 @@ real FiberSegment::projectPointF(const real w[], real& dis) const
 {
     assert_true( !modulo );
     
-    const real * p = fib_->addrPoint(pti_);
+    const real * p = fib_->addrPoint(sgi_);
     
     real dX = p[DIM  ] - p[0];
     real aX = w[0]     - p[0];
