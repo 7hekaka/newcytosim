@@ -206,19 +206,25 @@ public:
     /// access to cell for ORD==1
     CELL & icell1D_clamped(const int x) const
     {
-        return gCell[MAP::pack1D_clamped(x)];
+        size_t inx = MAP::pack1D_clamped(x);
+        assert_true( inx < MAP::mNbCells );
+        return gCell[inx];
     }
     
     /// access to cell for ORD==2
     CELL & icell2D_clamped(const int x, const int y) const
     {
-        return gCell[MAP::pack2D_clamped(x,y)];
+        size_t inx = MAP::pack2D_clamped(x,y);
+        assert_true( inx < MAP::mNbCells );
+        return gCell[inx];
     }
     
     /// access to cell for ORD==3
     CELL & icell3D_clamped(const int x, const int y, const int z) const
     {
-        return gCell[MAP::pack3D_clamped(x,y,z)];
+        size_t inx = MAP::pack3D_clamped(x,y,z);
+        assert_true( inx < MAP::mNbCells );
+        return gCell[inx];
     }
 
     //-----------------------------------------------------------------------

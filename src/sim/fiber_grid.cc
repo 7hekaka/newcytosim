@@ -131,7 +131,7 @@ void paintCell(const int x_inf, const int x_sup, const int y, const int z, void 
     FiberGrid::SegmentList * last = & grid->icell3D_clamped(x_sup, y, z);
 #endif
     
-    // Since all the lists are independent, they can be updated in parallel
+    // Since all the lists are independent, they could be updated in parallel
     #pragma ivdep
     for ( ; list <= last; ++list )
         list->push_back(seg);
@@ -384,9 +384,10 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 #endif
 
 
-FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& vec) const
+FiberGrid::SegmentList FiberGrid::nearbySegments(Vector const& place) const
 {
-    return fGrid.icell(fGrid.index(vec, 0.5));
+    const auto inx = fGrid.index(place, 0.5);
+    return fGrid[inx];
 }
 
 /**

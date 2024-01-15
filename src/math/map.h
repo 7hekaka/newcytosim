@@ -140,8 +140,9 @@ protected:
 protected:
     
     /// return closest integer to `c` in the segment [ 0, s-1 ]
-    static inline size_t image_(size_t s, long c)
+    inline size_t image_(int d, long c) const
     {
+        size_t s = mDim[d];
         ///@todo use remainder() function for branchless code?
         while ( c <  0 ) c += s;
         size_t u = (size_t) c;
@@ -149,9 +150,9 @@ protected:
         return u;
     }
 
-    static inline size_t clamp_(size_t s, long c)
+    inline size_t clamp_(int d, long c) const
     {
-        return std::min((size_t)std::max(0L, c), s-1);
+        return std::min((size_t)std::max(0L, c), mDim[d]-1);
         //return c <= 0 ? 0 : ( c >= s ? s-1 : c );
     }
     
@@ -160,10 +161,10 @@ protected:
     {
 #if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
-            return image_(mDim[d], c);
+            return image_(d, c);
         else
 #endif
-            return clamp_(mDim[d], c);
+            return clamp_(d, c);
     }
 
 
@@ -581,7 +582,7 @@ public:
     {
         assert_true( map(0, x) < mDim[0] );
         // clamping is necessary for semi-periodic condition
-        size_t Y = clamp_(mDim[1], map(1, y));
+        size_t Y = clamp_(1, map(1, y));
         return (size_t)map(0, x) + mDim[0]*Y;
     }
 
@@ -589,8 +590,8 @@ public:
     size_t direct_index3D(const real x, const real y, const real z) const
     {
         // periodic may occurr in X with semi-periodic condition
-        size_t Y = clamp_(mDim[1], map(1, y));
-        size_t Z = clamp_(mDim[2], map(2, z));
+        size_t Y = clamp_(1, map(1, y));
+        size_t Z = clamp_(2, map(2, z));
         return map(0, x) + mDim[0] * ( Y + mDim[1] * Z );
     }
 
