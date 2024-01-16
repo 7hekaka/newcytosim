@@ -187,6 +187,34 @@ inline float nrm8(const size_t siz, const float* ptr)
     return res;
 }
 
+#elif defined(__ARM_NEON__)
+
+inline double nrm8(const size_t cnt, const double* ptr)
+{
+    vec2 var{0.0, 0.0};
+    double const* end = ptr + cnt;
+    double const* stop = end - 2;
+    for ( ; ptr < stop; ptr += 2 )
+        var = max2(var, abs2(load2(ptr)));
+    double res = std::max(var[0], var[1]);
+    for ( ; ptr < end; ++ptr )
+        res = std::max(res, std::fabs(*ptr));
+    return res;
+}
+
+inline float nrm8(const size_t cnt, const float* ptr)
+{
+    vec4f var{0.0, 0.0, 0.0, 0.0};
+    float const* end = ptr + cnt;
+    float const* stop = end - 4;
+    for ( ; ptr < stop; ptr += 4 )
+        var = max4f(var, abs4f(load4f(ptr)));
+    float res = std::max(std::max(var[0], var[1]), std::max(var[2], var[3]));
+    for ( ; ptr < end; ++ptr )
+        res = std::max(res, std::fabs(*ptr));
+    return res;
+}
+
 #else
 inline real nrm8(const size_t N, const real* X)
 {

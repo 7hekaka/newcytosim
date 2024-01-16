@@ -4,7 +4,7 @@
 /// Vector holding 2 double precision floats
 typedef __m128d vec2;
 
-constexpr vec2 sgn11 = {-0.0, -0.0};
+constexpr vec2 sgn11{-0.0, -0.0};
 
 // Attention: the second value returned by load1() is not set and will be garbage!
 LOCAL vec2 load1(double const* a)           { return _mm_load_sd(a); }

@@ -98,7 +98,7 @@ LOCAL vec2 min2(vec2 a, vec2 b)      { return vminq_f64(a, b); }
 LOCAL vec2 max2(vec2 a, vec2 b)      { return vmaxq_f64(a, b); }
 LOCAL vec2 and2(vec2 a, vec2 b)      { return vandq_s64(a, b); }
 LOCAL vec2 andnot2(vec2 a, vec2 b)   { return vbicq_s64(a, b); }
-LOCAL vec2 abs2(vec2 a)              { return vbicq_s64(float64x2_t{-0.,-0.}, a); }
+LOCAL vec2 abs2(vec2 a)              { return vbicq_s64(a, float64x2_t{-0.,-0.}); }
 LOCAL vec2 flipsign2(vec2 a)         { return veorq_s64(a, float64x2_t{-0.,-0.}); }
 
 /// return { a[0], b[0] }
@@ -107,9 +107,10 @@ LOCAL vec2 unpacklo2(vec2 a, vec2 b) { return vzip1q_f64(a, b); }
 LOCAL vec2 unpackhi2(vec2 a, vec2 b) { return vzip2q_f64(a, b); }
 /// return { a[1], a[0] }
 LOCAL vec2 swap2(vec2 a)             { return vextq_f64(a, a, 1); }
-/// set a = { a[0] b[0] } and b = { b[0] a[0] }
+
+/// change arguments to a = { a[0] b[0] } and b = { b[0] a[0] }
 LOCAL void swap2upper(vec2& a, vec2& b) { a=vzip1q_f64(a, b); b=vzip1q_f64(b, a); }
-/// set a = { b[0] a[0] } and b = { a[0] b[0] }
+/// change arguments to a = { b[0] a[0] } and b = { a[0] b[0] }
 LOCAL void swap2lower(vec2& a, vec2& b) { vec2 t=b; b=vzip1q_f64(a, b); a=vzip1q_f64(t, a); }
 
 /// concatenate and shift left, returning { BC } from a={ AB } b={ CD }
