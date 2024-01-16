@@ -45,9 +45,9 @@ uint32_t get_random_seed()
     catch (const std::exception &e) {
         std::cerr << e.what() << '\n';
         // use clock otherwise
-        struct timeval now;
-        gettimeofday(&now, nullptr);
-        s = hash(now.tv_sec, now.tv_usec);
+        timespec now;
+        clock_gettime(CLOCK_MONOTONIC, &now);
+        s = hash(now.tv_sec, now.tv_nsec);
         //std::cerr << "system clock ---> seed " << s << '\n';
     }
     if ( s == 0 )

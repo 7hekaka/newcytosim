@@ -4,9 +4,9 @@
 
 unsigned long milliseconds()
 {
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    return 1000 * (unsigned long)tv.tv_sec + tv.tv_usec / 1000;
+    timespec tv;
+    clock_gettime(CLOCK_MONOTONIC, &tv);
+    return 1000 * (unsigned long)tv.tv_sec + tv.tv_nsec / 1000;
 }
 
 #include "xtbsv.h"

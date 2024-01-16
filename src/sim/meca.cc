@@ -898,7 +898,7 @@ unsigned Meca::solve()
     //printf("\n   /sol "); VecPrint::print(std::cerr, dim, vSOL, 3);
     //printf("\n   >pts "); VecPrint::print(std::cerr, dim, vPTS, 3);
 
-    auto solve = cycles_;
+    auto apply = cycles_;
     cycles_ = milliseconds() - start;
 
 #if 0
@@ -954,8 +954,8 @@ unsigned Meca::solve()
             unsigned cnt = std::max(1U, monitor.count());
             oss << "  cycles " << precond_ << "T " << std::setw(8) << cycles_;
             oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
-            oss << " S " << std::setw(8) << solve << std::setw(6) << solve/cnt;
-            oss << " M " << std::setw(6) << ( cycles_ - factor - solve ) / cnt;
+            oss << " S " << std::setw(8) << apply << std::setw(6) << apply/cnt;
+            oss << " M " << std::setw(6) << ( cycles_ - factor - apply ) / cnt;
         }
         Cytosim::out << oss.str() << std::endl;
         //std::clog << oss.str() << std::endl;

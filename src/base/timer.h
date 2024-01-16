@@ -6,28 +6,28 @@
 #include <sys/time.h>
 
 // using computer's clock
-struct timeval tic_t;
+struct timespec tic_t;
 
 /// return current time in milliseconds
 inline unsigned long timer()
 {
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    return 1000 * (unsigned long)tv.tv_sec + tv.tv_usec / 1000;
+    timespec tv;
+    clock_gettime(CLOCK_MONOTONIC, &tv);
+    return 1000 * (unsigned long)tv.tv_sec + tv.tv_nsec / 1e6;
 }
 
 /// start timer
 inline void tick()
 {
-    gettimeofday(&tic_t, nullptr);
+    clock_gettime(CLOCK_MONOTONIC, &tic_t);
 }
 
 /// return time since last 'tick()', divided by 'arg'
 inline double tock(double arg = 1)
 {
-    timeval tv;
-    gettimeofday(&tv, nullptr);
-    return double(1000*(tv.tv_sec-tic_t.tv_sec) + (tv.tv_usec-tic_t.tv_usec)/1000)/arg;
+    timespec tv;
+    clock_gettime(CLOCK_MONOTONIC, &tv);
+    return double(1000*(tv.tv_sec-tic_t.tv_sec) + (tv.tv_nsec-tic_t.tv_nsec)/1e6)/arg;
 }
 
 
