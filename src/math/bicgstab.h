@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec.  Copyright 2021 Cambridge University.
+// Cytosim was created by Francois Nedelec.  Copyright 2023 Cambridge University.
 
 #ifndef BICGSTAB_H
 #define BICGSTAB_H
@@ -13,7 +13,7 @@
 #define BICGSTAB_USES_BLAS 0
 
 /// assumes that vector 'sol' is zero initially
-#define BCGS_ZERO_INITIALIZED 0
+#define BICGSTAB_ZERO_INITIALIZED 0
 
 /// Bi-Conjugate Gradient Stabilized method to solve a system of linear equations
 /**
@@ -26,91 +26,129 @@ namespace LinearSolvers
      This solves `mat * x = rhs` with a tolerance specified in 'monitor'
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >
-    void BCGS(const LinearOperator& mat, const real* rhs, real* sol,
+    void BCGS(const LinearOperator& mat, const real* rhs, real* S,
               Monitor& monitor, Allocator& allocator)
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
+        double upsilon = 0.0;
         
         const int dim = mat.dimension();
         allocator.allocate(dim, 5);
-        real * r  = allocator.bind(0);
-        real * r0 = allocator.bind(1);
-        real * p  = allocator.bind(2);
-        real * t  = allocator.bind(3);
-        real * v  = allocator.bind(4);
+        real * R  = allocator.bind(0);
+        real * R0 = allocator.bind(1);
+        real * P  = allocator.bind(2);
+        real * T  = allocator.bind(3);
+        real * V  = allocator.bind(4);
 
-#if BCGS_ZERO_INITIALIZED
-        blas::xfill(dim, 0, sol);
-        // assuming that 'sol == 0' initially:
-        blas::xcopy(dim, rhs, 1, r, 1);
-        blas::xcopy(dim, rhs, 1, r0, 1);
-        blas::xcopy(dim, rhs, 1, p, 1);
+#if BICGSTAB_ZERO_INITIALIZED
+        for ( int i = 0; i < dim; ++i )
+        {
+            S[i] = 0;
+            real x = rhs[i];
+            R0[i] = x;
+            R[i] = x;
+            P[i] = x;
+        }
 #else
-        mat.multiply(sol, r0);                  // r0 = MAT * sol
-        blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
-        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * sol
-        if ( monitor.finished(dim, r) )
+        mat.multiply(S, R0);                  // r0 = MAT * s
+#if BICGSTAB_USES_BLAS
+        blas::xcopy(dim, rhs, 1, R, 1);       // r = rhs
+        blas::xaxpy(dim, -1.0, R0, 1, R, 1);  // r = rhs - MAT * s
+        if ( monitor.finished(dim, R) )
             return;
-        blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
-        blas::xcopy(dim, r, 1, p, 1);
+        blas::xcopy(dim, R, 1, R0, 1);        // r0 = r
+        blas::xcopy(dim, R, 1, P, 1);
+#else
+        for ( int i = 0; i < dim; ++i )
+        {
+            real x = rhs[i] - R0[i];
+            R0[i] = x;
+            R[i] = x;
+            P[i] = x;
+        }
+        if ( monitor.finished(dim, R) )
+            return;
 #endif
-        rho = blas::dot(dim, r, r);
+#endif
+        rho = blas::dot(dim, R, R);
         goto start;
         
-        while ( ! monitor.finished(dim, r) )
+        while ( ! monitor.finished(dim, R) )
         {
             rho_old = rho;
-            rho = blas::dot(dim, r0, r);
+            rho = blas::dot(dim, R0, R);
             
             if ( rho == 0.0 )
             {
 #if ( 1 )
                 /* The residual vector became nearly orthogonal to the
                  arbitrarily chosen direction r0, and we restart with a new r0 */
-                blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
-                mat.multiply(sol, r0);                  // r0 = A*x
-                blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * x
-                blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
-                rho = blas::dot(dim, r0, r0);
+                blas::xcopy(dim, rhs, 1, R, 1);       // r = rhs
+                mat.multiply(S, R0);                  // r0 = A*x
+                blas::xaxpy(dim, -1.0, R0, 1, R, 1);  // r = rhs - MAT * x
+                blas::xcopy(dim, R, 1, R0, 1);        // r0 = r
+                rho = blas::dot(dim, R0, R0);
 #else
-                monitor.finish(2, dim, r);
+                monitor.finish(2, dim, R);
                 break;
 #endif
             }
             
             beta = ( rho / rho_old ) * ( alpha / omega );
             // p = r + beta * ( p - omega * v )
-            blas::xaxpy(dim, -omega, v, 1, p, 1);
-            blas::xpay(dim, r, beta, p);
+#if BICGSTAB_USES_BLAS
+            blas::xaxpy(dim, -omega, V, 1, P, 1);  // p = p - omega * v
+            blas::xpay(dim, R, beta, P);           // p = r + beta * p
+#else
+            upsilon = beta * omega;
+            for ( int i = 0; i < dim; ++i )
+                P[i] = R[i] + beta * P[i] - upsilon * V[i];
+#endif
 
         start:
             
-            mat.multiply(p, v);                     // v = MAT * p;
-            alpha = rho / blas::dot(dim, r0, v);
+            mat.multiply(P, V);                   // v = MAT * p;
+            alpha = rho / blas::dot(dim, R0, V);
 
-            blas::xaxpy(dim, -alpha, v, 1, r, 1);   // r = r - alpha * v;
-            blas::xaxpy(dim,  alpha, p, 1, sol, 1); // x = x + alpha * p;
-            
-            //if ( monitor.finished(dim, r) )
+#if BICGSTAB_USES_BLAS
+            blas::xaxpy(dim, -alpha, V, 1, R, 1); // r = r - alpha * v;
+            blas::xaxpy(dim,  alpha, P, 1, S, 1); // s = s + alpha * p;
+#else
+            #pragma ivdep
+            for ( int i = 0; i < dim; ++i )
+            {
+                R[i] -= alpha * V[i];
+                S[i] += alpha * P[i];
+            }
+#endif
+
+            //if ( monitor.finished(dim, R) )
             //    break;
             
-            mat.multiply(r, t);                     // t = MAT * r;
+            mat.multiply(R, T);                   // t = MAT * r;
             monitor += 2;
 
-            double tdt = blas::dot(dim, t, t);
+            double tdt = blas::dot(dim, T, T);
             
             if ( tdt > 0.0 )
             {
-                omega = blas::dot(dim, t, r) / tdt;
+                omega = blas::dot(dim, T, R) / tdt;
                 
                 if ( omega == 0.0 )
                 {
-                    monitor.finish(3, dim, r);
+                    monitor.finish(3, dim, R);
                     break;
                 }
-                
-                blas::xaxpy(dim,  omega, r, 1, sol, 1);  // x = x + omega * r
-                blas::xaxpy(dim, -omega, t, 1, r, 1);    // r = r - omega * t
+#if BICGSTAB_USES_BLAS
+                blas::xaxpy(dim,  omega, R, 1, S, 1); // s = s + omega * r
+                blas::xaxpy(dim, -omega, T, 1, R, 1); // r = r - omega * t
+#else
+                for ( int i = 0; i < dim; ++i )
+                {
+                    S[i] += omega * R[i];
+                    R[i] -= omega * T[i];
+                }
+#endif
             }
             else
                 omega = 0.0;
@@ -124,71 +162,72 @@ namespace LinearSolvers
      This solves `mat * x = rhs` with a tolerance specified in 'monitor'
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >
-    void BCGSP(const LinearOperator& mat, const real* rhs, real* sol,
+    void BCGSP(const LinearOperator& mat, const real* rhs, real* S,
                Monitor& monitor, Allocator& allocator)
     {
         double rho = 1.0, rho_old = 1.0, alpha = 0.0, beta = 0.0, omega = 1.0;
-        double delta, upsilon;
+        double delta = 0.0, upsilon = 0.0;
         
         const int dim = mat.dimension();
         allocator.allocate(dim, 7);
-        real * r    = allocator.bind(0);
-        real * r0   = allocator.bind(1);
-        real * p    = allocator.bind(2);
-        real * t    = allocator.bind(3);
-        real * v    = allocator.bind(4);
-        real * phat = allocator.bind(5);
-        real * shat = allocator.bind(6);
+        real * R    = allocator.bind(0);
+        real * R0   = allocator.bind(1);
+        real * P    = allocator.bind(2);
+        real * T    = allocator.bind(3);
+        real * V    = allocator.bind(4);
+        real * Phat = allocator.bind(5);
+        real * Shat = allocator.bind(6);
 
-#if BCGS_ZERO_INITIALIZED
-        blas::xfill(dim, 0, sol);
-        // assuming that 'sol == 0' initially:
-        blas::xcopy(dim, rhs, 1, r, 1);
-        blas::xcopy(dim, rhs, 1, r0, 1);
-        blas::xcopy(dim, rhs, 1, p, 1);
-#else
-        mat.multiply(sol, r0);                  // r0 = MAT * sol
-#if BICGSTAB_USES_BLAS
-        blas::xcopy(dim, rhs, 1, r, 1);         // r = rhs
-        blas::xaxpy(dim, -1.0, r0, 1, r, 1);    // r = rhs - MAT * sol
-        if ( monitor.finished(dim, r) )
-            return;
-        blas::xcopy(dim, r, 1, r0, 1);          // r0 = r
-        blas::xcopy(dim, r, 1, p, 1);
-        rho = blas::dot(dim, r, r);
-#else
-        rho = 0;
+#if BICGSTAB_ZERO_INITIALIZED
         for ( int i = 0; i < dim; ++i )
         {
-            real x = rhs[i] - r0[i];
-            rho += x * x;
-            r0[i] = x;
-            r[i] = x;
-            p[i] = x;
+            S[i] = 0;
+            real x = rhs[i];
+            R0[i] = x;
+            R[i] = x;
+            P[i] = x;
         }
-        if ( monitor.finished(dim, r) )
+#else
+        mat.multiply(S, R0);                  // r0 = MAT * s
+#if BICGSTAB_USES_BLAS
+        blas::xcopy(dim, rhs, 1, R, 1);       // r = rhs
+        blas::xaxpy(dim, -1.0, R0, 1, R, 1);  // r = rhs - r0 = rhs - MAT * s
+        if ( monitor.finished(dim, R) )
+            return;
+        blas::xcopy(dim, R, 1, R0, 1);        // r0 = r
+        blas::xcopy(dim, R, 1, P, 1);
+#else
+        for ( int i = 0; i < dim; ++i )
+        {
+            real x = rhs[i] - R0[i];
+            R0[i] = x;
+            R[i] = x;
+            P[i] = x;
+        }
+        if ( monitor.finished(dim, R) )
             return;
 #endif
 #endif
+        rho = blas::dot(dim, R, R);
         goto start;
 
-        while ( ! monitor.finished(dim, r) )
+        while ( ! monitor.finished(dim, R) )
         {
             //fprintf(stderr, "BCGSP %4i res %14.9f\n", monitor.count(), monitor.residual());
             rho_old = rho;
-            rho = blas::dot(dim, r0, r);
+            rho = blas::dot(dim, R0, R);
             
             if ( rho == 0.0 )
             {
 #if ( 1 )
                 /* The residual vector became nearly orthogonal to the
                  arbitrarily chosen direction r0, and we restart with a new r0 */
-                mat.multiply(sol, r);
-                blas::xaxpy(dim, -1.0, rhs, 1, r, 1); // r = rhs - MAT * x
-                blas::xcopy(dim, r, 1, r0, 1);        // r0 = r
-                rho = blas::dot(dim, r0, r0);
+                mat.multiply(S, R);
+                blas::xaxpy(dim, -1.0, rhs, 1, R, 1); // r = rhs - MAT * x
+                blas::xcopy(dim, R, 1, R0, 1);        // r0 = r
+                rho = blas::dot(dim, R0, R0);
 #else
-                monitor.finish(2, dim, r);
+                monitor.finish(2, dim, R);
                 break;
 #endif
             }
@@ -196,61 +235,62 @@ namespace LinearSolvers
             beta = ( rho * alpha ) / ( rho_old * omega );
             // p = r + beta * ( p - omega * v )
 #if BICGSTAB_USES_BLAS
-            blas::xaxpy(dim, -omega, v, 1, p, 1);  // p = p - omega * v
-            blas::xpay(dim, r, beta, p);           // p = r + beta * p
+            blas::xaxpy(dim, -omega, V, 1, P, 1);  // p = p - omega * v
+            blas::xpay(dim, R, beta, P);           // p = r + beta * p
 #else
             upsilon = beta * omega;
             for ( int i = 0; i < dim; ++i )
-                p[i] = r[i] + beta * p[i] - upsilon * v[i];
+                P[i] = R[i] + beta * P[i] - upsilon * V[i];
 #endif
         start:
             
-            mat.precondition(p, phat);             // phat = PC * p;
-            mat.multiply(phat, v);                 // v = MAT * PC * p;
+            mat.precondition(P, Phat);             // phat = PC * p;
+            mat.multiply(Phat, V);                 // v = MAT * PC * p;
             
-            delta = blas::dot(dim, r0, v);
+            delta = blas::dot(dim, R0, V);
             if ( delta == 0.0 )
             {
                 ++monitor;
-                monitor.finish(4, dim, r);
+                monitor.finish(4, dim, R);
                 break;
             }
             
             alpha = rho / delta;
 #if BICGSTAB_USES_BLAS
-            blas::xaxpy(dim, -alpha,    v, 1,   r, 1); // r = r - alpha * v;
-            blas::xaxpy(dim,  alpha, phat, 1, sol, 1); // x = x + alpha * phat;
+            blas::xaxpy(dim, -alpha,    V, 1, R, 1); // r = r - alpha * v;
+            blas::xaxpy(dim,  alpha, Phat, 1, S, 1); // s = s + alpha * phat;
 #else
             for ( int i = 0; i < dim; ++i )
             {
-                r[i] -= alpha * v[i];
-                sol[i] += alpha * phat[i];
+                R[i] -= alpha * V[i];
+                S[i] += alpha * Phat[i];
             }
 #endif
-            mat.precondition(r, shat);             // shat = PC * r
-            mat.multiply(shat, t);                 // t = MAT * PC * r
+            mat.precondition(R, Shat);             // shat = PC * r
+            mat.multiply(Shat, T);                 // t = MAT * PC * r
 
             monitor += 2;
 
-            double tdt = blas::dot(dim, t, t);
+            double tdt = blas::dot(dim, T, T);
             
             if ( tdt > 0.0 )
             {
-                omega = blas::dot(dim, t, r) / tdt;
+                omega = blas::dot(dim, T, R) / tdt;
             
                 if ( omega == 0.0 )
                 {
-                    monitor.finish(3, dim, r);
+                    monitor.finish(3, dim, R);
                     break;
                 }
 #if BICGSTAB_USES_BLAS
-                blas::xaxpy(dim,  omega, shat, 1, sol, 1); // x = x + omega * shat
-                blas::xaxpy(dim, -omega,    t, 1,   r, 1); // r = r - omega * t
+                blas::xaxpy(dim,  omega, Shat, 1, S, 1); // s = s + omega * shat
+                blas::xaxpy(dim, -omega,    T, 1, R, 1); // r = r - omega * t
 #else
+                #pragma ivdep
                 for ( int i = 0; i < dim; ++i )
                 {
-                    sol[i] += omega * shat[i];
-                    r[i] -= omega * t[i];
+                    S[i] += omega * Shat[i];
+                    R[i] -= omega * T[i];
                 }
 #endif
             }
@@ -258,11 +298,11 @@ namespace LinearSolvers
                 omega = 0.0;
         }
 #if 0
-        /* recalculate the true residual r0 = rhs - MAT * sol */
+        /* recalculate the true residual r0 = rhs - MAT * s */
         real est = monitor.residual();
-        mat.multiply(sol, r);
-        blas::xaxpy(dim, -1.0, rhs, 1, r, 1);
-        monitor.finished(dim, r);
+        mat.multiply(S, R);
+        blas::xaxpy(dim, -1.0, rhs, 1, R, 1);
+        monitor.finished(dim, R);
         fprintf(stderr, "[BCGSP %4i res %14.9f %14.9f]", monitor.count(), est, monitor.residual());
 #endif
         //fprintf(stderr, "BCGSP %4i res %14.9f - end\n", monitor.count(), monitor.residual());
