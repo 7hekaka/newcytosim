@@ -106,7 +106,8 @@ void Simul::writeObjects(Outputter& out) const
     tubules.writeSet(out);
     //events.write(out);
     
-    out.write("\n#section end\n#end cytosim\n");
+    out.write("\n#section end");
+    out.write("\n#end cytosim\n");
 }
 
 

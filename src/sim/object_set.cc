@@ -599,7 +599,6 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
         inventory_.assign(obj);
     }
     assert_true( obj->identity() == id );
-    assert_true( obj->property() );
     
     try {
         //std::clog << "- read " << obj->reference() << '\n';
