@@ -1,16 +1,24 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
-#include <sys/time.h>
+#include "xtbsv.h"
+#include "xtrsm.h"
 
-unsigned long milliseconds()
+#ifdef __APPLE__
+#  include <mach/mach_time.h>
+unsigned long machine_time()
+{
+    // the units of this counter is not specified, but seems close to nanosec
+    return mach_absolute_time() >> 20;
+}
+#else
+#  include <sys/time.h>
+unsigned long machine_time()
 {
     timespec tv;
     clock_gettime(CLOCK_MONOTONIC, &tv);
     return 1000 * (unsigned long)tv.tv_sec + tv.tv_nsec / 1000;
 }
-
-#include "xtbsv.h"
-#include "xtrsm.h"
+#endif
 
 /// if you like Alsatian specialities, set this to a prime number
 #define CHOUCROUTE 7
@@ -172,7 +180,7 @@ static inline void applyPreconditionner(Mecable const* mec, real* Y)
 /** This can be done in parallel if the preconditionner is block-diagonal */
 void Meca::precondition(const real* X, real* Y) const
 {
-    unsigned long rdt = milliseconds();
+    unsigned long rdt = machine_time();
     if ( Y != X )
         copy_real(dimension(), X, Y);
     
@@ -187,7 +195,7 @@ void Meca::precondition(const real* X, real* Y) const
 #endif
             applyPreconditionner(mec, Y+inx);
     }
-    cycles_ += milliseconds() - rdt;
+    cycles_ += machine_time() - rdt;
 }
 
 

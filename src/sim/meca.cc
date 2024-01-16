@@ -748,9 +748,9 @@ unsigned Meca::solve()
 #endif
 
     // compute preconditionner:
-    auto start = milliseconds();
+    auto start = machine_time();
     computePreconditionner();
-    auto factor = milliseconds() - start;
+    auto factor = machine_time() - start;
     cycles_ = 0;
 
     /*
@@ -899,7 +899,7 @@ unsigned Meca::solve()
     //printf("\n   >pts "); VecPrint::print(std::cerr, dim, vPTS, 3);
 
     auto apply = cycles_;
-    cycles_ = milliseconds() - start;
+    cycles_ = machine_time() - start;
 
 #if 0
     // print displacement of Mecable that has moved the most
