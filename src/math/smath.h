@@ -57,7 +57,7 @@ namespace sMath
     
     /// sort in ascending order
     template <typename T>
-    inline void sort(const T& a, const T& b)
+    inline void mm_sort(T& a, T& b)
     {
         T i = a;
         a = std::min(a, b);
@@ -66,40 +66,58 @@ namespace sMath
     
     /// sort in ascending order
     template <typename T>
-    inline void sort(const T& a, const T& b, const T& c)
+    inline void mm_sort(T& a, T& b, T& c)
     {
-        sort(a, b);
-        sort(b, c);
-        sort(a, b);
+        mm_sort(a, b);
+        mm_sort(b, c);
+        mm_sort(a, b);
     }
 
     /// sort in ascending order
     template <typename T>
-    inline void sort(const T& a, const T& b, const T& c, const T& d)
-    {
-        sort(a, b);
-        sort(c, d);
-        sort(a, c);
-        sort(b, d);
-        sort(b, c);
-    }
-
-    /// sort in ascending order
-    template <typename T>
-    inline void sort(const T& a, const T& b, const T& c, const T& d, const T& e)
+    inline void mm_sort(T& a, T& b, T& c, T& d)
     {
         //4 inputs [[1 2][3 4][1 3][2 4][2 3]]
+        mm_sort(a, b);
+        mm_sort(c, d);
+        mm_sort(a, c);
+        mm_sort(b, d);
+        mm_sort(b, c);
+    }
+
+    /// sort in ascending order
+    template <typename T>
+    inline void mm_sort(T& a, T& b, T& c, T& d, T& e)
+    {
         //5 inputs [[1 2][3 4][1 3][2 5][1 2][3 4][2 3][4 5][3 4]]
+        mm_sort(a, b);
+        mm_sort(c, d);
+        mm_sort(a, c);
+        mm_sort(b, e);
+        mm_sort(a, b);
+        mm_sort(c, d);
+        mm_sort(b, c);
+        mm_sort(d, e);
+        mm_sort(c, d);
+    }
+
+    /// sort in ascending order
+    template <typename T>
+    inline void mm_sort(T& a, T& b, T& c, T& d, T& e, T& f)
+    {
         //6 inputs [[1 2][3 4][5 6][1 3][2 5][4 6][1 2][3 4][5 6][2 3][4 5][3 4]]
-        sort(a, b);
-        sort(c, d);
-        sort(a, c);
-        sort(b, e);
-        sort(a, b);
-        sort(c, d);
-        sort(b, c);
-        sort(d, e);
-        sort(c, d);
+        mm_sort(a, b);
+        mm_sort(c, d);
+        mm_sort(e, f);
+        mm_sort(a, c);
+        mm_sort(b, e);
+        mm_sort(d, f);
+        mm_sort(a, b);
+        mm_sort(c, d);
+        mm_sort(e, f);
+        mm_sort(b, c);
+        mm_sort(d, e);
+        mm_sort(c, d);
     }
 
     /// return index of the arguments that is the smallest: {0, 1, 2}
