@@ -10,6 +10,7 @@
 #include "monitor.h"
 
 
+/// using BLAS requires functions calls, and more loops are required.
 #define BICGSTAB_USES_BLAS 0
 
 /// assumes that vector 'sol' is zero initially
@@ -41,6 +42,7 @@ namespace LinearSolvers
         real * V  = allocator.bind(4);
 
 #if BICGSTAB_ZERO_INITIALIZED
+        #pragma ivdep
         for ( int i = 0; i < dim; ++i )
         {
             S[i] = 0;
@@ -59,6 +61,7 @@ namespace LinearSolvers
         blas::xcopy(dim, R, 1, R0, 1);        // r0 = r
         blas::xcopy(dim, R, 1, P, 1);
 #else
+        #pragma ivdep
         for ( int i = 0; i < dim; ++i )
         {
             real x = rhs[i] - R0[i];
@@ -143,6 +146,7 @@ namespace LinearSolvers
                 blas::xaxpy(dim,  omega, R, 1, S, 1); // s = s + omega * r
                 blas::xaxpy(dim, -omega, T, 1, R, 1); // r = r - omega * t
 #else
+                #pragma ivdep
                 for ( int i = 0; i < dim; ++i )
                 {
                     S[i] += omega * R[i];
@@ -197,6 +201,7 @@ namespace LinearSolvers
         blas::xcopy(dim, R, 1, R0, 1);        // r0 = r
         blas::xcopy(dim, R, 1, P, 1);
 #else
+        #pragma ivdep
         for ( int i = 0; i < dim; ++i )
         {
             real x = rhs[i] - R0[i];
@@ -239,6 +244,7 @@ namespace LinearSolvers
             blas::xpay(dim, R, beta, P);           // p = r + beta * p
 #else
             upsilon = beta * omega;
+            #pragma ivdep
             for ( int i = 0; i < dim; ++i )
                 P[i] = R[i] + beta * P[i] - upsilon * V[i];
 #endif
@@ -260,6 +266,7 @@ namespace LinearSolvers
             blas::xaxpy(dim, -alpha,    V, 1, R, 1); // r = r - alpha * v;
             blas::xaxpy(dim,  alpha, Phat, 1, S, 1); // s = s + alpha * phat;
 #else
+            #pragma ivdep
             for ( int i = 0; i < dim; ++i )
             {
                 R[i] -= alpha * V[i];
