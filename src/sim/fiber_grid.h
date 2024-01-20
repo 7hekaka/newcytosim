@@ -52,12 +52,12 @@ class FiberGrid
 {
 public:
     
-    /// type for a list of FiberSegment
+    /// variable-size list of FiberSegment
     typedef Array<FiberSegment> SegmentList;
     //typedef std::vector<FiberSegment> SegmentList;
 
-    /// type of grid
-    typedef Grid<SegmentList, DIM> grid_type;
+    /// a grid of SegmentList
+    typedef Grid<SegmentList, DIM> SegmentGrid;
 
 #if BIND_CLOSEST_FIBER
 
@@ -77,14 +77,14 @@ public:
     };
     
     /// list of SegmentHits used in tryToAttach()
-    mutable Array<BindingTarget> targets;
+    mutable Array<BindingTarget> targets_;
     
 #endif
     
 private:
     
     /// grid for divide-and-conquer strategies:
-    grid_type fGrid;
+    SegmentGrid fGrid;
     
     /// Object for periodic boundary conditions
     Modulo const* modulo_;

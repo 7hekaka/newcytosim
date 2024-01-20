@@ -100,9 +100,9 @@ size_t FiberGrid::nbTargets() const
 /// Structure used by FiberGrid::paintGrid to find Hand's attachement
 struct PaintJob
 {
-    FiberGrid::grid_type * grid;
+    FiberGrid::SegmentGrid * grid;
     FiberSegment segment;
-    PaintJob(FiberGrid::grid_type* g, Fiber const* f) { grid=g; segment.set(f, 0); }
+    PaintJob(FiberGrid::SegmentGrid* g, Fiber const* f) { grid=g; segment.set(f, 0); }
 };
 
 
@@ -255,8 +255,8 @@ std::string FiberGrid::BindingTarget::to_string() const
     return oss.str();
 }
     
-/// qsort function comparing distance between segment and target
-static int compareSegments(const void * A, const void * B)
+/// qsort function comparing target segments from near to far
+static int compareTargets(const void * A, const void * B)
 {
     real a = static_cast<FiberGrid::BindingTarget const*>(A)->dis_;
     real b = static_cast<FiberGrid::BindingTarget const*>(B)->dis_;
@@ -271,6 +271,9 @@ static int compareSegments(const void * A, const void * B)
  
  NOTE:
  The distance at which Fibers are detected is limited to the range given in paintGrid()
+ 
+ The operation can be done in parallel, if a thread_local target list is used (targets_),
+ since the grid is read-only during the operation
  */
 void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
 {
@@ -281,7 +284,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      */
     SegmentList const& segments = fGrid.icell(fGrid.index(place, 0.5));
     // using here the member variable 'targets' as a temporary list:
-    targets.clear();
+    targets_.clear();
     
     // calculate distance to all targets
     const real sup = square(ha.property()->binding_range);
@@ -297,7 +300,9 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
                 FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
                 if ( ha.attachmentAllowed(sit) )
                 {
-                    targets.emplace(sit, dis);
+                    /* Might be better to insert the new target at the right position,
+                     to directly produce an ordered list, avoiding the sorting stage below */
+                    targets_.emplace(sit, dis);
                     //std::clog << "   target " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
                 }
                 //else std::clog << "      xxx " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
@@ -307,9 +312,9 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     }
     
     // sort targets within range from close to distant:
-    if ( targets.size() > 1 )
-        targets.sort(compareSegments);
-    else if ( targets.empty() )
+    if ( targets_.size() > 1 )
+        targets_.sort(compareTargets);
+    else if ( targets_.empty() )
         return;
     
     /**
@@ -318,7 +323,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      distribution */
     const uint64_t prob = 0x1p+32 * ha.property()->binding_prob;
     //std::clog << &ha << " trying ";
-    for ( BindingTarget const& hit : targets )
+    for ( BindingTarget const& hit : targets_ )
     {
         if ( RNG.pint32() < prob )
         {
