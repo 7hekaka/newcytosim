@@ -114,15 +114,13 @@ Vector SpaceBicylinder::project(Vector const& W) const
     {
         // in plane X=Y
         projectEllipse(X, Y, M_SQRT1_2*(W.XX+W.YY), W.ZZ, M_SQRT2*radius_, radius_);
-        X *= M_SQRT1_2;
-        return Vector(X, X, Y);
+        return Vector(M_SQRT1_2*X, M_SQRT1_2*X, Y);
     }
     else
     {
         // in plane X=-Y
         projectEllipse(X, Y, M_SQRT1_2*(W.XX-W.YY), W.ZZ, M_SQRT2*radius_, radius_);
-        X *= M_SQRT1_2;
-        return Vector(X, -X, Y);
+        return Vector(M_SQRT1_2*X, -M_SQRT1_2*X, Y);
     }
 
 #endif

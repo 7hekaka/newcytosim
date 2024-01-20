@@ -204,6 +204,9 @@ real SpaceTee::projectOnArm(const Vector& W, Vector& P) const
 
 
 //------------------------------------------------------------------------------
+/**
+ solveQuartic can be replaced here by projectEllipse(), which should be equally good
+ */
 void SpaceTee::projectOnInter(const Vector& W, Vector& P) const
 {
     const real xRel = (W.XX - tJunction);
