@@ -72,9 +72,9 @@ void checkQuartic(real a, real b, real c, real d, real e, cplx x)
 void testQuartic(size_t cnt, const int DEG)
 {
     real res = 0;
-    unsigned miss = 0;
+    unsigned missed = 0;
     
-    const real p = 0.3;
+    const real PR = 0.2;
     real A, B, C, D, E = 0;
     real s1, s2, s3, s4;
     real x1, x2, x3, x4;
@@ -83,12 +83,13 @@ void testQuartic(size_t cnt, const int DEG)
     for ( size_t u = 0; u < cnt; ++u )
     {
         x1 = RNG.sreal();
-        x2 = RNG.test(p) ? x1 : RNG.sreal();
-        x3 = RNG.test(p) ? x2 : RNG.sreal();
-        x4 = RNG.test(p) ? x3 : RNG.sreal();
+        x2 = RNG.test(PR) ? x1 : RNG.sreal();
+        x3 = RNG.test(PR) ? x2 : RNG.sreal();
+        x4 = RNG.test(PR) ? x3 : RNG.sreal();
+        int N = 1 + ( x1 != x2 ) + ( x2 != x3 ) + ( x4 != x3 );
         
         int n = 0, m = 0;
-        s1 = 0; s2 = 0; s3 = 0; s4 = 0;
+        s1 = NAN; s2 = NAN; s3 = NAN; s4 = NAN;
         
 #if ( 0 )
         A = 1;
@@ -117,19 +118,19 @@ void testQuartic(size_t cnt, const int DEG)
         
         if ( n != DEG )
         {
-            ++miss;
+            ++missed;
             printf("missed:\n");
             if ( DEG == 3 )
             {
-                printf("x   %i :  %+f   %+f   %+f\n", DEG, x1, x2, x3);
-                printf("s   %i :  %+f   %+f   %+f\n", n,   s1, s2, s3);
+                printf("   roots %i :  %+10f   %+10f   %+10f\n", N, x1, x2, x3);
+                printf("   solve %i :  %+10f   %+10f   %+10f\n", n, s1, s2, s3);
             } else {
-                printf("x   %i :  %+f   %+f   %+f   %+f\n", DEG, x1, x2, x3, x4);
-                printf("s   %i :  %+f   %+f   %+f   %+f\n", n,   s1, s2, s3, s4);
+                printf("   roots %i :  %+10f   %+10f   %+10f   %+10f\n", N, x1, x2, x3, x4);
+                printf("   solve %i :  %+10f   %+10f   %+10f   %+10f\n", n, s1, s2, s3, s4);
             }
         }
 
-        if ( 0 )
+        if ( 1 )
         {
             //check the order of the roots:
             if ( n > 1 && s1 < s2 ) fprintf(stderr, " disorder s1 s2\n");
@@ -169,13 +170,13 @@ void testQuartic(size_t cnt, const int DEG)
             printf("error:\n");
             if ( DEG == 3 )
             {
-                printf("x   %i :  %+f   %+f   %+f\n", DEG, x1, x2, x3);
-                printf("re  %i :  %+f   %+f   %+f\n", m,   z1.r, z2.r, z3.r);
-                printf("im  %i :  %+f   %+f   %+f\n", m,   z1.i, z2.i, z3.i);
+                printf("x   %i :  %+10f   %+10f   %+10f\n", DEG, x1, x2, x3);
+                printf("re  %i :  %+10f   %+10f   %+10f\n", m,   z1.r, z2.r, z3.r);
+                printf("im  %i :  %+10f   %+10f   %+10f\n", m,   z1.i, z2.i, z3.i);
             } else {
-                printf("x   %i :  %+f   %+f   %+f   %+f\n", DEG, x1, x2, x3, x4);
-                printf("re  %i :  %+f   %+f   %+f   %+f\n", m,   z1.r, z2.r, z3.r, z4.r);
-                printf("im  %i :  %+f   %+f   %+f   %+f\n", m,   z1.i, z2.i, z3.i, z4.i);
+                printf("x   %i :  %+10f   %+10f   %+10f   %+10f\n", DEG, x1, x2, x3, x4);
+                printf("re  %i :  %+10f   %+10f   %+10f   %+10f\n", m,   z1.r, z2.r, z3.r, z4.r);
+                printf("im  %i :  %+10f   %+10f   %+10f   %+10f\n", m,   z1.i, z2.i, z3.i, z4.i);
             }
         }
         
@@ -188,7 +189,7 @@ void testQuartic(size_t cnt, const int DEG)
             else
                 r = abs_real(quartic(A, B, C, D, E, s1));
             
-            if ( r > res )
+            if ( abs(r) > abs(res) )
                 res = r;
             
             if ( r > 0.5  ||  s1 != s1 )
@@ -199,11 +200,10 @@ void testQuartic(size_t cnt, const int DEG)
                 printf("C = %.36f\n", C);
                 printf("D = %.36f\n", D);
                 printf("E = %.36f\n", E);
-                return;
             }
         }
     }
-    printf("max quartic residual = %e  misses %i\n", res, miss);
+    printf("max quartic residual = %e  missed %i\n", res, missed);
 }
 
 
@@ -211,5 +211,4 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     testQuartic(1<<14, 4);
-    printf("test complete\n");
 }

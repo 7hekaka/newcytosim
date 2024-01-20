@@ -63,81 +63,33 @@ namespace QuarticSolver
         return ((( a * x + b ) * x + c ) * x + d ) * x + e;
     }
     
-    /**
-     Sort in decreasing order
-     */
-    template < typename TYPE >
-    void sort(TYPE& x1, TYPE& x2)
+    /// sort in decreasing order
+    template <typename T>
+    inline void ii_sort(T& a, T& b)
     {
-        if ( x1 < x2 )
-        {
-            TYPE x = x2;
-            x2 = x1;
-            x1 = x;
-        }
+        T i = a;
+        a = std::max(a, b);
+        b = std::min(i, b);
+    }
+    
+    /// sort in decreasing order
+    template <typename T>
+    inline void ii_sort(T& a, T& b, T& c)
+    {
+        ii_sort(a, b);
+        ii_sort(b, c);
+        ii_sort(a, b);
     }
 
-    template < typename TYPE >
-    void sort(TYPE& x1, TYPE& x2, TYPE& x3)
+    /// sort in decreasing order
+    template <typename T>
+    inline void ii_sort(T& a, T& b, T& c, T& d)
     {
-        TYPE x;
-        if ( x1 < x3 )
-        {
-            x  = x3;
-            x3 = x1;
-            x1 = x;
-        }
-        if ( x1 < x2 )
-        {
-            x  = x2;
-            x2 = x1;
-            x1 = x;
-        }
-        if ( x2 < x3 )
-        {
-            x  = x3;
-            x3 = x2;
-            x2 = x;
-        }
-    }
-
-    /**
-     Sort in decreasing order
-     */
-    template < typename TYPE >
-    void sort(TYPE& x1, TYPE& x2, TYPE& x3, TYPE& x4)
-    {
-        TYPE x;
-        if ( x2 < x4 )
-        {
-            x  = x4;
-            x4 = x2;
-            x2 = x;
-        }
-        if ( x1 < x3 )
-        {
-            x  = x3;
-            x3 = x1;
-            x1 = x;
-        }
-        if ( x3 < x4 )
-        {
-            x  = x4;
-            x4 = x3;
-            x3 = x;
-        }
-        if ( x1 < x2 )
-        {
-            x  = x2;
-            x2 = x1;
-            x1 = x;
-        }
-        if ( x2 < x3 )
-        {
-            x  = x3;
-            x3 = x2;
-            x2 = x;
-        }
+        ii_sort(a, b);
+        ii_sort(c, d);
+        ii_sort(a, c);
+        ii_sort(b, d);
+        ii_sort(b, c);
     }
 
     //----------------------------------------------------------------------------
@@ -170,8 +122,8 @@ namespace QuarticSolver
         {
             case 0: break;
             case 1: break;
-            case 2: sort(r1, r2);
-            case 3: sort(r1, r2, r3);
+            case 2: ii_sort(r1, r2);
+            case 3: ii_sort(r1, r2, r3);
         }
         return n;
     }
@@ -197,9 +149,9 @@ namespace QuarticSolver
         {
             case 0: break;
             case 1: break;
-            case 2: sort(r1, r2);
-            case 3: sort(r1, r2, r3);
-            case 4: sort(r1, r2, r3, r4);
+            case 2: ii_sort(r1, r2); break;
+            case 3: ii_sort(r1, r2, r3); break;
+            case 4: ii_sort(r1, r2, r3, r4); break;
         }
         return n;
     }
