@@ -448,7 +448,7 @@ void Meca::getReady(Simul const& sim)
      and for large systems random partitionning may not be so bad. Moreover for
      homogeneous systems (if all filaments have the same length) this is useless.
     */
-    mecables.sort(compareMecables);
+    mecables.quick_sort(compareMecables);
     
     /*
     for ( Mecable const* mec : mecables )

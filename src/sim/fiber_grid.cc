@@ -313,7 +313,7 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
     
     // sort targets within range from close to distant:
     if ( targets_.size() > 1 )
-        targets_.sort(compareTargets);
+        targets_.quick_sort(compareTargets);
     else if ( targets_.empty() )
         return;
     
@@ -322,16 +322,15 @@ void FiberGrid::tryToAttach(Vector const& place, Hand& ha) const
      number to get the index of the next target that will bind, using a Poisson
      distribution */
     const uint64_t prob = 0x1p+32 * ha.property()->binding_prob;
-    //std::clog << &ha << " trying ";
+    //std::clog << &ha << " target";
     for ( BindingTarget const& hit : targets_ )
     {
+        //std::clog << " " << hit.to_string();
         if ( RNG.pint32() < prob )
         {
-            //std::clog << hit.to_string() << "\n";
             ha.attach(hit.site());
-            return;
+            break;
         }
-        //std::clog << hit.to_string() << " | ";
     }
     //std::clog << "\n";
 }

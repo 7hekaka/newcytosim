@@ -6,6 +6,7 @@
 #include "assert_macro.h"
 #include "random.h"
 #include <iostream>
+#include <algorithm>
 
 
 /**
@@ -542,10 +543,16 @@ public:
     
     
     /// Sort array using `std::qsort()` and the provided comparison function
-    void sort(int (*comp)(const void *, const void *))
+    void quick_sort(int (*comp)(const void *, const void *))
     {
         assert_true( val_ || nbo_==0 );
         qsort(val_, nbo_, sizeof(VAL), comp);
+    }
+    
+    void sort()
+    {
+        //std::sort using a lambada function
+        std::sort(val_, val_+nbo_, [](VAL const& a, VAL const& b) { return a < b; });
     }
     
     /// Return one of the value in the array, chosen randomly

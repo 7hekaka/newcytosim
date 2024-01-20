@@ -42,7 +42,7 @@ int main(int argc, char* argv[])
             for( int i : b )
                 printf(" %i", i);
             
-            b.sort(compare);
+            b.quick_sort(compare);
             
             printf("\n   sort %2lu :", b.size());
             for( int i : b )

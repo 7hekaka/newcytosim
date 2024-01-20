@@ -2692,7 +2692,7 @@ void Display::drawTransparentObjects(Array<zObject>& list)
         i.calculate_depth(depthAxis);
     
     // depth-sort objects:
-    list.sort(compareZObject);
+    list.quick_sort(compareZObject);
     //std::clog << " depth sorted " << list.size() << " zObjects axis: "<< depthAxis << "\n";
 
     gym::enableLighting();

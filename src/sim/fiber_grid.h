@@ -73,9 +73,11 @@ public:
         
         FiberSite site() const { return sit_; }
         
+        friend bool operator <(const BindingTarget& a, const BindingTarget& b) { return a.dis_ < b.dis_; }
+
         std::string to_string() const;
     };
-    
+
     /// list of SegmentHits used in tryToAttach()
     mutable Array<BindingTarget> targets_;
     
