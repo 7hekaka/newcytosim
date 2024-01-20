@@ -195,6 +195,7 @@ void Meca::precondition(const real* X, real* Y) const
 #endif
             applyPreconditionner(mec, Y+inx);
     }
+    // CPU time is recorded, but only for info, so this code can be removed
     cycles_ += machine_time() - rdt;
 }
 

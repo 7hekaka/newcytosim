@@ -944,7 +944,7 @@ void SingleSet::equilibrate()
         const real prob = hp->binding_rate / ( hp->binding_rate + hp->unbinding_rate );
         
         // check all segments within grid cell
-        for ( FiberSegment const& seg : simul_.fiberGrid.nearbySegments(pos) )
+        for ( FiberSegment const& seg : grid.nearbySegments(pos) )
         {
             real dis = INFINITY;
             real abs = seg.projectPoint(pos, dis);
