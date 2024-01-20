@@ -1,6 +1,7 @@
 # Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
-OBJ_PLAY := display_prop.o player_prop.o display.o display1.o display2.o display3.o
+OBJ_PLAY := fiber_disp.o line_disp.o point_disp.o player_prop.o\
+            display_prop.o display.o display1.o display2.o display3.o
 
 FILES_PLAYER := player.cc player.h player_disp.cc
 

@@ -198,7 +198,7 @@ test_rasterizer: test_rasterizer.cc rasterizerG.o $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 
-test_space: test_space.cc cytolibG.a $(OBJ_GLAP) | bin
+test_space: test_space.cc cytolibG.a point_disp.o $(OBJ_GLAP) | bin
 	$(GLTEST_MAKE)
 	$(DONE)
 
