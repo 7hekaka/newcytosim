@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2024 Cambridge University.
 
+#include <limits.h>
 #include <sys/time.h>
 #include <iostream>
 #include <random>
@@ -10,7 +11,7 @@
  Better than uint32_t(x) in case x is floating point in [0,1]
  Based on code by Lawrence Kirby (fred@genesis.demon.co.uk)
  */
-static uint32_t hash(long t, int32_t c)
+static uint32_t hash(long t, long c)
 {
     uint32_t h1 = 0;
     unsigned char* p = (unsigned char*) &t;
