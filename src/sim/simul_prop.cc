@@ -62,7 +62,7 @@ void SimulProp::read(Glossary& glos)
     if ( glos.set(d, "dimension", "dim") && d != DIM )
     {
         std::cerr << "Aborting since the config file specifies a different dimensionality:\n";
-        std::cerr << "Cytosim was compiled with DIM="<<DIM<<" but the config includes `dim="<<d<<"'\n";
+        std::cerr << "    Cytosim was compiled with DIM="<<DIM<<" but the config includes `dim="<<d<<"'\n";
         exit(0);
         //throw InvalidParameter("dimensionality missmatch");
     }

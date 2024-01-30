@@ -75,7 +75,7 @@ Example of an error that can be ignored:
 	--------------------------------------------------endocytosis.cym
 	 0.00 sec
 	> Aborting since the config file specifies a different dimensionality:
-	> Cytosim was compiled with DIM=2 but the config specifies `dim=3'
+	>     Cytosim was compiled with DIM=2 but the config specifies `dim=3'
 
 This is a simulation that is specifically built for 3D, and the code compiled in 2D will bail out.
 
