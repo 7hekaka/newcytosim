@@ -26,6 +26,11 @@ namespace gym
     inline void disableBlending() { blend_ = glIsEnabled(GL_BLEND); glDisable(GL_BLEND); }
     /// restore previous Blending state
     inline void restoreBlending() { if ( blend_ ) glEnable(GL_BLEND); else glDisable(GL_BLEND); }
+    /// initialize blending for standard transparency
+    inline void initializeBlending() { glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); }
+    /// initialize blending for standard transparency
+    inline void invertedBlending() { glEnable(GL_BLEND); glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO); }
+
 
     /// enable depth test
     inline void enableDepthTest() { depth_ = glIsEnabled(GL_DEPTH_TEST); glEnable(GL_DEPTH_TEST); }

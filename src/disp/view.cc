@@ -60,15 +60,7 @@ void View::initGL() const
     glDisable(GL_STENCIL_TEST);
     glDisable(GL_DITHER);
     
-    if ( 1 )
-    {
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-    else
-    {
-        //glDisable(GL_BLEND);
-    }
+    gym::initializeBlending();
     
     if ( multisample > 1 )
     {
