@@ -241,6 +241,7 @@ int main(int argc, char* argv[])
     if ( arg.use_key("live") || arg.has_key(".cym") )
     {
         arg.peek(name, ".cym");
+        simul.prop.config_file = name;
         player.goLive = true;
     }
     
