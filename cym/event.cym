@@ -3,11 +3,11 @@
 
 set simul system
 {
-    steric = 1, 100
+    steric = 1, 20
     steric_max_range = 0.5
     
     time_step = 0.01
-    viscosity = 0.1
+    viscosity = 1
     precondition = 0
 }
 
@@ -80,8 +80,8 @@ delete ball
 
 new event
 {
-   rate = 2
-   code = ( delete ball )
+   rate = 1
+   code = ( delete 1 ball )
 }
 
 new event
@@ -137,7 +137,7 @@ delete all event
     mark = 1
 }
 
-run 1000 system
+run 10000 system
 {
     nb_frames = 10
 }
