@@ -898,7 +898,7 @@ void View::flashText(std::string const& str)
 #pragma mark -
 
 
-/// init vertical ticks over ] -cnt*d, +cnt*d [
+/// set horizontal lines over ] -cnt*d, +cnt*d [
 void setLadderH(float* pts, int cnt, float d, float a, float b)
 {
     flute4* flu = (flute4*)pts;
@@ -908,10 +908,11 @@ void setLadderH(float* pts, int cnt, float d, float a, float b)
         flu[2*i-1] = {-i*d, a, -i*d, b};
         flu[2*i  ] = { i*d, b,  i*d, a};
     }
+    // duplicate point to be able to draw a rectangle
     flu[2*cnt+1] = flu[2*cnt-1];
 }
 
-/// draw horizontal ticks over ] -cnt*d, +cnt*d [
+/// set vertical lines over ] -cnt*d, +cnt*d [
 void setLadderV(float* pts, int cnt, float d, float a, float b)
 {
     flute4* flu = (flute4*)pts;
@@ -921,45 +922,46 @@ void setLadderV(float* pts, int cnt, float d, float a, float b)
         flu[2*i-1] = {a, -i*d, b, -i*d};
         flu[2*i  ] = {b,  i*d, a,  i*d};
     }
+    // duplicate point to be able to draw a rectangle
     flu[2*cnt+1] = flu[2*cnt-1];
 }
 
 
 /**
  This will draw:
- - a horizontal box of length scale, bounded with Y=a and Y=b
+ - a horizontal box of length `s`, bounded within Y=a and Y=b
  - lines every scale/10, of width (b-a)/5
  - lines every scale/100, of width (b-a)/25
  - lines every scale/1000, of width (b-a)/125
  .
  */
-void View::drawScaleHV(float s, float a, float b, void (*func)(float*, int cnt, float, float, float)) const
+void View::drawScaleHV(float S, float a, float b, void (*func)(float*, int cnt, float, float, float), float border) const
 {
     float W(2);
-    s /= 10;
+    S /= 10;
     
     float* flt = (float*)gym::mapBufferV2(24);
-    func(flt, 5, s, a, b);
+    func(flt, 5, S, a, b);
     gym::unmapBufferV2();
-    gym::drawLineStrip(1, 18, 5);
-    gym::drawLines(W, 0, 18);
+    gym::drawLineStrip(W+border, 18, 5);
+    gym::drawLines(W+border, 0, 18);
 
     // draw tick marks
     char str[16] = {0};
     do {
         W -= 0.5;
-        s /= 10;
+        S /= 10;
         a /= 10;
         b /= 10;
         float Z = 10 * pixelSize();
-        if ( s > Z )
+        if ( S > Z )
         {
             flt = (float*)gym::mapBufferV2(44);
-            func(flt, 10, s, a, b);
+            func(flt, 10, S, a, b);
             gym::unmapBufferV2();
-            gym::drawLines(W, 2, 36);
-            snprintf(str, sizeof(str), "%g", s);
-            fgStrokeString(s-Z, b+s+Z, pixelSize(), 1, str, 1);
+            gym::drawLines(W+border, 2, 36);
+            snprintf(str, sizeof(str), "%g", S);
+            fgStrokeString(S-Z, b+S+Z, pixelSize(), 1, str, 1);
         }
     } while ( W >= 0.5 );
 }
@@ -971,12 +973,12 @@ void View::drawScaleHV(float s, float a, float b, void (*func)(float*, int cnt, 
  - tiny lines every scale/1000, of width 0.25
  .
  */
-void View::drawScaleX(float scale) const
+void View::drawScaleX(float scale, float border) const
 {
     float s(scale);
     float a( scale/20);
     float b(-scale/20);
-    float w(2);
+    float W(2);
 
     flute4* flu = (flute4*)gym::mapBufferV2(12);
     flu[0] = {-s, a,-s, b};
@@ -986,25 +988,25 @@ void View::drawScaleX(float scale) const
     flu[4] = {-s, 0, s, 0};
     flu[5] = { 0,-s, 0, s};
     gym::unmapBufferV2();
-    gym::drawLines(w, 0, 12);
+    gym::drawLines(W+border, 0, 12);
 
     do {
-        w -= 0.5;
+        W -= 0.5;
         s /= 10;
         if ( s > 2 * pixelSize() )
         {
             float* flt = (float*)gym::mapBufferV2(44);
             setLadderV(flt, 10, s, a, b);
             gym::unmapBufferV2();
-            gym::drawLines(w, 2, 36);
+            gym::drawLines(W+border, 2, 36);
             flt = (float*)gym::mapBufferV2(44);
             setLadderH(flt, 10, s, a, b);
             gym::unmapBufferV2();
-            gym::drawLines(w, 2, 36);
+            gym::drawLines(W+border, 2, 36);
         }
         a /= 10;
         b /= 10;
-    } while ( w >= 0.5 );
+    } while ( W >= 0.5 );
 }
 
 
@@ -1015,7 +1017,6 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
     gym::disableDepthTest();
     gym::disableLighting();
 
-    gym::color(color);
     float shift(32 * pixelSize() * zoom);
     
     switch( mode )
@@ -1024,18 +1025,21 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
             break;
         case 1:
             gym::eye_view(0, shift-0.5*visRange[1], eyeDistance, zoom);
+            gym::color(color);
             drawScaleHV(S, S/10, 0, setLadderH);
             break;
         case 2:
             gym::eye_view(0.5*visRange[0]-shift, 0, eyeDistance, zoom);
+            gym::color(color);
             drawScaleHV(S, -S/10, 0, setLadderV);
             break;
         case 3: {
             gym::eye_view(0, 0, eyeDistance, zoom);
+            gym::color(color);
             drawScaleX(S);
         } break;
     }
 
-    gym::restoreDepthTest();
     gym::restoreLighting();
+    gym::restoreDepthTest();
 }
