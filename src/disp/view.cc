@@ -898,7 +898,7 @@ void View::flashText(std::string const& str)
 #pragma mark -
 
 
-/// set horizontal lines over ] -cnt*d, +cnt*d [
+/// set horizontal lines over [ -cnt*d, +cnt*d ]
 void setLadderH(float* pts, int cnt, float d, float a, float b)
 {
     flute4* flu = (flute4*)pts;
@@ -912,7 +912,7 @@ void setLadderH(float* pts, int cnt, float d, float a, float b)
     flu[2*cnt+1] = flu[2*cnt-1];
 }
 
-/// set vertical lines over ] -cnt*d, +cnt*d [
+/// set vertical lines over [ -cnt*d, +cnt*d ]
 void setLadderV(float* pts, int cnt, float d, float a, float b)
 {
     flute4* flu = (flute4*)pts;
