@@ -3,7 +3,7 @@
 #
 # File src/disp/makefile.inc
 
-OBJ_DISP := view.o view_prop.o grid_display.o glapp.o
+OBJ_DISP := fiber_disp.o line_disp.o point_disp.o view.o view_prop.o grid_display.o glapp.o
 
 #----------------------------targets--------------------------------------------
 
