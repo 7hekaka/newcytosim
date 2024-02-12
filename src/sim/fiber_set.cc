@@ -690,7 +690,7 @@ void FiberSet::updateFibers() const
     {
         assert_false(fib->bad());
         fib->updateRange(nullptr);
-        fib->resetLattice();
+        fib->resetLattice(1);
         fib->updateHands();
     }
 }

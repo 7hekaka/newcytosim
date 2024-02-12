@@ -105,7 +105,6 @@ Vector Hand::unbindingPosition() const
 }
 
 
-/** Used to transfer a bound Hand normally to a different fiber */
 void Hand::relocate(Fiber const* f, const real a)
 {
     assert_true(f);

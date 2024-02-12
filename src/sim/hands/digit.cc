@@ -231,31 +231,36 @@ std::ostream& operator << (std::ostream& os, Digit const& arg)
 
 
 #if FIBER_HAS_LATTICE
-void Fiber::resetLattice()
+bool Fiber::resetLattice(bool lazy)
 {
-    if ( fLattice.data() )
+    if ( !fLattice.data() )
     {
-        fLattice.clear();
-        real uni = fLattice.unit();
+        if ( lazy )
+            return false;
+        fLattice.setRange(abscissaM(), abscissaP());
+    }
+
+    fLattice.clear();
+    real uni = fLattice.unit();
     
-        for ( Hand * h = fHands.front(); h; h = h->next() )
+    for ( Hand * h = fHands.front(); h; h = h->next() )
+    {
+        if ( h->lattice() == lattice() )
         {
-            if ( h->lattice() == lattice() )
+            Digit* i = static_cast<Digit*>(h);
+            FiberSite::lati_t s = i->site();
+            if ( i->vacant(s) )
             {
-                Digit* i = static_cast<Digit*>(h);
-                FiberSite::lati_t s = i->site();
-                if ( i->vacant(s) )
-                {
-                    i->inc();
-                    i->setAbscissa(uni * s + i->prop()->site_shift);
-                }
-                else
-                {
-                    std::cerr << "doubly occupied site? " << reference() << " @ " << s << '\n';
-                }
+                i->inc();
+                i->setAbscissa(uni * s + i->prop()->site_shift);
+            }
+            else
+            {
+                std::cerr << "doubly occupied site? " << reference() << " @ " << s << '\n';
             }
         }
     }
+    return true;
 }
 #endif
 

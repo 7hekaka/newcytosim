@@ -460,24 +460,24 @@ Fiber* Fiber::severPoint(size_t pti)
         h = x;
     }
     
-    resetLattice();
-    fib->resetLattice();
+    if ( resetLattice(1) )
+        fib->resetLattice(0);
     return fib;
 }
 
 
 /**
 The Fiber is cut at distance `dis1` and `dis2` from its minus end:
- - current Fiber is truncated to keep only the section [ minus end , dis1 ],
- - A new Fiber is created representing the other section [ dis2 , PLUS_END ],
+ - the current Fiber is truncated to its former section [ minus_end, dis1 ],
+ - A new Fiber is created representing the other section [ dis2, plus_end ],
  - Hands are relocated to the new Fiber if appropriate,
  - Lattice substances are also relocated or released
  .
- A pointer to the new Fiber is returned (containing the PLUS_END), but this
+ A pointer to the new Fiber is returned (containing the plus_end), but this
  pointer may be zero, if the cut position was not within the valid range of abscissa.
- If a new Fiber was created, it should be added to the FiberSet.
+ If the return value is not null, a new Fiber was created and it should be linked to the FiberSet.
  */
-Fiber* Fiber::severM(real dis1, real dis2)
+Fiber* Fiber::severSegment(real dis1, real dis2)
 {
     assert_true( dis1 <= dis2 );
     // create a new Fiber of the same class:
@@ -530,8 +530,8 @@ Fiber* Fiber::severM(real dis1, real dis2)
         h = x;
     }
 
-    resetLattice();
-    fib->resetLattice();
+    if ( resetLattice(1) )
+        fib->resetLattice(0);
     return fib;
 }
 
@@ -581,7 +581,7 @@ Fiber* Fiber::severNow(const real abs1, const real abs2, const real min)
         }
     }
     //std::clog << "\n";
-    return severM(lenM, abs2-M);
+    return severSegment(lenM, abs2-M);
 }
 
 
@@ -755,7 +755,7 @@ void Fiber::join(Fiber * fib)
     }
     delete(fib);
 
-    resetLattice();
+    resetLattice(1);
 }
 
 

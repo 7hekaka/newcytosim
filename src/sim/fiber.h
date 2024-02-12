@@ -130,7 +130,7 @@ protected:
     std::set<CutFacts> pendingCuts;
 
     
-    /// cut Fiber at point `pti`, return section `[ pti - plus end ]`
+    /// cut Fiber at point `pti`, return section `[ pti, plus_end ]`
     virtual Fiber* severPoint(size_t pti);
     
     /// return index of point where there is a kink with ( std::cos(angle) < max_cos )
@@ -149,13 +149,13 @@ protected:
     /// add confinement interactions to a Meca
     void setFiberConfinement(Meca&, Confinement, Space const*, real stiff, real stiff2) const;
     
-    /// cut fiber at distance `abs` from the minus end; returns section `[ abs - plus end ]`
-    Fiber * severM(real abs1, real abs2);
+    /// cut fiber at distance `abs` from the minus end; returns section `[ abs, plus_end ]`
+    Fiber * severSegment(real abs1, real abs2);
 
     /// calculate the edges for a cut of width `w` around `a` (arguments used for input/output)
     virtual void findSeverEdges(real& a, real& w);
 
-    /// cut fiber at abscissa `[abs1, abs2]`, returning section `[ abs2 - plus end ]`
+    /// cut fiber at abscissa `[abs1, abs2]`, returning section `[ abs2, plus_end ]`
     Fiber * severNow(real abs1, real abs2, const real min);
 
     /// cut fiber, delete sections shorter than `min`, and set states of the newly created ends
@@ -367,10 +367,10 @@ public:
     FiberLattice * lattice() const { return &fLattice; }
     
     /// recalculate occupancy lattice from bound Digits
-    void resetLattice();
+    bool resetLattice(bool);
 #else
     /// does nothing
-    void resetLattice() {}
+    bool resetLattice(bool) { return false; }
 #endif
     
     /// record minium, maximum and sum of lattice values
