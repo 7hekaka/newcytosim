@@ -155,7 +155,7 @@ public:
     }
     
     /// Copy assignment operator
-    Array& operator = (Array<VAL> const & o)
+    Array& operator = (Array<VAL> const& o)
     {
         if ( o.nbo_ > alc_ )
         {
@@ -227,14 +227,14 @@ public:
     }
     
     /// reference to Object at index ii (val_[ii])
-    VAL & at(const size_t ii) const
+    VAL& at(const size_t ii) const
     {
         assert_true( ii < nbo_ );
         return val_[ii];
     }
     
     /// reference to Object at index ii (val_[ii])
-    VAL & operator[](const size_t ii) const
+    VAL& operator[](const size_t ii) const
     {
         assert_true( ii < nbo_ );
         return val_[ii];
@@ -248,7 +248,7 @@ public:
     }
     
     /// return element at index 0
-    VAL & front()
+    VAL& front()
     {
         assert_true( 0 < nbo_ );
         return val_[0];
@@ -262,7 +262,7 @@ public:
     }
     
     /// return last element
-    VAL & back()
+    VAL& back()
     {
         assert_true( 0 < nbo_ );
         return val_[nbo_-1];
@@ -382,7 +382,7 @@ public:
 #pragma mark -
     
     /// Increment the size of the array, and return new value at end of it
-    VAL & new_val()
+    VAL& new_val()
     {
         if ( nbo_ >= alc_ )
             reallocate(chunked(nbo_+1));

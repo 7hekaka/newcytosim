@@ -165,7 +165,7 @@ void Random::sreal4(real& a, real& b, real& c, real& d)
  Set two signed real number, following a normal law N(0,v*v)
  using Box-Muller method (George E. P. Box et Mervin E. Muller, 1958)
  */
-void Random::box_muller(real & x, real & y)
+void Random::box_muller(real& x, real& y)
 {
     real w = std::sqrt( -2 * std::log(preal()) );
     real a = M_PI * sreal();
@@ -177,7 +177,7 @@ void Random::box_muller(real & x, real & y)
  Set two signed real number, following a normal law N(0,v*v)
  using Marsaglia polar method (George Marsaglia, 1964)
  */
-void Random::gauss_set(real & a, real & b, real v)
+void Random::gauss_set(real& a, real& b, real v)
 {
     real x, y, w;
     do {

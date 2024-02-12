@@ -1096,7 +1096,7 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
             }
             while ( a >= fib->abscissaM() )
             {
-                out << '\n' << fib->pos(a);
+                out << '\n' << fib->pos(a) << " " << a;
                 a += spread * std::log(pcg32(Z)*TINY);
             }
         }
@@ -1109,7 +1109,7 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
                 a -= spread * std::log(pcg32(Z)*TINY);
             while ( a <= fib->abscissaP() )
             {
-                out << '\n' << fib->pos(a);
+                out << '\n' << fib->pos(a) << " " << a;
                 a -= spread * std::log(pcg32(Z)*TINY);
             }
         }

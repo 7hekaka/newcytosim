@@ -131,14 +131,14 @@ public:
     }
     
     /// return cell at index 'inx'
-    CELL & icell(const size_t inx) const
+    CELL& icell(const size_t inx) const
     {
         assert_true( inx < MAP::mNbCells );
         return gCell[ inx ];
     }
     
     /// reference to CELL whose center is closest to w[]
-    CELL & cell(const real w[ORD]) const
+    CELL& cell(const real w[ORD]) const
     {
         size_t inx = MAP::index(w);
         assert_true( inx < MAP::mNbCells );
@@ -146,28 +146,28 @@ public:
     }
     
     /// reference to CELL of coordinates c[]
-    CELL & cell(const int c[ORD]) const
+    CELL& cell(const int c[ORD]) const
     {
         assert_true( MAP::pack(c) < MAP::mNbCells );
         return gCell[ MAP::pack(c) ];
     }
    
     /// operator access to a cell by index
-    CELL & operator[](const size_t inx) const
+    CELL& operator[](const size_t inx) const
     {
         assert_true( inx <= MAP::mNbCells );
         return gCell[ inx ];
     }
 
     /// short-hand access to a cell by coordinates
-    CELL & operator()(const int c[ORD]) const
+    CELL& operator()(const int c[ORD]) const
     {
         assert_true( MAP::pack(c) < MAP::mNbCells );
         return gCell[ MAP::pack(c) ];
     }
     
     /// operator access to a cell by position
-    CELL & operator()(const real w[ORD]) const
+    CELL& operator()(const real w[ORD]) const
     {
         assert_true( MAP::index(w) < MAP::mNbCells );
         return gCell[ MAP::index(w) ];
@@ -186,25 +186,25 @@ public:
     }
 
     /// access to cell for ORD==1
-    CELL & icell1D(const int x) const
+    CELL& icell1D(const int x) const
     {
         return gCell[MAP::pack1D(x)];
     }
     
     /// access to cell for ORD==2
-    CELL & icell2D(const int x, const int y) const
+    CELL& icell2D(const int x, const int y) const
     {
         return gCell[MAP::pack2D(x,y)];
     }
     
     /// access to cell for ORD==3
-    CELL & icell3D(const int x, const int y, const int z) const
+    CELL& icell3D(const int x, const int y, const int z) const
     {
         return gCell[MAP::pack3D(x,y,z)];
     }
     
     /// access to cell for ORD==1
-    CELL & icell1D_clamped(const int x) const
+    CELL& icell1D_clamped(const int x) const
     {
         size_t inx = MAP::pack1D_clamped(x);
         assert_true( inx < MAP::mNbCells );
@@ -212,7 +212,7 @@ public:
     }
     
     /// access to cell for ORD==2
-    CELL & icell2D_clamped(const int x, const int y) const
+    CELL& icell2D_clamped(const int x, const int y) const
     {
         size_t inx = MAP::pack2D_clamped(x,y);
         assert_true( inx < MAP::mNbCells );
@@ -220,7 +220,7 @@ public:
     }
     
     /// access to cell for ORD==3
-    CELL & icell3D_clamped(const int x, const int y, const int z) const
+    CELL& icell3D_clamped(const int x, const int y, const int z) const
     {
         size_t inx = MAP::pack3D_clamped(x,y,z);
         assert_true( inx < MAP::mNbCells );
