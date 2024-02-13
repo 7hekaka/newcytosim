@@ -4,14 +4,13 @@
 #include <stdlib.h>
 #include <cstdint>
 #include <algorithm>
+#include <vector>
 
 #include "timer.h"
 #include "random_pcg.h"
 #include "random_seed.cc"
 
-
 uint64_t pcg32_state;
-
 
 int compare16(const void * A, const void * B)
 {
@@ -34,27 +33,52 @@ int compare64(const void * A, const void * B)
     return ( a > b ) - ( a < b );
 }
 
+// plain data type
+
 struct stuff
 {
-    uint32_t key;
-    uint32_t load[511];
-    stuff& operator = (uint32_t const i) { key = i; return *this; }
-    bool operator < (const stuff s) const { return key < s.key; }
+    double X, Y, Z;
+    uint32_t load[58];
+    stuff& operator = (uint32_t const i) { Z = i; return *this; }
+    bool operator < (const stuff s) const { return Z < s.Z; }
 };
 
-int compare(const void * A, const void * B)
+int compare_stuff(const void * A, const void * B)
 {
-    uint32_t a = static_cast<stuff const*>(A)->key;
-    uint32_t b = static_cast<stuff const*>(B)->key;
+    uint32_t a = static_cast<stuff const*>(A)->Z;
+    uint32_t b = static_cast<stuff const*>(B)->Z;
     return ( a > b ) - ( a < b );
 }
 
 
-template < typename INTEGER, int COMPARE(void const*, void const*) >
-void speed_test(size_t cnt, size_t rep)
+// indirect data type with std::vector
+
+class node
 {
-    size_t S = cnt * sizeof(INTEGER);
-    INTEGER * val = (INTEGER*)malloc(S);
+public:
+    std::vector<double> vec; // X, Y, Z
+    uint32_t load[58];
+    
+    node() : vec(3) { vec[0]=0; vec[0]=0; vec[0]=0; }
+    node& operator = (uint32_t const i) { vec[2] = i; return *this; }
+    bool operator < (const node s) const { return vec[2] < s.vec[2]; }
+};
+
+int compare_node(const void * A, const void * B)
+{
+    double a = static_cast<node const*>(A)->vec[2];
+    double b = static_cast<node const*>(B)->vec[2];
+    return ( a > b ) - ( a < b );
+}
+
+
+
+
+template < typename TYPE, int FUNC(void const*, void const*) >
+void speed_test(const char str[], size_t cnt, size_t rep)
+{
+    size_t S = cnt * sizeof(TYPE);
+    TYPE * val = new TYPE[cnt];
 
     // check random number generator
     tick();
@@ -71,7 +95,7 @@ void speed_test(size_t cnt, size_t rep)
     {
         for ( size_t i = 0; i < cnt; ++i )
             val[i] = pcg32(pcg32_state);
-        qsort(val, cnt, sizeof(INTEGER), COMPARE);
+        qsort(val, cnt, sizeof(TYPE), FUNC);
     }
     double t1 = 1000*tock(cnt);
     
@@ -81,23 +105,24 @@ void speed_test(size_t cnt, size_t rep)
     {
         for ( size_t i = 0; i < cnt; ++i )
             val[i] = pcg32(pcg32_state);
-        std::sort(val, val+cnt, [](INTEGER const& a, INTEGER const& b) { return a < b; });
+        std::sort(val, val+cnt, [](TYPE const& a, TYPE const& b) { return a < b; });
     }
     double t2 = 1000*tock(cnt);
-    printf("int%-6lu  size %8lu kB  set %8.2f  qsort %8.2f  std::sort %8.2f\n", 8*sizeof(INTEGER), S>>10, t0, t1, t2);
-    free(val);
+    printf("%-10s   %8lu kB  set %8.2f  qsort %8.2f  std::sort %8.2f\n", str, S>>10, t0, t1, t2);
+    delete[] val;
 }
 
 
 int main(int argc, char* argv[])
 {
-    size_t cnt = 1<<16, rep = 256;
+    size_t cnt = 1<<16, rep = 64;
     if ( argc > 1 )
         cnt = std::max(2, atoi(argv[1]));
     pcg32_state = get_random_seed();
-    speed_test<uint16_t, compare16>(cnt, rep);
-    speed_test<uint32_t, compare32>(cnt, rep);
-    speed_test<uint64_t, compare64>(cnt, rep);
-    speed_test<stuff, compare>(cnt, rep);
+    speed_test<uint16_t, compare16>("int16", cnt, rep);
+    speed_test<uint32_t, compare32>("int32", cnt, rep);
+    speed_test<uint64_t, compare64>("int64", cnt, rep);
+    speed_test<stuff, compare_stuff>("stuff", cnt, rep);
+    speed_test<node, compare_node>("node", cnt, rep);
     printf("done\n");
 }
