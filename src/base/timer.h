@@ -3,6 +3,7 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+#include <time.h>
 #include <sys/time.h>
 
 // using computer's clock

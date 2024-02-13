@@ -2249,6 +2249,7 @@
 		BBDE7FF914E2609B00A23E0C /* picket_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = picket_long.h; path = singles/picket_long.h; sourceTree = "<group>"; };
 		BBDE7FFC14E260B400A23E0C /* wrist_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wrist_long.cc; path = singles/wrist_long.cc; sourceTree = "<group>"; };
 		BBDE7FFD14E260B400A23E0C /* wrist_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wrist_long.h; path = singles/wrist_long.h; sourceTree = "<group>"; };
+		BBDF20FD2B7BEF55001AD8A1 /* test_sort.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = test_sort.cc; sourceTree = "<group>"; };
 		BBDF72AD0B5C2327007CAD2A /* sparmatsymblk.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsymblk.cc; path = src/math/sparmatsymblk.cc; sourceTree = SOURCE_ROOT; };
 		BBDF72AE0B5C2327007CAD2A /* sparmatsymblk.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsymblk.h; path = src/math/sparmatsymblk.h; sourceTree = SOURCE_ROOT; };
 		BBDF9AA3228BFBD3005018BD /* xpttrf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xpttrf.h; sourceTree = "<group>"; };
@@ -3337,7 +3338,9 @@
 				BB1227AE114FB8640042589A /* test_blas.cc */,
 				BBAA7E7D2455D86300C924DB /* test_block.cc */,
 				BB940AB8164BCDDF00542F06 /* test_cxx.cc */,
+				BB158A8028A3E823008AFB22 /* test_dot.cc */,
 				BB9DACC02381BA8D009A9D6B /* test_dispatch.cc */,
+				BB1575B328FC0BE300D92D4E /* test_gaussian.cc */,
 				BBDAA458152C648F0099FD2D /* test_gillespie.cc */,
 				BB73590905B98DA3006956D5 /* test_glapp.cc */,
 				BB7DC19B2200DCE400DB779E /* test_glossary.cc */,
@@ -3349,23 +3352,22 @@
 				BB73590A05B98DA3006956D5 /* test_opengl.cc */,
 				BBD3030225798FC600C6D61A /* test_orthonormal.cc */,
 				BBC91299204EC2DC00219DC5 /* test_pipe.cc */,
-				BB9A56010A74E9E40069E362 /* test_tesselator.cc */,
 				BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */,
 				BB749D621793620500B43298 /* test_quartic.cc */,
 				BB73590F05B98DA3006956D5 /* test_quaternion.cc */,
-				BB1575B328FC0BE300D92D4E /* test_gaussian.cc */,
 				BB73591005B98DA3006956D5 /* test_random.cc */,
 				BB73591105B98DA3006956D5 /* test_rasterizer.cc */,
 				BB7086372449C83100C73273 /* test_rigidity.cc */,
-				BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */,
-				BB158A8028A3E823008AFB22 /* test_dot.cc */,
-				BB5783DB23EB3A250022878E /* test_size.cc */,
 				BBCD0E910C5E84CC00B463EB /* test_sizeof.cc */,
+				BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */,
 				BB73591405B98DA3006956D5 /* test_solve.cc */,
 				BB2EFCAD230AAF7100073B5A /* test_solver.cc */,
+				BBDF20FD2B7BEF55001AD8A1 /* test_sort.cc */,
+				BB5783DB23EB3A250022878E /* test_size.cc */,
 				BBE151DF05E574F300F782A8 /* test_space.cc */,
 				BB73591705B98DA3006956D5 /* test_sphere.cc */,
 				BBC4C3A024D5CDE100DB5187 /* test_string.cc */,
+				BB9A56010A74E9E40069E362 /* test_tesselator.cc */,
 				BBE13B800CD535DE008C212D /* test_thread.cc */,
 				BB17CD1425CD49DF00202087 /* test_variablerate.cc */,
 				BB3F600D14964B740092690C /* test_vbo.cc */,

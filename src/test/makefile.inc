@@ -127,6 +127,10 @@ test_sizeof: test_sizeof.cc | bin
 	$(COMPILE) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
+test_sort: test_sort.cc $(TEST_OBJ) | bin
+	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
+	$(DONE)
+
 test_pipe: test_pipe.cc gym_color.cc gym_color_list.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math -Isrc/gym $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
