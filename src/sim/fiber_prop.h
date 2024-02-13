@@ -315,7 +315,7 @@ public:
 #endif
 #if NEW_FIBER_MAKE_COUPLE
     /// rate of creation
-    real        source_rate;
+    real source_rate;
     
     /// type of couple being made
     std::string source_type;

@@ -2,7 +2,7 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-///this turns on display code in simul.h
+///this turns on display code in some objects
 #define DISPLAY 1
 
 #include "gym_color.h"

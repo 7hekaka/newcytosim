@@ -9,6 +9,8 @@
 #include "fiber_prop.h"
 #include "random_pcg.h"
 
+extern uint64_t pcg32_state;
+
 #define DISPLAY 1
 #include "gym_color.h"
 #include "gym_color_list.h"
@@ -325,6 +327,8 @@ void Display::initFiberDisp(FiberProp* fp, PropertyList& alldisp, gym_color col)
     if ( fp->display_fresh )
     {
         disp->read_string(fp->display, fp->name()+":display");
+        if ( disp->mask && !disp->mask_bitfield )
+            disp->mask_bitfield = distribute_bits(disp->mask, pcg32_state);
         fp->display_fresh = false;
     }
     
