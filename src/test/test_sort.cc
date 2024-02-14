@@ -38,7 +38,7 @@ int compare64(const void * A, const void * B)
 struct stuff
 {
     double X, Y, Z;
-    uint32_t load[58];
+    uint32_t load[2];
     stuff& operator = (uint32_t const i) { Z = i; return *this; }
     bool operator < (const stuff s) const { return Z < s.Z; }
 };
@@ -53,21 +53,41 @@ int compare_stuff(const void * A, const void * B)
 
 // indirect data type with std::vector
 
-class node
+class vertex
 {
 public:
     std::vector<double> vec; // X, Y, Z
-    uint32_t load[58];
+    uint32_t load[2];
     
-    node() : vec(3) { vec[0]=0; vec[0]=0; vec[0]=0; }
-    node& operator = (uint32_t const i) { vec[2] = i; return *this; }
-    bool operator < (const node s) const { return vec[2] < s.vec[2]; }
+    vertex() : vec(3) { vec.resize(3,0.0); }
+    vertex& operator = (uint32_t const i) { vec[2] = i; return *this; }
+    bool operator < (const vertex s) const { return vec[2] < s.vec[2]; }
 };
 
-int compare_node(const void * A, const void * B)
+int compare_vertex(const void * A, const void * B)
 {
-    double a = static_cast<node const*>(A)->vec[2];
-    double b = static_cast<node const*>(B)->vec[2];
+    double a = static_cast<vertex const*>(A)->vec[2];
+    double b = static_cast<vertex const*>(B)->vec[2];
+    return ( a > b ) - ( a < b );
+}
+
+// even more indirect data type with std::vector
+
+class triangle
+{
+public:
+    std::vector<std::vector<double> > pts; // A, B, C
+    uint32_t load[2];
+    
+    triangle() : pts(3) { pts[0].resize(3, 0.0); pts[1].resize(3, 0.0); pts[2].resize(3, 0.0);  }
+    triangle& operator = (uint32_t const i) { pts[0][2] = i; return *this; }
+    bool operator < (const triangle s) const { return pts[0][2] < s.pts[0][2]; }
+};
+
+int compare_triangle(const void * A, const void * B)
+{
+    double a = static_cast<triangle const*>(A)->pts[0][2];
+    double b = static_cast<triangle const*>(B)->pts[0][2];
     return ( a > b ) - ( a < b );
 }
 
@@ -115,7 +135,7 @@ void speed_test(const char str[], size_t cnt, size_t rep)
 
 int main(int argc, char* argv[])
 {
-    size_t cnt = 1<<16, rep = 64;
+    size_t cnt = 1<<16, rep = 32;
     if ( argc > 1 )
         cnt = std::max(2, atoi(argv[1]));
     pcg32_state = get_random_seed();
@@ -123,6 +143,7 @@ int main(int argc, char* argv[])
     speed_test<uint32_t, compare32>("int32", cnt, rep);
     speed_test<uint64_t, compare64>("int64", cnt, rep);
     speed_test<stuff, compare_stuff>("stuff", cnt, rep);
-    speed_test<node, compare_node>("node", cnt, rep);
+    speed_test<vertex, compare_vertex>("vertex", cnt, rep);
+    speed_test<triangle, compare_triangle>("triangle", cnt, rep);
     printf("done\n");
 }
