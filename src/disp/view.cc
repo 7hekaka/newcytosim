@@ -352,13 +352,6 @@ void View::drawInteractiveFeatures() const
     gym::disableDepthTest();
     gym::one_view(W, H);
 
-    if ( draw_memo && memo.size() )
-    {
-        float white[4] = {1,1,1,1};
-        float black[4] = {0,0,0,0.9};
-        placeText(4, BITMAP_8_BY_13, white, memo.c_str(), black, W, H);
-    }
-
     if ( top_message.size() )
     {
         placeText(3, BITMAP_9_BY_15, front_color, top_message.c_str(), nullptr, W, H);
@@ -369,6 +362,13 @@ void View::drawInteractiveFeatures() const
         placeText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
     }
     
+    if ( draw_memo && memo.size() )
+    {
+        float white[4] = {1,1,1,1};
+        float black[4] = {0,0,0,0.9};
+        placeText(4, BITMAP_8_BY_13, white, memo.c_str(), black, W, H);
+    }
+
     if ( flash.size() )
     {
         float yellow[4] = { 0.6f, 0.6f, 1.f, 1.f };

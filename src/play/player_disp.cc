@@ -136,14 +136,14 @@ std::string Player::buildMemo(int type) const
     std::ostringstream oss;
     switch ( type )
     {
-        case 0: return "";
         case 1: return "Please, visit www.cytosim.org";
-        case 2: helpKeys(oss); return oss.str();
-        case 3: glApp::help(oss);  return oss.str();
-        case 4: writePlayParameters(oss, true); return oss.str();
-        case 5: writeDisplayParameters(oss, true); return oss.str();
+        case 2: helpKeys(oss); break;
+        case 3: glApp::help(oss); break;
+        case 4: writePlayParameters(oss, true); break;
+        case 5: writeDisplayParameters(oss, true); break;
+        default: return "";
     }
-    return "";
+    return oss.str();
 }
 
 //------------------------------------------------------------------------------
