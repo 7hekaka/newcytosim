@@ -11,6 +11,7 @@
 #include "random_seed.cc"
 
 uint64_t pcg32_state;
+constexpr size_t LOAD = 128;
 
 int compare16(const void * A, const void * B)
 {
@@ -38,7 +39,7 @@ int compare64(const void * A, const void * B)
 struct stuff
 {
     double X, Y, Z;
-    uint32_t load[2];
+    uint32_t load[LOAD];
     stuff& operator = (uint32_t const i) { Z = i; return *this; }
     bool operator < (const stuff s) const { return Z < s.Z; }
 };
@@ -57,7 +58,7 @@ class vertex
 {
 public:
     std::vector<double> vec; // X, Y, Z
-    uint32_t load[2];
+    uint32_t load[LOAD];
     
     vertex() : vec(3) { vec.resize(3,0.0); }
     vertex& operator = (uint32_t const i) { vec[2] = i; return *this; }
@@ -77,7 +78,7 @@ class triangle
 {
 public:
     std::vector<std::vector<double> > pts; // A, B, C
-    uint32_t load[2];
+    uint32_t load[LOAD];
     
     triangle() : pts(3) { pts[0].resize(3, 0.0); pts[1].resize(3, 0.0); pts[2].resize(3, 0.0);  }
     triangle& operator = (uint32_t const i) { pts[0][2] = i; return *this; }
