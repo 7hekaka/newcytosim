@@ -71,6 +71,9 @@ namespace gym
 #pragma mark - Functions to set the Current Color
     
     /// make RGBA color current
+    void setColor(const float col[]);
+
+    /// make RGBA color current
     inline void color(const float col[]) { glColor4fv(col); }
 
     /// make RGB color current

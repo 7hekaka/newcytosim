@@ -6,6 +6,9 @@
 /// current color
 //float gym::col_[4] = { 1, 1, 1, 1 };
 
+/// make RGBA color current
+void gym::setColor(const float col[]) { glColor4fv(col); }
+
 /**
  draw back first, and then front of object,
  CULL_FACE is temporarily enabled for this

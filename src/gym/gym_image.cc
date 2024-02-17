@@ -4,7 +4,7 @@
 
 
 /// promote 0/1 bits values to 1 byte per bit, either full 1 or full 0
-void unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsigned char* bits, unsigned lda)
+void gym::unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsigned char* bits, unsigned lda)
 {
     // number of bytes in a row of 'input'
     const unsigned Wb = ( W + 7 ) >> 3;

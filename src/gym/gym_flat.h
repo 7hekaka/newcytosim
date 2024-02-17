@@ -3,15 +3,15 @@
 
 namespace gym
 {
-    /// a debug function using printf() for ASCII art...
+    /// print pixels in ASCII art for debugging
     void printPixels(unsigned W, unsigned H, const unsigned char* pixels, unsigned lda);
 
     /// draw Bitmap using a texture over a rectangle
     void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
-    
-    /// draw all pixels of the bitmap
-    void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
-    
+
+    /// draw pixels in packed format
+    void paintPackedBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
+
     /// draw all pixels of the bitmap
     void paintSequence(float X, float Y, float W, float H, const char str[]);
 
@@ -27,10 +27,10 @@ namespace gym
     /// draw plane with squares of alternating colors
     void drawTiledFloor(int R, float T, float Z);
     
-    /// draw Octagon
+    /// fill Octagon
     void paintOctagon(float L, float B, float R, float T, const float col[4], float D);
 
-    /// paint octagon
+    /// outline Octagon
     void drawOctagon(float L, float B, float R, float T, const float col[4], float D, float W);
 
 }

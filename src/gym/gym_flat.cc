@@ -8,25 +8,9 @@
 #include "gym_draw.h"
 #include "gym_image.h"
 
+
 /// name of OpenGL texture buffer
 GLuint gym_font_texture_ = 0;
-
-/// global function accessible from C
-void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bytes, const float color[4])
-{
-    gym::color(color);
-    gym::drawPixels(W, H, X, Y, S, bytes);
-}
-
-/// global function accessible from C
-///\todo: we should unpack the whole font data only once!
-void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits, const float color[4])
-{
-    gym::color(color);
-    unsigned char pixels[W*H+8];
-    unpackBitmap(pixels, W, H, bits, W);
-    gym::drawPixels(W, H, X, Y, S, pixels);
-}
 
 
 void gym::printPixels(unsigned W, unsigned H, const unsigned char* pixels, unsigned lda)
@@ -71,14 +55,9 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     CHECK_GL_ERROR("drawPixels2");
 }
 
-void paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits, const float col[4])
-{
-    gym::color(col);
-    gym::paintBitmap(W, H, X0, Y0, S, bits);
-}
 
 /** This is drawing pixels of `bits`, line by line, using triangle strips */
-void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
+void gym::paintPackedBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
 {
     const unsigned Wb = ( W + 7 ) >> 3;
     unsigned n_bits = 0;
@@ -121,7 +100,7 @@ void gym::paintBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const
     //printf("%4lu %4u\n", ptr-flu, 6*n_bits);
     gym::unmapBufferV2();
     gym::drawTriangleStrip(0, ptr-flu);
-    CHECK_GL_ERROR("paintBitmap");
+    CHECK_GL_ERROR("paintPackedBitmap");
 }
 
 
@@ -269,6 +248,7 @@ void gym::drawTiledFloor(int R, float T, float Z)
 }
 
 
+/// left, bottom, right, top and D = corners
 void gym::paintOctagon(float L, float B, float R, float T, const float col[4], float D)
 {
     gym::color(col);
@@ -285,6 +265,7 @@ void gym::paintOctagon(float L, float B, float R, float T, const float col[4], f
     glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
 }
 
+/// left, bottom, right, top and D = corners
 void gym::drawOctagon(float L, float B, float R, float T, const float col[4], float D, float W)
 {
     gym::color(col);

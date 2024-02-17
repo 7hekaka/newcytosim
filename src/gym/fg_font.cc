@@ -97,29 +97,56 @@ static SFG_Font const* fghFont( int font )
 
 /* -- INTERFACE FUNCTIONS -------------------------------------------------- */
 
-void drawBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data, const float color[4]);
-
-/// convert binary image into one byte per pixel
-void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[], unsigned lda);
-void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data, const float color[4]);
-
-void paintBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data, const float color[4]);
-
+// Drawing uses Gym's functions defined elsewhere
+namespace gym
+{
+    void setColor(const float[]);
+    void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[], unsigned lda);
+    void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data);
+    void paintPackedBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* data);
+}
 
 /*
  * Draw a bitmap character
  */
-void fgBitmapCharacter(float x, float y, float S, int fontID, const float color[4], int character)
+void fgBitmapCharacter(float X, float Y, float S, int fontID, const float col[4], int character)
 {
-    const uByte* face;
     SFG_Font const* font = fghFont( fontID );
     if ( font && character >= 1 && character < 256 )
     {
         /*
          * Find the character we want to draw (???)
          */
-        face = font->Characters[character];
-        paintBitmap(face[0], font->Height, S*x-font->xorig, S*y-font->yorig, S, face+1, color);
+        const uByte* face = font->Characters[character];
+        unsigned W = face[0];
+        unsigned H = font->Height;
+        unsigned char pixels[W*H+8];
+        gym::unpackBitmap(pixels, W, H, face+1, W);
+        gym::setColor(col);
+        gym::drawPixels(W, H, S*X-font->xorig, S*Y-font->yorig, S, pixels);
+    }
+}
+
+
+/// use gray for text starting with '%'
+static inline void setTextColor(char c, char& d, const float color[4])
+{
+    float gray[4] = { 0.5, 0.5, 0.5, 1 };
+    if ( c == '%' )
+    {
+        if ( d != c )
+        {
+            d = c;
+            gym::setColor(gray);
+        }
+    }
+    else
+    {
+        if ( d != c )
+        {
+            d = c;
+            gym::setColor(color);
+        }
     }
 }
 
@@ -130,10 +157,9 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
     if ( !font )
         return;
 
-    float gray[4] = { 0.5, 0.5, 0.5, 1 };
-    const float* col = color;
     char * str = strdup(string);
     char * token = NULL;
+    char col = 0;
     
     if ( vshift == 0 )
         vshift = font->Height;
@@ -145,11 +171,7 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
     while ((token = strsep(&str, "\n")) != NULL)
     {
         //printf("%s\n", token);
-        if ( token[0] == '%' )
-            col = gray;
-        else
-            col = color;
-        //printf("color %3.1f %3.1f %3.1f %3.1f : %c\n", col[0], col[1], col[2], col[3]);
+        setTextColor(token[0], col, color);
         const unsigned H = font->Height;
         // calculate total string length in pixels:
         unsigned L = 7;
@@ -170,11 +192,11 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
                 const uByte* face = font->Characters[c];
                 //unpackBitmap(pixels+W, face[0], H, 1+face, L);
                 unsigned cw = face[0];
-                paintBitmap(cw, H, X+scale*W, Y, scale, 1+face, col);
+                gym::paintPackedBitmap(cw, H, X+scale*W, Y, scale, 1+face);
                 W += cw;
             }
         }
-        //drawPixels(L, H, X, Y, scale, pixels, col);
+        //drawPixels(L, H, X, Y, scale, pixels);
         // move down one line.
         Y += scale * vshift;
     }
