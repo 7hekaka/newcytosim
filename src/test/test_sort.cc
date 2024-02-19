@@ -35,13 +35,12 @@ int compare64(const void * A, const void * B)
 }
 
 // plain data type
-
 struct stuff
 {
     double X, Y, Z;
     uint32_t load[LOAD];
     stuff& operator = (uint32_t const i) { Z = i; return *this; }
-    bool operator < (const stuff s) const { return Z < s.Z; }
+    bool operator < (const stuff& s) const { return Z < s.Z; }
 };
 
 int compare_stuff(const void * A, const void * B)
@@ -53,7 +52,6 @@ int compare_stuff(const void * A, const void * B)
 
 
 // indirect data type with std::vector
-
 class vertex
 {
 public:
@@ -62,7 +60,7 @@ public:
     
     vertex() : vec(3) { vec.resize(3,0.0); }
     vertex& operator = (uint32_t const i) { vec[2] = i; return *this; }
-    bool operator < (const vertex s) const { return vec[2] < s.vec[2]; }
+    bool operator < (const vertex& s) const { return vec[2] < s.vec[2]; }
 };
 
 int compare_vertex(const void * A, const void * B)
@@ -73,7 +71,6 @@ int compare_vertex(const void * A, const void * B)
 }
 
 // even more indirect data type with std::vector
-
 class triangle
 {
 public:
@@ -82,7 +79,7 @@ public:
     
     triangle() : pts(3) { pts[0].resize(3, 0.0); pts[1].resize(3, 0.0); pts[2].resize(3, 0.0);  }
     triangle& operator = (uint32_t const i) { pts[0][2] = i; return *this; }
-    bool operator < (const triangle s) const { return pts[0][2] < s.pts[0][2]; }
+    bool operator < (const triangle& s) const { return pts[0][2] < s.pts[0][2]; }
 };
 
 int compare_triangle(const void * A, const void * B)
