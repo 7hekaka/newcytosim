@@ -26,6 +26,9 @@ class FrameReader
 {
 private:
     
+    /// special value indicating that no frame is currently loaded
+    const size_t NO_FRAME = -1;
+
     /// accessory class to store a position in a file
     class file_pos 
     {
@@ -36,19 +39,16 @@ private:
     };
     
     /// type for list of positions
-    typedef std::vector<file_pos> PosList;
+    typedef std::vector<file_pos> pos_list;
     
     /// the stream from which input is made
     Inputter inputter;
     
     /// starting position for each frame
-    PosList framePos;
+    pos_list framePos;
     
-    /// index of frame stored currently
+    /// index of frame currently stored
     size_t frameIndex;
-    
-    /// last frame loaded successfully
-    size_t lastLoaded;
     
     /// go to a position where a frame close to `frm` is known to start
     size_t seekPos(size_t frm);
@@ -80,7 +80,7 @@ public:
     int badFile();
 
     /// rewind file
-    void rewind() { inputter.rewind(); frameIndex=0; }
+    void rewind() { inputter.rewind(); frameIndex = NO_FRAME; }
     
     /// dimensionality of vectors
     unsigned vectorSize() const { return inputter.vectorSize(); }
