@@ -959,10 +959,6 @@ void processKey(unsigned char key, int modifiers = 0)
         case 'G':
             worker.releaseHandle();
             break;
-            
-        case 'i':
-            glApp::currentView().invertColors();
-            break;
 
         case 'r':
             prop.toggleReport(altKeyDown?-1:1);
@@ -1220,6 +1216,9 @@ void processKey(unsigned char key, int modifiers = 0)
                 shufflePointDispVisible(player.allHandDisp(), 1);
             break;
         
+        case 3:  // ENTER
+            setPointDispVisible(player.allHandDisp(), 1);
+
 #if 0
         case 185: //that is the key left of '=' on the numpad
         case '=':

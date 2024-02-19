@@ -89,6 +89,15 @@ public:
     }
 
     /// specify floating point components
+    void set(COLOF r, COLOF g, COLOF b)
+    {
+        col_[0] = clamp(r);
+        col_[1] = clamp(g);
+        col_[2] = clamp(b);
+        col_[3] = 1.0;
+    }
+
+    /// specify floating point components
     void set(COLOF r, COLOF g, COLOF b, COLOF a)
     {
         col_[0] = clamp(r);

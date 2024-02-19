@@ -454,7 +454,14 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
             flashText("view:pixel_size = %.2f nm", 1000*view.pixelSize());
             break;
         
+        case 'B':
+            view.back_color.set(0,0,0);
+            break;
             
+        case 'i':
+            view.invertColors();
+            break;
+
         case 'h':
             view.draw_memo = ( view.draw_memo + 1 ) % 3;
             if ( view.draw_memo == 2 )
