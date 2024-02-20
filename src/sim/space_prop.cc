@@ -178,9 +178,9 @@ Space * SpaceProp::newSpace(Glossary& opt) const
 void SpaceProp::clear()
 {
     shape         = "";
+    dimensions    = "";
     display       = "";
     display_fresh = false;
-    dimensions    = "";
 }
 
 

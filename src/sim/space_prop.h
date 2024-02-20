@@ -31,11 +31,11 @@ public:
     /// primitive (e.g. `rectangle`)
     std::string shape;
     
-    /// display string (see @ref PointDispPar)
-    std::string display;
-    
     /// name of the file where dimensions are stored
     std::string dimensions;
+    
+    /// display string (see @ref PointDispPar)
+    std::string display;
 
     /// @}
     
