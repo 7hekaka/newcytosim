@@ -1782,6 +1782,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
         Vector tmp;
         in.readFloat();
         in.readFloats(tmp, DIM);
+        std::clog << "Ignored " << reference() << " clamp @ " << tmp << "\n";
 #endif
     }
 }
