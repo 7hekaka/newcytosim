@@ -931,7 +931,7 @@ void Meca::computePreconditionner()
             for ( Mecable * mec : mecables )
             {
                 if ( mec->tag() == Bead::TAG )
-                    computePrecondIsoB(mec);
+                    computePrecondIsoS(mec);
                 else
                     computePrecondFull(mec, tmp);
             }
