@@ -19,7 +19,7 @@ Both `sim` or `play` use these mathematical libraries:
 
 There exists a [public reference implementation](http://netlib.org), which can be compiled with a [FORTRAN](http://en.wikipedia.org/wiki/Fortran) compiler.
 
-If possible, use a precompiled library, which is possible on most platforms:
+However, the precompiled library, is available on many platforms:
 
 - [Intel Math Kernel Library](https://software.intel.com/mkl)
 - [Apple's vecLib](http://developer.apple.com/hardwaredrivers/ve/vector_libraries.html)
@@ -44,13 +44,13 @@ Cytosim's `play` can export PNG images, because its code include a copy of [libs
 
 ### Multi player
  
-Cytosim's ***multiplay*** is built on:
+Cytosim's ***monoplay*** and ***multiplay*** are built on:
 
 - [OpenGL](http://www.opengl.org/) 
 - [POSIX threads](http://en.wikipedia.org/wiki/POSIX_Threads)
 - [libspng](https://libspng.org/) to export images
 - [GLFW](https://www.glfw.org/) for windowing.
- 
+
 GLFW must be installed.
 One option is to [compile](https://www.glfw.org/docs/latest/compile_guide.html) from the [source code](https://www.glfw.org/download.html), which requires [cmake](https://cmake.org/).
 
@@ -77,9 +77,12 @@ To make `play` install the OpenGL developer libraries and FreeGLUT or OpenGLUT.
 
 ### Windows
 
-Native compilation on Windows can be complicated. We thus recommend installing Cygwin, which emulates a Linux-like environment. A fresh installation of Cygwin is recommended to ensure that all required reference libraries are installed.  
+Native compilation on Windows can be complicated. We thus recommend installing a Linux-like environment on top of Windows, unless a dual boot system is already available. 
+
+For Windows 10 and later, use the [Windows Subsystem for Linux](wsl.md).  
+For older systems, [use Cygwin](cygwin.md).
+
 You will need a compiler, the X window system, BLAS/LAPACK and GLUT.  
-Please, [refer to the dedicated page](cygwin.md).
 
 
 # Compilation
