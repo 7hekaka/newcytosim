@@ -48,17 +48,36 @@ void Interface::eraseSimul(bool arg) const
         sim_->eraseProperties();
 }
 
+
 ObjectSet* Interface::findClass(std::string const& name, Property*& pp)
 {
-    pp = sim_->properties.find(name);
     ObjectSet * set = nullptr;
+    pp = sim_->properties.find(name);
     if ( pp )
         set = sim_->findSet(pp->category());
     else
         set = sim_->findSet(name);
-    if ( !set )
-        throw InvalidSyntax("could not determine the class of `"+name+"'");
     return set;
+}
+
+
+Object* Interface::findObject(std::string const& name, Property*& pp)
+{
+    ObjectSet * set = nullptr;
+    // search for object name, eg. `microtubule1`:
+    long num = 0;
+    std::string str = name;
+    if ( Tokenizer::split_polysymbol(str, num) )
+    {
+        pp = sim_->properties.find(str);
+        if ( pp )
+        {
+            set = sim_->findSet(pp->category());
+            if ( set )
+                return set->findObject(pp, num);
+        }
+    }
+    return nullptr;
 }
 
 //------------------------------------------------------------------------------
@@ -769,32 +788,58 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
         return sim_->eraseObjects();
     Property * pp = nullptr;
     ObjectSet * set = findClass(name, pp);
-    
-    Filter filter(sim_, pp, opt);
-    ObjectList objs = set->collect(pass_filter, &filter, cnt);
-    
-    if ( objs.size() > 0 )
-        sim_->erase(objs);
+    if ( set )
+    {
+        // multiple objects are specified, by matching the conditions
+        Filter filter(sim_, pp, opt);
+        ObjectList objs = set->collect(pass_filter, &filter, cnt);
+        if ( objs.size() > 0 )
+            sim_->erase(objs);
+        else
+            Cytosim::warn << "found no `" << name << "' to delete\n";
+    }
     else
-        Cytosim::warn << "found no `" << name << "' to delete\n";
+    {
+        // a single object is specified
+        Object * obj = findObject(name, pp);
+        if ( !obj )
+            throw InvalidParameter("invalid object specified in command `delete'");
+        sim_->erase(obj);
+    }
 }
 
 
 /**
  This moves objects to a new position, or translates them by given vector
  */
-void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
+size_t Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
 {
     Property * pp = nullptr;
-    ObjectSet * set = findClass(name, pp);
     Space const* spc = sim_->spaces.master();
-    
+    ObjectList objs;
     bool detach = false;
     opt.set(detach, "detach");
+
+    ObjectSet * set = findClass(name, pp);
+    if ( set )
+    {
+        // multiple objects are specified, by matching the conditions
+        Filter filter(sim_, pp, opt);
+        objs = set->collect(pass_filter, &filter, cnt);
+        if ( objs.empty() )
+            throw InvalidParameter("no object found for command `move'");
+    }
+    else
+    {
+        // a single object is specified
+        Object * obj = findObject(name, pp);
+        if ( !obj )
+            throw InvalidParameter("invalid object specified in command `move'");
+        objs.push_back(obj);
+    }
     
-    Filter filter(sim_, pp, opt);
-    ObjectList objs = set->collect(pass_filter, &filter, cnt);
-    
+    VLOG("-MOVE " << objs.size() << " " << name << " "+opt.to_string());
+
     Vector vec;
     std::string str;
     for ( Object * obj : objs )
@@ -811,7 +856,24 @@ void Interface::execute_move(std::string const& name, Glossary& opt, size_t cnt)
             vec = Cytosim::findPosition(str, spc);
             obj->translate(vec);
         }
+#if NEW_SOLID_CLAMP
+        else if ( opt.set(str, "clamp") )
+        {
+            Solid * sol = Solid::toSolid(obj);
+            if ( sol )
+            {
+                real val = sol->clampStiffness();
+                opt.set(val, "clamp", 1);
+                sol->setClamp(Cytosim::findPosition(str, spc), val);
+            }
+            else
+                throw InvalidParameter("invalid Solid for command `move'");
+        }
+#endif
+        else
+            throw InvalidParameter("unspecified position for command `move'");
     }
+    return objs.size();
 }
 
 
@@ -822,16 +884,30 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
 {
     Property * pp = nullptr;
     ObjectSet * set = findClass(name, pp);
-
+    
     ObjectMark mk = 0;
     if ( ! opt.set(mk, "mark") )
         throw InvalidParameter("mark must be specified for command `mark'");
     opt.clear("mark");
-    
-    Filter filter(sim_, pp, opt);
-    ObjectList objs = set->collect(pass_filter, &filter, cnt);
-    
-    sim_->mark(objs, mk);
+
+    if ( set )
+    {
+        // multiple objects are specified, by matching the conditions
+        Filter filter(sim_, pp, opt);
+        ObjectList objs = set->collect(pass_filter, &filter, cnt);
+        if ( objs.size() > 0 )
+            sim_->mark(objs, mk);
+        else
+            Cytosim::warn << "found no `" << name << "' to mark\n";
+    }
+    else
+    {
+        // a single object is specified
+        Object * obj = findObject(name, pp);
+        if ( !obj )
+            throw InvalidParameter("invalid object specified in command `mark'");
+        obj->mark(mk);
+    }
 }
 
 
@@ -1032,7 +1108,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
         }
     }
     
-    VLOG("+RUN START " << sec);
+    VLOG("+RUN START +" << sec);
     double tau = sim_->time_step();
     // limit to one frame per time_step:
     long max = std::max(std::min(frames, std::lround(sec/tau)), 1L);
@@ -1089,7 +1165,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
             sim_->writeObjects(sim_->prop.system_file, true, binary);
     }
     
-    VLOG("+RUN END");
+    VLOG("+RUN END t: " << sim_->time());
     hold();
 }
 

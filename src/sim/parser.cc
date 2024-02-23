@@ -564,7 +564,7 @@ void Parser::parse_move(std::istream& is)
     std::streampos ipos = is.tellg();
     size_t cnt = ~0UL;
     Tokenizer::get_integer(is, cnt);
-    std::string name = Tokenizer::get_symbol(is);
+    std::string name = Tokenizer::get_polysymbol(is);
 
     if ( name == "all" )
     {
@@ -588,8 +588,8 @@ void Parser::parse_move(std::istream& is)
 
     if ( do_run )
     {
-        execute_move(name, opt, cnt);
-        check_warnings(opt, is, ipos);
+        size_t cnt = execute_move(name, opt, cnt);
+        check_warnings(opt, is, ipos, cnt);
     }
 }
 

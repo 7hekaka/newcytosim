@@ -77,6 +77,9 @@ public:
     
     /// determine Property and find set corresponding to object class `name`
     ObjectSet* findClass(std::string const& name, Property*&);
+    
+    /// find an object specified as `property:identity`, eg. `microtubule1`
+    Object* findObject(std::string const& name, Property*&);
 
     //-------------------------------------------------------------------------------
 
@@ -102,7 +105,7 @@ public:
     void execute_delete(std::string const& name, Glossary&, size_t cnt);
     
     /// move object of type `name`, following options in Glossary
-    void execute_move(std::string const& name, Glossary&, size_t cnt);
+    size_t execute_move(std::string const& name, Glossary&, size_t cnt);
     
     /// mark `cnt` objects of type `name`, following options in Glossary
     void execute_mark(std::string const& name, Glossary&, size_t cnt);

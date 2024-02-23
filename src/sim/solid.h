@@ -242,6 +242,9 @@ public:
     /// returns clamp position
     Vector clampPosition() const { return clamp_place; }
     
+    /// set clamp stiffness and position
+    void setClamp(Vector const& pos, real val) { clamp_place=pos; clamp_stiff=val; }
+
     /// force due to clamping
     Vector clampForce() const { return clamp_stiff * ( clamp_place - posPoint(0) ); }
 #endif

@@ -179,6 +179,9 @@ public:
     bool badIdentity(Object const* obj) const { return obj != inventory_.get(obj->identity()); }
 
     /// return Object corresponding to specifications
+    Object * findObject(Property const*, long identity) const;
+
+    /// return Object corresponding to specifications
     Object * findObject(const std::string& cat, std::string spec, long identity) const;
     
     /// return an Object which has this property

@@ -558,7 +558,7 @@ void Glossary::print(std::ostream& os, std::string const& prefix) const
 std::string Glossary::to_string() const
 {
     std::stringstream ss;
-    ss << '{';
+    ss << "{ ";
     for ( auto const& i : mTerms )
     {
         ss << i.first;
@@ -568,9 +568,8 @@ std::string Glossary::to_string() const
             for ( size_t x = 1; x < i.second.size(); ++x )
                 ss << ", " + i.second[x].value_;
         }
-        ss << ";";
+        ss << "; ";
     }
-    
     ss << '}';
     return ss.str();
 }

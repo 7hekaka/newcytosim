@@ -194,6 +194,38 @@ void ObjectSet::erase()
     inventory_.clear();
 }
 
+Object* ObjectSet::findObject(Property const* pp, long num) const
+{
+    Inventoried* inv = nullptr;
+    if ( num > 0 )
+    {
+        // 'microtubule1' would return the first created microtubule
+        // std::clog << "findObject -> highest pick `" << spec << num << "'\n";
+        inv = inventory_.first();
+        while ( inv )
+        {
+            num -= ( static_cast<Object*>(inv)->property() == pp );
+            if ( num <= 0 )
+                break;
+            inv = inventory_.next(inv);
+        }
+    }
+    else
+    {
+        // 'microtubule0' would return the last created microtubule
+        //std::clog << "findObject -> highest pick `" << spec << num << "'\n";
+        inv = inventory_.last();
+        while ( inv )
+        {
+            num += ( static_cast<Object*>(inv)->property() == pp );
+            if ( num >= 0 )
+                break;
+            inv = inventory_.previous(inv);
+        }
+    }
+    return static_cast<Object*>(inv);
+}
+
 
 Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num) const
 {
@@ -239,38 +271,8 @@ Object* ObjectSet::findObject(const std::string& cat, std::string spec, long num
 
     // finally search for a property name:
     Property * pp = simul_.findProperty(cat, spec);
-
     if ( pp )
-    {
-        Inventoried* inv = nullptr;
-        if ( num > 0 )
-        {
-            // 'microtubule1' would return the first created microtubule
-            // std::clog << "findObject -> highest pick `" << spec << num << "'\n";
-            inv = inventory_.first();
-            while ( inv )
-            {
-                num -= ( static_cast<Object*>(inv)->property() == pp );
-                if ( num <= 0 )
-                    break;
-                inv = inventory_.next(inv);
-            }
-        }
-        else
-        {
-            // 'microtubule0' would return the last created microtubule
-            //std::clog << "findObject -> highest pick `" << spec << num << "'\n";
-            inv = inventory_.last();
-            while ( inv )
-            {
-                num += ( static_cast<Object*>(inv)->property() == pp );
-                if ( num >= 0 )
-                    break;
-                inv = inventory_.previous(inv);
-            }
-        }
-        return static_cast<Object*>(inv);
-    }
+        return findObject(pp, num);
     
     return nullptr;
 }

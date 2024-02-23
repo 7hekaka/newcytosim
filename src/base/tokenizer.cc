@@ -177,8 +177,9 @@ std::string Tokenizer::get_polysymbol(std::istream& is, bool eat_line)
     while ( is.peek() == ':' )
     {
         res += (char)is.get();
-        res += get_symbol(is, false);
+        res += get_stuff(is, valid_symbol);
     }
+    VLOG("Tokenizer:POLYSYMBOL |" << res << "|\n");
     return res;
 }
 
