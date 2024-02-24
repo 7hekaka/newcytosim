@@ -781,7 +781,7 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
     }
     
     if ( code & 4 )
-        msg = "Warning, the parameter `" + pair.first + "' was ignored";
+        msg = "Warning, the parameter `" + format(pair) + "' was ignored";
     else if ( code & 2 )
         msg = "Warning, a value was ignored: " + format_counts(pair);
     else if ( code & 1 )
