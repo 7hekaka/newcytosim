@@ -65,7 +65,7 @@ public:
     void openFile(std::string const& file);
     
     /// return index of current frame (0 is lowest valid value)
-    size_t currentFrame() const { return frameIndex; }
+    size_t currentFrame() const { return ( frameIndex!=NO_FRAME ? frameIndex : 0 );  }
 
     /// last frame seen in the file
     size_t lastKnownFrame() const;

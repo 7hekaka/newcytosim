@@ -294,7 +294,7 @@ int FrameReader::loadNextFrame(Simul& sim)
         if ( frameIndex != NO_FRAME )
             ++frameIndex;
 
-        VLOG("FrameReader: loadNextFrame() read frame "<<currentFrame()<<'\n');
+        VLOG("FrameReader: loadNextFrame() read frame "<<frameIndex<<'\n');
         
         // the position we used was good, to read this frame
         if ( has_pos )
@@ -307,7 +307,7 @@ int FrameReader::loadNextFrame(Simul& sim)
     }
     else
     {
-        VLOG("FrameReader: loadNextFrame() failed at frame "<<currentFrame()<<'\n');
+        VLOG("FrameReader: loadNextFrame() failed at frame "<<frameIndex<<'\n');
         return res;
     }
 }
