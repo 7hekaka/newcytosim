@@ -374,9 +374,9 @@ real Sphere::addBrownianForces(real const* fce, real alpha, real* rhs) const
     Torque T(nullTorque);
 
     // position of center:
-    real cx = pPos[0];
-    real cy = pPos[1];
-    real cz = pPos[2];
+    real cX = pPos[0];
+    real cY = pPos[1];
+    real cZ = pPos[2];
 
     /*
      Stage 1: add random forces to the surface points, calculating resulting force
@@ -393,11 +393,11 @@ real Sphere::addBrownianForces(real const* fce, real alpha, real* rhs) const
         res[0] = fce[DIM*p+0] + fp.XX;
 #if   ( DIM == 2 )
         res[1] = fce[DIM*p+1] + fp.YY;
-        T += cross(Vector(pos[0]-cx, pos[1]-cy), fp);
+        T += cross(Vector(pos[0]-cX, pos[1]-cY), fp);
 #elif ( DIM >= 3 )
         res[1] = fce[DIM*p+1] + fp.YY;
         res[2] = fce[DIM*p+2] + fp.ZZ;
-        T += cross(Vector(pos[0]-cx, pos[1]-cy, pos[2]-cz), fp);
+        T += cross(Vector(pos[0]-cX, pos[1]-cY, pos[2]-cZ), fp);
 #endif
     }
 
@@ -408,7 +408,7 @@ real Sphere::addBrownianForces(real const* fce, real alpha, real* rhs) const
      and the decomposition over these 3 points gives a factor 2.
      */
     T /= ( DIM - 1 ) * spRadius * spRadius;
-    Vector R = cross(Vector(cx,cy,cz), T);
+    Vector R = cross(Vector(cX,cY,cZ), T);
 
     for ( size_t p = 1; p < nbRefPoints; ++p )
     {
@@ -420,14 +420,14 @@ real Sphere::addBrownianForces(real const* fce, real alpha, real* rhs) const
         assert_true( fce[DIM*p+1] == 0 );
         res[0] = fp.XX - R.XX + T * pos[1];
         res[1] = fp.YY - R.YY - T * pos[0];
-        F += fp + cross(Vector(pos[0]-cx, pos[1]-cy), T);
+        F += fp + cross(Vector(pos[0]-cX, pos[1]-cY), T);
 #elif ( DIM >= 3 )
         assert_true( fce[DIM*p+1] == 0 );
         assert_true( fce[DIM*p+2] == 0 );
         res[0] = fp.XX - R.XX - T.YY * pos[2] + T.ZZ * pos[1];
         res[1] = fp.YY - R.YY - T.ZZ * pos[0] + T.XX * pos[2];
         res[2] = fp.ZZ - R.ZZ - T.XX * pos[1] + T.YY * pos[0];
-        F += fp + cross(Vector(pos[0]-cx, pos[1]-cy, pos[2]-cz), T);
+        F += fp + cross(Vector(pos[0]-cX, pos[1]-cY, pos[2]-cZ), T);
 #endif
     }
     
@@ -436,12 +436,12 @@ real Sphere::addBrownianForces(real const* fce, real alpha, real* rhs) const
      the force generated in stage 1, such as to not overestimate diffusion
      */
 #if   ( DIM == 2 )
-    rhs[0] = bT * rhs[0] - F.XX;
-    rhs[1] = bT * rhs[1] - F.YY;
+    rhs[0] = fce[0] + bT * rhs[0] - F.XX;
+    rhs[1] = fce[1] + bT * rhs[1] - F.YY;
 #elif ( DIM >= 3 )
-    rhs[0] = bT * rhs[0] - F.XX;
-    rhs[1] = bT * rhs[1] - F.YY;
-    rhs[2] = bT * rhs[2] - F.ZZ;
+    rhs[0] = fce[0] + bT * rhs[0] - F.XX;
+    rhs[1] = fce[1] + bT * rhs[1] - F.YY;
+    rhs[2] = fce[2] + bT * rhs[2] - F.ZZ;
 #endif
 
     return std::max(bT/spDrag, bS*prop->point_mobility);
@@ -490,13 +490,33 @@ void Sphere::reshape()
 {
     assert_true( nPoints > 0 );
     assert_true( spRadius > 0 );
-    Vector axis;
     Vector cen(pPos);
     
-    for ( size_t j = 1; j < nPoints; ++j )
+    for ( size_t i = 1; i < nPoints; ++i )
     {
-        axis = ( posP(j) - cen ).normalized(spRadius);
-        setPoint(j, cen + axis);
+        Vector off = ( posP(i) - cen ).normalized(spRadius);
+        setPoint(i, cen + off);
+    }
+    
+#if ( DIM >= 3 )
+    orthogonalize(RNG.pint32(3));
+#endif
+}
+
+
+/// adjust position, projecting the surface point on the sphere
+void Sphere::getPoints(real const* arg)
+{
+    assert_true( nPoints > 0 );
+    assert_true( spRadius > 0 );
+
+    Vector cen(arg);
+    copy_real(DIM, arg, pPos);
+    
+    for ( size_t i = 1; i < nPoints; ++i )
+    {
+        Vector off = ( Vector(arg+DIM*i) - cen ).normalized(spRadius);
+        setPoint(i, cen + off);
     }
     
 #if ( DIM >= 3 )
@@ -532,8 +552,8 @@ void Sphere::makeProjection()
     {
         real * dir = sDir + DIM * p;
         real * pos = pPos + DIM * p;
-         for ( size_t d = 0; d < DIM; ++d )
-             dir[d] = curv * pos[d] - cen[d];
+        for ( int d = 0; d < DIM; ++d )
+            dir[d] = curv * pos[d] - cen[d];
     }
 }
 
@@ -569,11 +589,12 @@ void Sphere::projectForces(const real* X, real* Y) const
     }
     
     Vector cen(pPos);
-
-    T -= cross(cen, F);       // reduce the torque to the center of mass
-    T *= 1.0/spDragRot;       // multiply by the mobility
-    F  = F*(1.0/spDrag) + cross(cen, T);
-
+    
+    T -= cross(cen, F); // reduce the torque to the center of mass
+    T *= 1.0/spDragRot; // multiply by the mobility
+    // scale force and add component due to shift of origin:
+    F  = F * (1.0/spDrag) + cross(cen, T);
+    
     for ( size_t p = 0; p < nbRefPoints; ++p )
     {
         real * yyy = Y + DIM * p;

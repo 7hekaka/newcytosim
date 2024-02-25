@@ -125,7 +125,7 @@ public:
     void orthogonalize(size_t i);
 
     /// set position
-    void getPoints(real const* x) { Mecable::getPoints(x); reshape(); }
+    void getPoints(real const*);
 
     /// normalize point and add center
     size_t addSurfacePoint(Vector const&);

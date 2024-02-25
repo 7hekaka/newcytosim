@@ -103,7 +103,7 @@ real Bead::addBrownianForces(real const* fce, real alpha, real* rhs) const
     real b = std::sqrt( alpha * paDrag );
 
     for ( size_t d = 0; d < DIM; ++d )
-        rhs[d] = b * rhs[d] + fce[d];
+        rhs[d] = fce[d] + b * rhs[d];
     
     //the amplitude is needed in Meca
     return b / paDrag;
