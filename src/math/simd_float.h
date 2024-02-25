@@ -137,8 +137,8 @@ LOCAL vec4i shiftbitsR4(vec4f a, int b) { return _mm_srli_epi32(cast4fi(a), b); 
 LOCAL vec4i shiftbitsL4(vec4f a, int b) { return _mm_slli_epi32(cast4fi(a), b); }
 
 /// extract component
-//LOCAL int32_t getlane4i(vec4i a, int b) { return _mm_extract_epi32(a, b); }
-#define getlane4i(a, b) _mm_extract_epi32(a, b);
+//LOCAL int32_t getlane4i(vec4i a, int i) { return _mm_extract_epi32(a, i); }
+#define getlane4i(a, i) _mm_extract_epi32(a, i);
 
 
 /// load 4 32-bit integers

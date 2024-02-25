@@ -241,13 +241,13 @@ LOCAL vec4f set4fi(int a) { return vdupq_n_u32(a); }
 LOCAL vec4f load4f(float const* a) { return vld1q_f32(a); }
 LOCAL vec4f loadu4f(float const* a) { return vld1q_f32(a); }
 
-//LOCAL vec4f shiftbitsR4(vec4f a, int b) { return vshrq_n_u32((int32x4_t)a, b); }
-//LOCAL vec4f shiftbitsL4(vec4f a, int b) { return vshlq_n_u32((int32x4_t)a, b); }
-//LOCAL int32_t getlane4i(vec4i a, int b) { return vgetq_lane_u32(a, b); }
+//LOCAL vec4f shiftbitsR4(vec4f a, int i) { return vshrq_n_u32((int32x4_t)a, i); }
+//LOCAL vec4f shiftbitsL4(vec4f a, int i) { return vshlq_n_u32((int32x4_t)a, i); }
+//LOCAL int32_t getlane4i(vec4i a, int i) { return vgetq_lane_u32(a, i); }
 
-#define shiftbitsR4(a,b) vshrq_n_u32((int32x4_t)a,b)
-#define shiftbitsL4(a,b) vshlq_n_u32((int32x4_t)a,b)
-#define getlane4i(a, b) vgetq_lane_u32(a, b);
+#define shiftbitsR4(a,i) vshrq_n_u32((int32x4_t)a,i)
+#define shiftbitsL4(a,i) vshlq_n_u32((int32x4_t)a,i)
+#define getlane4i(a, i) vgetq_lane_u32(a, i);
 
 /// load integers
 LOCAL int32x4_t load4i(int32_t const* a) { return vld1q_s32(a); }
