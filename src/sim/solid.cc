@@ -35,7 +35,7 @@ void Solid::oldLinkTwins(Meca& meca, real stiff, real separation) const
 {
     real R0 = radius(0);
     constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-    const real sep = std::max(real(0), separation/2-R0*(1+Q));
+    const real sep = max_real(0, separation/2-R0*(1+Q));
     // Linking the 3 points forming the first triad
     size_t off = matIndex();
     // X = 1 contributes to a distance R*sqrt(DIM) along the X-axis

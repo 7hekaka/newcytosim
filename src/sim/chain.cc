@@ -1978,7 +1978,7 @@ Interpolation Chain::interpolateCenter() const
  */
 Interpolation Chain::interpolateM(const real ab) const
 {
-    real a = std::max(ab*iCut, real(0));
+    real a = max_real(ab*iCut, 0);
     unsigned i = std::min((unsigned)a, (unsigned)nPoints-2);
     return Interpolation(this, std::min(a-i, real(1)), i);
 }

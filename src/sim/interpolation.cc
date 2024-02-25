@@ -14,7 +14,7 @@ Interpolation::Interpolation(FiberSegment const& loc, real abs)
     // convert abscissa to coefficient:
     coef_ = abs * loc.lenInv();
     assert_true( 0 <= coef_ && coef_ <= 1 );
-    //coef_ = std::max((real)0, std::min((real)1, coef_));
+    //coef_ = max_real(0, min_real(1, coef_));
 }
 
 

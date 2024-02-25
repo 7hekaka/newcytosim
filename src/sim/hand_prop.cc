@@ -310,7 +310,7 @@ void HandProp::complete(Simul const& sim)
  */
 void HandProp::checkStiffness(real stiff, real len, real, real kT) const
 {
-    real dis = std::max(real(0), binding_range - len);
+    real dis = max_real(0, binding_range - len);
     real en = ( stiff * dis * dis ) / kT;
     
     if ( en > 10.0 && binding_rate > 0 )

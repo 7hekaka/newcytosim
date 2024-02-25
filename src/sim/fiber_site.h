@@ -130,7 +130,7 @@ public:
 #if 0
         reinterpolate(hFiber->interpolate(hAbs));
 #else
-        real a = std::max(hFiber->segmentationInv()*(hAbs-hFiber->abscissaM()), real(0));
+        real a = max_real(hFiber->segmentationInv()*(hAbs-hFiber->abscissaM()), 0);
         segix_ = std::min((unsigned)a, (unsigned)hFiber->lastSegment());
         inter_ = std::min(a-segix_, real(1));
 #endif

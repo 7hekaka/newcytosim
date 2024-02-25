@@ -1320,7 +1320,7 @@ void Fiber::updateHands() const
     #pragma ivdep
     for ( Hand * h = fHands.front(); h; h = h->next() )
     {
-        real a = std::max(iS*h->abscissa()-SM, real(0));
+        real a = max_real(iS*h->abscissa()-SM, 0);
         unsigned i = std::min((unsigned)a, L);
         h->reinterpolate(std::min(a-i, real(1)), i);
     }
@@ -1356,7 +1356,7 @@ void Fiber::updateFiber()
         assert_true(h->fiber()==this);
         const real abs = h->abscissa();
         // this is equivalent to h->reinterpolate():
-        real a = std::max(iS*abs-SM, real(0));
+        real a = max_real(iS*abs-SM, 0);
         unsigned i = std::min((unsigned)a, L);
         h->reinterpolate(std::min(a-i, real(1)), i);
         // Attention: `handleDisassembly()` may lead to detachment:

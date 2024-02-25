@@ -129,7 +129,7 @@ void SpaceRing::setConfinement(Vector const& pos, Mecapoint const& mp,
 {
     if ( radius_ > rad )
     {
-        real len = max_real(half_-rad, real(0));
+        real len = max_real(half_-rad, 0);
         if ( abs_real(pos.XX) > len )
             meca.addPlaneClampX(mp, std::copysign(len, pos.XX), stiff);
         
