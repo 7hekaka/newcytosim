@@ -18,7 +18,7 @@
 class SpaceCapsule : public Space
 {    
     /// apply a force directed towards the edge of the Space
-    static void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff, real len, real rad);
+    static void setConfinement_(Vector const& pos, Mecapoint const&, Meca&, real stiff, real len, real rad);
 
 private:
     
@@ -69,7 +69,7 @@ public:
     /// apply a force directed towards the edge of the Space
     void setConfinement(Vector const& pos, Mecapoint const& mp, Meca& meca, real stiff) const
     {
-        setConfinement(pos, mp, meca, stiff, half_, radius_);
+        setConfinement_(pos, mp, meca, stiff, half_, radius_);
     }
 
     /// apply a force directed towards the edge of the Space

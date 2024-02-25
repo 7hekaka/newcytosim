@@ -193,8 +193,8 @@ Vector SpaceCapsule::placeOnEdge(real) const
 /**
  This applies the correct forces in the cylindrical and spherical parts.
  */
-void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& mp,
-                                  Meca& meca, real stiff, const real len, const real rad)
+void SpaceCapsule::setConfinement_(Vector const& pos, Mecapoint const& mp,
+                                   Meca& meca, real stiff, const real len, const real rad)
 {
     if ( abs_real(pos.XX) > len )
     {
@@ -212,10 +212,11 @@ void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& mp,
 void SpaceCapsule::setConfinement(Vector const& pos, Mecapoint const& mp, real rad,
                                   Meca& meca, real stiff) const
 {
-    if ( rad < radius_ )
-        setConfinement(pos, mp, meca, stiff, half_, radius_-rad);
+    real R = radius_ - rad;
+    if ( R > 0 )
+        setConfinement_(pos, mp, meca, stiff, half_, R);
     else
-        setConfinement(pos, mp, meca, stiff, half_, 0);
+        setConfinement_(pos, mp, meca, stiff, max_real(half_+R, 0), 0);
 }
 
 //------------------------------------------------------------------------------
