@@ -98,7 +98,7 @@ namespace VecPrint
     template < typename T >
     void print(std::string const& msg, size_t len, const T* vec, int digits = 2)
     {
-        fprintf(OUT, "%s %6i ", msg.c_str(), len);
+        fprintf(OUT, "%s %6zu ", msg.c_str(), len);
         print(OUT, std::min(len, SUP), vec, digits);
         putc('\n', OUT);
     }
