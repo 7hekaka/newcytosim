@@ -312,7 +312,6 @@ int main(int argc, char* argv[])
     {
         pcg32_state = get_random_seed();
         has_frame = arg.set(frm, "frame");
-        simul.initCytosim();
     }
     catch( Exception & e )
     {

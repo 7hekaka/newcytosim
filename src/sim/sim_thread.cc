@@ -199,6 +199,7 @@ void SimThread::prolong_run(double sec)
 {
     assert_true( isWorker() );
     Parser * back = sim_->parser();
+    sim_->initCytosim();
     sim_->parser(this);
     try {
         Parser::execute_run(sec);
