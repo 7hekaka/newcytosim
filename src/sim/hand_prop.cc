@@ -227,7 +227,7 @@ void HandProp::read(Glossary& glos)
         display_fresh = true;
 
 #if BACKWARD_COMPATIBILITY < 50
-    if ( glos.set(hold_growing_end, "hold_growing_ends") )
+    if ( glos.set(hold_growing_end, 2, "hold_growing_ends") )
         Cytosim::warn << "hand:hold_growing_ends was renamed hold_growing_end\n";
 #endif
 }

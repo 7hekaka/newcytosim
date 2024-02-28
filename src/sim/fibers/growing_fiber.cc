@@ -154,6 +154,8 @@ void GrowingFiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #if BACKWARD_COMPATIBILITY < 44
         if ( tag == TAG && in.formatID() < 44 )
             readEndStates(in);
+#endif
+#if BACKWARD_COMPATIBILITY < 46
         const real len = length();
 #endif
         

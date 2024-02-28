@@ -161,9 +161,10 @@ static ObjectID readObjectID_old(Inputter& in, ObjectTag& tag)
     // up to format 49, a '$' was added to indicate fat format
     if ( c == '$' )
     {
-        tag = in.get_char();
-        if ( tag == EOF )
+        c = in.get_char();
+        if ( c == EOF )
             throw InvalidIO("unexpected end of file");
+        tag = c;
         fat = 1;
     }
 #endif

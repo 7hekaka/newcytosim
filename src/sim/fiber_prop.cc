@@ -514,7 +514,7 @@ void FiberProp::read(Glossary& glos)
                                   {"minus_end", CONFINE_MINUS_END},
                                   {"plus_end",  CONFINE_PLUS_END}});
     
-    glos.set(confine_stiff, "confined", 1);
+    glos.set(confine_stiff[0], "confined", 1);
 #endif
 
 #if NEW_FIBER_MAKE_COUPLE
