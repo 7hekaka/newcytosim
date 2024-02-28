@@ -1413,10 +1413,10 @@ void Solid::setDragCoefficient()
     
     // sanity check:
     if ( soDrag < REAL_EPSILON )
-        throw InvalidParameter("ill-formed Solid has no translational drag");
+        throw InvalidParameter("solid "+reference()+" has no drag (no bead with radius > 0)");
 
     if ( soDragRot < REAL_EPSILON )
-        throw InvalidParameter("ill-formed Solid has no rotational drag");
+        throw InvalidParameter("ill-formed Solid "+reference()+" has zero rotational drag");
 
 #if ( 0 )
     std::clog << "Solid " << reference() << " (viscosity " << prop->viscosity << ") has:\n";
