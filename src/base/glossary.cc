@@ -215,7 +215,7 @@ void Glossary::add_counts(Glossary const& opt)
 }
 
 
-Glossary Glossary::extract(key_type const& key) const
+Glossary Glossary::get_term(key_type const& key) const
 {
     Glossary res;
     map_type::const_iterator w = mTerms.find(key);
@@ -227,7 +227,7 @@ Glossary Glossary::extract(key_type const& key) const
 }
 
 
-Glossary Glossary::extract_unused() const
+Glossary Glossary::unused_terms() const
 {
     Glossary res;
     for ( auto const& i : mTerms )

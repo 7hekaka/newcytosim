@@ -274,10 +274,10 @@ public:
     void add_counts(Glossary const&);
 
     /// create a new Glossary with only the given key
-    Glossary extract(key_type const&) const;
+    Glossary get_term(key_type const&) const;
     
     /// create a new Glossary with terms that were not used
-    Glossary extract_unused() const;
+    Glossary unused_terms() const;
 
     /// return number of values associated with a key
     size_t num_values(key_type const&) const;
