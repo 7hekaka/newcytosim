@@ -200,6 +200,8 @@ namespace gle
     void thinLongTube();
     /// draw tube with grooves
     void flutedTube();
+    /// draw lines on the surface of a tube
+    void stripedTube(float line_width, gym_color);
 
     /// display a super nice cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone1();
@@ -276,8 +278,8 @@ namespace gle
     /// draw a yellow tennisball
     void tennisball();
     
-    /// draw lines on the surface of a tube
-    void stripedTube(float width);
+    /// draw multiple lines forming a tube
+    void stripes(float line_width);
     /// primitive used to draw the central segments of fibers
     inline void innerTube() { longTube2(); }
     /// primitive used to draw the minus ends of fibers

@@ -25,10 +25,10 @@ typedef flute5 flute4D;
 namespace gym
 {
     /// reinterpret buffer with different layout
-    inline void rebindBufferVD(size_t gap) { rebind(); setBufferV((DIM>2?3:2), gap); }
+    inline void rebindBufferVD(size_t stride) { rebind(); setBufferV((DIM>2?3:2), stride); }
     
     /// reinterpret buffer with different layout
-    inline void rebindBufferC4VD(size_t gap) { rebind(); setBufferCV(4, (DIM>2?4:2), gap); }
+    inline void rebindBufferC4VD(size_t stride) { rebind(); setBufferCV(4, (DIM>2?4:2), stride); }
 
     inline fluteD* mapBufferVD(size_t n)
     {

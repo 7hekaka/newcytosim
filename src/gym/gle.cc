@@ -785,14 +785,14 @@ namespace gle
     
     void cubeEdges(float width)
     {
-        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
+        gym::bindBufferV3(buf_[0], 1, 3*blobs_[3]);
         gym::drawLines(width, 0, 24);
         gym::cleanup(1);
     }
     
     void cubeVerticalEdges(float width)
     {
-        gym::bindBufferV3(buf_[0], 3*blobs_[3]);
+        gym::bindBufferV3(buf_[0], 1, 3*blobs_[3]);
         gym::drawLines(width, 0, 8);
         gym::cleanup(1);
     }
@@ -1457,6 +1457,19 @@ namespace gle
         gym::cleanup();
     }
     
+    inline void doStripedTubeStrip(float line_width, size_t inx, size_t cnt, gym_color col)
+    {
+        gym::bindBufferV3N3(buf_[0]);
+        gym::drawTriangleStrip(tubes_[inx], cnt);
+        gym::cleanup(1);
+        gym::rebind();
+        gym::disableLighting();
+        gym::color(col);
+        gym::drawLines(line_width, tubes_[inx], cnt);
+        gym::cleanup();
+        gym::restoreLighting();
+    }
+
     // using Vertex Buffer Objects
     void tube1()         { doTubeStrip(0, nbTrianglesTube(1)); }
     void tube2()         { doTubeStrip(1, nbTrianglesTube(2)); }
@@ -1495,10 +1508,11 @@ namespace gle
     void ring()          { doTubeStrip(30, 2+pi_twice); }
     void thin_ring()     { doTubeStrip(31, 2+pi_twice); }
 
+    void stripedTube(float w, gym_color col) { doStripedTubeStrip(w, 3, nbTrianglesTube(8), col); }
+
     inline void bindBufferV2() { gym::bindBufferV2(buf_[0]); }
-    inline void bindBufferV3N3() { gym::bindBufferV3N3(buf_[0]); }
     
-    void stripedTube(float w) { bindBufferV3N3(); gym::cleanup(1); gym::drawLines(w, tubes_[2], nbTrianglesTube(4)); }
+    void stripes(float w) { gym::bindBufferV3(buf_[0], 2); gym::drawLines(w, tubes_[2], nbTrianglesTube(4)); }
     void circle1(float w) { bindBufferV2(); gym::drawLineStrip(w, discs_[0], 1+pi_twice); }
     void circle2(float w) { bindBufferV2(); gym::drawLineStrip(w, discs_[1], 1+pi_twice/2); }
     void dottedCircle(float w) { bindBufferV2(); gym::drawPoints(w, discs_[1], 1+pi_twice/2); }

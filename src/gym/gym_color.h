@@ -272,7 +272,7 @@ public:
 
     gym_color inverted() const
     {
-        return gym_color(1-col_[0], 1-col_[1], 1-col_[2], col_[3]);
+        return gym_color(1.f-col_[0], 1.f-col_[1], 1.f-col_[2], col_[3]);
     }
     
     gym_color mix(gym_color C) const
@@ -299,7 +299,7 @@ public:
     static void set_hue_components(COLOF& r, COLOF& g, COLOF& b, COLOF h);
 
     /// return new saturated color with given Hue value `h` in [-PI, PI]
-    static gym_color hue_color(COLOF h, COLOF alpha = 1.0f);
+    static gym_color hue_color(COLOF h, COLOF alpha = 1.f);
     
     /// return new saturated color with Hue value `atan2(y, x)`
     static gym_color radial_colorXY(COLOF x, COLOF y, COLOF alpha);
@@ -308,13 +308,13 @@ public:
     static gym_color radial_color(COLOF x, COLOF y, COLOF z, COLOF alpha);
 
     /// return new jet color for h in [0, 5] with specified alpha component
-    static gym_color bgr_color(COLOF h, COLOF alpha = 1.0f);
+    static gym_color bgr_color(COLOF h, COLOF alpha = 1.f);
 
     /// return new jet color for h in [0, 5] with specified alpha component
-    static gym_color jet_color(COLOF h, COLOF alpha = 1.0f);
+    static gym_color jet_color(COLOF h, COLOF alpha = 1.f);
     
     /// return new jet color extended
-    static gym_color dark_jet_color(COLOF h, COLOF alpha = 1.0f);
+    static gym_color dark_jet_color(COLOF h, COLOF alpha = 1.f);
     
     /// return new jet color extended
     static gym_color jet_color_alpha(COLOF h);

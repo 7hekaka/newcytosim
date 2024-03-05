@@ -58,18 +58,18 @@ namespace gym
         return (float*)ptr;
     }
     
-    void setBufferV(size_t pts, size_t gap, size_t off)
+    void setBufferV(size_t pts, size_t stride, size_t off)
     {
-        glVertexPointer(pts, GL_FLOAT, pts*gap*Q, (void*)(off*Q));
+        glVertexPointer(pts, GL_FLOAT, pts*stride*Q, (void*)(off*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void setBufferVxT2(size_t pts, size_t gap)
+    void setBufferVxT2(size_t pts, size_t stride)
     {
         assert_true(!glIsEnabled(GL_TEXTURE_COORD_ARRAY));
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-        glVertexPointer(std::min(pts, 3UL), GL_FLOAT, gap*Q, nullptr);
-        glTexCoordPointer(2, GL_FLOAT, gap*Q, (void*)(pts*Q));
+        glVertexPointer(std::min(pts, 3UL), GL_FLOAT, stride*Q, nullptr);
+        glTexCoordPointer(2, GL_FLOAT, stride*Q, (void*)(pts*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
@@ -96,10 +96,10 @@ namespace gym
         setBufferV(2, 1, off);
     }
     
-    void bindBufferV3(GLuint buf, size_t off)
+    void bindBufferV3(GLuint buf, size_t stride, size_t off)
     {
         glBindBuffer(GL_ARRAY_BUFFER, buf);
-        setBufferV(3, 1, off);
+        setBufferV(3, stride, off);
     }
 
     void bindBufferV3N3(GLuint buf)
@@ -125,32 +125,32 @@ namespace gym
         setBufferV3N0(first);
     }
 
-    void setBufferCV(size_t col, size_t pts, size_t gap)
+    void setBufferCV(size_t col, size_t pts, size_t stride)
     {
         assert_true(currStream() == boundBuffer());
-        gap *= ( col + pts );
+        stride *= ( col + pts );
         if ( col > 0 )
         {
             glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, GL_FLOAT, gap*Q, nullptr);
+            glColorPointer(4, GL_FLOAT, stride*Q, nullptr);
         }
         else
         {
             assert_true(!glIsEnabled(GL_COLOR_ARRAY));
         }
         assert_enabled(GL_VERTEX_ARRAY);
-        glVertexPointer(std::min(pts, 3UL), GL_FLOAT, gap*Q, (void*)(col*Q));
+        glVertexPointer(std::min(pts, 3UL), GL_FLOAT, stride*Q, (void*)(col*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
 
-    void setBufferCNV(size_t col, size_t nor, size_t pts, size_t gap)
+    void setBufferCNV(size_t col, size_t nor, size_t pts, size_t stride)
     {
         assert_true(currStream() == boundBuffer());
-        gap *= ( col + pts + nor );
+        stride *= ( col + pts + nor );
         if ( col > 0 )
         {
             glEnableClientState(GL_COLOR_ARRAY);
-            glColorPointer(4, GL_FLOAT, gap*Q, nullptr);
+            glColorPointer(4, GL_FLOAT, stride*Q, nullptr);
         }
         else
         {
@@ -159,14 +159,14 @@ namespace gym
         if ( nor > 1 )
         {
             glEnableClientState(GL_NORMAL_ARRAY);
-            glNormalPointer(GL_FLOAT, gap*Q, (void*)(col*Q));
+            glNormalPointer(GL_FLOAT, stride*Q, (void*)(col*Q));
         }
         else
         {
             assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
         }
         assert_enabled(GL_VERTEX_ARRAY);
-        glVertexPointer(pts, GL_FLOAT, gap*Q, (void*)((col+nor)*Q));
+        glVertexPointer(pts, GL_FLOAT, stride*Q, (void*)((col+nor)*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     

@@ -9,23 +9,23 @@
 namespace gym
 {
     /// define buffer layout
-    void setBufferV(size_t vertex, size_t gap = 1, size_t off = 0);
+    void setBufferV(size_t size, size_t stride = 1, size_t off = 0);
 
     /// define buffer layout
     void setBufferVN(size_t normals, size_t vertex);
 
     /// define buffer layout
-    void setBufferCV(size_t colors, size_t vertex, size_t gap = 1);
+    void setBufferCV(size_t colors, size_t vertex, size_t stride = 1);
 
     /// define buffer layout
-    void setBufferCNV(size_t colors, size_t normals, size_t vertex, size_t gap);
+    void setBufferCNV(size_t colors, size_t normals, size_t vertex, size_t stride);
     
     
     /// define buffer layout for a Device buffer
     void bindBufferV2(GLuint, size_t off = 0);
     
     /// define buffer layout for a Device buffer
-    void bindBufferV3(GLuint, size_t off = 0);
+    void bindBufferV3(GLuint, size_t stride = 1, size_t off = 0);
 
     /// bind buffer with 3-position coordinates, 3 normal coordinates
     void bindBufferV3N3(GLuint);
@@ -76,7 +76,7 @@ namespace gym
     /// map / unmap GPU buffer for 3D vertex
     inline flute3* mapBufferV3(size_t n) { return (flute3*)mapFloatBuffer(3*n); }
     inline void  unmapBufferV3() { unmap(); setBufferV(3); }
-    inline void rebindBufferV3(size_t gap, size_t off) { rebind(); setBufferV(3, gap, 3*off); }
+    inline void rebindBufferV3(size_t stride, size_t off) { rebind(); setBufferV(3, stride, 3*off); }
 
     inline void unmapBufferV3N0() { unmap(); setBufferV3N0(0); }
     
@@ -97,7 +97,7 @@ namespace gym
     
     unsigned short* mapIndexBuffer(size_t n);
     void unmapIndexBuffer();
-    void bindIndexBuffer(size_t gap);
+    void bindIndexBuffer(size_t stride);
 };
 
 #endif

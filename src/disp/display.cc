@@ -882,7 +882,7 @@ void Display::drawFiberGrowth(Fiber const& fib, float size) const
         const float rad = 1.03125 * pixscale(size);
         gym::color_both(1, 1, 1, 1);
         gym::stretchAlignZ1(fib.posEndM(), rad, fib.dirEndM(), fib.freshAssemblyM());
-        gle::stripedTube(1.0);
+        gle::stripes(1.f);
     }
     if ( fib.freshAssemblyP() > 0 )
     {
@@ -890,7 +890,7 @@ void Display::drawFiberGrowth(Fiber const& fib, float size) const
         const float rad = 1.03125 * pixscale(size);
         gym::color_both(1, 1, 1, 1);
         gym::stretchAlignZ1(fib.posEndP(), rad, -fib.dirEndP(), fib.freshAssemblyP());
-        gle::stripedTube(1.0);
+        gle::stripes(1.f);
     }
 }
 
@@ -2163,13 +2163,13 @@ void Display::drawSolid(Solid const& obj)
         real rad = M_SQRT2 * pixscale(disp->size);
         gym::ref_view();
         gym::enableLighting();
-        gym::color_both(lor, 1);
         const size_t off = DIM+1; // index of point to be linked
         const size_t sup = std::min(obj.lastPoint(), 2*off+1); // last point to be linked
         for ( size_t inx = off; inx <= sup; inx += off+1 )
         {
             gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), rad);
-            gle::hexTube();
+            gym::color_both(lor, 1);
+            gle::stripedTube(1.f, gym_color(1.f,1.f,1.f));
         }
     }
 #endif
