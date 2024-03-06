@@ -160,7 +160,7 @@ public:
     /// print list of buddies
     void printBuddies(std::ostream& os) const
     {
-        os << "Buddies of Object " << this << " are: ";
+        os << "Buddies of " << this << " : ";
         Buddy * b = buddy_;
         while ( b != this )
         {
