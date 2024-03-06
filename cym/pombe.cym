@@ -52,7 +52,7 @@ set bundle bunch
     stiffness = 1000
 }
 
-set nucleus noyau
+set nucleus kern
 {
     stiffness = 200
 }
@@ -63,7 +63,7 @@ new cell
     radius = 1.62
 }
 
-new noyau
+new kern
 {
     sphere    = envelope
     bundles   = 4, bunch, (fibers=2, microtubule, (length=0.5; plus_end=grow;))
