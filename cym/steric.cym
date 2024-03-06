@@ -1,10 +1,13 @@
 % A test of steric interactions between fibers and beads
 % F. Nedelec, 23 Jan 2010
 
+% To enable Steric interactions, global parameters must be set in 'simul',
+% and additionally in every class that is to be subject of steric forces
+% in addition a parameter 
 
 set simul system
 {
-    steric = 1, 100
+    steric = 1, 200  % 1=enable, 200=stiffness 
     precondition = 0
     time_step = 0.005
     kT = 0.0042
@@ -15,13 +18,12 @@ set simul system
 
 set space cell
 {
-    shape = dice
+    shape = circle
 }
 
 new cell
 {
-    length = 3, 3, 0.5
-    edge = 0.25
+    radius = 3
 }
 
 set fiber filament
@@ -29,7 +31,7 @@ set fiber filament
     rigidity = 1
     confine = inside, 100
     segmentation = 0.2
-    steric = 1, 0.05
+    steric = 1, 0.05  % 1=enable, 0.05=radius
     
     activity = classic
     growing_speed     = 0.2,  0.2
@@ -52,14 +54,14 @@ new 20 filament
 
 set bead ball
 {
-    steric = 1
+    steric = 1  % 1=enable
     confine = all_inside, 100
     display = ( style=5; coloring=1; )
 }
 
 new 40 ball
 {
-    radius = 0.25, 0.1, 0.05
+    radius = 0.25
 }
 
 run 100000 system

@@ -165,7 +165,7 @@ void SimulProp::complete(Simul const& sim)
             throw InvalidParameter("steric stiffness (push, steric[1]) must be >= 0");
 
         if ( steric_stiff_pull[0] < 0 )
-            throw InvalidParameter("steric stiffness (pull steric[2]) must be >= 0");
+            throw InvalidParameter("steric stiffness (pull, steric[2]) must be >= 0");
     }
     /*
      If the Global parameters have changed, we update all derived parameters.

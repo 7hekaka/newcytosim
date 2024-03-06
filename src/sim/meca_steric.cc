@@ -16,9 +16,7 @@ static void setStericGrid(GRID& grid, Space const* spc, real& range)
     assert_true(spc);
     real res = range;
 
-    if ( res <= 0 )
-        throw InvalidParameter("simul:steric_max_range must be defined");
-
+    // adjust grid size to avoid excessive memory footprint:
     const size_t sup = 1 << 17;
     while ( grid.setGrid(spc, res) > sup )
         res *= M_SQRT2;
@@ -29,26 +27,31 @@ static void setStericGrid(GRID& grid, Space const* spc, real& range)
         range = res;
     }
     
+    /** If the Space dimensions have not changed, we would only need
+     to allocate the Grid once, but this is not garanteed in general */
     grid.createCells();
 }
 
 
 void Meca::selectStericEngine(Simul const& sim)
 {
+    steric_ = 0;
     if ( sim.prop.steric_mode )
     {
         Space const* spc = sim.spaces.master();
         if ( ! spc )
-            throw InvalidParameter("simul:steric could not find a Space");
+            throw InvalidParameter("simul:steric could not determine its Space");
 
-        // without pulling, use `locusGrid` which is simpler:
+        // without attractive forces, the simpler LocusGrid will be used:
         steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
         
-        /** If the Space size is not expected to change, then we would only need
-         to allocate the Grid once, but this is not garanteed in general */
+        // the grid size can be specified as a parameter, or computed automatically:
         if ( sim.prop.steric_max_range <= REAL_EPSILON )
             sim.prop.steric_max_range = sim.minimumStericRange();
         
+        if ( sim.prop.steric_max_range <= REAL_EPSILON )
+            throw InvalidParameter("simul:steric_max_range must be defined");
+
         switch ( steric_ )
         {
             case 1:
@@ -64,15 +67,11 @@ void Meca::selectStericEngine(Simul const& sim)
                 break;
         }
     }
-    else
-    {
-        steric_ = 0;
-    }
 }
 
 
 //------------------------------------------------------------------------------
-#pragma mark - PointGrid
+#pragma mark - PointGrid with attraction
 
 /**
  The prop->steric of each object is a bit-field that

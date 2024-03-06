@@ -10,6 +10,7 @@
  
  It assumes that Fiber::adjustSegmentation() is used, such that at any time:
      actual_segmentation <  4/3 * FiberProp::segmentation
+ If no fiber is dynamic, the real segmentation can be used.
  */
 real Simul::minimumStericRange() const
 {
@@ -23,38 +24,38 @@ real Simul::minimumStericRange() const
         if ( fp->steric )
         {
             // The maximum length of a segment is 4/3 * segmentation
-            len = std::max(len, (real)(1.34) * fp->segmentation);
+            len = max_real(len, (real)(1.34) * fp->segmentation);
             
             // check extended range of interaction
-            ran = std::max(ran, fp->steric_radius + fp->steric_range);
+            ran = max_real(ran, 2 * fp->steric_radius + fp->steric_range);
         }
     }
     
-    // verify against the actual segmentations of the Fibers:
+    // for safety, check the actual segmentation of all fibers:
     for ( Fiber const* F=fibers.first(); F; F=F->next() )
     {
         if ( F->prop->steric )
-            len = std::max(len, F->segmentation());
+            len = max_real(len, F->segmentation());
     }
 
     /*
-     The interaction can be aligned with the fiber, and we must add the distances:
-     2 * range if two fibers of radius 'range' interact.
-     + 2 * ( len / 2 ) since len/2 is the distance between the center of the segment
-     and its most distal points.
+     Since two fibers can be aligned end-on, we must add the distances:
+     `2 * steric_radius + steric_range + 2 * ( len / 2 )`
+     since `len/2` is the distance between the center of a segment
+     and any of its point that may be considered for interaction.
      */
-    ran = len + 2 * ran;
-    
+    ran = ran + len;
+
     for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
         if ( O->prop->steric )
-            ran = std::max(ran, 2 * O->radius() + O->prop->steric_range);
+            ran = max_real(ran, 2 * O->radius() + O->prop->steric_range);
     }
     
     for ( Bead const* B=beads.first(); B; B=B->next() )
     {
         if ( B->prop->steric )
-            ran = std::max(ran, 2 * B->radius() + B->prop->steric_range);
+            ran = max_real(ran, 2 * B->radius() + B->prop->steric_range);
     }
     
     for ( Solid const* S=solids.first(); S; S=S->next() )
@@ -62,7 +63,7 @@ real Simul::minimumStericRange() const
         if ( S->prop->steric )
         {
             for ( size_t p = 0; p < S->nbPoints(); ++p )
-                ran = std::max(ran, 2 * S->radius(p) + S->prop->steric_range);
+                ran = max_real(ran, 2 * S->radius(p) + S->prop->steric_range);
         }
     }
     
@@ -121,10 +122,6 @@ void Simul::setAllInteractions(Meca& meca) const
     for ( Tubule const* t = tubules.first(); t; t=t->next() )
         t->setInteractions(meca);
 
-#if 0
-    for ( Event const* e = events.first(); e; e=e->next() )
-        e->setInteractions(meca);
-#endif
     
     // add steric interactions
     if ( meca.steric_ == 2 )
