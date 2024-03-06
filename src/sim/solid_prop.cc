@@ -12,7 +12,7 @@ void SolidProp::clear()
 {
     drag         = -1;
     viscosity    = -1;
-    steric       = 0;
+    steric_key   = 0;
     steric_range = 0;
     
     confine = CONFINE_OFF;
@@ -46,7 +46,7 @@ void SolidProp::read(Glossary& glos)
     glos.set(drag,           "drag");
     glos.set(viscosity,      "viscosity");
     
-    glos.set(steric,         "steric");
+    glos.set(steric_key,     "steric");
     glos.set(steric_range,   "steric", 1);
     
     glos.set(confine,        "confine", {{"off",          CONFINE_OFF},
@@ -124,7 +124,7 @@ void SolidProp::complete(Simul const& sim)
     if ( confine && confine_stiff < 0 )
         throw InvalidParameter(name()+":confine_stiff must be >= 0");
     
-    if ( primed(sim) && steric && !sim.prop.steric_mode )
+    if ( primed(sim) && steric_key && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
     
 #if NEW_SOLID_MAKE_COUPLE
@@ -156,7 +156,7 @@ void SolidProp::write_values(std::ostream& os) const
 {
     if ( drag > 0 )  write_value(os, "drag", drag);
     write_value(os, "viscosity", viscosity);
-    write_value(os, "steric",    steric, steric_range);
+    write_value(os, "steric",    steric_key, steric_range);
     write_value(os, "confine",   confine, confine_stiff, confine_label);
 #if NEW_RADIAL_FLOW
     write_value(os, "flow_center", flow_center);

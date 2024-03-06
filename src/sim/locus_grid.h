@@ -449,7 +449,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(w).emplace(fib, inx, rad, rge, w);
 #else
-        cell_pane(w, fib->prop->steric).emplace(fib, inx, rad, rad, w);
+        cell_pane(w, fib->prop->steric_key).emplace(fib, inx, rad, rad, w);
 #endif
     }
     
@@ -461,7 +461,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(w).emplace(mec, inx, rad, rad, w);
 #else
-        cell_pane(w, mec->prop->steric).emplace(mec, inx, rad, rad, w);
+        cell_pane(w, mec->prop->steric_key).emplace(mec, inx, rad, rad, w);
 #endif
     }
     
@@ -476,7 +476,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(c).emplace(fib, inx, rad, rge, w);
 #else
-        cell_pane(c, fib->prop->steric).emplace(fib, inx, rad, rad, w);
+        cell_pane(c, fib->prop->steric_key).emplace(fib, inx, rad, rad, w);
 #endif
     }
 
@@ -491,7 +491,7 @@ public:
 #if ( MAX_STERIC_PANES <= 1 )
         cell_pane(c).emplace(mec, inx, rad, rad, w);
 #else
-        cell_pane(c, mec->prop->steric).emplace(mec, inx, rad, rad, w);
+        cell_pane(c, mec->prop->steric_key).emplace(mec, inx, rad, rad, w);
 #endif
     }
 #endif

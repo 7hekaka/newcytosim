@@ -61,7 +61,7 @@ public:
     real viscosity;
     
     /// flag to include steric interactions
-    int steric;
+    int steric_key;
     
     /// distance added to radius to set the steric interaction distance
     real steric_range;

@@ -18,7 +18,7 @@ void SphereProp::clear()
     point_mobility = -1;
     viscosity     = -1;
     piston_effect = false;
-    steric        = 0;
+    steric_key    = 0;
     steric_range  = 0;
     
     confine = CONFINE_OFF;
@@ -37,7 +37,7 @@ void SphereProp::read(Glossary& glos)
     glos.set(piston_effect,   "piston_effect");
     glos.set(viscosity,       "viscosity");
     
-    glos.set(steric,          "steric");
+    glos.set(steric_key,      "steric");
     glos.set(steric_range,    "steric", 1);
  
     glos.set(confine, "confine", {{"off",        CONFINE_OFF},
@@ -95,7 +95,7 @@ void SphereProp::complete(Simul const& sim)
     if ( confine && confine_stiff < 0 )
         throw InvalidParameter(name()+":confine_stiff must be >= 0");
     
-    if ( primed(sim) && steric && !sim.prop.steric_mode )
+    if ( primed(sim) && steric_key && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( point_mobility < 0 )
@@ -108,7 +108,7 @@ void SphereProp::write_values(std::ostream& os) const
     write_value(os, "viscosity",      viscosity);
     write_value(os, "point_mobility", point_mobility);
     write_value(os, "piston_effect",  piston_effect);
-    write_value(os, "steric",         steric, steric_range);
+    write_value(os, "steric",         steric_key, steric_range);
     write_value(os, "confine",        confine, confine_stiff, confine_label);
     write_value(os, "display",        "("+display+")");
 }

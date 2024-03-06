@@ -3,7 +3,7 @@
 template <typename T>
 static bool has_steric(T const& obj, int sup)
 {
-    int S = obj->prop->steric;
+    int S = obj->prop->steric_key;
     if ( S < 0 || S > sup )
         throw InvalidParameter(obj->prop->name()+":steric is out-of-range");
     return S;
@@ -74,14 +74,13 @@ void Meca::selectStericEngine(Simul const& sim)
 #pragma mark - PointGrid with attraction
 
 /**
- The prop->steric of each object is a bit-field that
- specify one or more 'pane' where the object is present.
- The different panes are then treated consecutively and independently,
+ The `prop->steric_key` is a bit-field specifying one or more 'pane' where the
+ object is present. Each panes is then treated consecutively and independently,
  and only objects in the same pane may interact.
  
-     for ( int pane=1; pane<=2 && pane<=prop->steric; ++pane )
+     for ( int pane = 1; pane <= Simul::steric_mode; ++pane )
      {
-         if ( obj->prop->steric & pane )
+         if ( obj->prop->steric_key & pane )
          ...
      }
  
@@ -277,17 +276,16 @@ static void distributeStericMecablesModulo(LocusGrid& grid, Simul const& sim)
 #endif
 
 /**
- The prop->steric of each object is a bit-field that
- specify one or more 'pane' where the object is present.
- The different panes are then treated consecutively and independently,
+ The `prop->steric_key` is a bit-field specifying one or more 'pane' where the
+ object is present. Each panes is then treated consecutively and independently,
  and only objects in the same pane may interact.
- 
-     for ( int pane=1; pane<=2 && pane<=prop->steric; ++pane )
+
+     for ( int pane = 1; pane <= Simul::steric_mode; ++pane )
      {
-         if ( obj->prop->steric & pane )
+         if ( obj->prop->steric_key & pane )
          ...
      }
- 
+
  With this mechanism, the user can flexibly configure which objects
  may see each other and thus control the steric interactions.
  

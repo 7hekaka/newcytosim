@@ -21,7 +21,7 @@ real Simul::minimumStericRange() const
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
-        if ( fp->steric )
+        if ( fp->steric_key )
         {
             // The maximum length of a segment is 4/3 * segmentation
             len = max_real(len, (real)(1.34) * fp->segmentation);
@@ -34,7 +34,7 @@ real Simul::minimumStericRange() const
     // for safety, check the actual segmentation of all fibers:
     for ( Fiber const* F=fibers.first(); F; F=F->next() )
     {
-        if ( F->prop->steric )
+        if ( F->prop->steric_key )
             len = max_real(len, F->segmentation());
     }
 
@@ -48,19 +48,19 @@ real Simul::minimumStericRange() const
 
     for ( Sphere const* O=spheres.first(); O; O=O->next() )
     {
-        if ( O->prop->steric )
+        if ( O->prop->steric_key )
             ran = max_real(ran, 2 * O->radius() + O->prop->steric_range);
     }
     
     for ( Bead const* B=beads.first(); B; B=B->next() )
     {
-        if ( B->prop->steric )
+        if ( B->prop->steric_key )
             ran = max_real(ran, 2 * B->radius() + B->prop->steric_range);
     }
     
     for ( Solid const* S=solids.first(); S; S=S->next() )
     {
-        if ( S->prop->steric )
+        if ( S->prop->steric_key )
         {
             for ( size_t p = 0; p < S->nbPoints(); ++p )
                 ran = max_real(ran, 2 * S->radius(p) + S->prop->steric_range);
@@ -77,7 +77,7 @@ real Simul::minimumStericRange() const
 /**
  This will:
  - call setInteractions() for all objects in the system,
- - call addStericInteractions() if prop->steric is true.
+ - call addStericInteractions() if simul:steric is true.
  .
  */
 void Simul::setAllInteractions(Meca& meca) const

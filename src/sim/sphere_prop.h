@@ -28,44 +28,44 @@ public:
     
     
     /// mobility of points on the surface
-    real         point_mobility;
+    real point_mobility;
     
     /// effective viscosity (if unspecified, simul:viscosity is used)
     /**
      Set the effective `viscosity` to lower or increase the drag coefficient of a particular class of Sphere.\n
      If unspecified, the global `simul:viscosity` is used.
      */
-    real         viscosity;
+    real viscosity;
     
     /// if true, use special formula to calculate mobilities
     /**
      This formula is derived from Lubrication theory and applies
      in the case where the sphere fits tightly in an elongated volume.
      */
-    bool         piston_effect;
+    bool piston_effect;
     
     /// flag to include steric interaction for this object
-    int          steric;
+    int steric_key;
     
     /// distance added to the radius to set the steric interaction distance
-    real         steric_range;
+    real steric_range;
     
     /// flag to confine this object
     Confinement  confine;
     
     /// confinement stiffness (also known as `confine[1]`)
-    real         confine_stiff;
+    real confine_stiff;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string  confine_label;
+    std::string confine_label;
     
     /// display parameters (see @ref PointDispPar)
-    std::string  display;
+    std::string display;
     
     /// @}
     
     /// derived variable: flag to indicate that `display` has a new value
-    bool         display_fresh;
+    bool display_fresh;
 
     /// derived variable: parameters derived from string `display`
     PointDisp *  disp;

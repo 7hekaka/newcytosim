@@ -276,7 +276,7 @@ public:
      This force is repulsive at short range ( d < d_0 ),
      and attractive elsewhere ( d > d_0 ).
      */
-    int steric;
+    int steric_key;
     
     /// radius of repulsive steric interaction (also known as `steric[1]`)
     real steric_radius;

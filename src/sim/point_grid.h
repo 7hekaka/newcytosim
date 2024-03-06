@@ -427,7 +427,7 @@ public:
 #if ( NUM_STERIC_PANES <= 1 )
         locus_list(w).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
 #else
-        locus_list(w, fib->prop->steric).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
+        locus_list(w, fib->prop->steric_key).emplace(FiberSegment(fib, inx), rad, rge, sup, w);
 #endif
     }
     
@@ -439,7 +439,7 @@ public:
 #if ( NUM_STERIC_PANES <= 1 )
         point_list(w).emplace(Mecapoint(mec, inx), rad, rge, w);
 #else
-        point_list(w, mec->prop->steric).emplace(Mecapoint(mec, inx), rad, rge, w);
+        point_list(w, mec->prop->steric_key).emplace(Mecapoint(mec, inx), rad, rge, w);
 #endif
     }
 

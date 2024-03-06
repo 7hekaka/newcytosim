@@ -340,7 +340,7 @@ void FiberProp::clear()
     confine_range[1] = INFINITY;
 #endif
 
-    steric = 0;
+    steric_key = 0;
     steric_radius = 0;
     steric_range = 0;
     
@@ -532,7 +532,7 @@ void FiberProp::read(Glossary& glos)
         {"minus_end", MINUS_END}, {"center", CENTER}, {"both_ends", BOTH_ENDS}, {"torque", ORIGIN}});
 #endif
 
-    glos.set(steric,        "steric");
+    glos.set(steric_key,    "steric");
     glos.set(steric_radius, "steric", 1);
     glos.set(steric_range,  "steric", 2);
     glos.set(steric_radius, "steric_radius");
@@ -606,7 +606,7 @@ void FiberProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":confine2_stiffness must be specified and >= 0");
 #endif
     
-    if ( primed(sim) && steric && !sim.prop.steric_mode )
+    if ( primed(sim) && steric_key && !sim.prop.steric_mode )
         Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
 
     if ( min_length < 0 )
@@ -685,7 +685,7 @@ void FiberProp::complete(Simul const& sim)
                 fib->adjustSegmentation(segmentation);
     }
     
-    if ( steric && steric_radius <= 0 )
+    if ( steric_key && steric_radius <= 0 )
         throw InvalidParameter("fiber:steric[1] (radius) must be specified and > 0");
     
     if ( drag_radius <= 0 )
@@ -767,7 +767,7 @@ void FiberProp::write_values(std::ostream& os) const
 #if NEW_CONFINE_RANGE
     write_value(os, "confine_range",       confine_range, 2);
 #endif
-    write_value(os, "steric",              steric, steric_radius, steric_range);
+    write_value(os, "steric",              steric_key, steric_radius, steric_range);
     write_value(os, "field",               field);
     write_value(os, "glue",                glue, glue_single);
 #if NEW_FIBER_MAKE_COUPLE
