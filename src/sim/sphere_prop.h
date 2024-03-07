@@ -37,10 +37,10 @@ public:
      */
     real viscosity;
     
-    /// if true, use special formula to calculate mobilities
+    /// if true, use special formula to calculate mobility coefficients
     /**
-     This formula is derived from Lubrication theory and applies
-     in the case where the sphere fits tightly in an elongated volume.
+     This formula is derived from Lubrication theory and is only valid
+     in the case where the sphere fits tightly in an elongated cylinder.
      */
     bool piston_effect;
     

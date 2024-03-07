@@ -86,10 +86,7 @@ public:
     void prepareMecable();
 
     /// calculate mobility with piston effect
-    void setDragCoefficientPiston();
-    
-    /// calculate mobility with piston effect
-    void setDragCoefficientStokes();
+    void setDragCoefficientPiston(real thickness);
     
     /// calculate mobility
     void setDragCoefficient();

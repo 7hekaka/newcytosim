@@ -52,7 +52,7 @@ Sphere::Sphere(SphereProp const* p, real rad)
         addPoint( Vector(0,0,rad) );
     }
     
-    setDragCoefficientStokes();
+    setDragCoefficient();
 }
 
 
@@ -221,31 +221,6 @@ void Sphere::resize(const real R)
     }
 }
 
-/**
- The mobility is that of a sphere in an infinite fluid (Stokes law):
- 
- Translation:
-     dposition/dtime = mu_T * force
-     mu_T = 6 * PI * viscosity * radius
- 
- Rotation:
-     dangle/dtime = mu_R * torque
-     mu_R = 8 * PI * viscosity * radius^3
- 
- */
-void Sphere::setDragCoefficientStokes()
-{
-    assert_true( spRadius > 0 );
-    
-    const real rad = spRadius;
-    
-    //hydrodynamic not corrected: infinite fluid is assumed
-    spDrag    = ( 6 * M_PI ) * ( prop->viscosity * rad );
-    spDragRot = ( 8 * M_PI ) * ( prop->viscosity * rad * ( rad * rad ));
-
-    //Cytosim::log("Sphere of radius %.3f has mobility %.2e\n", spRadius, spDrag);
-}
-
 
 /**
  Expect higher friction due to flow around the sphere in a narrow tube.
@@ -261,41 +236,54 @@ void Sphere::setDragCoefficientStokes()
      \gamma^{rot} = 2 \pi^2 \sqrt{\frac{2}{\epsilon}} \,\eta\, r^3
  @end
  */
-void Sphere::setDragCoefficientPiston()
+void Sphere::setDragCoefficientPiston(real thick)
 {
-    assert_true( radius() > 0 );
-    assert_true( prop->confine_space );
-    
     const real rad = radius();
-    real thick = 0.5 * prop->confine_space->thickness();
-    real eps = ( thick - rad ) / rad;
+    real eps = ( 0.5 * thick - rad ) / rad;
     
     if ( eps <= 0 )
-        throw InvalidParameter("Sphere's mobility piston formula yields invalid value");
+        throw InvalidParameter("Sphere's piston_effect would yield invalid values");
     if ( eps > 1 )
-    {
-        Cytosim::log("Sphere's mobility piston formula inapplicable");
-        return;
-    }
+        throw InvalidParameter("Sphere's piston_effect is inapplicable");
 
-    spDrag    = M_PI*M_PI*prop->viscosity*rad * 2.25 * M_SQRT2 * std::pow(eps,-2.5);
-    spDragRot = M_PI*M_PI*prop->viscosity*rad * rad * rad * std::sqrt(8/eps);
+    real vr = M_PI * M_PI * prop->viscosity * rad;
+    spDrag    = vr * ( 2.25 * M_SQRT2 ) * std::pow(eps,-2.5);
+    spDragRot = vr * square(rad) * std::sqrt(8/eps);
         
     //report the reduced mobility of the sphere:
     Cytosim::log("Sphere of radius %.3f has piston mobility %.2e\n", spRadius, spDrag);
 }
 
 
+/**
+ Except if the `piston_effect` is enabled,
+ the mobility is that of a sphere in an infinite fluid (Stokes law):
+ 
+ Translation:
+     dposition/dtime = mu_T * force
+     mu_T = 6 * PI * viscosity * radius
+ 
+ Rotation:
+     dangle/dtime = mu_R * torque
+     mu_R = 8 * PI * viscosity * radius^3
+ 
+ */
 void Sphere::setDragCoefficient()
 {
-    setDragCoefficientStokes();
+    assert_true( spRadius > 0 );
+    const real rad = radius();
+    
+    real vr = prop->viscosity * rad;
+    // hydrodynamic not corrected: infinite fluid is assumed
+    spDrag    = ( 6 * M_PI ) * vr;
+    spDragRot = ( 8 * M_PI ) * ( vr * square(rad) );
 
     if ( prop->piston_effect )
     {
         if ( prop->confine_space )
-            setDragCoefficientPiston();
+            setDragCoefficientPiston(prop->confine_space->thickness());
         else
-            Cytosim::warn << "Piston effect ignored because space is undefined\n";
+            Cytosim::warn << "Piston effect ignored for lack of confine space\n";
     }
 }
 
