@@ -26,12 +26,25 @@ set hand molecule
 {
     binding = 10, 0.05
     unbinding = 0, 3
-    display = ( size=10; color=green, green; )
+    display = ( size=10; color=green, 0x00FF0088; )
 }
 
 set single grafted
 {
     hand = molecule
+    stiffness = 100
+}
+
+set hand protein
+{
+    binding = 10, 0.05
+    unbinding = 0, 3
+    display = ( size=10; color=blue, 0x0000FF88; )
+}
+
+set single anchored
+{
+    hand = protein
     stiffness = 100
 }
 
@@ -54,11 +67,11 @@ new 1 blob
 new 1 blob
 {
     radius = 1
-    point1 =  1  0  0, grafted
-    point2 = -1  0  0, grafted
+    point1 =  1  0  0, 2 anchored
+    point2 = -1  0  0, 1 anchored
     point3 =  0  1  0
     point4 =  0 -1  0
-    point5 =  0  0 -1, grafted
+    point5 =  0  0 -1, 2 grafted
     point6 =  0  0  1, grafted
     position = 0 0 0
 }

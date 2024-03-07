@@ -5,8 +5,8 @@
 
 set simul system
 {
+    kT = 0.0042
     time_step  = 0.01
-    kT         = 0.0042
     viscosity  = 0.9
     precondition = 0
     display = ( window_size=1024,384; delay=2; )
