@@ -24,7 +24,7 @@ namespace gym
         M[ 5] = diag;
         M[10] = diag;
         M[14] = depth;
-        M[15] = 1.0;
+        M[15] = 1.f;
     }
 
     /// M <- Q
@@ -67,6 +67,9 @@ namespace gym
     
     /// multiply matrices: out = out x B */
     void mat_multiply(float[16], const float[16]);
+
+    /// scale matrix, like glScale()
+    void mat_scale(float[16], float S);
 
     /// scale matrix, like glScale()
     void mat_scale(float[16], float X, float Y, float Z);

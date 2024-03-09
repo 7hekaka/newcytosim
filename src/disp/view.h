@@ -221,8 +221,8 @@ public:
     void move_to(const Vector3&);
     
     /// set additional translation of focal point
-    void move_shift(const Vector3&);
-    
+    void move_shift(real X, real Y, real Z) { focus_shift.set(X, Y, Z);}
+
     /// translate view
     void move_by(const Vector3& trans) { move_to( focus - trans ); }
 

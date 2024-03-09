@@ -869,7 +869,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     mouseY = view.height()-mY;
     
     savedView = view; // copy the current Model-View transformation
-    savedView.move_shift(Vector3(0,0,0));
+    savedView.move_shift(0,0,0);
     
     if ( state == GLUT_UP )
     {

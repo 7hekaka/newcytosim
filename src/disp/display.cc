@@ -270,30 +270,30 @@ void Display::drawTiled(Simul const& sim, int tile)
     const Vector3 px = modulo->period(0);
     const Vector3 py = modulo->period(1);
     const Vector3 pz = modulo->period(2);
-
+    
     Vector4 pos[32];
     int cnt = 0;
     
     for ( int dx = l[0]; dx <= u[0]; ++dx )
-    for ( int dy = l[1]; dy <= u[1]; ++dy )
-    for ( int dz = l[2]; dz <= u[2]; ++dz )
-    {
-        Vector3 P = dx * px + dy * py + dz * pz;
-        pos[cnt] = Vector4(P);
-        pos[cnt++].TT = dot(depthAxis, Vector3(P));
-    }
+        for ( int dy = l[1]; dy <= u[1]; ++dy )
+            for ( int dz = l[2]; dz <= u[2]; ++dz )
+            {
+                Vector3 P = dx * px + dy * py + dz * pz;
+                pos[cnt] = Vector4(P);
+                pos[cnt++].TT = dot(depthAxis, Vector3(P));
+            }
     
     // depth-sort positions:
     qsort(pos, cnt, sizeof(Vector4), &compareVector4);
-
-    float ref[16], mat[16];
+    
+    float ref[16];
     gym::get_view(ref);
     for ( int i = 0; i < cnt; ++i )
     {
-        gym::mat_translate(mat, ref, pos[i].XX, pos[i].YY, pos[i].ZZ);
-        gym::set_view(mat);
+        gym::set_view(ref, pos[i].XX, pos[i].YY, pos[i].ZZ);
         drawSimul(sim);
     }
+    gym::set_view(ref);
 }
 
 //------------------------------------------------------------------------------

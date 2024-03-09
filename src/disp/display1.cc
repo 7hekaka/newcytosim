@@ -93,23 +93,23 @@ void Display1::drawFibers(FiberSet const& set)
 {
 #if ENABLE_EXPLODED_DISPLAY
     //translate whole display to display the Fiber
-    GLfloat ref[16], mat[16];
+    GLfloat ref[16];
     gym::get_view(ref);
-#endif
-
     for ( Fiber const* fib = set.first(); fib ; fib=fib->next() )
     {
         if ( fib->disp->visible )
         {
-#if ENABLE_EXPLODED_DISPLAY
-            gym::mat_translate(mat, ref, 0, fib->disp->explode_shift, 0);
-            gym::set_view(mat);
-#endif
+            gym::set_view(ref, 0, fib->disp->explode_shift, 0);
             drawFiber(*fib);
         }
     }
-#if ENABLE_EXPLODED_DISPLAY
     gym::set_view(ref);
+#else
+    for ( Fiber const* fib = set.first(); fib ; fib=fib->next() )
+    {
+        if ( fib->disp->visible )
+            drawFiber(*fib);
+    }
 #endif
 }
 

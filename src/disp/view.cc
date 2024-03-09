@@ -661,14 +661,6 @@ void View::move_to(const Vector3& d)
 }
 
 
-void View::move_shift(const Vector3& d)
-{
-    //std::clog << "shift" << focus << " move_shift " << d << '\n';
-    focus_shift = d;
-    setModelView();
-}
-
-
 void View::rotate_to(const Quaternion<real> & q)
 {
     rotation = normalize(q);

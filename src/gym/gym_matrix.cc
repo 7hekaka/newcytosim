@@ -152,20 +152,26 @@ void gym::mat_rotateZ(float M[16], float C, float S)
     }
 }
 
+void gym::mat_scale(float M[16], float S)
+{
+    for ( int i = 0; i < 12; ++i )
+        M[i] *= S;
+}
+
 void gym::mat_scale(float M[16], float X, float Y, float Z)
 {
     for ( int i = 0; i < 4; ++i )
-    {
-        M[i  ] *= X;
-        M[i+4] *= Y;
-        M[i+8] *= Z;
-    }
+        M[i] *= X;
+    for ( int i = 0; i < 4; ++i )
+        M[4+i] *= Y;
+    for ( int i = 0; i < 4; ++i )
+        M[8+i] *= Z;
 }
 
 void gym::mat_translate(float M[16], float X, float Y, float Z)
 {
     for ( int i = 0; i < 4; ++i )
-        M[12+i] += X * M[i] + Y * M[i+4] + Z * M[i+8];
+        M[12+i] += X * M[i] + Y * M[4+i] + Z * M[8+i];
 }
 
 void gym::mat_translate(float M[16], const float R[16], float X, float Y, float Z)
@@ -173,17 +179,17 @@ void gym::mat_translate(float M[16], const float R[16], float X, float Y, float 
     for ( int i = 0; i < 12; ++i )
         M[i] = R[i];
     for ( int i = 0; i < 4; ++i )
-        M[12+i] = R[12+i] + X * R[i] + Y * R[i+4] + Z * R[i+8];
+        M[12+i] = R[12+i] + X * R[i] + Y * R[4+i] + Z * R[8+i];
 }
 
 void gym::mat_transscale(float M[16], float X, float Y, float Z, float S)
 {
     for ( int i = 0; i < 4; ++i )
     {
-        M[12+i] += X * M[i] + Y * M[i+4] + Z * M[i+8];
+        M[12+i] += X * M[i] + Y * M[4+i] + Z * M[8+i];
         M[i  ] *= S;
-        M[i+4] *= S;
-        M[i+8] *= S;
+        M[4+i] *= S;
+        M[8+i] *= S;
     }
 }
 
@@ -200,17 +206,21 @@ void gym::mat_transscale(float M[16], const float R[16], float X, float Y, float
         M[12+i] = R[12+i] + X * R[i] + Y * R[i+4] + Z * R[i+8];
 }
 
-/** This works if the scaling is isotropic */
+
 void gym::mat_unrotate(float T[16], const float M[16])
 {
-    float X = M[0] * M[0] + M[1] * M[1] + M[2] * M[2];
-    float Y = M[4] * M[4] + M[5] * M[5] + M[6] * M[6];
-    float Z = M[8] * M[8] + M[9] * M[9] + M[10] * M[10];
-    float S = sqrtf(( X + Y + Z ) / 3.0);
-    X = M[12];
-    Y = M[13];
-    Z = M[14];
-    mat_diagonal(T, S);
+    float SX = sqrtf(M[0] * M[0] + M[1] * M[1] + M[2] * M[2]);
+    float SY = sqrtf(M[4] * M[4] + M[5] * M[5] + M[6] * M[6]);
+    float SZ = sqrtf(M[8] * M[8] + M[9] * M[9] + M[10] * M[10]);
+    float X = M[12];
+    float Y = M[13];
+    float Z = M[14];
+    mat_zero(T);
+    T[ 0] = SX;
+    T[ 5] = SY;
+    T[10] = SZ;
+    T[14] = 0.f;
+    T[15] = 1.f;
     T[12] = X;
     T[13] = Y;
     T[14] = Z;

@@ -158,7 +158,7 @@ void Player::autoFocus(Simul const& sim, View& view) const
     {
         Vector M, G, P;
         FiberSet::infoPosition(sim.fibers.collect(), M, G, P);
-        view.move_shift(Vector3(G));
+        view.move_shift(G.x(), G.y(), G.z());
         //std::clog << "auto center: " << G << '\n';
     }
     
@@ -166,8 +166,10 @@ void Player::autoFocus(Simul const& sim, View& view) const
     {
         // align with mean nematic direction
         static Vector3 dir(0, 0, 0);
-        real S = FiberSet::infoNematic(sim.fibers.collect(), mat);
-        //flashText("Nematic order S = %5.3f", S);
+        /*
+         real S = FiberSet::infoNematic(sim.fibers.collect(), mat);
+         flashText("Nematic order S = %5.3f", S);
+         */
         Vector3 vec(mat);
         real alpha = std::copysign(0.125, dot(dir, vec));
         // time-average the direction vector:
@@ -197,7 +199,7 @@ void Player::autoFocus(Simul const& sim, View& view) const
             Vector pos(0,0,0);
             for ( Solid const* B=sim.solids.first(); B; B=B->next() )
                 pos += B->position();
-            view.move_shift(Vector3(pos)*(1.0/cnt));
+            view.move_shift(pos.x()/cnt, pos.y()/cnt, pos.z()/cnt);
         }
     }
 }
