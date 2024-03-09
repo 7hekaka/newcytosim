@@ -98,7 +98,8 @@ public:
     void draw2D(float width) const { drawPolygon(width, width); }
     /// OpenGL display function
     void draw3D() const;
-
+    /// draw polygon points
+    void drawPolygonPoints() const;
 };
 
 #endif

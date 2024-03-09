@@ -185,7 +185,7 @@ void gym::mat_copytrans(float M[16], const float R[16], float X, float Y, float 
 void gym::mat_translate(float M[16], const float R[16], float X, float Y, float Z)
 {
     for ( int i = 0; i < 4; ++i )
-        M[12+i] += X * R[i] + Y * R[4+i] + Z * R[8+i];
+        M[12+i] = R[12+i] + X * R[i] + Y * R[4+i] + Z * R[8+i];
 }
 
 void gym::mat_transscale(float M[16], float X, float Y, float Z, float S)

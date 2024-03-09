@@ -62,16 +62,16 @@ Display::~Display()
 }
 
 
-void Display::drawText(Vector const& vec, const char str[]) const
+static void strokeText(Vector const& vec, const char str[], float scale)
 {
 #if ( DIM == 3 )
-    gym::face_view(vec.XX, vec.YY, vec.ZZ);
+    gym::translate_ref(vec.XX, vec.YY, vec.ZZ);
 #elif ( DIM == 2 )
-    gym::face_view(vec.XX, vec.YY, 0.f);
+    gym::translate_ref(vec.XX, vec.YY, 0.f);
 #else
-    gym::face_view(vec.XX, 0.f, 0.f);
+    gym::translate_ref(vec.XX, 0.f, 0.f);
 #endif
-    fgStrokeString(0, 0, pixelSize, 0, str, 1);
+    fgStrokeString(0, 0, scale, 0, str, 1);
 }
 
 
@@ -1358,7 +1358,7 @@ void Display::drawFiberLatticeValues(Fiber const& fib, VisibleLattice const& lat
     for ( auto h = inf; h <= sup; ++h, abs += uni )
     {
         snprintf(str, sizeof(str), "%.3f", real(lat.data(h)));
-        drawText(fib.posM(abs), str);
+        strokeText(fib.posM(abs), str, pixelSize);
     }
     gym::restoreAlphaTest();
 }
@@ -1382,7 +1382,7 @@ void Display::drawFiberLatticeBits(Fiber const& fib, FiberLattice const& lat) co
 #else
         snprintf(str, sizeof(str), "%.3f", lat.data(h));
 #endif
-        drawText(fib.posM(abs), str);
+        strokeText(fib.posM(abs), str, pixelSize);
     }
 }
 
@@ -1397,7 +1397,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%lu", i);
-            drawText(fib.posP(i), str);
+            strokeText(fib.posP(i), str, pixelSize);
         }
     } 
     else if ( style & 2 )
@@ -1407,25 +1407,25 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
-            drawText(fib.posP(i), str);
+            strokeText(fib.posP(i), str, pixelSize);
         }
     }
     if ( style & 4 )
     {
         // display integral abscissa along the fiber
         snprintf(str, sizeof(str), "%.3f", fib.abscissaM());
-        drawText(fib.posEndM(), str);
+        strokeText(fib.posEndM(), str, pixelSize);
         
         int s = (int)std::ceil(fib.abscissaM());
         int e = (int)std::floor(fib.abscissaP());
         for ( int a = s; a <= e; ++a )
         {
             snprintf(str, sizeof(str), "%i", a);
-            drawText(fib.pos(a), str);
+            strokeText(fib.pos(a), str, pixelSize);
         }
         
         snprintf(str, sizeof(str), "%.3f", fib.abscissaP());
-        drawText(fib.posEndP(), str);
+        strokeText(fib.posEndP(), str, pixelSize);
     }
     if ( style & 8 )
     {
@@ -1435,7 +1435,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
         {
             Vector b = fib.posP(i);
             snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
-            drawText(0.5*(a+b), str);
+            strokeText(0.5*(a+b), str, pixelSize);
             a = b;
         }
     }
@@ -2049,6 +2049,7 @@ void Display::drawFibers(FiberSet const& set)
 void Display::drawFiberTexts(FiberSet const& set)
 {
     gym::ref_view();
+    gym::cancelRotation();
     gym::disableLighting();
     gym::disableAlphaTest();
     // display Fibers in a random (ever changing) order:
@@ -2291,11 +2292,11 @@ void Display::drawSolid(Solid const& obj)
         char tmp[32];
         gym::color(col);
         snprintf(tmp, sizeof(tmp), "0:%u", obj.identity());
-        drawText(obj.posP(0), tmp);
+        strokeText(obj.posP(0), tmp, pixelSize);
         for ( size_t i = 1; i < obj.nbPoints(); ++i )
         {
             snprintf(tmp, sizeof(tmp), "%lu", i);
-            drawText(obj.posP(i), tmp);
+            strokeText(obj.posP(i), tmp, pixelSize);
         }
     }
     

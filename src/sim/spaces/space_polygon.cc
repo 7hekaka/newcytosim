@@ -325,7 +325,6 @@ void SpacePolygon::drawPolygon(float lines, float points) const
     glClear(GL_STENCIL_BUFFER_BIT);
     glStencilFunc(GL_EQUAL, 1, ~0U);
     glStencilOp(GL_KEEP, GL_ZERO, GL_ZERO);
-
     if ( lines > 0 )
     {
         gym::drawLineStrip(lines, 0, nbp+1);
@@ -333,22 +332,26 @@ void SpacePolygon::drawPolygon(float lines, float points) const
     if ( points > 0 )
     {
         gym::drawPoints(points, 0, nbp);
-#if ( 0 )
-        // indicate index of each point:
-        char tmp[32];
-        gym::color(1, 1, 0);
-        for ( size_t n = 0; n < nbp; ++n )
-        {
-            snprintf(tmp, sizeof(tmp), "%lu", n);
-            gym::face_view(pts[n].xx, pts[n].yy, height_);
-            fgStrokeString(0, 0, pixelSize, 1, tmp, 1);
-        }
-#endif
     }
     glClear(GL_STENCIL_BUFFER_BIT);
     glDisable(GL_STENCIL_TEST);
 }
 
+/*
+void SpacePolygon::drawPolygonPoints() const
+{
+    const size_t nbp = poly_.nbPoints();
+    Polygon::Point2D const* pts = poly_.pts_;
+    // indicate index of each point:
+    char tmp[32];
+    for ( size_t n = 0; n < nbp; ++n )
+    {
+        snprintf(tmp, sizeof(tmp), "%lu", n);
+        gym::translate_ref(pts[n].xx, pts[n].yy, height_);
+        fgStrokeString(0, 0, pixelSize, 1, tmp, 1);
+    }
+}
+*/
 
 void SpacePolygon::draw3D() const
 {

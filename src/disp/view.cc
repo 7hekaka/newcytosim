@@ -185,10 +185,17 @@ void View::closeDisplay() const
 
 void View::strokeString(const char str[], float width) const
 {
-    gym::one_view(viewport_[2], viewport_[3]);
     gym::color(front_color);
+    gym::one_view(viewport_[2], viewport_[3]);
     fgStrokeString(8, 4, 1.0, 1, str, width, 0, -0.25);
     loadView();
+}
+
+
+void View::strokeString(float X, float Y, float Z, const char str[]) const
+{
+    gym::translate_ref(X, Y, Z);
+    fgStrokeString(0, 0, pixelSize(), 1, str, 1);
 }
 
 
@@ -278,19 +285,19 @@ void View::placeText(int position, FontType font, const float color[4],
 /**
  draw text at position `vec`
  */
-void View::drawText(Vector3 const& vec, const float color[4], const char text[], const float offset, FontType font) const
+void View::drawText(Vector3 const& vec, const float color[4], const char str[], const float offset, FontType) const
 {
     gym::disableLighting();
     gym::disableAlphaTest();
     gym::disableDepthTest();
-    gym::face_view(vec.XX, vec.YY, vec.ZZ);
+    gym::cancelRotation();
+    gym::translate_ref(vec.XX, vec.YY, vec.ZZ);
 #if 0
     int H = fgFontHeight(font);
-    int L, W = fgTextWidth(font, text, L);
-    fgBitmapString(-W*offset, -H/3, pixelSize(), font, color, text, H);
+    fgBitmapString(offset, -H/3, pixelSize(), font, color, str, H);
 #else
     gym::color(color);
-    fgStrokeString(0, 0, pixelSize(), 1, text, 1);
+    fgStrokeString(0, 0, pixelSize(), 1, str, 1);
 #endif
     gym::restoreDepthTest();
     gym::restoreAlphaTest();

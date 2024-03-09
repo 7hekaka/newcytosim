@@ -52,14 +52,14 @@ namespace gym
     
     /// make one-to-one correspondance between pixel and model coordinates
     void one_view(int W, int H);
-    
-    /// keep scale and translation, but remove rotation component
-    inline void cancel_rotation() { gym::mat_unrotate(mvp_, mvp_); load(); }
-    
-    /// translate to (X, Y, Z), keep scale and translation, but remove rotation component
-    inline void face_view(float X, float Y, float Z) { gym::mat_copytrans(mvp_, ref_, X, Y, Z); cancel_rotation(); }
 
 #pragma mark - Modifying the current view
+    
+    /// keep scale and translation, but remove rotation component
+    inline void cancelRotation() { gym::mat_unrotate(mvp_, mvp_); }
+    
+    /// translate by (X, Y, Z), relative to reference
+    inline void translate_ref(float X, float Y, float Z) { gym::mat_translate(mvp_, ref_, X, Y, Z); load(); }
 
     /// multiply current matrix by 'mat'
     inline void apply(const float mat[16]) { gym::mat_multiply(mvp_, ref_, mat); load(); }

@@ -119,9 +119,6 @@ private:
     
     /// draw translucent objects after depth-sorting
     void drawTransparentObjects(Array<zObject>&);
-
-    /// draw text at given position
-    void drawText(Vector const&, const char[]) const;
     
 public:
     

@@ -154,9 +154,6 @@ public:
     
     /// unset clipping planes and fog parameters, display axes and scale bar
     void closeDisplay() const;
-    
-    /// display text in bottom-left corner
-    void strokeString(const char[], float width) const;
 
     /// display frame-per-seconds
     void drawFPS(size_t) const;
@@ -287,6 +284,12 @@ public:
         BITMAP_HELVETICA_12 = 7,
         BITMAP_HELVETICA_18 = 8
     };
+    
+    /// display text in bottom-left corner
+    void strokeString(const char[], float width) const;
+
+    /// stroke text at given position
+    void strokeString(float X, float Y, float Z, const char str[]) const;
 
     /// set position of text in window
     float textPosition(float&, float&, int width, int height, int line, int W, int H, const int position) const;

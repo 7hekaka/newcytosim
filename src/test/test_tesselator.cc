@@ -177,10 +177,11 @@ void drawEdges()
 #endif
 }
 
-void namePoints(float scale)
+void namePoints(View& view)
 {
     gym::disableLighting();
     gym::disableAlphaTest();
+    gym::cancelRotation();
     char tmp[128];
     for ( unsigned i=0; i < ico->num_vertices(); ++i )
     {
@@ -194,8 +195,7 @@ void namePoints(float scale)
         gym::color(col);
         const float* ptr = ico->vertex_data(i);
         snprintf(tmp, sizeof(tmp), "%u", i);
-        gym::face_view(ptr[0], ptr[1], ptr[2]);
-        fgStrokeString(0, 0, scale, 1, tmp, 2);
+        view.strokeString(ptr[0], ptr[1], ptr[2], tmp);
     }
     gym::restoreAlphaTest();
     gym::restoreLighting();
@@ -278,7 +278,7 @@ int display(View& view)
     {
         glDisable(GL_LIGHTING);
         gym::color(1, 1, 1);
-        namePoints(view.pixelSize());
+        namePoints(view);
     }
     view.closeDisplay();
     return 0;

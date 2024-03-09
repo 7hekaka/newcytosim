@@ -81,13 +81,13 @@ void processNormalKey(unsigned char c, int x, int y)
     switch (c)
     {
         case 'q' : exit(1);
-        case 'r': n_points-=256;  break;
-        case 't': n_points-=32;   break;
-        case 'y': n_points+=1;    break;
-        case 'u': n_points+=4;    break;
-        case 'i': n_points+=16;   break;
-        case 'o': n_points+=128;  break;
-        case 'p': n_points+=1024; break;
+        case 'r': n_points-=256; break;
+        case 't': n_points-=32;  break;
+        case 'y': n_points+=1;   break;
+        case 'u': n_points+=4;   break;
+        case 'i': n_points+=16;  break;
+        case 'o': n_points+=64;  break;
+        case 'p': n_points+=256; break;
         case 's': front = (front==&S?&T:&S); return;
         default: glApp::processNormalKey(c,x,y); return;
     }
@@ -118,17 +118,17 @@ void drawVertices()
     gym::drawPoints(5, 0, cnt);
 }
 
-void nameVertices(float scale)
+void nameVertices(View& view)
 {
     gym::disableLighting();
     gym::disableAlphaTest();
+    gym::cancelRotation();
     char tmp[32] = { 0 };
     for ( size_t i=0; i < front->nbPoints(); ++i )
     {
         snprintf(tmp, sizeof(tmp), "%lu", i);
         real const* ptr = front->addr(i);
-        gym::face_view(ptr[0], ptr[1], ptr[2]);
-        fgStrokeString(0, 0, scale, 1, tmp, 1);
+        view.strokeString(ptr[0], ptr[1], ptr[2], tmp);
     }
     gym::restoreAlphaTest();
     gym::restoreLighting();
@@ -166,7 +166,7 @@ int display(View& view)
     gym::color(col);
     drawVertices();
     gym::color(0,1,1);
-    nameVertices(view.pixelSize());
+    nameVertices(view);
     //drawTangents(col, lor);
     view.closeDisplay();
     return 0;

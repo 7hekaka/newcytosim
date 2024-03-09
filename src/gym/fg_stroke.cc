@@ -69,7 +69,7 @@ SFG_StrokeFont const* fghStrokeByID( int mono )
 void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char arg,
                        float stroke_width, float stroke_size)
 {
-    scale *= 0.125;
+    scale *= 0.1;
     const SFG_StrokeChar *schar;
     const SFG_StrokeStrip *strip;
     SFG_StrokeFont const* font = fghStrokeByID( mono );
