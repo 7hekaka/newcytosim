@@ -97,10 +97,10 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
 }
 
 
-void fgStrokeString(float X, float Y, float scale, int mono, const char *string,
+float fgStrokeString(float X, float Y, float scale, int mono, const char *string,
                     float stroke_width, float stroke_size, float vshift)
 {
-    scale *= 0.125;
+    scale *= 0.1;
     unsigned char c;
     float X0 = X;
     SFG_StrokeFont const* font = fghStrokeByID( mono );
@@ -145,6 +145,7 @@ void fgStrokeString(float X, float Y, float scale, int mono, const char *string,
             }
         }
     }
+    return X;
 }
 
 /*

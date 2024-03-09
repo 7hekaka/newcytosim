@@ -65,8 +65,10 @@ void Display1::drawObjects(Simul const& sim)
 #endif
     
     drawFibers(sim.fibers);
-    gym::disableLighting();
+#if !ENABLE_EXPLODED_DISPLAY
     drawFiberTexts(sim.fibers);
+#endif
+    gym::disableLighting();
 
     if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
         drawCouplesA(sim.couples);
