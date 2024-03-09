@@ -50,6 +50,7 @@ void Display2::drawObjects(Simul const& sim)
     glBindBuffer(GL_PIXEL_UNPACK_BUFFER, 0);
     
     drawFibers(sim.fibers);
+    drawFiberTexts(sim.fibers);
 
 #if ( DIM >= 3 )
     gym::enableLighting();

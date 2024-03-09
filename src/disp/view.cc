@@ -537,8 +537,8 @@ void View::setModelView() const
 {
     float T[4] = { 0, 0, eyeDistance, 1 };
     rotation.setOpenGLMatrix(modelview_, zoom, T);
-    Vector3 V = - ( focus + focus_shift );
-    gym::mat_translate(modelview_, V.XX, V.YY, V.ZZ);
+    Vector3 V = focus + focus_shift;
+    gym::mat_translate(modelview_, -V.XX, -V.YY, -V.ZZ);
     gym::set_view(modelview_);
     
     //std::clog << "setModelView win " << window() << '\n';

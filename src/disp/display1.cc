@@ -66,6 +66,7 @@ void Display1::drawObjects(Simul const& sim)
     
     drawFibers(sim.fibers);
     gym::disableLighting();
+    drawFiberTexts(sim.fibers);
 
     if (( prop->couple_select & 2 ) && ( sim.couples.sizeA() > 0 ))
         drawCouplesA(sim.couples);

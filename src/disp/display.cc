@@ -186,7 +186,8 @@ void Display::drawObjects(Simul const& sim)
      */
     //gym::enableCullFace(GL_BACK);
     drawFibers(sim.fibers);
-    
+    drawFiberTexts(sim.fibers);
+
     gym::enableLighting();
     gym::enableCullFace(GL_BACK);
 
@@ -1353,10 +1354,6 @@ void Display::drawFiberLatticeValues(Fiber const& fib, VisibleLattice const& lat
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
     
-    gym::ref_view();
-    gym::disableLighting();
-    gym::disableAlphaTest();
-    gym::color(fib.disp->color);
     real abs = (inf+0.25) * uni - fib.abscissaM();
     for ( auto h = inf; h <= sup; ++h, abs += uni )
     {
@@ -1377,10 +1374,6 @@ void Display::drawFiberLatticeBits(Fiber const& fib, FiberLattice const& lat) co
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
     
-    gym::ref_view();
-    gym::disableLighting();
-    gym::disableAlphaTest();
-    gym::color(fib.disp->color);
     real abs = (inf+0.25) * uni - fib.abscissaM();
     for ( auto h = inf; h <= sup; ++h, abs += uni )
     {
@@ -1391,21 +1384,16 @@ void Display::drawFiberLatticeBits(Fiber const& fib, FiberLattice const& lat) co
 #endif
         drawText(fib.posM(abs), str);
     }
-    gym::restoreAlphaTest();
 }
 
 
-void Display::drawFiberLabels(Fiber const& fib, int style, gym_color const& col) const
+void Display::drawFiberLabels(Fiber const& fib, int style) const
 {
     char str[32] = { 0 };
-    gym::ref_view();
-    gym::disableLighting();
-    gym::disableAlphaTest();
-    gym::color(col);
     if ( style & 1 )
     {
         // draw fiber identity and vertex indices
-        int C = snprintf(str, sizeof(str), " %u ", fib.identity());
+        int C = snprintf(str, sizeof(str), " %u:", fib.identity());
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%lu", i);
@@ -1415,7 +1403,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style, gym_color const& col)
     else if ( style & 2 )
     {
         // draw fiber identity and abscissa value at vertices
-        int C = snprintf(str, sizeof(str), " %u ", fib.identity());
+        int C = snprintf(str, sizeof(str), " %u:", fib.identity());
         for ( size_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
@@ -1451,8 +1439,6 @@ void Display::drawFiberLabels(Fiber const& fib, int style, gym_color const& col)
             a = b;
         }
     }
-    gym::restoreAlphaTest();
-    CHECK_GL_ERROR("in Display::drawFiberLabels()");
 }
 
 
@@ -1936,14 +1922,6 @@ void Display::drawFiber(Fiber const& fib)
                     return drawFiberLattice3(fib, *lat, rad);
                 case 4:
                     drawFiberLatticeEdges(fib, *lat, rad); break;
-                case 5:
-                    drawFiberLatticeValues(fib, *lat); break;
-#if FIBER_HAS_LATTICE
-                case 6:
-                    drawFiberLatticeBits(fib, *fib.lattice()); break;
-#endif
-                default:
-                    std::clog << "Unexpected value of fiber:lattice_style\n";
             }
             style = 0;
         }
@@ -2044,17 +2022,9 @@ void Display::drawFiber(Fiber const& fib)
         drawFiberSpeckles(fib);
 
     // draw other fiber elements only if fiber is fully visible:
-    if ( fib.disp->visible > 0 )
+    if ( disp->force_style && fib.disp->visible > 0 )
     {
-        if ( disp->label_style )
-        {
-            drawFiberLabels(fib, disp->label_style, fib.disp->color);
-        }
-
-        if ( disp->force_style )
-        {
-            drawFiberForces(fib, disp->force_scale, pixwidth(disp->point_size));
-        }
+        drawFiberForces(fib, disp->force_scale, pixwidth(disp->point_size));
     }
 }
 
@@ -2075,6 +2045,50 @@ void Display::drawFibers(FiberSet const& set)
     CHECK_GL_ERROR("in Display::drawFibers()");
 }
 
+
+void Display::drawFiberTexts(FiberSet const& set)
+{
+    gym::ref_view();
+    gym::disableLighting();
+    gym::disableAlphaTest();
+    // display Fibers in a random (ever changing) order:
+    for ( Fiber const* fib = set.first(); fib ; fib=fib->next() )
+    {
+        if ( fib->disp && fib->disp->visible > 0 )
+        {
+            FiberDisp const*const disp = fib->prop->disp;
+#if FIBER_HAS_LATTICE || FIBER_HAS_MESH
+            if ( disp->lattice_style == 5 )
+            {
+                VisibleLattice const* lat = fib.visibleLattice();
+                if ( lat )
+                {
+                    gym::color(fib->disp->color);
+                    drawFiberLatticeValues(fib, *lat);
+                }
+            }
+#endif
+#if FIBER_HAS_LATTICE
+            if ( disp->lattice_style == 6 )
+            {
+                VisibleLattice const* lat = fib.visibleLattice();
+                if ( lat )
+                {
+                    gym::color(fib->disp->color);
+                    drawFiberLatticeBits(fib, *fib.lattice()); break;
+                }
+            }
+#endif
+            if ( disp->label_style )
+            {
+                gym::color(fib->disp->color);
+                drawFiberLabels(*fib, disp->label_style);
+            }
+        }
+    }
+    CHECK_GL_ERROR("in Display::drawFiberTexts()");
+    gym::restoreAlphaTest();
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Couples

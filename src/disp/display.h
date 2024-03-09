@@ -260,7 +260,7 @@ public:
     virtual void drawFiberLatticeBits(Fiber const&, FiberLattice const&) const;
 
     /// display Labels for a Fiber
-    void drawFiberLabels(Fiber const&, int style, gym_color const&) const;
+    void drawFiberLabels(Fiber const&, int style) const;
     
     /// display forces acting on the fiber vertices
     void drawFiberForces(Fiber const&, real scale, float width) const;
@@ -271,6 +271,9 @@ public:
     /// draw Fibers
     void drawFibers(FiberSet const&);
     
+    /// draw Fibers
+    void drawFiberTexts(FiberSet const&);
+
     /// draw the average fiber for the pool defined by func(obj, val) == true
     void drawAverageFiber(ObjectList const&, gym_color) const;
     

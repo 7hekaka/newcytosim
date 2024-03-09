@@ -102,6 +102,7 @@ void Display3::drawObjects(Simul const& sim)
         drawFibers(sim.fibers);
     }
     
+    drawFiberTexts(sim.fibers);
     gym::enableLighting();
     gym::enableCullFace(GL_BACK);
 
