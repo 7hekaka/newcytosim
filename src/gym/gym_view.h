@@ -34,7 +34,7 @@ namespace gym
     inline void set_view(const float mat[16]) { gym::mat_copy(ref_, mat); gym::mat_copy(mvp_, mat); load_ref(); }
     
     /// replace reference modelview matrix by `mat` translated by (X, Y, Z)
-    inline void set_view(const float mat[16], float X, float Y, float Z) { gym::mat_translate(ref_, mat, X, Y, Z); gym::mat_copy(mvp_, ref_); load_ref(); }
+    inline void set_view(const float mat[16], float X, float Y, float Z) { gym::mat_copytrans(ref_, mat, X, Y, Z); gym::mat_copy(mvp_, ref_); load_ref(); }
 
     /// make reference matrix current and loaded
     inline void ref_view() { pull_ref(); load_ref(); }
@@ -57,7 +57,7 @@ namespace gym
     inline void cancel_rotation() { gym::mat_unrotate(mvp_, mvp_); load(); }
     
     /// translate to (X, Y, Z), keep scale and translation, but remove rotation component
-    inline void face_view(float X, float Y, float Z) { gym::mat_translate(mvp_, ref_, X, Y, Z); cancel_rotation(); }
+    inline void face_view(float X, float Y, float Z) { gym::mat_copytrans(mvp_, ref_, X, Y, Z); cancel_rotation(); }
 
 #pragma mark - Modifying the current view
 
