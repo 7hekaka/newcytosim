@@ -156,7 +156,7 @@ public:
     void closeDisplay() const;
 
     /// display frame-per-seconds
-    void drawFPS(size_t) const;
+    void drawFPS() const;
 
     /// draw bottom-left label
     void drawLabel() const;
@@ -286,32 +286,35 @@ public:
     };
     
     /// display text in bottom-left corner
-    void strokeString(const char[], float width) const;
+    void drawString(const char[], float width) const;
 
     /// stroke text at given position
     void strokeString(float X, float Y, float Z, const char str[]) const;
-
-    /// set position of text in window
-    float textPosition(float&, float&, int width, int height, int line, int W, int H, const int position) const;
-
-    /// display text on a rectangle of color `bcol`, in a corner of the center of the display window
-    void placeText(int position, FontType, const float color[4], const char text[], const float back[4], int width, int height) const;
     
     /// draw `text` at position `pos`
-    void drawText(Vector3 const& pos, const float color[4], const char text[], float offset=0.5, FontType = BITMAP_9_BY_15) const;
-    
+    void drawText(float X, float Y, float Z, const float color[4], const char text[], float offset=0.5, FontType = BITMAP_9_BY_15) const;
+
+    /// draw `text` at position `pos`
+    void drawText(Vector3 const& pos, const float color[4], const char text[], float offset=0.5, FontType font = BITMAP_9_BY_15) const
+    {
+        drawText(pos.XX, pos.YY, pos.ZZ, color, text, offset, font);
+    }
+
     /// draw `text` at position `pos`
     void drawText(Vector2 const& pos, const float color[4], const char text[], float offset=0.5, FontType font = BITMAP_9_BY_15) const
     {
-        drawText(Vector3(pos.XX, pos.YY, 0), color, text, offset, font);
+        drawText(pos.XX, pos.YY, 0, color, text, offset, font);
     }
     
     /// draw `text` at position `pos`
     void drawText(Vector1 const& pos, const float color[4], const char text[], float offset=0.5, FontType font = BITMAP_9_BY_15) const
     {
-        drawText(Vector3(pos.XX, 0, 0), color, text, offset, font);
+        drawText(pos.XX, 0, 0, color, text, offset, font);
     }
-    
+
+    /// display text on a rectangle of color `bcol`, in a corner of the center of the display window
+    void frameText(int position, FontType, const float color[4], const char text[], const float back[4], int width, int height) const;
+
     /// display a scale bar vertical or horizontal
     void drawScaleHV(float, float, float, void (*func)(float*, int cnt, float, float, float), float=0.f) const;
     

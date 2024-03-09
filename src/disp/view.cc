@@ -166,6 +166,8 @@ void View::closeDisplay() const
     if ( scalebar )
         drawScaleBar(scalebar, scalebar_length, scalebar_color);
     
+    //drawFPS();
+    
 #if 0
     if ( label != "off" )
     {
@@ -174,7 +176,7 @@ void View::closeDisplay() const
         size_t n = full_label.find('\n');
         full_label.copy(str, sizeof(str), n);
         str[n] = '\0';
-        strokeString(str);
+        strokeString(str, 1.f);
     }
 #endif
 }
@@ -183,11 +185,20 @@ void View::closeDisplay() const
 #pragma mark - Text
 
 
-void View::strokeString(const char str[], float width) const
+void View::drawString(const char str[], float size) const
 {
+    int W = width(), H = height();
+    gym::disableLighting();
+    gym::disableAlphaTest();
+    gym::disableDepthTest();
+    gym::one_view(W, H);
+    gym::color(back_color);
+    fgStrokeString(0, H-18, 1, 1, str, 4+size, 4+size, 0);
     gym::color(front_color);
-    gym::one_view(viewport_[2], viewport_[3]);
-    fgStrokeString(8, 4, 1.0, 1, str, width, 0, -0.25);
+    fgStrokeString(0, H-18, 1, 1, str, size, 0, 0);
+    gym::restoreDepthTest();
+    gym::restoreAlphaTest();
+    gym::restoreLighting();
     loadView();
 }
 
@@ -200,8 +211,8 @@ void View::strokeString(float X, float Y, float Z, const char str[]) const
 
 
 /// width = text_width; height = text_heigth, (W, H) = window_size
-float View::textPosition(float& px, float& py, int width, int height, int lines,
-                        int W, int H, const int position) const
+static float textPosition(float& px, float& py, int width, int height, int lines,
+                          int W, int H, const int position)
 {
     assert_true( W > 0 );
     assert_true( H > 0 );
@@ -256,7 +267,7 @@ float View::textPosition(float& px, float& py, int width, int height, int lines,
  
  Note: width and height are the current size of the viewport (window)
  */
-void View::placeText(int position, FontType font, const float color[4],
+void View::frameText(int position, FontType font, const float color[4],
                      const char text[], const float back[4], int W, int H) const
 {
     int lines = 1;
@@ -285,13 +296,13 @@ void View::placeText(int position, FontType font, const float color[4],
 /**
  draw text at position `vec`
  */
-void View::drawText(Vector3 const& vec, const float color[4], const char str[], const float offset, FontType) const
+void View::drawText(float X, float Y, float Z, const float color[4], const char str[], const float offset, FontType) const
 {
     gym::disableLighting();
     gym::disableAlphaTest();
     gym::disableDepthTest();
     gym::cancelRotation();
-    gym::translate_ref(vec.XX, vec.YY, vec.ZZ);
+    gym::translate_ref(X, Y, Z);
 #if 0
     int H = fgFontHeight(font);
     fgBitmapString(offset, -H/3, pixelSize(), font, color, str, H);
@@ -308,21 +319,21 @@ void View::drawText(Vector3 const& vec, const float color[4], const char str[], 
 #pragma mark -
 
 // display FPS = frames per seconds
-void View::drawFPS(size_t arg) const
+void View::drawFPS() const
 {
-    static char str[16];
+    static char str[16] = { 0 };
     static size_t cnt = 0;
     static double sec = TimeDate::seconds_today();
-    cnt += arg;
+    cnt++;
     double now = TimeDate::seconds_today();
     if ( now > sec + 1.0 )
     {
         double fps = cnt / ( now - sec );
-        snprintf(str, sizeof(str), "%6.2f", fps);
+        snprintf(str, sizeof(str), "%6.2f fps", fps);
         sec = now;
         cnt = 0;
     }
-    strokeString(str, 2);
+    drawString(str, 1);
 }
 
 
@@ -334,7 +345,7 @@ void View::drawLabel() const
     gym::disableAlphaTest();
     gym::disableDepthTest();
     gym::one_view(W, H);
-    placeText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
+    frameText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
     gym::restoreDepthTest();
     gym::restoreAlphaTest();
     gym::restoreLighting();
@@ -361,25 +372,25 @@ void View::drawInteractiveFeatures() const
 
     if ( top_message.size() )
     {
-        placeText(3, BITMAP_9_BY_15, front_color, top_message.c_str(), nullptr, W, H);
+        frameText(3, BITMAP_9_BY_15, front_color, top_message.c_str(), nullptr, W, H);
     }
     
     if ( label != "off" )
     {
-        placeText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
+        frameText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
     }
     
     if ( draw_memo && memo.size() )
     {
         float white[4] = {1,1,1,1};
         float black[4] = {0,0,0,0.9};
-        placeText(4, BITMAP_8_BY_13, white, memo.c_str(), black, W, H);
+        frameText(4, BITMAP_8_BY_13, white, memo.c_str(), black, W, H);
     }
 
     if ( flash.size() )
     {
         float yellow[4] = { 0.6f, 0.6f, 1.f, 1.f };
-        placeText(2, BITMAP_9_BY_15, yellow, flash.c_str(), nullptr, W, H);
+        frameText(2, BITMAP_9_BY_15, yellow, flash.c_str(), nullptr, W, H);
         if ( TimeDate::seconds_since_1970() > flash_end )
             flash = "";
     }
