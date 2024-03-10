@@ -32,16 +32,8 @@ void gym::unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsi
 }
 
 
-size_t gym::countBits(size_t n_bytes, const unsigned char* bits)
-{
-    unsigned n = 0;
-    for ( unsigned b = 0; b < n_bytes; ++b )
-        n += __builtin_popcount(bits[b]);
-    return n;
-}
-
-
-/** This is drawing pixels of `bits`, line by line, using triangle strips */
+#if 1
+/** Transform bitmap into a triangle strip */
 size_t gym::unpackBitmap(flute2* flu, unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
 {
     const unsigned Wb = ( W + 7 ) >> 3;
@@ -54,9 +46,10 @@ size_t gym::unpackBitmap(flute2* flu, unsigned W, unsigned H, float X0, float Y0
         unsigned char old = 0;
         for ( unsigned j = 0; j < Wb; ++j )
         {
-            for ( int k = 7; k >= 0; --k )
+            unsigned char byte = row[j];
+            for ( int k = 0; k < 8; ++k )
             {
-                unsigned char bit = ( row[j] >> k ) & 1;
+                unsigned char bit = ( byte << k ) & 128;
                 if ( bit != old )
                 {
                     old = bit;
@@ -79,6 +72,46 @@ size_t gym::unpackBitmap(flute2* flu, unsigned W, unsigned H, float X0, float Y0
     return ptr-flu;
 }
 
+#else
+/** Transform bitmap into a triangle strip */
+size_t gym::unpackBitmap(flute2* flu, unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
+{
+    const unsigned Wb = ( W + 7 ) >> 3;
+    flute2* ptr = flu;
+    for ( unsigned j = 0; j < Wb; ++j )
+    {
+        float X = X0, R = X + S;
+        unsigned char old = 0;
+        for ( int k = 7; k >= 0; --k )
+        {
+            float Y = Y0;
+            for ( unsigned i = 0; i < H; ++i )
+            {
+                unsigned char bit = ( bits[i*Wb+j] >> k ) & 1;
+                if ( bit != old )
+                {
+                    old = bit;
+                    ptr[0] = { X, Y };
+                    ptr[1] = { (bit?X:R), Y };
+                    ptr[2] = { R, Y };
+                    ptr += 3;
+                }
+                Y += S;
+            }
+            if ( old )
+            {
+                ptr[0] = { X, Y };
+                ptr[1] = { R, Y };
+                ptr[2] = { R, Y };
+                ptr += 3;
+            }
+            X += S;
+            R += S;
+        }
+    }
+    return ptr-flu;
+}
+#endif
 
 /**
  This will downsample pixelmap `src` and set destination `dst`. The pixel

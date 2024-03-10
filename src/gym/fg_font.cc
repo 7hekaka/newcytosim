@@ -102,6 +102,17 @@ static SFG_Font const* fghFont( int font )
 #include "gym_image.h"
 #include "gym_flat.h"
 
+
+
+static size_t countBits(size_t n_bytes, const unsigned char* bytes)
+{
+    size_t n = 0;
+    for ( unsigned b = 0; b < n_bytes; ++b )
+        n += __builtin_popcount(bytes[b]);
+    return n;
+}
+
+
 /*
  * Draw a bitmap character
  */
@@ -122,7 +133,7 @@ void fgBitmapCharacter(float X, float Y, float S, int fontID, const float col[4]
         gym::unpackBitmap(pixels, W, H, face+1, W);
         gym::drawPixels(W, H, S*X-font->xorig, S*Y-font->yorig, S, pixels);
 #else
-        unsigned n_bits = gym::countBits(H*((W+7)>>3), 1+face);
+        size_t n_bits = countBits(H*((W+7)>>3), 1+face);
         flute2* flu = gym::mapBufferV2(6*n_bits);
         size_t cnt = gym::unpackBitmap(flu, W, H, S*X-font->xorig, S*Y-font->yorig, S, 1+face);
         gym::unmapBufferV2();
@@ -155,6 +166,7 @@ static inline void setTextColor(char c, char& d, const float color[4])
 }
 
 
+/* Converts every character into a pixel map (1 byte/pixel) and then render */
 void fgBitmapString0(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
 {
     SFG_Font const* font = fghFont(fontID);
@@ -205,6 +217,7 @@ void fgBitmapString0(float X, float Y, float scale, int fontID, const float colo
 }
 
 
+/* Faster: this converts every character into a triangle strip */
 void fgBitmapString(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
 {
     SFG_Font const* font = fghFont(fontID);
@@ -212,6 +225,9 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
         return;
 
     char * str = strdup(string);
+    for ( char * c = str; *c; ++c )
+        if ( !isprint(*c) && *c != '\n' ) *c = '*';
+
     char * token = NULL;
     char col = 0;
     
@@ -227,23 +243,25 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
         if ( color )
             setTextColor(token[0], col, color);
         const unsigned H = font->Height;
-        unsigned W = 0;
-        for ( char * ptr = token; *ptr; ++ptr )
+        size_t n_bits = 0;
+        for ( char const* c = token; *c; ++c )
         {
-            unsigned char c = *ptr;
-            if ( isprint(c) )
-            {
-                const uByte* face = font->Characters[c];
-                //unpackBitmap(pixels+W, face[0], H, 1+face, L);
-                unsigned cW = face[0];
-                unsigned n_bits = gym::countBits(H*((cW+7)>>3), 1+face);
-                flute2* flu = gym::mapBufferV2(6*n_bits);
-                size_t cnt = gym::unpackBitmap(flu, cW, H, X+scale*W, Y, scale, 1+face);
-                gym::unmapBufferV2();
-                gym::drawTriangleStrip(0, cnt);
-                W += cW;
-            }
+            const uByte* face = font->Characters[(unsigned char)*c];
+            unsigned cW = face[0];
+            n_bits += countBits(H*((cW+7)>>3), 1+face);
         }
+        flute2* flu = gym::mapBufferV2(6*n_bits);
+        unsigned cnt = 0;
+        unsigned W = 0;
+        for ( char const* c = token; *c; ++c )
+        {
+            const uByte* face = font->Characters[(unsigned char)*c];
+            unsigned cW = face[0];
+            cnt += gym::unpackBitmap(flu+cnt, cW, H, X+scale*W, Y, scale, 1+face);
+            W += cW;
+        }
+        gym::unmapBufferV2();
+        gym::drawTriangleStrip(0, cnt);
         // move down one line.
         Y += scale * vshift;
     }

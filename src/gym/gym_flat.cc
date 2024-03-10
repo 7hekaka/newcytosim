@@ -55,53 +55,6 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     CHECK_GL_ERROR("drawPixels2");
 }
 
-#if 0
-/** This is drawing pixels of `bits`, line by line, using triangle strips */
-void gym::paintPackedBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
-{
-    const unsigned Wb = ( W + 7 ) >> 3;
-    unsigned n_bits = 0;
-    for ( unsigned b = 0; b < H*Wb; ++b )
-        n_bits += __builtin_popcount(bits[b]);
-    if ( !n_bits )
-        return;
-    flute2* flu = gym::mapBufferV2(6*n_bits);
-    flute2* ptr = flu;
-    for ( unsigned i = 0; i < H; ++i )
-    {
-        float X = X0;
-        float Y = Y0 + S * i, T = Y + S;
-        const unsigned char* row = bits + i * Wb;
-        unsigned char old = 0;
-        for ( unsigned j = 0; j < Wb; ++j )
-        {
-            for ( int k = 7; k >= 0; --k )
-            {
-                unsigned char bit = ( row[j] >> k ) & 1;
-                if ( bit != old )
-                {
-                    old = bit;
-                    ptr[0] = { X, Y };
-                    ptr[1] = { X, (bit?Y:T) };
-                    ptr[2] = { X, T };
-                    ptr += 3;
-                }
-                X += S;
-            }
-        }
-        if ( old )
-        {
-            ptr[0] = { X, Y };
-            ptr[1] = { X, T };
-            ptr[2] = { X, T };
-            ptr += 3;
-        }
-    }
-    //printf("%4lu %4u\n", ptr-flu, 6*n_bits);
-    gym::unmapBufferV2();
-    gym::drawTriangleStrip(0, ptr-flu);
-}
-#endif
 
 /** This is drawing squares of dimension WxH for every '1' in str[] */
 void gym::paintSequence(float X, float Y, float W, float H, const char str[])

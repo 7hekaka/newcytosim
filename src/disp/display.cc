@@ -25,7 +25,7 @@ extern uint64_t pcg32_state;
 #include "gym_flute.h"
 #include "gym_flute_dim.h"
 #include "gym_check.h"
-#include "fg_stroke.h"
+#include "fg_font.h"
 
 #include "point_disp.h"
 #include "fiber_disp.h"
@@ -71,8 +71,8 @@ static void strokeText(Vector const& vec, const char str[], float scale)
 #else
     gym::translate_ref(vec.XX, 0.f, 0.f);
 #endif
-    //fgBitmapString(0, 0, scale, 2, nullptr, str, 0);
-    fgStrokeString(0, 0, scale, 0, str, 1);
+    fgBitmapString(0, 0, scale, 2, nullptr, str, 0);
+    //fgStrokeString(0, 0, scale, 0, str, 1);
     CHECK_GL_ERROR("strokeText");
 }
 

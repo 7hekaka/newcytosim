@@ -15,9 +15,6 @@ namespace gym
 
     /// print pixel map in ASCII
     void printPixels(FILE*, uint8_t const* pix, unsigned W, unsigned H);
-    
-    /// return number of 1s in bytes
-    size_t countBits(size_t, const unsigned char* bits);
 
     /// convert binary image into one byte per pixel
     void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[], unsigned);
