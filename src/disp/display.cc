@@ -71,7 +71,9 @@ static void strokeText(Vector const& vec, const char str[], float scale)
 #else
     gym::translate_ref(vec.XX, 0.f, 0.f);
 #endif
+    //fgBitmapString(0, 0, scale, 2, nullptr, str, 0);
     fgStrokeString(0, 0, scale, 0, str, 1);
+    CHECK_GL_ERROR("strokeText");
 }
 
 

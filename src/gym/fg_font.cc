@@ -171,7 +171,8 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
     while ((token = strsep(&str, "\n")) != NULL)
     {
         //printf("%s\n", token);
-        setTextColor(token[0], col, color);
+        if ( color )
+            setTextColor(token[0], col, color);
         const unsigned H = font->Height;
         // calculate total string length in pixels:
         unsigned L = 7;
