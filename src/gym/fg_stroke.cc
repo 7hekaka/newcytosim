@@ -100,50 +100,74 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
 float fgStrokeString(float X, float Y, float scale, int mono, const char *string,
                      float line_width, float point_size, float vshift)
 {
+    const size_t ONE = 32;
+    const size_t MAX = 16;
     scale *= 0.1;
-    unsigned char c;
     float X0 = X;
     SFG_StrokeFont const* font = fghStrokeByID( mono );
     if ( font && string )
     {
-        if ( vshift == 0 )
-            vshift = font->Height;
+        size_t inx = 0, cnt = 0;
+        size_t start[MAX] = { 0 };
+        flute2* flu = gym::mapBufferV2(ONE*MAX);
         /*
          * Step through the string, drawing each character.
          * A newline will simply translate the next character's insertion
          * point back to the start of the line and down one line.
          */
+        unsigned char c;
         while( ( c = *string++) ) if ( c < font->Quantity )
         {
             if ( c == '\n' )
             {
                 X = X0;
+                if ( vshift == 0 )
+                    vshift = font->Height;
                 Y -= scale * vshift;
             }
             else  /* Not an EOL, draw the bitmap character */
             {
                 const SFG_StrokeChar *schar = font->Characters[c];
-                if( schar )
+                if ( schar )
                 {
                     const SFG_StrokeStrip *strip = schar->Strips;
-                    
-                    for( unsigned i = 0; i < schar->Number; i++, strip++ )
+                    for ( unsigned i = 0; i < schar->Number; i++, strip++ )
                     {
                         const size_t num = strip->Number;
                         const SFG_StrokeVertex* ptr = strip->Vertices;
-                        flute2* flu = gym::mapBufferV2(num);
+                        if ( cnt >= MAX )
+                        {
+                            gym::unmapBufferV2();
+                            if ( line_width > 0 )
+                            {
+                                gym::drawLineStrip(line_width, 0, start[0]);
+                                for ( unsigned s = 1; s < cnt; ++s )
+                                    gym::drawLineStrip(start[s-1], start[s]-start[s-1]);
+                            }
+                            if ( point_size > 0 )
+                                gym::drawPoints(point_size, 0, inx);
+                            cnt = 0;
+                            inx = 0;
+                            flu = gym::mapBufferV2(ONE*MAX);
+                        }
+                        // we translate and scale in CPU:
                         for ( size_t j = 0; j < num; ++j )
-                            flu[j] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
-                        gym::unmapBufferV2();
-                        if ( line_width > 0 )
-                            gym::drawLineStrip(line_width, 0, num);
-                        if ( point_size > 0 )
-                            gym::drawPoints(point_size, 0, num);
+                            flu[inx++] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
+                        start[cnt++] = inx;
                     }
                     X += scale * schar->Advance;
                 }
             }
         }
+        gym::unmapBufferV2();
+        if ( line_width > 0 )
+        {
+            gym::drawLineStrip(line_width, 0, start[0]);
+            for ( unsigned s = 1; s < cnt; ++s )
+                gym::drawLineStrip(start[s-1], start[s]-start[s-1]);
+        }
+        if ( point_size > 0 )
+            gym::drawPoints(point_size, 0, inx);
     }
     return X;
 }
