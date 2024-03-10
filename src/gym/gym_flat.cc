@@ -262,7 +262,7 @@ void gym::paintOctagon(float L, float B, float R, float T, const float col[4], f
     flu[6] = {L, B+D};
     flu[7] = {L, T-D};
     gym::unmapBufferV2();
-    glDrawArrays(GL_TRIANGLE_STRIP, 0, 8);
+    gym::drawTriangleStrip(0, 8);
 }
 
 /// left, bottom, right, top and D = corners

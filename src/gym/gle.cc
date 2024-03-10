@@ -1758,9 +1758,8 @@ namespace gle
         }
         flu[i++] = {R, 0, 0, 1, 0, 0};
         gym::unmapBufferV3N3();
-        glDrawArrays(GL_TRIANGLES, 0, i);
+        gym::drawTriangles(0, i);
         gym::cleanup(1);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
     
     
