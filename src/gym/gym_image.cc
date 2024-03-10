@@ -6,28 +6,77 @@
 /// promote 0/1 bits values to 1 byte per bit, either full 1 or full 0
 void gym::unpackBitmap(unsigned char * bytes, unsigned W, unsigned H, const unsigned char* bits, unsigned lda)
 {
+    const unsigned char ONE = 0xFF;
     // number of bytes in a row of 'input'
     const unsigned Wb = ( W + 7 ) >> 3;
     // each line is independent:
     for ( unsigned i = 0; i < H; ++i )
     {
-        unsigned char * ptr = bytes + ( H-1 - i ) * lda;
         unsigned char const* row = bits + i * Wb;
+        unsigned char * dst = bytes + ( H-1 - i ) * lda;
         // the operation could be vectorized, processing 16 bytes at a time
         for ( unsigned j = 0; j < Wb; ++j )
         {
             unsigned char b = row[j];
-            ptr[0] = ( b & 128 ) ? 0xFF : 0;
-            ptr[1] = ( b & 64  ) ? 0xFF : 0;
-            ptr[2] = ( b & 32  ) ? 0xFF : 0;
-            ptr[3] = ( b & 16  ) ? 0xFF : 0;
-            ptr[4] = ( b & 8   ) ? 0xFF : 0;
-            ptr[5] = ( b & 4   ) ? 0xFF : 0;
-            ptr[6] = ( b & 2   ) ? 0xFF : 0;
-            ptr[7] = ( b & 1   ) ? 0xFF : 0;
-            ptr += 8;
+            dst[0] = ( b & 128 ) ? ONE : 0;
+            dst[1] = ( b & 64  ) ? ONE : 0;
+            dst[2] = ( b & 32  ) ? ONE : 0;
+            dst[3] = ( b & 16  ) ? ONE : 0;
+            dst[4] = ( b & 8   ) ? ONE : 0;
+            dst[5] = ( b & 4   ) ? ONE : 0;
+            dst[6] = ( b & 2   ) ? ONE : 0;
+            dst[7] = ( b & 1   ) ? ONE : 0;
+            dst += 8;
         }
     }
+}
+
+
+size_t gym::countBits(size_t n_bytes, const unsigned char* bits)
+{
+    unsigned n = 0;
+    for ( unsigned b = 0; b < n_bytes; ++b )
+        n += __builtin_popcount(bits[b]);
+    return n;
+}
+
+
+/** This is drawing pixels of `bits`, line by line, using triangle strips */
+size_t gym::unpackBitmap(flute2* flu, unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
+{
+    const unsigned Wb = ( W + 7 ) >> 3;
+    flute2* ptr = flu;
+    for ( unsigned i = 0; i < H; ++i )
+    {
+        float X = X0;
+        float Y = Y0 + S * i, T = Y + S;
+        const unsigned char* row = bits + i * Wb;
+        unsigned char old = 0;
+        for ( unsigned j = 0; j < Wb; ++j )
+        {
+            for ( int k = 7; k >= 0; --k )
+            {
+                unsigned char bit = ( row[j] >> k ) & 1;
+                if ( bit != old )
+                {
+                    old = bit;
+                    ptr[0] = { X, Y };
+                    ptr[1] = { X, (bit?Y:T) };
+                    ptr[2] = { X, T };
+                    ptr += 3;
+                }
+                X += S;
+            }
+        }
+        if ( old )
+        {
+            ptr[0] = { X, Y };
+            ptr[1] = { X, T };
+            ptr[2] = { X, T };
+            ptr += 3;
+        }
+    }
+    return ptr-flu;
 }
 
 

@@ -58,6 +58,8 @@ namespace gym
     inline void unmap() { glUnmapBuffer(GL_ARRAY_BUFFER); }
     /// private
     inline void rebind() { glBindBuffer(GL_ARRAY_BUFFER, currStream()); }
+    ///
+    inline void subdata(size_t size, float const* ptr) { glBufferSubData(currStream(), 0, size, ptr); }
     
     /// map / unmap GPU buffer for 2D vertex
     inline flute2* mapBufferV2(size_t n) { return (flute2*)mapFloatBuffer(2*n); }

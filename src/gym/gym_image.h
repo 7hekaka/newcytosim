@@ -2,6 +2,7 @@
 
 #include <cstdio>
 #include <stdint.h>
+#include "gym_flute.h"
 
 namespace gym
 {
@@ -15,7 +16,13 @@ namespace gym
     /// print pixel map in ASCII
     void printPixels(FILE*, uint8_t const* pix, unsigned W, unsigned H);
     
+    /// return number of 1s in bytes
+    size_t countBits(size_t, const unsigned char* bits);
+
     /// convert binary image into one byte per pixel
     void unpackBitmap(unsigned char data[], unsigned W, unsigned H, const unsigned char bits[], unsigned);
+
+    /// unpack binary image into vertex data to be rendered as a triangle strip
+    size_t unpackBitmap(flute2*, unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
 
 }

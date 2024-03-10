@@ -14,7 +14,7 @@
 /*
  * Draw a bitmap character
  */
-void fgBitmapCharacter(float x, float y, int font, const float color[4], int character);
+void fgBitmapCharacter(float x, float y, float S, int font, const float color[4], int character);
 
 /*
  * Draw a bitmap string at position (x, y) with pixel-size S

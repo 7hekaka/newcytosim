@@ -9,9 +9,6 @@ namespace gym
     /// draw Bitmap using a texture over a rectangle
     void drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
 
-    /// draw pixels in packed format
-    void paintPackedBitmap(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bits);
-
     /// draw all pixels of the bitmap
     void paintSequence(float X, float Y, float W, float H, const char str[]);
 

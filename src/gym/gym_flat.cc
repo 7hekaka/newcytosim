@@ -27,9 +27,9 @@ void gym::printPixels(unsigned W, unsigned H, const unsigned char* pixels, unsig
 }
 
 
-/** This is drawing `bits` by using a texture over [X, X+S*W]x[Y, Y+S*H].
- S is the pixel dimension */
-void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* pixels)
+/** This is drawing `bytes` by using a texture over [X, X+S*W]x[Y, Y+S*H].
+ S is the pixel dimension. Each Pixel is represented by one byte */
+void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const unsigned char* bytes)
 {
     //printPixels(W, H, pixels, W);
     CHECK_GL_ERROR("drawPixels0");
@@ -41,7 +41,7 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     glBindTexture(GL_TEXTURE_2D, gym_font_texture_);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, W, H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, pixels);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, W, H, 0, GL_ALPHA, GL_UNSIGNED_BYTE, bytes);
 
     flute4* flu = gym::mapBufferV2T2(4);
     flu[0] = { X,     Y+S*H, 0, 0 };
@@ -55,7 +55,7 @@ void gym::drawPixels(unsigned W, unsigned H, float X, float Y, float S, const un
     CHECK_GL_ERROR("drawPixels2");
 }
 
-
+#if 0
 /** This is drawing pixels of `bits`, line by line, using triangle strips */
 void gym::paintPackedBitmap(unsigned W, unsigned H, float X0, float Y0, float S, const unsigned char* bits)
 {
@@ -100,9 +100,8 @@ void gym::paintPackedBitmap(unsigned W, unsigned H, float X0, float Y0, float S,
     //printf("%4lu %4u\n", ptr-flu, 6*n_bits);
     gym::unmapBufferV2();
     gym::drawTriangleStrip(0, ptr-flu);
-    CHECK_GL_ERROR("paintPackedBitmap");
 }
-
+#endif
 
 /** This is drawing squares of dimension WxH for every '1' in str[] */
 void gym::paintSequence(float X, float Y, float W, float H, const char str[])
