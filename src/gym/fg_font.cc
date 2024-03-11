@@ -68,13 +68,16 @@ enum GLUTFontType
 
 int fgFontHeight(int font)
 {
-    if ( font == BITMAP_8_BY_13 )        return 15;
-    if ( font == BITMAP_9_BY_15 )        return 16;
-    if ( font == BITMAP_TIMES_ROMAN_10 ) return 12;
-    if ( font == BITMAP_TIMES_ROMAN_24 ) return 27;
-    if ( font == BITMAP_HELVETICA_10 )   return 13;
-    if ( font == BITMAP_HELVETICA_12 )   return 15;
-    if ( font == BITMAP_HELVETICA_18 )   return 22;
+    switch ( font )
+    {
+        case BITMAP_8_BY_13:        return 15;
+        case BITMAP_9_BY_15:        return 16;
+        case BITMAP_TIMES_ROMAN_10: return 12;
+        case BITMAP_TIMES_ROMAN_24: return 27;
+        case BITMAP_HELVETICA_10:   return 13;
+        case BITMAP_HELVETICA_12:   return 15;
+        case BITMAP_HELVETICA_18:   return 22;
+    }
     return 13;
 }
 
@@ -85,13 +88,16 @@ int fgFontHeight(int font)
  */
 static SFG_Font const* fghFont( int font )
 {
-    if( font == BITMAP_8_BY_13        ) return &fgFontFixed8x13;
-    if( font == BITMAP_9_BY_15        ) return &fgFontFixed9x15;
-    if( font == BITMAP_HELVETICA_10   ) return &fgFontHelvetica10;
-    if( font == BITMAP_HELVETICA_12   ) return &fgFontHelvetica12;
-    if( font == BITMAP_HELVETICA_18   ) return &fgFontHelvetica18;
-    if( font == BITMAP_TIMES_ROMAN_10 ) return &fgFontTimesRoman10;
-    if( font == BITMAP_TIMES_ROMAN_24 ) return &fgFontTimesRoman24;
+    switch ( font )
+    {
+        case BITMAP_8_BY_13:        return &fgFontFixed8x13;
+        case BITMAP_9_BY_15:        return &fgFontFixed9x15;
+        case BITMAP_TIMES_ROMAN_10: return &fgFontTimesRoman10;
+        case BITMAP_TIMES_ROMAN_24: return &fgFontTimesRoman24;
+        case BITMAP_HELVETICA_10:   return &fgFontHelvetica10;
+        case BITMAP_HELVETICA_12:   return &fgFontHelvetica12;
+        case BITMAP_HELVETICA_18:   return &fgFontHelvetica18;
+    }
     return NULL;
 }
 
@@ -239,7 +245,6 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
 
     while ((token = strsep(&str, "\n")) != NULL)
     {
-        //printf("%s\n", token);
         if ( color )
             setTextColor(token[0], col, color);
         const unsigned H = font->Height;
@@ -260,6 +265,7 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
             cnt += gym::unpackBitmap(flu+cnt, cW, H, X+scale*W, Y, scale, 1+face);
             W += cW;
         }
+        //printf("%s  %u\n", token, cnt);
         gym::unmapBufferV2();
         gym::drawTriangleStrip(0, cnt);
         // move down one line.

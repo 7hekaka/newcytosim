@@ -44,28 +44,39 @@ size_t gym::unpackBitmap(flute2* flu, unsigned W, unsigned H, float X0, float Y0
         float Y = Y0 + S * i, T = Y + S;
         const unsigned char* row = bits + i * Wb;
         unsigned char old = 0;
+        unsigned k = 0;
         for ( unsigned j = 0; j < Wb; ++j )
         {
+            k = j * 8;
             unsigned char byte = row[j];
-            for ( int k = 0; k < 8; ++k )
+            while ( byte )
             {
-                unsigned char c = ( byte << k );
-                unsigned char bit = c & 128;
-                if ( 0 == c )
-                    break;
+                unsigned char bit = byte & 128;
                 if ( bit != old )
                 {
                     old = bit;
+                    X = X0 + k * S;
                     ptr[0] = { X, Y };
                     ptr[1] = { X, (bit?Y:T) };
                     ptr[2] = { X, T };
                     ptr += 3;
                 }
-                X += S;
+                byte <<= 1;
+                ++k;
+            }
+            if ( k & 7 )
+            {
+                old = 0;
+                X = X0 + k * S;
+                ptr[0] = { X, Y };
+                ptr[1] = { X, T };
+                ptr[2] = { X, T };
+                ptr += 3;
             }
         }
         if ( old )
         {
+            X = X0 + k * S;
             ptr[0] = { X, Y };
             ptr[1] = { X, T };
             ptr[2] = { X, T };
