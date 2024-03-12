@@ -289,7 +289,7 @@ void View::frameText(int position, FontType font, const float color[4],
             gym::drawOctagon(X-E, B, R, T, color, 5, 1);
     }
     
-    fgBitmapString(X, Y, 1.f, font, color, text, vshift);
+    fgBitmapText(X, Y, 1.f, font, color, text, vshift);
     //fgStrokeString(X, Y, 1.f, 0, text, 1, 0, 0);
 }
 
@@ -330,6 +330,7 @@ void View::drawFPS() const
     {
         double fps = cnt / ( now - sec );
         snprintf(str, sizeof(str), "%6.2f fps", fps);
+        //printf("%s\n", str);
         sec = now;
         cnt = 0;
     }
