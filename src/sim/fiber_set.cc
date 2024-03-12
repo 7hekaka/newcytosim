@@ -283,11 +283,12 @@ void FiberSet::steps()
             simul_.couples.add(C);
         }
 #endif
-        obj->step(); // this may delete 'obj'
+        obj->step();
         // delete object that have been flagged
         if ( ! obj->prop ) delete(obj);
         obj = nxt;
     }
+    if ( size() > 1 ) shuffle();
 }
 
 

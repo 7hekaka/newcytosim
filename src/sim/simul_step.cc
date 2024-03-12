@@ -124,16 +124,6 @@ void Simul::steps()
     spheres.steps();
     beads.steps();
     solids.steps();
-    
-    // mix object lists
-    if ( events.size() > 1 ) events.shuffle();
-    if ( organizers.size() > 1 ) organizers.shuffle();
-    if ( tubules.size() > 1 ) tubules.shuffle();
-    if ( beads.size() > 1 ) beads.shuffle();
-    if ( solids.size() > 1 ) solids.shuffle();
-    if ( spheres.size() > 1 ) spheres.shuffle();
-    if ( spaces.size() > 1 ) spaces.shuffle();
-    if ( fields.size() > 1 ) fields.shuffle();
 
     //printf("     ::steps    %16llu\n", (timer()-rdt)>>5); rdt = timer();
 
@@ -183,12 +173,9 @@ void Simul::steps()
         singles.steps();
         //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
     }
-    if ( couples.size() > 1 ) couples.shuffle();
-    if ( singles.size() > 1 ) singles.shuffle();
 
     // This will also update all the attached Hands
     fibers.steps();
-    if ( fibers.size() > 1 ) fibers.shuffle();
 
     fresh_ = 1;
 }

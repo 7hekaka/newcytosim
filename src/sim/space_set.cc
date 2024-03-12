@@ -69,6 +69,7 @@ void SpaceSet::steps()
 {
     for ( Space * sp = first(); sp; sp=sp->next() )
         sp->step();
+    if ( size() > 1 ) shuffle();
 }
 
 

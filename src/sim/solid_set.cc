@@ -35,6 +35,7 @@ void SolidSet::steps()
         }
     }
 #endif
+    if ( size() > 1 ) shuffle();
 }
 
 

@@ -109,6 +109,8 @@ void SingleSet::steps()
         Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
     }
 #endif
+    if ( aList.size() > 1 ) aList.shuffle();
+    if ( fList.size() > 1 ) fList.shuffle();
 }
 
 
@@ -123,6 +125,7 @@ void SingleSet::stepSkipUnattached()
     //Cytosim::log("SingleSet::stepSkipUnattached : F %5i A %5i\n", fList.size(), aList.size());
     
     step_singles<&Single::stepA>(firstA(), sizeA() & 1);
+    if ( aList.size() > 1 ) aList.shuffle();
 }
 
 

@@ -133,6 +133,7 @@ void CoupleSet::steps()
     }
 #endif
     //printf(" couples: %lu %lu [ %u %u ]\n", size(), inventory_.count(), inventory_.lowest(), inventory_.highest());
+    if ( size() > 1 ) shuffle();
 }
 
 
@@ -173,6 +174,7 @@ void CoupleSet::stepSkipUnattached()
         step_couples<&Couple::stepHand1>(afHead, afOdd);
         step_couples<&Couple::stepHand2>(faHead, faOdd);
     }
+    if ( size() > 1 ) shuffle();
 }
 
 //------------------------------------------------------------------------------

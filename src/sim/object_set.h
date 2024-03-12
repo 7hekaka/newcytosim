@@ -160,7 +160,7 @@ public:
     /// delete all Objects in list and forget all serial numbers
     virtual void erase();
     
-    /// number of elements
+    /// number of registered elements
     virtual size_t size() const { return pool_.size(); }
 
     /// mix the order of elements in the doubly linked list pool

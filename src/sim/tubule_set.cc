@@ -25,6 +25,7 @@ void TubuleSet::steps()
 {
     for ( Tubule * e=first(); e; e=e->next() )
         e->step();
+    if ( size() > 1 ) shuffle();
 }
 
 
