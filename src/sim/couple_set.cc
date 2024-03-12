@@ -643,31 +643,31 @@ void CoupleSet::reheat()
 #pragma mark -
 
 
-void CoupleSet::writeAA(Outputter& out) const
+void CoupleSet::writeObjectsAA(Outputter& out) const
 {
     out.write("\n#section couple AA");
     writeObjects(out, aaList);
 }
 
-void CoupleSet::writeAF(Outputter& out) const
+void CoupleSet::writeObjectsAF(Outputter& out) const
 {
     out.write("\n#section couple AF");
     writeObjects(out, afList);
 }
 
-void CoupleSet::writeFA(Outputter& out) const
+void CoupleSet::writeObjectsFA(Outputter& out) const
 {
     out.write("\n#section couple FA");
     writeObjects(out, faList);
 }
 
-void CoupleSet::writeFF(Outputter& out) const
+void CoupleSet::writeObjectsFF(Outputter& out) const
 {
     out.write("\n#section couple FF");
     writeObjects(out, ffList);
 }
 
-void CoupleSet::writeFF_skip(Outputter& out) const
+void CoupleSet::writeObjectsFF_skip(Outputter& out) const
 {
     out.write("\n#section couple FF");
     writeRecords(out, ffList.size(), inventory_.highest());
@@ -705,17 +705,17 @@ void CoupleSet::writeFF_skip(Outputter& out) const
 void CoupleSet::writeSet(Outputter& out) const
 {
     if ( sizeAA() > 0 )
-        writeAA(out);
+        writeObjectsAA(out);
     if ( sizeAF() > 0 )
-        writeAF(out);
+        writeObjectsAF(out);
     if ( sizeFA() > 0 )
-        writeFA(out);
+        writeObjectsFA(out);
     if ( sizeFF() > 0 )
     {
         if ( simul_.prop.skip_free_couple )
-            writeFF_skip(out);
+            writeObjectsFF_skip(out);
         else
-            writeFF(out);
+            writeObjectsFF(out);
     }
 }
 

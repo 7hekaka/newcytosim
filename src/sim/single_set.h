@@ -51,7 +51,7 @@ private:
     void uniRelax();
 
     /// save free Single for which `fast_diffusion == 0`
-    void writeF_skip(Outputter&) const;
+    void writeObjectsF_skip(Outputter&) const;
     
     /// list of Properties for which `fast_diffusion == true`
     std::vector<SingleProp const*> uniSingles;

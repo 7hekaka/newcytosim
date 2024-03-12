@@ -97,19 +97,19 @@ public:
     Object * newObject(ObjectTag, PropertyID);
     
     /// save free Couples
-    void writeFF(Outputter&) const;
+    void writeObjectsFF(Outputter&) const;
     
     /// save free Couples for which `fast_diffusion == 0`
-    void writeFF_skip(Outputter&) const;
+    void writeObjectsFF_skip(Outputter&) const;
 
     /// save attached Couples
-    void writeAF(Outputter&) const;
+    void writeObjectsAF(Outputter&) const;
     
     /// save attached Couples
-    void writeFA(Outputter&) const;
+    void writeObjectsFA(Outputter&) const;
 
     /// save bridging Couples
-    void writeAA(Outputter&) const;
+    void writeObjectsAA(Outputter&) const;
 
     /// save objects
     void writeSet(Outputter&) const;

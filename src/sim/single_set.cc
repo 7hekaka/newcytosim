@@ -473,7 +473,7 @@ void SingleSet::reheat()
 }
 
 
-void SingleSet::writeF_skip(Outputter& out) const
+void SingleSet::writeObjectsF_skip(Outputter& out) const
 {
     writeRecords(out, fList.size(), inventory_.highest());
     
@@ -519,7 +519,7 @@ void SingleSet::writeSet(Outputter& out) const
     {
         out.write("\n#section single F");
         if ( simul_.prop.skip_free_single )
-            writeF_skip(out);
+            writeObjectsF_skip(out);
         else
             writeObjects(out, fList);
     }
