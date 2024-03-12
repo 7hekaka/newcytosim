@@ -265,7 +265,7 @@ void fgBitmapString(float X, float Y, float scale, int fontID, const float color
             cnt += gym::unpackBitmap(flu+cnt, cW, H, X+scale*W, Y, scale, 1+face);
             W += cW;
         }
-        //printf("%s  %u\n", token, cnt);
+        //printf("`%s' %lu %u\n", token, n_bits, cnt);
         gym::unmapBufferV2();
         gym::drawTriangleStrip(0, cnt);
         // move down one line.
