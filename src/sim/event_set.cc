@@ -17,7 +17,7 @@ Event * EventSet::findID(ObjectID n) const
     return static_cast<Event*>(inventory_.get(n));
 }
 
-void EventSet::step()
+void EventSet::steps()
 {
     for ( Event * e=first(); e; e=e->next() )
         e->step(simul_);

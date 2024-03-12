@@ -21,7 +21,7 @@ Tubule * TubuleSet::findID(ObjectID n) const
 }
 
 
-void TubuleSet::step()
+void TubuleSet::steps()
 {
     for ( Tubule * e=first(); e; e=e->next() )
         e->step();

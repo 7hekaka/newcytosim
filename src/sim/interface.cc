@@ -1004,7 +1004,7 @@ inline void Interface::step_simul()
         hold();
         //fprintf(stderr, "> step @%.12e\n", sim_->time());
         (sim_->*FUNC)();
-        sim_->step();
+        sim_->steps();
     }
 }
 
@@ -1184,7 +1184,7 @@ void Interface::execute_run(real sec)
     {
         hold();
         sim_->solve_meca();
-        sim_->step();
+        sim_->steps();
     }
     
     // check if ending the simulation was requested:

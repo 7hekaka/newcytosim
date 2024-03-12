@@ -31,7 +31,7 @@ void FieldSet::prepare()
 }
 
 
-void FieldSet::step()
+void FieldSet::steps()
 {
     for ( Field * f=first(); f; f=f->next() )
     {

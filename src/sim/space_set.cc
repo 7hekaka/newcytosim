@@ -65,7 +65,7 @@ Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-void SpaceSet::step()
+void SpaceSet::steps()
 {
     for ( Space * sp = first(); sp; sp=sp->next() )
         sp->step();

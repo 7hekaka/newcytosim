@@ -7,7 +7,7 @@
 #include "simul.h"
 
 
-void SolidSet::step()
+void SolidSet::steps()
 {
 #if ( 0 )
     for ( Solid * S = first(); S; S = S->next() )

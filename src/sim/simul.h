@@ -167,7 +167,7 @@ public:
     void prepare();
     
     /// perform one Monte-Carlo step, corresponding to the time step
-    void step();
+    void steps();
 
     /// time in the simulated world (shortcut to `SimulProp::time`)
     double time() const { return prop.time; }

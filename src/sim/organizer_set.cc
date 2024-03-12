@@ -13,7 +13,7 @@
 
 //------------------------------------------------------------------------------
 
-void OrganizerSet::step()
+void OrganizerSet::steps()
 {
     Organizer * obj = first(), * nxt;
     while ( obj )

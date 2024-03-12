@@ -46,7 +46,7 @@ public:
     ObjectID findOrganizerID(Mecable const*) const;
 
     /// Monte-Carlo simulation step for every Object
-    void step();
+    void steps();
 
 };
 

@@ -8,7 +8,7 @@
 #include "simul.h"
 
 
-void BeadSet::step()
+void BeadSet::steps()
 {
 #if ( 0 )
     for ( Bead * B = first(); B; B = B->next() )

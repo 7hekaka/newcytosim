@@ -55,7 +55,7 @@ public:
     void erase();
     
     /// Monte-Carlo step for every Space
-    void step();
+    void steps();
     
     /// first Space
     Space * first() const { return static_cast<Space*>(pool_.front()); }

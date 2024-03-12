@@ -24,7 +24,7 @@ void SingleSet::prepare(PropertyList const& properties)
 /// templated member function pointer...
 /**
 In the loops we get the 'next' in the list always before calling 'FUNC', since
-'step()' may transfer the node to another list, changing the value of 'next()'
+'steps()' may transfer the node to another list, changing the value of 'next()'
 */
 template < void (Single::*FUNC)() >
 static inline void step_singles(Single * obj, bool odd)
@@ -72,7 +72,7 @@ void SingleSet::uniStepCollect(Single * obj)
 
 
 /**
-SingleSet::step() must call the appropriate Single::step() exactly once
+SingleSet::steps() must call the appropriate Single::step() exactly once
 for each Single: either stepF() or stepA().
 
 The Singles are stored in two lists, and are automatically transferred
@@ -81,7 +81,7 @@ on the fact that a Single will be moved to the start of the list to which it
 is transferred, by 'push_front'. By starting always from the node that
 was first before any transfer could occur, we process each Couple only once.
 */
-void SingleSet::step()
+void SingleSet::steps()
 {
     //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
     

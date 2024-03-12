@@ -48,11 +48,11 @@ public:
     /// return pointer to the Object of given ID, or zero if not found
     Field * findID(ObjectID n) const;
     
-    /// get ready to do a step()
+    /// get ready to do steps()
     void prepare();
     
     /// Monte-Carlo simulation step for every Object
-    void step();
+    void steps();
 
 };
 

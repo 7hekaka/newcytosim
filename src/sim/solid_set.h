@@ -65,7 +65,7 @@ public:
     Solid * insideSphere(Vector const&, real range, size_t& inx, SolidProp const*) const;
                              
     /// Monte-Carlo simulation step for every Object
-    void step();
+    void steps();
 };
 
 

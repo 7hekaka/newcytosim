@@ -24,7 +24,7 @@ void CoupleSet::prepare(PropertyList const& properties)
 /// templated member function pointer...
 /**
  In the loops we get the 'next' in the list always before calling 'FUNC', since
- 'step()' may transfer the node to another list, changing the value of 'next()'
+ 'Couple::step()' may transfer the node to another list, changing the value of 'next()'
  */
 template < void (Couple::*FUNC)() >
 static inline void step_couples(Couple * obj, bool odd)
@@ -73,7 +73,7 @@ void CoupleSet::uniStepCollect(Couple * obj)
 
 
 /**
- CoupleSet::step() must call the appropriate Couple::step() exactly once
+ CoupleSet::steps() must call the appropriate Couple::step() exactly once
  for each Couple: either stepFF(), stepFA(), stepAF() or stepAA().
  
  The Couples are stored in multiple lists, and are automatically transferred
@@ -82,7 +82,7 @@ void CoupleSet::uniStepCollect(Couple * obj)
  is transferred, by 'push_front'. By starting always from the node that
  was first before any transfer could occur, we process each Couple only once.
  */
-void CoupleSet::step()
+void CoupleSet::steps()
 {
     /*
     Cytosim::log("CoupleSet::step : FF %5i AF %5i FA %5i AA %5i\n",

@@ -48,7 +48,7 @@ public:
     Tubule * findID(ObjectID n) const;
     
     /// Monte-Carlo simulation step for every Object
-    void step();
+    void steps();
 
 };
 

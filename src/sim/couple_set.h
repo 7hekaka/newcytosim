@@ -171,11 +171,11 @@ public:
     /// mix order of elements
     void shuffle();
     
-    /// prepare for step()
+    /// prepare for steps()
     void prepare(PropertyList const& properties);
     
     /// Monte-Carlo step
-    void step();
+    void steps();
     
     /// Monte-Carlo step without Hand attachment
     void stepSkipUnattached();

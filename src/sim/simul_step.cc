@@ -106,40 +106,35 @@ real Simul::maxBindingRange() const
  Lists are mixed such that objects are considered in a different
  and random order at each step, to avoid biais in the simulation
 
- step() is called for every list, i.e. for every Object
+ steps() is called for every list, calling step() for every Object
  */
-void Simul::step()
+void Simul::steps()
 {
     //auto rdt = timer();
     // increment time:
     prop.time += prop.time_step;
     //fprintf(stderr, "\n----------------------------------- time is %8.3f\n", prop.time);
 
+    // Monte-Carlo step for all objects
+    events.steps();
+    organizers.steps();
+    tubules.steps();
+    fields.steps();
+    spaces.steps();
+    spheres.steps();
+    beads.steps();
+    solids.steps();
+    
     // mix object lists
     if ( events.size() > 1 ) events.shuffle();
     if ( organizers.size() > 1 ) organizers.shuffle();
     if ( tubules.size() > 1 ) tubules.shuffle();
     if ( beads.size() > 1 ) beads.shuffle();
     if ( solids.size() > 1 ) solids.shuffle();
-    if ( fibers.size() > 1 ) fibers.shuffle();
     if ( spheres.size() > 1 ) spheres.shuffle();
-    if ( couples.size() > 1 ) couples.shuffle();
-    if ( singles.size() > 1 ) singles.shuffle();
     if ( spaces.size() > 1 ) spaces.shuffle();
     if ( fields.size() > 1 ) fields.shuffle();
 
-    //printf("Simul::shuffles %16llu\n", (timer()-rdt)>>5); rdt = timer();
-
-    // Monte-Carlo step for all objects
-    events.step();
-    organizers.step();
-    tubules.step();
-    fields.step();
-    spaces.step();
-    spheres.step();
-    beads.step();
-    solids.step();
-    
     //printf("     ::steps    %16llu\n", (timer()-rdt)>>5); rdt = timer();
 
 #if POOL_UNATTACHED > 1
@@ -184,13 +179,17 @@ void Simul::step()
         }
 
         // step Hand-containing objects, giving them a possibility to attach Fibers:
-        couples.step();
-        singles.step();
+        couples.steps();
+        singles.steps();
         //printf("     ::attach   %16llu\n", (timer()-rdt)>>3);
     }
-    
+    if ( couples.size() > 1 ) couples.shuffle();
+    if ( singles.size() > 1 ) singles.shuffle();
+
     // This will also update all the attached Hands
-    fibers.step();
+    fibers.steps();
+    if ( fibers.size() > 1 ) fibers.shuffle();
+
     fresh_ = 1;
 }
 

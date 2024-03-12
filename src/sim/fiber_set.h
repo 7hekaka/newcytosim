@@ -81,11 +81,11 @@ public:
     /// Special code to trim a spindle from both ends
     void shortenSpindle(real, real) const;
     
-    /// get ready to do a step()
+    /// get ready to do steps()
     void prepare();
 
     /// Monte-Carlo step for every Fiber
-    void step();
+    void steps();
     
     /// bring all objects to centered image using periodic boundary conditions
     void foldPositions(Modulo const*) const;

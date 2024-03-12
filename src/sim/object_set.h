@@ -30,7 +30,7 @@ class Simul;
  - object creation: newProperty(), newObjects().
  - object lists: size(), add(), remove(), erase().
  - object access: first(), find().
- - simulation: step(), shuffle().
+ - simulation: steps(), shuffle().
  - I/O: loadObject(), read(), write(), freeze(), thaw().
  .
  */

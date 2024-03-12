@@ -222,7 +222,7 @@ void FiberSet::report(std::ostream& os) const
  Calls step() once for every Fiber.
  */
 
-void FiberSet::step()
+void FiberSet::steps()
 {
     PropertyList plist = simul_.properties.find_all("fiber");
     
