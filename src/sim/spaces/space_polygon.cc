@@ -381,7 +381,7 @@ void SpacePolygon::draw3D() const
         gym::rebindBufferV3(2, 1);
         gym::drawLineStrip(lines, 0, nbp+1);
     }
-    gym::cleanup();
+    gym::cleanupV();
 }
 
 #else

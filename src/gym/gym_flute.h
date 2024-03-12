@@ -94,8 +94,9 @@ namespace gym
     inline flute6* mapBufferV3N3(size_t n) { return (flute6*)mapFloatBuffer(6*n); }
     inline void unmapBufferV3N3() { unmap(); setBufferVN(3, 3); }
 
-    inline void cleanup() { glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_NORMAL_ARRAY); }
-    inline void cleanup(int) { glDisableClientState(GL_NORMAL_ARRAY); }
+    inline void cleanupV() { }
+    inline void cleanupVN() { glDisableClientState(GL_NORMAL_ARRAY); }
+    inline void cleanupCV() { glDisableClientState(GL_COLOR_ARRAY); glDisableClientState(GL_NORMAL_ARRAY); }
     
     unsigned short* mapIndexBuffer(size_t n);
     void unmapIndexBuffer();

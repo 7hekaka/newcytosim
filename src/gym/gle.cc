@@ -787,28 +787,28 @@ namespace gle
     {
         gym::bindBufferV3(buf_[0], 1, 3*blobs_[3]);
         gym::drawLines(width, 0, 24);
-        gym::cleanup(1);
+        gym::cleanupV();
     }
     
     void cubeVerticalEdges(float width)
     {
         gym::bindBufferV3(buf_[0], 1, 3*blobs_[3]);
         gym::drawLines(width, 0, 8);
-        gym::cleanup(1);
+        gym::cleanupV();
     }
 
     void doCubeTriangles(size_t inx, GLsizei cnt)
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangles(cubes_[inx], cnt);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
 
     void doCubeStrip(size_t inx, GLsizei cnt)
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(cubes_[inx], cnt);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
 
     void tetrahedron() { doCubeTriangles(0, 12); }
@@ -836,7 +836,7 @@ namespace gle
         setIcosahedron(tmp);
         gym::unmapBufferV3N3();
         gym::drawTriangles(0, 60);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
 
     //-----------------------------------------------------------------------
@@ -969,7 +969,7 @@ namespace gle
         gym::drawTriangleStrip(0, 26);
         gym::color_both(1,1,0,0.75);
         gym::drawTriangleStrip(28, 26);
-        gym::cleanup();
+        gym::cleanupVN();
     }
     
     void nothing()
@@ -996,7 +996,7 @@ namespace gle
     {
         gym::bindBufferV3N0(buf_[0], 0);
         gym::drawTriangleStrip(blobs_[inx], cnt);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
 
     void blob()   { doBlobStrip(0, 54); }
@@ -1454,19 +1454,19 @@ namespace gle
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(tubes_[inx], cnt);
-        gym::cleanup();
+        gym::cleanupVN();
     }
     
     inline void doStripedTubeStrip(float line_width, size_t inx, size_t cnt, gym_color col)
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(tubes_[inx], cnt);
-        gym::cleanup(1);
+        gym::cleanupVN();
         gym::rebind();
         gym::disableLighting();
         gym::color(col);
         gym::drawLines(line_width, tubes_[inx], cnt);
-        gym::cleanup();
+        gym::cleanupVN();
         gym::restoreLighting();
     }
 
@@ -1559,7 +1559,7 @@ namespace gle
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
     
     void dualPassIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
@@ -1576,7 +1576,7 @@ namespace gle
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
 
     void sphere1() { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
@@ -1605,7 +1605,7 @@ namespace gle
         glDrawElements(GL_TRIANGLE_STRIP, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
 
     void icoid() { drawTriangleStripBuffer(icoid_pts_, icoid_idx_, icoid_idx_); }
@@ -1759,7 +1759,7 @@ namespace gle
         flu[i++] = {R, 0, 0, 1, 0, 0};
         gym::unmapBufferV3N3();
         gym::drawTriangles(0, i);
-        gym::cleanup(1);
+        gym::cleanupVN();
     }
     
     
@@ -1854,7 +1854,7 @@ namespace gle
             gym::unmapBufferV3N3();
             gym::drawTriangleStrip(0, i);
         }
-        gym::cleanup();
+        gym::cleanupVN();
     }
     
     /**
@@ -1893,7 +1893,7 @@ namespace gle
         }
         gym::unmapBufferV3N3();
         gym::drawTriangleStrip(0, ptr-flu);
-        gym::cleanup();
+        gym::cleanupVN();
     }
 
     /// some volume of revolution with axis along Z
@@ -1996,7 +1996,7 @@ namespace gle
         flu[3] = { cB, BX,  rB };
         gym::unmapBufferC4V2();
         gym::drawTriangleStrip(0, 4);
-        gym::cleanup();
+        gym::cleanupCV();
     }
     
     void drawBand(Vector2 const& A, float rA, gym_color cA,
@@ -2017,7 +2017,7 @@ namespace gle
             flu[3] = { cB, BX-rB*dX, BY-rB*dY };
             gym::unmapBufferC4V2();
             gym::drawTriangleStrip(0, 4);
-            gym::cleanup();
+            gym::cleanupCV();
         }
     }
     
@@ -2057,7 +2057,7 @@ namespace gle
         flu[5] = { cB, b+db };
         gym::unmapBufferC4V2();
         gym::drawTriangleStrip(0, 6);
-        gym::cleanup();
+        gym::cleanupCV();
     }
     
     
@@ -2081,6 +2081,7 @@ namespace gle
         gym::unmapBufferV2();
         gym::drawTriangleStrip(0, 4);
         gym::drawTriangleStrip(4, 4);
+        gym::cleanupV();
     }
     
     void drawBar(Vector3 const& A, Vector3 const& dA,
@@ -2112,6 +2113,7 @@ namespace gle
         gym::drawTriangleStrip(4, 4);
         gym::drawTriangleStrip(8, 4);
         gym::drawTriangleStrip(12, 4);
+        gym::cleanupV();
     }
     
     
@@ -2141,6 +2143,7 @@ namespace gle
         pts[11] = B+x+y;
         gym::unmapBufferV2();
         gym::drawTriangleStrip(0, 12);
+        gym::cleanupV();
     }
     
     void drawTipi(real* ref, int inx, real rad)
@@ -2154,7 +2157,7 @@ namespace gle
         pts[0] = {S, B};
         gym::unmapBufferV3N3();
         gym::drawTriangles(0, 4);
-        gym::cleanup();
+        gym::cleanupVN();
     }
 
     //-----------------------------------------------------------------------
@@ -2396,7 +2399,7 @@ namespace gle
         gym::unmapBufferV3N3();
         gym::drawTriangleStrip(0, 8);
         gym::drawTriangleStrip(8, 8);
-        gym::cleanup();
+        gym::cleanupVN();
     }
 
     /// draw faces of cuboid of axis [A,B] and size `rad`
@@ -2415,6 +2418,7 @@ namespace gle
         flu[5] = { P + Y };
         gym::unmapBufferV3();
         gym::drawTriangleStrip(0, 6);
+        gym::cleanupV();
     }
 
     /// draw triangular prism extending over [P3,Q3] with directions XYZ and ABC
@@ -2439,6 +2443,7 @@ namespace gle
         flu[9] = { Q + A };
         gym::unmapBufferV3();
         gym::drawTriangleStrip(0, 10);
+        gym::cleanupV();
     }
 
     /// draw triangular prism extending over [P3,Q3] with directions XYZ and ABC
@@ -2467,6 +2472,7 @@ namespace gle
         flu[13] = { Q + C };
         gym::unmapBufferV3();
         gym::drawTriangleStrip(0, 14);
+        gym::cleanupV();
     }
 
 }

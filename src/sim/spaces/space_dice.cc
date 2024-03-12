@@ -357,7 +357,7 @@ void SpaceDice::draw3D() const
     gym::unmapBufferV3N3();
     gym::drawTriangles(0, 36);
 #endif
-    gym::cleanup(1);
+    gym::cleanupVN();
 }
 
 #else

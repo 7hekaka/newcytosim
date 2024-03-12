@@ -52,7 +52,7 @@ void drawValues(Grid<CELL, 1> const& grid,
     }
     gym::unmapBufferC4V2();
     gym::drawTriangleStrip(0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -88,7 +88,7 @@ void drawValues(Grid<CELL, 2> const& grid,
         gym::unmapBufferC4V2();
         gym::drawTriangleStrip(0, ptr-flu);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -128,7 +128,7 @@ void drawValues(Grid<CELL, 3> const& grid,
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -167,7 +167,7 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -206,7 +206,7 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -262,7 +262,7 @@ void drawValues(Grid<CELL, 3> const& grid,
         gym::unmapBufferC4V4();
         gym::drawTriangleStrip(0, ptr-flu);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 

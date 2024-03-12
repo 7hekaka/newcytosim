@@ -151,7 +151,7 @@ void drawTangents(const float col[4], const float lor[4])
     }
     gym::unmapBufferC4V4();
     gym::drawLines(3, 0, n);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 

@@ -261,7 +261,7 @@ void Display2::drawCoupleB(Couple const* cx) const
 #endif
         gym::unmapBufferC4VD();
         gym::drawLines(pd1->widthX, 0, 4);
-        gym::cleanup();
+        gym::cleanupCV();
     }
     
     if ( cx->active() )

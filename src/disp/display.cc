@@ -905,7 +905,7 @@ void Display::drawFiberBackbone(Fiber const& fib, float width) const
     gym::color(fib.disp->color);
     gym::loadPoints(fib.nbPoints(), fib.addrPoints());
     gym::drawLineStrip(width, 0, fib.nbPoints());
-    gym::cleanup();
+    gym::cleanupV();
 }
 
 
@@ -990,7 +990,7 @@ void Display::drawFiberLines(Fiber const& fib, const int style) const
         gym::drawLineStrip(w, 0, ptr-flu);
     else
         gym::drawLines(w, 0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -1045,7 +1045,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
     gym::unmapBufferC4VD();
     gym::drawLineStrip(pixwidth(disp->line_width), 0, ptr-flu);
     gym::restoreLighting();
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -1240,7 +1240,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLineStrip(rad, 0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -1309,7 +1309,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLines(rad, 0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -1342,7 +1342,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     gym::disableLighting();
     gym::color(fib.disp->color);
     gym::drawPoints(rad, 0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupV();
 }
 
 
@@ -1462,7 +1462,7 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLines(size, 0, cnt);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 //------------------------------------------------------------------------------
@@ -1558,7 +1558,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     gym::ref_view();
     gym::disableLighting();
     gym::drawTriangleStrip(0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -1623,7 +1623,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     gym::ref_view();
     gym::disableLighting();
     gym::drawTriangleStrip(0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -2159,7 +2159,6 @@ void Display::drawSolid(Solid const& obj)
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
             drawObject(obj.posP(i), rad, gle::hedron(obj.radius(i)>0));
-        gym::cleanup(1);
     }
     
 #if NEW_SOLID_CLAMP
@@ -2390,7 +2389,6 @@ void Display::drawSolids(SolidSet const& set)
                             drawSolidT(*obj, i);
                 }
             }
-            gym::cleanup(1);
         }
     }
 }

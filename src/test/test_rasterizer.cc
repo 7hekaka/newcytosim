@@ -57,7 +57,7 @@ void drawDots(size_t N, const Vector P[], float size, gym_color col)
         flu[i] = { col, P[i] };
     gym::unmapBufferC4V4();
     gym::drawPoints(size, 0, i);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
@@ -70,7 +70,7 @@ void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
     flu[0] = { gym_color(0, 1, 0), P[0].XX, P[0].YY, 0.f };
     gym::unmapBufferC4V4();
     gym::drawLineStrip(size, 0, i);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 void newPoints()
@@ -123,7 +123,7 @@ void paint(int x_inf, int x_sup, int y, int z, void*)
     gym::unmapBufferC4V4();
     gym::drawLines(1, 0, 2);
     gym::drawPoints(3, 0, 1);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 void rasterize(Vector P, Vector Q, void (func)(int, int, int, int, void*))
@@ -256,7 +256,7 @@ void drawGridPoints()
         flu[n++] = { col, (float)i, (float)j, 0.f };
     gym::unmapBufferC4V4();
     gym::drawPoints(1, 0, n);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 void drawGrid()
@@ -275,7 +275,7 @@ void drawGrid()
     }
     gym::unmapBufferC4V4();
     gym::drawLines(0.5, 0, n);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 

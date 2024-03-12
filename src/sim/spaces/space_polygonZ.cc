@@ -226,7 +226,7 @@ void SpacePolygonZ::draw3D() const
             gym::drawTriangleStrip(0, ptr-flu);
         }
     }
-    gym::cleanup();
+    gym::cleanupVN();
 }
 
 
@@ -253,6 +253,7 @@ void SpacePolygonZ::drawRings(float width) const
             gym::drawLineStrip(width, 0, gle::pi_twice+1);
         }
     }
+    gym::cleanupVN();
 }
 
 

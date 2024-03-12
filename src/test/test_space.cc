@@ -545,7 +545,7 @@ void drawLines(Vector const A[], gym_color const& col, Vector const B[], gym_col
     }
     gym::unmapBufferC4V4();
     gym::drawLines(2*LW, 0, n);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -606,7 +606,7 @@ int display(View& view)
         gym::enableBlending();
         gym::drawLines(LW, 0, n);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 
     if ( showNormals )
         drawLines(project, gym_color(1.f, 1.f, 1.f), upward, gym_color(1.f, 1.f, 1.f, 0.f));

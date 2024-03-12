@@ -205,7 +205,7 @@ int display(View& view)
     *ptr++ = { blue, node };
     gym::unmapBufferC4VD();
     gym::drawPoints(10, 0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 
     //-------------draw region
     if ( grid.hasRegions() )

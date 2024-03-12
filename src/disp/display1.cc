@@ -184,7 +184,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
         gym::unmapBufferC4VD();
         gym::drawPoints(pointSize, 0, ptr-flu);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -229,7 +229,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
         gym::rebindBufferC4VD(2);
         gym::drawPoints(pointSize, 0, (ptr-flu)/2);
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 //------------------------------------------------------------------------------
@@ -272,7 +272,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
     gym::drawPoints(pointSize, 0, ptr-flu);
     // display inactive Couples with square dots:
     gym::drawSquarePoints(0.25*pointSize, end-flu, cnt-(end-flu));
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -321,7 +321,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
     assert_true( size_t(ptr-flu) <= cnt );
     gym::unmapBufferC4VD();
     gym::drawPoints(pointSize, 0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -356,7 +356,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
         assert_true( size_t(ptr-flu) <= cnt );
         gym::unmapBufferC4VD();
         gym::drawPoints(pointSize, 0, ptr-flu);
-        gym::cleanup();
+        gym::cleanupCV();
     }
 }
 
@@ -421,7 +421,7 @@ void Display1::drawCouplesB1(CoupleSet const& set) const
         gym::drawPoints(pointSize, 0, ptr-flu);
 #endif
     }
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
 
@@ -446,6 +446,6 @@ void Display1::drawCouplesB0(CoupleSet const& set) const
         gym::drawLines(linkWidth, 0, ptr-flu);
     if ( prop->point_size > 0 )
         gym::drawPoints(pointSize, 0, ptr-flu);
-    gym::cleanup();
+    gym::cleanupCV();
 }
 
