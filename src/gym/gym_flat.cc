@@ -87,8 +87,53 @@ void gym::paintSequence(float X, float Y, float W, float H, const char str[])
     gym::unmapBufferV2();
     //assert_true( ptr-flu <= 3*n+2 );
     gym::drawTriangleStrip(0, ptr-flu);
+    gym::cleanupV();
     CHECK_GL_ERROR("paintSequence");
 }
+
+
+/** Transform bitmap into a triangle strip */
+size_t unpackLinearBitmap(flute2* flu, float X0, float Y, float W, float H, unsigned long bits)
+{
+    flute2* ptr = flu;
+    float X = X0, T = Y + H;
+    unsigned p, k = 0;
+    while ( bits )
+    {
+        // find next '1':
+        p = __builtin_clzl(bits);
+        k += p;
+        bits <<= p;
+        X = X0 + k * W;
+        ptr[0] = { X, Y };
+        ptr[1] = { X, Y };
+        ptr[2] = { X, T };
+        ptr += 3;
+        // find next '0':
+        p = __builtin_clzl(~bits);
+        k += p;
+        bits <<= p;
+        X = X0 + k * W;
+        ptr[0] = { X, Y };
+        ptr[1] = { X, T };
+        ptr[2] = { X, T };
+        ptr += 3;
+    }
+    return ptr-flu;
+}
+
+
+/** This is drawing squares of dimension WxH for every '1' in bits */
+void gym::paintSequence(float X, float Y, float W, float H, unsigned long bits, unsigned n_bits)
+{
+    flute2* flu = gym::mapBufferV2(3*n_bits+2);
+    size_t cnt = unpackLinearBitmap(flu, X-W*(64-n_bits), Y, W, H, bits);
+    gym::unmapBufferV2();
+    gym::drawTriangleStrip(0, cnt);
+    gym::drawRectangle(0, 0, W*n_bits, H, 0, 0.5);
+    gym::cleanupV();
+}
+
 
 /**
  rectangle should be specified as [ left, bottom, right, top ]
@@ -98,6 +143,18 @@ void gym::drawRectangle(const int rec[4], float width)
 {
     float L(rec[0]), B(rec[1]), R(rec[2]), T(rec[3]);
     flute2 * flu = gym::mapBufferV2(4);
+    flu[0] = {L, B};
+    flu[1] = {R, B};
+    flu[2] = {R, T};
+    flu[3] = {L, T};
+    flu[4] = {L, B};
+    gym::unmapBufferV2();
+    gym::drawLineStrip(width, 0, 5);
+}
+
+void gym::drawRectangle(float L, float B, float R, float T, float width)
+{
+    flute2 * flu = gym::mapBufferV2(5);
     flu[0] = {L, B};
     flu[1] = {R, B};
     flu[2] = {R, T};

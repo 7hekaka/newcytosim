@@ -25,6 +25,7 @@ extern uint64_t pcg32_state;
 #include "gym_flute.h"
 #include "gym_flute_dim.h"
 #include "gym_check.h"
+#include "gym_flat.h"
 #include "fg_font.h"
 
 #include "point_disp.h"
@@ -1380,11 +1381,17 @@ void Display::drawFiberLatticeBits(Fiber const& fib, FiberLattice const& lat) co
     for ( auto h = inf; h <= sup; ++h, abs += uni )
     {
 #if FIBER_HAS_LATTICE > 0
-        sMath::binary_representation(str, sizeof(str), 4, lat.data(h));
+        //sMath::binary_representation(str, sizeof(str), 4, lat.data(h));
+        if ( lat.data(h) )
+        {
+            Vector vec = fib.posM(abs);
+            gym::translate_ref(vec.XX, vec.y(), vec.z());
+            gym::paintSequence(0, 0, 2*pixelSize, 12*pixelSize, lat.data(h), 8*sizeof(FiberLattice::cell_t));
+        }
 #else
         snprintf(str, sizeof(str), "%.3f", lat.data(h));
-#endif
         strokeText(fib.posM(abs), str, pixelSize);
+#endif
     }
 }
 
