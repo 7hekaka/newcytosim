@@ -2063,22 +2063,22 @@ void Display::drawFiberTexts(FiberSet const& set)
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
             if ( disp->lattice_style == 5 )
             {
-                VisibleLattice const* lat = fib.visibleLattice();
+                VisibleLattice const* lat = fib->visibleLattice();
                 if ( lat )
                 {
                     gym::color(fib->disp->color);
-                    drawFiberLatticeValues(fib, *lat);
+                    drawFiberLatticeValues(*fib, *lat);
                 }
             }
 #endif
 #if FIBER_HAS_LATTICE
             if ( disp->lattice_style == 6 )
             {
-                VisibleLattice const* lat = fib.visibleLattice();
+                VisibleLattice const* lat = fib->lattice();
                 if ( lat )
                 {
                     gym::color(fib->disp->color);
-                    drawFiberLatticeBits(fib, *fib.lattice()); break;
+                    drawFiberLatticeBits(*fib, *lat); break;
                 }
             }
 #endif
