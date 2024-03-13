@@ -11,8 +11,13 @@
 void BeadSet::steps()
 {
 #if ( 0 )
-    for ( Bead * B = first(); B; B = B->next() )
-        B->step();
+    Bead * obj = first();
+    while ( obj )
+    {
+        Bead * nxt = obj->next();
+        obj->step();
+        obj = nxt;
+    }
 #endif
 #if NEW_SOLID_MAKE_COUPLE
     static float nextCreation = RNG.exponential();

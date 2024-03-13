@@ -285,7 +285,7 @@ void FiberSet::steps()
 #endif
         obj->step();
         // delete object that have been flagged
-        if ( ! obj->prop ) delete(obj);
+        if ( ! obj->prop ) eraseObject(obj);
         obj = nxt;
     }
     if ( size() > 1 ) shuffle();

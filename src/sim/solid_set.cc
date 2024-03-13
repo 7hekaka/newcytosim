@@ -10,8 +10,13 @@
 void SolidSet::steps()
 {
 #if ( 0 )
-    for ( Solid * S = first(); S; S = S->next() )
-        S->step();
+    Solid * obj = first();
+    while ( obj )
+    {
+        Solid * nxt = obj->next();
+        obj->step();
+        obj = nxt;
+    }
 #endif
 #if NEW_SOLID_MAKE_COUPLE
     static float nextCreation = RNG.exponential();

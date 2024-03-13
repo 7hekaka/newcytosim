@@ -15,10 +15,10 @@
 
 void OrganizerSet::steps()
 {
-    Organizer * obj = first(), * nxt;
+    Organizer * obj = first();
     while ( obj )
     {
-        nxt = obj->next();
+        Organizer * nxt = obj->next();
         obj->step();
         obj = nxt;
     }

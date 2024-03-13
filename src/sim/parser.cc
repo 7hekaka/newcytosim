@@ -529,7 +529,15 @@ void Parser::parse_delete(std::istream& is)
 #endif
     if ( name == "all" )
     {
+        // class or property specified next:
         name = Tokenizer::get_symbol(is);
+        if ( name.empty() )
+        {
+            std::string blok = Tokenizer::get_block(is, '{');
+            if ( do_new ) sim_->eraseObjects();
+            std::cerr << blok << "\n";
+            return;
+        }
         if ( do_new && !isCategory(name) && !sim_->properties.find(name) )
             throw InvalidSyntax("`"+name+"' is not a known class of object");
     }

@@ -33,13 +33,16 @@ void FieldSet::prepare()
 
 void FieldSet::steps()
 {
-    for ( Field * f=first(); f; f=f->next() )
+    Field * obj = first();
+    while ( obj )
     {
-        if ( f->hasField() )
+        Field * nxt = obj->next();
+        if ( obj->hasField() )
         {
             LOG_ONCE("!!!! Field is active\n");
-            f->step(simul_.fibers);
+            obj->step(simul_.fibers);
         }
+        obj = nxt;
     }
     if ( size() > 1 ) shuffle();
 }

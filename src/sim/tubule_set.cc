@@ -23,8 +23,13 @@ Tubule * TubuleSet::findID(ObjectID n) const
 
 void TubuleSet::steps()
 {
-    for ( Tubule * e=first(); e; e=e->next() )
-        e->step();
+    Tubule * obj = first();
+    while ( obj )
+    {
+        Tubule * nxt = obj->next();
+        obj->step();
+        obj = nxt;
+    }
     if ( size() > 1 ) shuffle();
 }
 

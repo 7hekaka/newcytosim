@@ -19,9 +19,13 @@ Event * EventSet::findID(ObjectID n) const
 
 void EventSet::steps()
 {
-    for ( Event * e=first(); e; e=e->next() )
-        e->step(simul_);
-    if ( size() > 1 ) shuffle();
+    Event * obj = first();
+    while ( obj )
+    {
+        Event * nxt = obj->next();
+        obj->step(simul_);
+        obj = nxt;
+    }
 }
 
 

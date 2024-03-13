@@ -169,9 +169,8 @@ Mecable* Simul::toMecable(Object * obj)
 }
 
 /**
- Find an object from a Human-friendly representation, such as
- fiber1
- single1
+ Find an object from a user-defined specification,
+ such as `fiber1` or `single1`
  */
 Mecable * Simul::pickMecable(const std::string& arg) const
 {
