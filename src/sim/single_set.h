@@ -137,7 +137,7 @@ public:
     /// collect objects for which func(obj, val) == true
     size_t count(bool (*func)(Object const*, void const*), void const*) const;
 
-    /// erase all Object and all Property
+    /// erase all objects
     void erase();
     
     /// detach all Hands

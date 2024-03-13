@@ -51,7 +51,7 @@ public:
     /// remove Object
     void unlink(Object *);
 
-    /// erase all Object and all Property
+    /// erase all objects
     void erase();
     
     /// Monte-Carlo step for every Space

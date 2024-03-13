@@ -138,7 +138,7 @@ public:
     void remove(ObjectList const&);
     
     /// remove and delete object
-    void erase(Object *);
+    void eraseObject(Object *);
     
     /// remove and delete all objects from given list
     void erase(ObjectList const&);

@@ -234,7 +234,7 @@ void Simul::remove(ObjectList const& objs)
 }
 
 
-void Simul::erase(Object * w)
+void Simul::eraseObject(Object * w)
 {
     //std::clog << "Simul::erase " << w->reference() << '\n';
     remove(w);

@@ -136,20 +136,20 @@ public:
     /// link the object last in the list
     virtual void link(Object *);
     
-    /// unlink object
+    /// unlink object from the pool
     virtual void unlink(Object *);
     
-    /// remove Object
+    /// remove Object, from the pool and the inventory
     virtual void remove(Object *);
+    
+    /// remove Object, and delete it
+    void eraseObject(Object *);
 
     /// allocate to be ready to handle `cnt` objects
     void reserve(size_t cnt) { inventory_.reserve(cnt); }
     
     /// register Object, adding it at the end of the list
     void add(Object *);
-    
-    /// remove Object, and delete it
-    void erase(Object *);
 
     /// add multiple Objects
     void add(ObjectList const&);

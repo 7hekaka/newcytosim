@@ -311,6 +311,8 @@ void FiberSet::planarCut(Vector const& n, const real a,
     {
         Fiber * nxt = obj->next();
         obj->planarCut(n, a, stateP, stateM, min_len);
+        if ( obj->prop == nullptr )
+            eraseObject(obj);
         obj = nxt;
     }
 }
@@ -328,7 +330,11 @@ void FiberSet::planarCut(ObjectList& objs, Vector const& n, const real a,
     {
         Fiber * fib = Fiber::toFiber(i);
         if ( fib )
+        {
             fib->planarCut(n, a, stateP, stateM, min_len);
+            if ( i->property() == nullptr )
+                eraseObject(i);
+        }
     }
 }
 

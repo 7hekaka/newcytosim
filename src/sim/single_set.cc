@@ -116,7 +116,7 @@ void SingleSet::steps()
 
 /**
  This version does not simulate the attachment of free Hand, and hence skips
- Single::stepF() that performs attachment
+ `Single::stepF()` that performs attachment
 
  This is only used if POOL_UNATTACHED > 1
 */
@@ -688,7 +688,7 @@ void SingleSet::deleteWrists(Object const* arg)
     {
         nxt = obj->next();
         if ( obj->base() == arg )
-            delete(obj);
+            eraseObject(obj);
         obj = nxt;
     }
 
@@ -697,7 +697,7 @@ void SingleSet::deleteWrists(Object const* arg)
     {
         nxt = obj->next();
         if ( obj->base() == arg )
-            delete(obj);
+            eraseObject(obj);
         obj = nxt;
     }
 }
@@ -714,7 +714,7 @@ void SingleSet::deleteInvalidWrists()
         if ( obj->invalid() )
         {
             std::clog << "WARNING: invalid base for " << obj->reference() << "\n";
-            delete(obj);
+            eraseObject(obj);
         }
         obj = nxt;
     }
@@ -726,7 +726,7 @@ void SingleSet::deleteInvalidWrists()
         if ( obj->invalid() )
         {
             std::clog << "WARNING: invalid base for " << obj->reference() << "\n";
-            delete(obj);
+            eraseObject(obj);
         }
         obj = nxt;
     }

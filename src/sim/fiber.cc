@@ -704,11 +704,9 @@ void Fiber::planarCut(Vector const& n, const real a,
         real m = abs, p = 0;
         findSeverEdges(m, p);
         severNow(m, p, min_len, stateP, stateM);
-        if ( prop == nullptr || length() < min_len )
-        {
-            delete(this);
+        if ( prop == nullptr )
             return;
-        }
+        assert_true( length() >= min_len );
     }
 }
 

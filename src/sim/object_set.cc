@@ -168,7 +168,7 @@ void ObjectSet::remove(ObjectList const& list)
 }
 
 
-void ObjectSet::erase(Object * obj)
+void ObjectSet::eraseObject(Object * obj)
 {
     //std::clog << "ObjectSet::erase " << obj->reference() << '\n';
     remove(obj);

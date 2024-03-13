@@ -162,7 +162,7 @@ public:
     /// total number of elements
     size_t size()   const { return ffList.size() + faList.size() + afList.size() + aaList.size(); }
 
-    /// erase all Object and all Property
+    /// erase all objects
     void erase();
     
     /// detach all Hands

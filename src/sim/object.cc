@@ -42,9 +42,9 @@ bool match_mark(Object const* obj, void const* mrk)
 /**
  This is a selection function used in ObjectSet::collect()
  */
-bool match_property(Object const* obj, void const* prop)
+bool match_property(Object const* obj, void const* arg)
 {
-    return ( prop == nullptr ) || ( obj->property() == prop );
+    return ( arg == nullptr ) || ( obj->property() == arg );
 }
 
 
