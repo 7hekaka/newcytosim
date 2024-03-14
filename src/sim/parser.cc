@@ -708,8 +708,7 @@ void Parser::parse_cut(std::istream& is)
  
     if ( str == "all" )
     {
-        if ( Tokenizer::get_symbol(is) != "fiber" )
-            throw InvalidParameter("only 'fiber' can be cut");
+        str = Tokenizer::get_symbol(is);
     }
 #if BACKWARD_COMPATIBILITY <= 50
     else if ( str == "fiber" )

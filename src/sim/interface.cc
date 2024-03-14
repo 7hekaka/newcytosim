@@ -917,7 +917,10 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     real a = 0;
     real len = 0;
     
-    opt.set(n, "plane");
+    if ( opt.value_is("plane", 0, "random") )
+        n = Vector::randU();
+    else
+        opt.set(n, "plane");
     opt.set(a, "plane", 1);
     opt.set(len, "min_length");
 
@@ -944,6 +947,12 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
     if ( pp )
     {
         ObjectList objs = set->collect(match_property, pp, cnt);
+        VLOG("-CUT " << objs.size() << " " << name << " PLANE (" << n << ").x = " << -a);
+        sim_->fibers.planarCut(objs, n, a, stateP, stateM, len);
+    }
+    else if ( cnt < sim_->fibers.size() )
+    {
+        ObjectList objs = set->collect(cnt);
         VLOG("-CUT " << objs.size() << " " << name << " PLANE (" << n << ").x = " << -a);
         sim_->fibers.planarCut(objs, n, a, stateP, stateM, len);
     }
