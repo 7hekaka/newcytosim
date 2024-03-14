@@ -49,10 +49,10 @@ private:
     Hand();
     
     /// Pointer used to build the list of Hands bound to a Fiber
-    Hand * hNext;
+    Hand * nextH;
     
     /// Pointer used to build the list of Hands bound to a Fiber
-    Hand * hPrev;
+    Hand * prevH;
 
 protected:
     
@@ -93,16 +93,16 @@ public:
 
 
     /// return next Hand in Fiber's list
-    Hand * next() const { return hNext; }
+    Hand * next() const { return nextH; }
     
     /// return previous Hand in Fiber's list
-    Hand * prev() const { return hPrev; }
+    Hand * prev() const { return prevH; }
 
     /// set next Hand in Fiber's list
-    void next(Hand * h) { hNext = h; }
+    void next(Hand * h) { nextH = h; }
     
     /// set previous Hand in Fiber's list
-    void prev(Hand * h) { hPrev = h; }
+    void prev(Hand * h) { prevH = h; }
 
     
     /// a random position, at distance `binding_range' on the side of the fiber
