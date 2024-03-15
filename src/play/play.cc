@@ -311,6 +311,7 @@ int main(int argc, char* argv[])
     try
     {
         pcg32_state = get_random_seed();
+        RNG.seed(pcg32(pcg32_state));
         has_frame = arg.set(frm, "frame");
     }
     catch( Exception & e )
