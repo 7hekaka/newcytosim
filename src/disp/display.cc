@@ -404,7 +404,7 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
     self->end_color[1] = disp->end_colors[0];
 #endif
     
-#if ( 0 )
+#if ( 1 )
     // For dynamic Fibers, change colors of tips according to state:
     if ( fib->endStateP() > 0 )
         self->end_color[0] = disp->end_colors[std::min(fib->endStateP(),5U)];
