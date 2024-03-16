@@ -1272,14 +1272,14 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Tubes
 
-    inline size_t nbTrianglesTubeClosed(size_t inc)
+    inline size_t nbTrianglesCylinder(size_t inc, int top = 0)
     {
-        return 2 + 2 * (( pi_once + pi_twice ) / inc);
+        return 1 + 2 * (( pi_twice + pi_once*(1+top) ) / inc) + top;
     }
 
     /// set triangle strip for a tube of radius 1 at Z=B, and R at Z=T, closed at Z=B
     /** Note that if T < B, the triangles will be given clockwise */
-    size_t setClosedTube(flute6* flu, size_t inc, float B, float T, float R)
+    size_t setCylinder(flute6* flu, size_t inc, float B, float T, float R, int top = 0)
     {
         const float H(T-B), W(R-1);
         const float Z = std::copysign(1.f, H);
@@ -1288,7 +1288,7 @@ namespace gle
         const float Y(tg*R);
         size_t i = 0;
         size_t p = pi_once - inc;
-        // bottom disc, from PI to 2*PI:
+        // bottom disc, from PI to 0:
         flu[i++] = { -1, 0, B, 0, 0, -Z };
         while ( p >= inc )
         {
@@ -1297,7 +1297,7 @@ namespace gle
             flu[i++] = { C,-S, B, 0, 0, -Z };
             p -= inc;
         }
-        // sides, from 2*PI to 0:
+        // sides, from 0 to 2*PI:
         flu[i++] = { 1, 0, B, X, 0, Y };
         while ( p <= pi_twice - inc )
         {
@@ -1307,8 +1307,19 @@ namespace gle
             p += inc;
         }
         flu[i++] = { R, 0, T, X, 0, Y };
-        flu[i++] = { 1, 0, B, X, 0, Y };
-        size_t j = nbTrianglesTubeClosed(inc);
+        if ( top )
+        {
+            // top disc, from 2*PI to PI:
+            while ( p >= pi_once + inc )
+            {
+                float C = cos_(p), S = sin_(p);
+                flu[i++] = { C*R,-S*R, T, 0, 0, Z };
+                flu[i++] = { C*R, S*R, T, 0, 0, Z };
+                p -= inc;
+            }
+            flu[i++] = { -R, 0, T, 0, 0, Z };
+        }
+        size_t j = nbTrianglesCylinder(inc, top);
         assert_true( i == j );
         return i;
     }
@@ -1441,7 +1452,7 @@ namespace gle
 
     static size_t sizeTubeBuffers()
     {
-        return 46 * pi_twice;  // this is empirical!
+        return 51 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)
@@ -1466,24 +1477,24 @@ namespace gle
         tubes_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
         tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
         
-        tubes_[13] = i+s; i += setClosedTube(ptr+i, 1, -0.5, 0.5, 1);
-        tubes_[14] = i+s; i += setClosedTube(ptr+i, 2, 0, 1, 1);
-        tubes_[15] = i+s; i += setClosedTube(ptr+i, 2, 0, T, 1);
+        tubes_[13] = i+s; i += setCylinder(ptr+i, 1, 0, 1, 1, 1);
+        tubes_[14] = i+s; i += setCylinder(ptr+i, 1, -1, 1, 1, 1);
+        tubes_[15] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 1);
+        tubes_[16] = i+s; i += setCylinder(ptr+i, 2, 0, T, 1);
 
-        tubes_[16] = i+s; i += setClosedTube(ptr+i, 1, 0, 1, 0); // cone1
-        tubes_[17] = i+s; i += setClosedTube(ptr+i, 2, 0, 1, 0); // cone2
-        tubes_[19] = i+s; i += setClosedTube(ptr+i, 2, -1, 2, 0); // longCone
-        tubes_[20] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
-        tubes_[21] = i+s; i += setHelix(ptr+i, 0, 1, 5);
+        tubes_[17] = i+s; i += setCylinder(ptr+i, 1, 0, 1, 0); // cone1
+        tubes_[18] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 0); // cone2
+        tubes_[19] = i+s; i += setCylinder(ptr+i, 2,-1, 1, 0); // coneC
+        tubes_[20] = i+s; i += setCylinder(ptr+i, 2, -1, 2, 0); // longCone
+        tubes_[21] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
+        tubes_[22] = i+s; i += setHelix(ptr+i, 0, 1, 5);
 
-        tubes_[22] = i+s; i += setDisc(ptr+i, 1, 0, 1);
-        tubes_[23] = i+s; i += setDisc(ptr+i, 2, 0, 1);
-        tubes_[24] = i+s; i += setDisc(ptr+i, 1, 1, 1);
-        tubes_[25] = i+s; i += setDisc(ptr+i, 2, 1, 1);
-        tubes_[26] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
-        tubes_[27] = i+s; i += setDisc(ptr+i, 1, 0, -1);
-        tubes_[28] = i+s; i += setDisc(ptr+i, 2, 0, -1);
-        tubes_[29] = i+s; i += setDisc(ptr+i, 2, 0.5, 1);
+        tubes_[24] = i+s; i += setDisc(ptr+i, 1, 0, 1);
+        tubes_[25] = i+s; i += setDisc(ptr+i, 2, 0, 1);
+        tubes_[26] = i+s; i += setDisc(ptr+i, 1, 1, 1);
+        tubes_[27] = i+s; i += setDisc(ptr+i, 2, 1, 1);
+        tubes_[28] = i+s; i += setDisc(ptr+i, 1, 0, -1);
+        tubes_[29] = i+s; i += setDisc(ptr+i, 2, 0, -1);
         tubes_[30] = i+s; i += setRing(ptr+i, 2, M_SQRT2, 0, 1);
         tubes_[31] = i+s; i += setRing(ptr+i, 2, 1.19, 0, 1);
         size_t j = sizeTubeBuffers();
@@ -1528,24 +1539,24 @@ namespace gle
     void halfTube2()     { doTubeStrip(11, nbTrianglesTube(2)); }
     void halfTube4()     { doTubeStrip(12, nbTrianglesTube(4)); }
     
-    void shutTubeC()     { doTubeStrip(13, nbTrianglesTubeClosed(1)); }
-    void shutTube2()     { doTubeStrip(14, nbTrianglesTubeClosed(2)); }
-    void shutLongTube2() { doTubeStrip(15, nbTrianglesTubeClosed(2)); }
+    void cylinder1()     { doTubeStrip(13, nbTrianglesCylinder(1, 1)); }
+    void cylinderC()     { doTubeStrip(14, nbTrianglesCylinder(1, 1)); }
+    void shutTube2()     { doTubeStrip(15, nbTrianglesCylinder(2)); }
+    void shutLongTube2() { doTubeStrip(16, nbTrianglesCylinder(2)); }
 
-    void cone1()         { doTubeStrip(16, nbTrianglesTubeClosed(1)); }
-    void cone2()         { doTubeStrip(17, nbTrianglesTubeClosed(2)); }
-    void longCone()      { doTubeStrip(19, nbTrianglesTubeClosed(2)); }
-    void truncatedCone() { doTubeStrip(20, nbTrianglesTube(2)); }
-    void helix()         { doTubeStrip(21, nbTrianglesHelix(5)); }
+    void cone1()         { doTubeStrip(17, nbTrianglesCylinder(1)); }
+    void cone2()         { doTubeStrip(18, nbTrianglesCylinder(2)); }
+    void coneC()         { doTubeStrip(19, nbTrianglesCylinder(2)); }
+    void longCone()      { doTubeStrip(20, nbTrianglesCylinder(2)); }
+    void truncatedCone() { doTubeStrip(21, nbTrianglesTube(2)); }
+    void helix()         { doTubeStrip(22, nbTrianglesHelix(5)); }
 
-    void disc1()         { doTubeStrip(22, pi_twice); }
-    void disc2()         { doTubeStrip(23, pi_twice/2); }
-    void discTop1()      { doTubeStrip(24, pi_twice); }
-    void discTop2()      { doTubeStrip(25, pi_twice/2); }
-    void discTopH()      { doTubeStrip(26, pi_twice/2); }
-    void discBottom1()   { doTubeStrip(27, pi_twice); }
-    void discBottom2()   { doTubeStrip(28, pi_twice/2); }
-    void discMid2()      { doTubeStrip(29, pi_twice/2); }
+    void disc1()         { doTubeStrip(24, pi_twice); }
+    void disc2()         { doTubeStrip(25, pi_twice/2); }
+    void discTop1()      { doTubeStrip(26, pi_twice); }
+    void discTop2()      { doTubeStrip(27, pi_twice/2); }
+    void discBottom1()   { doTubeStrip(28, pi_twice); }
+    void discBottom2()   { doTubeStrip(29, pi_twice/2); }
     void ring()          { doTubeStrip(30, 2+pi_twice); }
     void thin_ring()     { doTubeStrip(31, 2+pi_twice); }
 

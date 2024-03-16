@@ -76,8 +76,6 @@ namespace gle
     void discTop1();
     /// draw 2D disc of radius 1 at Z=1, with +Z as normal
     void discTop2();
-    /// draw 2D disc of radius 1 at Z=0.5, with +Z as normal
-    void discTopH();
     /// draw nice 2D disc of radius 1 in XY plane, with -Z as normal
     void discBottom1();
     /// draw 2D disc of radius 1 in XY plane, with -Z as normal
@@ -207,16 +205,18 @@ namespace gle
     void cone1();
     /// display a nicer cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone2();
+    /// display a cone of axis Z, radius 1 at Z=-1, summit at Z=1
+    void coneC();
     /// display a closed cone directed along Z, of radius 1 in Z=[-1, +2]
     void longCone();
     /// display an open cone directed along Z, of radius 1 at Z=0
     void truncatedCone();
 
-    /// display a cylinder of axis Z, radius 1 covering Z=[0, 1]
-    inline void cylinder1() { shutTube2(); discTop2(); }
-    /// display a cylinder of axis Z, radius 1 covering Z=[-0.5, 0.5]
-    inline void cylinderC() { shutTubeC(); discTopH(); }
-    
+    /// display cylinder of axis Z, radius 1 covering Z=[0, 1]
+    void cylinder1();
+    /// display cylinder of axis Z, radius 0.5 covering Z=[-1, 1]
+    void cylinderC();
+
     /// draw a 3-portion cylinder with a larger central section
     void barrel();
     /// draw a 3-portion cylinder with a larger central section

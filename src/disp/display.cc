@@ -2170,7 +2170,7 @@ void Display::drawSolid(Solid const& obj)
                 {
                     Vector Q = obj.posP(i+d);
                     gym::transAlignZ(Q, rad, Q-P);
-                    gle::smallCube();
+                    gle::coneC();
                 }
                 i += DIM;
                 continue;

@@ -707,7 +707,7 @@ void Display3::drawFiberEndMinus(Fiber const& fib, int style, float size) const
         default: break;
         case 1: drawObject(fib.posEndM(), rad, gle::sphere2); break;
         case 2: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::longCone); break;
-        case 3: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cylinderC); break;
+        case 3: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cylinder1); break;
         case 4: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::arrowTail); break;
         case 5: drawObject(fib.posEndM(), fib.dirEndM(), rad, gle::arrowTail); break;
         case 6: drawObject(fib.posEndM(),-fib.dirEndM(), rad, gle::cube); break;
@@ -737,7 +737,7 @@ void Display3::drawFiberEndPlus(Fiber const& fib, int style, float size) const
         default: break;
         case 1: drawObject(fib.posEndP(), rad, gle::sphere2); break;
         case 2: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::longCone); break;
-        case 3: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cylinderC); break;
+        case 3: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cylinder1); break;
         case 4: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::arrowTail); break;
         case 5: drawObject(fib.posEndP(),-fib.dirEndP(), rad, gle::arrowTail); break;
         case 6: drawObject(fib.posEndP(), fib.dirEndP(), rad, gle::cube); break;
