@@ -89,7 +89,8 @@ void SimThread::hold()
         hold_ = 0;
         //debug("holding");
         holding_ = 1;
-        cond_wait();  // this also unlocks and locks the mutex
+        cond_wait();  // unlocks mutex, wait for 'signal', lock again
+        holding_ = 0;
     }
 }
 

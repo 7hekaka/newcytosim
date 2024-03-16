@@ -63,7 +63,7 @@ void timerCallback(const int value)
 {
     unsigned millisec = prop.delay;
 
-    //std::clog << "timerCallback @ " << std::fixed << simul.time() << "s\n";
+    //std::clog << "timerCallback(" << value << ") @ " << std::fixed << simul.time() << "s\n";
     if ( player.goLive && worker.alive() )
     {
         //worker.debug("timerCallback");

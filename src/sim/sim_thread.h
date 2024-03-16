@@ -117,7 +117,7 @@ public:
     int cond_wait() { return pthread_cond_wait(&condition_, &mutex_); }
     
     /// send signal to child thread. Will reset holding state if successful
-    void signal() { holding_=0; pthread_cond_signal(&condition_); }
+    void signal() { pthread_cond_signal(&condition_); }
 
 #else
     
@@ -133,8 +133,8 @@ public:
     /// wait for the condition
     int cond_wait() { debug("unlock, wait"); int R=pthread_cond_wait(&condition_, &mutex_); debug("wake, lock"); return R; }
     
-    /// signal child thread to continue
-    void signal() { debug("signal"); holding_=0; pthread_cond_signal(&condition_); }
+    /// signal child thread to continue, called by the parent
+    void signal() { debug("signal"); pthread_cond_signal(&condition_); }
     
 #endif
     
