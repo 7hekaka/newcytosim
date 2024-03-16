@@ -1461,13 +1461,12 @@ namespace gle
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(tubes_[inx], cnt);
-        gym::cleanupVN();
         gym::rebind();
         gym::disableLighting();
         gym::color(col);
         gym::drawLines(line_width, tubes_[inx], cnt);
-        gym::cleanupVN();
         gym::restoreLighting();
+        gym::cleanupVN();
     }
 
     // using Vertex Buffer Objects

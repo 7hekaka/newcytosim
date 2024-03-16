@@ -865,11 +865,15 @@ void Display3::drawOrganizer(Organizer const& obj) const
     if ( !sol && !sph ) return;
     PointDisp const* disp = ( sol ? sol->prop->disp : sph->prop->disp );
     if ( !disp ) return;
+    gym_color col;
+    if ( sol ) col = bodyColorF(*sol).match_a(disp->color);
+    if ( sph ) col = bodyColorF(*sph).match_a(disp->color);
 
     if ( disp->style & 2 )
     {
+        // draw links between Solid/Sphere and Mecables
         Vector P, Q;
-        bodyColor(disp, obj.signature());
+        gym::color_front(col);
         const float wid = pixscale(disp->width);
 
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
@@ -888,12 +892,12 @@ void Display3::drawOrganizer(Organizer const& obj) const
     {
         if ( sol && sol->nbPoints() >= 4 )
         {
-            bodyColor(*sol);
+            gym::color_front(col);
+            gym::color_back(col.darken(0.5));
 #if ( DIM >= 3 )
             Vector3 a = 0.5 * (sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5 * (sol->posP(1) + sol->posP(3));
             gym::stretchAlignZ(a, b, 1);
-            gym::color(0.6f,0.6f,0.6f);
             gle::dualPassBarrel();
 #else
             const float wid = pixscale(disp->width);

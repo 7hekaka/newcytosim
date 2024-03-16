@@ -174,8 +174,12 @@ namespace {
 #pragma mark - Color schemes for Sphere / Solid / Bead
     
     /**
-     returns the front color used to display Object
-     if `coloring` is enabled, this loads the N-th bright color,
+     returns the front color to be used to display the object.
+     
+     If `coloring` is enabled, the color depends on the object's `mark` and `signature`.
+     `coloring==1` will randomly color according to signature
+     `coloring==2` will color according to mark
+     `coloring==3` will use different tones of colors around the normal display color
      otherwise load the object's display color
      */
     template < typename T >
@@ -183,11 +187,11 @@ namespace {
     {
         PointDisp const* disp = obj.prop->disp;
         if ( disp->coloring && obj.mark() )
-            return gym::bright_color(obj.mark()).match_a(disp->color);
+            return gym::bright_color(obj.mark());
         switch ( disp->coloring )
         {
-            case 1: return gym::bright_color(obj.signature()).match_a(disp->color);
-            case 2: return gym::bright_color(obj.mark()).match_a(disp->color);
+            case 1: return gym::bright_color(obj.signature());
+            case 2: return gym::bright_color(obj.mark());
             case 3: return disp->color.tweak(obj.signature());
             default: return disp->color;
         }
@@ -207,26 +211,6 @@ namespace {
             size_t i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
             gym_color col = gym::bright_color(i);
             gym::color_load(col);
-            gym::color_back(col.darken(0.5));
-        }
-        else
-        {
-            gym::color_front(disp->color, 1.0);
-            gym::color_back(disp->color2);
-        }
-    }
-    
-    /**
-     Sets color material for lighting mode
-     if `coloring` is enabled, this loads the N-th bright color,
-     otherwise load the object's display color
-     */
-    void bodyColor(PointDisp const* disp, size_t s)
-    {
-        if ( disp->coloring )
-        {
-            gym_color col = gym::bright_color(s);
-            gym::color_front(col);
             gym::color_back(col.darken(0.5));
         }
         else

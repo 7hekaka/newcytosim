@@ -2344,6 +2344,7 @@ void Display::drawSolidT(Solid const& obj, unsigned inx) const
     if ( obj.twin() )
         col = bodyColorF(*obj.twin()).tweak(obj.signature());
 #endif
+    col.match_a(obj.prop->disp->color);
 #if ( DIM > 2 )
     drawBallT(X, obj.radius(inx), col, obj.mark());
 #else
@@ -2364,6 +2365,7 @@ void Display::drawSolids(SolidSet const& set)
             drawSolid(*obj);
             if ( disp->style & 1 )
             {
+                // draw Solid's balls which can be transparent or not
                 size_t sup = obj->nbPoints();
                 if ( disp->style & 4 ) sup = 1;
 #if ( DIM >= 3 )
@@ -2465,7 +2467,7 @@ void Display::drawBeadT(Bead const& obj) const
     
     assert_true( disp->style & 1 );
     {
-        gym_color col = bodyColorF(obj);
+        gym_color col = bodyColorF(obj).match_a(disp->color);
 #if ( DIM > 2 )
         drawBeadS(obj.position(), obj.radius(), col, obj.mark());
 #else
@@ -2534,25 +2536,26 @@ void Display::drawSphereT(Sphere const& obj) const
 
     if ( disp->style & 7 )
     {
+        gym_color col = bodyColorF(obj).match_a(disp->color);
         const Vector C = obj.posP(0);
 #if ( DIM < 3 )
         if ( obj.radius() > pixelSize )
         {
-            gym::color(bodyColorF(obj));
+            gym::color(col);
             gym::transScale(C, obj.radius());
             if ( disp->style & 1 )
                 gle::circle1(disp->widthX);
             if ( disp->style & 2 )
                 gle::disc();
             if ( disp->style & 4 )
-                drawDiscT(C, obj.radius(), bodyColorF(obj));
+                drawDiscT(C, obj.radius(), col);
         }
 #else
         /* Note: The rotation matrix for the sphere calculated below from the
          reference points, includes scaling by the radius of the sphere.
          We then use a primitive for a sphere of radius 1.
          */
-        gym::color_both(bodyColorF(obj));
+        gym::color_both(col);
         gym::enableLighting();
         gym::transRotate(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C);
         if ( disp->style & 1 )
@@ -2594,11 +2597,15 @@ void Display::drawOrganizer(Organizer const& obj) const
     if ( !sol && !sph ) return;
     PointDisp const* disp = ( sol ? sol->prop->disp : sph->prop->disp );
     if ( !disp ) return;
+    gym_color col;
+    if ( sol ) col = bodyColorF(*sol).match_a(disp->color);
+    if ( sph ) col = bodyColorF(*sph).match_a(disp->color);
 
     size_t i = 0, cnt = obj.nbLinks();
 
     if ( disp->style & 2 )
     {
+        // draw links between Solid/Sphere and Mecables
         Vector P, Q;
         fluteD* flu = gym::mapBufferVD(2*cnt);
         while ( obj.getLink(i, P, Q) )
@@ -2609,10 +2616,9 @@ void Display::drawOrganizer(Organizer const& obj) const
             if ( ++i >= cnt ) break;
         }
         gym::unmapBufferVD();
+        gym::color(col);
         gym::ref_view();
         gym::disableLighting();
-        if ( sol ) gym::color(bodyColorF(*sol));
-        else gym::color(bodyColorF(*sph));
         gym::drawLines(disp->widthX, 0, 2*i);
         gym::rebindBufferVD(2);
         gym::drawPoints(disp->sizeX, 0, i);
@@ -2628,14 +2634,15 @@ void Display::drawOrganizer(Organizer const& obj) const
         {
 #if ( DIM >= 3 )
             gym::enableLighting();
-            bodyColor(*sol);
+            gym::color_front(col);
+            gym::color_back(col.darken(0.5));
             Vector3 a = 0.5*(sol->posP(0) + sol->posP(2));
             Vector3 b = 0.5*(sol->posP(1) + sol->posP(3));
             gym::stretchAlignZ(a, b, 1);
             gle::dualPassBarrel();
 #else
             gym::disableLighting();
-            gym::color(bodyColorF(*sol));
+            gym::color(col);
             gym::ref_view();
             gym::loadPoints(sol->nbPoints(), sol->addrPoints());
             gym::drawLines(disp->widthX, 0, sol->nbPoints());
