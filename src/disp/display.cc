@@ -95,11 +95,9 @@ void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*
 }
 
 
-void drawBallT(Vector const& pos, real rad, gym_color const& col, ObjectMark mark)
+void drawBallT(Vector const& pos, real rad, ObjectMark mark)
 {
     gym::transScale(pos, rad);
-    //gym::enableLighting();
-    gym::color_both(col);
     gle::dualPassSphere2();
     if ( mark && mark < 8 )
     {
@@ -110,11 +108,9 @@ void drawBallT(Vector const& pos, real rad, gym_color const& col, ObjectMark mar
 }
 
 // using sphere4() for presumably smaller objects
-void drawBeadS(Vector const& pos, real rad, gym_color const& col, ObjectMark mark)
+void drawBeadS(Vector const& pos, real rad, ObjectMark mark)
 {
     gym::transScale(pos, rad);
-    //gym::enableLighting();
-    gym::color_both(col);
     gle::dualPassSphere4();
     if ( mark && mark < 8 )
     {
@@ -124,11 +120,10 @@ void drawBeadS(Vector const& pos, real rad, gym_color const& col, ObjectMark mar
 }
 
 
-void drawDiscT(Vector const& pos, real rad, gym_color const& col)
+void drawDiscT(Vector const& pos, real rad)
 {
     gym::transScale(pos, rad);
     gym::disableLighting();
-    gym::color(col);
     gle::disc();
 }
 
@@ -2344,11 +2339,12 @@ void Display::drawSolidT(Solid const& obj, unsigned inx) const
     if ( obj.twin() )
         col = bodyColorF(*obj.twin()).tweak(obj.signature());
 #endif
-    col.match_a(obj.prop->disp->color);
 #if ( DIM > 2 )
-    drawBallT(X, obj.radius(inx), col, obj.mark());
+    gym::color_both(col, obj.prop->disp->color.alpha());
+    drawBallT(X, obj.radius(inx), obj.mark());
 #else
-    drawDiscT(X, obj.radius(inx), col);
+    gym::color(col, obj.prop->disp->color.alpha());
+    drawDiscT(X, obj.radius(inx));
 #endif
     for ( size_t i = 0; i < num; ++i )
         gym::disableClipPlane(5-i);
@@ -2469,9 +2465,11 @@ void Display::drawBeadT(Bead const& obj) const
     {
         gym_color col = bodyColorF(obj).match_a(disp->color);
 #if ( DIM > 2 )
-        drawBeadS(obj.position(), obj.radius(), col, obj.mark());
+        gym::color_both(col);
+        drawBeadS(obj.position(), obj.radius(), obj.mark());
 #else
-        drawDiscT(obj.position(), obj.radius(), col);
+        gym::color(col);
+        drawDiscT(obj.position(), obj.radius());
 #endif
     }
 }

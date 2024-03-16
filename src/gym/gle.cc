@@ -1563,7 +1563,8 @@ namespace gle
     
     void dualPassIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
     {
-        assert_enabled(GL_CULL_FACE);
+        assertLighting();
+        assertCullFace();
         assert_true(buf_[0]); assert_true(buf_[1]);
         // the normal in each vertex is equal to the vertex!
         gym::bindBufferV3N0(buf_[0], pts);

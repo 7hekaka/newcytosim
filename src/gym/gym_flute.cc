@@ -75,7 +75,7 @@ namespace gym
 
     void setBufferVN(size_t pts, size_t nor)
     {
-        assert_enabled(GL_VERTEX_ARRAY);
+        assertVertexArray();
         size_t tot = ( pts + nor );
         glVertexPointer(std::min(pts, 3UL), GL_FLOAT, tot*Q, nullptr);
         if ( nor > 1 )
@@ -111,7 +111,7 @@ namespace gym
     /// use same data for position and normal
     void setBufferV3N0(GLsizei first)
     {
-        assert_enabled(GL_VERTEX_ARRAY);
+        assertVertexArray();
         glVertexPointer(3, GL_FLOAT, 3*Q, (void*)(first*Q));
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 3*Q, (void*)(first*Q));
@@ -138,7 +138,7 @@ namespace gym
         {
             assert_true(!glIsEnabled(GL_COLOR_ARRAY));
         }
-        assert_enabled(GL_VERTEX_ARRAY);
+        assertVertexArray();
         glVertexPointer(std::min(pts, 3UL), GL_FLOAT, stride*Q, (void*)(col*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }
@@ -165,7 +165,7 @@ namespace gym
         {
             assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
         }
-        assert_enabled(GL_VERTEX_ARRAY);
+        assertVertexArray();
         glVertexPointer(pts, GL_FLOAT, stride*Q, (void*)((col+nor)*Q));
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     }

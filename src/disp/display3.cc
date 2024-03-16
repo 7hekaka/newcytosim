@@ -147,7 +147,7 @@ inline void Display3::drawPoint(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
-        assert_enabled(GL_LIGHTING);
+        assertLighting();
         drawObject(pos, pixscale(dis->size), gle::sphere1);
     }
 }
@@ -164,7 +164,7 @@ inline void Display3::drawHand(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
-        assert_enabled(GL_LIGHTING);
+        assertLighting();
         gym::color_both(dis->color);
         drawObject(pos, pixscale(dis->size), gle::blob);
     }
@@ -175,7 +175,7 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 {
     if ( dis->perceptible )
     {
-        assert_enabled(GL_LIGHTING);
+        assertLighting();
         gym::color_both(dis->color2);
         drawObject(pos, pixscale(dis->size), gle::blob);
     }
@@ -755,7 +755,7 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
         return;
     gym::color_front(fib.disp->color);
     gym::color_back(disp->back_color);
-    assert_enabled(GL_LIGHTING);
+    assertLighting();
 
     // display random speckles:
     if ( disp->speckle_style == 1 )
@@ -916,7 +916,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
 
 void Display3::drawSinglesF(SingleSet const& set) const
 {
-    assert_enabled(GL_LIGHTING);
+    assertLighting();
     for ( Single * obj=set.firstF(); obj ; obj=obj->next() )
     {
         PointDisp const* dis = obj->disp();
@@ -1038,7 +1038,7 @@ void Display3::drawCouplesF(CoupleSet const& set) const
  */
 void Display3::drawCouplesF1(CoupleSet const& set) const
 {
-    assert_enabled(GL_LIGHTING);
+    assertLighting();
     for ( Couple * obj = set.firstFF(); obj ; obj=obj->next() )
     {
         //drawHandF(cx->posFree(), cx->disp1());
