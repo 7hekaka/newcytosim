@@ -26,6 +26,7 @@ void EventSet::steps()
         obj->step(simul_);
         obj = nxt;
     }
+    if ( size() > 1 ) shuffle();
 }
 
 
