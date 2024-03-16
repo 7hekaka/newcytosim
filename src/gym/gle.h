@@ -18,9 +18,9 @@ class Vector3;
  */
 namespace gle
 {
-    /// `finesse` affects the number of triangles used to draw shapes such as cylinders
+    /// `finesse` sets the number of triangles used to draw shapes such as cylinders
     /** Higher values are better: 2 is okay, 4 is good, 8 is nice and 16 is very nice */
-    constexpr size_t finesse = 4;
+    constexpr size_t finesse = 2;
     
     /// number of circle points stored in buffer
     /** We use multiples of 5 to match circles and the icosahedron */
@@ -198,10 +198,10 @@ namespace gle
     void thinTube();
     /// draw a closed cylinder along Z, of hexagonal crosssection with Z=[0, 256]
     void thinLongTube();
-    /// draw tube with grooves
-    void flutedTube();
     /// draw lines on the surface of a tube
     void stripedTube(float line_width, gym_color);
+    /// draw helix on the surface of a tube
+    void helix();
 
     /// display a super nice cone of axis Z, radius 1 at Z=0, summit at Z=1
     void cone1();

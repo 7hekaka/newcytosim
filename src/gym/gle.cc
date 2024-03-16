@@ -1366,6 +1366,46 @@ namespace gle
         }
         return i;
     }
+    
+    /// return essentially finesse * 24 / inc
+    inline size_t nbTrianglesHelix(int turns)
+    {
+        return 2 + pi_twice * ( 2 * turns + 1 );
+    }
+
+    /// set triangle strip for a spiral, with Z in [B, T]
+    size_t setHelix(flute6* flu, float Z, float T, int turns)
+    {
+        assert_true( Z <= T );
+        float W = ( T - Z ) / ( turns * 2.0 );
+        float dZ = ( T - Z ) / ( turns * pi_twice );
+        size_t i = 0;
+        // add quarter-turn with no increment
+        for ( size_t p = pi_3half; p < pi_twice; ++p )
+        {
+            float C = cos_(p), S = sin_(p);
+            flu[i++] = { C, S, Z+W, C, S, 0 };
+            flu[i++] = { C, S, Z, C, S, 0 };
+        }
+        for ( int t = 0; t < turns; ++t )
+        for ( size_t p = 0; p < pi_twice; ++p )
+        {
+            float C = cos_(p), S = sin_(p);
+            flu[i++] = { C, S, Z+W, C, S, 0 };
+            flu[i++] = { C, S, Z, C, S, 0 };
+            Z += dZ;
+        }
+        // add quarter-turn with no increment
+        for ( size_t p = 0; p <= pi_half; ++p )
+        {
+            float C = cos_(p), S = sin_(p);
+            flu[i++] = { C, S, Z+W, C, S, 0 };
+            flu[i++] = { C, S, Z, C, S, 0 };
+        }
+        size_t j = nbTrianglesHelix(turns);
+        assert_true( i <= j );
+        return i;
+    }
 
     /// set triangle strip for a disc at Z, with given normal in Z
     size_t setDisc(flute6* flu, size_t inc, float Z, float N)
@@ -1401,7 +1441,7 @@ namespace gle
 
     static size_t sizeTubeBuffers()
     {
-        return 36 * pi_twice;  // this is empirical!
+        return 46 * pi_twice;  // this is empirical!
     }
     
     size_t setTubeBuffers(flute6* ptr, flute6* const ori)
@@ -1434,6 +1474,7 @@ namespace gle
         tubes_[17] = i+s; i += setClosedTube(ptr+i, 2, 0, 1, 0); // cone2
         tubes_[19] = i+s; i += setClosedTube(ptr+i, 2, -1, 2, 0); // longCone
         tubes_[20] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
+        tubes_[21] = i+s; i += setHelix(ptr+i, 0, 1, 5);
 
         tubes_[22] = i+s; i += setDisc(ptr+i, 1, 0, 1);
         tubes_[23] = i+s; i += setDisc(ptr+i, 2, 0, 1);
@@ -1495,6 +1536,7 @@ namespace gle
     void cone2()         { doTubeStrip(17, nbTrianglesTubeClosed(2)); }
     void longCone()      { doTubeStrip(19, nbTrianglesTubeClosed(2)); }
     void truncatedCone() { doTubeStrip(20, nbTrianglesTube(2)); }
+    void helix()         { doTubeStrip(21, nbTrianglesHelix(5)); }
 
     void disc1()         { doTubeStrip(22, pi_twice); }
     void disc2()         { doTubeStrip(23, pi_twice/2); }

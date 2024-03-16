@@ -2197,14 +2197,16 @@ void Display::drawSolid(Solid const& obj)
         real rad = M_SQRT2 * pixscale(disp->size);
         gym::ref_view();
         gym::enableLighting();
+        gym::disableCullFace();
         const size_t off = DIM+1; // index of point to be linked
         const size_t sup = std::min(obj.lastPoint(), 2*off+1); // last point to be linked
         for ( size_t inx = off; inx <= sup; inx += off+1 )
         {
             gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), rad);
             gym::color_both(lor, 1);
-            gle::stripedTube(1.f, gym_color(1.f,1.f,1.f));
+            gle::helix();
         }
+        gym::restoreCullFace();
     }
 #endif
 
