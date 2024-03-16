@@ -56,7 +56,7 @@ void ForkProp::complete(Simul const& sim)
 #endif
 
     if ( angular_stiffness < 0 )
-        throw InvalidParameter("The angular stiffness, torque[0] should be >= 0");
+        throw InvalidParameter("The angular stiffness, torque[0] must be >= 0");
 }
 
 

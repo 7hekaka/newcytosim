@@ -44,7 +44,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
         }
         else
         {
-            // nucleating from a Mecable:
+            // nucleating radially out from a Mecable:
             dir = hMonitor->linkDir(this);
         }
     }

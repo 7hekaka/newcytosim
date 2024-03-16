@@ -2,7 +2,7 @@
 % Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
 % F. Nedelec, Cambridge 12.11.2022, Sunny. 25.11.2022, Rainy; Fat Chromosomes: 31.12.2022
 % FJN, Strasbourg 26.03.2023: new linkage of Twin Solids
-% This relies on: NEW_SOLID_HAS_TWIN, NEW_SOLID_MAKE_COUPLE, NEW_ANCHOR_NORMAL
+% This relies on: NEW_SOLID_HAS_TWIN, NEW_SOLID_MAKE_COUPLE
 
 set simul system
 {
@@ -64,7 +64,7 @@ set hand nucleator
 {
     unbinding = 0, inf
     activity = nucleate
-    specificity = mostly_parallel
+    nucleation_angle = 0
     nucleate = 0.1, microtubule, ( length=0.032; end_state=grow,white; )
     display = ( color=yellow; size=2; width=3; )
 }

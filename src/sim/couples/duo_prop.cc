@@ -96,7 +96,7 @@ void DuoProp::complete(Simul const& sim)
     rest_dir.YY = std::sin(rest_angle);
     if ( DIM == 3 ) rest_dir.YY = abs_real(rest_dir.YY);
     if ( angular_stiffness < 0 )
-        throw InvalidParameter("The angular stiffness, torque[0] should be >= 0");
+        throw InvalidParameter("The angular stiffness, torque[0] must be >= 0");
 #endif
 
     /// print predicted decay distance in verbose mode:

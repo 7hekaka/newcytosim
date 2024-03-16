@@ -24,7 +24,7 @@ public:
      @{
      */
     
-    /// Resting angle in radian (set as `torque[0]`
+    /// Resting angle in radian (set as `torque[0]`)
     real rest_angle;
     
     /// Stiffness of the angular link, in Torque per radians (pN.um/radian) (set as `torque[1]`)
@@ -35,7 +35,7 @@ public:
     
     /// @}
     
-    /// derived variable: [cos(rest_angle), sin(rest_angle)]
+    /// derived variable: [cos(angle), sin(angle)]
     Vector2 rest_dir;
 
 public:
