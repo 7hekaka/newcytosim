@@ -921,21 +921,29 @@ void Solid::rotateTriad(size_t ref, Rotation const& rot)
 
 
 /** will return the size of the base vector, negated if triad is indirect */
-real Solid::hasTriad(size_t inx) const
+real Solid::hasTriad(size_t inx, real epsilon) const
 {
     if ( inx + DIM >= nbPoints() )
         return 0;
-    Vector P = posPoint(inx);
-    real R = posPoint(inx+1).XX - P.XX;
-    real res = R;
-    for ( int i = 0; i < DIM; ++i )
+    Vector P = posPoint(inx), Y;
+    Vector X = posPoint(inx+1) - P;
+    real res = X.normSqr();
+    if ( DIM >= 2 )
     {
-        Vector pos = posPoint(inx+i+1) - P;
-        Vector vec(0, 0, 0);
-        vec[i] = R;
-        if ( (pos+vec).norm_inf() < REAL_EPSILON )
-            res *= -1;
-        else if ( (pos-vec).norm_inf() > REAL_EPSILON )
+        Y = posPoint(inx+2) - P;
+        if ( abs_real(Y.normSqr() - res) > epsilon )
+            return 0;
+        if ( abs_real(dot(X, Y)) > epsilon )
+            return 0;
+    }
+    if ( DIM >= 3 )
+    {
+        Vector Z = posPoint(inx+3) - P;
+        if ( abs_real(Z.normSqr() - res) > epsilon )
+            return 0;
+        if ( abs_real(dot(X, Z)) > epsilon )
+            return 0;
+        if ( abs_real(dot(Y, Z)) > epsilon )
             return 0;
     }
     return res;

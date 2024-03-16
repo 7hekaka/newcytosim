@@ -61,10 +61,10 @@ private:
     /// the dimensions used in Stokes' law to calculate overall mobility
     real * soRadius;
     
-    /// array to store the reference shape of the solid, as coordinates
+    /// array of coordinates for the reference shape of the solid
     real * soShape;
     
-    /// the mean of the the points weighted by their drag coefficients
+    /// the mean of the vertices weighted by their drag coefficients
     Vector soCenter;
 
     /// the reduced total (all points summed) drag coefficient for translation
@@ -213,7 +213,7 @@ public:
     void rotateTriad(size_t, Rotation const&);
 
     /// check if a coordinate system already exist at given index
-    real hasTriad(size_t) const;
+    real hasTriad(size_t, real epsilon = 0.001) const;
     
     //--------------------------------------------------------------------------
     

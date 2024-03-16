@@ -2160,7 +2160,23 @@ void Display::drawSolid(Solid const& obj)
         gym::color_both(col);
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
+        {
+            if ( obj.hasTriad(i) )
+            {
+                Vector P = obj.posP(i);
+                gym::transScale(P, rad);
+                gle::star();
+                for ( int d = 1; d <= DIM; ++d )
+                {
+                    Vector Q = obj.posP(i+d);
+                    gym::transAlignZ(Q, rad, Q-P);
+                    gle::smallCube();
+                }
+                i += DIM;
+                continue;
+            }
             drawObject(obj.posP(i), rad, gle::hedron(obj.radius(i)>0));
+        }
     }
     
 #if NEW_SOLID_CLAMP
