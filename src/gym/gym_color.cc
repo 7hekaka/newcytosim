@@ -242,10 +242,10 @@ void gym_color::set_hue_components(COLOF& r, COLOF& g, COLOF& b, const COLOF h)
  */
 gym_color gym_color::radial_color(const COLOF x, const COLOF y, const COLOF z, const COLOF a)
 {
-    COLOF pX = std::max(0.0f,-x), nX = -0.5f * std::min(0.0f,-x);
-    COLOF pY = std::max(0.0f, y), nY = -0.5f * std::min(0.0f, y);
-    COLOF pZ = std::max(0.0f, z), nZ = -0.5f * std::min(0.0f, z);
-    return gym_color(pX+nY+nZ, nX+pY+nZ, nX+nY+pZ, a);
+    COLOF pX = std::max(0.0f,-x), nX = std::min(0.0f,-x);
+    COLOF pY = std::max(0.0f, y), nY = std::min(0.0f, y);
+    COLOF pZ = std::max(0.0f, z), nZ = std::min(0.0f, z);
+    return gym_color(pX-0.5f*(nY+nZ), pY-0.5f*(nX+nZ), pZ-0.5f*(nX+nY), a);
 }
 
 /**
