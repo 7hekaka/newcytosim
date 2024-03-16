@@ -1030,7 +1030,7 @@ void processKey(unsigned char key, int modifiers = 0)
 
         case 't':
             if ( altKeyDown )
-                view.track_fibers ^= 8;
+                view.track_fibers = ( view.track_fibers ? 0 : 10 );
             else
                 view.track_fibers ^= 1;
             flashTracking(view.track_fibers);

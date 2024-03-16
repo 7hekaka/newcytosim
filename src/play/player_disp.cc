@@ -166,16 +166,14 @@ void Player::autoFocus(Simul const& sim, View& view) const
     {
         // align with mean nematic direction
         static Vector3 dir(0, 0, 0);
-        /*
-         real S = FiberSet::infoNematic(sim.fibers.collect(), mat);
-         flashText("Nematic order S = %5.3f", S);
-         */
+        real S = FiberSet::infoNematic(sim.fibers.collect(), mat);
+        //flashText("Nematic order S = %5.3f", S);
         Vector3 vec(mat);
         real alpha = std::copysign(0.125, dot(dir, vec));
         // time-average the direction vector:
         dir = ( dir * 0.875 + vec * alpha ).normalized();
         view.align_with(dir);
-        //std::clog << "auto align with: " << vec << '\n';
+        //std::clog << "nematic direction: " << vec << '\n';
     }
 
     if ( mode & 4 )
@@ -193,14 +191,15 @@ void Player::autoFocus(Simul const& sim, View& view) const
     if ( mode & 8 )
     {
         // track position of Solid (kinetochores)
-        size_t cnt = sim.solids.size();
-        if ( cnt )
+        size_t cnt = 0;
+        Vector pos(0,0,0);
+        for ( Solid const* B=sim.solids.first(); B; B=B->next() )
         {
-            Vector pos(0,0,0);
-            for ( Solid const* B=sim.solids.first(); B; B=B->next() )
-                pos += B->position();
-            view.move_shift(pos.x()/cnt, pos.y()/cnt, pos.z()/cnt);
+            ++cnt;
+            pos += B->position();
         }
+        if ( cnt > 0 )
+            view.move_shift(pos.x()/cnt, pos.y()/cnt, pos.z()/cnt);
     }
 }
 
