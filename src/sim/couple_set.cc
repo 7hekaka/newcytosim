@@ -677,16 +677,13 @@ void CoupleSet::writeObjectsFF_skip(Outputter& out) const
     // count all the elements that are not written:
     const PropertyID UNI_MAX = 16;
     size_t cnt[UNI_MAX] = { 0 };
-    PropertyID sup = 0;
     for ( CoupleProp const* P : uniCouples )
     {
         PropertyID i = P->number();
         if ( i < UNI_MAX )
-        {
-            sup = std::max(sup, i);
             cnt[i] = P->uni_counts;
-        }
     }
+    // write Couple without `fast_diffusion`:
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
@@ -695,9 +692,14 @@ void CoupleSet::writeObjectsFF_skip(Outputter& out) const
         else
             n->write(out);
     }
+    // compute highest prop ID that was skipped:
+    assert_true( cnt[0] == 0 );
+    PropertyID sup = UNI_MAX;
+    while ( --sup > 0 )
+        if ( cnt[sup] ) break;
     if ( sup > 0 )
     {
-        assert_true( sup < UNI_MAX );
+        // write counts of Couple that were not saved:
         out.write("\n#section couple reheat");
         for ( size_t i = 0; i <= sup; ++i )
             out.writeInt(cnt[i], ' ');

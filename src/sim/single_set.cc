@@ -395,6 +395,7 @@ void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
 
 void SingleSet::makeSingles(size_t cnt[], size_t n_cnt)
 {
+    //std::clog << "makeSingles " << cnt[0] << " " << cnt[1] << " " << cnt[2] << "\n";
     // note that id=0 is invalid
     for ( size_t i = 1; i < n_cnt; ++i )
     {
@@ -439,29 +440,27 @@ void SingleSet::freeze()
 /** cnt[i] is the number of Singles of type `i` to be released */
 void SingleSet::reheat(size_t cnt[], size_t n_cnt)
 {
-    //std::clog << "Single::reheat " << ice_.size() << "\n";
+    //std::clog << "Single::reheat " << ice_.size() << " " << cnt[1] << "\n";
     Object * i = ice_.front();
     while ( i )
     {
         Single* S = static_cast<Single*>(i);
         i = i->next();
-        if ( S->prop->fast_diffusion )
+        ice_.pop(S);
+        // we want to skip the 'beforeDetachment' here:
+        S->hand()->detachHand();
+        PropertyID id = S->prop->number();
+        if ( id < n_cnt && 0 < cnt[id] )
         {
-            ice_.pop(S);
-            // we want to skip the 'beforeDetachment' here:
-            S->hand()->detachHand();
-            PropertyID id = S->prop->number();
-            if ( id < n_cnt && 0 < cnt[id] )
-            {
-                --cnt[id];
+            --cnt[id];
+            if ( S->prop->fast_diffusion )
                 S->randomizePosition();
-                addFreeSingle(S);
-            }
-            else
-            {
-                inventory_.unassign(S);
-                S->prop->stocks.push(S);
-            }
+            addFreeSingle(S);
+        }
+        else
+        {
+            inventory_.unassign(S);
+            S->prop->stocks.push(S);
         }
     }
 }
@@ -483,27 +482,29 @@ void SingleSet::writeObjectsF_skip(Outputter& out) const
     // count all the elements that are not written:
     const PropertyID UNI_MAX = 16;
     size_t cnt[UNI_MAX] = { 0 };
-    PropertyID sup = 0;
     for ( SingleProp const* P : uniSingles )
     {
         PropertyID i = P->number();
         if ( i < UNI_MAX )
-        {
-            sup = std::max(sup, i);
             cnt[i] = P->uni_counts;
-        }
     }
+    // write Single without `fast_diffusion`:
     for ( Single const* n=firstF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
-        if ( i < UNI_MAX && n->prop->fast_diffusion )
+        if ( i < UNI_MAX )
             ++cnt[i];
         else
             n->write(out);
     }
+    // compute highest prop ID that was skipped:
+    assert_true( cnt[0] == 0 );
+    PropertyID sup = UNI_MAX;
+    while ( --sup > 0 )
+        if ( cnt[sup] ) break;
     if ( sup > 0 )
     {
-        assert_true( sup < UNI_MAX );
+        // write counts of Single that were not saved:
         out.write("\n#section single reheat");
         for ( size_t i = 0; i <= sup; ++i )
             out.writeInt(cnt[i], ' ');
