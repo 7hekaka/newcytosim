@@ -959,10 +959,9 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
         Fiber * fib = Fiber::toFiber(i);
         if ( fib )
         {
-            const size_t N = fib->nbSegments();
-            const real w = square(fib->segmentationInv());
+            const size_t cnt = fib->nbSegments();
             real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
-            for ( size_t n = 0; n < N; ++n )
+            for ( size_t n = 0; n < cnt; ++n )
             {
                 Vector p = fib->diffPoints(n);
                 XX += p.XX * p.XX;
@@ -976,6 +975,8 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
                 ZZ += p.ZZ * p.ZZ;
 #endif
             }
+            // we should normalize by 1/L^2, but to weigth by length, we use 1/L
+            const real w = fib->segmentationInv();
             // update lower triangle of 3x3 second rank traceless tensor:
             M[0] += w * XX;
             M[1] += w * XY;
@@ -983,7 +984,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
             M[4] += w * YY;
             M[5] += w * YZ;
             M[8] += w * ZZ;
-            sum += N;
+            sum += cnt;
         }
     }
     
