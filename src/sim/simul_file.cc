@@ -119,6 +119,12 @@ void Simul::writeObjects(Outputter& out) const
 */
 void Simul::writeObjects(std::string const& name, bool append, bool binary) const
 {
+    if ( prop.clear_system_file && name==prop.system_file )
+    {
+        std::remove(prop.system_file.c_str());
+        prop.clear_system_file = false;
+    }
+    
     Outputter out(name.c_str(), append, binary);
     
     if ( ! out.good() )

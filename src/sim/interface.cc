@@ -1103,18 +1103,11 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     do_write &= ( frames > 0 );
     sim_->prepare();
 
-    if ( do_write )
+    if ( do_write && frames > 1 )
     {
+        // write initial state:
         sim_->writeProperties(prune);
-        if ( sim_->prop.clear_system_file )
-        {
-            sim_->prop.clear_system_file = false;
-            // write initial state:
-            if ( frames > 1 )
-                sim_->writeObjects(sim_->prop.system_file, false, binary);
-            else
-                std::remove(sim_->prop.system_file.c_str());
-        }
+        sim_->writeObjects(sim_->prop.system_file, false, binary);
     }
     
     VLOG("+RUN START +" << sec);

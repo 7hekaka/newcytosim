@@ -1308,9 +1308,9 @@ int Parser::evaluate_one(std::istream& is)
         parse_report(is);
     else if ( tok == "write" )
         parse_write(is);
-    else if ( tok == "import" )
+    else if ( tok == "load" || tok == "import" )
         parse_import(is);
-    else if ( tok == "export" )
+    else if ( tok == "save" || tok == "export" )
         parse_export(is);
     else if ( tok == "call" )
         parse_call(is);
