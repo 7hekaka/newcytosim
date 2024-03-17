@@ -258,9 +258,10 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         //assert_true(isalpha(tag));
         if ( c & HIGH_BIT )
         {
-            ObjectID a = in.get_char();
-            ObjectID b = in.get_char();
-            id = ( a << 16 ) + ( b << 8 ) + ObjectID(in.get_char());
+            ObjectID x = in.get_char();
+            ObjectID y = in.get_char();
+            ObjectID z = in.get_char();
+            id = ( x << 16 ) + ( y << 8 ) + z;
         }
         else if ( c != Object::NULL_TAG )
         {
@@ -323,7 +324,11 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag, ObjectID& id)
              //throw InvalidIO("unknown fiber ID "+std::to_string(id));
             break;
         default:
-            throw InvalidIO("expected a fiber tag ("+std::string(1, tag)+")");
+            if ( in.eof() )
+                std::clog << "unexpected end-of-file\n";
+            else
+                std::clog << "unknown fiber tag (" << tag << ")\n";
+            break;
     }
     return fib;
 }
@@ -408,8 +413,6 @@ public:
         sim->fibers.defrost();
         sim->spaces.defrost();
         sim->fields.defrost();
-        sim->fibers.updateFibers();
-        sim->singles.deleteInvalidWrists();
         sim = nullptr;
     }
     
@@ -434,8 +437,6 @@ public:
         sim->fibers.thaw();
         sim->spaces.thaw();
         sim->fields.thaw();
-        sim->fibers.updateFibers();
-        sim->singles.deleteInvalidWrists();
         sim = nullptr;
     }
 
@@ -475,19 +476,19 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
         VLOG("readObjects start at [" << in.peek() << "]\n");
         int res = readObjects(in, subset);
         VLOG("readObjects end\n");
-
         in.unlock();
-        if ( 0 == res )
-        {
-            // if no error occurred, process objects that have not been updated
-            if ( prune )
-                lock.prune_all();
-            else
-                lock.thaw_all();
-            // renew pointers to objects, particularly 'confine_label'
-            primed_ = 0;
-            prop.complete(*this);
-        }
+
+        primed_ = 0;
+        // if no error occurred, process objects that have not been updated
+        if ( 0 == res && prune )
+            lock.prune_all();
+        else
+            lock.thaw_all();
+        // renew pointers to objects, particularly 'confine_label'
+        prop.complete(*this);
+        fibers.updateFibers();
+        singles.deleteInvalidWrists();
+
         assert_false(singles.bad());
         assert_false(couples.bad());
         return res;
