@@ -460,9 +460,10 @@ public:
         REAL yz =  q[2]*q[3];
         REAL zz = -q[3]*q[3];
         
-        des[0] = two * ((yy + zz)*src[0] + (xy - rz)*src[1] + (ry + xz)*src[2] ) + src[0];
-        des[1] = two * ((rz + xy)*src[0] + (xx + zz)*src[1] + (yz - rx)*src[2] ) + src[1];
-        des[2] = two * ((xz - ry)*src[0] + (rx + yz)*src[1] + (xx + yy)*src[2] ) + src[2];
+        REAL X = src[0], Y = src[1], Z = src[2];
+        des[0] = two * ((yy + zz)*X + (xy - rz)*Y + (ry + xz)*Z ) + X;
+        des[1] = two * ((rz + xy)*X + (xx + zz)*Y + (yz - rx)*Z ) + Y;
+        des[2] = two * ((xz - ry)*X + (rx + yz)*Y + (xx + yy)*Z ) + Z;
     }
     
     
@@ -635,18 +636,23 @@ public:
         q[axis+1] = std::sin(a);
     }
     
-    /// set as rotation to transform `dir` into (1, 0, 0), assuming norm(dir)==1
-    void setRotationToVector(const REAL dir[3])
+    /// set as rotation transforming `A` into `B`, assuming norm(B)==1
+    void setRotationToVector(const REAL A[3], const REAL B[3])
     {
-        // axis is obtained by vector product: axis = cross(X, dir)
-        REAL axis[3] = { 0, dir[2], -dir[1] };
-        // norm(axis) = sin(angle) = 2 * S * C
-        //real n = std::sqrt( dir[1]*dir[1] + dir[2]*dir[2] );
-        // cosine(angle) = scalar product(dir, X):
-        REAL X = std::max(REAL(-1), std::min(REAL(1), dir[0]));
-        // need half-angle for Quaternion, obtained by trigonometric identity:
-        REAL C = std::sqrt(0.5*(1+X));
-        setFromAxis(axis, C, 0.5/C); // since S / n = 0.5 / C
+        // axis is obtained by vector product: axis = cross(B, A)
+        // and norm(axis) = sin(angle) * norm(A) = 2 * S * C * N
+        REAL X[3] = { A[1]*B[2]-A[2]*B[1], A[2]*B[0]-A[0]*B[2], A[0]*B[1]-A[1]*B[0] };
+        //REAL N = std::sqrt( A[0]*A[0] + A[1]*A[1] + A[2]*A[2] );
+        // cosine(angle) = scalar product(A, B):
+        REAL d = ( A[0]*B[0] + A[1]*B[1] + A[2]*B[2] );// / N;
+        // need half-angle for Quaternion: cos(x/2)=sqrt(0.5*[1+cos(x)])
+        REAL C = std::sqrt(std::max(REAL(0), 0.5+0.5*d));
+        setFromAxis(X, C, 0.5/(d)); // since S / norm(X) = 0.5 / C * N
+#if 0
+        real V[3] = { A[0], A[1], A[2] };
+        rotateVector(V, V);
+        std::clog<<"quat: "<<V[0]<<" "<<V[1]<<" "<<V[2]<<" | "<<norm()<<'\n';
+#endif
     }
 
     /// return angle of the rotation
