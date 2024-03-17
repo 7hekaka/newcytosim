@@ -648,25 +648,25 @@ void CoupleSet::reheat()
 void CoupleSet::writeObjectsAA(Outputter& out) const
 {
     out.write("\n#section couple AA");
-    writeObjects(out, aaList);
+    writePool(out, aaList);
 }
 
 void CoupleSet::writeObjectsAF(Outputter& out) const
 {
     out.write("\n#section couple AF");
-    writeObjects(out, afList);
+    writePool(out, afList);
 }
 
 void CoupleSet::writeObjectsFA(Outputter& out) const
 {
     out.write("\n#section couple FA");
-    writeObjects(out, faList);
+    writePool(out, faList);
 }
 
 void CoupleSet::writeObjectsFF(Outputter& out) const
 {
     out.write("\n#section couple FF");
-    writeObjects(out, ffList);
+    writePool(out, ffList);
 }
 
 void CoupleSet::writeObjectsFF_skip(Outputter& out) const

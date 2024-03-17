@@ -517,7 +517,7 @@ void SingleSet::writeSet(Outputter& out) const
     if ( sizeA() > 0 )
     {
         out.write("\n#section single A");
-        writeObjects(out, aList);
+        writePool(out, aList);
     }
     if ( sizeF() > 0 )
     {
@@ -525,7 +525,7 @@ void SingleSet::writeSet(Outputter& out) const
         if ( simul_.prop.skip_free_single )
             writeObjectsF_skip(out);
         else
-            writeObjects(out, fList);
+            writePool(out, fList);
     }
 }
 

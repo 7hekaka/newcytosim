@@ -77,6 +77,6 @@ void TubuleSet::writeSet(Outputter& out) const
     if ( size() > 0 )
     {
         out.write("\n#section "+title());
-        writeObjects(out, pool_);
+        writePool(out, pool_);
     }
 }

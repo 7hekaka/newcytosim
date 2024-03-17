@@ -69,7 +69,7 @@ protected:
     void writeRecords(Outputter&, size_t tot, size_t sup) const;
 
     /// write Object in ObjectPool to file
-    void writeObjects(Outputter&, ObjectPool const&) const;
+    void writePool(Outputter&, ObjectPool const&) const;
     
     /// print a list of the content (nb of objects, class)
     void writeReport(std::ostream&, const std::string& title) const;

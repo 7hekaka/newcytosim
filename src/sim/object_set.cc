@@ -455,7 +455,7 @@ void ObjectSet::writeRecords(Outputter& out, size_t tot, size_t sup) const
 /**
  Write Reference and Object's data, for all Objects in `list`
  */
-void ObjectSet::writeObjects(Outputter& out, ObjectPool const& list) const
+void ObjectSet::writePool(Outputter& out, ObjectPool const& list) const
 {
     writeRecords(out, list.size(), inventory_.highest());
     // record objects:

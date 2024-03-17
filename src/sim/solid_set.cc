@@ -126,7 +126,7 @@ void SolidSet::writeSet(Outputter& out) const
     if ( size() > 0 )
     {
         out.write("\n#section "+title());
-        writeObjects(out, pool_);
+        writePool(out, pool_);
 #if NEW_SOLID_HAS_TWIN
         /* All twins must be writen after all Solid, to make sure
          we find the references when they are read back */
