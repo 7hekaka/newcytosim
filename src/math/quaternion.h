@@ -646,7 +646,7 @@ public:
         // cosine(angle) = scalar product(A, B):
         REAL d = ( A[0]*B[0] + A[1]*B[1] + A[2]*B[2] );// / N;
         // need half-angle for Quaternion: cos(x/2)=sqrt(0.5*[1+cos(x)])
-        REAL C = std::sqrt(std::max(REAL(0), 0.5+0.5*d));
+        REAL C = std::sqrt(std::max(REAL(0), REAL(0.5)+REAL(0.5)*d));
         setFromAxis(X, C, 0.5/(d)); // since S / norm(X) = 0.5 / C * N
 #if 0
         real V[3] = { A[0], A[1], A[2] };
