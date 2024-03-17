@@ -292,17 +292,17 @@ int FrameReader::loadNextFrame(Simul& sim)
     if ( res == 0 )
     {
         if ( frameIndex != NO_FRAME )
+        {
             ++frameIndex;
-
-        VLOG("FrameReader: loadNextFrame() read frame "<<frameIndex<<'\n');
-        
-        // the position we used was good, to read this frame
-        if ( has_pos )
-            savePos(frameIndex, pos, 4);
-        
-        // the next frame should normally start from the current position:
-        if ( !inputter.get_pos(pos) )
-            savePos(frameIndex+1, pos, 1);
+            VLOG("FrameReader: loadNextFrame() read frame "<<frameIndex<<'\n');
+            // the position we used was good, to read this frame
+            if ( has_pos )
+                savePos(frameIndex, pos, 4);
+            
+            // the next frame should normally start from the current position:
+            if ( !inputter.get_pos(pos) )
+                savePos(frameIndex+1, pos, 1);
+        }
         return SUCCESS;
     }
     else
@@ -330,7 +330,7 @@ int FrameReader::loadLastFrame(Simul& sim, size_t cnt)
     
     /// go from here to last frame:
     int res = NOT_FOUND;
-    while ( !sim.reloadObjects(inputter) )
+    while ( 0 == sim.reloadObjects(inputter) )
     {
         frameIndex = frm++;
         res = SUCCESS;
