@@ -2357,11 +2357,12 @@ void Display::drawSolidT(Solid const& obj, unsigned inx) const
     if ( obj.twin() )
         col = bodyColorF(*obj.twin()).tweak(obj.signature());
 #endif
+    col.set_alpha(obj.prop->disp->color.alpha());
 #if ( DIM > 2 )
-    gym::color_both(col, obj.prop->disp->color.alpha());
+    gym::color_both(col);
     drawBallT(X, obj.radius(inx), obj.mark());
 #else
-    gym::color(col, obj.prop->disp->color.alpha());
+    gym::color(col);
     drawDiscT(X, obj.radius(inx));
 #endif
     for ( size_t i = 0; i < num; ++i )
@@ -2564,7 +2565,7 @@ void Display::drawSphereT(Sphere const& obj) const
             if ( disp->style & 2 )
                 gle::disc();
             if ( disp->style & 4 )
-                drawDiscT(C, obj.radius(), col);
+                drawDiscT(C, obj.radius());
         }
 #else
         /* Note: The rotation matrix for the sphere calculated below from the
