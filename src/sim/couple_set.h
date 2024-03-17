@@ -112,7 +112,7 @@ public:
     void writeObjectsAA(Outputter&) const;
 
     /// save objects
-    void writeSet(Outputter&) const;
+    void writeSet(Outputter&, int skip) const;
 
     //--------------------------
 

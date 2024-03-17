@@ -216,9 +216,6 @@ public:
     /// load one Object from file
     void loadObject(Inputter&, ObjectTag tag, int bin);
     
-    /// write all Objects to file
-    virtual void writeSet(Outputter&) const = 0;
-    
     /// read meta data from file
     virtual void readMetaData(Inputter&, int) {}
 

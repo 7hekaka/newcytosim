@@ -706,7 +706,7 @@ void CoupleSet::writeObjectsFF_skip(Outputter& out) const
     }
 }
 
-void CoupleSet::writeSet(Outputter& out) const
+void CoupleSet::writeSet(Outputter& out, int skip) const
 {
     if ( sizeAA() > 0 )
         writeObjectsAA(out);
@@ -716,7 +716,7 @@ void CoupleSet::writeSet(Outputter& out) const
         writeObjectsFA(out);
     if ( sizeFF() > 0 )
     {
-        if ( simul_.prop.skip_free_couple )
+        if ( skip == 1 )
             writeObjectsFF_skip(out);
         else
             writeObjectsFF(out);
