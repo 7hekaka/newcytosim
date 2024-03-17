@@ -1129,7 +1129,7 @@ void processKey(unsigned char key, int modifiers = 0)
 
         case '3':
             if ( altKeyDown || shiftKeyDown )
-                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, shiftKeyDown);
+                setFiberDisp(player.allVisibleFiberDisp(), changePointSize, 1);
             else
                 setFiberDisp(player.allVisibleFiberDisp(), changeSize, 1);
             break;
