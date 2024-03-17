@@ -522,10 +522,12 @@ void SingleSet::writeSet(Outputter& out) const
     if ( sizeF() > 0 )
     {
         out.write("\n#section single F");
-        if ( simul_.prop.skip_free_single )
+        if ( simul_.prop.skip_free_single == 1 )
             writeObjectsF_skip(out);
         else
             writePool(out, fList);
+        // set to skip next time:
+        simul_.prop.skip_free_single &= 1;
     }
 }
 
