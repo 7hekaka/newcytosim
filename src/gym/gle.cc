@@ -1388,8 +1388,8 @@ namespace gle
     size_t setHelix(flute6* flu, float Z, float T, int turns)
     {
         assert_true( Z <= T );
-        float W = ( T - Z ) / ( turns * 2.0 );
-        float dZ = ( T - Z ) / ( turns * pi_twice );
+        float W = ( T - Z ) / ( 1 + turns * 2 );
+        float dZ = 2.0 * W / pi_twice;
         size_t i = 0;
         // add quarter-turn with no increment
         for ( size_t p = pi_3half; p < pi_twice; ++p )
