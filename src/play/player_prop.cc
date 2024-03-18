@@ -78,7 +78,7 @@ void PlayerProp::write_values(std::ostream& os) const
 
     for ( int k = 0; k < NB_MAGIC_KEYS; ++k )
     {
-        std::string var = "magic_key" + std::to_string(k);
+        std::string var = "magic_key" + std::to_string(k+1);
         write_value(os, var, magic_key[k], "("+magic_code[k]+")");
     }
 }
