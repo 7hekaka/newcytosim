@@ -976,7 +976,9 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
 #endif
             }
             // we should normalize by 1/L^2, but to weigth by length, we use 1/L
-            const real w = fib->segmentationInv();
+            real w = fib->segmentation();
+            sum += cnt * w;
+            w = 1.0 / w;
             // update lower triangle of 3x3 second rank traceless tensor:
             M[0] += w * XX;
             M[1] += w * XY;
@@ -984,7 +986,6 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
             M[4] += w * YY;
             M[5] += w * YZ;
             M[8] += w * ZZ;
-            sum += cnt;
         }
     }
     
@@ -995,7 +996,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
     sum = beta * DIM / sum;
     for ( size_t d = 0; d < 9; ++d )
         M[d] = sum * M[d];
-    //std::clog << "trace = " << M[0] + M[4] + M[8] << "\n";
+    //std::clog << "trace = " << M[0] + M[4] + M[8] << " (should be DIM/2)\n";
     // subtract trace:
     M[0] -= beta;
     if ( DIM > 1 ) M[4] -= beta;
