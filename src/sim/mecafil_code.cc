@@ -426,7 +426,7 @@ void projectForcesU2D_SSE(size_t nbs, const double* dir, const double* src, doub
     {
         y = load2(src+2);
         vec2 a = mul2(sub2(y, x), load2(dir));
-        store1(mul, add2(a, unpackhi2(a, a)));
+        store1(mul, add1(a, unpackhi2(a, a)));
     }
 }
 
@@ -491,7 +491,7 @@ void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, doub
     if ( mul < end+3 )
     {
         vec2 a = mul2(sub2(load2(src+2), load2(src)), load2(dir));
-        store1(mul, add2(a, permute2(a)));
+        store1(mul, add1(a, permute2(a)));
     }
 }
 
@@ -700,7 +700,7 @@ void projectForcesD3D_SSE1(size_t nbs, const double* dir,
         src -= 3;
         dst -= 3;
         storeu2(dst , sub2(p2, x0));
-        store1(dst+2, sub2(p3, x1));
+        store1(dst+2, sub1(p3, x1));
         p2 = add2(loadu2(src), x0);
         p3 = add2(load1(src+2), x1);
     }
@@ -753,8 +753,12 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
     //if ( mul <= end )
     {
         src += 3;
-        vec2 s0 = mul2(loadu2(dir), sub2(loadu2(src), p0));
-        vec2 s1 = mul1(load1(dir+2), sub1(load1(src+2), p1));
+        vec2 y0 = loadu2(src);
+        vec2 y1 = load1(src+2);
+        vec2 s0 = mul2(loadu2(dir), sub2(y0, p0));
+        vec2 s1 = mul1(load1(dir+2), sub1(y1, p1));
+        p0 = y0;
+        p1 = y1;
         dir += 3;
         vec2 mm = add1(s1, add1(s0, unpackhi2(s0, s0))); // only lower value used
         xx = fnmadd1(xx, de, mm); // x = mul[n] - x * DE[n-1];
@@ -769,8 +773,8 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
     assert_true(dir == dir0 + 3 * nbs);
      */
     dst += 3 * nbs;
-    p0 = loadu2(src);
-    p1 = load1(src+2);
+    //p0 = loadu2(src);
+    //p1 = load1(src+2);
 
     //assert_true(mul == mul0 + nbs - 1);
     //xx = mul[0];
@@ -785,7 +789,7 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
         src -= 3;
         vec2 x1 = mul1(load1(dir+2), mm); // only lower value used
         vec2 x0 = mul2(loadu2(dir), mm);
-        store1(dst+2, sub2(p1, x1));
+        store1(dst+2, sub1(p1, x1));
         storeu2(dst , sub2(p0, x0));
         p1 = add1(x1, load1(src+2));
         p0 = add2(x0, loadu2(src));
