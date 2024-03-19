@@ -155,17 +155,17 @@ static inline void setTextColor(char c, char& d, const float color[4])
     float gray[4] = { 0.5, 0.5, 0.5, 1 };
     if ( c == '%' )
     {
-        if ( d != c )
+        if ( d != '%' )
         {
-            d = c;
+            d = '%';
             gym::setColor(gray);
         }
     }
     else
     {
-        if ( d != c )
+        if ( d != 'a' )
         {
-            d = c;
+            d = 'a';
             gym::setColor(color);
         }
     }
