@@ -550,16 +550,20 @@ void projectForcesD2D_AVX(size_t nbs, const double* dir,
 #pragma mark - SIMD Fused Up and Down stages!
 
 /**
- Scalar code for the fused version
+ Scalar code for the fused projectForces
  
  projectForces() combines the three operations:
      projectForcesU(nbs, iDir, X, iLLG);
-     DPTTS2(nbs, 1, iJJt, iJJtU, iLLG, nbs);
+     DPTTS2(nbs, 1, iJJt, iJJtU, iLLG, nbs); (Alsatian's tridiagonal solve)
      projectForcesD(nbs, iDir, X, iLLG, Y);
  
+ projectForcesU() traverses the data [0 --> nbs]
+ DPTTS2() traverses the data twice:  [0 --> nbs] and [nbs --> 0]
+ projectForcesD() traverses the data [nbs --> 0]
+ 
  By joining projectForceU with the first sweep of DPTTS2,
- and the second sweep of DPTTS2 by projectForcesD(),
- it reduces the number of sweeps to only two
+ and the second sweep of DPTTS2 with projectForcesD(),
+ it reduces the number of sweeps to 2
  */
 void projectForces(size_t nbs, const real* dir, const real* src,
                    real* mul, const real* D, const real* DE, real* dst)
@@ -779,12 +783,12 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
         store1(mul, xx); // mul[n] = x;
         dir -= 3;
         src -= 3;
-        vec2 x0 = mul2(loadu2(dir), mm);
         vec2 x1 = mul1(load1(dir+2), mm); // only lower value used
-        storeu2(dst , sub2(p0, x0));
+        vec2 x0 = mul2(loadu2(dir), mm);
         store1(dst+2, sub2(p1, x1));
-        p0 = add2(x0, loadu2(src));
+        storeu2(dst , sub2(p0, x0));
         p1 = add1(x1, load1(src+2));
+        p0 = add2(x0, loadu2(src));
         dst -= 3;
     }
     //x = loaddup2(mul);
@@ -793,20 +797,20 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
     dst -= 3;
     {
         vec2 mm = unpacklo2(xx, xx);
-#if defined(__FMA__)
-        vec2 x0 = loadu2(dir);
+#if 1
         vec2 x1 = load1(dir+2); // only lower value used
-        p0 = fnmadd2(x0, mm, p0); //sub2(p0, x0);
+        vec2 x0 = loadu2(dir);
         p1 = fnmadd1(x1, mm, p1); //sub2(p1, x1); // only lower value used
-        x0 = fmadd2(x0, mm, loadu2(src));
+        p0 = fnmadd2(x0, mm, p0); //sub2(p0, x0);
         x1 = fmadd1(x1, mm, load1(src+2)); // only lower value used
+        x0 = fmadd2(x0, mm, loadu2(src));
 #else
-        vec2 x0 = mul2(loadu2(dir), mm);
         vec2 x1 = mul1(load1(dir+2), xx); // only lower value used
+        vec2 x0 = mul2(loadu2(dir), mm);
         p0 = sub2(p0, x0);
         p1 = sub2(p1, x1); // only lower value used
-        x0 = add2(x0, loadu2(src));
         x1 = add2(x1, load1(src+2)); // only lower value used
+        x0 = add2(x0, loadu2(src));
 #endif
         storeu2(dst+4, catshift(p0, p1));
         storeu2(dst+2, unpacklo2(x1, p0));
