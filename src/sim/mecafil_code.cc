@@ -731,18 +731,18 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
     vec2 de = setzero2();
     vec2 xx = setzero2();
     vec2 p0 = loadu2(src);
-    vec2 p1 = load1(src+2);
+    vec2 p2 = load1(src+2);
     while ( mul < end )
     {
         src += 3;
         vec2 y0 = loadu2(src);
-        vec2 y1 = load1(src+2);
+        vec2 y2 = load1(src+2);
         vec2 s0 = mul2(loadu2(dir), sub2(y0, p0));
-        vec2 s1 = mul1(load1(dir+2), sub1(y1, p1));
+        vec2 s2 = mul1(load1(dir+2), sub1(y2, p2));
         p0 = y0;
-        p1 = y1;
+        p2 = y2;
         dir += 3;
-        vec2 mm = add1(s1, add1(s0, unpackhi2(s0, s0))); // only lower value used
+        vec2 mm = add1(add1(s0, s2), unpackhi2(s0, s0)); // only lower value used
         xx = fnmadd1(xx, de, mm); // x = mul[n] - x * DE[n-1];
         store1(mul, mul1(xx, load1(D))); // mul[n] = x * D[n];
         de = load1(DE);
@@ -754,13 +754,13 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
     {
         src += 3;
         vec2 y0 = loadu2(src);
-        vec2 y1 = load1(src+2);
+        vec2 y2 = load1(src+2);
         vec2 s0 = mul2(loadu2(dir), sub2(y0, p0));
-        vec2 s1 = mul1(load1(dir+2), sub1(y1, p1));
+        vec2 s2 = mul1(load1(dir+2), sub1(y2, p2));
         p0 = y0;
-        p1 = y1;
+        p2 = y2;
         dir += 3;
-        vec2 mm = add1(s1, add1(s0, unpackhi2(s0, s0))); // only lower value used
+        vec2 mm = add1(add1(s0, s2), unpackhi2(s0, s0)); // only lower value used
         xx = fnmadd1(xx, de, mm); // x = mul[n] - x * DE[n-1];
         xx = mul1(xx, load1(D));
         store1(mul, xx); // mul[n] = x * D[n];
@@ -776,23 +776,33 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
     //p0 = loadu2(src);
     //p1 = load1(src+2);
 
+    xx = unpacklo2(xx, xx); //loaddup2(mul);
     //assert_true(mul == mul0 + nbs - 1);
     //xx = mul[0];
     while ( mul > last )
     {
         --DE;
         --mul;
-        vec2 mm = unpacklo2(xx, xx); //loaddup2(mul);
-        xx = fnmadd1(xx, load1(DE), load1(mul)); // x = mul[n] - x * DE[n];
+        vec2 mm = xx;
+        xx = fnmadd2(xx, loaddup2(DE), loaddup2(mul)); // x = mul[n] - x * DE[n];
         store1(mul, xx); // mul[n] = x;
         dir -= 3;
         src -= 3;
-        vec2 x1 = mul1(load1(dir+2), mm); // only lower value used
+#if 1
+        vec2 d2 = load1(dir+2);
+        vec2 d0 = loadu2(dir);
+        store1(dst+2, fnmadd1(d2, mm, p2));
+        storeu2(dst , fnmadd2(d0, mm, p0));
+        p2 = fmadd1(d2, mm, load1(src+2));
+        p0 = fmadd2(d0, mm, loadu2(src));
+#else
+        vec2 x2 = mul1(load1(dir+2), mm); // only lower value used
         vec2 x0 = mul2(loadu2(dir), mm);
-        store1(dst+2, sub1(p1, x1));
+        store1(dst+2, sub1(p2, x2));
         storeu2(dst , sub2(p0, x0));
-        p1 = add1(x1, load1(src+2));
+        p2 = add1(x2, load1(src+2));
         p0 = add2(x0, loadu2(src));
+#endif
         dst -= 3;
     }
     //x = loaddup2(mul);
@@ -800,24 +810,23 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
     src -= 3;
     dst -= 3;
     {
-        vec2 mm = unpacklo2(xx, xx);
 #if 1
-        vec2 x1 = load1(dir+2); // only lower value used
+        vec2 x2 = load1(dir+2); // only lower value used
         vec2 x0 = loadu2(dir);
-        p1 = fnmadd1(x1, mm, p1); //sub2(p1, x1); // only lower value used
-        p0 = fnmadd2(x0, mm, p0); //sub2(p0, x0);
-        x1 = fmadd1(x1, mm, load1(src+2)); // only lower value used
-        x0 = fmadd2(x0, mm, loadu2(src));
+        p2 = fnmadd1(x2, xx, p2); //sub2(p1, x1); // only lower value used
+        p0 = fnmadd2(x0, xx, p0); //sub2(p0, x0);
+        x2 = fmadd1(x2, xx, load1(src+2)); // only lower value used
+        x0 = fmadd2(x0, xx, loadu2(src));
 #else
-        vec2 x1 = mul1(load1(dir+2), xx); // only lower value used
-        vec2 x0 = mul2(loadu2(dir), mm);
+        vec2 x2 = mul1(load1(dir+2), xx); // only lower value used
+        vec2 x0 = mul2(loadu2(dir), xx);
         p0 = sub2(p0, x0);
-        p1 = sub2(p1, x1); // only lower value used
-        x1 = add2(x1, load1(src+2)); // only lower value used
+        p2 = sub2(p2, x2); // only lower value used
+        x2 = add2(x2, load1(src+2)); // only lower value used
         x0 = add2(x0, loadu2(src));
 #endif
-        storeu2(dst+4, catshift(p0, p1));
-        storeu2(dst+2, unpacklo2(x1, p0));
+        storeu2(dst+4, catshift(p0, p2));
+        storeu2(dst+2, unpacklo2(x2, p0));
         storeu2(dst, x0);
     }
     /*
@@ -863,7 +872,9 @@ void projectForces2D_SSE(size_t nbs, const double* dir, const double* src,
     //if ( mul <= end )
     {
         src += 2;
-        vec2 s0 = mul2(loadu2(dir), sub2(loadu2(src), p0));
+        vec2 y0 = loadu2(src);
+        vec2 s0 = mul2(loadu2(dir), sub2(y0, p0));
+        p0 = y0;
         dir += 2;
         vec2 mm = add1(s0, unpackhi2(s0, s0)); // only lower value used
         xx = fnmadd1(xx, de, mm); // x = mul[n] - x * DE[n-1];
@@ -871,7 +882,6 @@ void projectForces2D_SSE(size_t nbs, const double* dir, const double* src,
         store1(mul, xx); // mul[n] = x * D[n];
     }
     dst += 2 * nbs;
-    p0 = loadu2(src);
     while ( mul > last )
     {
         --DE;
