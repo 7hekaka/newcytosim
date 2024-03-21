@@ -240,8 +240,8 @@ void HandProp::complete(Simul const& sim)
     
     unbinding_rate_dt = unbinding_rate * time_step(sim);
     //std::clog << std::setw(16) << name() << ":binding_prob = " << binding_prob << "\n";
-    const real bind = binding_rate * time_step(sim) * POOL_UNATTACHED;
-    binding_prob = -std::expm1(-bind);
+    const real BR = binding_rate * time_step(sim) * POOL_UNATTACHED;
+    binding_prob = -std::expm1(-BR);
     
     if ( binding_range < 0 )
         throw InvalidParameter(name()+":binding_range must be >= 0");
@@ -264,13 +264,14 @@ void HandProp::complete(Simul const& sim)
 
     if ( primed(sim) )
     {
+        if ( binding_prob > sim.prop.acceptable_prob )
+        {
 #if ( POOL_UNATTACHED > 1 )
-        if ( binding_prob > sim.prop.acceptable_prob )
-            Cytosim::warn << name() << ":binding_rate (" << bind << ") is too high: decrease POOL_UNATTACHED\n";
-        else
+            Cytosim::warn << name() << ":binding_rate (" << BR << ") is too high: decrease POOL_UNATTACHED\n";
+#else
+            Cytosim::warn << name() << ":binding_rate (" << BR << ") is too high: decrease time_step\n";
 #endif
-        if ( binding_prob > sim.prop.acceptable_prob )
-            Cytosim::warn << name() << ":binding_rate (" << bind << ") is too high: decrease time_step\n";
+        }
     
         if ( unbinding_rate_dt > sim.prop.acceptable_prob )
             Cytosim::warn << name() << ":unbinding_rate is too high: decrease time_step\n";
