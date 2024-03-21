@@ -202,7 +202,7 @@ public:
         return vec;
     }
     
-    /// intermediate position between P and Q=P+1 = P + A * ( Q - P )
+    /// intermediate position between P and Q=P+1 : P + A * ( Q - P )
     /** returns P if A=0; returns P+1 if A=1, and returns middle of segment if A = 0.5*/
     Vector midPoint(const size_t P, const real A) const
     {
@@ -212,7 +212,7 @@ public:
         return Vector::interpolated(pPos+DIM*P, A, pPos+DIM*P+DIM);
     }
     
-    /// intermediate position between P and P+1 = 0.5 * ( P + Q )
+    /// middle position between P and P+1 = 0.5 * ( P + Q )
     Vector midPoint(const size_t P) const
     {
         assert_true( P+1 < nPoints );

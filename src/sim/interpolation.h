@@ -52,7 +52,7 @@ public:
     
     /// set to interpolate P and Q on `m`, with coefficient `c`
     Interpolation(const Mecable * m, real c, unsigned P, unsigned Q)
-    : mec_(m), coef_(c), pt1_(P), pt2_(Q) { assert_true(Q < m->nbPoints() );  }
+    : mec_(m), coef_(c), pt1_(P), pt2_(Q) { assert_true(Q < m->nbPoints() ); }
 
     /// disabled old-style constructor
     Interpolation(const Mecable*, unsigned, unsigned, real) = delete;
