@@ -1610,7 +1610,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
         ptr[1] = { clr, pos + off };
         std::swap(col, lor);
         std::swap(inc, onc);
-        if (( ++cnt & 15 )==1) clr = black; else clr = col;
+        if ( (++cnt & 15) == 1 ) clr = black; else clr = col;
         ptr[2] = { clr, pos - off };
         ptr[3] = { clr, pos + off };
         ptr += 4;
@@ -1631,7 +1631,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
 
 /**
  Draw segments of length 'inc, onc' of alternating colors, in register with Fiber's abscissa
- Every 8 stripe has a black section indicating ~256 nm
+ Every 16th stripe is drawn in black, hence with separation of 256 nm for microtubules
 */
 void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
                                gym_color col, real onc, gym_color lor) const
@@ -1683,7 +1683,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
         dir = normalize(nxt-old);
         // alternate different tones:
         gym::color_load((++cnt&1)?col:lor);
-        if (( cnt & 15 )==1) gym::color_load(black);
+        if ( (cnt & 15) == 1 ) gym::color_load(black);
         gym::setClipPlane(5, -dir, pos);
         gym::transAlignZ(old, rad, pos-old);
         gle::innerTube();
@@ -1949,22 +1949,17 @@ void Display::drawFiber(Fiber const& fib)
         
         switch( disp->style )
         {
-            case 2:
-                if ( prop->style == 1 )
-                {
-                    float w = pixscale(disp->line_width);
-                    float l = std::max(w, 0.008f);
-                    drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
-                    //drawFiberWide(fib, w);
-                }
-                else if ( prop->style == 2 )
-                    drawFiberStriped2D(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
-                else
-                    drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2);
-                break;
+            case 2: drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2); break;
             case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
             case 4: drawActin(fib, col1, col2, colE); break;
             case 5: drawMicrotubule(fib, col1, col2, colE); break;
+            case 6: drawFiberStriped2D(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2); break;
+            case 7: {
+                float w = pixscale(disp->line_width);
+                float l = std::max(w, 0.008f);
+                drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
+                //drawFiberWide(fib, w);
+            } break;
         }
         style = 0;
     }
