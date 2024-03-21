@@ -289,7 +289,7 @@ public:
     }
     
     /// the square of the standard norm, minus TT*TT
-    real normSqrSub(const real& TT) const
+    real normSqrSubtracted(const real& TT) const
     {
         return ( XX*XX + YY*YY ) - TT*TT;
     }

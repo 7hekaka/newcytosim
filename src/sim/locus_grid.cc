@@ -451,7 +451,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         a = 0.5 * ( min_real(len1, max_real(m1, p1)) + max_real(0, min_real(m1, p1)));
         // clamp inside segment and use mid-point
         b = 0.5 * ( min_real(len2, max_real(m2, p2)) + max_real(0, min_real(m2, p2)));
-        dis2 = off.normSqrSub(m1);
+        dis2 = off.normSqrSubtracted(m1);
     }
     
     if ( dis2 < ran*ran )
