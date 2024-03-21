@@ -183,7 +183,7 @@ void Couple::diffuse()
 /**
  Simulates:
  - diffusive motion
- - attachment
+ - attachment of cHand1 and cHand2
  .
  */
 void Couple::stepFF()
@@ -205,6 +205,7 @@ void Couple::stepFF()
 /**
  Simulates:
  - attachment of cHand2
+ - detachment of cHand1
  - attached activity of cHand1
  .
  */
@@ -223,6 +224,7 @@ void Couple::stepAF()
 /**
  Simulates:
  - attachment of cHand1
+ - detachment of cHand2
  - attached activity of cHand2
  .
  */
@@ -241,7 +243,9 @@ void Couple::stepFA()
 
 /**
  Simulates:
+ - detachment of cHand1
  - attached activity of cHand1
+ - detachment of cHand2
  - attached activity of cHand2
  .
  */

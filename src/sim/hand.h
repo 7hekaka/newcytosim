@@ -68,6 +68,9 @@ protected:
     /// Gillespie countdown timer used for other activities
     float nextAct;
 
+    /// bind at position `a` on Fiber `f`
+    void do_attach(Fiber const* f, real a);
+
 public:
 
     /// unmodifiable Property
@@ -114,9 +117,6 @@ public:
     /// relocate to the specified tip of the current fiber
     void moveToEnd(FiberEnd);
 
-    /// bind at position `a` on Fiber `f`
-    void locate(Fiber const* f, real a);
-
     // Check that binding can occur on Fiber, from BITWISE AND of the binding keys
     bool keyMatch(Fiber const* fib) const { return prop->binding_key & fib->prop->binding_key; }
     
@@ -130,7 +130,7 @@ public:
     /// tell if attachment at given site is permitted
     virtual bool attachmentAllowed(FiberSite&) const;
     
-    /// bin at position represented by FiberSite
+    /// bind at position indicated by FiberSite
     virtual void attach(FiberSite const&);
     
     /// detach
@@ -156,10 +156,10 @@ public:
     void checkFiberRange(real absM, real absP);
 
     /// attach at specified distance `ab` from FiberEnd (this calls attach(FiberSite))
-    void attach(Fiber const* f, real a, FiberEnd ref) { locate(f, f->abscissaFrom(a, ref)); }
+    void attach(Fiber const* f, real a, FiberEnd ref) { do_attach(f, f->abscissaFrom(a, ref)); }
     
     /// attach at the specified end of given Fiber
-    void attachEnd(Fiber const* f, FiberEnd end) { locate(f, f->abscissaEnd(end)); }
+    void attachEnd(Fiber const* f, FiberEnd end) { do_attach(f, f->abscissaEnd(end)); }
 
     /// detach, without updating Monitor
     void detachHand();

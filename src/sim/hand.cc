@@ -219,7 +219,7 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
 }
 
 
-void Hand::locate(Fiber const* f, real a)
+void Hand::do_attach(Fiber const* f, real a)
 {
     assert_true(f);
     assert_true(!hFiber);
@@ -241,7 +241,7 @@ void Hand::attach(FiberSite const& s)
     assert_true(s.attached());
     assert_true(!hFiber);
 
-    locate(s.fiber(), s.abscissa());
+    do_attach(s.fiber(), s.abscissa());
 #if 0
     Hand const* h = otherHand();
     if ( h && h->attached() )
