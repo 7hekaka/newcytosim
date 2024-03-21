@@ -131,14 +131,7 @@ void Simul::steps()
     doAttachCounter = ( doAttachCounter + 1 ) % POOL_UNATTACHED;
     if ( doAttachCounter )
     {
-        if ( couples.size() )
-        {
-            // distribute Fibers over a grid for binding of Hands:
-            const real range = maxBindingRange();
-            fiberGrid.paintGrid(fibers.first(), nullptr, range);
-            
-            couples.stepSkipUnattached();
-        }
+        couples.stepSkipUnattached();
         singles.stepSkipUnattached();
         //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
     }

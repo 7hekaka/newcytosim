@@ -150,17 +150,14 @@ void CoupleSet::stepSkipUnattached()
                  ffList.size(), afList.size(), faList.size(), aaList.size());
     */
     
-    Couple *const ffHead = firstFF();
     Couple *const afHead = firstAF();
     Couple *const faHead = firstFA();
     
     bool const aaOdd = aaList.size() & 1;
     bool const faOdd = faList.size() & 1;
     bool const afOdd = afList.size() & 1;
-    bool const ffOdd = ffList.size() & 1;
     
     //size_t cnt = sizeFF();
-    step_couples<&Couple::stepDiffusingDuo>(ffHead, ffOdd);
     //printf(" CoupleSet::stepSkipUnattached %lu -> %lu\n", cnt, sizeFF());
 
     step_couples<&Couple::stepAA>(firstAA(), aaOdd);

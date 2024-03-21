@@ -63,9 +63,6 @@ public:
     /// simulation step for a free Duo
     void stepFF();
     
-    /// simulate attachment of hands for the Duo
-    void stepDiffusingDuo() { stepFF(); }
-    
     /// simulation step for a Duo attached by Hand1
     void stepAF();
     
