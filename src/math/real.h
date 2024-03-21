@@ -208,6 +208,10 @@ inline static real clamp_real(const real x, const real i, const real s)
     return std::max(i, std::min(x, s));
 }
 
+/// true if 'a' is inside [0, 1]
+/* using bitwise AND to avoid the branching associated with short-circuit evaluation */
+inline bool within01(real a) { return ( 0 <= a ) & ( a <= 1.0 ); }
+
 /// adjust 'x' to canonical image with period 'p':
 inline static real fold_real(const real x, const real p)
 {
