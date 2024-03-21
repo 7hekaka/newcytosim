@@ -1603,7 +1603,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
                     if (( dis2 < sup ) && seg.within(abs1) && soc.within(abs2))
                     {
                         ++cnt;
-                        Vector pos1 = seg.pos(abs1/seg.len());
+                        Vector pos1 = seg.midPoint(abs1/seg.len());
                         //Vector pos2 = loc2.pos(abs2/loc2.len());
                         if ( details == 2 )
                         {

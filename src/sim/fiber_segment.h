@@ -72,7 +72,7 @@ public:
     Vector pos2()       const { return fib_->posP(sgi_+1); }
 
     /// interpolated position, where c is in [0, 1]
-    Vector pos(real c)  const { return fib_->midPoint(sgi_, c); }
+    Vector midPoint(real c) const { return fib_->midPoint(sgi_, c); }
     
     /// that is [ pos2() + pos1() ] / 2
     Vector middle()     const { return fib_->midPoint(sgi_); }
