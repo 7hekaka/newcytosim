@@ -136,7 +136,7 @@ else ifeq ($(COMPILER),icc)
     # '-march=corei7-avx' for AVX
     # '-march=core-avx2' for Intel core i7 (ca. 2015)
     FAST := -O2 -march=core-avx2
-    FAST := -O2 -march=core-avx2 -mfma -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
+    FAST := -O2 -fno-devirtualize -march=core-avx2 -mfma -Wl,-no_pie -funroll-loops -fno-math-errno -fp-model fast=1 -fp-model no-except
     WARN := -qopt-report=2 -qopt-report-phase=vec# -opt-report-file=stderr
     WARN :=
 
@@ -149,8 +149,8 @@ else ifeq ($(COMPILER),clang)
 # the old library: -stdlib=libstdc++ (deprecated)
 
     CXX := c++ -Wfatal-errors
-    FAST := -O2 -funroll-loops -mavx2 -mfma
-    FAST := -O2 -funroll-loops
+    FAST := -O2 -fno-devirtualize -funroll-loops -mavx2 -mfma
+    FAST := -O2 -fno-devirtualize -funroll-loops
     DEBUG := -g3 -ggdb
     COVER := -fprofile-arcs -ftest-coverage
 
@@ -166,7 +166,7 @@ ifeq ($(MACHINE),mac)
 
     FlagsC := $(COVER)
     FlagsD := $(DEBUG) $(WARN)
-    FlagsP := -O2 $(ALIGN) -fno-inline
+    FlagsP := -O2 -fno-devirtualize $(ALIGN) -fno-inline
     FlagsF := $(FAST) $(ALIGN)
 
     LINK   := -framework Accelerate $(OMPLIB)
@@ -203,7 +203,7 @@ ifeq ($(MACHINE),cluster)
     MKLDIR := $(MKLROOT)/lib/intel64
 
     # Beware of AVX2 and other advanced features on heterogeneous clusters:
-    FAST   :=-O3 -mavx2 -mfma -ffp-contract=fast
+    FAST   := -O2 -fno-devirtualize -mavx2 -mfma -ffp-contract=fast
 
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := $(FAST) $(ALIGN) -O0 -fno-inline -pg
@@ -239,7 +239,7 @@ ifeq ($(MACHINE),linux)
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := -O0 -fno-inline -pg $(ALIGN) $(FAST)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
-    FlagsF := -O2 -finline-functions $(ALIGN) $(FAST)
+    FlagsF := -O2 -fno-devirtualize -finline-functions $(ALIGN) $(FAST)
 
     # specify the library path:
     LIBDIR := /usr/lib
@@ -298,7 +298,7 @@ ifeq ($(MACHINE),cygwin)
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := -O0 -fno-inline -pg $(ALIGN) $(FAST)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
-    FlagsF := -O2 -finline-functions $(ALIGN) $(FAST)
+    FlagsF := -O2 -fno-devirtualize -finline-functions $(ALIGN) $(FAST)
 
     ### Needs
     # blas:   yum install blas-devel
