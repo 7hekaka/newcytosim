@@ -556,7 +556,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
         {
             if ( tok == "F" )
             {
-                if ( prop.skip_free_single > 1 )
+                if ( prop.skip_free_single & 4 )
                     in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
                 if ( in.formatID() < 58 )
@@ -589,7 +589,7 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
         {
             if ( tok == "FF" )
             {
-                if ( prop.skip_free_couple > 1 )
+                if ( prop.skip_free_couple & 4 )
                     in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
                 if ( in.formatID() < 58 )
