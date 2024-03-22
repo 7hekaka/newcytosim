@@ -2236,7 +2236,7 @@ void Simul::reportSingleLink(std::ostream& out, Property const* sel) const
  */
 void Simul::reportSingle(std::ostream& out, Property const* sel) const
 {
-    constexpr size_t SUP = 128;
+    constexpr unsigned SUP = 128;
     
     size_t free[SUP+1] = { 0 };
     size_t bound[SUP+1] = { 0 };
@@ -2245,23 +2245,17 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
     for ( Single const* i = singles.firstF(); i ; i = i->next() )
     {
         assert_true(!i->attached());
-        size_t x = i->prop->number();
-        if ( x < SUP )
-        {
-            ++free[x];
-            based[x] += ( i->base() != nullptr );
-        }
+        unsigned x = std::min(i->prop->number(), SUP);
+        ++free[x];
+        based[x] += ( i->base() != nullptr );
     }
     
     for ( Single const* i=singles.firstA(); i ; i=i->next() )
     {
         assert_true(i->attached());
-        size_t x = i->prop->number();
-        if ( x < SUP )
-        {
-            ++bound[x];
-            based[x] += ( i->base() != nullptr );
-        }
+        unsigned x = std::min(i->prop->number(), SUP);
+        ++bound[x];
+        based[x] += ( i->base() != nullptr );
     }
     
     out << COM << ljust("single", 2, 2);
@@ -2294,31 +2288,28 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
  */
 void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
 {
-    constexpr size_t MAX = 8;
-    real cnt[MAX+1] = { 0 };
-    real avg[MAX+1] = { 0 };
-    real sup[MAX+1] = { 0 };
-    real len[MAX+1] = { 0 };
+    constexpr unsigned SUP = 8;
+    real cnt[SUP+1] = { 0 };
+    real avg[SUP+1] = { 0 };
+    real sup[SUP+1] = { 0 };
+    real len[SUP+1] = { 0 };
 
     // accumulate counts:
     for ( Single const* i=singles.firstA(); i; i=i->next() )
     {
         if ( i->hasLink() && ( !sel || sel == i->prop ))
         {
-            size_t x = i->prop->number();
-            if ( x < MAX )
-            {
-                real f = i->force().norm();
-                avg[x] += f;
-                cnt[x] += 1;
-                sup[x] = std::max(sup[x], f);
-                len[x] = std::max(len[x], i->stretch().norm());
-            }
+            unsigned x = std::min(i->prop->number(), SUP);
+            real f = i->force().norm();
+            avg[x] += f;
+            cnt[x] += 1;
+            sup[x] = std::max(sup[x], f);
+            len[x] = std::max(len[x], i->stretch().norm());
         }
     }
     
     out << COM << ljust("single", 2, 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
-    for ( size_t i = 0; i < MAX; ++i )
+    for ( size_t i = 0; i < SUP; ++i )
     {
         if ( cnt[i] > 0 )
         {
@@ -2512,31 +2503,28 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
  */
 void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
 {
-    constexpr size_t MAX = 8;
-    real cnt[MAX+1] = { 0 };
-    real avg[MAX+1] = { 0 };
-    real sup[MAX+1] = { 0 };
-    real len[MAX+1] = { 0 };
+    constexpr unsigned SUP = 8;
+    real cnt[SUP+1] = { 0 };
+    real avg[SUP+1] = { 0 };
+    real sup[SUP+1] = { 0 };
+    real len[SUP+1] = { 0 };
 
     // accumulate counts:
     for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
         if ( !sel || sel == i->prop )
         {
-            size_t x = i->prop->number();
-            if ( x < MAX )
-            {
-                real f = i->force().norm();
-                avg[x] += f;
-                cnt[x] += 1;
-                sup[x] = std::max(sup[x], f);
-                len[x] = std::max(len[x], i->stretch().norm());
-            }
+            unsigned x = std::min(i->prop->number(), SUP);
+            real f = i->force().norm();
+            avg[x] += f;
+            cnt[x] += 1;
+            sup[x] = std::max(sup[x], f);
+            len[x] = std::max(len[x], i->stretch().norm());
         }
     }
         
     out << COM << ljust("couple", 2) << SEP << "count" << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
-    for ( size_t i = 0; i < MAX; ++i )
+    for ( size_t i = 0; i < SUP; ++i )
     {
         if ( cnt[i] > 0 )
         {
@@ -2556,33 +2544,30 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
  */
 void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
 {
-    const size_t IMAX = 8;
-    const size_t BMAX = 256;
-    size_t cnt[IMAX][BMAX+1];
+    const unsigned SUP = 8;
+    const unsigned MAX = 256;
+    size_t cnt[SUP+1][MAX+1];
 
     real delta = 0.5;
-    size_t nbin = 64;
+    unsigned nbin = 64;
     opt.set(delta, "interval");
     opt.set(nbin, "interval", 1);
-    nbin = std::min(nbin, BMAX);
+    nbin = std::min(nbin, MAX);
 
     // reset counts:
-    for ( size_t ii = 0; ii <  IMAX; ++ii )
+    for ( size_t ii = 0; ii <  MAX; ++ii )
     for ( size_t jj = 0; jj <= nbin; ++jj )
         cnt[ii][jj] = 0;
     
     // accumulate counts:
     for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
-        size_t x = i->prop->number();
-        if ( x < IMAX )
-        {
-            unsigned f = (unsigned)( i->force().norm() / delta );
-            if ( f < nbin )
-                ++cnt[x][f];
-            else
-                ++cnt[x][nbin];
-        }
+        unsigned x = std::min(i->prop->number(), SUP);
+        unsigned f = (unsigned)( i->force().norm() / delta );
+        if ( f < nbin )
+            ++cnt[x][f];
+        else
+            ++cnt[x][nbin];
     }
     
     if ( 1 )
@@ -2595,7 +2580,7 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
         out.precision(p);
     }
     
-    for ( size_t ii = 0; ii < IMAX; ++ii )
+    for ( size_t ii = 0; ii < SUP; ++ii )
     {
         size_t sum = 0;
         for ( size_t jj = 0; jj <= nbin; ++jj )
@@ -2616,11 +2601,11 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
  */
 void Simul::reportCouple(std::ostream& out, Property const* sel) const
 {
-    constexpr size_t SUP = 128;
+    constexpr unsigned SUP = 128;
     int act[SUP] = { 0 }, cnt[SUP][4];
     
     //reset counts:
-    for ( size_t i = 0; i < SUP; ++i )
+    for ( unsigned i = 0; i < SUP; ++i )
     {
         cnt[i][0] = 0;
         cnt[i][1] = 0;
@@ -2631,44 +2616,32 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
     for ( Couple const* i=couples.firstFF(); i ; i = i->next() )
     {
         assert_true(!i->attached1() && !i->attached2());
-        size_t x = i->prop->number();
-        if ( x < SUP )
-        {
-            if ( i->active() ) ++act[x];
-            ++(cnt[x][0]);
-        }
+        unsigned x = std::min(i->prop->number(), SUP);
+        act[x] += ( i->active() );
+        ++(cnt[x][0]);
     }
     
     for ( Couple const* i=couples.firstAF(); i ; i = i->next() )
     {
         assert_true(i->attached1() && !i->attached2());
-        size_t x = i->prop->number();
-        if ( x < SUP )
-        {
-            if ( i->active() ) ++act[x];
-            ++(cnt[x][1]);
-        }
+        unsigned x = std::min(i->prop->number(), SUP);
+        act[x] += ( i->active() );
+        ++(cnt[x][1]);
     }
     for ( Couple const* i=couples.firstFA(); i ; i = i->next() )
     {
         assert_true(!i->attached1() && i->attached2());
-        size_t x = i->prop->number();
-        if ( x < SUP )
-        {
-            if ( i->active() ) ++act[x];
-            ++(cnt[x][2]);
-        }
+        unsigned x = std::min(i->prop->number(), SUP);
+        act[x] += ( i->active() );
+        ++(cnt[x][2]);
     }
     
     for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
         assert_true(i->attached1() && i->attached2());
-        size_t x = i->prop->number();
-        if ( x < SUP )
-        {
-            if ( i->active() ) ++act[x];
-            ++(cnt[x][3]);
-        }
+        unsigned x = std::min(i->prop->number(), SUP);
+        act[x] += ( i->active() );
+        ++(cnt[x][3]);
     }
     
     out << COM << ljust("couple", 2, 2);
