@@ -641,31 +641,6 @@ void CoupleSet::reheat()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-
-void CoupleSet::writeObjectsAA(Outputter& out) const
-{
-    out.write("\n#section couple AA");
-    writePool(out, aaList);
-}
-
-void CoupleSet::writeObjectsAF(Outputter& out) const
-{
-    out.write("\n#section couple AF");
-    writePool(out, afList);
-}
-
-void CoupleSet::writeObjectsFA(Outputter& out) const
-{
-    out.write("\n#section couple FA");
-    writePool(out, faList);
-}
-
-void CoupleSet::writeObjectsFF(Outputter& out) const
-{
-    out.write("\n#section couple FF");
-    writePool(out, ffList);
-}
-
 void CoupleSet::writeObjectsFF_skip(Outputter& out) const
 {
     out.write("\n#section couple FF");
@@ -706,17 +681,29 @@ void CoupleSet::writeObjectsFF_skip(Outputter& out) const
 void CoupleSet::writeSet(Outputter& out, int skip) const
 {
     if ( sizeAA() > 0 )
-        writeObjectsAA(out);
+    {
+        out.write("\n#section couple AA");
+        writePool(out, aaList);
+    }
     if ( sizeAF() > 0 )
-        writeObjectsAF(out);
+    {
+        out.write("\n#section couple AF");
+        writePool(out, afList);
+    }
     if ( sizeFA() > 0 )
-        writeObjectsFA(out);
+    {
+        out.write("\n#section couple FA");
+        writePool(out, faList);
+    }
     if ( sizeFF() > 0 )
     {
         if ( skip == 1 )
             writeObjectsFF_skip(out);
         else
-            writeObjectsFF(out);
+        {
+            out.write("\n#section couple FF");
+            writePool(out, ffList);
+        }
     }
 }
 

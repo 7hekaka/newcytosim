@@ -96,20 +96,8 @@ public:
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);
     
-    /// save free Couples
-    void writeObjectsFF(Outputter&) const;
-    
     /// save free Couples for which `fast_diffusion == 0`
     void writeObjectsFF_skip(Outputter&) const;
-
-    /// save attached Couples
-    void writeObjectsAF(Outputter&) const;
-    
-    /// save attached Couples
-    void writeObjectsFA(Outputter&) const;
-
-    /// save bridging Couples
-    void writeObjectsAA(Outputter&) const;
 
     /// save objects
     void writeSet(Outputter&, int skip) const;
