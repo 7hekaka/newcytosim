@@ -596,7 +596,7 @@ void Parser::parse_move(std::istream& is)
 
     if ( do_run )
     {
-        size_t cnt = execute_move(name, opt, cnt);
+        cnt = execute_move(name, opt, cnt);
         check_warnings(opt, is, ipos, cnt);
     }
 }
