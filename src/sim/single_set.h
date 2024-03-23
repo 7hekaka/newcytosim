@@ -34,6 +34,9 @@ private:
     
     /// List for attached Singles (a=attached)
     ObjectPool aList;
+    
+    /// list of Properties for which `fast_diffusion > 0`
+    std::vector<SingleProp const*> uniSingles;
 
     /// gather all Single with `fast_diffusion` in reserve lists
     void uniStepCollect(Single*);
@@ -51,10 +54,7 @@ private:
     void uniRelax();
 
     /// save free Single for which `fast_diffusion == 0`
-    void writeObjectsF_skip(Outputter&) const;
-    
-    /// list of Properties for which `fast_diffusion == true`
-    std::vector<SingleProp const*> uniSingles;
+    void writeSomeFreeObjects(Outputter&) const;
 
 public:
 

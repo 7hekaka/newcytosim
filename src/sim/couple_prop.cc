@@ -37,7 +37,7 @@ void CoupleProp::clear()
     stiffness      = -1;
     length         = 0;
     diffusion      = 0;
-    fast_diffusion = false;
+    fast_diffusion = 0;
     fast_reservoir = 0;
     trans_activated = 0;
     min_loop       = 1;

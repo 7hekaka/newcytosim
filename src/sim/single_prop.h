@@ -77,8 +77,6 @@ public:
      - 2: attach Single only near growing PLUS_ENDS
      Similar to mode 1, but Hand1 of Single is directly attached
      at random positions on the growing ends of the fibers.
-     
-     - 3: attach Single only near the edge of the Space.
      .
 
      */

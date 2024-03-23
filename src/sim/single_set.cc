@@ -48,7 +48,7 @@ static inline void step_singles(Single * obj, bool odd)
 
 /**
  Call stepF() for all free Single starting from `obj`, except that if
- `fast_diffusion==true`, the Single is transferred to corresponding reserve list
+ `fast_diffusion > 0`, the Single is transferred to corresponding reserve list
 */
 void SingleSet::uniStepCollect(Single * obj)
 {
@@ -57,7 +57,7 @@ void SingleSet::uniStepCollect(Single * obj)
     {
         nxt = obj->next();
         SingleProp const* P = obj->prop;
-        if ( P->fast_diffusion && !obj->base() )
+        if ( P->fast_diffusion > 0 && !obj->base() )
         {
             fList.pop(obj);
             inventory_.unassign(obj);
@@ -387,7 +387,8 @@ void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
     while ( cnt-- > 0 )
     {
         Single * S = makeSingle(P);
-        S->randomizePosition();
+        if ( P->fast_diffusion > 0 )
+            S->randomizePosition();
         addFreeSingle(S);
     }
 }
@@ -453,7 +454,7 @@ void SingleSet::reheat(size_t cnt[], size_t n_cnt)
         if ( id < n_cnt && 0 < cnt[id] )
         {
             --cnt[id];
-            if ( S->prop->fast_diffusion )
+            if ( S->prop->fast_diffusion > 0 )
                 S->randomizePosition();
             addFreeSingle(S);
         }
@@ -475,36 +476,31 @@ void SingleSet::reheat()
 }
 
 
-void SingleSet::writeObjectsF_skip(Outputter& out) const
+void SingleSet::writeSomeFreeObjects(Outputter& out) const
 {
     writeRecords(out, fList.size(), inventory_.highest());
     
+    std::map<PropertyID, size_t> cnt;
     // count all the elements that are not written:
-    const PropertyID UNI_MAX = 16;
-    size_t cnt[UNI_MAX] = { 0 };
     for ( SingleProp const* P : uniSingles )
     {
         PropertyID i = P->number();
-        if ( i < UNI_MAX )
-            cnt[i] = P->uni_counts;
+        cnt[i] = P->uni_counts;
     }
     // write Single without `fast_diffusion`:
     for ( Single const* n=firstF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
-        if ( i < UNI_MAX )
+        if ( n->prop->fast_diffusion )
             ++cnt[i];
         else
             n->write(out);
     }
-    // compute highest prop ID that was skipped:
-    assert_true( cnt[0] == 0 );
-    PropertyID sup = UNI_MAX;
-    while ( --sup > 0 )
-        if ( cnt[sup] ) break;
+    // get highest prop ID that was skipped:
+    PropertyID sup = cnt.rbegin()->first;
     if ( sup > 0 )
     {
-        // write counts of Single that were not saved:
+        // write counts for each class of unwritten Single:
         out.write("\n#section single reheat");
         for ( size_t i = 0; i <= sup; ++i )
             out.writeInt(cnt[i], ' ');
@@ -523,7 +519,7 @@ void SingleSet::writeSet(Outputter& out, int skip) const
     {
         out.write("\n#section single F");
         if ( skip == 1 )
-            writeObjectsF_skip(out);
+            writeSomeFreeObjects(out);
         else
             writePool(out, fList);
     }
@@ -857,7 +853,7 @@ void SingleSet::uniAttach(FiberSet const& fibers)
         if ( cnt > 0 )
         {
             const real vol = P->spaceVolume();
-            if ( P->fast_diffusion & 2 )
+            if ( P->fast_diffusion == 2 )
             {
                 real dis = vol / ( cnt * P->hand_prop->bindingSectionRate() );
                 fibers.newFiberSitesP(loc, dis);
@@ -890,14 +886,14 @@ void SingleSet::uniPrepare(PropertyList const& properties)
     for ( Property const* i : properties.find_all("single") )
     {
         SingleProp const* P = static_cast<SingleProp const*>(i);
-        if ( P->fast_diffusion )
+        if ( P->fast_diffusion > 0 )
             uniSingles.push_back(P);
     }
 }
 
 
 /**
-Release all Singles from the reserves
+ Revive all singles from the reserves, setting them in the free state
 */
 void SingleSet::uniRelax()
 {

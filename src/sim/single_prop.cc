@@ -101,7 +101,7 @@ void SingleProp::clear()
 #endif
     length         = 0;
     diffusion      = 0;
-    fast_diffusion = false;
+    fast_diffusion = 0;
     fast_reservoir = 0;
 #if NEW_MOBILE_SINGLE
     speed.reset();
@@ -124,7 +124,10 @@ void SingleProp::read(Glossary& glos)
 #endif
     glos.set(length,         "length");
     if ( glos.value_is("diffusion", 0, "fast") )
+    {
+        diffusion = 100;
         fast_diffusion = 1;
+    }
     else
         glos.set(diffusion,  "diffusion");
     glos.set(fast_diffusion, "fast_diffusion");
@@ -135,8 +138,11 @@ void SingleProp::read(Glossary& glos)
     if ( glos.set(activity, "activity") )
     {
         // change the default value for confinement
-        if ( activity=="fixed" )
+        if ( activity == "fixed" )
+        {
+            fast_diffusion = -1;
             confine = CONFINE_OFF;
+        }
     }
     
     glos.set(confine, "confine",

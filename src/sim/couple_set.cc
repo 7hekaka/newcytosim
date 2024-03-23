@@ -605,25 +605,23 @@ void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
     {
         Couple* C = static_cast<Couple*>(i);
         i = i->next();
-        if ( C->prop->fast_diffusion )
+        ice_.pop(C);
+        // we want to skip the 'beforeDetachment' here:
+        C->hand1()->detachHand();
+        C->hand2()->detachHand();
+        PropertyID id = C->prop->number();
+        if ( id < n_cnt && 0 < cnt[id] )
         {
-            ice_.pop(C);
-            // we want to skip the 'beforeDetachment' here:
-            C->hand1()->detachHand();
-            C->hand2()->detachHand();
-            PropertyID id = C->prop->number();
-            if ( id < n_cnt && 0 < cnt[id] )
-            {
-                --cnt[id];
+            --cnt[id];
+            if ( C->prop->fast_diffusion )
                 C->randomizePosition();
-                addFreeCouple(C);
-            }
-            else
-            {
-                // place C on reserve
-                inventory_.unassign(C);
-                C->prop->stocks.push(C);
-            }
+            addFreeCouple(C);
+        }
+        else
+        {
+            // place C on reserve
+            inventory_.unassign(C);
+            C->prop->stocks.push(C);
         }
     }
 }
@@ -641,42 +639,37 @@ void CoupleSet::reheat()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void CoupleSet::writeObjectsFF_skip(Outputter& out) const
+void CoupleSet::writeSomeFreeObjects(Outputter& out) const
 {
-    out.write("\n#section couple FF");
     writeRecords(out, ffList.size(), inventory_.highest());
     
+    std::map<PropertyID, size_t> cnt;
     // count all the elements that are not written:
-    const PropertyID UNI_MAX = 16;
-    size_t cnt[UNI_MAX] = { 0 };
     for ( CoupleProp const* P : uniCouples )
     {
         PropertyID i = P->number();
-        if ( i < UNI_MAX )
-            cnt[i] = P->uni_counts;
+        cnt[i] = P->uni_counts;
     }
     // write Couple without `fast_diffusion`:
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
-        if ( i < UNI_MAX && n->prop->fast_diffusion )
+        if ( n->prop->fast_diffusion )
             ++cnt[i];
         else
             n->write(out);
     }
-    // compute highest prop ID that was skipped:
-    assert_true( cnt[0] == 0 );
-    PropertyID sup = UNI_MAX;
-    while ( --sup > 0 )
-        if ( cnt[sup] ) break;
+    // get highest prop ID that was skipped:
+    PropertyID sup = cnt.rbegin()->first;
     if ( sup > 0 )
     {
-        // write counts of Couple that were not saved:
+        // write counts for each class of unwritten Couple:
         out.write("\n#section couple reheat");
         for ( size_t i = 0; i <= sup; ++i )
             out.writeInt(cnt[i], ' ');
     }
 }
+
 
 void CoupleSet::writeSet(Outputter& out, int skip) const
 {
@@ -697,13 +690,11 @@ void CoupleSet::writeSet(Outputter& out, int skip) const
     }
     if ( sizeFF() > 0 )
     {
+        out.write("\n#section couple FF");
         if ( skip == 1 )
-            writeObjectsFF_skip(out);
+            writeSomeFreeObjects(out);
         else
-        {
-            out.write("\n#section couple FF");
             writePool(out, ffList);
-        }
     }
 }
 
@@ -1015,7 +1006,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
         {
             const real alpha = 2 * P->spaceVolume() / cnt;
             
-            if ( P->fast_diffusion & 2 )
+            if ( P->fast_diffusion == 2 )
             {
                 real dis = alpha / P->hand1_prop->bindingSectionRate();
                 fibers.newFiberSitesP(loc, dis);
@@ -1035,7 +1026,7 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
             if ( !P->trans_activated )
             {
                 // if ( couple:trans_activated == true ), Hand2 cannot bind
-                if ( P->fast_diffusion & 2 )
+                if ( P->fast_diffusion == 2 )
                 {
                     real dis = alpha / P->hand2_prop->bindingSectionRate();
                     fibers.newFiberSitesP(loc, dis);

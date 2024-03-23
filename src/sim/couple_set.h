@@ -53,6 +53,9 @@ private:
         }
     }
     
+    /// list of Properties for which `fast_diffusion == true`
+    std::vector<CoupleProp const*> uniCouples;
+
     /// gather all Couple with `fast_diffusion` in reserve lists
     void uniStepCollect(Couple*);
 
@@ -74,8 +77,8 @@ private:
     /// release Couples from reserve lists
     void uniRelax();
     
-    /// list of Properties for which `fast_diffusion == true`
-    std::vector<CoupleProp const*> uniCouples;
+    /// save free Couples for which `fast_diffusion == 0`
+    void writeSomeFreeObjects(Outputter&) const;
 
 public:
 
@@ -95,9 +98,6 @@ public:
     
     /// create a new object (used for reading trajectory file)
     Object * newObject(ObjectTag, PropertyID);
-    
-    /// save free Couples for which `fast_diffusion == 0`
-    void writeObjectsFF_skip(Outputter&) const;
 
     /// save objects
     void writeSet(Outputter&, int skip) const;
