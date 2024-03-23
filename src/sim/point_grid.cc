@@ -318,7 +318,7 @@ void PointGrid::checkLL(FatLocus const& aa, FatLocus const& bb) const
     
     if ( dis2 < ran * ran )
     {
-        if ( aa.seg_.within(a) & bb.seg_.within(b) )
+        if ( aa.seg_.within(a) && bb.seg_.within(b) )
         {
             const real len = aa.rad_ + bb.rad_;
             real stiff = sign_select(dis2-len*len, push_,pull_);

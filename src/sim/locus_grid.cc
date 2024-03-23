@@ -458,7 +458,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     {
         dis2 = off.normSqr();
         
-        if ( aa.within(a) & bb.within(b) )
+        if ( aa.within(a) && bb.within(b) )
         {
             // Since axis is orthogonal to daa, we know the norm of the cross-product:
             Vector leg = cross(daa, axis) * ( copysign(ran, D) * aa.lenInv() * sqrt(iS) );
@@ -641,7 +641,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     
     if ( dis2 < ran*ran )
     {
-        if ( as.within(a) & bs.within(b) )
+        if ( as.within(a) && bs.within(b) )
             meca_.addSideSlidingLink(as, a, Interpolation(bs, b), ran, push_);
     }
     else
