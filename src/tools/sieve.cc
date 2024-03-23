@@ -110,10 +110,8 @@ int main(int argc, char* argv[])
         if ( skip_set )
             skip_set->erase();
         
-        /*
-        simul.reportInventory(std::cout);
-        std::clog << "\r" << std::setw(5) << cnt << "   ";
-        */
+        //simul.reportInventory(std::cout);
+        //std::clog << "\r" << std::setw(5) << frm << "   ";
         
         try {
             simul.writeObjects(argv[2], true, binary);
