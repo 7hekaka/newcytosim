@@ -294,10 +294,22 @@ public:
     /// If `true`, any pre-existing system file will be cleared (<em>default = true</em>)
     bool clear_system_file;
     
-    /// If `true` free singles are not saved/read to/from file (<em>default = false</em>)
+    /// Bitfield determining how free singles are saved/read to/from file (<em>default = 0</em>)
+    /**
+     0 : always save
+     1 : do not save
+     3 : save only once
+     4 : do not load
+     */
     int skip_free_single;
     
-    /// If `true` free couples are not saved/read to/from file (<em>default = false</em>)
+    /// Bitfield determining how free couples are saved/read to/from file (<em>default = 0</em>)
+    /**
+     0 : always save
+     1 : do not save
+     3 : save only once
+     4 : do not load
+     */
     int skip_free_couple;
 
     /// Display parameters (see @ref DisplayPar)
