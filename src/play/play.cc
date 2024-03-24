@@ -181,10 +181,8 @@ void print_error(Exception const& e)
 int main(int argc, char* argv[])
 {
     Style style = OFFSCREEN;
-    int menu = 1;
     int mode = SAVE_NOTHING;
     int fullscreen = 0;
-    Glossary arg;
     std::string name = "Cytosim     ";
     name += FilePath::get_cwd();
     
@@ -197,8 +195,6 @@ int main(int argc, char* argv[])
     view.setDisplayFunc(drawSimul);
 #else
     glApp::setDimensionality(DIM);
-    if ( arg.use_key("fullscreen") )
-        fullscreen = 1;
     View& view = glApp::views[0];
 #endif
     if ( DIM == 3 )
@@ -206,10 +202,12 @@ int main(int argc, char* argv[])
     else
         view.depth_test = 0;
 
+    Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
     
-    arg.set(menu, "menu");
+    if ( arg.use_key("fullscreen") )
+        fullscreen = 1;
 
     // check for major options:
     if ( arg.use_key("-") )
@@ -238,6 +236,9 @@ int main(int argc, char* argv[])
         return 0;
     }
     
+    int menu = 1;
+    arg.set(menu, "menu");
+
     if ( arg.use_key("live") || arg.has_key(".cym") )
     {
         if ( arg.set(name, ".cym") )
