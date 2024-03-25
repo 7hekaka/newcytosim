@@ -196,6 +196,9 @@ public:
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t alc);
     
+    /// number of columns
+    size_t num_columns() const { return rsize_; }
+
     /// number of elements in j-th column
     size_t column_size(size_t j) const { assert_true(j<rsize_); return 1+pilar_[j].noff_; }
     
@@ -266,12 +269,15 @@ public:
     void vecMulDiagonal3D(const real* X, real* Y) const;
     /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
     void vecMulDiagonal4D(const real* X, real* Y) const;
-
-    /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
-    void vecMulDiagonal3D_SSE(const float* X, float* Y) const;
     
-    /// multiplication of a vector: Y <- M * X with dim(X) = dim(M)
+    /// multiplication of diagonal by a vector: Y <- DIAGONAL * X with dim(X) = dim(M)
+    void vecMulDiagonal3D_SIMD(const double* X, double* Y) const;
+    
+    /// multiplication of diagonal by a vector: Y <- DIAGONAL * X with dim(X) = dim(M)
     void vecMulDiagonal3D_AVX(const double* X, double* Y) const;
+
+    /// multiplication of diagonal by a vector: Y <- DIAGONAL * X with dim(X) = dim(M)
+    void vecMulDiagonal3D_SSE(const float* X, float* Y) const;
 
     // process only off-diagonal elements with columns [start, stop[
     void vecMulAddTriangle(const real* X, real* Y, size_t start, size_t stop) const

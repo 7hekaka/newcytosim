@@ -139,6 +139,9 @@ public:
     
     /// set to zero
     void reset();
+    
+    /// number of columns
+    size_t num_columns() const { return size_; }
 
     /// return column at index j
     Element const* column(size_t j) const { assert_true(j<size_); return column_[j]; }

@@ -181,6 +181,7 @@ public:
         bytes = (uint8_t*)calloc(height*BPR, 1);
     }
     
+    // the matrix is allocated uninitialized
     BitMap(unsigned W, unsigned H)
     {
         resize(W, H);
