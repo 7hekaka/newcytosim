@@ -862,9 +862,10 @@ size_t Interface::execute_move(std::string const& name, Glossary& opt, size_t cn
             Solid * sol = Solid::toSolid(obj);
             if ( sol )
             {
+                vec = Cytosim::findPosition(str, spc);
                 real val = sol->clampStiffness();
                 opt.set(val, "clamp", 1);
-                sol->setClamp(Cytosim::findPosition(str, spc), val);
+                sol->setClamp(vec, val);
             }
             else
                 throw InvalidParameter("invalid Solid for command `move'");

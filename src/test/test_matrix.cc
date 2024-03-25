@@ -266,7 +266,8 @@ real checkMatrix(MATRIX & mat, real const* x, real const* y, real * z, size_t pr
     if ( print > 1 ) VecPrint::print("vec3", NP, z);
     
     real n = std::max(abs_real(sum1-sum2), abs_real(sum2-sum3));
-    if ( print ) {
+    if ( print )
+    {
         if ( n > 1e-6 )
             printf(" FAILED");
         else
