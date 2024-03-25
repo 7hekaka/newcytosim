@@ -48,9 +48,7 @@ void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
     }
     assert_true(u == nbv);
 
-#if USE_MATRIX_BLOCK
     setAdjacency(mat, sup, table, nbv, mFUL);
-#endif
 #if USE_ISO_MATRIX
     setAdjacency(mat, sup, table, nbv, mISO);
 #endif
@@ -250,9 +248,7 @@ void Meca::flagClusters() const
             table[i] = mec;
     }
     
-#if USE_MATRIX_BLOCK
     flagConnectedMecables(mecables, MAX, table, mFUL);
-#endif
 #if USE_ISO_MATRIX
     flagConnectedMecables(mecables, MAX, table, mISO);
 #endif
@@ -847,10 +843,8 @@ void Meca::saveMatrixBitmaps(const char prefix[], size_t inc) const
     snprintf(str, sizeof(str), "%siso%08lu.bmp", prefix, cnt);
     saveMatrixBitmap(mISO, mecables, nbVertices(), str);
 #endif
-#if USE_MATRIX_BLOCK
     snprintf(str, sizeof(str), "%sful%08lu.bmp", prefix, cnt);
     saveMatrixBitmap(mFUL, mecables, nbVertices(), str);
-#endif
     cnt += inc;
 }
 
