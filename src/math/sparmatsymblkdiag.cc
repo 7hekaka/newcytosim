@@ -404,7 +404,8 @@ size_t SparMatSymBlkDiag::nbElements(size_t start, size_t stop, size_t& alc) con
     assert_true( start <= stop );
     stop = std::min(stop, rsize_);
     alc = 0;
-    size_t cnt = stop - start; // counting diagonal elements
+    //size_t cnt = stop - start; // counting diagonal elements
+    size_t cnt = 0; // not counting diagonal elements
     for ( size_t i = start; i < stop; ++i )
     {
         cnt += pilar_[i].noff_;
@@ -1389,9 +1390,9 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
         auto const& mat = dia_.data();
         yy = loadu2(Y+jj);
-        vec2 mat6 = loadu2(mat+6);
         s0 = fmadd2(loadu2(mat  ), xy, unpacklo2(yy, zero));
         s1 = fmadd2(loadu2(mat+3), xy, unpackhi2(yy, zero));
+        vec2 mat6 = loadu2(mat+6);
         s2 = fmadd2(mat6, xy, load1Z(Y+jj+2));
         // prepare broadcasted vectors:
         xx = duplo2(xy);
@@ -1889,7 +1890,7 @@ void SparMatSymBlkDiag::vecMulAdd(const real* X, real* Y, size_t start, size_t s
 /*
 This code is disabled here in favor of the next version which is unrolled
 */
-#if ( SD_BLOCK_SIZE == -3 ) && REAL_IS_DOUBLE && defined(__AVX__)
+#if ( SD_BLOCK_SIZE == 0 ) && REAL_IS_DOUBLE && defined(__AVX__)
 void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) const
 {
     #pragma ivdep unroll (4)
@@ -1899,9 +1900,9 @@ void SparMatSymBlkDiag::vecMulDiagonal3D_AVX(const double* src, double* dst) con
         Block const& D = pilar_[j].dia_;
         /**
          Since the diagonal block is symmetric, we only need to load 6 scalars
-         instead of 9 here. Moreover, the elements of the vector and matrix can be
-         handled together to limit the numbers of swaps. Particular in SSE code
-         this should be faster than the code below. */
+         instead of 9 here. Moreover, the elements of the vector and matrix can
+         be handled together to limit the numbers of swaps.
+         Particular in SSE code this should be faster than the code below. */
 #if 1
         vec4 x0 = loadu4(src);
         vec4 x2 = swap2f128(x0);
@@ -2032,7 +2033,7 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
     for ( size_t j = colix_[0]; j < rsize_; j = colix_[j+1] )
         pilar_[j].vecMulAddTriangle3D_SSE(X, Y, 3*j);
     
-#elif ( SD_BLOCK_SIZE == 7 )
+#elif ( SD_BLOCK_SIZE == 0 )
     
     // process diagonal:
     vecMulDiagonal3D(X, Y);
