@@ -2,8 +2,23 @@
 // SIMD for the ARM architecture; Split from simd.h on 12.08.2022
 
 
-/// Vector holding 2 double precision floats
 typedef float64x1_t vec1;
+
+LOCAL vec1 load1S(double const* a) { return vld1_f64(a); }
+LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
+
+LOCAL vec1 add1(vec1 a, vec1 b)      { return vadd_f64(a,b); }
+LOCAL vec1 sub1(vec1 a, vec1 b)      { return vsub_f64(a,b); }
+LOCAL vec1 mul1(vec1 a, vec1 b)      { return vmul_f64(a,b); }
+LOCAL vec1 div1(vec1 a, vec1 b)      { return vdiv_f64(a,b); }
+/// a * b + c
+LOCAL vec1 fmadd1(vec1 a, vec1 b, vec1 c)  { return vfma_f64(c,a,b); }
+/// c - a * b
+LOCAL vec1 fnmadd1(vec1 a, vec1 b, vec1 c) { return vfms_f64(c,a,b); }
+
+
+
+/// Vector holding 2 double precision floats
 typedef float64x2_t vec2;
 
 LOCAL void _mm_empty() {};
@@ -13,8 +28,8 @@ LOCAL vec2 set2(double a)  { return vdupq_n_f64(a); }
 LOCAL vec2 setzero2()      { return vdupq_n_f64(0); }
 LOCAL vec2 negate2(vec2 a) { return vnegq_f64(a); }
 
-LOCAL vec2 load1(double const* a) { return vsetq_lane_f64(*a, setzero2(), 0); }
-LOCAL vec2 load1Z(double const* a) { return vandq_u32(vld1q_f64(a), uint32x4_t{~0U,~0U,0,0}); }
+LOCAL vec2 load1(double const* a) { return vec2{a[0], 0}; }
+LOCAL vec2 load1Z(double const* a) { return vec2{a[0], 0}; }
 LOCAL vec2 load1upper(double const* b) { return vsetq_lane_f64(*b, setzero2(), 1); }
 LOCAL vec2 load1lower(vec2 a, double const* b) { return vsetq_lane_f64(*b, a, 0); }
 LOCAL vec2 load1upper(vec2 a, double const* b) { return vsetq_lane_f64(*b, a, 1); }
@@ -32,8 +47,8 @@ LOCAL vec2 cvtsd2(float32x2_t a) { return vcvt_f64_f32(a); }
 // convert two single-precision floats in lower registers, to double precision
 LOCAL vec2 cvtsd2(float32x4_t a) { return vcvt_f64_f32(vget_low_f32(a)); }
 
-// load 1 float and convert to double and zero
-LOCAL vec2 load1d(float const* a) { return vec2{a[0], 0}; }
+//LOCAL vec2 load1d(float const* a) { return vec2{a[0], 0}; }
+LOCAL vec2 load1d(float const* a) { return vcvt_f64_f32(float32x2_t{a[0], 0}); }
 // load 2 floats and convert to double
 LOCAL vec2 load2d(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
 
@@ -64,8 +79,6 @@ LOCAL vec2 load1b(bfloat16 const* a) { return vcvt_f64_f32(load1_bf16(a)); }
 LOCAL vec2 load2b(bfloat16 const* a) { return vcvt_f64_f32(load2_bf16(a)); }
 
 
-//LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
-LOCAL void store1(double* a, vec1 b)   { vst1_f64(a, b); }
 LOCAL void store1(double* a, vec2 b)   { vst1_f64(a, vget_low_f64(b)); }
 LOCAL void store2(double* a, vec2 b)   { vst1q_f64(a, b); }
 LOCAL void store1upper(double* a, vec2 b) { vst1_f64(a, vget_high_f64(b)); }
@@ -74,13 +87,9 @@ LOCAL void store1upper(double* a, vec2 b) { vst1_f64(a, vget_high_f64(b)); }
 //LOCAL void storelo(double* a, vec2 b)  { _mm_store_sd(a, b); }
 LOCAL void storeu2(double* a, vec2 b)  { vst1q_f64(a, b); }
 
+LOCAL vec2 duplo2(vec1 a)            { return vcombine_f64(a, a); }
 LOCAL vec2 duplo2(vec2 a)            { return vdupq_laneq_f64(a, 0); }
 LOCAL vec2 duphi2(vec2 a)            { return vdupq_laneq_f64(a, 1); }
-
-LOCAL vec1 add1(vec1 a, vec1 b)      { return vadd_f64(a,b); }
-LOCAL vec1 sub1(vec1 a, vec1 b)      { return vsub_f64(a,b); }
-LOCAL vec1 mul1(vec1 a, vec1 b)      { return vmul_f64(a,b); }
-LOCAL vec1 div1(vec1 a, vec1 b)      { return vdiv_f64(a,b); }
 
 LOCAL vec2 add1(vec2 a, vec2 b)      { return vaddq_f64(a, b); }
 LOCAL vec2 sub1(vec2 a, vec2 b)      { return vsubq_f64(a, b); }
@@ -115,6 +124,8 @@ LOCAL void swap2lower(vec2& a, vec2& b) { vec2 t=b; b=vzip1q_f64(a, b); a=vzip1q
 
 /// concatenate and shift left, returning { BC } from a={ AB } b={ CD }
 LOCAL vec2 catshift(vec2 a, vec2 b) { return vextq_f64(a, b, 1); }
+/// concatenate and shift left, returning { BC } from a={ AB } b={ CD }
+LOCAL vec2 catshift(vec2 a, vec1 b) { return vcombine_f64(vget_high_f64(a), b); }
 
 /// blend to return { low = a[0], high = b[1] }
 //LOCAL vec2 blend11(vec2 a, vec2 b) { return vcombine_f64(vget_low_f64(a), vget_high_f64(b)); }
@@ -158,17 +169,11 @@ LOCAL vec2 normalize2(vec2 vec, double n)
 
 
 //---------------------------- Multiply-Accumulate -----------------------------
-#if 0
-/// a * b + c
-LOCAL vec1 fmadd1(vec1 a, vec1 b, vec1 c)  { return vfma_f64(c,a,b); }
-/// c - a * b
-LOCAL vec1 fnmadd1(vec1 a, vec1 b, vec1 c) { return vfms_f64(c,a,b); }
-#else
+
 /// a * b + c
 LOCAL vec2 fmadd1(vec2 a, vec2 b, vec2 c)  { return vfmaq_f64(c,a,b); }
 /// c - a * b
 LOCAL vec2 fnmadd1(vec2 a, vec2 b, vec2 c) { return vfmsq_f64(c,a,b); }
-#endif
 
 /// a * b + c
 LOCAL vec2 fmadd2(vec2 a, vec2 b, vec2 c)  { return vfmaq_f64(c,a,b); } //vmlaq_f64 will issue mul & add
@@ -222,8 +227,8 @@ LOCAL vec4f setzero4f() { return vdupq_n_f32(0); }
 LOCAL vec4f negate4f(vec4f a) { return vnegq_f32(a); }
 
 LOCAL vec4f broadcast1f(float const* a) { return vld1q_dup_f32(a); }
-//LOCAL vec4f load1f(float const* a) { return vcombine_f32(vld1_f32(a), setzero2f()); }
-//LOCAL vec4f load2f(float const* a) { return vcombine_f32(vld1_f32(a), setzero2f()); }
+//LOCAL vec4f load1f(float const* a) { return vec4f{a[0], 0, 0, 0}; }
+//LOCAL vec4f load2f(float const* a) { return vec4f{a[0], a[1], 0, 0}; }
 
 LOCAL void store1f(float* a, vec4f b) { *a = b[0]; }
 LOCAL void store2f(float* a, vec4f b) { vst1_f32(a, vget_low_f32(b)); }
@@ -316,9 +321,14 @@ LOCAL vec4f unpacklo4f(vec4f a, vec4f b) { return vzip1q_f32(a, b); }
 LOCAL vec4f unpackhi4f(vec4f a, vec4f b) { return vzip2q_f32(a, b); }
 
 // return { a[0], a[1], b[0], b[1] }
-LOCAL vec4f movelh4f(vec4f a, vec4f b) { return vcombine_f32(vget_low_f32(a), vget_low_f32(b)); }
+//LOCAL vec4f movelh4f(vec4f a, vec4f b) { return vcombine_f32(vget_low_f32(a), vget_low_f32(b)); }
 // return { b[2], b[3], a[2], a[2] }
-LOCAL vec4f movehl4f(vec4f a, vec4f b) { return vcombine_f32(vget_high_f32(b), vget_high_f32(a)); }
+//LOCAL vec4f movehl4f(vec4f a, vec4f b) { return vcombine_f32(vget_high_f32(b), vget_high_f32(a)); }
+
+// return { a[0], a[1], b[0], b[1] }
+LOCAL vec4f movelh4f(vec4f a, vec4f b) { return vtrn1q_f64(a, b); }
+// return { b[2], b[3], a[2], a[2] }
+LOCAL vec4f movehl4f(vec4f a, vec4f b) { return vtrn2q_f64(b, a); }
 
 // copy a[0] into all elements of destination
 LOCAL vec4f broadcastXf(vec4f a) { return vdupq_laneq_f32(a,0); }

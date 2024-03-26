@@ -74,7 +74,7 @@ void test_swapSSE()
 
 void test_shuffle()
 {
-    printf("------ test_shuffle\n");
+    printf("---------- shuffle\n");
     // two shuffles to perform a blend
     vec4f a { 1, 2, 3, 4 };
     vec4f b {-1,-2,-3,-4 };
@@ -260,7 +260,7 @@ inline void sumXYZ(double const* src, double* dst)
 
 void test_twine()
 {
-    printf("------ test_twine\n");
+    printf("---------- twine\n");
     double dst[12] = { 0 };
     const double src[12] = { 1.1, 1.2, 1.3, 2.1, 2.2, 2.3, 3.1, 3.2, 3.3, 4.1, 4.2, 4.3 };
     double X[4] = { 1 }, Y[4] = { 2 }, Z[4] = { 3 };
@@ -309,7 +309,7 @@ inline void destride3x4(double const* src, double* dst)
 
 void test_stride()
 {
-    printf("------ test_stride\n");
+    printf("---------- stride\n");
     const size_t CNT = 1024;
     double a[CNT*12];
     double b[CNT*16];
@@ -359,7 +359,7 @@ void unpack_matrix()
 
 void test_cat()
 {
-    printf("------ test_cat\n");
+    printf("---------- cat\n");
     vec2 y{1.0, 2.0};
     vec2 x{3.0, 4.0};
     x = setr2(1.0, 2.0);
@@ -373,7 +373,7 @@ void test_cat()
 
 void test_load()
 {
-    printf("------ test_load\n");
+    printf("---------- load\n");
     double mem[4] = { 1, 2, 3, 4 };
     vec4 x{1.0, 2.0, 3.0, 4.0};
     dump(x, "set ");
@@ -413,7 +413,7 @@ void test_load()
 
 void test_load_float()
 {
-    printf("------ test_load_float\n");
+    printf("---------- load_float\n");
     float mem[4] = { 1, 2, 3, 4 };
     vec4f x{1.0, 2.0, 3.0, 4.0};
     dump(x, "set ");
@@ -424,7 +424,7 @@ void test_load_float()
 
 void test_broadcast()
 {
-    printf("------ test_broadcast\n");
+    printf("---------- broadcast\n");
     double mem[4] = { 1, 2, 3, 4 };
     
     // using 4 loads
@@ -508,7 +508,7 @@ __m256i make_mask(long i)
 
 void test_store()
 {
-    printf("------ test_store\n");
+    printf("---------- store\n");
     double mem[4] = { 0, 0, 0, 0 };
     vec4 x{1.0, 2.0, 3.0, 4.0};
     dump(x, "value");
@@ -523,7 +523,7 @@ void test_store()
 
 void test_swap1()
 {
-    printf("------ test_swap1\n");
+    printf("---------- swap1\n");
     vec4 a{ 1, 2, 3, 4};
     vec4 b{-1,-2,-3,-4};
     dump(a, "a = ");
@@ -540,7 +540,7 @@ void test_swap1()
 
 void test_rotate()
 {
-    printf("------ test_rotate\n");
+    printf("---------- rotate\n");
     vec4 a{ 1, 2, 3, 4 };
     vec4 b{-5,-6,-7,-8 };
     dump(a, "a/x = ");
@@ -564,7 +564,7 @@ void test_rotate()
 
 void test_swap2()
 {
-    printf("------ test_swap2\n");
+    printf("---------- swap2\n");
     vec4 a{ 1,  2,  3,  4};
     vec4 b{-1, -2, -3, -4};
     dump(a, "a");
@@ -584,7 +584,7 @@ void test_swap2()
  */
 void test_swap4()
 {
-    printf("------ test_swap4\n");
+    printf("---------- swap4\n");
     vec4 s{1, 2, 3, 4};
 
     {
@@ -629,7 +629,7 @@ void test_swap4()
 
 void test_hadd()
 {
-    printf("------ test_hadd\n");
+    printf("---------- hadd\n");
     vec4 a{1, -1, 2, -2};
     vec4 b{3, -3, 4, -4};
     dump(a, "a");
@@ -658,7 +658,7 @@ void test_hsum()
     vec4f s2{ 3, 1, 2, 0.3 };
     vec4f s3{ 0, 0, 0, 0 };
 
-    printf("------ test_hsum\n");
+    printf("---------- hsum\n");
     dump(s0, "s0  ");
     dump(s1, "s1  ");
     dump(s2, "s2  ");
@@ -683,7 +683,7 @@ void test_hsum()
 
 void test_mat()
 {
-    printf("------ test_mat\n");
+    printf("---------- mat\n");
     // matrix:
     vec4 m012{0, 1, 2, -1};
     vec4 m345{3, 4, 5, -1};
@@ -714,7 +714,7 @@ void test_mat()
 
 void test_transpose2()
 {
-    printf("------ test_transpose2\n");
+    printf("---------- transpose2\n");
     vec4 m{1, 2, 3, 4};
     vec4 t = blend0110(m, permute4(permute2f128(m,m,0x01),0b1100));
     dump(m, "m");
@@ -732,7 +732,7 @@ void test_transpose2()
 
 void test_transpose3()
 {
-    printf("------ test_transpose3\n");
+    printf("---------- transpose3\n");
     // matrix:
     vec4 m012{1, 2, 3, 0};
     vec4 m345{4, 5, 6, 0};
@@ -762,7 +762,7 @@ void test_transpose3()
 
 void test_transpose4()
 {
-    printf("------ test_transpose4\n");
+    printf("---------- transpose4\n");
     // matrix:
     vec4 m0{ 0,  1,  2,  3};
     vec4 m1{ 4,  5,  6,  7};
@@ -843,7 +843,7 @@ void transpose4x4(double const* src, double* dst)
 
 void test_swap7()
 {
-    printf("------ test_swap7\n");
+    printf("---------- swap7\n");
     vec4 s{1, 2, 3, 4};
     dump(s, "source");
 
@@ -897,32 +897,55 @@ void transpose4x4(float const* src, float* dst)
 #if defined(__ARM_NEON__)
 void transpose4x4neon(float const* src, float* dst)
 {
-    float32x4_t v0 = loadu4f(src);
-    float32x4_t v1 = loadu4f(src+4);
-    float32x4_t v2 = loadu4f(src+8);
-    float32x4_t v3 = loadu4f(src+12);
-    float32x4x2_t xx = vtrnq_f32(v0, v1);
-    float32x4x2_t yy = vtrnq_f32(v2, v3);
-    vst1q_f32(dst   , movehl4f(yy.val[0], xx.val[0]));
-    vst1q_f32(dst+4 , movehl4f(yy.val[1], xx.val[1]));
-    vst1q_f32(dst+8 , movelh4f(xx.val[0], yy.val[0]));
-    vst1q_f32(dst+12, movelh4f(xx.val[1], yy.val[1]));
+    float32x4_t v0 = vld1q_f32(src);
+    float32x4_t v1 = vld1q_f32(src+4);
+    float32x4_t v2 = vld1q_f32(src+8);
+    float32x4_t v3 = vld1q_f32(src+12);
+    float32x4_t x = vtrn1q_f32(v0, v1);
+    float32x4_t y = vtrn2q_f32(v0, v1);
+    float32x4_t z = vtrn1q_f32(v2, v3);
+    float32x4_t t = vtrn2q_f32(v2, v3);
+#if 1
+    vst1q_f32(dst   , vtrn1q_f64(x, z));
+    vst1q_f32(dst+4 , vtrn1q_f64(y, t));
+    vst1q_f32(dst+8 , vtrn2q_f64(x, z));
+    vst1q_f32(dst+12, vtrn2q_f64(y, t));
+#else
+    vst1q_f32(dst   , movelh4f(x, z));
+    vst1q_f32(dst+4 , movelh4f(y, t));
+    vst1q_f32(dst+8 , movehl4f(z, x));
+    vst1q_f32(dst+12, movehl4f(t, y));
+#endif
 }
 #endif
 
+void test_transpose2x2()
+{
+    printf("---------- transpose2x2\n");
+    vec4f a{1,2,3,4};
+    vec4f b{5,6,7,8};
+    dump(a, "a");
+    dump(b, "b");
+    dump(movehl4f(a,b), "movehl4f(a,b)");
+    dump(movelh4f(a,b), "movelh4f(a,b)");
+}
+
 void test_transpose4x4()
 {
-    printf("------ test_transpose4x4\n");
+    //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
+    const float src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
+    printf("---------- transpose4x4\n");
     {
         float dst[16] = { 0 };
-        //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
-        const float src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
         transpose4x4(src, dst);
         printf("float\n"); dump(4, 4, src);
         printf("transpose\n"); dump(4, 4, dst);
+    }
+    {
 #if defined(__ARM_NEON__)
+        float dst[16] = { 0 };
         transpose4x4neon(src, dst);
-        printf("transpose\n"); dump(4, 4, dst);
+        printf("Transpose\n"); dump(4, 4, dst);
 
 #endif
     }
@@ -941,6 +964,7 @@ void test_transpose4x4()
 
 void test_loads()
 {
+        printf("---------- loads\n");
     double src[] = { 1, 2, 3, 4, 5, 6 };
     
 #if defined(__ARM_NEON__)
@@ -948,6 +972,13 @@ void test_loads()
     dump(tmp.val[0], "vld3[0] ");
     dump(tmp.val[1], "vld3[1] ");
     dump(tmp.val[2], "vld3[2] ");
+        
+    float64x2_t one = vld1q_f64(src);
+    dump(one, "vld1 ");
+
+    float flt[] = { 1, 2, 3, 4, 5, 6 };
+    float32x2_t two = vld1_f32(flt);
+    dump(two, "vldf ");
 #endif
 }
 
@@ -965,6 +996,7 @@ int main(int argc, char * argv[])
         case 0:
             test_swapSSE();
             test_loads();
+            test_transpose2x2();
             test_transpose4x4();
             test_signselect();
             break;
