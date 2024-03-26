@@ -22,7 +22,7 @@ unsigned long machine_time()
 
 /// if you like Alsatian specialities, set this to a prime number
 #define CHOUCROUTE 7
-
+#define SAUERKRAUT 7
 
 /// leading dimension of the banded matrix used for iso symmetric blocks
 constexpr size_t ISOB_KD = 2;
@@ -103,7 +103,7 @@ static inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     const int bks = DIM * mec->nbPoints();
     assert_true( (int)BAND_NUD < bks );
-#if CHOUCROUTE
+#if SAUERKRAUT
     alsatian_xpbtrsLK<BAND_NUD>(bks, mec->pblock(), BAND_LDD, Y);
 #elif 1
     blas_xtbsvLN<'N'>(bks, BAND_NUD, mec->pblock(), BAND_LDD, Y, 1);
@@ -123,7 +123,7 @@ static inline void applyPrecondBand(Mecable const* mec, real* Y)
 static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
     const int bks = DIM * mec->nbPoints();
-#if CHOUCROUTE
+#if SAUERKRAUT
     // assuming that diagonal terms of the preconditionner block have been inverted:
     alsatian_xpotrsL(bks, mec->pblock(), bks, Y);
 #elif 1
@@ -756,7 +756,7 @@ void Meca::computePrecondBand(Mecable* mec)
 #endif
         
         // calculate Cholesky factorization for band storage:
-#if CHOUCROUTE
+#if SAUERKRAUT
         alsatian_xpbtf2L<BAND_NUD>(bks, mec->pblock(), BAND_LDD, &info);
 #else
         lapack::xpbtf2('L', bks, BAND_NUD, mec->pblock(), BAND_LDD, &info);
@@ -768,8 +768,12 @@ void Meca::computePrecondBand(Mecable* mec)
         mec->blockSize(bks, bks*bks, 0);
         getHalfBlock(mec, mec->pblock());
         // calculate Cholesky factorization:
-#if CHOUCROUTE
-        alsatian_xpotf2L(bks, mec->pblock(), bks, &info);
+#if SAUERKRAUT
+        double * blk = mec->pblock();
+        alsatian_xpotf2L(bks, blk, bks, &info);
+#   if REAL_IS_DOUBLE
+        convert_to_floats(bks*bks, blk, (float*)blk);
+#   endif
 #else
         lapack::xpotf2('L', bks, mec->pblock(), bks, &info);
 #endif
@@ -796,7 +800,7 @@ void Meca::computePrecondBand(Mecable* mec)
 void Meca::computePrecondHalf(Mecable* mec, real* tmp)
 {
     const size_t bks = DIM * mec->nbPoints();
-#if CHOUCROUTE && REAL_IS_DOUBLE
+#if SAUERKRAUT && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*bks/2, bks);
     // use temporary memory to build matrix block:
     real * blk = tmp;
@@ -810,7 +814,7 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
 
     int info = 0;
     // calculate Cholesky factorization:
-#if CHOUCROUTE
+#if SAUERKRAUT
     alsatian_xpotf2L(bks, blk, bks, &info);
 #else
     lapack::xpotf2('L', bks, blk, bks, &info);
@@ -829,7 +833,7 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
         ++bump_;
     }
     
-#if CHOUCROUTE && REAL_IS_DOUBLE
+#if SAUERKRAUT && REAL_IS_DOUBLE
     convert_to_floats(bks*bks, blk, (float*)mec->pblock());
 #endif
 }
