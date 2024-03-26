@@ -178,6 +178,9 @@ public:
     /// allocate the matrix to hold ( sz * sz )
     void allocate(size_t alc);
     
+    /// number of columns
+    size_t num_columns() const { return rsize_; }
+
     /// number of elements in j-th column
     size_t column_size(size_t j) const { assert_true(j<rsize_); return column_[j].nbb_; }
     

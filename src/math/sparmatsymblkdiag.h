@@ -200,10 +200,10 @@ public:
     size_t num_columns() const { return rsize_; }
 
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { assert_true(j<rsize_); return 1+pilar_[j].noff_; }
+    size_t column_size(size_t j) const { assert_true(j<rsize_); return pilar_[j].noff_; }
     
     /// line index of n-th element in j-th column (not multiplied by BLOCK_SIZE)
-    size_t column_index(size_t j, size_t n) const { assert_true(j<rsize_); if ( !n ) return j; return pilar_[j].inx_[n-1]; }
+    size_t column_index(size_t j, size_t n) const { assert_true(j<rsize_); return pilar_[j].inx_[n]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
     Block& block(const size_t ii, const size_t jj)
