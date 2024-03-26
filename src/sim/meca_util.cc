@@ -839,7 +839,7 @@ static void saveMatrixBitmap(MATRIX& mat, Array<Mecable*> mecs, size_t nbv, cons
             bmap.clear();
             markMatrix(bmap, nbv, mat);
             size_t mag = DIM*nbv/mat.size();
-            markDiagonal(bmap, mag, mecs);
+            //markDiagonal(bmap, mag, mecs);
             markMecables(bmap, mag, mecs);
             bmap.save(f);
         }

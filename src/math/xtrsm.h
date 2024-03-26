@@ -1490,8 +1490,8 @@ void alsatian_xtrsmLUN1C_4U_SSE(const int M, const float* A, const int lda, doub
             pB -= 2;
             vec2 x = fnmadd2(t0, load2d(pA), loadu2(pB));
             x = fnmadd2(t1, load2d(pA+lda), x); // column K+1
-            x = fnmadd2(t2, load2d(pA+2*lda), x); // column K+2
-            x = fnmadd2(t3, load2d(pA+3*lda), x); // column K+3
+            x = fnmadd2(t2, load2d(pA+lda*2), x); // column K+2
+            x = fnmadd2(t3, load2d(pA+lda*3), x); // column K+3
             storeu2(pB, x);
         }
         if ( pB > B )
@@ -1500,8 +1500,8 @@ void alsatian_xtrsmLUN1C_4U_SSE(const int M, const float* A, const int lda, doub
             --pB;
             vec2 x = fnmadd1(t0, load1d(pA), load1(pB));
             x = fnmadd1(t1, load1d(pA+lda), x); // column K+1
-            x = fnmadd1(t2, load1d(pA+2*lda), x); // column K+2
-            x = fnmadd1(t3, load1d(pA+3*lda), x); // column K+2
+            x = fnmadd1(t2, load1d(pA+lda*2), x); // column K+2
+            x = fnmadd1(t3, load1d(pA+lda*3), x); // column K+3
             store1(pB, x);
         }
     }

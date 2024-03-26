@@ -1757,7 +1757,7 @@ void alsatian_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
         ABORT_NOW("unexpected dimension!");
 }
 
-#include "vecprint.h"
+//#include "vecprint.h"
 
 template < int KD >
 void alsatian_xpbtrsLK(const int N, real const* AB, int LDAB, real* B)
