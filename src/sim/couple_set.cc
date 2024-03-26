@@ -659,14 +659,17 @@ void CoupleSet::writeSomeFreeObjects(Outputter& out) const
         else
             n->write(out);
     }
-    // get highest prop ID that was skipped:
-    PropertyID sup = cnt.rbegin()->first;
-    if ( sup > 0 )
+    if ( !cnt.empty() )
     {
-        // write counts for each class of unwritten Couple:
-        out.write("\n#section couple reheat");
-        for ( size_t i = 0; i <= sup; ++i )
-            out.writeInt(cnt[i], ' ');
+        // get highest prop ID that was skipped:
+        PropertyID sup = cnt.rbegin()->first;
+        if ( sup > 0 )
+        {
+            // write counts for each class of unwritten Couple:
+            out.write("\n#section couple reheat");
+            for ( size_t i = 0; i <= sup; ++i )
+                out.writeInt(cnt[i], ' ');
+        }
     }
 }
 

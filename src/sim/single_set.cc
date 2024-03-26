@@ -496,14 +496,17 @@ void SingleSet::writeSomeFreeObjects(Outputter& out) const
         else
             n->write(out);
     }
-    // get highest prop ID that was skipped:
-    PropertyID sup = cnt.rbegin()->first;
-    if ( sup > 0 )
+    if ( !cnt.empty() )
     {
-        // write counts for each class of unwritten Single:
-        out.write("\n#section single reheat");
-        for ( size_t i = 0; i <= sup; ++i )
-            out.writeInt(cnt[i], ' ');
+        // get highest prop ID that was skipped:
+        PropertyID sup = cnt.rbegin()->first;
+        if ( sup > 0 )
+        {
+            // write counts for each class of unwritten Single:
+            out.write("\n#section single reheat");
+            for ( size_t i = 0; i <= sup; ++i )
+                out.writeInt(cnt[i], ' ');
+        }
     }
 }
 
