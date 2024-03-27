@@ -104,42 +104,42 @@ void iso1(int N, real const* AB, int LDA, real* B)
 {
     for ( int d = 0; d < DIM; ++d )
     {
-        blas_xtbsvLN<'I'>(N, KD, AB, LDA, B+d, DIM);
-        blas_xtbsvLT<'I'>(N, KD, AB, LDA, B+d, DIM);
+        blas_xtbsvLN<'C'>(N, KD, AB, LDA, B+d, DIM);
+        blas_xtbsvLT<'C'>(N, KD, AB, LDA, B+d, DIM);
     }
 }
 
 void iso2(int N, real const* AB, int LDA, real* B)
 {
-    alsatian_xtbsvLNN<DIM>(N, KD, AB, LDA, B);
-    alsatian_xtbsvLTN<DIM>(N, KD, AB, LDA, B);
+    alsatian_iso_xtbsvLNN<DIM>(N, KD, AB, LDA, B);
+    alsatian_iso_xtbsvLTN<DIM>(N, KD, AB, LDA, B);
 }
 
 void iso3(int N, real const* AB, int LDA, real* B)
 {
-    alsatian_xpbtrsL<DIM>(N, AB, LDA, B);
+    alsatian_iso_xpbtrsL<DIM>(N, AB, LDA, B);
 }
 
 void iso5(int N, real const* AB, int LDA, real* B)
 {
 #if ( DIM == 3 ) && defined(__AVX__) && REAL_IS_DOUBLE
-    alsatian_xtbsvLNN2K3_AVX(N, AB, LDA, B);
-    alsatian_xtbsvLTN2K3_AVX(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLNN2K_AVX(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLTN2K_AVX(N, AB, LDA, B);
 #elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
-    alsatian_xtbsvLNN2K3_SIMD(N, AB, LDA, B);
-    alsatian_xtbsvLTN2K3_SIMD(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLNN2K_SIMD(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLTN2K_SIMD(N, AB, LDA, B);
 #elif ( DIM == 3 ) && defined(__SSE3__) && !REAL_IS_DOUBLE
-    alsatian_xtbsvLNN2K3_SSE(N, AB, LDA, B);
-    alsatian_xtbsvLTN2K3_SSE(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLNN2K_SSE(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLTN2K_SSE(N, AB, LDA, B);
 #elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
-    alsatian_xtbsvLNN2K2_SIMD(N, AB, LDA, B);
-    alsatian_xtbsvLTN2K2_SIMD(N, AB, LDA, B);
+    alsatian_iso2_xtbsvLNN2K_SIMD(N, AB, LDA, B);
+    alsatian_iso2_xtbsvLTN2K_SIMD(N, AB, LDA, B);
 #elif ( DIM == 1 )
-    alsatian_xtbsvLNN2K1(N, AB, LDA, B);
-    alsatian_xtbsvLTN2K1(N, AB, LDA, B);
+    alsatian_xtbsvLNN2K(N, AB, LDA, B);
+    alsatian_xtbsvLTN2K(N, AB, LDA, B);
 #else
-    alsatian_xtbsvLNN<DIM>(N, 2, AB, LDA, B);
-    alsatian_xtbsvLTN<DIM>(N, 2, AB, LDA, B);
+    alsatian_iso_xtbsvLNN<DIM>(N, 2, AB, LDA, B);
+    alsatian_iso_xtbsvLTN<DIM>(N, 2, AB, LDA, B);
 #endif
 }
 
@@ -148,13 +148,13 @@ void isoLNN(int N, real const* AB, int LDA, real* B)
 #if ( DIM == 1 )
     alsatian_xtbsvLNN2K1(N, AB, LDA, B);
 #elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
-    alsatian_xtbsvLNN2K2_SIMD(N, AB, LDA, B);
+    alsatian_iso2_xtbsvLNN2K_SIMD(N, AB, LDA, B);
 #elif ( DIM == 2 )
-    alsatian_xtbsvLNN2K2(N, AB, LDA, B);
+    alsatian_iso2_xtbsvLNN2K(N, AB, LDA, B);
 #elif ( DIM == 3 ) && defined(__AVX__)
-    alsatian_xtbsvLNN2K3_AVX(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLNN2K_AVX(N, AB, LDA, B);
 #elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
-    alsatian_xtbsvLNN2K3_SIMD(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLNN2K_SIMD(N, AB, LDA, B);
 #else
     alsatian_xtbsvLNN<DIM>(N, 2, AB, LDA, B);
 #endif
@@ -163,15 +163,15 @@ void isoLNN(int N, real const* AB, int LDA, real* B)
 void isoLTN(int N, real const* AB, int LDA, real* B)
 {
 #if ( DIM == 1 )
-    alsatian_xtbsvLTN2K1(N, AB, LDA, B);
+    alsatian_xtbsvLTN2K(N, AB, LDA, B);
 #elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
-    alsatian_xtbsvLTN2K2_SIMD(N, AB, LDA, B);
+    alsatian_iso2_xtbsvLTN2K_SIMD(N, AB, LDA, B);
 #elif ( DIM == 2 )
-    alsatian_xtbsvLTN2K2(N, AB, LDA, B);
+    alsatian_iso2_xtbsvLTN2K(N, AB, LDA, B);
 #elif ( DIM == 3 ) && defined(__AVX__)
-    alsatian_xtbsvLTN2K3_AVX(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLTN2K_AVX(N, AB, LDA, B);
 #elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
-    alsatian_xtbsvLTN2K3_SIMD(N, AB, LDA, B);
+    alsatian_iso3_xtbsvLTN2K_SIMD(N, AB, LDA, B);
 #else
     alsatian_xtbsvLTN<DIM>(N, 2, AB, LDA, B);
 #endif
@@ -195,14 +195,23 @@ void testISO(int N, size_t rep)
     zero_real(N*LDAB, AB);
     nan_spill(AB+N*LDAB);
     for ( int i = 0; i < N*DIM; ++i )
-        S[i] = 1.0 + RNG.sreal();
+        S[i] = RNG.sreal();
     for ( int i = 0; i < N; ++i )
     {
-        AB[  LDAB*i] = 2 + 0.25 * RNG.sreal();
-        AB[1+LDAB*i] = -0.125 + 0.25 * RNG.preal();
-        AB[2+LDAB*i] = -0.125 + 0.25 * RNG.preal();
+        AB[  LDAB*i] = 1+0.5 * RNG.sreal();
+        AB[1+LDAB*i] = 0.125 * RNG.sreal();
+        AB[2+LDAB*i] = 0.125 * RNG.sreal();
     }
     int info;
+    if ( 1 )
+    {
+        real * ABc = new_real(N*LDAB+4);
+        copy_real(N*LDAB+4, AB, ABc);
+        lapack::xpbtf2('L', N, 2, ABc, LDAB, &info);
+        check<iso0>(N, DIM, S, ABc, LDAB, B, "blas:tbsv", rep);
+        free_real(ABc);
+    }
+    // factorize, Alsatian's way:
     alsatian_xpbtf2L(N, 2, AB, LDAB, &info);
     
     //check<iso0>(NPTS, DIM, S, AB, B, "fail BLAS", rep);
@@ -446,15 +455,15 @@ void testTBSV(int N, size_t rep)
     }
     
     int info = 0;
-#if 1
-    real * ABc = new_real(N*std::max(N, BLDD)+4);
-    copy_real(N*BLDD, AB, ABc);
-    lapack::xpbtf2('L', N, RANK, ABc, BLDD, &info);
-    check<uni0>(N, 1, S, ABc, BLDD, B, "blas:tbsv", rep);
-    free_real(ABc);
-#endif
-    
-    // factorize with the Alsatian's version:
+    if ( 1 )
+    {
+        real * ABc = new_real(N*std::max(N, BLDD)+4);
+        copy_real(N*BLDD, AB, ABc);
+        lapack::xpbtf2('L', N, RANK, ABc, BLDD, &info);
+        check<uni0>(N, 1, S, ABc, BLDD, B, "blas:tbsv", rep);
+        free_real(ABc);
+    }
+    // factorize, Alsatian's way:
     alsatian_xpbtf2L(N, RANK, AB, BLDD, &info);
 
 #if 1
@@ -683,9 +692,9 @@ int main(int argc, char* argv[])
         CNT = std::max(1, atoi(argv[1]));
     size_t REP = 1024;
     RNG.seed();
-    //testISO(CNT, REP);
+    testISO(CNT, REP);
     //testPOTRS(CNT, REP);
-    testTBSV(CNT, REP);
+    //testTBSV(CNT, REP);
     //testGETRS(DIM*CNT, REP);
     printf("\n");
 }
