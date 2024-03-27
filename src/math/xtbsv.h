@@ -121,9 +121,13 @@ void blas_xtbsvLN(const int N, const int KD, const real* A, const int lda, real*
         if ( X[j] != 0 )
         {
             const real * pA = A + j * lda;
-            if ( diag == 'N' ) X[j] /= pA[0];
-            else if ( diag == 'I' ) X[j] *= pA[0];
             real tmp = X[j];
+            if ( diag == 'N' )
+            { tmp /= pA[0]; X[j] = tmp; }
+            else if ( diag == 'I' )
+            { tmp *= pA[0]; X[j] = tmp; }
+            else if ( diag == 'C' )
+            { X[j] = tmp * pA[0]; }
             const int sup = std::min(N-1, j+KD);
             for (int i = j + 1; i <= sup; ++i)
                 X[i] -= tmp * pA[i-j];
@@ -214,6 +218,7 @@ void blas_xtbsvLT(const int N, const int KD, const real* A, const int lda, real*
     {
         real tmp = X[j];
         const real * pA = A + j * lda;
+        if ( diag == 'C' ) tmp *= pA[0];
         const int sup = std::min(N-1, j+KD);
         for (int i = sup; i > j; --i)
             tmp -= pA[i-j] * X[i];
@@ -307,22 +312,22 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
             *INFO = J+1;
             return;
         }
-        dia = std::sqrt(dia) / dia;
-        AB[0] = dia;
+        dia = real(1) / dia;
+        AB[0] = std::sqrt(dia);
         int KN = std::min(KD, N-1-J);  // N-1-J < KD iff J >= N-KD
-        // scale off diagonal terms in column J:
-        for ( int K = 1; K <= KN; ++K )
-            AB[K] *= dia;
         // update the trailing submatrix within the band:
         real* A = AB + LDAB;
         for ( int K = 0; K < KN; ++K )
         {
             // update column J+K of AB
-            real tmp = AB[K+1];
+            real tmp = AB[K+1] * dia;
             for ( int I = K; I < KN; ++I )
                 A[I] -= AB[I+1] * tmp;
             A += KLD;
         }
+        // scale off diagonal terms in column:
+        for ( int K = 1; K <= KN; ++K )
+            AB[K] *= dia;
         AB += LDAB;
     }
     *INFO = 0;
@@ -353,8 +358,7 @@ void alsatian_xtbsvLTN_ORI(const int N, const int KD, const real* A, const int l
     {
         real tmp = X[j];
         const int sup = std::min(N-1, j+KD);  // sup=N-1 if N-1<j+KD : j >= N-KD
-        for ( int i = j + 1; i <= sup; ++i )
-        //for ( int i = sup; i > j; --i )
+        for ( int i = sup; i > j; --i )
             tmp -= A[i] * X[i];
         X[j] = tmp * A[j];
         A -= lda - 1;
@@ -368,8 +372,8 @@ void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, 
     // general case:
     for ( int j = 0; j < nkd; ++j )
     {
-        const real tmp = X[j] * A[0];
-        X[j] = tmp;
+        const real tmp = X[j];
+        X[j] = tmp * A[0];
         for ( int i = 1; i <= KD; ++i )
             X[i+j] -= tmp * A[i];
         A += lda;
@@ -377,8 +381,8 @@ void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, 
     // process truncated cases:
     for ( int j = nkd; j < N; ++j )
     {
-        const real tmp = X[j] * A[0];
-        X[j] = tmp;
+        const real tmp = X[j];
+        X[j] = tmp * A[0];
         for ( int i = j + 1; i < N; ++i )
             X[i] -= tmp * A[i-j];
         A += lda;
@@ -392,21 +396,19 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
     // process KD truncated cases:
     for ( int j = N-1; j >= nkd; --j )
     {
-        real tmp = X[j];
-        for ( int i = j + 1; i < N; ++i )
-        //for ( int i = N-1; i > j; --i )
+        real tmp = A[0] * X[j];
+        for ( int i = N-1; i > j; --i )
             tmp -= A[i-j] * X[i];
-        X[j] = A[0] * tmp;
+        X[j] = tmp;
         A -= lda;
     }
     // general case, downward:
     for ( int j = nkd-1; j >= 0; --j )
     {
-        real tmp = X[j];
-        for ( int i = 1; i <= KD; ++i )
-        //for ( int i = KD; i > 0; --i )
+        real tmp = A[0] * X[j];
+        for ( int i = KD; i > 0; --i )
             tmp -= A[i] * X[i+j];
-        X[j] = A[0] * tmp;
+        X[j] = tmp;
         A -= lda;
     }
 }
@@ -424,8 +426,8 @@ void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* X)
     if ( 0 < N )
     {
         // 'general case' with j = 0, initializing buf[]
-        real t = X[0] * A[0];
-        X[0] = t;
+        real t = X[0];
+        X[0] = t * A[0];
         for ( int i = 1; i <= std::min(N,KD); ++i )
             buf[i-1] = X[i] - t * A[i];
         A += lda;
@@ -435,13 +437,13 @@ void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* X)
     for ( int j = 1; j < nkd; ++j )
     {
         /*
-        const real t = X[j] * A[0];
-        X[j] = t;
+        const real t = X[j];
+        X[j] = t * A[0];
         for ( int i = 1; i <= KD; ++i )
             X[i+j] -= t * A[i];
          */
-        real t = buf[0] * A[0];
-        X[0] = t;
+        real t = buf[0];
+        X[0] = t * A[0];
         for ( int i = 1; i < KD; ++i )
             buf[i-1] = buf[i] - t * A[i]; // buf[i] contains X[i+j]
         buf[KD-1] = X[KD] - t * A[KD];
@@ -457,8 +459,8 @@ void alsatian_xtbsvLNNK(const int N, const real* A, const int lda, real* X)
         for ( int i = j + 1; i < N; ++i )
             X[i] -= t * A[i-j];
          */
-        real t = buf[0] * A[0];
-        X[0] = t;
+        real t = buf[0];
+        X[0] = t * A[0];
         for ( int i = 1; i < std::min(KD, N-j); ++i )
             buf[i-1] = buf[i] - t * A[i]; // buf[i] contains X[i+j]
         A += lda;
@@ -478,14 +480,14 @@ void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
     // process KD truncated cases:
     for ( int j = N-1; j >= nkd; --j )
     {
-        real tmp = X[0];
+        real tmp = A[0] * X[0];
 /*
         for ( int i = j + 1; i < N; ++i )
             tmp -= A[i-j] * X[i];
 */
-        for ( int i = j + 1; i < N; ++i )
+        for ( int i = N-1; i > j; --i )
             tmp -= A[i-j] * buf[i-nkd]; // buf[] is X[i];
-        buf[j-nkd] = A[0] * tmp;
+        buf[j-nkd] = tmp;
         X[0] = buf[j-nkd];
         A -= lda;
         X -= 1;
@@ -499,13 +501,13 @@ void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
          for ( int i = 1; i <= KD; ++i )
             tmp -= A[i] * X[i+j];
          */
-        real tmp = X[0] - A[KD] * buf[KD-1];
+        real tmp = A[0] * X[0] - A[KD] * buf[KD-1];
         for ( int i = KD-1; i > 0; --i )
         {
             tmp -= A[i] * buf[i-1];
             buf[i] = buf[i-1];
         }
-        buf[0] = A[0] * tmp;
+        buf[0] = tmp;
         X[0] = buf[0];
         A -= lda;
         X -= 1;
@@ -525,39 +527,36 @@ void alsatian_xtbsvLNN6K(const int N, const real* A, const int lda, real* X)
     assert_true( lda > 6 );
     assert_true( N >= 6 );
     real tt = X[0];
-    real aa = A[0];
-    X[0] = tt * aa;
-    real x0 = X[1] - tt * (aa * A[1]);
-    real x1 = X[2] - tt * (aa * A[2]);
-    real x2 = X[3] - tt * (aa * A[3]);
-    real x3 = X[4] - tt * (aa * A[4]);
-    real x4 = X[5] - tt * (aa * A[5]);
-    real x5 = X[6] - tt * (aa * A[6]);
+    X[0] = tt * A[0];
+    real x0 = X[1] - tt * A[1];
+    real x1 = X[2] - tt * A[2];
+    real x2 = X[3] - tt * A[3];
+    real x3 = X[4] - tt * A[4];
+    real x4 = X[5] - tt * A[5];
+    real x5 = X[6] - tt * A[6];
     A += lda;
     ++X;
     for ( ; X < end; ++X )
     {
         tt = x0;
-        aa = A[0];
-        X[0] = x0 * aa;
-        x0 = x1 - tt * (aa * A[1]);
-        x1 = x2 - tt * (aa * A[2]);
-        x2 = x3 - tt * (aa * A[3]);
-        x3 = x4 - tt * (aa * A[4]);
-        x4 = x5 - tt * (aa * A[5]);
-        x5 = X[6] - tt * (aa * A[6]);
+        X[0] = x0 * A[0];
+        x0 = x1 - tt * A[1];
+        x1 = x2 - tt * A[2];
+        x2 = x3 - tt * A[3];
+        x3 = x4 - tt * A[4];
+        x4 = x5 - tt * A[5];
+        x5 = X[6] - tt * A[6];
         A += lda;
     }
     for ( ; X < end+6; ++X )
     {
         tt = x0;
-        aa = A[0];
-        X[0] = x0 * aa;
-        x0 = x1 - tt * (aa * A[1]);
-        x1 = x2 - tt * (aa * A[2]);
-        x2 = x3 - tt * (aa * A[3]);
-        x3 = x4 - tt * (aa * A[4]);
-        x4 = x5 - tt * (aa * A[5]);
+        X[0] = x0 * A[0];
+        x0 = x1 - tt * A[1];
+        x1 = x2 - tt * A[2];
+        x2 = x3 - tt * A[3];
+        x3 = x4 - tt * A[4];
+        x4 = x5 - tt * A[5];
         x5 = 0;
         A += lda;
     }
@@ -576,20 +575,19 @@ void alsatian_xtbsvLTN6K(const int N, const real* A, const int lda, real* X)
     real x0 = 0, x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0;
     for ( ; X >= end; --X )
     {
-        real aa = A[0];
-        real tt = aa * ( X[0] - x5 * A[6] );
-        tt -= x4 * (aa * A[5]);
+        real tt = x5 * A[6];
+        tt += x4 * A[5];
         x5 = x4;
         x4 = x3;
-        tt -= x3 * (aa * A[4]);
-        tt -= x2 * (aa * A[3]);
+        tt += x3 * A[4];
+        tt += x2 * A[3];
         x3 = x2;
         x2 = x1;
-        tt -= x1 * (aa * A[2]);
-        tt -= x0 * (aa * A[1]);
+        tt += x1 * A[2];
+        tt += x0 * A[1];
         x1 = x0;
-        x0 = tt;
-        X[0] = tt;
+        x0 = A[0] * X[0] - tt;
+        X[0] = x0;
         A -= lda;
     }
 }
@@ -610,55 +608,26 @@ void alsatian_xtbsvLNN6K_SSE(const int N, const double* A, const int lda, double
     assert_true( lda > KD );
     assert_true( N >= KD );
     const double * end = X + N - KD;
-    vec2 x0, x2, x4, aa, tt;
+    vec2 x0, x2, x4, tt;
     // first iteration with j = 0
-    aa = loaddup2(A);
-    tt = mul1(aa, loaddup2(X));
+    tt = loaddup2(X);
     x0 = fnmadd2(tt, loadu2(A+1), loadu2(X+1));
     x2 = fnmadd2(tt, loadu2(A+3), loadu2(X+3));
     x4 = fnmadd2(tt, loadu2(A+5), loadu2(X+5)); // may load garbage if N <= KD
-    store1(X, tt);
+    store1(X, mul1(tt, load1(A)));
     A += lda;
     X += 1;
     // general case:
     for ( ; X < end; ++X ) //for ( int j = 1; j < nkd; ++j )
     {
-        /*
-         By expanding the multiplication, we reduce the dependency chain...
-         tt = buf[0];
-         aa = A[0];
-         X[0] = buf[0] * aa;
-         buf[0] = buf[1] - tt * (aa * A[1]);
-         buf[1] = buf[2] - tt * (aa * A[2]);
-         buf[2] = buf[3] - tt * (aa * A[3]);
-         buf[3] = buf[4] - tt * (aa * A[4]);
-         buf[4] = buf[5] - tt * (aa * A[5]);
-         buf[5] =  X[KD] - tt * (aa * A[6]);
-        */
-#if DEVELOP_XTBSV
-        aa = loaddup2(A);
         tt = unpacklo2(x0, x0);
-        store1(X, mul1(aa, x0));
+        store1(X, mul1(load1(A), x0));
         x0 = catshift(x0, x2);
         x2 = catshift(x2, x4);
         x4 = catshift(x4, load1(X+KD));
-        x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
-        x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
-        x4 = fnmadd2(tt, mul2(aa, loadu2(A+5)), x4);
-#else
-        /* This is a direct translation of the C-code above, but the dependency
-        between each iteration is longer than above, which is limiting throughput:
-        From x0 to x0, two sequential multiplications are needed */
-        vec2 t = mul1(load1(A), x0);
-        store1(X, t);
-        x0 = catshift(x0, x2);
-        x2 = catshift(x2, x4);
-        x4 = catshift(x4, load1(X+KD));
-        tt = unpacklo2(t, t);
         x0 = fnmadd2(tt, loadu2(A+1), x0);
         x2 = fnmadd2(tt, loadu2(A+3), x2);
         x4 = fnmadd2(tt, loadu2(A+5), x4);
-#endif
         A += lda;
     }
     /*
@@ -667,52 +636,46 @@ void alsatian_xtbsvLNN6K_SSE(const int N, const double* A, const int lda, double
      it performs the same calculation than the normal iteration six times.
      */
     // process truncated case: j = N - 6
-    aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
-    vec2 yy = mul1(aa, x0);
+    vec2 yy = mul1(load1(A), x0);
     x0 = catshift(x0, x2);
     x2 = catshift(x2, x4);
     x4 = unpackhi2(x4, setzero2());
-    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
-    x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
-    x4 = fnmadd1(tt, mul1(aa, load1(A+5)), x4);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
+    x2 = fnmadd2(tt, loadu2(A+3), x2);
+    x4 = fnmadd1(tt, load1(A+5), x4);
     A += lda;
     // process truncated case: j = N - 5
-    aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
-    storeu2(X, unpacklo2(yy, mul1(aa, x0)));
+    storeu2(X, unpacklo2(yy, mul1(load1(A), x0)));
     x0 = catshift(x0, x2);
     x2 = catshift(x2, x4);
-    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
-    x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), x2);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
+    x2 = fnmadd2(tt, loadu2(A+3), x2);
     A += lda;
     // process truncated case: j = N - 4
-    aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
-    yy = mul1(aa, x0);
+    yy = mul1(load1(A), x0);
     x0 = catshift(x0, x2);
     x2 = catshift(x2, setzero2());
-    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
-    x2 = fnmadd1(tt, mul1(aa, load1(A+3)), x2);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
+    x2 = fnmadd1(tt, load1(A+3), x2);
     A += lda;
     // process truncated case: j = N - 3
-    aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
-    storeu2(X+2, unpacklo2(yy, mul1(aa, x0)));
+    storeu2(X+2, unpacklo2(yy, mul1(load1(A), x0)));
     x0 = catshift(x0, x2);
-    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
+    x0 = fnmadd2(tt, loadu2(A+1), x0);
     A += lda;
     // process last two scalars:
     if ( N <= KD ) {
-        aa = load1(A);
-        yy = mul1(aa, x0);
+        yy = mul1(load1(A), x0);
         store1(X+4, yy);
         return;
     }
-    aa = load2(A);
-    yy = mul1(aa, x0);
+    yy = mul1(load1(A), x0);
     x2 = unpackhi2(x0, x0);
-    x2 = fnmadd1(yy, unpackhi2(aa, aa), x2);
+    x2 = fnmadd1(x0, load1(A+1), x2);
     x2 = mul1(load1(A+lda), x2);
     storeu2(X+4, unpacklo2(yy, x2));
 }
@@ -731,10 +694,12 @@ void alsatian_xtbsvLTN6K_SSE(const int N, const double* A, const int lda, double
     assert_true( N >= 6 );
     A += ( N - 1 ) * lda;
     X += N - 1;
-    vec2 aa, tt;
     vec2 x0 = setzero2();
+    vec2 x1 = setzero2();
     vec2 x2 = setzero2();
+    vec2 x3 = setzero2();
     vec2 x4 = setzero2();
+    vec2 x5 = setzero2();
 #if 1
     /*
      The starting sequence avoids loading elements of X beyond X+N, and elements
@@ -742,151 +707,106 @@ void alsatian_xtbsvLTN6K_SSE(const int N, const double* A, const int lda, double
      it performs the same calculation than the normal iteration six times.
      */
     // truncated round at j = N-1
-    x0 = mul1(load1(A), load1Z(X));
-    A -= lda;
-    // truncated round at j = N-2
-    tt = fnmadd1(x0, load1(A+1), load1(X-1));
-    tt = mul1(load1(A), tt);
-    x0 = unpacklo2(tt, x0);
-    storeu2(X-1, x0);
-    A -= lda;
-    // truncated round at j = N-3
-    aa = loaddup2(A);
-    tt = mul2(aa, load1Z(X-2));
-    x2 = catshift(x0, x2);
-    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
-    tt = add1(tt, swap2(tt));
-    x0 = unpacklo2(tt, x0);
-    A -= lda;
-    // truncated round at j = N-4
-    aa = loaddup2(A);
-    tt = mul2(aa, load1Z(X-3));
-    tt = fnmadd2(x2, mul2(aa, load1Z(A+3)), tt);
-    x2 = catshift(x0, x2);
-    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
-    tt = add1(tt, swap2(tt));
-    x0 = unpacklo2(tt, x0);
-    storeu2(X-3, x0);
-    A -= lda;
-    // truncated round at j = N-5
-    aa = loaddup2(A);
-    tt = mul2(aa, load1Z(X-4));
-    tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
-    x4 = catshift(x2, x4);
-    x2 = catshift(x0, x2);
-    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
-    tt = add1(tt, swap2(tt));
-    x0 = unpacklo2(tt, x0);
-    A -= lda;
-    // truncated round at j = N-6
-    aa = loaddup2(A);
-    tt = mul2(aa, fnmadd2(x4, load1Z(A+5), load1Z(X-5)));
-    tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
-    x4 = catshift(x2, x4);
-    x2 = catshift(x0, x2);
-    tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
-    tt = add1(tt, swap2(tt));
-    x0 = unpacklo2(tt, x0);
-    storeu2(X-5, x0);
-    A -= lda;
-    X -= 6;
-#endif
-#if 0
-    // unrolling does not change the dependency chain...
-    for ( A -= lda, --X; X > end; X -= 2 )
     {
-        const real* B = A + lda;
-        vec2 xx, bb, ab = unpacklo2(load1(A), load1(B));
-        aa = loadu2(A+5);
-        bb = loadu2(B+5);
-        tt = mul2(ab, fnmadd2(x4, unpackhi2(aa, bb), loadu2(X)));
-        tt = fnmadd2(catshift(x2, x4), mul2(ab, unpacklo2(aa, bb)), tt);
-        aa = loadu2(A+3);
-        bb = loadu2(B+3);
-        tt = fnmadd2(x2, mul2(ab, unpackhi2(aa, bb)), tt);
-        tt = fnmadd2(catshift(x0, x2), mul2(ab, unpacklo2(aa, bb)), tt);
-        aa = loadu2(A+1);
-        bb = loadu2(B+1);
-        tt = fnmadd2(x0, mul2(ab, unpackhi2(aa, bb)), tt);
-        vec2 AB = mul2(ab, unpacklo2(aa, bb));
-        // set correct value in high position:
-        xx = fnmadd2(unpacklo2(x0, x0), AB, tt);
-        // set correct values in both positions:
-        tt = fnmadd2(catshift(xx, x0), AB, tt);
-        x4 = x2;
-        x2 = x0;
-        x0 = tt;
-        storeu2(X, tt);
-        A -= lda*2;
-    }
-    A += lda;
-    ++X;
-#endif
-#if 1
-    // this does not use SIMD parallelism, and it is as fast as anything else...
-    vec2 x1 = unpackhi2(x0, x0);
-    vec2 x3 = unpackhi2(x2, x2);
-    vec2 x5 = unpackhi2(x4, x4);
-    for ( ; X >= end; --X )
-    {
-        aa = load1(A);
-        vec2 ab = loadu2(A+5);
-        tt = mul1(aa, fnmadd1(x5, unpackhi2(ab, ab), load1(X)));
-        tt = fnmadd1(x4, mul1(aa, unpacklo2(ab, ab)), tt);
-        x5 = x4;
-        x4 = x3;
-        ab = loadu2(A+3);
-        tt = fnmadd1(x3, mul1(aa, unpackhi2(ab, ab)), tt);
-        tt = fnmadd1(x2, mul1(aa, unpacklo2(ab, ab)), tt);
-        x3 = x2;
-        x2 = x1;
-        ab = loadu2(A+1);
-        tt = fnmadd1(x1, mul1(aa, unpackhi2(ab, ab)), tt);
-        tt = fnmadd1(x0, mul1(aa, unpacklo2(ab, ab)), tt);
-        x1 = x0;
-        x0 = tt;
-        store1(X, tt);
+        x0 = mul1(load1(A), load1(X));
         A -= lda;
     }
-    return;
+    // truncated round at j = N-2
+    {
+        vec2 tt = mul1(load1(A), load1(X-1));
+        x1 = x0;
+        x0 = fnmadd1(x0, load1(A+1), tt);
+        store2(X-1, unpacklo2(x0, x1));
+        A -= lda;
+    }
+    // truncated round at j = N-3
+    {
+        vec2 tt = mul1(load1(A), load1(X-2));
+        vec2 ab = loadu2(A+1);
+        x2 = x1;
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        A -= lda;
+    }
+    // truncated round at j = N-4
+    {
+        vec2 tt = mul1(load1(A), load1(X-3));
+        x3 = x2;
+        tt = fnmadd1(x2, load1(A+3), tt); x2 = x1;
+        vec2 ab = loadu2(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        store2(X-3, unpacklo2(x0, x1));
+        A -= lda;
+    }
+    // truncated round at j = N-5
+    {
+        vec2 tt = mul1(load1(A), load1(X-4));
+        x4 = x3;
+        vec2 ab = loadu2(A+3);
+        tt = fnmadd1(x3, unpackhi2(ab, ab), tt); x3 = x2;
+        tt = fnmadd1(x2, unpacklo2(ab, ab), tt); x2 = x1;
+        ab = loadu2(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        A -= lda;
+    }
+    // truncated round at j = N-6
+    {
+        vec2 tt = mul1(load1(A), load1(X-5));
+        x5 = x4;
+        tt = fnmadd1(x4, load1(A+5), tt); x4 = x3;
+        vec2 ab = loadu2(A+3);
+        tt = fnmadd1(x3, unpackhi2(ab, ab), tt); x3 = x2;
+        tt = fnmadd1(x2, unpacklo2(ab, ab), tt); x2 = x1;
+        ab = loadu2(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        store2(X-5, unpacklo2(x0, x1));
+        A -= lda;
+    }
+    // update pointer
+    X -= 6;
 #endif
+    for ( ; X >= end; --X )
+    {
+        vec2 tt = mul1(load1(A), load1(X));
+        vec2 ab = loadu2(A+5);
+        tt = fnmadd1(x5, unpackhi2(ab, ab), tt); x5 = x4;
+        tt = fnmadd1(x4, unpacklo2(ab, ab), tt); x4 = x3;
+        ab = loadu2(A+3);
+        tt = fnmadd1(x3, unpackhi2(ab, ab), tt); x3 = x2;
+        tt = fnmadd1(x2, unpacklo2(ab, ab), tt); x2 = x1;
+        ab = loadu2(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        store1(X, x0);
+        A -= lda;
+    }
+}
+
+void alsatian_xtbsvLTN6K_SSE_ALT(const int N, const double* A, const int lda, double* X)
+{
+    const double * end = X;
+    //constexpr int KD = 6;
+    assert_true( lda > 6 );
+    assert_true( N >= 6 );
+    A += ( N - 1 ) * lda;
+    X += N - 1;
+    vec2 tt;
+    vec2 x0 = setzero2();
+    vec2 x2 = setzero2();
+    vec2 x4 = setzero2();
     // general case, downward!
     for ( ; X >= end; --X ) //for ( int j = nkd-1; j >= 0; --j )
     {
-        /*
-         // distributing the multiplication to reduce the dependency chain...
-         real tmp = A[0] * ( X[0] - A[6] * buf[5] );
-         tmp -= A[0] * ( A[5] * buf[4] );
-         tmp -= (A[0] * A[4]) * buf[3];
-         tmp -= (A[0] * A[3]) * buf[2];
-         tmp -= (A[0] * A[2]) * buf[1];
-         tmp -= (A[0] * A[1]) * buf[0];
-         for ( int i = KD-1; i > 0; --i )
-             buf[i] = buf[i-1];
-         buf[0] = tmp;
-         X[0] = buf[0];
-         */
-#if DEVELOP_XTBSV
-        aa = loaddup2(A);
-        tt = mul2(aa, fnmadd2(x4, loadu2(A+5), load1Z(X)));
-        //tt = fnmadd2(x4, mul2(aa, loadu2(A+5)), mul2(aa, load1Z(X)));
-        tt = fnmadd2(x2, mul2(aa, loadu2(A+3)), tt);
-        x4 = catshift(x2, x4);
-        x2 = catshift(x0, x2);
-        tt = fnmadd2(x0, mul2(aa, loadu2(A+1)), tt);
-        tt = add1(tt, swap2(tt));
-#else
-        /* This is a direct translation of the C-code above, but the dependency
-        between each iteration is longer than above, which is limiting throughput:
-        From x0 to x0, four sequential multiplications are needed */
-        tt = fnmadd2(x4, loadu2(A+5), load1Z(X));
+        tt = mul1(load1(A), load1Z(X));
+        tt = fnmadd2(x4, loadu2(A+5), tt);
         tt = fnmadd2(x2, loadu2(A+3), tt);
         x4 = catshift(x2, x4);
         x2 = catshift(x0, x2);
         tt = fnmadd2(x0, loadu2(A+1), tt);
         tt = add1(tt, swap2(tt));
-        tt = mul1(load1(A), tt);
-#endif
         x0 = unpacklo2(tt, x0);
         store1(X, tt);
         A -= lda;

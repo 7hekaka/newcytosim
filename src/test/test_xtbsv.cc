@@ -21,14 +21,6 @@
 #define DEVELOP_XTBSV 1
 #include "xtbsv.h"
 
-namespace U
-{
-#undef XTBSV_H
-#undef DEVELOP_XTBSV
-#define DEVELOP_XTBSV 0
-#include "xtbsv.h"
-}
-
 
 /// print 12 scalars from `vec[]` of dimension `num`
 inline void print_vector(int num, real const* vec)
@@ -95,7 +87,7 @@ void multi(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Isotropic Solvers for interleaved vectors
 
 const size_t KD = 2;
 
@@ -124,11 +116,6 @@ void iso2(int N, real const* AB, int LDA, real* B)
 }
 
 void iso3(int N, real const* AB, int LDA, real* B)
-{
-    U::alsatian_xpbtrsL<DIM>(N, AB, LDA, B);
-}
-
-void iso4(int N, real const* AB, int LDA, real* B)
 {
     alsatian_xpbtrsL<DIM>(N, AB, LDA, B);
 }
@@ -221,8 +208,7 @@ void testISO(int N, size_t rep)
     //check<iso0>(NPTS, DIM, S, AB, B, "fail BLAS", rep);
     check<iso1>(N, DIM, S, AB, LDAB, B, "blas_pbtrsL", rep);
     check<iso2>(N, DIM, S, AB, LDAB, B, "alsa_pbtrsL<D>", rep);
-    check<iso3>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs_U", rep);
-    check<iso4>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs", rep);
+    check<iso3>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs", rep);
     check<iso5>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs_SSE", rep);
 
 #if 0 && REAL_IS_DOUBLE
@@ -308,7 +294,8 @@ void testPOTRS(int N, size_t rep)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Banded matrices
+
 const int RANK = 6;
 
 // this assumes that the diagonal terms are not inverted
@@ -320,8 +307,8 @@ void uni0(int N, real const* AB, int LDA, real* B)
 
 void uni1(int N, real const* AB, int LDA, real* B)
 {
-    blas_xtbsvLN<'I'>(N, RANK, AB, LDA, B);
-    blas_xtbsvLT<'I'>(N, RANK, AB, LDA, B);
+    blas_xtbsvLN<'C'>(N, RANK, AB, LDA, B);
+    blas_xtbsvLT<'C'>(N, RANK, AB, LDA, B);
 }
 
 void uni2(int N, real const* AB, int LDA, real* B)
@@ -336,7 +323,13 @@ void uni3(int N, real const* AB, int LDA, real* B)
     alsatian_xtbsvLTNK<RANK>(N, AB, LDA, B);
 }
 
-void uni4(int N, real const* AB, int LDA, real* B)
+void uni6(int N, real const* AB, int LDA, real* B)
+{
+    alsatian_xtbsvLNN6K(N, AB, LDA, B);
+    alsatian_xtbsvLTN6K(N, AB, LDA, B);
+}
+
+void uni7(int N, real const* AB, int LDA, real* B)
 {
     alsatian_xpbtrsLK<RANK>(N, AB, LDA, B);
 }
@@ -373,11 +366,6 @@ void uniLN3(int N, real const* AB, int LDA, real* B)
 
 #if REAL_IS_DOUBLE && USE_SIMD
 void uniLN4(int N, real const* AB, int LDA, real* B)
-{
-    U::alsatian_xtbsvLNN6K_SSE(N, AB, LDA, B);
-}
-
-void uniLN5(int N, real const* AB, int LDA, real* B)
 {
     alsatian_xtbsvLNN6K_SSE(N, AB, LDA, B);
 }
@@ -416,11 +404,6 @@ void uniLT3(int N, real const* AB, int LDA, real* B)
 
 #if REAL_IS_DOUBLE && USE_SIMD
 void uniLT4(int N, real const* AB, int LDA, real* B)
-{
-    U::alsatian_xtbsvLTN6K_SSE(N, AB, LDA, B);
-}
-
-void uniLT5(int N, real const* AB, int LDA, real* B)
 {
     alsatian_xtbsvLTN6K_SSE(N, AB, LDA, B);
 }
@@ -478,38 +461,37 @@ void testTBSV(int N, size_t rep)
     check<uni1>(N, 1, S, AB, BLDD, B, "blas_tbsv", rep);
     check<uni2>(N, 1, S, AB, BLDD, B, "tbsvLxN", rep);
     check<uni3>(N, 1, S, AB, BLDD, B, "tbsvLxNK<KD>", rep);
-    check<uni4>(N, 1, S, AB, BLDD, B, "alsa_xpbtrsLK", rep);
+    check<uni6>(N, 1, S, AB, BLDD, B, "LLN6K+LTN6K", rep);
+    check<uni7>(N, 1, S, AB, BLDD, B, "alsa_xpbtrsLK", rep);
 #endif
     if ( 1 )
     {
         std::cout << "\nTBSVLN --- triangular band forward solve --- rank " << RANK;
-        //check<uniLNB>(N, S, AB, B, "blas::xtbsv", rep);
-        //check<uniLN0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLN", rep);
-        //check<uniLN1>(N, 1, S, AB, BLDD, B, "xtbsvLNN", rep);
+        //check<uniLNB>(N, 1, S, AB, BLDD, B, "blas::xtbsv", rep);
+        check<uniLN0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLN", rep);
+        check<uniLN1>(N, 1, S, AB, BLDD, B, "xtbsvLNN", rep);
         check<uniLN2>(N, 1, S, AB, BLDD, B, "LNNK<KD>", rep);
     }
     if ( DIM == 3 )
     {
         check<uniLN3>(N, 1, S, AB, BLDD, B, "LLN6K", rep);
 #if REAL_IS_DOUBLE && USE_SIMD
-        check<uniLN4>(N, 1, S, AB, BLDD, B, "U:LNN6K_SSE", rep);
-        check<uniLN5>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", rep);
+        check<uniLN4>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", rep);
 #endif
     }
     if ( 1 )
     {
         std::cout << "\nTBSVLT --- triangular band backward solve --- rank " << RANK;
-        //check<uniLTB>(N, S, AB, B, "blas::tbsv", rep);
-        //check<uniLT0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLT", rep);
-        //check<uniLT1>(N, 1, S, AB, BLDD, B, "xtbsvLTN", rep);
+        //check<uniLTB>(N, 1, S, AB, BLDD, B, "blas::tbsv", rep);
+        check<uniLT0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLT", rep);
+        check<uniLT1>(N, 1, S, AB, BLDD, B, "xtbsvLTN", rep);
         check<uniLT2>(N, 1, S, AB, BLDD, B, "LTNK<KD>", rep);
     }
     if ( DIM == 3 )
     {
         check<uniLT3>(N, 1, S, AB, BLDD, B, "LTN6K", rep);
 #if REAL_IS_DOUBLE && USE_SIMD
-        check<uniLT4>(N, 1, S, AB, BLDD, B, "U:LTN6K_SSE", rep);
-        check<uniLT5>(N, 1, S, AB, BLDD, B, "LTN6K_SSE", rep);
+        check<uniLT4>(N, 1, S, AB, BLDD, B, "LTN6K_SSE", rep);
 #endif
     }
     free_real(B);
@@ -699,11 +681,11 @@ int main(int argc, char* argv[])
     int CNT = DIM*31;
     if ( argc > 1 )
         CNT = std::max(1, atoi(argv[1]));
-    size_t REP = 256;
+    size_t REP = 1024;
     RNG.seed();
     //testISO(CNT, REP);
     //testPOTRS(CNT, REP);
-    //testTBSV(CNT, REP);
-    testGETRS(DIM*CNT, REP);
+    testTBSV(CNT, REP);
+    //testGETRS(DIM*CNT, REP);
     printf("\n");
 }
