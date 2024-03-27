@@ -696,11 +696,11 @@ void alsatian_xtbsvLNN6K_SSE(const int N, const double* A, const int lda, double
     vec2 x0, x2, x4, aa, tt;
     // first iteration with j = 0
     aa = loaddup2(A);
-    tt = loaddup2(X);
-    store1(X, mul1(aa, tt));
-    x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), loadu2(X+1));
-    x2 = fnmadd2(tt, mul2(aa, loadu2(A+3)), loadu2(X+3));
-    x4 = fnmadd2(tt, mul2(aa, loadu2(A+5)), loadu2(X+5)); // may load garbage if N <= KD
+    tt = mul1(aa, loaddup2(X));
+    x0 = fnmadd2(tt, loadu2(A+1), loadu2(X+1));
+    x2 = fnmadd2(tt, loadu2(A+3), loadu2(X+3));
+    x4 = fnmadd2(tt, loadu2(A+5), loadu2(X+5)); // may load garbage if N <= KD
+    store1(X, tt);
     A += lda;
     X += 1;
     // general case:
@@ -749,7 +749,7 @@ void alsatian_xtbsvLNN6K_SSE(const int N, const double* A, const int lda, double
      of A in the last column that should normally be equal to zero, but otherwise
      it performs the same calculation than the normal iteration six times.
      */
-    // process truncated case: j = N - KD
+    // process truncated case: j = N - 6
     aa = loaddup2(A);
     tt = unpacklo2(x0, x0);
     vec2 yy = mul1(aa, x0);
@@ -785,18 +785,19 @@ void alsatian_xtbsvLNN6K_SSE(const int N, const double* A, const int lda, double
     x0 = catshift(x0, x2);
     x0 = fnmadd2(tt, mul2(aa, loadu2(A+1)), x0);
     A += lda;
-    // process last two cases
-    aa = load1(A);
-    tt = x0;
-    yy = mul1(aa, x0);
+    // process last two scalars:
     if ( N <= KD ) {
-        store1(X, yy);
+        aa = load1(A);
+        yy = mul1(aa, x0);
+        store1(X+4, yy);
         return;
     }
-    x0 = unpackhi2(x0, x0);
-    x0 = fnmadd1(tt, mul1(aa, load1(A+1)), x0);
-    x0 = mul1(load1(A+lda), x0);
-    storeu2(X+4, unpacklo2(yy, x0));
+    aa = load2(A);
+    yy = mul1(aa, x0);
+    x2 = unpackhi2(x0, x0);
+    x2 = fnmadd1(yy, unpackhi2(aa, aa), x2);
+    x2 = mul1(load1(A+lda), x2);
+    storeu2(X+4, unpacklo2(yy, x2));
 }
 
 
