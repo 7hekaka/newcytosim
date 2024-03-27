@@ -39,18 +39,18 @@ inline void print_vector(int num, real const* vec)
         fprintf(stderr, "...");
         VecPrint::print(6, vec+num-6, 3);
         fprintf(stderr, " |");
-        VecPrint::print(2, vec+num, 1);
+        VecPrint::print(4, vec+num, 1);
     }
     else
     {
         VecPrint::print(num, vec, 3);
         fprintf(stderr, " |");
-        VecPrint::print(2, vec+num, 1);
+        VecPrint::print(4, vec+num, 1);
     }
     real sum = vec[0];
     for ( int i = 1; i < num; ++i )
         sum += vec[i];
-    fprintf(stderr, "  sum %+18.16f ", sum);
+    fprintf(stderr, "  %+22.16f ", sum);
 }
 
 void nan_spill(real * dst)
@@ -61,7 +61,7 @@ void nan_spill(real * dst)
 }
 
 template < void (*FUNC)(int, real const*, int, real*) >
-void check(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char const str[], size_t cnt, size_t sub=128)
+void check(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char const str[], size_t rep, size_t sub=128)
 {
     printf("\n");
     copy_real(ORD*N, S, B);
@@ -69,7 +69,7 @@ void check(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char
     FUNC(N, AB, LDA, B);
     print_vector(ORD*N, B);
     tick();
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( size_t n = 0; n < rep; ++n )
     {
         copy_real(ORD*N, S, B);
         for ( size_t u = 0; u < sub; ++u )
@@ -79,13 +79,13 @@ void check(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char
 }
 
 template < void (*FUNC)(int, real const*, int, real*) >
-void multi(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char const str[], size_t cnt, size_t sub)
+void multi(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char const str[], size_t rep, size_t sub)
 {
     size_t BLK = N * N + 4;
     copy_real(ORD*N, S, B);
     nan_spill(B+ORD*N);
     tick();
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( size_t n = 0; n < rep; ++n )
     {
         copy_real(ORD*N, S, B);
         for ( size_t u = 0; u < sub; ++u )
@@ -195,7 +195,7 @@ void isoLTN(int N, real const* AB, int LDA, real* B)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testISO(int N, size_t cnt)
+void testISO(int N, size_t rep)
 {
     std::cout << DIM << "D rank 2 Cholesky factorization & iso solve " << N << " points --- real " << sizeof(real);
     std::cout << " --- " << __VERSION__;
@@ -216,18 +216,18 @@ void testISO(int N, size_t cnt)
         AB[2+LDAB*i] = -0.125 + 0.25 * RNG.preal();
     }
     int info;
-    alsatian_xpbtf2L<2>(N, AB, LDAB, &info);
+    alsatian_xpbtf2L(N, 2, AB, LDAB, &info);
     
-    //check<iso0>(NPTS, DIM, S, AB, B, "fail BLAS", cnt);
-    check<iso1>(N, DIM, S, AB, LDAB, B, "blas_pbtrsL", cnt);
-    check<iso2>(N, DIM, S, AB, LDAB, B, "alsa_pbtrsL<D>", cnt);
-    check<iso3>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs_U", cnt);
-    check<iso4>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs", cnt);
-    check<iso5>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs_SSE", cnt);
+    //check<iso0>(NPTS, DIM, S, AB, B, "fail BLAS", rep);
+    check<iso1>(N, DIM, S, AB, LDAB, B, "blas_pbtrsL", rep);
+    check<iso2>(N, DIM, S, AB, LDAB, B, "alsa_pbtrsL<D>", rep);
+    check<iso3>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs_U", rep);
+    check<iso4>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs", rep);
+    check<iso5>(N, DIM, S, AB, LDAB, B, "alsa_pbtrs_SSE", rep);
 
 #if 0 && REAL_IS_DOUBLE
-    check<isoLNN>(N, DIM, S, AB, LDAB, B, "tbsvLNN3", cnt);
-    check<isoLTN>(N, DIM, S, AB, LDAB, B, "tbsvLTN3", cnt);
+    check<isoLNN>(N, DIM, S, AB, LDAB, B, "tbsvLNN3", rep);
+    check<isoLTN>(N, DIM, S, AB, LDAB, B, "tbsvLTN3", rep);
 #endif
 
     free_real(B);
@@ -265,7 +265,7 @@ void pot3(int N, real const* AB, int LDA, real* B)
 }
 #endif
 
-void testPOTRS(int N, size_t cnt)
+void testPOTRS(int N, size_t rep)
 {
     std::cout << "\n Cholesky factorization of full matrix & iso solve " << N << " points --- real " << sizeof(real);
     std::cout << " --- " << __VERSION__;
@@ -291,10 +291,10 @@ void testPOTRS(int N, size_t cnt)
     alsatian_xpotf2L(N, AB, LDA, &info);
     if ( info == 0 )
     {
-        check<pot1>(N, DIM, S, AB, LDA, B, "alsa_potrsLref", cnt);
-        check<pot2>(N, DIM, S, AB, LDA, B, "iso_trsmLLN<D>", cnt);
+        check<pot1>(N, DIM, S, AB, LDA, B, "alsa_potrsLref", rep);
+        check<pot2>(N, DIM, S, AB, LDA, B, "iso_trsmLLN<D>", rep);
 #if defined(__AVX__) && REAL_IS_DOUBLE
-        check<pot3>(N, DIM, S, AB, LDA, B, "alsa_trsmLLND", cnt);
+        check<pot3>(N, DIM, S, AB, LDA, B, "alsa_trsmLLND", rep);
 #endif
     }
     else
@@ -309,9 +309,9 @@ void testPOTRS(int N, size_t cnt)
 
 //------------------------------------------------------------------------------
 #pragma mark -
-const int RANK = 2*DIM;
+const int RANK = 6;
 
-// this gives wrong results as the diagonal terms are not inverted
+// this assumes that the diagonal terms are not inverted
 void uni0(int N, real const* AB, int LDA, real* B)
 {
     blas::xtbsv('L', 'N', 'N', N, RANK, AB, LDA, B, 1);
@@ -430,13 +430,14 @@ void uniLT5(int N, real const* AB, int LDA, real* B)
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testTBSV(int N, size_t cnt)
+void testTBSV(int N, size_t rep)
 {
-    std::cout << "\n rank " << RANK << " banded matrix Cholesky factorization " << N << " points --- real " << sizeof(real);
+    std::cout << "\nTBSV Banded matrix Cholesky factorization ---- rank ";
+    std::cout << RANK << " ---- " << N << " points --- real " << sizeof(real);
     std::cout << " --- "  << __VERSION__;
 
     /// rank of diagonal matrices:
-    const int BLDD = RANK+1;
+    const int BLDD = RANK+2;
 
     real * AB = new_real(N*std::max(N, BLDD)+4);
     real * S = new_real(N);
@@ -444,6 +445,7 @@ void testTBSV(int N, size_t cnt)
 
     for ( int i = 0; i < N; ++i )
         S[i] = RNG.sreal();
+    
     zero_real(N*BLDD, AB);
     nan_spill(AB+N*BLDD);
     for ( int i = 0; i < N; ++i )
@@ -459,46 +461,55 @@ void testTBSV(int N, size_t cnt)
         AB[1+BLDD*i] += r;
         AB[2+BLDD*i] -= r;
     }
-    int info;
-    alsatian_xpbtf2L<RANK>(N, AB, BLDD, &info);
     
+    int info = 0;
 #if 1
-    check<uni0>(N, 1, S, AB, BLDD, B, "fail blas:tbsv", cnt);
-    check<uni1>(N, 1, S, AB, BLDD, B, "blas_tbsv", cnt);
-    check<uni2>(N, 1, S, AB, BLDD, B, "tbsvLxN", cnt);
-    check<uni3>(N, 1, S, AB, BLDD, B, "tbsvLxNK<KD>", cnt);
-    check<uni4>(N, 1, S, AB, BLDD, B, "alsa_xpbtrsLK", cnt);
+    real * ABc = new_real(N*std::max(N, BLDD)+4);
+    copy_real(N*BLDD, AB, ABc);
+    lapack::xpbtf2('L', N, RANK, ABc, BLDD, &info);
+    check<uni0>(N, 1, S, ABc, BLDD, B, "blas:tbsv", rep);
+    free_real(ABc);
+#endif
+    
+    // factorize with the Alsatian's version:
+    alsatian_xpbtf2L(N, RANK, AB, BLDD, &info);
+
+#if 1
+    check<uni1>(N, 1, S, AB, BLDD, B, "blas_tbsv", rep);
+    check<uni2>(N, 1, S, AB, BLDD, B, "tbsvLxN", rep);
+    check<uni3>(N, 1, S, AB, BLDD, B, "tbsvLxNK<KD>", rep);
+    check<uni4>(N, 1, S, AB, BLDD, B, "alsa_xpbtrsLK", rep);
 #endif
     if ( 1 )
     {
-        std::cout << "\n rank" << RANK << " TBSVLN --- triangular band matrix forward solve";
-        //check<uniLNB>(N, S, AB, B, "blas::xtbsv", cnt);
-        check<uniLN0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLN", cnt);
-        check<uniLN1>(N, 1, S, AB, BLDD, B, "xtbsvLNN", cnt);
-        check<uniLN2>(N, 1, S, AB, BLDD, B, "LNNK<KD>", cnt);
+        std::cout << "\nTBSVLN --- triangular band forward solve --- rank " << RANK;
+        //check<uniLNB>(N, S, AB, B, "blas::xtbsv", rep);
+        //check<uniLN0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLN", rep);
+        //check<uniLN1>(N, 1, S, AB, BLDD, B, "xtbsvLNN", rep);
+        check<uniLN2>(N, 1, S, AB, BLDD, B, "LNNK<KD>", rep);
     }
     if ( DIM == 3 )
     {
-        check<uniLN3>(N, 1, S, AB, BLDD, B, "LLN6K", cnt);
+        check<uniLN3>(N, 1, S, AB, BLDD, B, "LLN6K", rep);
 #if REAL_IS_DOUBLE && USE_SIMD
-        check<uniLN4>(N, 1, S, AB, BLDD, B, "U:LNN6K_SSE", cnt);
-        check<uniLN5>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", cnt);
+        check<uniLN4>(N, 1, S, AB, BLDD, B, "U:LNN6K_SSE", rep);
+        check<uniLN5>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", rep);
 #endif
     }
     if ( 1 )
     {
-        std::cout << "\n rank" << RANK << " TBSVLT --- triangular band matrix backward solve";
-        //check<uniLTB>(N, S, AB, B, "blas::tbsv", cnt);
-        check<uniLT0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLT", cnt);
-        check<uniLT1>(N, 1, S, AB, BLDD, B, "xtbsvLTN", cnt);
-        check<uniLT2>(N, 1, S, AB, BLDD, B, "LTNK<KD>", cnt);
+        std::cout << "\nTBSVLT --- triangular band backward solve --- rank " << RANK;
+        //check<uniLTB>(N, S, AB, B, "blas::tbsv", rep);
+        //check<uniLT0>(N, 1, S, AB, BLDD, B, "blas_xtbsvLT", rep);
+        //check<uniLT1>(N, 1, S, AB, BLDD, B, "xtbsvLTN", rep);
+        check<uniLT2>(N, 1, S, AB, BLDD, B, "LTNK<KD>", rep);
     }
     if ( DIM == 3 )
     {
-        check<uniLT3>(N, 1, S, AB, BLDD, B, "LTN6K", cnt);
+        check<uniLT3>(N, 1, S, AB, BLDD, B, "LTN6K", rep);
 #if REAL_IS_DOUBLE && USE_SIMD
-        check<uniLT4>(N, 1, S, AB, BLDD, B, "U:LTN6K_SSE", cnt);
-        check<uniLT5>(N, 1, S, AB, BLDD, B, "LTN6K_SSE", cnt);
+        check<uniLT4>(N, 1, S, AB, BLDD, B, "U:LTN6K_SSE", rep);
+        check<uniLT5>(N, 1, S, AB, BLDD, B, "LTN6K_SSE", rep);
 #endif
     }
     free_real(B);
@@ -511,16 +522,21 @@ void testTBSV(int N, size_t cnt)
 
 int* pivot = nullptr;
 
-void getrs1(int N, real const* B, int LDB, real* Y)
+void getrs0(int N, real const* B, int LDB, real* Y)
 {
     int info = 0;
     lapack::xgetrs('N', N, 1, B, LDB, pivot, Y, N, &info);
     assert_true(info==0);
 }
 
-void getrs2(int N, real const* B, int LDB, real* Y)
+void getrs1(int N, real const* B, int LDB, real* Y)
 {
     lapack_xgetrsN(N, B, LDB, pivot, Y);
+}
+
+void getrs2(int N, real const* B, int LDB, real* Y)
+{
+    alsatian_xgetrsN<1>(N, B, LDB, pivot, Y);
 }
 
 void getrs3(int N, real const* B, int LDB, real* Y)
@@ -532,9 +548,9 @@ void getrs4(int N, real const* B, int LDB, real* Y)
 {
     // Apply row interchanges to the right hand side.
     xlaswp1(Y, 1, N, pivot);
-    // Solve L*X = B, overwriting B with X.
+    // Solve L*X = Y, overwriting Y with X.
     alsatian_xtrsmLLN1U(N, (float*)B, LDB, Y);
-    // Solve U*X = B, overwriting B with X.
+    // Solve U*X = Y, overwriting Y with X.
     alsatian_xtrsmLUN1C(N, (float*)B, LDB, Y);
 }
 
@@ -590,7 +606,7 @@ void setMatrix(size_t N, real* A, size_t LDA)
     }
 }
 
-void testGETRS(int N, size_t cnt)
+void testGETRS(int N, size_t rep)
 {
     std::cout << "\n" << DIM << "D xGETRS " << N << "x" << N << " --- real " << sizeof(real);
     std::cout << " --- "  << __VERSION__;
@@ -601,7 +617,6 @@ void testGETRS(int N, size_t cnt)
     size_t BLK = N * LDA + 4;
     
     real * A = new_real(BLK*MULTI);
-    real * M = A + BLK;
     real * Y = new_real(N+4);
     real * S = new_real(N+4);
     pivot = new int[N+4];
@@ -612,27 +627,30 @@ void testGETRS(int N, size_t cnt)
     if ( 1 )
     {
         setMatrix(N, A, LDA);
-        copy_real(BLK, A, M);
-        lapack::xgetf2(N, N, M, LDA, pivot, &info);
+        real * Ac = A + BLK;
+        copy_real(BLK, A, Ac);
+        lapack::xgetf2(N, N, Ac, LDA, pivot, &info);
         printf("\n %lu swaps", count_swaps(1, N, pivot));
         if ( info == 0 )
         {
-            //check<getrs1>(N, 1, S, M, LDA, Y, "lapack::xgetrs", cnt);
-            check<getrs2>(N, 1, S, M, LDA, Y, "lapack_xgetrs", cnt);
+            check<getrs0>(N, 1, S, Ac, LDA, Y, "lapack::xgetrs", rep);
+            check<getrs1>(N, 1, S, Ac, LDA, Y, "lapack_xgetrs", rep);
         }
+        
         alsatian_xgetf2(N, A, LDA, pivot, &info);
 #if REAL_IS_DOUBLE
         convert_to_floats(N*LDA, A, (float*)A);
 #endif
         if ( info == 0 )
         {
-            check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt);
-            check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", cnt);
-            check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", cnt);
+            check<getrs2>(N, 1, S, A, LDA, Y, "alsa_getrsN<>", rep);
+            check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", rep);
+            check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", rep);
+            check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", rep);
             if ( DIM == 3 )
             {
-                check<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", cnt);
-                check<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", cnt);
+                check<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", rep);
+                check<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", rep);
             }
         }
     }
@@ -645,8 +663,8 @@ void testGETRS(int N, size_t cnt)
             setMatrix(N, mat, LDA);
             lapack::xgetf2(N, N, mat, N, pivot, &info);
         }
-        multi<getrs1>(N, 1, S, A, LDA, Y, "lapack::xgetrs", cnt, MULTI);
-        multi<getrs2>(N, 1, S, A, LDA, Y, "lapack_xgetrs", cnt, MULTI);
+        multi<getrs1>(N, 1, S, A, LDA, Y, "lapack::xgetrs", rep, MULTI);
+        multi<getrs2>(N, 1, S, A, LDA, Y, "lapack_xgetrs", rep, MULTI);
     }
     if ( 1 )
     {
@@ -659,13 +677,13 @@ void testGETRS(int N, size_t cnt)
             convert_to_floats(N*LDA, mat, (float*)mat);
 #endif
         }
-        multi<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", cnt, MULTI);
-        multi<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", cnt, MULTI);
-        multi<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", cnt, MULTI);
+        multi<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", rep, MULTI);
+        multi<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", rep, MULTI);
+        multi<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", rep, MULTI);
         if ( DIM == 3 )
         {
-            multi<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", cnt, MULTI);
-            multi<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", cnt, MULTI);
+            multi<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", rep, MULTI);
+            multi<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", rep, MULTI);
         }
     }
     
@@ -678,10 +696,10 @@ void testGETRS(int N, size_t cnt)
 
 int main(int argc, char* argv[])
 {
-    int CNT = DIM*13;
+    int CNT = DIM*31;
     if ( argc > 1 )
         CNT = std::max(1, atoi(argv[1]));
-    size_t REP = 1<<10;
+    size_t REP = 256;
     RNG.seed();
     //testISO(CNT, REP);
     //testPOTRS(CNT, REP);

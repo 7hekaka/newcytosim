@@ -309,102 +309,19 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
         }
         dia = std::sqrt(dia) / dia;
         AB[0] = dia;
-        // Compute elements J+1:J+KN of column J
         int KN = std::min(KD, N-1-J);  // N-1-J < KD iff J >= N-KD
-        // scale off diagonal terms in column:
+        // scale off diagonal terms in column J:
         for ( int K = 1; K <= KN; ++K )
             AB[K] *= dia;
-        // update the trailing submatrix within the band.
-        real* A = AB + LDAB; // next column of AB
+        // update the trailing submatrix within the band:
+        real* A = AB + LDAB;
         for ( int K = 0; K < KN; ++K )
         {
+            // update column J+K of AB
             real tmp = AB[K+1];
             for ( int I = K; I < KN; ++I )
                 A[I] -= AB[I+1] * tmp;
             A += KLD;
-        }
-        AB += LDAB;
-    }
-    *INFO = 0;
-}
-
-/**
- This calls the standard lapack::pbtf2()
- and then *** inverts *** the diagonal terms
- 
- SUBROUTINE DPBTF2( UPLO='L', N, KD=2, AB, LDAB, INFO )
-*/
-template < int KD >
-void alsatian_xpbtf2L(const int N, real* AB, const int LDAB, int* INFO)
-{
-#if 0
-    lapack::xpbtf2('L', N, KD, AB, LDAB, INFO);
-    if ( 0 == *INFO )
-    {
-        for ( int u = 0; u < N; ++u )
-            AB[LDAB*u] = 1.0 / AB[LDAB*u];
-    }
-    return;
-#endif
-    assert_true( LDAB > KD );
-    const int KLD = std::max(1, LDAB-1);
-    const int nkd = std::max(0, N-KD);
-    //Compute the Cholesky factorization A = L*L**T.
-    for ( int J = 0; J < nkd; ++J )
-    {
-        //Compute L(J,J) and test for non-positive-definiteness.
-        real dia = AB[0];
-        if ( dia <= 0 )
-        {
-            *INFO = J+1;
-            return;
-        }
-        /* In the Alsatian version of the factorization, we invert
-         the diagonal term, such that only multiplications are needed
-         for applying the factorization to a vector. */
-        dia = std::sqrt(dia) / dia;
-        AB[0] = dia;
-        /* Compute elements J+1:J+KN of column J and update the
-         trailing submatrix within the band.*/
-        for ( int K = 1; K <= KD; ++K )
-            AB[K] *= dia;
-        real* nA = AB + LDAB; // next column of AB
-        for ( int K = 0; K < KD; ++K )
-        {
-            real tmp = AB[K+1];
-            for ( int I = K; I < KD; ++I )
-                nA[I] -= AB[I+1] * tmp;
-            nA += KLD;
-        }
-        AB += LDAB;
-    }
-    // process remaining columns with < KD terms
-    for ( int J = nkd; J < N; ++J )
-    {
-        //Compute L(J,J) and test for non-positive-definiteness.
-        real dia = AB[0];
-        if ( dia <= 0 )
-        {
-            *INFO = J+1;
-            return;
-        }
-        /* In the Alsatian version of the factorization, we invert
-         the diagonal term, such that only multiplications are needed
-         for applying the factorization to a vector. */
-        dia = std::sqrt(dia) / dia;
-        AB[0] = dia;
-        /* Compute elements J+1:J+KN of column J and update the
-         trailing submatrix within the band.*/
-        int KN = std::min(KD, N-1-J); // always N-1-J
-        for ( int K = 1; K <= KN; ++K )
-            AB[K] *= dia;
-        real* nA = AB + LDAB; // next column of AB
-        for ( int K = 0; K < KN; ++K )
-        {
-            real tmp = AB[K+1];
-            for ( int I = K; I < KN; ++I )
-                nA[I] -= AB[I+1] * tmp;
-            nA += KLD;
         }
         AB += LDAB;
     }
