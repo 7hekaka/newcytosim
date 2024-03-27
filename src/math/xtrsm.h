@@ -311,8 +311,8 @@ void blas_xtrsm(char Side, char Uplo, char Trans, char Diag, int M, int N, REAL 
  }
 
  */
-template < int ORD, char diag, typename REAL >
-void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
+template < int ORD, char diag, typename FLOAT, typename REAL >
+void iso_xtrsmLLN(const int M, const FLOAT* A, const int lda, REAL* B)
 {
     assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
@@ -360,8 +360,8 @@ void iso_xtrsmLLN(const int M, const REAL* A, const int lda, REAL* B)
      B[I] = tmp;
  }
 */
-template < int ORD, char diag, typename REAL >
-void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
+template < int ORD, char diag, typename FLOAT, typename REAL >
+void iso_xtrsmLLT(const int M, const FLOAT* A, const int lda, REAL* B)
 {
     assert_true( M <= lda );
     for ( int I = M-1; I >= 0; --I )
@@ -403,8 +403,8 @@ void iso_xtrsmLLT(const int M, const REAL* A, const int lda, REAL* B)
          B[I] -= tmp * A[I+lda*K];
  }
 */
-template < int ORD, char diag, typename REAL >
-void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
+template < int ORD, char diag, typename FLOAT, typename REAL >
+void iso_xtrsmLUN(const int M, const FLOAT* A, const int lda, REAL* B)
 {
     assert_true( M <= lda );
     for ( int K = M-1; K >= 0; --K )
@@ -435,7 +435,7 @@ void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
                 for ( int d = 0; d < ORD; ++d )
                     tmp[d] = B[ORD*K+d];
             } else {
-                printf("Error: unknown `diag` in alsatian_xtrsmLUN2\n");
+                printf("Error: unknown `diag` in alsatian_xtrsmLUN<>\n");
             }
 
             for ( int I = 0; I < K; ++I )
@@ -464,8 +464,8 @@ void iso_xtrsmLUN(const int M, const REAL* A, const int lda, REAL* B)
      B[I] = tmp;
  }
 */
-template < int ORD, char diag, typename REAL >
-void iso_xtrsmLUT(const int M, const REAL* A, const int lda, REAL* B)
+template < int ORD, char diag, typename FLOAT, typename REAL >
+void iso_xtrsmLUT(const int M, const FLOAT* A, const int lda, REAL* B)
 {
     assert_true( M <= lda );
     for ( int I = 0; I < M; ++I )
@@ -997,8 +997,8 @@ void alsatian_xtrsmLLT1(const int M, const FLOAT* A, const int lda, REAL* B)
 
 
 /// specialized version for ORD==1
-template < char diag, typename REAL >
-void alsatian_xtrsmLUN1(const int M, const REAL* A, const int lda, REAL* B)
+template < char diag, typename FLOAT, typename REAL >
+void alsatian_xtrsmLUN1(const int M, const FLOAT* A, const int lda, REAL* B)
 {
     assert_true( M <= lda );
     A += M * lda;
@@ -1853,25 +1853,27 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
     {
         alsatian_xtrsmLLN3<'I'>(N, A, LDA, B);
         alsatian_xtrsmLLT3<'I'>(N, A, LDA, B);
-    }
-    else if ( ORD == 2 )
+    } else
+#endif
+#if XTRSM_USES_SSE3
+        if ( ORD == 2 )
     {
         alsatian_xtrsmLLN2<'I'>(N, A, LDA, B);
         alsatian_xtrsmLLT2<'I'>(N, A, LDA, B);
-    }
-    else if ( ORD == 1 )
+    } else
+#endif
+        if ( ORD == 1 )
     {
         alsatian_xtrsmLLN1<'I'>(N, A, LDA, B);
         alsatian_xtrsmLLT1<'I'>(N, A, LDA, B);
     }
     else
-        ABORT_NOW("unexpected dimension!");
-#else
-    // Solve L*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLN<ORD,'I'>(N, A, LDA, B);
-    // Solve U*X = B, overwriting B with X. ALPHA = 1.0
-    iso_xtrsmLLT<ORD,'I'>(N, A, LDA, B);
-#endif
+    {
+        // Solve L*X = B, overwriting B with X. ALPHA = 1.0
+        iso_xtrsmLLN<ORD,'I'>(N, A, LDA, B);
+        // Solve U*X = B, overwriting B with X. ALPHA = 1.0
+        iso_xtrsmLLT<ORD,'I'>(N, A, LDA, B);
+    }
 }
 
 
@@ -2050,7 +2052,7 @@ void alsatian_sgetf2(const int N, float* A, const int LDA, int* IPIV, int* INFO)
     {
         for ( int j = 0; j < N; ++j )
         {
-            real tmp = 1.0f / A[j];
+            float tmp = 1.0f / A[j];
             for ( int i = 0; i < j; ++i )
                 A[i] *= tmp;
             A[j] = tmp;
@@ -2208,9 +2210,9 @@ void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, rea
     // Apply row interchanges to the right hand side.
     iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
     // Solve L*X = B, overwriting B with X.
-    iso_xtrsmLLN<ORD, 'U'>(N, A, LDA, B);
+    iso_xtrsmLLN<ORD,'U'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
-    iso_xtrsmLUN<ORD, 'N'>(N, A, LDA, B);
+    iso_xtrsmLUN<ORD,'N'>(N, A, LDA, B);
 #endif
 }
 
@@ -2221,34 +2223,36 @@ void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV
 {
     // Apply row interchanges to the right hand side.
     iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
-#if XTRSM_USES_AVX
+#if 0 && XTRSM_USES_AVX
     if ( ORD == 3 )
     {
         // Solve L*X = B, overwriting B with X.
         alsatian_xtrsmLLN3<'U'>(N, A, LDA, B);
         // Solve U*X = B, overwriting B with X.
         alsatian_xtrsmLUN3<'C'>(N, A, LDA, B);
-    }
-    else if ( ORD == 2 )
+    } else
+#endif
+#if 0 && XTRSM_USES_SSE3
+        if ( ORD == 2 )
     {
         // Solve L*X = B, overwriting B with X.
         alsatian_xtrsmLLN2<'U'>(N, A, LDA, B);
         // Solve U*X = B, overwriting B with X.
         alsatian_xtrsmLUN2<'C'>(N, A, LDA, B);
-    }
-    else if ( ORD == 1 )
+    } else
+#endif
+        if ( ORD == 1 )
     {
         // Solve L*X = B, overwriting B with X.
-        alsatian_xtrsmLLN1<'U'>(N, A, LDA, B);
+        alsatian_xtrsmLLN1<'U'>(N, (float*)A, LDA, B);
         // Solve U*X = B, overwriting B with X.
-        alsatian_xtrsmLUN1<'C'>(N, A, LDA, B);
+        alsatian_xtrsmLUN1<'C'>(N, (float*)A, LDA, B);
     }
     else
-        ABORT_NOW("unexpected dimension!");
-#else
-    iso_xtrsmLLN<ORD,'U'>(N, A, LDA, B);
-    iso_xtrsmLUN<ORD,'D'>(N, A, LDA, B);
-#endif
+    {
+        iso_xtrsmLLN<ORD,'U'>(N, (float*)A, LDA, B);
+        iso_xtrsmLUN<ORD,'C'>(N, (float*)A, LDA, B);
+    }
 }
 
 #endif

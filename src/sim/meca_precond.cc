@@ -35,8 +35,8 @@ constexpr size_t ISOB_LDD = 3;
  */
 constexpr size_t BAND_NUD = 6;
 
-// should allocate to also hold the true diagonal
-constexpr size_t BAND_LDD = BAND_NUD+1;
+// should allocate to also hold the true diagonal: BAND_LDD > BAND_NUD
+constexpr size_t BAND_LDD = BAND_NUD+2;
 
 
 //------------------------------------------------------------------------------
@@ -93,8 +93,11 @@ static inline void applyPrecondIsoS(Mecable const* mec, real* Y)
 static inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
-    //iso_xgetrsN<DIM>(nbp, mec->pblock(), nbp, mec->pivot(), Y);
+#if SAUERKRAUT
     alsatian_xgetrsN<DIM>(nbp, mec->pblock(), nbp, mec->pivot(), Y);
+#else
+    iso_xgetrsN<DIM>(nbp, mec->pblock(), nbp, mec->pivot(), Y);
+#endif
 }
 
 
@@ -618,7 +621,7 @@ void Meca::computePrecondIsoB(Mecable* mec)
 
         // calculate Banded Cholesky factorization:
 #if CHOUCROUTE
-        alsatian_xpbtf2L<ISOB_KD>(nbp, mec->pblock(), ISOB_LDD, &info);
+        alsatian_xpbtf2L(nbp, ISOB_KD, mec->pblock(), ISOB_LDD, &info);
 #else
         lapack::xpbtf2('L', nbp, ISOB_KD, mec->pblock(), ISOB_LDD, &info);
 #endif
@@ -709,20 +712,29 @@ void Meca::computePrecondIsoP(Mecable* mec)
     int info = 0;
 
     const size_t bks = DIM * nbp;
-    // we claim too much memory here, but this preconditionner is not good anyhow:
     mec->blockSize(bks, bks*bks, bks);
-    getFullBlock(mec, mec->pblock());
-    project_matrix<DIM>(nbp, mec->pblock(), bks, mec->pblock(), nbp);
+    double * blk = mec->pblock();
+
+    // we claim too much memory here, but this preconditionner is not good anyhow:
+    getFullBlock(mec, blk);
+    project_matrix<DIM>(nbp, blk, bks, blk, nbp);
 
     //VecPrint::full("isop preconditionner", nbp, nbp, mec->pblock(), nbp, 2);
 
     // calculate LU factorization:
-    lapack::xgetf2(nbp, nbp, mec->pblock(), nbp, mec->pivot(), &info);
+#if SAUERKRAUT
+    alsatian_xgetf2(nbp, blk, nbp, mec->pivot(), &info);
+#else
+    lapack::xgetf2(nbp, nbp, blk, nbp, mec->pivot(), &info);
+#endif
 
     if ( 0 == info )
     {
         mec->blockType(3);
         //checkBlock(mec, blk);
+#if SAUERKRAUT && REAL_IS_DOUBLE
+    convert_to_floats(bks*bks, blk, (float*)blk);
+#endif
     }
     else
     {
@@ -740,42 +752,38 @@ void Meca::computePrecondBand(Mecable* mec)
 {
     assert_true(BAND_NUD < BAND_LDD);
     const size_t bks = DIM * mec->nbPoints();
-   
+    mec->blockSize(bks, std::min(BAND_LDD, bks)*bks, 0);
+    double * blk = mec->pblock();
+
     int bt, info = 0;
 
     if ( BAND_LDD < bks )
     {
-        mec->blockSize(bks, BAND_LDD*bks, 0);
-        getBandedBlock(mec, mec->pblock(), BAND_LDD, BAND_NUD);
+        getBandedBlock(mec, blk, BAND_LDD, BAND_NUD);
         
 #if ( 0 )
-        VecPrint::full("band block "+std::to_string(bks), BAND_LDD, bks, mec->pblock(), BAND_LDD);
+        VecPrint::full("band block "+std::to_string(bks), BAND_LDD, bks, blk, BAND_LDD);
         mec->blockSize(bks, bks*bks, 0);
-        getHalfBlock(mec, mec->pblock());
-        VecPrint::full("half block", bks, bks, mec->pblock(), bks);
+        getHalfBlock(mec, blk);
+        VecPrint::full("half block", bks, bks, blk, bks);
 #endif
         
         // calculate Cholesky factorization for band storage:
 #if SAUERKRAUT
-        alsatian_xpbtf2L<BAND_NUD>(bks, mec->pblock(), BAND_LDD, &info);
+        alsatian_xpbtf2L(bks, BAND_NUD, blk, BAND_LDD, &info);
 #else
-        lapack::xpbtf2('L', bks, BAND_NUD, mec->pblock(), BAND_LDD, &info);
+        lapack::xpbtf2('L', bks, BAND_NUD, blk, BAND_LDD, &info);
 #endif
         bt = 4;
     }
     else
     {
-        mec->blockSize(bks, bks*bks, 0);
-        getHalfBlock(mec, mec->pblock());
+        getHalfBlock(mec, blk);
         // calculate Cholesky factorization:
 #if SAUERKRAUT
-        double * blk = mec->pblock();
         alsatian_xpotf2L(bks, blk, bks, &info);
-#   if REAL_IS_DOUBLE
-        convert_to_floats(bks*bks, blk, (float*)blk);
-#   endif
 #else
-        lapack::xpotf2('L', bks, mec->pblock(), bks, &info);
+        lapack::xpotf2('L', bks, blk, bks, &info);
 #endif
         bt = 5;
     }
@@ -784,6 +792,9 @@ void Meca::computePrecondBand(Mecable* mec)
     {
         mec->blockType(bt);
         //checkBlock(mec, blk);
+#if SAUERKRAUT && REAL_IS_DOUBLE
+        convert_to_floats(bks*bks, blk, (float*)blk);
+#endif
     }
     else
     {
@@ -825,6 +836,9 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
         mec->blockType(5);
         //checkBlock(mec, blk);
         //VecPrint::full("half", bks, bks, blk, bks);
+#if SAUERKRAUT && REAL_IS_DOUBLE
+        convert_to_floats(bks*bks, blk, (float*)mec->pblock());
+#endif
     }
     else
     {
@@ -832,10 +846,6 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
         //std::clog << "failed to compute half Preconditionner bloc of size " << bks << "\n";
         ++bump_;
     }
-    
-#if SAUERKRAUT && REAL_IS_DOUBLE
-    convert_to_floats(bks*bks, blk, (float*)mec->pblock());
-#endif
 }
 
 /**
@@ -869,6 +879,9 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
         mec->blockType(6);
         //checkBlock(mec, blk);
         //if ( bks < 4 ) VecPrint::full("full", bks, bks, blk, bks);
+#if CHOUCROUTE && REAL_IS_DOUBLE
+        convert_to_floats(bks*bks, blk, (float*)mec->pblock());
+#endif
     }
     else
     {
@@ -876,10 +889,6 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
         //std::clog << "failed to compute full Preconditionner block of size " << bks << "\n";
         ++bump_;
     }
-    
-#if CHOUCROUTE && REAL_IS_DOUBLE
-    convert_to_floats(bks*bks, blk, (float*)mec->pblock());
-#endif
 }
 
 
