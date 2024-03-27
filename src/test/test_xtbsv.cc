@@ -556,12 +556,14 @@ void getrs5(int N, real const* B, int LDB, real* Y)
 
 void getrs6(int N, real const* B, int LDB, real* Y)
 {
+#if ( DIM == 3 )
     // Apply row interchanges to the right hand side.
     xlaswp1(Y, 1, N, pivot);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_3D(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1C_3D(N, (float*)B, LDB, Y);
+#endif
 }
 
 void getrs7(int N, real const* B, int LDB, real* Y)

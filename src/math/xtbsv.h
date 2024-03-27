@@ -352,7 +352,7 @@ void alsatian_xtbsvLNN_ORI(const int N, const int KD, const real* A, const int l
         const int sup = std::min(N-1, j+KD);  // sup=N-1 if N-1<j+KD : j >= N-KD
         for ( int i = j + 1; i <= sup; ++i )
             X[i] -= tmp * A[i];
-        A += lda - 1;
+        A += lda;
     }
 }
 
@@ -366,7 +366,7 @@ void alsatian_xtbsvLTN_ORI(const int N, const int KD, const real* A, const int l
         for ( int i = sup; i > j; --i )
             tmp -= A[i] * X[i];
         X[j] = tmp;
-        A -= lda - 1;
+        A -= lda;
     }
 }
 #endif
@@ -915,54 +915,49 @@ void alsatian_iso3_xtbsvLNN2K_AVX(const int N, const double* pA, const int lda, 
 }
 #elif USE_SIMD
 /// specialized SSE & ARM's NEON version for KD==2 and ORD==3 (21.08.2022)
-void alsatian_iso3_xtbsvLNN2K_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_iso3_xtbsvLNN2K_SIMD(const int N, const double* A, const int lda, double* X)
 {
     constexpr int ORD = 3;
-    const double*const end = pA + (N-2) * lda;
-    vec2 x1 = loadu2(pX);
-    vec2 z1 = load1(pX+2);
-    vec2 x2 = loadu2(pX+ORD);
-    vec2 z2 = load1(pX+ORD+2);
-    while ( pA < end ) // for ( int j = 0; j < N-2; ++j )
+    const double * end = X + ORD * ( N - 2 );
+    vec2 x2 = load2(X);   //may load garbage if N == 0
+    vec2 z2 = load1(X+2); //may load garbage if N == 0
+    vec2 x4 = load2(X+3); //may load garbage if N < 1
+    vec2 z4 = load1(X+5); //may load garbage if N < 1
+    while ( X < end ) // ( int j = 2; j < N; ++j )
     {
-        vec2 a0 = loaddup2(pA);
-        vec2 a1 = mul2(a0, loaddup2(pA+1));
-        vec2 a2 = mul2(a0, loaddup2(pA+2));
-        vec2 x0 = x1;
-        vec2 z0 = z1;
-        x1 = fnmadd2(x1, a1, x2);
-        z1 = fnmadd1(z1, a1, z2);
-        x2 = fnmadd2(x0, a2, loadu2(pX+2*ORD));
-        z2 = fnmadd1(z0, a2, load1(pX+2*ORD+2));
-        storeu2(pX, mul2(a0, x0));
-        store1(pX+2, mul1(a0, z0));
-        pA += lda;
-        pX += ORD;
+        vec2 x0 = x2; // x1 = load2(X);
+        vec2 z0 = z2;
+        vec2 aa = load2(A+1);
+        vec2 a1 = unpacklo2(aa, aa);
+        vec2 a2 = unpackhi2(aa, aa);
+        aa = loaddup2(A);
+        x2 = fnmadd2(a1, x0, x4); // x4 = load2(X+2);
+        z2 = fnmadd1(a1, z0, z4);
+        x4 = fnmadd2(a2, x0, load2(X+6));
+        z4 = fnmadd1(a2, z0, load1(X+8));
+        store2(X, mul2(aa, x0));
+        store1(X+2, mul1(aa, z0));
+        A += lda;
+        X += ORD;
     }
-    if ( N >= 2 ) // j = N-2
+    if ( N > 1 )
     {
-        vec2 a0 = loaddup2(pA);
-        vec2 a1 = loaddup2(pA+1);
-        vec2 x0 = mul2(x1, a0);
-        vec2 z0 = mul1(z1, a0);
-        x1 = fnmadd2(x0, a1, x2);
-        z1 = fnmadd1(z0, a1, z2);
-        storeu2(pX, x0);
-        store1(pX+2, z0);
-        //pA += lda;
-        //pX += ORD;
-        // j = N-1:
-        a0 = loaddup2(pA+lda);
-        storeu2(pX+ORD, mul2(x1, a0));
-        store1(pX+ORD+2, mul1(z1, a0));
+        vec2 aa = load2(A);
+        vec2 a0 = unpacklo2(aa, aa);
+        store2(X, mul2(a0, x2));
+        store1(X+2, mul2(a0, z2));
+        vec2 a1 = unpackhi2(aa, aa);
+        x2 = fnmadd2(a1, x2, x4); // x4 = load2(X+2);
+        z2 = fnmadd1(a1, z2, z4); // x4 = load2(X+2);
+        vec2 aL = loaddup2(A+lda);
+        store2(X+3, mul2(aL, x2));
+        store1(X+5, mul2(aL, z2));
     }
-    else if ( N >= 1 ) // j = N-1
+    else if ( N > 0 )
     {
-        vec2 a0 = loaddup2(pA);
-        storeu2(pX, mul2(x1, a0));
-        store1(pX+2, mul1(z1, a0));
-        //pA += lda;
-        //pX += ORD;
+        vec2 aa = loaddup2(A);
+        store2(X, mul2(aa, x2));
+        store1(X+2, mul1(aa, z2));
     }
 }
 #endif
@@ -1045,84 +1040,58 @@ void alsatian_iso3_xtbsvLTN2K_AVX(const int N, const double* pA, const int lda, 
 }
 #elif USE_SIMD
 /// specialized version for KD==2 and ORD==3, using SSE or ARM's NEON (21.08.2022)
-void alsatian_iso3_xtbsvLTN2K_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_iso3_xtbsvLTN2K_SIMD(const int N, const double* A, const int lda, double* X)
 {
     constexpr int ORD = 3;
-    const double*const end = pA + lda;
-    pX += ( N - 1 ) * ORD;
-    pA += ( N - 1 ) * lda;
-    vec2 a1, x1, z1;
-    vec2 a2, x2, z2;
-    if ( N <= 2 )
+    const double * end = X;
+    X += N * ORD;
+    A += N * lda;
+    vec2 x4, z4, x2, z2;
+    if ( N > 0 ) // j = N-1
     {
-        if ( N > 0 ) // j = N-1
-        {
-            vec2 a0 = loaddup2(pA);
-            x2 = mul2(a0, loadu2(pX));
-            z2 = mul1(a0, load1(pX+2));
-            storeu2(pX, x2);
-            store1(pX+2, z2);
-            pA -= lda;
-            pX -= ORD;
-        }
-        if ( N > 1 ) // j = N-2
-        {
-            vec2 a0 = loaddup2(pA);
-            a1 = mul2(a0, loaddup2(pA+1));
-            x1 = fnmadd2(a1, x2, mul2(a0, loadu2(pX)));
-            z1 = fnmadd1(a1, z2, mul1(a0, load1(pX+2)));
-            storeu2(pX, x1);
-            store1(pX+2, z1);
-            //pA -= lda;
-            //pX -= ORD;
-        }
-        return;
+        A -= lda;
+        X -= ORD;
+        vec2 aa = loaddup2(A);
+        x4 = mul2(aa, load2(X));
+        z4 = mul1(aa, load1(X+2));
+        store2(X, x4);
+        store1(X+2, z4);
     }
-    // j = N-1
-    vec2 a0 = loaddup2(pA);
-    x1 = mul2(a0, loadu2(pX));
-    z1 = mul1(a0, load1(pX+2));
-    storeu2(pX, x1);
-    store1(pX+2, z1);
-    pA -= lda;
-    pX -= ORD;
-    x2 = x1;
-    z2 = z1;
-    // j = N-2
-    a0 = loaddup2(pA);
-    a1 = mul2(a0, loaddup2(pA+1));
-    x1 = fnmadd2(a1, x1, mul2(a0, loadu2(pX)));
-    z1 = fnmadd1(a1, z1, mul1(a0, load1(pX+2)));
-    storeu2(pX, x1);
-    store1(pX+2, z1);
-    pA -= lda;
-    pX -= ORD;
-    while ( pA >= end ) // for ( int j = N-3; j > 0; --j )
+    if ( N > 1 ) // j = N-2
     {
-        a0 = loaddup2(pA);
-        a1 = mul2(a0, loaddup2(pA+1));
-        a2 = mul2(a0, loaddup2(pA+2));
-        vec2 x0 = fnmadd2(a2, x2, mul2(a0, loadu2(pX)));
-        vec2 z0 = fnmadd1(a2, z2, mul2(a0, load1(pX+2)));
-        x2 = x1;
-        z2 = z1;
-        x1 = fnmadd2(a1, x1, x0);
-        z1 = fnmadd1(a1, z1, z0);
-        storeu2(pX, x1);
-        store1(pX+2, z1);
-        pA -= lda;
-        pX -= ORD;
+        A -= lda;
+        X -= ORD;
+        vec2 aa = load2(A);
+        vec2 a0 = unpacklo2(aa, aa);
+        vec2 a1 = unpackhi2(aa, aa);
+        vec2 x0 = mul2(a0, load2(X));
+        vec2 z0 = mul1(a0, load1(X+2));
+        x2 = fnmadd2(a1, x4, x0); // x4 = load2(X+2)
+        z2 = fnmadd1(a1, z4, z0);
+        store2(X, x2);
+        store1(X+2, z2);
     }
-    // j = 0
-    a0 = loaddup2(pA);
-    a1 = mul2(a0, loaddup2(pA+1));
-    a2 = mul2(a0, loaddup2(pA+2));
-    x2 = fnmadd2(a2, x2, mul2(a0, loadu2(pX)));
-    z2 = fnmadd1(a2, z2, mul2(a0, load1(pX+2)));
-    x1 = fnmadd2(a1, x1, x2);
-    z1 = fnmadd1(a1, z1, z2);
-    storeu2(pX, x1);
-    store1(pX+2, z1);
+    while ( X > end )
+    {
+        A -= lda;
+        X -= ORD;
+        vec2 aa = loaddup2(A);
+        vec2 x0 = mul2(aa, load2(X));
+        vec2 z0 = mul1(aa, load1(X+2));
+        aa = load2(A+1);
+        vec2 a1 = unpacklo2(aa, aa);
+        vec2 a2 = unpackhi2(aa, aa);
+        x0 = fnmadd2(a1, x2, x0); // x2 = load2(X+2)
+        z0 = fnmadd1(a1, z2, z0);
+        x0 = fnmadd2(a2, x4, x0); // x4 = load2(X+4)
+        z0 = fnmadd1(a2, z4, z0);
+        x4 = x2;
+        z4 = z2;
+        x2 = x0;
+        z2 = z0;
+        store2(X, x0);
+        store1(X+2, z0);
+    }
 }
 #endif
 
@@ -1252,94 +1221,67 @@ void alsatian_iso3_xtbsvLTN2K_SSE(const int N, const float* pA, const int lda, f
 
 #if USE_SIMD
 /// specialized version for KD==2 and ORD==2
-void alsatian_iso2_xtbsvLNN2K_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_iso2_xtbsvLNN2K_SIMD(const int N, const double* A, const int lda, double* X)
 {
     constexpr int ORD = 2;
-    vec2 x1 = load2(pX);     //may load garbage if N == 0
-    vec2 x2 = load2(pX+ORD); //may load garbage if N < 1
-    for ( int j = 0; j < N-2; ++j )
+    const double * end = X + ORD * ( N - 2 );
+    vec2 x2 = load2(X);   //may load garbage if N == 0
+    vec2 x4 = load2(X+2); //may load garbage if N < 1
+    while ( X < end ) // ( int j = 2; j < N; ++j )
     {
-#if DEVELOP_XTBSV
-        // this reduces the dependency path
-        vec2 aa = loaddup2(pA);
-        vec2 a1 = mul2(aa, loaddup2(pA+1));
-        vec2 a2 = mul2(aa, loaddup2(pA+2));
-        vec2 x0 = x1;
-        store2(pX, mul2(aa, x1));
-        x1 = fnmadd2(a1, x0, x2);
-        x2 = fnmadd2(a2, x0, load2(pX+2*ORD));
-#else
-        vec2 x0 = mul2(loaddup2(pA), x1);      // x1 = loadu4(pX);
-        x1 = fnmadd2(loaddup2(pA+1), x0, x2);  // x2 = loadu4(pX+ORD);
-        x2 = fnmadd2(loaddup2(pA+2), x0, load2(pX+2*ORD));
-        store2(pX, x0);
-#endif
-        pA += lda;
-        pX += ORD;
+        vec2 x0 = x2; // x1 = load2(X);
+        x2 = fnmadd2(loaddup2(A+1), x2, x4); // x4 = load2(X+2);
+        x4 = fnmadd2(loaddup2(A+2), x0, load2(X+4));
+        store2(X, mul2(loaddup2(A), x0));
+        A += lda;
+        X += ORD;
     }
-    if ( N >= 2 ) // j = N-2
+    if ( N > 1 )
     {
-        vec2 x0 = mul2(loaddup2(pA), x1);
-        x1 = fnmadd2(loaddup2(pA+1), x0, x2);
-        store2(pX, x0);
-        //pA += lda;
-        //pX += ORD;
-        // j = N-1
-        x0 = mul2(loaddup2(pA+lda), x1);
-        store2(pX+ORD, x0);
+        store2(X, mul2(loaddup2(A), x2));
+        x2 = fnmadd2(loaddup2(A+1), x2, x4); // x4 = load2(X+2);
+        store2(X+2, mul2(loaddup2(A+lda), x2));
     }
-    else if ( N >= 1 ) // j = N-1
+    else if ( N > 0 )
     {
-        vec2 x0 = mul2(loaddup2(pA), x1);
-        store2(pX, x0);
-        //pA += lda;
-        //pX += ORD;
+        store2(X, mul2(loaddup2(A), x2));
     }
 }
 
 
 /// specialized version for KD==2 and ORD==2
-void alsatian_iso2_xtbsvLTN2K_SIMD(const int N, const double* pA, const int lda, double* pX)
+void alsatian_iso2_xtbsvLTN2K_SIMD(const int N, const double* A, const int lda, double* X)
 {
     constexpr int ORD = 2;
-    pX += ( N - 1 ) * ORD;
-    pA += ( N - 1 ) * lda;
-    vec2 x1 = setzero2();
-    if ( N >= 1 ) // j = N-1
+    const double * end = X;
+    X += N * ORD;
+    A += N * lda;
+    vec2 x4, x2;
+    if ( N > 0 ) // j = N-1
     {
-        x1 = mul2(loaddup2(pA), load2(pX));
-        store2(pX, x1);
-        pA -= lda;
-        pX -= ORD;
+        A -= lda;
+        X -= ORD;
+        x4 = mul2(loaddup2(A), load2(X));
+        store2(X, x4);
     }
-    vec2 x2 = x1;
-    if ( N >= 2 ) // j = N-2
+    if ( N > 1 ) // j = N-2
     {
-        vec2 x0 = fnmadd2(loaddup2(pA+1), x1, load2(pX));
-        x1 = mul2(loaddup2(pA), x0);
-        store2(pX, x1);
-        pA -= lda;
-        pX -= ORD;
+        A -= lda;
+        X -= ORD;
+        vec2 x0 = mul2(loaddup2(A), load2(X));
+        x2 = fnmadd2(loaddup2(A+1), x4, x0); // x4 = load2(X+2)
+        store2(X, x2);
     }
-    for ( int j = N-3; j >= 0; --j )
+    while ( X > end )
     {
-#if DEVELOP_XTBSV
-        // this reduces the dependency path
-        vec2 aa = loaddup2(pA);
-        vec2 a1 = mul2(aa, loaddup2(pA+1));
-        vec2 a2 = mul2(aa, loaddup2(pA+2));
-        vec2 x0 = fnmadd2(a2, x2, mul2(aa, load2(pX)));
-        x2 = x1;
-        x1 = fnmadd2(a1, x1, x0);
-#else
-        vec2 x0 = fnmadd2(loaddup2(pA+2), x2, load2(pX));
-        x0 = fnmadd2(loaddup2(pA+1), x1, x0);
-        x2 = x1;
-        x1 = mul2(loaddup2(pA), x0);
-#endif
-        store2(pX, x1);
-        pA -= lda;
-        pX -= ORD;
+        A -= lda;
+        X -= ORD;
+        vec2 x0 = mul2(loaddup2(A), load2(X));
+        x0 = fnmadd2(loaddup2(A+1), x2, x0); // x2 = load2(X+2)
+        x0 = fnmadd2(loaddup2(A+2), x4, x0); // x4 = load2(X+4)
+        x4 = x2;
+        x2 = x0;
+        store2(X, x0);
     }
 }
 
@@ -1349,86 +1291,68 @@ void alsatian_iso2_xtbsvLTN2K_SIMD(const int N, const double* pA, const int lda,
 #pragma mark - 1D-Isotropic Symmetric Banded Solve xTBSV for KD==2
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLNN2K(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLNN2K(const int N, const real* A, const int lda, real* X)
 {
-    real x1 = pX[0]; //may load garbage
-    real x2 = pX[1]; //may load garbage
-    for ( int j = 0; j < N-2; ++j )
+    const double * end = X + ( N - 2 );
+    real x2 = X[0]; //may load garbage
+    real x4 = X[1]; //may load garbage
+    while ( X < end )
     {
-#if DEVELOP_XTBSV
-        // this reduces the dependency path
-        real aa = pA[0];
-        real x0 = x1;
-        x1 = x2 - ( aa * pA[1] ) * x0;
-        x2 = pX[2] - ( aa * pA[2] ) * x0;
-        pX[0] = aa * x0;
-#else
-        real x0 = pA[0] * x1;
-        x1 = x2 - pA[1] * x0;
-        x2 = pX[2] - pA[2] * x0;
-        pX[0] = x0;
-#endif
-        pA += lda;
-        pX += 1;
+        real x0 = x2;
+        x2 = x4 - A[1] * x2;
+        x4 = X[2] - A[2] * x0;
+        X[0] = A[0] * x0;
+        A += lda;
+        X += 1;
     }
-    if ( N >= 2 ) // j = N-2
+    if ( N > 1 ) // j = N-2
     {
-        real x0 = pA[0] * x1;
-        x1 = x2 - pA[1] * x0;
-        pX[0] = x0;
-        pA += lda;
-        pX += 1;
+        X[0] = A[0] * x2;
+        x2 = x4 - A[1] * x2;
+        A += lda;
+        X += 1;
     }
-    if ( N >= 1 ) // j = N-1
+    if ( N > 0 ) // j = N-1
     {
-        real x0 = pA[0] * x1;
-        pX[0] = x0;
-        //pA += lda;
-        //pX += 1;
+        X[0] = A[0] * x2;
+        //A += lda;
+        //X += 1;
     }
 }
 
 
 /// specialized version for KD==2 and ORD==1
-void alsatian_xtbsvLTN2K(const int N, const real* pA, const int lda, real* pX)
+void alsatian_xtbsvLTN2K(const int N, const real* A, const int lda, real* X)
 {
-    pX += ( N - 1 );
-    pA += ( N - 1 ) * lda;
-    real x1 = 0;
-    if ( N >= 1 ) // j = N-1
+    const double * end = X;
+    X += N;
+    A += N * lda;
+    real x4, x2;
+    if ( N > 0 ) // j = N-1
     {
-        real x0 = pX[0];
-        x1 = pA[0] * x0;
-        pX[0] = x1;
-        pA -= lda;
-        pX -= 1;
+        A -= lda;
+        X -= 1;
+        x4 = A[0] * X[0];
+        X[0] = x4;
     }
-    real x2 = x1;
-    if ( N >= 2 ) // j = N-2
+    if ( N > 1 ) // j = N-2
     {
-        real x0 = pX[0] - pA[1] * x1;
-        x1 = pA[0] * x0;
-        pX[0] = x1;
-        pA -= lda;
-        pX -= 1;
+        A -= lda;
+        X -= 1;
+        real x0 = A[0] * X[0];
+        x2 = x0 - A[1] * x4;
+        X[0] = x2;
     }
-    for ( int j = N-3; j >= 0; --j )
+    while ( X > end )
     {
-#if DEVELOP_XTBSV
-        // this reduces the dependency path
-        real aa = pA[0];
-        real x0 = aa * pX[0] - ( aa * pA[2] ) * x2;
-        x2 = x1;
-        x1 = x0 - ( aa * pA[1] ) * x1;
-#else
-        real x0 = pX[0] - pA[2] * x2;
-        x0 = x0 - pA[1] * x1;
-        x2 = x1;
-        x1 = pA[0] * x0;
-#endif
-        pX[0] = x1;
-        pA -= lda;
-        pX -= 1;
+        A -= lda;
+        X -= 1;
+        real x0 = A[0] * X[0];
+        x0 = x0 - A[1] * x2;
+        x0 = x0 - A[2] * x4;
+        x4 = x2;
+        x2 = x0;
+        X[0] = x0;
     }
 }
 
