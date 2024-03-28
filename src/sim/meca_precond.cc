@@ -49,7 +49,7 @@ static inline void applyPrecondIsoB(Mecable const* mec, real* Y)
 
 #if CHOUCROUTE
     assert_true( ISOB_KD == 2 );
-    alsatian_xpbtrsL<DIM>(nbp, mec->pblock(), ISOB_LDD, Y);
+    alsatian_iso_xpbtrsL<DIM>(nbp, mec->pblock(), ISOB_LDD, Y);
 #else
     /*
      we cannot call lapack::DPBTRS('L', bks, KD, 1, mec->pblock(), KD+1, Y, bks, &info)
