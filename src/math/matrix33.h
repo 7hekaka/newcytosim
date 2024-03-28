@@ -169,7 +169,7 @@ public:
 #  else
     vec4f data0() const { return loadu4f(val); }
     vec4f data1() const { return loadu4f(val+BLD); }
-    vec4f data2() const { return load3fZ(val+BLD*2); } // last value may be garbage
+    vec4f data2() const { return load3Zf(val+BLD*2); } // last value may be garbage
 #  endif
 #endif
 

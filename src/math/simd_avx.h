@@ -111,7 +111,7 @@ LOCAL vec4 unpackhi2f128(vec4 a, vec4 b) { return _mm256_permute2f128_pd(a, b, 0
 
 LOCAL vec2 permute2(vec2 a) { return _mm_permute_pd(a,1); }
 
-/// return { a[0], a[0], a[3], b[3] }
+/// return { a[0], a[0], a[3], a[3] }
 LOCAL vec4 duplohi4(vec4 a) { return _mm256_permute_pd(a,0b1100); }
 
 #define insertf128(a,b,k)   _mm256_insertf128_pd(a,b,k)

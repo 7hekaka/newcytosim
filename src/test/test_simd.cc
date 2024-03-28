@@ -113,6 +113,24 @@ void test_signselect()
     dump(x, "signselect");
 }
 
+
+void test_float4()
+{
+    printf("---------- float4\n");
+    vec4f x{ 1, 2, 3, 4 };
+    vec4f y{-5,-6,-7,-8 };
+    dump(x, "x");
+    dump(y, "y");
+    
+    dump(catshift1f(x, y), "catshift1f(x, y)");
+    dump(catshift2f(x, y), "catshift2f(x, y)");
+    dump(catshift3f(x, y), "catshift3f(x, y)");
+
+    dump(blend13f(x, y), "blend13f(x, y)");
+    dump(blend22f(x, y), "blend22f(x, y)");
+    dump(blend31f(x, y), "blend31f(x, y)");
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -549,16 +567,6 @@ void test_rotate()
     dump(catshift1(a, b), "catshift1(a, b)");
     dump(catshift2(a, b), "catshift2(a, b)");
     dump(catshift3(a, b), "catshift3(a, b)");
-    
-    vec4f x{ 1, 2, 3, 4 };
-    vec4f y{-5,-6,-7,-8 };
-    dump(catshift1f(x, y), "catshift1f(x, y)");
-    dump(catshift2f(x, y), "catshift2f(x, y)");
-    dump(catshift3f(x, y), "catshift3f(x, y)");
-
-    dump(blend13f(x, y), "blend13f(x, y)");
-    dump(blend22f(x, y), "blend22f(x, y)");
-    dump(blend31f(x, y), "blend31f(x, y)");
 }
 
 
@@ -999,6 +1007,7 @@ int main(int argc, char * argv[])
             test_transpose2x2();
             test_transpose4x4();
             test_signselect();
+            test_float4();
             break;
 #ifdef __AVX__
         case 1:

@@ -183,7 +183,7 @@ LOCAL vec4f signselect4f(vec4f val, vec4f neg, vec4f pos) { return _mm_blendv_ps
 
 LOCAL vec4f load3f(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
 // loading 4 and clearing one
-LOCAL vec4f load3fZ(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
+LOCAL vec4f load3Zf(float const* a) { return _mm_blend_ps(_mm_loadu_ps(a), _mm_setzero_ps(), 0b1000); }
 
 #elif defined(__SSE3__)
 
@@ -197,7 +197,7 @@ LOCAL vec4f clear4th(vec4f a) { return _mm_shuffle_ps(a, _mm_shuffle_ps(a,_mm_se
 // loading 3 elements
 LOCAL vec4f load3f(float const* a) { return vec4f{a[0], a[1], a[2], 0}; }
 // loading 4 and clearing one
-LOCAL vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
+LOCAL vec4f load3Zf(float const* a) { return clear4th(loadu4f(a)); }
 
 #endif
 

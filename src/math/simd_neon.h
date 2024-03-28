@@ -294,11 +294,11 @@ LOCAL vec4f blendv4f(vec4f a, vec4f b, vec4f k) { return vbslq_f32(k,b,a); }
 LOCAL vec4f signselect4f(vec4f val, vec4f neg, vec4f pos) { return vbslq_f32(vcleq_f32(val, setzero4f()), neg, pos); }
 
 /// return { a[0], a[1], b[2], b[3] }
-LOCAL vec4f blend31f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,0,0,0},a,b); }
+LOCAL vec4f blend13f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,0,0,0},a,b); }
 /// return { a[0], b[1], b[2], b[3] }
 LOCAL vec4f blend22f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,~0,0,0},a,b); }
 /// return { a[0], a[1], a[2], b[3] }
-LOCAL vec4f blend13f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,~0,~0,0},a,b); }
+LOCAL vec4f blend31f(vec4f a, vec4f b) { return vbslq_f32(int32x4_t{~0,~0,~0,0},a,b); }
 
 /// concatenate and shift left
 LOCAL vec4f catshift1f(vec4f a, vec4f b) { return vextq_f32(a, b, 1); }
@@ -344,7 +344,7 @@ LOCAL vec4f clear4th(vec4f a) { return vsetq_lane_f32(0, a, 3); }
 // loading 3 elements
 LOCAL vec4f load3f(float const* a) { return vec4f{a[0], a[1], a[2], 0}; }
 // loading 4 and clearing one
-LOCAL vec4f load3fZ(float const* a) { return clear4th(loadu4f(a)); }
+LOCAL vec4f load3Zf(float const* a) { return clear4th(loadu4f(a)); }
 
 /// a * b + c
 LOCAL vec4f fmadd4f(vec4f a, vec4f b, vec4f c)  { return vfmaq_f32(c,a,b); }
