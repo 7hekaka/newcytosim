@@ -8,7 +8,7 @@
 unsigned long machine_time()
 {
     // the units of this counter is not specified, but seems close to nanosec
-    return mach_absolute_time() >> 20;
+    return mach_absolute_time() >> 10;
 }
 #else
 #  include <sys/time.h>
@@ -713,7 +713,7 @@ void Meca::computePrecondIsoP(Mecable* mec)
 
     const size_t bks = DIM * nbp;
     mec->blockSize(bks, bks*bks, bks);
-    double * blk = mec->pblock();
+    real * blk = mec->pblock();
 
     // we claim too much memory here, but this preconditionner is not good anyhow:
     getFullBlock(mec, blk);
@@ -733,7 +733,7 @@ void Meca::computePrecondIsoP(Mecable* mec)
         mec->blockType(3);
         //checkBlock(mec, blk);
 #if SAUERKRAUT && REAL_IS_DOUBLE
-    convert_to_floats(bks*bks, blk, (float*)blk);
+        convert_to_floats(bks*bks, blk, (float*)blk);
 #endif
     }
     else
@@ -753,7 +753,7 @@ void Meca::computePrecondBand(Mecable* mec)
     assert_true(BAND_NUD < BAND_LDD);
     const size_t bks = DIM * mec->nbPoints();
     mec->blockSize(bks, std::min(BAND_LDD, bks)*bks, 0);
-    double * blk = mec->pblock();
+    real * blk = mec->pblock();
 
     int bt, info = 0;
 
@@ -763,9 +763,10 @@ void Meca::computePrecondBand(Mecable* mec)
         
 #if ( 0 )
         VecPrint::full("band block "+std::to_string(bks), BAND_LDD, bks, blk, BAND_LDD);
-        mec->blockSize(bks, bks*bks, 0);
-        getHalfBlock(mec, blk);
-        VecPrint::full("half block", bks, bks, blk, bks);
+        real * tmp = new_real(bks*bks);
+        getHalfBlock(mec, tmp);
+        VecPrint::full("half block", bks, bks, tmp, bks);
+        free_real(tmp);
 #endif
         
         // calculate Cholesky factorization for band storage:
