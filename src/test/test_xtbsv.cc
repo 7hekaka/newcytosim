@@ -17,8 +17,6 @@
 #include "assert_macro.h"
 #include "cytoblas.h"
 #include "xtrsm.h"
-
-#define DEVELOP_XTBSV 1
 #include "xtbsv.h"
 
 
@@ -125,12 +123,9 @@ void iso5(int N, real const* AB, int LDA, real* B)
 #if ( DIM == 3 ) && defined(__AVX__) && REAL_IS_DOUBLE
     alsatian_iso3_xtbsvLNN2K_AVX(N, AB, LDA, B);
     alsatian_iso3_xtbsvLTN2K_AVX(N, AB, LDA, B);
-#elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
+#elif ( DIM == 3 ) && USE_SIMD
     alsatian_iso3_xtbsvLNN2K_SIMD(N, AB, LDA, B);
     alsatian_iso3_xtbsvLTN2K_SIMD(N, AB, LDA, B);
-#elif ( DIM == 3 ) && defined(__SSE3__) && !REAL_IS_DOUBLE
-    alsatian_iso3_xtbsvLNN2K_SSE(N, AB, LDA, B);
-    alsatian_iso3_xtbsvLTN2K_SSE(N, AB, LDA, B);
 #elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
     alsatian_iso2_xtbsvLNN2K_SIMD(N, AB, LDA, B);
     alsatian_iso2_xtbsvLTN2K_SIMD(N, AB, LDA, B);
@@ -146,17 +141,17 @@ void iso5(int N, real const* AB, int LDA, real* B)
 void isoLNN(int N, real const* AB, int LDA, real* B)
 {
 #if ( DIM == 1 )
-    alsatian_xtbsvLNN2K1(N, AB, LDA, B);
+    alsatian_xtbsvLNN2K(N, AB, LDA, B);
 #elif ( DIM == 2 ) && USE_SIMD && REAL_IS_DOUBLE
     alsatian_iso2_xtbsvLNN2K_SIMD(N, AB, LDA, B);
 #elif ( DIM == 2 )
     alsatian_iso2_xtbsvLNN2K(N, AB, LDA, B);
 #elif ( DIM == 3 ) && defined(__AVX__)
     alsatian_iso3_xtbsvLNN2K_AVX(N, AB, LDA, B);
-#elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
+#elif ( DIM == 3 ) && USE_SIMD
     alsatian_iso3_xtbsvLNN2K_SIMD(N, AB, LDA, B);
 #else
-    alsatian_xtbsvLNN<DIM>(N, 2, AB, LDA, B);
+    alsatian_iso_xtbsvLNN<DIM>(N, 2, AB, LDA, B);
 #endif
 }
 
@@ -170,10 +165,10 @@ void isoLTN(int N, real const* AB, int LDA, real* B)
     alsatian_iso2_xtbsvLTN2K(N, AB, LDA, B);
 #elif ( DIM == 3 ) && defined(__AVX__)
     alsatian_iso3_xtbsvLTN2K_AVX(N, AB, LDA, B);
-#elif ( DIM == 3 ) && USE_SIMD && REAL_IS_DOUBLE
+#elif ( DIM == 3 ) && USE_SIMD
     alsatian_iso3_xtbsvLTN2K_SIMD(N, AB, LDA, B);
 #else
-    alsatian_xtbsvLTN<DIM>(N, 2, AB, LDA, B);
+    alsatian_iso_xtbsvLTN<DIM>(N, 2, AB, LDA, B);
 #endif
 }
 
@@ -352,8 +347,8 @@ void uniLNB(int N, real const* AB, int LDA, real* B)
 
 void uniLN0(int N, real const* AB, int LDA, real* B)
 {
-    blas_xtbsvLN<'I'>(N, RANK, AB, LDA, B);
-    //blas_xtbsvLT<'I'>(N, RANK, AB, LDA, B);
+    blas_xtbsvLN<'C'>(N, RANK, AB, LDA, B);
+    //blas_xtbsvLT<'C'>(N, RANK, AB, LDA, B);
 }
 
 void uniLN1(int N, real const* AB, int LDA, real* B)
@@ -389,8 +384,8 @@ void uniLTB(int N, real const* AB, int LDA, real* B)
 
 void uniLT0(int N, real const* AB, int LDA, real* B)
 {
-    //blas_xtbsvLN<'I'>(N, RANK, AB, LDA, B);
-    blas_xtbsvLT<'I'>(N, RANK, AB, LDA, B);
+    //blas_xtbsvLN<'C'>(N, RANK, AB, LDA, B);
+    blas_xtbsvLT<'C'>(N, RANK, AB, LDA, B);
 }
 
 void uniLT1(int N, real const* AB, int LDA, real* B)
@@ -695,8 +690,8 @@ int main(int argc, char* argv[])
     size_t REP = 1024;
     RNG.seed();
     testISO(CNT, REP);
-    //testPOTRS(CNT, REP);
-    //testTBSV(CNT, REP);
-    //testGETRS(DIM*CNT, REP);
+    testPOTRS(CNT, REP);
+    testTBSV(CNT, REP);
+    testGETRS(DIM*CNT, REP);
     printf("\n");
 }
