@@ -706,18 +706,18 @@ Compute a preconditionner block corresponding to 'mec':
  Block of dimension reduced by DIM, including the projection
  The block is not symmetric and is factorized by LU decomposition
  */
-void Meca::computePrecondIsoP(Mecable* mec)
+void Meca::computePrecondIsoP(Mecable* mec, real* tmp)
 {
     const size_t nbp = mec->nbPoints();
     int info = 0;
 
     const size_t bks = DIM * nbp;
-    mec->blockSize(bks, bks*bks, bks);
+    mec->blockSize(nbp, nbp*nbp, bks);
     real * blk = mec->pblock();
 
-    // we claim too much memory here, but this preconditionner is not good anyhow:
-    getFullBlock(mec, blk);
-    project_matrix<DIM>(nbp, blk, bks, blk, nbp);
+    getFullBlock(mec, tmp);
+    // project matrix to reduce dimensionality:
+    project_matrix<DIM>(nbp, tmp, bks, blk, nbp);
 
     //VecPrint::full("isop preconditionner", nbp, nbp, mec->pblock(), nbp, 2);
 
@@ -733,7 +733,7 @@ void Meca::computePrecondIsoP(Mecable* mec)
         mec->blockType(3);
         //checkBlock(mec, blk);
 #if SAUERKRAUT && REAL_IS_DOUBLE
-        convert_to_floats(bks*bks, blk, (float*)blk);
+        convert_to_floats(nbp*nbp, blk, (float*)blk);
 #endif
     }
     else
@@ -927,7 +927,7 @@ void Meca::computePreconditionner()
             break;
         case 3:
             for ( Mecable * mec : mecables )
-                computePrecondIsoP(mec);
+                computePrecondIsoP(mec, tmp);
             break;
         case 4:
             for ( Mecable * mec : mecables )
