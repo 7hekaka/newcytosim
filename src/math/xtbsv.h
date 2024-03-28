@@ -1448,12 +1448,9 @@ void alsatian_iso_xpbtrsL(const int N, real const* AB, int LDAB, real* B)
 #if defined(__AVX__) && REAL_IS_DOUBLE
         alsatian_iso3_xtbsvLNN2K_AVX(N, AB, LDAB, B);
         alsatian_iso3_xtbsvLTN2K_AVX(N, AB, LDAB, B);
-#elif USE_SIMD && REAL_IS_DOUBLE
+#elif USE_SIMD
         alsatian_iso3_xtbsvLNN2K_SIMD(N, AB, LDAB, B);
         alsatian_iso3_xtbsvLTN2K_SIMD(N, AB, LDAB, B);
-#elif defined(__SSE3__) && !REAL_IS_DOUBLE
-        alsatian_iso3_xtbsvLNN2K_SSE(N, AB, LDAB, B);
-        alsatian_iso3_xtbsvLTN2K_SSE(N, AB, LDAB, B);
 #else
         alsatian_iso_xtbsvLNN<3>(N, 2, AB, LDAB, B);
         alsatian_iso_xtbsvLTN<3>(N, 2, AB, LDAB, B);

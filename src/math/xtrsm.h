@@ -493,7 +493,7 @@ void iso_xtrsmLUT(const int M, const FLOAT* A, const int lda, REAL* B)
 
 
 //------------------------------------------------------------------------------
-#pragma mark - 3D SIMD ALSATIAN DTRSM
+#pragma mark - 3D AVX ALSATIAN DTRSM
 
 #if defined(__AVX__)
 
@@ -509,7 +509,7 @@ void iso_xtrsmLUT(const int M, const FLOAT* A, const int lda, REAL* B)
  }
  */
 template < char diag >
-void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
+void alsatian_iso3_xtrsmLLN_AVX(const int M, const double* A, const int lda, double* B)
 {
     assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
@@ -650,7 +650,7 @@ void alsatian_xtrsmLLN3(const int M, const double* A, const int lda, double* B)
 
  */
 template < char diag >
-void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
+void alsatian_iso3_xtrsmLLT_AVX(const int M, const double* A, const int lda, double* B)
 {
     assert_true( M <= lda );
     A += M * lda;
@@ -779,7 +779,7 @@ void alsatian_xtrsmLLT3(const int M, const double* A, const int lda, double* B)
  }
  */
 template < char diag >
-void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
+void alsatian_iso3_xtrsmLUN_AVX(const int M, const double* A, const int lda, double* B)
 {
     assert_true( M <= lda );
     A += M * lda;
@@ -875,7 +875,7 @@ void alsatian_xtrsmLUN3(const int M, const double* A, const int lda, double* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLLN2(const int M, const double* A, const int lda, double* B)
+void alsatian_iso2_xtrsmLLN_SIMD(const int M, const double* A, const int lda, double* B)
 {
     assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
@@ -898,7 +898,7 @@ void alsatian_xtrsmLLN2(const int M, const double* A, const int lda, double* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLLT2(const int M, const double* A, const int lda, double* B)
+void alsatian_iso2_xtrsmLLT_SIMD(const int M, const double* A, const int lda, double* B)
 {
     assert_true( M <= lda );
     A += M * lda;
@@ -920,7 +920,7 @@ void alsatian_xtrsmLLT2(const int M, const double* A, const int lda, double* B)
 
 /// specialized version for ORD==2
 template < char diag >
-void alsatian_xtrsmLUN2(const int M, const double* A, const int lda, double* B)
+void alsatian_iso2_xtrsmLUN_SIMD(const int M, const double* A, const int lda, double* B)
 {
     assert_true( M <= lda );
     A += M * lda;
@@ -1829,7 +1829,7 @@ void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
 
 
 template < int ORD >
-void alsatian_xpotrsLref(const int N, const real* A, const int LDA, real* B)
+void alsatian_iso_xpotrsLref(const int N, const real* A, const int LDA, real* B)
 {
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
@@ -1848,20 +1848,20 @@ void alsatian_xpotrsLref(const int N, const real* A, const int LDA, real* B)
 
 
 template < int ORD >
-void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
+void alsatian_iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
 {
 #if XTRSM_USES_AVX
     if ( ORD == 3 )
     {
-        alsatian_xtrsmLLN3<'I'>(N, A, LDA, B);
-        alsatian_xtrsmLLT3<'I'>(N, A, LDA, B);
+        alsatian_iso3_xtrsmLLN_AVX<'I'>(N, A, LDA, B);
+        alsatian_iso3_xtrsmLLT_AVX<'I'>(N, A, LDA, B);
     } else
 #endif
 #if XTRSM_USES_SSE3
         if ( ORD == 2 )
     {
-        alsatian_xtrsmLLN2<'I'>(N, A, LDA, B);
-        alsatian_xtrsmLLT2<'I'>(N, A, LDA, B);
+        alsatian_iso2_xtrsmLLN_SIMD<'I'>(N, A, LDA, B);
+        alsatian_iso2_xtrsmLLT_SIMD<'I'>(N, A, LDA, B);
     } else
 #endif
         if ( ORD == 1 )
@@ -2228,22 +2228,22 @@ void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV
 {
     // Apply row interchanges to the right hand side.
     iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
-#if 0 && XTRSM_USES_AVX
+#if XTRSM_USES_AVX
     if ( ORD == 3 )
     {
         // Solve L*X = B, overwriting B with X.
-        alsatian_xtrsmLLN3<'U'>(N, A, LDA, B);
+        alsatian_iso3_xtrsmLLN_AVX<'U'>(N, A, LDA, B);
         // Solve U*X = B, overwriting B with X.
-        alsatian_xtrsmLUN3<'C'>(N, A, LDA, B);
+        alsatian_iso3_xtrsmLUN_AVX<'C'>(N, A, LDA, B);
     } else
 #endif
-#if 0 && XTRSM_USES_SSE3
+#if XTRSM_USES_SSE3
         if ( ORD == 2 )
     {
         // Solve L*X = B, overwriting B with X.
-        alsatian_xtrsmLLN2<'U'>(N, A, LDA, B);
+        alsatian_iso2_xtrsmLLN_SIMD<'U'>(N, A, LDA, B);
         // Solve U*X = B, overwriting B with X.
-        alsatian_xtrsmLUN2<'C'>(N, A, LDA, B);
+        alsatian_iso2_xtrsmLUN_SIMD<'C'>(N, A, LDA, B);
     } else
 #endif
         if ( ORD == 1 )

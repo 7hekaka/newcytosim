@@ -81,7 +81,7 @@ static inline void applyPrecondIsoS(Mecable const* mec, real* Y)
     free_real(tmp);
 #endif
 #if CHOUCROUTE
-    alsatian_xpotrsL<DIM>(nbp, mec->pblock(), nbp, Y);
+    alsatian_iso_xpotrsL<DIM>(nbp, mec->pblock(), nbp, Y);
 #else
     iso_xpotrsL<DIM>(nbp, mec->pblock(), nbp, Y);
 #endif

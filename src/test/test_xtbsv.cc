@@ -5,7 +5,7 @@
 #include <iostream>
 #include <limits>
 
-#define DIM 3
+#define DIM 2
 
 #include "real.h"
 #include "timer.h"
@@ -18,6 +18,15 @@
 #include "cytoblas.h"
 #include "xtrsm.h"
 #include "xtbsv.h"
+
+
+/// convert doubles to floats
+void convert_to_floats(size_t cnt, double const* src, float* dst)
+{
+    #pragma omp simd
+    for ( size_t i = 0; i < cnt; ++i )
+        dst[i] = (float)src[i];
+}
 
 
 /// print 12 scalars from `vec[]` of dimension `num`
@@ -235,7 +244,7 @@ void pot0(int N, real const* AB, int LDA, real* B)
 
 void pot1(int N, real const* AB, int LDA, real* B)
 {
-    alsatian_xpotrsLref<DIM>(N, AB, LDA, B);
+    alsatian_iso_xpotrsLref<DIM>(N, AB, LDA, B);
 }
 
 void pot2(int N, real const* AB, int LDA, real* B)
@@ -244,21 +253,16 @@ void pot2(int N, real const* AB, int LDA, real* B)
     iso_xtrsmLLT<DIM,'I'>(N, AB, LDA, B);
 }
 
-#if defined(__AVX__) && REAL_IS_DOUBLE
 void pot3(int N, real const* AB, int LDA, real* B)
 {
-#if ( DIM == 3 )
-    alsatian_xtrsmLLN3<'I'>(N, AB, LDA, B);
-    alsatian_xtrsmLLT3<'I'>(N, AB, LDA, B);
-#elif ( DIM == 2 )
-    alsatian_xtrsmLLN2<'I'>(N, AB, LDA, B);
-    alsatian_xtrsmLLT2<'I'>(N, AB, LDA, B);
-#elif ( DIM == 1 )
-    alsatian_xtrsmLLN1<'I'>(N, AB, LDA, B);
-    alsatian_xtrsmLLT1<'I'>(N, AB, LDA, B);
-#endif
+    alsatian_iso_xpotrsL<DIM>(N, AB, LDA, B);
 }
-#endif
+
+void pot4(int N, real const* AB, int LDA, real* B)
+{
+    iso_xtrsmLLN<DIM,'I'>(N, (float*)AB, LDA, B);
+    iso_xtrsmLLT<DIM,'I'>(N, (float*)AB, LDA, B);
+}
 
 void testPOTRS(int N, size_t rep)
 {
@@ -296,9 +300,11 @@ void testPOTRS(int N, size_t rep)
     if ( info == 0 )
     {
         check<pot1>(N, DIM, S, AB, LDA, B, "alsa_potrsLref", rep);
-        check<pot2>(N, DIM, S, AB, LDA, B, "iso_trsmLLN<D>", rep);
-#if defined(__AVX__) && REAL_IS_DOUBLE
-        check<pot3>(N, DIM, S, AB, LDA, B, "alsa_trsmLLND", rep);
+        check<pot2>(N, DIM, S, AB, LDA, B, "iso_trsmLL<D>", rep);
+        check<pot3>(N, DIM, S, AB, LDA, B, "alsa_potrs", rep);
+#if REAL_IS_DOUBLE
+        convert_to_floats(N*LDA, AB, (float*)AB);
+        check<pot4>(N, DIM, S, AB, LDA, B, "iso_trsm_float", rep);
 #endif
     }
     else
@@ -587,14 +593,6 @@ void getrs7(int N, real const* B, int LDB, real* Y)
 #endif
 }
 
-/// convert doubles to floats
-void convert_to_floats(size_t cnt, double const* src, float* dst)
-{
-    #pragma omp simd
-    for ( size_t i = 0; i < cnt; ++i )
-        dst[i] = (float)src[i];
-}
-
 /* initialize a general matrix that would be inversible. */
 void setMatrix(size_t N, real* A, size_t LDA)
 {
@@ -658,7 +656,7 @@ void testGETRS(int N, size_t rep)
     }
     if ( 1 )
     {
-        std::cout << "\n" << DIM << "D xGETRS--- " << MULTI << " matrices";
+        std::cout << "\n" << DIM << "D xGETRS " << N << "x" << N << " --- " << MULTI << " matrices";
         for ( size_t u = 0; u < MULTI; ++u )
         {
             real* mat = A + u * BLK;
@@ -698,14 +696,14 @@ void testGETRS(int N, size_t rep)
 
 int main(int argc, char* argv[])
 {
-    int CNT = DIM*31;
+    int CNT = 31;
     if ( argc > 1 )
         CNT = std::max(1, atoi(argv[1]));
     size_t REP = 1024;
     RNG.seed();
     testISO(CNT, REP);
     testPOTRS(CNT, REP);
-    testTBSV(CNT, REP);
+    testTBSV(DIM*CNT, REP);
     testGETRS(DIM*CNT, REP);
     printf("\n");
 }
