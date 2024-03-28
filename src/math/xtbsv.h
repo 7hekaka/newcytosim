@@ -815,7 +815,7 @@ void alsatian_xtbsvLTN6K_SSE(const int N, const double* A, const int lda, double
         vec2 tt = mul1(load1(A), load1(X-1));
         x1 = x0;
         x0 = fnmadd1(x0, load1(A+1), tt);
-        store2(X-1, unpacklo2(x0, x1));
+        storeu2(X-1, unpacklo2(x0, x1));
         A -= lda;
     }
     // truncated round at j = N-3
@@ -835,7 +835,7 @@ void alsatian_xtbsvLTN6K_SSE(const int N, const double* A, const int lda, double
         vec2 ab = loadu2(A+1);
         tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
         x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
-        store2(X-3, unpacklo2(x0, x1));
+        storeu2(X-3, unpacklo2(x0, x1));
         A -= lda;
     }
     // truncated round at j = N-5
@@ -861,7 +861,7 @@ void alsatian_xtbsvLTN6K_SSE(const int N, const double* A, const int lda, double
         ab = loadu2(A+1);
         tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
         x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
-        store2(X-5, unpacklo2(x0, x1));
+        storeu2(X-5, unpacklo2(x0, x1));
         A -= lda;
     }
     // update pointer
@@ -968,24 +968,24 @@ void alsatian_iso_xtbsvLTN(const int N, const int KD, const real* A, const int l
 
 #if defined(__AVX__)
 /// specialized version for KD==2 and ORD==3
-void alsatian_iso3_xtbsvLNN2K_AVX(const int N, const double* pA, const int lda, double* pX)
+void alsatian_iso3_xtbsvLNN2K_AVX(const int N, const double* A, const int lda, double* X)
 {
     constexpr int ORD = 3;
     const double * end = X + ORD * ( N - 2 );
-    vec4 x2 = load4(X);   //may load garbage if N == 0
-    vec4 x4 = load4(X+ORD); //may load garbage if N < 1
+    vec4 x2 = loadu4(X);   //may load garbage if N == 0
+    vec4 x4 = loadu4(X+ORD); //may load garbage if N < 1
     while ( X < end ) // ( int j = 2; j < N; ++j )
     {
         vec4 x0 = x2; // x1 = load3(X);
         x2 = fnmadd4(broadcast1(A+1), x2, x4); // x4 = load3(X+2);
-        x4 = fnmadd4(broadcast1(A+2), x0, load4(X+ORD*2));
-        store4(X, mul4(broadcast1(A), x0)); // 4th value to be overwritten
+        x4 = fnmadd4(broadcast1(A+2), x0, loadu4(X+ORD*2));
+        storeu4(X, mul4(broadcast1(A), x0)); // 4th value to be overwritten
         A += lda;
         X += ORD;
     }
     if ( N > 1 )
     {
-        store4(X, mul4(broadcast1(A), x2)); // 4th value to be overwritten
+        storeu4(X, mul4(broadcast1(A), x2)); // 4th value to be overwritten
         x2 = fnmadd4(broadcast1(A+1), x2, x4); // x4 = load3(X+2);
         store3(X+2, mul4(broadcast1(A+lda), x2));
     }
@@ -997,27 +997,31 @@ void alsatian_iso3_xtbsvLNN2K_AVX(const int N, const double* pA, const int lda, 
 
 
 /// specialized version for KD==2 and ORD==3
-void alsatian_iso3_xtbsvLTN2K_AVX(const int N, const double* pA, const int lda, double* pX)
+void alsatian_iso3_xtbsvLTN2K_AVX(const int N, const double* A, const int lda, double* X)
 {
     constexpr int ORD = 3;
     const double * end = X;
     X += N * ORD;
     A += N * lda;
-    vec4 x4, x2;
+    vec4 x4, x2, xx;
     if ( N > 1 ) // j = N-2
     {
         A -= lda * 2;
         X -= ORD * 2;
         x4 = mul4(broadcast1(A+lda), load3Z(X+ORD));
-        store2(X+ORD+1, catshift1(x4, setzero4()));
-        vec4 x0 = mul4(broadcast1(A), load4(X));
+        //store3(X, x2);
+        storeu2(X+ORD+1, getlo(catshift1(x4, setzero4())));
+        xx = broadcastX(x4); // save X for next round
+        vec4 x0 = mul4(broadcast1(A), loadu4(X));
         x2 = fnmadd4(broadcast1(A+1), x4, x0); // x4 = load3(X+2)
         //store3(X, x2);
-        storeu4(X, blend31(x2, x4));
+        storeu4(X, blend31(x2, xx));
+        xx = broadcastX(x2); // save X for next round
+
     }
     else
     {
-        x4 = mul4(broadcast1(A-lda), load4(X-ORD));
+        x4 = mul4(broadcast1(A-lda), loadu4(X-ORD));
         store3(X-ORD, x4);
         return;
     }
@@ -1025,13 +1029,14 @@ void alsatian_iso3_xtbsvLTN2K_AVX(const int N, const double* pA, const int lda, 
     {
         A -= lda;
         X -= ORD;
-        vec4 x0 = mul4(broadcast1(A), load4(X));
+        vec4 x0 = mul4(broadcast1(A), loadu4(X));
         x0 = fnmadd4(broadcast1(A+1), x2, x0); // x2 = load3(X+2)
         x0 = fnmadd4(broadcast1(A+2), x4, x0); // x4 = load3(X+4)
         x4 = x2;
         x2 = x0;
         //store3(X, x0);
-        storeu4(X, blend31(x0, x4));
+        storeu4(X, blend31(x0, xx));
+        xx = broadcastX(x0); // save X for next round
     }
 }
 #endif
@@ -1045,44 +1050,44 @@ void alsatian_iso3_xtbsvLNN2K_SIMD(const int N, const double* A, const int lda, 
 {
     constexpr int ORD = 3;
     const double * end = X + ORD * ( N - 2 );
-    vec2 x2 = load2(X);   //may load garbage if N == 0
+    vec2 x2 = loadu2(X);   //may load garbage if N == 0
     vec2 z2 = load1(X+2); //may load garbage if N == 0
-    vec2 x4 = load2(X+ORD); //may load garbage if N < 1
+    vec2 x4 = loadu2(X+ORD); //may load garbage if N < 1
     vec2 z4 = load1(X+ORD+2); //may load garbage if N < 1
     while ( X < end ) // ( int j = 2; j < N; ++j )
     {
         vec2 x0 = x2; // x1 = load2(X);
         vec2 z0 = z2;
-        vec2 aa = load2(A+1);
+        vec2 aa = loadu2(A+1);
         vec2 a1 = unpacklo2(aa, aa);
         vec2 a2 = unpackhi2(aa, aa);
         aa = loaddup2(A);
         x2 = fnmadd2(a1, x0, x4); // x4 = load2(X+2);
         z2 = fnmadd1(a1, z0, z4);
-        x4 = fnmadd2(a2, x0, load2(X+ORD*2));
+        x4 = fnmadd2(a2, x0, loadu2(X+ORD*2));
         z4 = fnmadd1(a2, z0, load1(X+ORD*2+2));
-        store2(X, mul2(aa, x0));
+        storeu2(X, mul2(aa, x0));
         store1(X+2, mul1(aa, z0));
         A += lda;
         X += ORD;
     }
     if ( N > 1 )
     {
-        vec2 aa = load2(A);
+        vec2 aa = loadu2(A);
         vec2 a0 = unpacklo2(aa, aa);
-        store2(X, mul2(a0, x2));
+        storeu2(X, mul2(a0, x2));
         store1(X+2, mul2(a0, z2));
         vec2 a1 = unpackhi2(aa, aa);
         x2 = fnmadd2(a1, x2, x4); // x4 = load2(X+2);
         z2 = fnmadd1(a1, z2, z4);
         vec2 aL = loaddup2(A+lda);
-        store2(X+3, mul2(aL, x2));
+        storeu2(X+3, mul2(aL, x2));
         store1(X+5, mul2(aL, z2));
     }
     else if ( N > 0 )
     {
         vec2 aa = loaddup2(A);
-        store2(X, mul2(aa, x2));
+        storeu2(X, mul2(aa, x2));
         store1(X+2, mul1(aa, z2));
     }
 }
@@ -1101,7 +1106,7 @@ void alsatian_iso3_xtbsvLTN2K_SIMD(const int N, const double* A, const int lda, 
         A -= lda;
         X -= ORD;
         vec2 aa = loaddup2(A);
-        x4 = mul2(aa, load2(X));
+        x4 = mul2(aa, loadu2(X));
         z4 = mul1(aa, load1(X+2));
         store2(X, x4);
         store1(X+2, z4);
@@ -1110,14 +1115,14 @@ void alsatian_iso3_xtbsvLTN2K_SIMD(const int N, const double* A, const int lda, 
     {
         A -= lda;
         X -= ORD;
-        vec2 aa = load2(A);
+        vec2 aa = loadu2(A);
         vec2 a0 = unpacklo2(aa, aa);
         vec2 a1 = unpackhi2(aa, aa);
-        vec2 x0 = mul2(a0, load2(X));
+        vec2 x0 = mul2(a0, loadu2(X));
         vec2 z0 = mul1(a0, load1(X+2));
         x2 = fnmadd2(a1, x4, x0); // x4 = load2(X+2)
         z2 = fnmadd1(a1, z4, z0);
-        store2(X, x2);
+        storeu2(X, x2);
         store1(X+2, z2);
     }
     while ( X > end )
@@ -1125,9 +1130,9 @@ void alsatian_iso3_xtbsvLTN2K_SIMD(const int N, const double* A, const int lda, 
         A -= lda;
         X -= ORD;
         vec2 aa = loaddup2(A);
-        vec2 x0 = mul2(aa, load2(X));
+        vec2 x0 = mul2(aa, loadu2(X));
         vec2 z0 = mul1(aa, load1(X+2));
-        aa = load2(A+1);
+        aa = loadu2(A+1);
         vec2 a1 = unpacklo2(aa, aa);
         vec2 a2 = unpackhi2(aa, aa);
         x0 = fnmadd2(a1, x2, x0); // x2 = load2(X+2)
@@ -1138,7 +1143,7 @@ void alsatian_iso3_xtbsvLTN2K_SIMD(const int N, const double* A, const int lda, 
         z4 = z2;
         x2 = x0;
         z2 = z0;
-        store2(X, x0);
+        storeu2(X, x0);
         store1(X+2, z0);
     }
 }

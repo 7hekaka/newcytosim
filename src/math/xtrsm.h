@@ -1778,21 +1778,18 @@ inline void lapack_xpotrs(char UPLO, int N, int NRHS, const real* A, int LDA, re
 
 
 template < int ORD >
-void iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
+void iso_xpotrsL_lapack(const int N, const real* A, const int LDA, real* B)
 {
     /*
      we cannot call lapack::DPOTRS('L', N, 1, A, LDA, B, N, &info);
      because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
      But calling DTBSV gets the required work done.
      */
-#if 0
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
     {
         for ( int u = 0; u < N; ++u )
             tmp[u] = B[d+ORD*u];
-        //int info = 0;
-        //lapack::xpotrs('L', N, 1, A, LDA, tmp, N, &info);
         // Solve L*X = B, overwriting B with X. ALPHA = 1.0
         blas::xtrsm('L', 'L', 'N', 'N', N, 1, 1.0, A, LDA, tmp, N);
         // Solve U*X = B, overwriting B with X. ALPHA = 1.0
@@ -1801,12 +1798,17 @@ void iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
             B[d+ORD*u] = tmp[u];
     }
     free_real(tmp);
-#else
+}
+
+
+template < int ORD >
+void iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
+{
+    //return iso_xpotrsL_lapack<ORD>(N, A, LDA, B);
     // Solve L*X = B, overwriting B with X. ALPHA = 1.0
     iso_xtrsmLLN<ORD,'N'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X. ALPHA = 1.0
     iso_xtrsmLLT<ORD,'N'>(N, A, LDA, B);
-#endif
 }
 
 
@@ -2179,16 +2181,14 @@ void alsatian_xgetrsN_SSE_CHECK(int N, const real* A, int LDA, const int* IPIV, 
 
 #endif
 
-/// version of xgetrs('N', ...) for ORD interleaved vectors in right-hand-side B
 template < int ORD >
-void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
+void iso_getrsN_lapack(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
     /*
      we cannot call lapack::DGETRS('N', bks, 1, mec->pblock(), bks, mec->pivot(), Y, bks, &info);
      because the coordinates of the vector 'Y' are not contiguous but offset by 'ORD'.
      But calling DTBSV gets the required work done.
      */
-#if 0
     real * tmp = new_real(N);
     for ( int d = 0; d < ORD; ++d )
     {
@@ -2206,14 +2206,19 @@ void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, rea
             B[d+ORD*u] = tmp[u];
     }
     free_real(tmp);
-#else
+}
+
+/// version of xgetrs('N', ...) for ORD interleaved vectors in right-hand-side B
+template < int ORD >
+void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
+{
+    //return iso_getrsN_lapack<ORD>(N, A, LDA, IPIV, B);
     // Apply row interchanges to the right hand side.
     iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
     // Solve L*X = B, overwriting B with X.
     iso_xtrsmLLN<ORD,'U'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
     iso_xtrsmLUN<ORD,'N'>(N, A, LDA, B);
-#endif
 }
 
 

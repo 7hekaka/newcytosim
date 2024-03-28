@@ -228,6 +228,11 @@ void testISO(int N, size_t rep)
 //------------------------------------------------------------------------------
 #pragma mark - Cholesky factorization
 
+void pot0(int N, real const* AB, int LDA, real* B)
+{
+    iso_xpotrsL_lapack<DIM>(N, AB, LDA, B);
+}
+
 void pot1(int N, real const* AB, int LDA, real* B)
 {
     alsatian_xpotrsLref<DIM>(N, AB, LDA, B);
@@ -278,6 +283,15 @@ void testPOTRS(int N, size_t rep)
     nan_spill(AB+N*LDA);
     //VecPrint::full("AB", N, N, AB, LDA);
     int info = 0;
+    if ( 1 )
+    {
+        real * ABc = new_real(N*LDA+4);
+        copy_real(N*LDA+4, AB, ABc);
+        lapack::xpotf2('L', N, ABc, LDA, &info);
+        check<pot0>(N, DIM, S, ABc, LDA, B, "blas:potrs", rep);
+        free_real(ABc);
+    }
+    
     alsatian_xpotf2L(N, AB, LDA, &info);
     if ( info == 0 )
     {
