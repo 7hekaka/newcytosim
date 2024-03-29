@@ -64,7 +64,7 @@ real checksum(size_t size, real const* vec)
     return s;
 }
 
-///set indices within [0, sup] that are multiples of 'dim'
+///set indices within [0, sup] that are below the diagonal: Y >= X
 void setIndices(unsigned sup, size_t cnt)
 {
     delete[] inx_;
@@ -205,10 +205,9 @@ void compareMatrices(unsigned S, MATRIX & mat1, MATROX& mat2, size_t fill)
 template <typename MATRIX>
 void fillMatrix(MATRIX& mat)
 {
-    mat.reset();
 #if ( DIM == 3 )
     Matrix33 S(alpha, beta, -beta, beta, -alpha, beta, -beta, beta, alpha);
-    Matrix33 U(kappa, iota, iota, -iota, kappa, iota, -iota,-iota, kappa);
+    Matrix33 U(kappa, iota, iota, -iota, kappa, iota, -iota, -iota, kappa);
     //Matrix33 U(kappa, iota, -iota, iota, kappa, iota, -iota, iota, -kappa);
 #elif ( DIM == 2 )
     Matrix22 S(alpha, beta, -beta, alpha);
@@ -243,30 +242,28 @@ void fillMatrix(MATRIX& mat)
 
 // check the results of Z = Mat * X + Y with different methods
 template <typename MATRIX>
-real checkMatrix(MATRIX & mat, real const* x, real const* y, real * z, size_t print)
+real checkMatrix(MATRIX & mat, real const* x, real const* y, real * z, size_t NP)
 {
-    mat.prepareForMultiply(1);
     size_t N = mat.size();
-    size_t NP = std::min(N, print);
-    if ( print > 1 ) VecPrint::print("xxxx", NP, x);
-    if ( print > 1 ) VecPrint::print("yyyy", NP, y);
+    if ( NP > 1 ) VecPrint::print("xxxx", NP, x);
+    if ( NP > 1 ) VecPrint::print("yyyy", NP, y);
     copy_real(N, y, z);
     mat.vecMulAdd(x, z);
     real sum1 = checksum(N, z);
-    if ( print > 1 ) VecPrint::print("vec1", NP, z);
+    if ( NP > 1 ) VecPrint::print("vec1", NP, z);
 
     copy_real(N, y, z);
     mat.vecMulAdd_ALT(x, z);
     real sum2 = checksum(N, z);
-    if ( print > 1 ) VecPrint::print("vec2", NP, z);
+    if ( NP > 1 ) VecPrint::print("vec2", NP, z);
 
     mat.vecMul(x, z);
     for ( size_t i = 0; i < N; ++i ) z[i] += y[i];
     real sum3 = checksum(N, z);
-    if ( print > 1 ) VecPrint::print("vec3", NP, z);
+    if ( NP > 1 ) VecPrint::print("vec3", NP, z);
     
     real n = std::max(abs_real(sum1-sum2), abs_real(sum2-sum3));
-    if ( print )
+    if ( NP > 0 )
     {
         if ( n > 1e-6 )
             printf(" FAILED");
@@ -284,6 +281,7 @@ void testMatrix(MATRIX & mat, real const* x, real const* y, real * z)
     tick();
     for ( size_t n=0; n<N_RUN; ++n )
     {
+        mat.reset();
         fill(mat);
         mat.prepareForMultiply(1);
     }
@@ -438,6 +436,7 @@ void testParallelVecmul(const unsigned S, const size_t F)
 
     SparMatA mat;
     mat.resize(DIM*S);
+    mat.reset();
     fillMatrix(mat);
     mat.prepareForMultiply(1);
 
@@ -638,12 +637,13 @@ void testMatrices(const unsigned S, const size_t F)
         for ( int i = 0; i < 1024; ++i )
         {
             setIndices(S, F);
+            mat.reset();
             fillMatrix(mat);
             err = checkMatrix(mat, x, y, z, 0);
             if ( err > REAL_EPSILON ) break;
         }
         printf(" error %e\n", err);
-        checkMatrix(mat, x, y, z, 10*(err>1e-6));
+        checkMatrix(mat, x, y, z, 16*(err>1e-6));
         //mat.printSparse(std::cout, 0, 0, 1000);
     }
     if ( 1 )
@@ -669,18 +669,20 @@ const real vec[4] = { -1, 3,  1, 2 };
 template < typename MATRIX >
 void fillBlockMatrix(MATRIX& mat)
 {
-    typename MATRIX::Block S = MATRIX::Block::outerProduct(dir);
-    typename MATRIX::Block U = MATRIX::Block::outerProduct(vec);
-    
+    typename MATRIX::Block D = MATRIX::Block::outerProduct(dir);
+    typename MATRIX::Block B = MATRIX::Block::outerProduct(dir);
+    typename MATRIX::Block U = MATRIX::Block::outerProduct(vec, dir);
+
     for ( size_t n = 0; n < icnt_; ++n )
     {
         size_t i = iny_[n];
         size_t j = inx_[n];
-        mat.diag_block(i).sub_half(S);
-        if ( i != j )
+        mat.diag_block(i).add_half(D);
+        if ( i > j )
         {
-            mat.diag_block(j).add_half(S);
-            mat.block(i, j).add_full(U);
+            mat.diag_block(j).add_half(D);
+            mat.block(j+1, j).add_full(B);
+            mat.block(i, j).sub_full(U);
         }
     }
 }
@@ -695,10 +697,12 @@ void testBlockMatrix(const unsigned S, const size_t F)
     setIndices(S, F);
     
     printf("------ %i x %u with %lu blocks:", DIM, S, F);
+    SparMatA A; A.resize(DIM*S); testMatrix<SparMatA, fillBlockMatrix>(A, x, y, z);
     SparMatB B; B.resize(DIM*S); testMatrix<SparMatB, fillBlockMatrix>(B, x, y, z);
     SparMatD D; D.resize(DIM*S); testMatrix<SparMatD, fillBlockMatrix>(D, x, y, z);
-    //SparMatA A; A.resize(DIM*S); testMatrix<SparMatA, fillBlockMatrix>(A, x, y, z);
     printf("\n");
+    
+    //D.printSummary(std::cout, 0, DIM*S);
 
     setIndices(0, 0);
     free_real(x);
