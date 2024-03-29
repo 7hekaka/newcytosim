@@ -177,7 +177,7 @@ real& SparMatSym::element(size_t ii, size_t jj)
 }
 
 
-real* SparMatSym::addr(size_t i, size_t j) const
+real* SparMatSym::address(size_t i, size_t j) const
 {
     // swap to get ii > jj (address lower triangle)
     size_t ii = std::max(i, j);

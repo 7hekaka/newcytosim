@@ -54,7 +54,7 @@ public:
     void allocate(size_t sz);
         
     /// returns the address of element at (x, y), no allocation is done
-    real* addr( size_t x, size_t y ) const;
+    real* address( size_t x, size_t y ) const;
     
     /// returns the address of element at (x, y), allocating if necessary
     real& operator()( size_t x, size_t y );

@@ -67,16 +67,16 @@ public:
     real* data() const { return mat_; }
     
     /// the address holding element (i, j)
-    real* addr(size_t i, size_t j) const;
+    real* address(size_t i, size_t j) const;
     
     /// returns the address of element at (i, j), allocating if necessary
-    real value(size_t i, size_t j) const { return *addr(i, j); }
+    real value(size_t i, size_t j) const { return *address(i, j); }
 
     /// returns the address of element at (i, j), allocating if necessary
-    real& operator()(size_t i, size_t j) { return *addr(i, j); }
+    real& operator()(size_t i, size_t j) { return *address(i, j); }
     
     /// returns the address of element at (i, j), allocating if necessary
-    real  operator()(size_t i, size_t j) const { return *addr(i, j); }
+    real  operator()(size_t i, size_t j) const { return *address(i, j); }
 
     
     /// reset with 'dia' on diagonal and 'off' elsewhere

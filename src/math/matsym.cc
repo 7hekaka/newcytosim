@@ -55,7 +55,7 @@ real& MatrixSymmetric::operator()( size_t x, size_t y)
 }
 
 
-real* MatrixSymmetric::addr( size_t x, size_t y) const
+real* MatrixSymmetric::address( size_t x, size_t y) const
 {
     assert_true( x < size_ );
     assert_true( y < size_ );

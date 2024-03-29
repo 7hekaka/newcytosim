@@ -226,7 +226,7 @@ real& SparMatSym1::element(size_t ii, size_t jj)
 }
 
 
-real* SparMatSym1::addr(size_t i, size_t j) const
+real* SparMatSym1::address(size_t i, size_t j) const
 {
     if ( i == j )
         return diagon_ + i;

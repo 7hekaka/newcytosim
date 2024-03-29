@@ -153,7 +153,7 @@ public:
     size_t column_index(size_t j, size_t n) const { assert_true(j<size_); return column_[j][n].inx; }
 
     /// returns the address of element at (x, y), no allocation is done
-    real* addr(size_t x, size_t y) const;
+    real* address(size_t x, size_t y) const;
 
     /// returns a modifiable diagonal element
     real& diagonal(size_t i);

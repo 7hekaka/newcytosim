@@ -223,7 +223,7 @@ real& SparMatSymBlkDiag::element(size_t iii, size_t jjj)
 }
 
 
-real* SparMatSymBlkDiag::addr(size_t iii, size_t jjj) const
+real* SparMatSymBlkDiag::address(size_t iii, size_t jjj) const
 {
     // branchless code to address lower triangle
     size_t ii = std::max(iii, jjj);

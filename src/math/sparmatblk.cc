@@ -186,7 +186,7 @@ real& SparMatBlk::element(size_t ii, size_t jj)
 }
 
 
-real* SparMatBlk::addr(size_t ii, size_t jj) const
+real* SparMatBlk::address(size_t ii, size_t jj) const
 {
     assert_true( ii >= jj );
 #if ( BLOCK_SIZE == 1 )

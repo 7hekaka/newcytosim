@@ -147,7 +147,7 @@ real& SparMat::operator()( size_t x, size_t y )
 
 
 //does not allocate the position:
-real* SparMat::addr( size_t x, size_t y) const
+real* SparMat::address( size_t x, size_t y) const
 {
     size_t * row = mxRow[y];
     if ( row )

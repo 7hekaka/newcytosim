@@ -72,7 +72,7 @@ public:
     void allocate(size_t sz);
     
     /// returns the address of element at (x, y), no allocation is done
-    real* addr(size_t x, size_t y) const;
+    real* address(size_t x, size_t y) const;
     
     /// returns a modifiable reference to the diagonal term at given index
     real& diagonal(size_t i);

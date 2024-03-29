@@ -538,7 +538,7 @@ void checkIsoMatrix(MATRIX & mat, real const* x, real const* y, real * z)
                 ful.diagonal(DIM*j+d) = e;
             for ( size_t i = j+1; i < S; ++i )
             {
-                real * p = mat.addr(i, j);
+                real * p = mat.address(i, j);
                 if ( p )
                 {
                     for ( int d = 0; d < DIM; ++d )

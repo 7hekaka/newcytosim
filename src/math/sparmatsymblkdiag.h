@@ -222,7 +222,7 @@ public:
     Block& diag_block(size_t i) { return pilar_[i].diag_block(); }
     
     /// returns the address of element at line i, column j, no allocation is done
-    real* addr(size_t i, size_t j) const;
+    real* address(size_t i, size_t j) const;
 
     /// returns the address of element at line i, column j, allocating if necessary
     real& element(size_t i, size_t j);

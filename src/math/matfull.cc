@@ -66,7 +66,7 @@ void MatrixFull::allocate(size_t alc)
 #pragma mark - Access
 
 
-real* MatrixFull::addr(size_t i, size_t j) const
+real* MatrixFull::address(size_t i, size_t j) const
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
@@ -82,7 +82,7 @@ void MatrixFull::reset(real dia, real off)
     for ( size_t i = 0; i < allo_*allo_ ; ++i )
         mat_[i] = off;
     for ( size_t i = 0; i < size_ ; ++i )
-        *addr(i,i) = dia;
+        *address(i,i) = dia;
 }
 
 
@@ -92,11 +92,11 @@ void MatrixFull::truncate(size_t kl, size_t ku)
     {
         //zero out terms above the diagonal:
         for ( size_t i = 0; i+ku < j; ++i )
-            *addr(i,j) = 0;
+            *address(i,j) = 0;
         
         //zero out terms below the diagonal:
         for ( size_t i = j+kl+1; i < size_; ++i )
-            *addr(i,j) = 0;
+            *address(i,j) = 0;
     }
 }
 
@@ -106,7 +106,7 @@ void MatrixFull::importMatrix(size_t size, real const* ptr, size_t lld)
     resize(size);
     for ( size_t i = 0; i < size; ++i )
     for ( size_t j = 0; j < size; ++j )
-        *addr(i,j) = ptr[i+lld*j];
+        *address(i,j) = ptr[i+lld*j];
 }
 
 
@@ -123,8 +123,8 @@ void MatrixFull::transpose()
     for ( size_t j = i; j < size_; ++j )
     {
         real tmp = value(i,j);
-        *addr(i,j) = *addr(j,i);
-        *addr(j,i) = tmp;
+        *address(i,j) = *address(j,i);
+        *address(j,i) = tmp;
     }
 }
 

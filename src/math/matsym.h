@@ -80,7 +80,7 @@ public:
     real* data() const { return val; }
 
     /// returns the address of element at (x, y), no allocation is done
-    real* addr(size_t x, size_t y) const;
+    real* address(size_t x, size_t y) const;
     
     /// returns the address of element at (x, y), allocating if necessary
     real& operator()(size_t i, size_t j);

@@ -8,7 +8,7 @@
 //------------------------------------------------------------------------------
 real Matrix::value(const size_t x, const size_t y) const
 {
-    real* v = addr( x, y );
+    real* v = address( x, y );
     if ( !v )
         return 0;
     else
@@ -23,7 +23,7 @@ real Matrix::norm_inf() const
     {
         for ( size_t jj = 0; jj < Z; ++jj )
         {
-            real* v = addr( ii, jj );
+            real* v = address( ii, jj );
             if ( v  &&  ( *v > result ) )
                 result = *v;
         }
@@ -95,7 +95,7 @@ void Matrix::printFull(std::ostream& os) const
     {
         for ( size_t jj = 0; jj < Z; ++jj )
         {
-            real * a = addr(ii,jj);
+            real * a = address(ii,jj);
             if ( a )
             {
                 snprintf(str, sizeof(str), " %9.3f", *a);
@@ -116,7 +116,7 @@ void Matrix::printSparse(std::ostream& os, real inf, size_t start, size_t stop) 
     for ( size_t ii = start; ii < stop; ++ii )
         for ( size_t jj = 0; jj < Z; ++jj )
         {
-            real * v = addr(ii, jj);
+            real * v = address(ii, jj);
             if ( v && abs_real(*v) >= inf )
                 os << std::setw(6) << ii << " " << std::setw(6) << jj << " " << std::setw(16) << v << "\n";
         }
