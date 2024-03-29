@@ -1388,10 +1388,11 @@ void Interface::execute_call(std::string& str, Glossary& opt)
 
 void Interface::execute_dump(std::string const& path, int mode)
 {
-    Cytosim::log("Cytosim is dumping a system of size %lu in `%s'...", sim_->sMeca.dimension(), path.c_str());
     sim_->sMeca.doNotify = 1;
     sim_->solve_half();
     
+    size_t dim = sim_->sMeca.dimension();
+    Cytosim::log("Cytosim is dumping a system of size %lu in `%s'...", dim, path.c_str());
     int cwd = FilePath::change_dir(path, true);
     
     if ( mode & 1 ) sim_->sMeca.saveSystem();
