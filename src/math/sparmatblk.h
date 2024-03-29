@@ -114,7 +114,7 @@ public:
         Block& block(size_t j);
         
         /// multiplication of a vector: L * X
-        void vecMulCol(const real* X, real* Y) const;
+        void vecMulLine(const real* X, real* Y) const;
         
         /// multiplication of a vector: L * X
         real vecMul1D(const real* X) const;
@@ -155,7 +155,7 @@ private:
     void symmetrize();
     
     /// this is 'true' if symmetrize() was called
-    bool already_symmetric;
+    bool is_symmetric;
     
 private:
     
@@ -165,7 +165,7 @@ private:
     /// amount of memory which has been allocated
     size_t alloc_;
     
-    /// array col_[c][] holds Elements of column 'c'
+    /// array row_[c][] holds Elements of line 'c'
     Line * row_;
     
     /// colidx_[i] is the index of the first non-empty row of index >= i
@@ -212,6 +212,7 @@ public:
         assert_true( ii >= jj );
         assert_true( ii < rsize_ );
         assert_true( jj < rsize_ );
+        is_symmetric = false;
         return row_[ii].block(jj);
     }
     

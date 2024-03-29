@@ -15,6 +15,7 @@ SparMatBlk::SparMatBlk()
     row_    = nullptr;
     blocks_ = nullptr;
     colidx_ = new unsigned[2]();
+    is_symmetric = false;
 }
 
 
@@ -207,7 +208,7 @@ real* SparMatBlk::address(size_t ii, size_t jj) const
 
 void SparMatBlk::reset()
 {
-    already_symmetric = false;
+    is_symmetric = false;
     for ( size_t n = 0; n < rsize_; ++n )
         row_[n].reset();
 }
@@ -379,7 +380,7 @@ static void printSparseBlock(std::ostream& os, real inf, SparMatBlk::Block const
 }
 
 
-void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
+void SparMatBlk::printSparse(std::ostream& os, real epsilon, size_t start, size_t stop) const
 {
     os << "% SparMatBlk size " << rsize_ << ":\n";
     stop = std::min(stop, rsize_);
@@ -392,7 +393,7 @@ void SparMatBlk::printSparse(std::ostream& os, real inf, size_t start, size_t st
         if ( row.notEmpty() )
             os << "% line " << jj << "\n";
         for ( size_t n = 0 ; n < row.rlen_ ; ++n )
-            printSparseBlock(os, inf, row.blk_[n], row.inx_[n], jj);
+            printSparseBlock(os, epsilon, row.blk_[n], row.inx_[n], jj);
     }
     os.precision(p);
 }
@@ -569,17 +570,16 @@ void SparMatBlk::symmetrize()
         
         for ( size_t n = 0 ; n < row.rlen_ ; ++n )
         {
-            /// we duplicate blocks from the lower triangle
+            /// we duplicate blocks below the diagonal:
             size_t j = row.inx_[n];
-            assert_true( j <= i );
-            if ( j < i )
-            {
+            if ( i == j )
+                row.blk_[n].copy_lower();
+            else {
+                assert_true( i > j );
                 //std::cerr << "copying block at " << i << ", " << j << "\n";
-                assert_true( row_[j].rlen_ > 0 );
                 row_[j].block(i) = row.blk_[n].transposed();
             }
-            else if ( i == j )
-                row.blk_[n].copy_lower();
+
         }
     }
     
@@ -623,12 +623,13 @@ bool SparMatBlk::prepareForMultiply(int)
         return false;
 
     sortElements();
-    if ( !already_symmetric )
+
+    if ( !is_symmetric )
     {
         //std::cerr << "\nMatrixSparseBlock:symmetrize " << nbElements();
         symmetrize();
         //std::cerr << " -> " << nbElements() << "  ";
-        already_symmetric = true;
+        is_symmetric = true;
     }
     
 #if 0
@@ -644,7 +645,7 @@ bool SparMatBlk::prepareForMultiply(int)
 //------------------------------------------------------------------------------
 #pragma mark - Basic Vector Multiplication
 
-void SparMatBlk::Line::vecMulCol(const real* X, real* Y) const
+void SparMatBlk::Line::vecMulLine(const real* X, real* Y) const
 {
     Vector vec(Y);
     for ( size_t n = 0; n < rlen_; ++n )
@@ -964,7 +965,7 @@ void SparMatBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop
     assert_true( start <= stop );
     stop = std::min(stop, rsize_);
     for ( size_t i = start; i < stop; ++i )
-        row_[i].vecMulCol(X, Y+BLOCK_SIZE*i);
+        row_[i].vecMulLine(X, Y+BLOCK_SIZE*i);
 }
 
 
@@ -984,7 +985,7 @@ void SparMatBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) co
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+3*i, add4(loadu4(Y+3*i), row_[i].vecMul3DU(X)));
 #else
-        row_[i].vecMulCol(X, Y+BLOCK_SIZE*i);
+        row_[i].vecMulLine(X, Y+BLOCK_SIZE*i);
 #endif
     }
 }
@@ -1011,7 +1012,7 @@ void SparMatBlk::vecMul(const real* X, real* Y, size_t start, size_t stop) const
         // we need to use store3 only for the last line, if multithreaded
         store3(Y+3*i, row_[i].vecMul3DUU(X));
 #else
-        row_[i].vecMulCol(X, Y+BLOCK_SIZE*i);
+        row_[i].vecMulLine(X, Y+BLOCK_SIZE*i);
 #endif
     }
 }
