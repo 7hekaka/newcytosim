@@ -5,7 +5,7 @@
 #include <iostream>
 #include <limits>
 
-#define DIM 2
+#define DIM 3
 
 #include "real.h"
 #include "timer.h"
@@ -542,7 +542,7 @@ void getrs1(int N, real const* B, int LDB, real* Y)
 
 void getrs2(int N, real const* B, int LDB, real* Y)
 {
-    alsatian_xgetrsN<1>(N, B, LDB, pivot, Y);
+    alsatian_iso_xgetrsN<1>(N, B, LDB, pivot, Y);
 }
 
 void getrs3(int N, real const* B, int LDB, real* Y)

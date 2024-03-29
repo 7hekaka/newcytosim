@@ -94,7 +94,7 @@ static inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 {
     int nbp = mec->nbPoints();
 #if SAUERKRAUT
-    alsatian_xgetrsN<DIM>(nbp, mec->pblock(), nbp, mec->pivot(), Y);
+    alsatian_iso_xgetrsN<DIM>(nbp, mec->pblock(), nbp, mec->pivot(), Y);
 #else
     iso_xgetrsN<DIM>(nbp, mec->pblock(), nbp, mec->pivot(), Y);
 #endif

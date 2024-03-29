@@ -2224,7 +2224,7 @@ void iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, rea
 
 /// version of xgetrs('N', ...) for ORD interleaved vectors in right-hand-side B
 template < int ORD >
-void alsatian_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
+void alsatian_iso_xgetrsN(const int N, const real* A, const int LDA, const int* IPIV, real* B)
 {
     // Apply row interchanges to the right hand side.
     iso_xlaswp<ORD>(B, 1, N, IPIV, 1);
