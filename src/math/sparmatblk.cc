@@ -35,7 +35,7 @@ void SparMatBlk::allocate(size_t alc)
        
         if ( row_ )
         {
-            // using the specialy defined '=' for a Line object
+            // using the custom '=' for a Line object
             for ( size_t n = 0; n < alloc_; ++n )
                 ptr[n] = row_[n];
             delete[] row_;
@@ -79,7 +79,7 @@ void SparMatBlk::Line::allocate(size_t alc)
         
         // use aligned memory:
         void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+4);
-        Block * blk_new  = new(ptr) Block[alc];
+        Block * blk_new = new(ptr) Block[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(unsigned)) )
             throw std::bad_alloc();
@@ -321,13 +321,15 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 int SparMatBlk::bad() const
 {
     if ( rsize_ <= 0 ) return 1;
-    for ( size_t jj = 0; jj < rsize_; ++jj )
+    for ( size_t i = 0; i < rsize_; ++i )
     {
-        Line & row = row_[jj];
+        Line & row = row_[i];
+        size_t sup = ( is_symmetric ? rsize_ : i );
         for ( size_t n = 0 ; n < row.rlen_ ; ++n )
         {
-            if ( row.inx_[n] >= rsize_ ) return 2;
-            if ( row.inx_[n] <= jj )    return 3;
+            size_t j = row.inx_[n];
+            if ( j > sup )
+                return 2;
         }
     }
     return 0;
@@ -603,6 +605,7 @@ void SparMatBlk::symmetrize()
 
 bool SparMatBlk::prepareForMultiply(int)
 {
+    assert_false(bad());
     colidx_[rsize_] = rsize_;
     if ( rsize_ > 0 )
     {

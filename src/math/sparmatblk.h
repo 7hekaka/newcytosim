@@ -212,7 +212,7 @@ public:
         assert_true( ii >= jj );
         assert_true( ii < rsize_ );
         assert_true( jj < rsize_ );
-        is_symmetric = false;
+        assert_false( is_symmetric );
         return row_[ii].block(jj);
     }
     
@@ -220,6 +220,7 @@ public:
     Block& diag_block(const size_t ii)
     {
         assert_true( ii < rsize_ );
+        assert_false( is_symmetric );
         return row_[ii].block(ii);
     }
 
