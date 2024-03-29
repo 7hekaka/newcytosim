@@ -7,18 +7,16 @@
 
 
 template < typename MATRIX >
-static void setAdjacency(int mat[], const size_t lld, unsigned table[],
-                         const size_t nbv, MATRIX const& MAT)
+static void setAdjacency(int mat[], const size_t lld, unsigned table[], MATRIX const& MAT)
 {
     // process all matrix columns:
-    for ( size_t j = 0; j < nbv; ++j )
+    for ( size_t j = 0; j < MAT.num_columns(); ++j )
     {
         unsigned a = table[j];
         // consider all blocks in column
         for ( size_t n = 0; n < MAT.column_size(j); ++n )
         {
             size_t i = MAT.column_index(j, n);
-            assert_true( i < nbv );
             unsigned b = table[i];
             mat[b+lld*a] = 1;
         }
@@ -28,7 +26,7 @@ static void setAdjacency(int mat[], const size_t lld, unsigned table[],
 /**
  Calculates the Adjacency matrix defined by the force matrices mFUL and mISO
  mat[i+lld*j] is set to 1 if i-th and j-th Mecables interact, ie. if some
- element of the matrices is not null.
+ element of the matrices is not null at the right indices.
  */
 void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
 {
@@ -48,9 +46,9 @@ void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
     }
     assert_true(u == nbv);
 
-    setAdjacency(mat, sup, table, nbv, mFUL);
+    setAdjacency(mat, sup, table, mFUL);
 #if USE_ISO_MATRIX
-    setAdjacency(mat, sup, table, nbv, mISO);
+    setAdjacency(mat, sup, table, mISO);
 #endif
 #if 0
     printf("Adjacency:\n");
