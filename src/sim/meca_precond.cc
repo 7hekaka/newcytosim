@@ -719,7 +719,7 @@ void Meca::computePrecondIsoP(Mecable* mec, real* tmp)
     // project matrix to reduce dimensionality:
     project_matrix<DIM>(nbp, tmp, bks, blk, nbp);
 
-    //VecPrint::full("isop preconditionner", nbp, nbp, mec->pblock(), nbp, 2);
+    //VecPrint::full("BlockIsoP", nbp, nbp, blk, nbp, 2);
 
     // calculate LU factorization:
 #if SAUERKRAUT
@@ -762,10 +762,10 @@ void Meca::computePrecondBand(Mecable* mec)
         getBandedBlock(mec, blk, BAND_LDD, BAND_NUD);
         
 #if ( 0 )
-        VecPrint::full("band block "+std::to_string(bks), BAND_LDD, bks, blk, BAND_LDD);
+        VecPrint::full("BlockBand", BAND_LDD, bks, blk, BAND_LDD);
         real * tmp = new_real(bks*bks);
         getHalfBlock(mec, tmp);
-        VecPrint::full("half block", bks, bks, tmp, bks);
+        VecPrint::full("BlockHalf", bks, bks, tmp, bks);
         free_real(tmp);
 #endif
         
@@ -822,7 +822,7 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
 #endif
     getHalfBlock(mec, blk);
     
-    //VecPrint::full("half block "+std::to_string(bks), bks, bks, mec->pblock(), bks);
+    //VecPrint::full("BlockHalf", bks, bks, mec->pblock(), bks);
 
     int info = 0;
     // calculate Cholesky factorization:
@@ -836,7 +836,7 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
     {
         mec->blockType(5);
         //checkBlock(mec, blk);
-        //VecPrint::full("half", bks, bks, blk, bks);
+        //VecPrint::full("Half", bks, bks, blk, bks);
 #if SAUERKRAUT && REAL_IS_DOUBLE
         convert_to_floats(bks*bks, blk, (float*)mec->pblock());
 #endif
@@ -866,6 +866,7 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
     
     getFullBlock(mec, blk);
     //verifyBlock(mec, blk);
+    //VecPrint::full("BlockFull", bks, bks, blk, bks);
     
     // calculate LU factorization:
     int info = 0;
@@ -879,7 +880,7 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
     {
         mec->blockType(6);
         //checkBlock(mec, blk);
-        //if ( bks < 4 ) VecPrint::full("full", bks, bks, blk, bks);
+        //if ( bks < 4 ) VecPrint::full("Full", bks, bks, blk, bks);
 #if CHOUCROUTE && REAL_IS_DOUBLE
         convert_to_floats(bks*bks, blk, (float*)mec->pblock());
 #endif
