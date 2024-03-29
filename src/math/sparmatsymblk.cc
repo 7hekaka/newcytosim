@@ -457,19 +457,19 @@ std::string SparMatSymBlk::what() const
 }
 
 
-static void printSparseBlock(std::ostream& os, real inf, SparMatSymBlk::Block const& B, size_t ii, size_t jj)
+static void printSparseBlock(std::ostream& os, real epsilon, SparMatSymBlk::Block const& B, size_t ii, size_t jj)
 {
     for ( size_t x = 0; x < B.dimension(); ++x )
     for ( size_t y = (ii==jj?x:0); y < B.dimension(); ++y )
     {
         real v = B(y, x);
-        if ( abs_real(v) > inf )
+        if ( abs_real(v) > epsilon )
             os << std::setw(6) << ii+y << " " << std::setw(6) << jj+x << " " << std::setw(16) << v << "\n";
     }
 }
 
 
-void SparMatSymBlk::printSparse(std::ostream& os, real inf, size_t start, size_t stop) const
+void SparMatSymBlk::printSparse(std::ostream& os, real epsilon, size_t start, size_t stop) const
 {
     os << "% SparMatSymBlk size " << rsize_ << ":\n";
     stop = std::min(stop, rsize_);
@@ -482,7 +482,7 @@ void SparMatSymBlk::printSparse(std::ostream& os, real inf, size_t start, size_t
         if ( col.notEmpty() )
             os << "% column " << jj << "\n";
         for ( size_t n = 0 ; n < col.nbb_ ; ++n )
-            printSparseBlock(os, inf, col.blk_[n], col.inx_[n], jj);
+            printSparseBlock(os, epsilon, col.blk_[n], col.inx_[n], jj);
     }
     os.precision(p);
 }
