@@ -475,9 +475,7 @@ void testParallelVecmul(const unsigned S, const size_t F)
     printf("\n");
 
     setIndices(0, 0);
-    free_real(x);
-    free_real(y);
-    free_real(z);
+    setVectors(0, x, y, z);
 }
 
 
@@ -613,6 +611,35 @@ void testMatrices(const size_t S, real const* x, real const* y, real * z)
 #endif
 }
 
+
+template < typename MATRIX >
+void testMatricesMulti(const unsigned S, const size_t F, const size_t rep)
+{
+    real * x = nullptr;
+    real * y = nullptr;
+    real * z = nullptr;
+    setVectors(DIM*S, x, y, z);
+    
+    MATRIX mat;
+    printf("------ %i x %i  multi-test %s:", DIM, S, mat.what().c_str());
+    mat.resize(DIM*S);
+    real err = 0;
+    for ( size_t i = 0; i < rep; ++i )
+    {
+        setIndices(S, F);
+        mat.reset();
+        fillMatrix(mat);
+        mat.prepareForMultiply(1);
+        err = checkMatrix(mat, x, y, z, 0);
+        if ( err > REAL_EPSILON ) break;
+    }
+    printf(" error %e\n", err);
+    checkMatrix(mat, x, y, z, 16*(err>1e-6));
+    //mat.printSparse(std::cout, 0, 0, 1000);
+    setIndices(0, 0);
+    setVectors(0, x, y, z);
+}
+
 void testMatrices(const unsigned S, const size_t F)
 {
     real * x = nullptr;
@@ -628,35 +655,12 @@ void testMatrices(const unsigned S, const size_t F)
         testIsoMatrices(S, x, y, z);
         printf("\n");
     }
-    if ( 1 )
-    {
-        printf("------ %i x %i  strain-test:", DIM, S);
-        SparMatD mat;
-        mat.resize(DIM*S);
-        real err = 0;
-        for ( int i = 0; i < 1024; ++i )
-        {
-            setIndices(S, F);
-            mat.reset();
-            fillMatrix(mat);
-            err = checkMatrix(mat, x, y, z, 0);
-            if ( err > REAL_EPSILON ) break;
-        }
-        printf(" error %e\n", err);
-        checkMatrix(mat, x, y, z, 16*(err>1e-6));
-        //mat.printSparse(std::cout, 0, 0, 1000);
-    }
-    if ( 1 )
-    {
-        printf("------ %i x %i  filled %.2f %%:", DIM, S, F*100.0/S/S);
-        setIndices(S, F);
-        testMatrices(DIM*S, x, y, z);
-        printf("\n");
-    }
+    printf("------ %i x %i  filled %.2f %%:", DIM, S, F*100.0/S/S);
+    setIndices(S, F);
+    testMatrices(DIM*S, x, y, z);
+    printf("\n");
     setIndices(0, 0);
-    free_real(x);
-    free_real(y);
-    free_real(z);
+    setVectors(0, x, y, z);
 }
 
 
@@ -705,9 +709,7 @@ void testBlockMatrix(const unsigned S, const size_t F)
     //D.printSummary(std::cout, 0, DIM*S);
 
     setIndices(0, 0);
-    free_real(x);
-    free_real(y);
-    free_real(z);
+    setVectors(0, x, y, z);
 }
 
 //------------------------------------------------------------------------------
@@ -784,7 +786,7 @@ int main( int argc, char* argv[] )
     //testMatrices(8*56, 1<<17);
     testMatrices(8*110, 1<<18);
 #else
-    //testMatrices(37, 1<<17);
+    testMatricesMulti<SparMatD>(37, 1<<17, 1024);
     testMatrices(5494, 131836);
     testBlockMatrix(5494, 131836);
     testBlockMatrix(5494, 431836);
