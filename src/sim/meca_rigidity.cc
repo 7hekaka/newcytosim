@@ -134,11 +134,11 @@ void addBendingRigidity(real* mat, size_t ldd, size_t cnt, const real R)
     const size_t e = ORD * ( cnt - 2 );
     const size_t f = ORD * ( cnt - 1 );
     
-    mat[0      ] += R1;
-    mat[  ldd*U] += R2;
-    mat[  ldd*D] += R1;
-    mat[U      ] += R2;
-    mat[D      ] += R1;
+    mat[0    ] += R1;
+    mat[ldd*U] += R2;
+    mat[ldd*D] += R1;
+    mat[U    ] += R2;
+    mat[D    ] += R1;
 
     mat[e+ldd*f] += R2;
     mat[f+ldd*f] += R1;
@@ -161,11 +161,11 @@ void addBendingRigidity(real* mat, size_t ldd, size_t cnt, const real R)
     
     for ( size_t n = D; n < e; n += U )
     {
-        mat[n  +ldd* n   ] += R6;
-        mat[n  +ldd*(n+U)] += R4;
-        mat[n  +ldd*(n+D)] += R1;
-        mat[n+U+ldd* n   ] += R4;
-        mat[n+D+ldd* n   ] += R1;
+        mat[n+ldd* n   ] += R6;
+        mat[n+ldd*(n+U)] += R4;
+        mat[n+ldd*(n+D)] += R1;
+        mat[n+U+ldd* n ] += R4;
+        mat[n+D+ldd* n ] += R1;
     }
 }
 

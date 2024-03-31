@@ -232,7 +232,7 @@ void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
     #pragma omp simd
     for ( size_t jj = 0; jj < DIM*nbt; ++jj )
     {
-        real f = ( X[jj+DIM*2] + X[jj] ) - two * X[jj+DIM];
+        real f = ( X[jj] + X[jj+DIM*2] ) - two * X[jj+DIM];
         Y[jj      ] -= f * R1;
         Y[jj+DIM  ] += f * R2;
         Y[jj+DIM*2] -= f * R1;
@@ -312,9 +312,9 @@ inline void add_rigidity3D(const int nbp, const real* X, const real R1, real* Y)
     real const*const end = X + DIM * ( nbp - 2 );
     while ( X < end )
     {
-        real gx = X[3] * two + ( X[6] + X[0] );
-        real gy = X[4] * two + ( X[7] + X[1] );
-        real gz = X[5] * two + ( X[8] + X[2] );
+        real gx = X[3] * two + ( X[0] + X[6] );
+        real gy = X[4] * two + ( X[1] + X[7] );
+        real gz = X[5] * two + ( X[2] + X[8] );
         real rx = fx - gx;
         real ry = fy - gy;
         real rz = fz - gz;

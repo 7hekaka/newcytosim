@@ -135,9 +135,9 @@ void add_rigidity3D(const size_t nbt, const real* X, const real R1, real* Y)
     real const*const end = X + DIM * nbt;
     while ( X < end )
     {
-        real gx = X[3] * two + ( X[6] + X[0] );
-        real gy = X[4] * two + ( X[7] + X[1] );
-        real gz = X[5] * two + ( X[8] + X[2] );
+        real gx = X[3] * two + ( X[0] + X[6] );
+        real gy = X[4] * two + ( X[1] + X[7] );
+        real gz = X[5] * two + ( X[2] + X[8] );
         X += DIM;
         real rx = fx - gx;
         real ry = fy - gy;
