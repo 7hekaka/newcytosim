@@ -25,6 +25,20 @@ class FiberSegment;
 class SimulProp;
 class Simul;
 
+
+/// set 1 to use matrix mISO and mFUL (the traditional way)
+/**
+ USE_ISO_MATRIX should not affect the results in any way, but the speed of execution.
+ This makes the simulation a lot faster on isotropic systems (eg. self.cym), that
+ are using isotropic force elements such as the Hookean link (Meca::addLink().
+ It is useless for a purely non-isotropic system and causes a bit of overhead.
+ 
+ Finally, the parallelization code does not consider the ISO matrix, hence
+ this option should be disabled if PARALLELIZE_MATRIX == 1
+ */
+#define USE_ISO_MATRIX 1
+
+
 /**
  Set to 1 to distribute the Matrix Vector-multiplication in multithreaded code.
  This will select a type for matrix mFUL specifically built for that purpose.
@@ -48,19 +62,6 @@ typedef SparMatSymBlkDiag BlockMatrixType;
 
 /// MatrixBlock is an alias to a matrix class of size DIM * DIM
 typedef BlockMatrixType::Block MatrixBlock;
-
-
-/// set 1 to use matrix mISO and mFUL (the traditional way)
-/**
- USE_ISO_MATRIX should not affect the results in any way, but the speed of execution.
- This makes the simulation a lot faster on isotropic systems (eg. self.cym), that
- are using isotropic force elements such as the Hookean link (Meca::addLink().
- It is useless for a purely non-isotropic system and causes a bit of overhead.
- 
- Finally, the parallelization code does not consider the ISO matrix, hence
- this option should be disabled if PARALLELIZE_MATRIX == 1
- */
-#define USE_ISO_MATRIX 1
 
 /**
  Option to allow 'play' to display Meca links graphically.

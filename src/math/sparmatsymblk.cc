@@ -332,7 +332,6 @@ void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start
 {
     assert_true( mul == S_BLOCK_SIZE );
     assert_true( start + cnt <= rsize_ );
-    size_t sup = std::min(cnt, rank+1);
 
     for ( size_t jj = 0; jj < cnt; ++jj )
     {
@@ -341,6 +340,7 @@ void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start
         {
             assert_true(col.inx_[0] == jj + start);
             real * dst = mat + ( jj + ldd * jj ) * S_BLOCK_SIZE;
+            size_t sup = std::min(cnt-jj, rank+1);
             col[0].addto_lower(dst, ldd, alpha);
             for ( size_t n = 1; n < col.nbb_; ++n )
             {
@@ -365,7 +365,6 @@ void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 {
     assert_true( mul == S_BLOCK_SIZE );
     assert_true( start + cnt <= rsize_ );
-    size_t sup = std::min(cnt, rank+1);
 
     for ( size_t jj = 0; jj < cnt; ++jj )
     {
@@ -375,6 +374,7 @@ void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
             assert_true(col.inx_[0] == jj + start);
             // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
             real * dst = mat + ( jj + ldd * jj );
+            size_t sup = std::min(cnt-jj, rank+1);
             dst[0] += alpha * col[0].trace();  // diagonal term
             for ( size_t n = 1; n < col.nbb_; ++n )
             {

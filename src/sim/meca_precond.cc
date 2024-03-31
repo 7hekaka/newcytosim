@@ -787,8 +787,8 @@ void Meca::computePrecondBand(Mecable* mec)
 #endif
         // calculate Cholesky factorization for band storage:
 #if SAUERKRAUT
-        //alsatian_xpbtf2L(bks, BAND_NUD, blk, BAND_LDD, &info);
-        alsatian_xpbtf2L_lapack(bks, BAND_NUD, blk, BAND_LDD, &info);
+        alsatian_xpbtf2L(bks, BAND_NUD, blk, BAND_LDD, &info);
+        //alsatian_xpbtf2L_lapack(bks, BAND_NUD, blk, BAND_LDD, &info);
         //PRINT_MAT("factorizedBand", BAND_NUD+1, bks, blk, BAND_LDD, 2);
 #else
         lapack::xpbtf2('L', bks, BAND_NUD, blk, BAND_LDD, &info);
