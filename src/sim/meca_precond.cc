@@ -39,6 +39,12 @@ constexpr size_t BAND_NUD = 6;
 constexpr size_t BAND_LDD = BAND_NUD+2;
 
 
+template < typename REAL >
+static void PRINT_MAT(std::string const& msg, size_t lin, size_t col, const REAL* mat, size_t ldd, int digits=0)
+{
+    VecPrint::full(msg, lin, col, mat, ldd, digits);
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Apply Blocks
 
@@ -101,7 +107,7 @@ static inline void applyPrecondIsoP(Mecable const* mec, real* Y)
 }
 
 
-/// apply banded symmetric preconditionner block
+/// apply banded symmetric preconditionner block, double precision
 static inline void applyPrecondBand(Mecable const* mec, real* Y)
 {
     const int bks = DIM * mec->nbPoints();
@@ -122,13 +128,13 @@ static inline void applyPrecondBand(Mecable const* mec, real* Y)
 }
 
 
-/// apply full size symmetric preconditionner block
+/// apply full size symmetric preconditionner block, single precision
 static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 {
     const int bks = DIM * mec->nbPoints();
 #if SAUERKRAUT
     // assuming that diagonal terms of the preconditionner block have been inverted:
-    alsatian_xpotrsL(bks, mec->pblock(), bks, Y);
+    alsatian_xpotrsL(bks, (float*)mec->pblock(), bks, Y);
 #elif 1
     iso_xpotrsL<1>(bks, mec->pblock(), bks, Y);
 #else
@@ -139,15 +145,15 @@ static inline void applyPrecondHalf(Mecable const* mec, real* Y)
 }
 
 
-/// apply full size non-symmetric preconditionner block
+/// apply full size non-symmetric preconditionner block, single precision
 static inline void applyPrecondFull(Mecable const* mec, real* Y)
 {
     const int bks = DIM * mec->nbPoints();
 #if CHOUCROUTE && USE_SIMD
     // assuming that diagonal terms of the preconditionner block have been inverted:
-    alsatian_xgetrsN_SSE(bks, mec->pblock(), bks, mec->pivot(), Y);
+    alsatian_xgetrsN_SSE(bks, (float*)mec->pblock(), bks, mec->pivot(), Y);
 #elif CHOUCROUTE
-    alsatian_xgetrsN(bks, mec->pblock(), bks, mec->pivot(), Y);
+    alsatian_xgetrsN(bks, (float*)mec->pblock(), bks, mec->pivot(), Y);
 #elif 1
     // translated LAPACK's reference code:
     lapack_xgetrsN(bks, mec->pblock(), bks, mec->pivot(), Y);
@@ -222,7 +228,7 @@ static void printPreconditionnerBlock(Mecable* mec, size_t sup)
     size_t S = std::min(bks, sup);
     real * blk = mec->pblock();
 
-    VecPrint::full("Diagonal block"+std::to_string(bks), S, S, mec->pblock(), bks, 3);
+    PRINT_MAT("Diagonal block"+std::to_string(bks), S, S, mec->pblock(), bks);
     
     std::clog << "S ";
     char str[32];
@@ -294,10 +300,8 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
     {
         //VecPrint::sparse(std::clog, bks, bks, wrk, bks, 3, (real)0.1);
         extractBlock(mec, wrk);
-        
-        std::cout << std::endl;
-        VecPrint::full("extracted", bks, bks, wrk, bks, 3);
-        VecPrint::full("computed", bks, bks, blk, bks, 3);
+        PRINT_MAT("\nextracted", bks, bks, wrk, bks);
+        PRINT_MAT("computed", bks, bks, blk, bks);
     }
     
     free_real(wrk);
@@ -347,9 +351,9 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     {
         std::cout << "\n";
         // print preconditionner block for visual inspection:
-        VecPrint::full("matrix", bks, bks, wrk, bks);
-        VecPrint::full("precond", bks, bks, blk, bks);
-        VecPrint::full("precond * matrix", bks, bks, mat, bks);
+        PRINT_MAT("matrix", bks, bks, wrk, bks);
+        PRINT_MAT("precond", bks, bks, blk, bks);
+        PRINT_MAT("precond * matrix", bks, bks, mat, bks);
     }
     free_real(vec);
     free_real(mat);
@@ -366,6 +370,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
      I - time_step * mobility * Rigidity
  
  This block is square, symmetric, definite positive and well-behaved
+ Banded storage is used and, mat(i, j) is stored in blk[i-j+ldd*j]
  */
 void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t ldd) const
 {
@@ -382,21 +387,23 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t l
     else
         zero_real(ldd*nbp, res);
     
-    //VecPrint::full("rigidity band", 3, nbp, res, ldd, 1);
+    //PRINT_MAT("rigidity band", 3, nbp, res, ldd);
 
     /*
      The matrix `res` is stored in 'packed symmetric banded storage':
-     usually, mat(i, j) is stored in mat[i+ldd*j]
-     but with banded storage, mat(i, j) is stored in mat[i-j+ldd*j] for i > j
-     So we use below ldd-1
+     usually, mat(i, j) is stored in mat[i+ldd*j] but with banded storage,
+        mat(i, j) is stored in mat[i-j+ldd*j] for i > j
+     We can get the correct addressing using `ldd-1` instead of `ldd`
      */
 
 #if USE_ISO_MATRIX
     mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 1, kd);
     if ( useFullMatrix )
 #endif
-        mFUL.addDiagonalTrace(beta/DIM, res, kd, mec->matIndex(), nbp, DIM, kd, false);
-
+    {
+        mFUL.addDiagonalTrace(beta/DIM, res, ldd-1, mec->matIndex(), nbp, DIM, kd, false);
+    }
+    
     // add Identity matrix to band storage:
     for ( size_t i = 0; i < nbp; ++i )
         res[ldd*i] += 1;
@@ -410,6 +417,7 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t l
  
  The result is constructed by using efficient methods from mISO and mFUL
  The block is symmetric and can be factorized by Cholesky, which may fail
+ Normal storage is used and, mat(i, j) is stored in blk[i+nbp*j]
  */
 void Meca::getIsoBlock(const Mecable * mec, real* res) const
 {
@@ -421,15 +429,17 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
     // set the Rigidity terms:
     real jR = mec->jointRigidity();
     if ( jR )
-        //addBendingRigidityLower<1>(res, nbp, mec->nbPoints(), mec->fiberRigidity());
+        //addBendingRigidityLower<1>(res, nbp, mec->nbPoints(), jR);
         addBendingRigidity<1>(res, nbp, mec->nbPoints(), jR);
 #endif
 #if USE_ISO_MATRIX
     mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp, 1, 1);
     if ( useFullMatrix )
 #endif
+    {
         mFUL.addDiagonalTrace(1.0/DIM, res, nbp, mec->matIndex(), nbp, DIM, nbp, true);
-
+    }
+    
     // the projection is not called, so we scale by mobility
     const real beta = -tau_ * mec->pointMobility();
 
@@ -468,19 +478,20 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
     if ( jR )
     {
         setBendingRigidity<DIM>(res, ldd-1, nbp, beta*jR);
-        //VecPrint::full("Rigidity block ", bks, bks, res, bks, 0);
+        //PRINT_MAT("Rigidity block ", bks, bks, res, bks);
     }
 #endif
 #if USE_ISO_MATRIX
     mISO.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, 1, rank/DIM);
 #endif
-    // VecPrint::full("\niso", ldd, bks, res, ldd);
+    // PRINT_MAT("\niso", ldd, bks, res, ldd);
     copy_lower_subspace<DIM>(bks, res, ldd-1, rank);
-    // VecPrint::full("\ncopy_subspace", ldd, bks, res, ldd);
+    // PRINT_MAT("\ncopy_subspace", ldd, bks, res, ldd);
 #if USE_ISO_MATRIX
     if ( useFullMatrix )
 #endif
         mFUL.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, DIM, rank);
+    
     // add Identity matrix to band storage:
     for ( size_t i = 0; i < bks; ++i )
         res[ldd*i] += 1;
@@ -508,7 +519,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
     if ( jR )
     {
         addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), jR);
-        //VecPrint::full("Rigidity block", bks, bks, res, bks, 0);
+        //PRINT_MAT("Rigidity block", bks, bks, res, bks);
     }
 #endif
 #if USE_ISO_MATRIX
@@ -536,7 +547,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
 /**
  Get the total diagonal block corresponding to an Object, which is:
  
-     I - time_step * P ( mISO + mFUL + diffP )
+     I - time_step * P * ( mISO + mFUL + diffP )
  
  The result is constructed by using functions from mISO and mFUL
  This block is square but not symmetric!
@@ -554,7 +565,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     if ( jR )
     {
         addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), jR);
-        //VecPrint::full("Rigidity block", bks, bks, res, bks, 0);
+        //PRINT_MAT("Rigidity block", bks, bks, res, bks);
     }
 #endif
 #if USE_ISO_MATRIX
@@ -566,18 +577,18 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
 #endif
         mFUL.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
     
-    //VecPrint::full("mISO+mFUL block", bks, bks, res, bks);
+    //PRINT_MAT("mISO+mFUL block", bks, bks, res, bks);
     
 #if ADD_PROJECTION_DIFF
     if ( mec->hasProjectionDiff() )
         mec->addProjectionDiff(res);
 #endif
-    
+#if 0
     // include the projection, by applying it to each column vector:
     /* This could be vectorized */
     for ( size_t i = 0; i < bks; ++i )
         mec->projectForces(res+bks*i, res+bks*i);
-    
+#endif
     // scale
     const real beta = -tau_ * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
@@ -597,7 +608,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
  The dimension is reduced by DIM and banded with diagonal + 2 off-diagonals
  This block is usually symmetric definite positive, and is factorized by Cholesky's method
  */
-void Meca::computePrecondIsoB(Mecable* mec)
+void Meca::computePrecondIsoB(Mecable* mec, real* tmp)
 {
     const size_t nbp = mec->nbPoints();
     mec->blockSize(DIM*nbp, ISOB_LDD*nbp, 0);
@@ -610,15 +621,15 @@ void Meca::computePrecondIsoB(Mecable* mec)
     int bt, info = 0;
     if ( ISOB_LDD <= nbp )
     {
-#if 0
-        // visual comparison with getIsoBlock()
-        mec->blockSize(DIM*nbp, std::max(ISOB_LDD, nbp)*nbp, 0);
-        getIsoBlock(mec, mec->pblock());
-        VecPrint::full("iso symmetric", nbp, nbp, mec->pblock(), nbp, 2);
-#endif
         getIsoBandedBlock(mec, mec->pblock(), ISOB_KD, ISOB_LDD);
-        //VecPrint::full("banded", ISOB_LDD, nbp, mec->pblock(), ISOB_LDD, 2);
-
+#if 0
+        PRINT_MAT("isoBand", ISOB_LDD, nbp, mec->pblock(), ISOB_LDD);
+        // visual comparison with getIsoBlock()
+        getFullBlock(mec, tmp);
+        PRINT_MAT("fullBlock", DIM*nbp, DIM*nbp, tmp, DIM*nbp);
+        //getIsoBlock(mec, tmp);
+        //PRINT_MAT("isoBlock", nbp, nbp, tmp, nbp);
+#endif
         // calculate Banded Cholesky factorization:
 #if CHOUCROUTE
         alsatian_xpbtf2L(nbp, ISOB_KD, mec->pblock(), ISOB_LDD, &info);
@@ -630,20 +641,24 @@ void Meca::computePrecondIsoB(Mecable* mec)
     else
     {
         getIsoBlock(mec, mec->pblock());
+#if 0
+        PRINT_MAT("isoBlock", nbp, nbp, mec->pblock(), nbp);
+        getFullBlock(mec, tmp);
+        PRINT_MAT("fullBlock", DIM*nbp, DIM*nbp, tmp, DIM*nbp);
+#endif
         // calculate Cholesky factorization:
 #if CHOUCROUTE
         alsatian_xpotf2L(nbp, mec->pblock(), nbp, &info);
 #else
         lapack::xpotf2('L', nbp, mec->pblock(), nbp, &info);
 #endif
-        //VecPrint::full("isoB", nbp, nbp, mec->pblock(), nbp, 2);
         bt = 2;
     }
 
     if ( 0 == info )
     {
         mec->blockType(bt);
-        //VecPrint::full("factorized", 3, nbp, mec->pblock(), ISOB_LDD, 1);
+        //PRINT_MAT("factorized", 3, nbp, mec->pblock(), ISOB_LDD);
     }
     else
     {
@@ -668,17 +683,17 @@ void Meca::computePrecondIsoS(Mecable* mec)
     mec->blockSize(bks, bks*bks, bks);
     getFullBlock(mec, mec->pblock());
     project_matrix<DIM>(nbp, mec->pblock(), bks, mec->pblock(), nbp);
-    VecPrint::full("projected: ", nbp, nbp, mec->pblock(), nbp, 2);
+    PRINT_MAT("projected: ", nbp, nbp, mec->pblock(), nbp);
 #endif
 
     mec->blockSize(DIM*nbp, nbp*nbp, 0);
     
     //getIsoBandedBlock(mec, mec->pblock(), ISOB_LDD);
-    //VecPrint::full("banded preconditionner ", 3, nbp, mec->pblock(), ISOB_LDD, 1);
+    //PRINT_MAT("banded preconditionner ", 3, nbp, mec->pblock(), ISOB_LDD);
 
     getIsoBlock(mec, mec->pblock());
     
-    //VecPrint::full("iso symmetric", nbp, nbp, mec->pblock(), nbp, 2);
+    //PRINT_MAT("isoSymm", nbp, nbp, mec->pblock(), nbp);
 
     // calculate Cholesky factorization:
     int info = 0;
@@ -719,7 +734,7 @@ void Meca::computePrecondIsoP(Mecable* mec, real* tmp)
     // project matrix to reduce dimensionality:
     project_matrix<DIM>(nbp, tmp, bks, blk, nbp);
 
-    //VecPrint::full("BlockIsoP", nbp, nbp, blk, nbp, 2);
+    //PRINT_MAT("BlockIsoP", nbp, nbp, blk, nbp);
 
     // calculate LU factorization:
 #if SAUERKRAUT
@@ -752,7 +767,8 @@ void Meca::computePrecondBand(Mecable* mec)
 {
     assert_true(BAND_NUD < BAND_LDD);
     const size_t bks = DIM * mec->nbPoints();
-    mec->blockSize(bks, std::min(BAND_LDD, bks)*bks, 0);
+    const size_t lin = std::min(BAND_LDD, bks);
+    mec->blockSize(bks, bks*lin, 0);
     real * blk = mec->pblock();
 
     int bt, info = 0;
@@ -760,18 +776,20 @@ void Meca::computePrecondBand(Mecable* mec)
     if ( BAND_LDD < bks )
     {
         getBandedBlock(mec, blk, BAND_LDD, BAND_NUD);
-        
 #if ( 0 )
-        VecPrint::full("BlockBand", BAND_LDD, bks, blk, BAND_LDD);
+        PRINT_MAT("fullBand", BAND_LDD, bks, blk, BAND_LDD);
         real * tmp = new_real(bks*bks);
         getHalfBlock(mec, tmp);
-        VecPrint::full("BlockHalf", bks, bks, tmp, bks);
+        PRINT_MAT("halfBlock", bks, bks, tmp, bks);
+        getIsoBandedBlock(mec, tmp, ISOB_KD, ISOB_LDD);
+        PRINT_MAT("isoBand", ISOB_LDD, mec->nbPoints(), tmp, ISOB_LDD);
         free_real(tmp);
 #endif
-        
         // calculate Cholesky factorization for band storage:
 #if SAUERKRAUT
-        alsatian_xpbtf2L(bks, BAND_NUD, blk, BAND_LDD, &info);
+        //alsatian_xpbtf2L(bks, BAND_NUD, blk, BAND_LDD, &info);
+        alsatian_xpbtf2L_lapack(bks, BAND_NUD, blk, BAND_LDD, &info);
+        //PRINT_MAT("factorizedBand", BAND_NUD+1, bks, blk, BAND_LDD, 2);
 #else
         lapack::xpbtf2('L', bks, BAND_NUD, blk, BAND_LDD, &info);
 #endif
@@ -783,6 +801,9 @@ void Meca::computePrecondBand(Mecable* mec)
         // calculate Cholesky factorization:
 #if SAUERKRAUT
         alsatian_xpotf2L(bks, blk, bks, &info);
+#   if REAL_IS_DOUBLE
+        convert_to_floats(bks*lin, blk, (float*)blk);
+#   endif
 #else
         lapack::xpotf2('L', bks, blk, bks, &info);
 #endif
@@ -793,9 +814,6 @@ void Meca::computePrecondBand(Mecable* mec)
     {
         mec->blockType(bt);
         //checkBlock(mec, blk);
-#if SAUERKRAUT && REAL_IS_DOUBLE
-        convert_to_floats(bks*bks, blk, (float*)blk);
-#endif
     }
     else
     {
@@ -822,7 +840,7 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
 #endif
     getHalfBlock(mec, blk);
     
-    //VecPrint::full("BlockHalf", bks, bks, mec->pblock(), bks);
+    //PRINT_MAT("halfBlock", bks, bks, mec->pblock(), bks);
 
     int info = 0;
     // calculate Cholesky factorization:
@@ -836,7 +854,7 @@ void Meca::computePrecondHalf(Mecable* mec, real* tmp)
     {
         mec->blockType(5);
         //checkBlock(mec, blk);
-        //VecPrint::full("Half", bks, bks, blk, bks);
+        //PRINT_MAT("half", bks, bks, blk, bks);
 #if SAUERKRAUT && REAL_IS_DOUBLE
         convert_to_floats(bks*bks, blk, (float*)mec->pblock());
 #endif
@@ -866,7 +884,7 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
     
     getFullBlock(mec, blk);
     //verifyBlock(mec, blk);
-    //VecPrint::full("BlockFull", bks, bks, blk, bks);
+    //PRINT_MAT("fullBlock", bks, bks, blk, bks);
     
     // calculate LU factorization:
     int info = 0;
@@ -880,7 +898,7 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
     {
         mec->blockType(6);
         //checkBlock(mec, blk);
-        //if ( bks < 4 ) VecPrint::full("Full", bks, bks, blk, bks);
+        //if ( bks < 4 ) PRINT_MAT("Full", bks, bks, blk, bks);
 #if CHOUCROUTE && REAL_IS_DOUBLE
         convert_to_floats(bks*bks, blk, (float*)mec->pblock());
 #endif
@@ -919,7 +937,7 @@ void Meca::computePreconditionner()
                 if ( mec->tag() == Solid::TAG )
                     computePrecondFull(mec, tmp);
                 else
-                    computePrecondIsoB(mec);
+                    computePrecondIsoB(mec, tmp);
             }
             break;
         case 2:

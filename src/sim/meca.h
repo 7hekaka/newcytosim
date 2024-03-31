@@ -348,7 +348,7 @@ private:
     void renewPreconditionner(Mecable*, int, real*, int*, real*, size_t);
     
     /// compute the preconditionner block corresponding to given Mecable
-    void computePrecondIsoB(Mecable*);
+    void computePrecondIsoB(Mecable*, real*);
     
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondIsoS(Mecable*);

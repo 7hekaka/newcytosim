@@ -19,9 +19,10 @@ static void copy_lower_subspace(size_t siz, real* mat, size_t ldd, size_t rank)
     for ( size_t j = 0; j < siz; j += ORD )
     for ( size_t i = j; i <= std::min(siz-1, j+rank); i += ORD )
     {
-        real val = mat[i+ldd*j];
+        real * dst = mat + i + ldd * j;
+        real val = dst[0];
         for ( size_t d = 1; d < ORD; ++d )
-            mat[i+d+ldd*(j+d)] = val;
+            dst[d+ldd*d] = val;
     }
     
     //VecPrint::full("copied", siz, siz, mat, ldd);
@@ -44,15 +45,17 @@ static void copy_upper_subspace(size_t siz, real* mat, size_t ldd)
     for ( size_t jj = 0; jj < siz; jj += ORD  )
     for ( size_t ii = 0; ii <= jj; ii += ORD  )
     {
-        real val = mat[ii+ldd*jj];
+        real * dst = mat + ii + ldd * jj;
+        real val = dst[0];
         // expand term in other dimensions:
         for ( size_t d = 1; d < ORD; ++d )
-            mat[ii+d+ldd*(jj+d)] = val;
+            dst[d+ldd*d] = val;
         
         if ( SYMMETRIZE )
         {
+            real * tsd = mat + jj + ldd * ii;
             for ( size_t d = 0; d < ORD; ++d )
-                mat[jj+d+ldd*(ii+d)] = val;
+                tsd[d+ldd*d] = val;
         }
     }
 
@@ -75,15 +78,17 @@ static void copy_lower_subspace(size_t siz, real* mat, size_t ldd)
     for ( size_t jj =  0; jj < siz; jj += ORD )
     for ( size_t ii = jj; ii < siz; ii += ORD )
     {
-        real val = mat[ii+ldd*jj];
+        real * dst = mat + ii + ldd * jj;
+        real val = dst[0];
         // expand term in other dimensions:
         for ( size_t d = 1; d < ORD; ++d )
-            mat[ii+d+ldd*(jj+d)] = val;
+            dst[d+ldd*d] = val;
         
         if ( SYMMETRIZE )
         {
+            real * tsd = mat + jj + ldd * ii;
             for ( size_t d = 0; d < ORD; ++d )
-                mat[jj+d+ldd*(ii+d)] = val;
+                tsd[d+ldd*d] = val;
         }
     }
     

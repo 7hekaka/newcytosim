@@ -547,7 +547,7 @@ void getrs2(int N, real const* B, int LDB, real* Y)
 
 void getrs3(int N, real const* B, int LDB, real* Y)
 {
-    alsatian_xgetrsN(N, B, LDB, pivot, Y);
+    alsatian_xgetrsN(N, (float*)B, LDB, pivot, Y);
 }
 
 void getrs4(int N, real const* B, int LDB, real* Y)
@@ -563,7 +563,7 @@ void getrs4(int N, real const* B, int LDB, real* Y)
 void getrs5(int N, real const* B, int LDB, real* Y)
 {
 #if USE_SIMD
-    alsatian_xgetrsN_SSE(N, B, LDB, pivot, Y);
+    alsatian_xgetrsN_SSE(N, (float*)B, LDB, pivot, Y);
 #else
     zero_real(N, Y);
 #endif

@@ -374,17 +374,21 @@ void blas_xsyrL(int N, real ALPHA, const real* X, real* A, int LDA)
 }
 
 
-/** Calling lapack::xpbtf2() and then scaling columns */
+/** This reference function is calling lapack::xpbtf2() and then scaling columns */
 void alsatian_xpbtf2L_lapack(const int N, const int KD, real* AB, const int LDAB, int* INFO)
 {
     assert_true(LDAB > KD);
     lapack::xpbtf2('L', N, KD, AB, LDAB, INFO);
+    if ( *INFO )
+    {
+        std::cerr << "lapack::xpbtf2 failed: " << *INFO << "\n";
+    }
     for ( int J = 0; J < N; ++J )
     {
-        real dia = real(1) / AB[0];
         // inverting diagonal term to avoid the division:
+        real dia = real(1) / AB[0];
         AB[0] = dia;
-        // scale off diagonal terms in column:
+        // scale off other terms in column by diagonal term:
         for ( int K = 1; K <= KD; ++K )
             AB[K] *= dia;
         AB += LDAB;
@@ -392,16 +396,18 @@ void alsatian_xpbtf2L_lapack(const int N, const int KD, real* AB, const int LDAB
 }
 
 /**
+ Compute the Cholesky factorization L, such that  A = L * transposed(L).
+
  This is equivalent to calling the standard lapack::pbtf2()
  and then *** scaling each column *** by 1/(diagonal term),
- while the diagonal term is inverted.
+ while the diagonal term itself is inverted.
  
  SUBROUTINE DPBTF2( UPLO='L', N, KD, AB, LDAB, INFO )
 */
-void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* INFO)
+void alsatian_xpbtf2L(const int N, const int KD, real* AB, int LDAB, int* INFO)
 {
     assert_true(LDAB > KD);
-    //Compute the Cholesky factorization A = L*L**T.
+    int KLD = std::max(1, LDAB-1);
     for ( int J = 0; J < N; ++J )
     {
         //Compute L(J,J) and test for non-positive-definiteness.
@@ -418,11 +424,11 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, const int LDAB, int* 
         real* A = AB + LDAB;
         for ( int K = 0; K < KN; ++K )
         {
-            // update column J+K of AB
+            // update column J+K of AB[]
             real tmp = AB[K+1] * dia;
             for ( int I = K; I < KN; ++I )
                 A[I] -= AB[I+1] * tmp;
-            A += KD;
+            A += KLD;
         }
         // scale off diagonal terms in column:
         for ( int K = 1; K <= KN; ++K )

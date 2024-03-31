@@ -242,21 +242,25 @@ void SparMatBlk::scale(const real alpha)
 
 void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, const size_t cnt, size_t mul) const
 {
-    assert_true( mul == Block::dimension() );
+    assert_true( mul == BLOCK_SIZE );
+    assert_true( start + cnt <= rsize_ );
     size_t end = start + cnt;
-    assert_true( end <= rsize_ );
-    size_t off = start + ldd * start;
 
     for ( size_t ii = start; ii < end; ++ii )
     {
+        size_t is = ii - start;
         Line & row = row_[ii];
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
-            size_t jj = row.inx_[n];
-            if ((start <= jj) & (jj < end))
+            // not assuming anything to be safe, since the matrix may be symmetric or not
+            auto jj = row.inx_[n];
+            if (( start <= jj ) & ( jj < end ))
             {
-                real * ptr = mat + (( ii + ldd * jj ) - off ) * BLOCK_SIZE;
-                row[n].addto(ptr, ldd);
+                auto js = jj - start;
+                if ( ii == jj )
+                    row[n].addto_symm(mat+(is+ldd*js)*BLOCK_SIZE, ldd);
+                else
+                    row[n].addto(mat+(is+ldd*js)*BLOCK_SIZE, ldd);
             }
         }
     }
@@ -266,51 +270,55 @@ void SparMatBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, con
 void SparMatBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt,
                               const size_t mul, const size_t rank) const
 {
-    assert_true( mul == Block::dimension() );
-    start *= mul;
-    cnt = start + mul * cnt;
-    assert_true( cnt <= rsize_ );
-    size_t off = start + ldd * start;
-    
-    for ( size_t ii = start; ii < cnt; ++ii )
+    assert_true( mul == BLOCK_SIZE );
+    assert_true( start + cnt <= rsize_ );
+    size_t end = start + cnt;
+
+    for ( size_t ii = start; ii < end; ++ii )
     {
+        size_t is = ii - start;
         Line & row = row_[ii];
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
-            size_t jj = row.inx_[n];
-            real * ptr = mat + (( ii + ldd * jj ) - off ) * BLOCK_SIZE;
-            if ( ii == jj )
-                row[n].addto_lower(ptr, ldd, alpha);
-            else if ((ii < jj) & (jj < cnt) & (jj <= ii+rank))
-                row[n].addto(ptr, ldd, alpha);
+            auto jj = row.inx_[n];
+            auto diff = ii > jj ? ii - jj : jj - ii;
+            if ((start <= jj) & (jj < end) & (diff <= rank))
+            {
+                auto js = jj - start;
+                if ( ii == jj )
+                    row[n].addto_lower(mat+(is+ldd*js)*BLOCK_SIZE, ldd, alpha);
+                else if ( ii > jj )
+                    row[n].addto(mat+(is+ldd*js)*BLOCK_SIZE, ldd, alpha);
+            }
         }
     }
 }
 
 
-// with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
 void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
                                   const size_t start, const size_t cnt,
                                   const size_t mul, const size_t rank, const bool sym) const
 {
-    assert_true( mul == Block::dimension() );
+    assert_true( mul == BLOCK_SIZE );
+    assert_true( start + cnt <= rsize_ );
     size_t end = start + cnt;
-    assert_true( end <= rsize_ );
 
     for ( size_t ii = start; ii < end; ++ii )
     {
-        size_t i = ii - start;
+        size_t is = ii - start;
         Line & row = row_[ii];
         for ( size_t n = 0; n < row.rlen_; ++n )
         {
-            size_t jj = row.inx_[n];
-            if (( start <= jj ) & ( jj < end ) & ( jj <= ii+rank ) & ( ii <= jj+rank ))
+            // not assuming anything to be safe:
+            auto jj = row.inx_[n];
+            auto diff = ii > jj ? ii - jj : jj - ii;
+            if (( start <= jj ) & ( jj < end ) & ( diff <= rank ))
             {
-                size_t j = jj - start;
+                size_t js = jj - start;
                 real a = alpha * row[n].trace();
-                //fprintf(stderr, "SMB %4lu %4lu : %.4f\n", i, j, a);
-                mat[i+ldd*j] += a;
-                if ( sym && ( i != j )) mat[j+ldd*i] += a;
+                //fprintf(stderr, "SMB %4lu %4lu : %.4f\n", is, js, a);
+                if ( ii >= jj || sym )
+                    mat[is+ldd*js] += a;
             }
         }
     }
@@ -320,7 +328,6 @@ void SparMatBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 
 int SparMatBlk::bad() const
 {
-    if ( rsize_ <= 0 ) return 1;
     for ( size_t i = 0; i < rsize_; ++i )
     {
         Line & row = row_[i];

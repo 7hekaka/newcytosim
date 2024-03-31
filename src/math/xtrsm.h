@@ -1819,7 +1819,9 @@ void iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
 void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
 {
     lapack::xpotf2('L', N, A, LDA, INFO);
-    if ( 0 == *INFO )
+    if ( *INFO )
+        std::cerr << "lapack::xpotf2 failed: " << *INFO << "\n";
+    else
     {
         const int S = LDA+1;
         for ( int u = 0; u < N*S; u += S )
@@ -1879,7 +1881,7 @@ void alsatian_iso_xpotrsL(const int N, const real* A, const int LDA, real* B)
 }
 
 
-void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
+void alsatian_xpotrsL(const int N, const float* A, const int LDA, real* B)
 {
 #if 1
     // Solve L*X = B, overwriting B with X
@@ -1887,8 +1889,8 @@ void alsatian_xpotrsL(const int N, const real* A, const int LDA, real* B)
     // Solve U*X = B, overwriting B with X
     alsatian_xtrsmLLT1<'I'>(N, (float*)A, LDA, B);
 #else
-    iso_xtrsmLLN<1,'I'>(N, A, LDA, B);
-    iso_xtrsmLLT<1,'I'>(N, A, LDA, B);
+    iso_xtrsmLLN<1,'I'>(N, (float*)A, LDA, B);
+    iso_xtrsmLLT<1,'I'>(N, (float*)A, LDA, B);
 #endif
 }
 
@@ -2125,43 +2127,43 @@ void lapack_xgetrsN(int N, const REAL* A, int LDA, const int* IPIV, REAL* B)
  We could use non-temporal loads for the matrix A, since it will not fit in the cache,
  but the vector B should be cached!
  */
-void alsatian_xgetrsN(int N, const real* A, int LDA, const int* IPIV, real* B)
+void alsatian_xgetrsN(int N, const float* A, int LDA, const int* IPIV, real* B)
 {
     // Apply row interchanges to the right hand side.
     xlaswp1(B, 1, N, IPIV); //iso_xlaswp<1>(B, 1, N, IPIV, 1);
     // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1U(N, (float*)A, LDA, B);
+    alsatian_xtrsmLLN1U(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1C(N, (float*)A, LDA, B);
+    alsatian_xtrsmLUN1C(N, A, LDA, B);
 }
 
 
 #if USE_SIMD
 /// This is used to apply the full block preconditionner, stored in single precision.
-void alsatian_xgetrsN_SSE(int N, const real* A, int LDA, const int* IPIV, real* B)
+void alsatian_xgetrsN_SSE(int N, const float* A, int LDA, const int* IPIV, real* B)
 {
     // Apply row interchanges to the right hand side.
     xlaswp1(B, 1, N, IPIV);
 #if REAL_IS_DOUBLE
     // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1U_4U_SSE(N, (float*)A, LDA, B);
+    alsatian_xtrsmLLN1U_4U_SSE(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1C_4U_SSE(N, (float*)A, LDA, B);
+    alsatian_xtrsmLUN1C_4U_SSE(N, A, LDA, B);
 #elif ( DIM == 3 )
     // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1U_3D(N, (float*)A, LDA, B);
+    alsatian_xtrsmLLN1U_3D(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1C_3D(N, (float*)A, LDA, B);
+    alsatian_xtrsmLUN1C_3D(N, A, LDA, B);
 #else
     // Solve L*X = B, overwriting B with X.
-    alsatian_xtrsmLLN1U(N, (float*)A, LDA, B);
+    alsatian_xtrsmLLN1U(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X.
-    alsatian_xtrsmLUN1C(N, (float*)A, LDA, B);
+    alsatian_xtrsmLUN1C(N, A, LDA, B);
 #endif
 }
 
 /// This compares results obtained by standard and optimized routines
-void alsatian_xgetrsN_SSE_CHECK(int N, const real* A, int LDA, const int* IPIV, real* B)
+void alsatian_xgetrsN_SSE_CHECK(int N, const float* A, int LDA, const int* IPIV, real* B)
 {
     real * T = new_real(N);
     copy_real(N, B, T);

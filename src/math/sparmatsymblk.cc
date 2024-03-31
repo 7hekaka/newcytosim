@@ -299,30 +299,27 @@ void SparMatSymBlk::scale(const real alpha)
 
 void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, const size_t cnt, size_t mul) const
 {
-    assert_true( mul == Block::dimension() );
-    size_t end = start + cnt;
-    assert_true( end <= rsize_ );
-    size_t off = start + ldd * start;
+    assert_true( mul == S_BLOCK_SIZE );
+    assert_true( start + cnt <= rsize_ );
     
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = 0; jj < cnt; ++jj )
     {
-        Column & col = column_[jj];
+        Column & col = column_[jj+start];
         if ( col.nbb_ > 0 )
         {
-            assert_true(col.inx_[0] == jj);
-            real * dia = mat + (( jj + ldd * jj ) - off ) * S_BLOCK_SIZE;
-            col[0].addto_symm(dia, ldd);
+            assert_true(col.inx_[0] == jj + start);
+            real * dst = mat + ( jj + ldd * jj ) * S_BLOCK_SIZE;
+            col[0].addto_symm(dst, ldd);
             for ( size_t n = 1; n < col.nbb_; ++n )
             {
-                size_t ii = col.inx_[n];
-                assert_true(ii > jj);
-                if ( ii < end )
+                // assuming lower triangle is stored:
+                assert_true( col.inx_[n] > jj + start );
+                auto ij = col.inx_[n] - ( jj + start );
+                if ( ij < cnt )
                 {
-                    //fprintf(stderr, "SMSB %4i %4i % .4f\n", ii, jj, a);
-                    real * mat1 = mat + (( ii + ldd * jj ) - off ) * S_BLOCK_SIZE;
-                    col[n].addto(mat1, ldd);
-                    real * mat2 = mat + (( jj + ldd * ii ) - off ) * S_BLOCK_SIZE;
-                    col[n].addto_trans(mat2, ldd);
+                    //fprintf(stderr, "SMSBD %4lu %4lu\n", ii, jj); col[n].print(stderr);
+                    col[n].addto(dst+ij*S_BLOCK_SIZE, ldd);
+                    col[n].addto_trans(dst+ij*ldd*S_BLOCK_SIZE, ldd);
                 }
             }
         }
@@ -333,67 +330,63 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, 
 void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt,
                                  const size_t mul, const size_t rank) const
 {
-    assert_true( mul == Block::dimension() );
-    size_t end = start + cnt;
-    size_t off = start + ldd * start;
-    assert_true( end <= rsize_ );
-    
-    for ( size_t jj = start; jj < end; ++jj )
+    assert_true( mul == S_BLOCK_SIZE );
+    assert_true( start + cnt <= rsize_ );
+    size_t sup = std::min(cnt, rank+1);
+
+    for ( size_t jj = 0; jj < cnt; ++jj )
     {
-        Column & col = column_[jj];
+        Column & col = column_[jj+start];
         if ( col.nbb_ > 0 )
         {
-            assert_true(col.inx_[0] == jj);
-            col[0].addto_lower(mat+(1+ldd)*jj-off, ldd, alpha);
+            assert_true(col.inx_[0] == jj + start);
+            real * dst = mat + ( jj + ldd * jj ) * S_BLOCK_SIZE;
+            col[0].addto_lower(dst, ldd, alpha);
             for ( size_t n = 1; n < col.nbb_; ++n )
             {
-                size_t ii = col.inx_[n];
-                assert_true(ii > jj);
-                if (( ii < end ) & ( ii <= jj+rank ))
+                // assuming lower triangle is stored:
+                assert_true(col.inx_[n] > jj + start);
+                auto ij = col.inx_[n] - ( jj + start );
+                if ( ij < sup )
                 {
                     //fprintf(stderr, "SMSB %4i %4i % .4f\n", ii, jj, a);
-                    real * mat1 = mat + (( ii + ldd * jj ) - off ) * S_BLOCK_SIZE;
-                    col[n].addto(mat1, ldd, alpha);
-                    //col[n].addto_trans(mat+(jj+ldd*ii)-off, ldd, alpha);
+                    col[n].addto(dst+ij*S_BLOCK_SIZE, ldd, alpha);
+                    //col[n].addto_trans(dst+ij*ldd*S_BLOCK_SIZE, ldd, alpha);
                 }
             }
         }
     }
 }
 
-/*
-addresses `mat' using lower banded storage for a symmetric matrix
-mat(i, j) is stored in mat[i-j+ldd*j]
-*/
+
 void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
                                      const size_t start, const size_t cnt,
                                      const size_t mul, const size_t rank, const bool sym) const
 {
-    assert_true( mul == Block::dimension() );
-    size_t end = start + cnt;
-    assert_true( end <= rsize_ );
+    assert_true( mul == S_BLOCK_SIZE );
+    assert_true( start + cnt <= rsize_ );
+    size_t sup = std::min(cnt, rank+1);
 
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( size_t jj = 0; jj < cnt; ++jj )
     {
-        Column & col = column_[jj];
+        Column & col = column_[jj+start];
         if ( col.nbb_ > 0 )
         {
-            size_t j = jj - start;
-            assert_true(col.inx_[0] == jj);
+            assert_true(col.inx_[0] == jj + start);
             // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
-            mat[j+ldd*j] += alpha * col[0].trace();  // diagonal term
+            real * dst = mat + ( jj + ldd * jj );
+            dst[0] += alpha * col[0].trace();  // diagonal term
             for ( size_t n = 1; n < col.nbb_; ++n )
             {
-                size_t ii = col.inx_[n];
                 // assuming lower triangle is stored:
-                assert_true( ii > jj );
-                if (( ii < end ) & ( ii <= jj+rank ))
+                assert_true(col.inx_[n] > jj + start);
+                auto ij = col.inx_[n] - ( jj + start );
+                if ( ij < sup )
                 {
-                    size_t i = ii - start;
                     real a = alpha * col[n].trace();
                     //fprintf(stderr, "SMSB %4lu %4lu : %.4f\n", i, j, a);
-                    mat[i+ldd*j] += a;
-                    if ( sym ) mat[j+ldd*i] += a;
+                    dst[ij] += a;
+                    if ( sym ) dst[ldd*ij] += a;
                 }
             }
         }
