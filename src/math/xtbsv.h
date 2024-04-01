@@ -703,7 +703,7 @@ void alsatian_xtbsvLTN6K(const int N, const real* A, const int lda, real* X)
 
 #if USE_SIMD
 /**
- Optmized version for KD == 6
+ Optimized version for KD == 6
  Beware: this works assuming that N >= KD, and it will in particular write
  to X[i] for i = 0 ... 6 for any value of N.
 */
@@ -787,7 +787,7 @@ void alsatian_xtbsvLNN6K_SSE(const int N, const double* A, const int lda, double
 
 
 /**
- Optmized version for KD == 6
+ Optimized version for KD == 6
  Beware: this works assuming that N >= KD, and it will in particular write
  to X[i] for i = 0 ... 6 for any value of N.
 */

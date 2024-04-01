@@ -485,7 +485,7 @@ void testTBSV(int N, size_t rep)
     check<uni1>(N, 1, S, AB, BLDD, B, "blas_tbsv", rep);
     check<uni2>(N, 1, S, AB, BLDD, B, "tbsvLxN", rep);
     check<uni3>(N, 1, S, AB, BLDD, B, "tbsvLxNK<KD>", rep);
-    check<uni6>(N, 1, S, AB, BLDD, B, "LLN6K+LTN6K", rep);
+    check<uni6>(N, 1, S, AB, BLDD, B, "LNN6K+LTN6K", rep);
     check<uni7>(N, 1, S, AB, BLDD, B, "alsa_xpbtrsLK", rep);
 #endif
     if ( 1 )
@@ -498,7 +498,7 @@ void testTBSV(int N, size_t rep)
     }
     if ( DIM == 3 )
     {
-        check<uniLN3>(N, 1, S, AB, BLDD, B, "LLN6K", rep);
+        check<uniLN3>(N, 1, S, AB, BLDD, B, "LNN6K", rep);
 #if REAL_IS_DOUBLE && USE_SIMD
         check<uniLN4>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", rep);
 #endif
