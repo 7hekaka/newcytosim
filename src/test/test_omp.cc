@@ -1,6 +1,18 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 // F. Nedelec, 22.04.2018
 
+/*
+ To use OpenMP on MacOS:
+ 
+ 1. Use GCC provided by Homebrew.
+ 
+ 2. Use clang, with libomp (brew install libomp)
+
+      clang -Xclang -fopenmp -L/opt/homebrew/opt/libomp/lib -I/opt/homebrew/opt/libomp/include -lomp src/test/test_omp.cc
+ 
+ */
+
+
 #include <cstdio>
 #include "omp.h"
 
@@ -43,7 +55,7 @@ void pooh(int off, real * vec, int inc)
 
 int main(int argc, char* argv[])
 {
-    double vec[1000];
+    double vec[max];
     
     omp_set_num_threads(num);
     #pragma omp parallel
