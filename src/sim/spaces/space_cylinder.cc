@@ -49,9 +49,9 @@ bool SpaceCylinder::inside(Vector const& W) const
 {
 #if ( DIM > 2 )
     const real RT = W.normYZSqr();
-    return ( abs_real(W.XX) < half_  &&  RT <= square(radius_) );
+    return ( abs_real(W.XX) <= half_  &&  RT <= square(radius_) );
 #elif ( DIM > 1 )
-    return ( abs_real(W.XX) < half_  &&  abs_real(W.YY) <= radius_ );
+    return ( abs_real(W.XX) <= half_  &&  abs_real(W.YY) <= radius_ );
 #else
     return false;
 #endif
@@ -63,9 +63,9 @@ bool SpaceCylinder::allInside(Vector const& W, const real rad) const
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
     const real RT = W.normYZSqr();
-    return ( abs_real(W.XX) + rad < half_  &&  RT <= square(radius_-rad) );
+    return ( abs_real(W.XX) + rad <= half_  &&  RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
-    return ( abs_real(W.XX) + rad < half_  &&  abs_real(W.YY) <= radius_-rad );
+    return ( abs_real(W.XX) + rad <= half_  &&  abs_real(W.YY) <= radius_-rad );
 #else
     return false;
 #endif

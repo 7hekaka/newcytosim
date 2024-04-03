@@ -71,7 +71,7 @@ bool SpaceCylinderP::allInside(Vector const& W, const real rad) const
 {
     assert_true( rad >= 0 );
 #if ( DIM > 2 )
-    const real RT =W.normYZSqr();
+    const real RT = W.normYZSqr();
     return ( RT <= square(radius_-rad) );
 #elif ( DIM > 1 )
     return ( abs_real(W.YY) <= radius_-rad );

@@ -118,7 +118,7 @@ real SpaceEllipse::surface() const
 bool SpaceEllipse::inside(Vector const& W) const
 {
 #if ( DIM == 1 )
-    return abs_real(W.XX) < radius_[0];
+    return abs_real(W.XX) <= radius_[0];
 #elif ( DIM == 2 )
     return square(W.XX/radius_[0]) + square(W.YY/radius_[1]) <= 1;
 #else
