@@ -4,9 +4,9 @@
  which is implemented in alsatian_xpttrs(), combining with code from the LINPACK
  project where reduction is bidirectional (routine dptsl).
  
- LINPACK documentation has a note:
+ LINPACK documentation has this note:
     Because of the two-way nature of the algorithm, systems can be solved up to
-    25% faster than convention alalgorithms. Although the techniques used here
+    25% faster than conventional algorithms. Although the techniques used here
     were independently discovered, they have been known for some time.
     (private communications, J. H. Wilkinson).
  
@@ -24,12 +24,11 @@
 
         D        real(N)
                  is the diagonal of the tridiagonal matrix.
-                 on output d is destroyed.
+                 on output D is destroyed.
 
         E        real(N)
                  is the offdiagonal of the tridiagonal matrix.
-                 e(1) through e(N-1) should contain the
-                 offdiagonal.
+                 E(1) through E(N-1) should contain the offdiagonal.
 
         X        real(N)
                  is the right hand side vector.
@@ -54,7 +53,7 @@ void linpack_xptsl(int N, real D[], const real E[], real X[])
     int mid = ( N - 1 ) / 2;
     int inx = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
-    for( int k = 0; k < mid; ++k, --inx )
+    for ( int k = 0; k < mid; ++k, --inx )
     {
         real t1 = E[k] / D[k];
         D[k+1] -= t1 * E[k];
@@ -88,18 +87,20 @@ void linpack_xptsl(int N, real D[], const real E[], real X[])
 }
 
 
-/** Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022. */
+/** 
+ alsatian_xptsl() was derived from linpack_xptsl(), replacing divisions by multiplications,
+ and reordering some of the operations to reduce the dependency chain.
+ Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022. */
 void alsatian_xptsl(int N, real D[], real E[], real X[])
 {
     int mid = ( N - 1 ) / 2;
     int inx = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
-    real t2 = 0;
     real xk = X[0];
     real xi = X[N-1];
     real dk = D[0];
     real di = D[N-1];
-    for( int k = 0; k < mid; ++k, --inx )
+    for ( int k = 0; k < mid; ++k, --inx )
     {
         dk = inverse(dk);
         D[k] = dk;
@@ -111,7 +112,7 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
 
         di = inverse(di);
         D[inx+1] = di;
-        t2 = di * E[inx];
+        real t2 = di * E[inx];
         X[inx+1] = di * xi;
         di = D[inx] - t2 * E[inx];
         xi = X[inx] - t2 * xi;
@@ -123,7 +124,7 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
         dk = inverse(dk);
         D[mid] = dk;
         xk = xk * dk;
-        t2 = E[mid] * dk;
+        real t2 = E[mid] * dk;
         di = inverse(di - t2 * E[mid]);
         D[mid+1] = di;
         xi = ( xi - E[mid] * xk ) * di;
@@ -153,16 +154,19 @@ void alsatian_xptsl(int N, real D[], real E[], real X[])
 }
 
 
-/** Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022. */
+/** 
+ alsadual_factor() will modify D[] and E[] according to alsatian_xptsl() above,
+ skipping the operations associated with X[] that are left for solve()
+ Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022.
+ */
 void alsadual_factor(int N, real D[], real E[])
 {
     int mid = ( N - 1 ) / 2;
-    int inx = N - 2;
+    int T = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
-    real t2 = 0;
     real dk = D[0];
     real di = D[N-1];
-    for( int k = 0; k < mid; ++k, --inx )
+    for ( int k = 0; k < mid; ++k, --T )
     {
         dk = inverse(dk);
         D[k] = dk;
@@ -170,21 +174,19 @@ void alsadual_factor(int N, real D[], real E[])
         dk = D[k+1] - t1 * E[k];
         E[k] = t1;
 
-        // Attention: for odd N, k+1==inx at the last iteration:
+        // Attention: for odd N, k+1==T at the last iteration:
         di = inverse(di);
-        D[inx+1] = di;
-        t2 = di * E[inx];
-        di = D[inx] - t2 * E[inx];
-        E[inx] = t2;
+        D[T+1] = di;
+        real t2 = di * E[T];
+        di = D[T] - t2 * E[T];
+        E[T] = t2;
     }
-    if ( mid == inx ) // N is even
+    if ( mid == T ) // N is even
     {
         // clean up for possible 2 x 2 block at center
         dk = inverse(dk);
         D[mid] = dk;
         D[mid+1] = inverse(di - dk * E[mid] * E[mid]);
-        ++mid;
-        --inx;
     }
     else // N is odd
     {
@@ -199,25 +201,33 @@ void alsadual_xpttrf(int size, real* D, real* E, int* INFO)
     alsadual_factor(size, D, E);
 }
 
-/** Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022. */
+/** 
+ alsadual_xptts2() will solve for the solution X[], given
+ the factorization calculated by alsadual_solve() above
+Francois J. Nedelec, La Foret Fouesnant, 2--10 August 2022.
+ */
 void alsadual_xptts2(int N, const real D[], const real E[], real X[])
 {
     int mid = ( N - 1 ) / 2;
-    int inx = N - 2;
+    int T = N - 2;
     // zero top half of subdiagonal and bottom half of superdiagonal
     real xk = X[0];
     real xi = X[N-1];
-    for( int k = 0; k < mid; ++k, --inx )
+    int k = 0;
+    while ( k < mid )
     {
         // k going up from 0 to mid-1
         X[k] = D[k] * xk;
         xk = X[k+1] - E[k] * xk;
         // Attention: for odd N, k+1==inx at the last iteration:
-        // inx going down from N-1 to mid
-        X[inx+1] = D[inx+1] * xi;
-        xi = X[inx] - E[inx] * xi;
+        // T going down from N-1 to mid
+        X[T+1] = D[T+1] * xi;
+        xi = X[T] - E[T] * xi;
+        ++k;
+        --T;
     }
-    if ( mid == inx ) // N is even
+    ++k; // assert_true( k == mid+1 );
+    if ( mid == T ) // N is even
     {
         // clean up for possible 2 x 2 block at center
         xk = xk * D[mid];
@@ -225,24 +235,28 @@ void alsadual_xptts2(int N, const real D[], const real E[], real X[])
         xi = ( xi - E[mid] * xk ) * D[mid+1];
         xk = xk - t2 * xi;
         X[mid] = xk;
-        ++mid;
-        --inx;
+        X[k] = xi;
+        ++k;
+        --T;
     }
     else // N is odd
     {
         xi = ( xk + xi - X[mid] ) * D[mid];
         xk = xi;
+        X[mid] = xi;
     }
-    X[mid] = xi;
     // back solve starting at the center, going towards the top and bottom
-    for ( int kp1 = mid+1; kp1 < N; ++kp1, --inx )
+    while ( T >= 0 )
     {
-        //X[inx] -= E[inx] * X[inx+1];  // inx from mid-1 to 0
-        xk = X[inx] - E[inx] * xk;
-        X[inx] = xk;
-        //X[kp1] -= E[kp1-1] * X[kp1-1]; // kp1 from mid+1 to N-1
-        xi = X[kp1] - E[kp1-1] * xi;
-        X[kp1] = xi;
+        //X[T] -= E[T] * X[T+1];  // T from mid-1 to 0
+        xk = X[T] - E[T] * xk;
+        X[T] = xk;
+        //X[k] -= E[k-1] * X[k-1]; // k from mid+1 to N-1
+        xi = X[k] - E[k-1] * xi;
+        X[k] = xi;
+        ++k;
+        --T;
     }
+    //assert_true( k == N );
 }
 

@@ -48,6 +48,9 @@ void factor(int N, real const* D, real const* U, real* d, real* u, char const st
         copy_real(N, U, u);
         FUNC(N, d, u, &info);
     }
+    VecPrint::edges(N, d, 3);
+    fprintf(stderr, " |");
+    VecPrint::edges(N-1, u, 3);
     printf(" %12s cpu %5.0f\n", str, tock());
 }
 
@@ -55,7 +58,7 @@ void factor(int N, real const* D, real const* U, real* d, real* u, char const st
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testFactor(int seg, size_t cnt)
+void testFactor(int seg, size_t rep)
 {
     real * d = new_real(seg);
     real * u = new_real(seg);
@@ -65,15 +68,15 @@ void testFactor(int seg, size_t cnt)
     for ( int i = 0; i < seg; ++i )
     {
         D[i] = 2.0;
-        U[i] = -0.5 * RNG.preal();
+        U[i] = 1.0;
     }
     
-    factor<divide>(seg, D, U, d, u, "divide", cnt);
-    factor<lapack::xpttrf>(seg, D, U, d, u, "lapack", cnt);
-    factor<lapack_xpttrf>(seg, D, U, d, u, "c-lapack", cnt);
-    factor<italian_factor>(seg, D, U, d, u, "italian", cnt);
-    factor<alsatian_xpttrf>(seg, D, U, d, u, "alsatian", cnt);
-    factor<alsadual_xpttrf>(seg, D, U, d, u, "alsadual", cnt);
+    factor<divide>(seg, D, U, d, u, "divide", rep);
+    factor<lapack::xpttrf>(seg, D, U, d, u, "lapack", rep);
+    factor<lapack_xpttrf>(seg, D, U, d, u, "c-lapack", rep);
+    factor<italian_factor>(seg, D, U, d, u, "italian", rep);
+    factor<alsatian_xpttrf>(seg, D, U, d, u, "alsatian", rep);
+    factor<alsadual_xpttrf>(seg, D, U, d, u, "alsadual", rep);
 
     free_real(d);
     free_real(u);
@@ -119,7 +122,7 @@ void solve(int N, real const* D, real const* U, real const* B, real* d, real* u,
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testSolve(int seg, size_t cnt)
+void testSolve(int seg, size_t rep)
 {
     real * d = new_real(seg);
     real * u = new_real(seg);
@@ -141,11 +144,11 @@ void testSolve(int seg, size_t cnt)
     copy_real(seg, U, u);
     copy_real(seg, B, S);
     solveL(seg, d, u, S);
-    solve<lapack::xpttrf, lapack::xptts2>(seg, D, U, B, d, u, b, S, "lapack", cnt);
-    solve<lapack_xpttrf, lapack_xptts2>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
-    solve<italian_factor, italian_xptts2>(seg, D, U, B, d, u, b, S, "italian", cnt);
-    solve<alsatian_xpttrf, alsatian_xptts2>(seg, D, U, B, d, u, b, S, "alsatian", cnt);
-    solve<alsadual_xpttrf, alsadual_xptts2>(seg, D, U, B, d, u, b, S, "alsadual", cnt);
+    solve<lapack::xpttrf, lapack::xptts2>(seg, D, U, B, d, u, b, S, "lapack", rep);
+    solve<lapack_xpttrf, lapack_xptts2>(seg, D, U, B, d, u, b, S, "c-lapack", rep);
+    solve<italian_factor, italian_xptts2>(seg, D, U, B, d, u, b, S, "italian", rep);
+    solve<alsatian_xpttrf, alsatian_xptts2>(seg, D, U, B, d, u, b, S, "alsatian", rep);
+    solve<alsadual_xpttrf, alsadual_xptts2>(seg, D, U, B, d, u, b, S, "alsadual", rep);
 
     free_real(d);
     free_real(u);
@@ -225,7 +228,7 @@ void fused(int N, real const* D, real const* U, real const* B, real* d, real* u,
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
  */
-void testFused(int seg, size_t cnt)
+void testFused(int seg, size_t rep)
 {
     real * d = new_real(seg);
     real * u = new_real(seg);
@@ -248,16 +251,16 @@ void testFused(int seg, size_t cnt)
     solveL(seg, d, u, S);
 
 #if 1
-    fused<solveL>(seg, D, U, B, d, u, b, S, "lapack", cnt);
-    fused<solveI>(seg, D, U, B, d, u, b, S, "italian", cnt);
-    fused<solveA>(seg, D, U, B, d, u, b, S, "alsatian", cnt);
-    fused<solveW>(seg, D, U, B, d, u, b, S, "wikipedia", cnt);
+    fused<solveL>(seg, D, U, B, d, u, b, S, "lapack", rep);
+    fused<solveI>(seg, D, U, B, d, u, b, S, "italian", rep);
+    fused<solveA>(seg, D, U, B, d, u, b, S, "alsatian", rep);
+    fused<solveW>(seg, D, U, B, d, u, b, S, "wikipedia", rep);
 #endif
-    fused<solveC>(seg, D, U, B, d, u, b, S, "c-lapack", cnt);
-    fused<solveN>(seg, D, U, B, d, u, b, S, "n_recipee", cnt);
-    fused<solveJ>(seg, D, U, B, d, u, b, S, "linpack", cnt);
-    fused<solveF>(seg, D, U, B, d, u, b, S, "alsafused", cnt);
-    fused<solveX>(seg, D, U, B, d, u, b, S, "alsadual", cnt);
+    fused<solveC>(seg, D, U, B, d, u, b, S, "c-lapack", rep);
+    fused<solveN>(seg, D, U, B, d, u, b, S, "n_recipee", rep);
+    fused<solveJ>(seg, D, U, B, d, u, b, S, "linpack", rep);
+    fused<solveF>(seg, D, U, B, d, u, b, S, "alsafused", rep);
+    fused<solveX>(seg, D, U, B, d, u, b, S, "alsadual", rep);
 
     free_real(d);
     free_real(u);
@@ -279,11 +282,15 @@ int main(int argc, char* argv[])
 
     std::cout << "Factorize\n";
     testFactor(nbs, rep);
-    std::cout << "Solve\n";
+    std::cout << nbs << " Solve\n";
     testSolve(nbs, rep);
+    std::cout << nbs+1 << " Solve\n";
     testSolve(nbs+1, rep);
-    std::cout << nbs << " Factorize & Solve\n";
-    testFused(nbs, rep);
-    std::cout << nbs+1 << " Factorize & Solve\n";
-    testFused(nbs+1, rep);
+    if ( 1 )
+    {
+        std::cout << nbs << " Factorize & Solve\n";
+        testFused(nbs, rep);
+        std::cout << nbs+1 << " Factorize & Solve\n";
+        testFused(nbs+1, rep);
+    }
 }
