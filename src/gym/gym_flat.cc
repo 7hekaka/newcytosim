@@ -191,6 +191,7 @@ void gym::fillRectangle(float L, float B, float R, float T, float Z, const float
 
 //-----------------------------------------------------------------------
 
+/// return `a` or `a+1`, depending if `b` is odd or even.
 static int copy_parity(const int a, const int b)
 {
     return a + (( std::abs(a) + b ) & 1 );
@@ -213,9 +214,10 @@ void gym::drawTiledFloor(int R, float T, float Z)
     int Q = std::floor( double(R) * M_SQRT1_2 );
     
     int x = R;
-    int RX = 2 * x - 3;
+    int RX = 2 * R - 3;
     int RY = 0;
-    flute3 * flu = gym::mapBufferV3(24*Q*Q);
+    size_t CNT = 24 * Q * Q;
+    flute3 * flu = gym::mapBufferV3(CNT);
     flute3 * ptr = flu;
     
     for ( int y = 0; y <= x; ++y )
@@ -243,15 +245,11 @@ void gym::drawTiledFloor(int R, float T, float Z)
             float Y = i * T;
             set_rect(ptr, X-H, Y-H, X+H, Y+H, Z);
             set_rect(ptr,-X+H,-Y+H,-X-H,-Y-H, Z);
-        }
-        for ( int i = copy_parity(Q,y); i <= x; i+=2 )
-        {
-            float X = y * T;
-            float Y = i * T;
             set_rect(ptr,-X-H, Y-H,-X+H, Y+H, Z);
             set_rect(ptr, X+H,-Y+H, X-H,-Y-H, Z);
         }
     }
+    //size_t j = ptr - flu;
     gym::unmapBufferV3();
     gym::drawTriangleStrip(0, ptr-flu);
 }
