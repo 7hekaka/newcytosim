@@ -619,7 +619,7 @@ void View::sliceView(int mode) const
         case 3:
             gym::enableClipPlane(2, V.XX, V.YY, V.ZZ, off);
             if ( !depth_clamp )
-                setFog(3, 2, fog_color);
+                setFog(1, 1, fog_color);
         break;
         case 4: {
             real thk = view_scale * 0.1;
