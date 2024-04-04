@@ -26,7 +26,7 @@ private:
     /// half-size of the OpenGL visible region in OpenGL units
     mutable float visRange[2];
     
-    /// translation between center of volume and camera
+    /// translation between origin and camera plane
     mutable float eyeDistance;
     
     /// OpenGL viewport

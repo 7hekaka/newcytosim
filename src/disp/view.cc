@@ -29,7 +29,7 @@ View::View(const std::string& n, int depth)
     
     visRange[0] = view_scale;
     visRange[1] = view_scale;
-    eyeDistance = -0.25f * view_scale;
+    eyeDistance = 0.25f * view_scale;
 
     viewport_[0] = 0;
     viewport_[1] = 0;
@@ -516,25 +516,25 @@ void View::setProjection() const
     if ( perspective == 3 )
     {
         // this creates a stronger perspective:
-        eyeDistance = -1.5f * S;
+        eyeDistance = 1.5f * S;
         gym::mat_frustum(projection_, -X, X, -Y, Y, S, 5.0f*S);
     }
     else if ( perspective == 2 )
     {
         // this creates a strong perspective:
-        eyeDistance = -2.0f * S;
+        eyeDistance = 2.0f * S;
         gym::mat_frustum(projection_, -X, X, -Y, Y, S, 6.0f*S);
     }
     else if ( perspective )
     {
         // this creates a perspective:
-        eyeDistance = -2.0f * S;
+        eyeDistance = 2.0f * S;
         gym::mat_frustum(projection_, -X, X, -Y, Y, S, 11.0f*S);
     }
     else
     {
         // The back-plane is set behind to avoid clipping
-        eyeDistance = -1.25f * S;
+        eyeDistance = 1.25f * S;
         gym::mat_ortho(projection_,-X, X, -Y, Y, 0.25f*S, 2.25f*S);
     }
 
@@ -554,7 +554,7 @@ void View::setPickProjection(float X, float Y, float W, float H) const
 
 void View::setModelView() const
 {
-    float T[4] = { 0, 0, eyeDistance, 1 };
+    float T[4] = { 0, 0, -eyeDistance, 1 };
     rotation.setOpenGLMatrix(modelview_, zoom, T);
     Vector3 V = focus + focus_shift;
     gym::mat_translate(modelview_, -V.XX, -V.YY, -V.ZZ);
@@ -803,7 +803,7 @@ void View::setFog(GLint type, float param, gym_color color) const
     if ( gl_type == GL_LINEAR )
     {
         // fog to start at the edge of Simulation's volume
-        float start = -eyeDistance - 0.5*view_scale;
+        float start = eyeDistance - 0.5*view_scale;
         glFogf(GL_FOG_START, start);
         glFogf(GL_FOG_END, start+param*view_scale);
     }
@@ -1050,12 +1050,12 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
         case 0:
             break;
         case 1:
-            gym::eye_view(0, shift-0.5*visRange[1], eyeDistance, zoom);
+            gym::eye_view(0, shift-0.5*visRange[1], -eyeDistance, zoom);
             gym::color(color);
             drawScaleHV(S, S/10, 0, setLadderH);
             break;
         case 2:
-            gym::eye_view(0.5*visRange[0]-shift, 0, eyeDistance, zoom);
+            gym::eye_view(0.5*visRange[0]-shift, 0, -eyeDistance, zoom);
             gym::color(color);
             drawScaleHV(S, -S/10, 0, setLadderV);
             break;

@@ -45,7 +45,7 @@ namespace gym
 #pragma mark - Set the current view
 
     /// set Identity transformation and load (reference view is not changed)
-    inline void eye_view(float Z, float S) { gym::mat_diagonal(mvp_, S, Z); load(); }
+    inline void eye_view(float Z, float S) { gym::mat_diagonal(mvp_, S, -Z); load(); }
     
     /// center view on (X, Y, Z) and scale by S (reference view is not changed)
     inline void eye_view(float X, float Y, float Z, float S) { gym::mat_diagonal(mvp_, S); gym::mat_translate(mvp_, X/S, Y/S, Z/S); load(); }
