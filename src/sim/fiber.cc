@@ -356,8 +356,8 @@ void Fiber::flipPolarity()
 }
 
 /**
- A portion of size `len` that includes the minus end is removed.
- The Hands bound within the deleted portion are detached.
+ Remove a portion of size `len` from the minus end
+ and detach Hands bound within the deleted portion.
  */
 void Fiber::cutM(real len)
 {
@@ -379,8 +379,8 @@ void Fiber::cutM(real len)
 
 
 /**
- A portion of size `len` that includes the plus end is removed.
- The Hands bound within the deleted portion are detached.
+ Remove a portion of size `len` from the plus end
+ and detach Hands bound within the deleted portion.
  */
 void Fiber::cutP(real len)
 {
@@ -689,13 +689,13 @@ void Fiber::planarCut(Vector const& n, const real a,
     Array<real> cuts;
     /*
      The cuts should be processed in order of decreasing abscissa,
-     hence we check intersections from plus end to minus end
+     hence we consider the segments downwards from plus end to minus end
     */
-    for ( size_t s = nbSegments(); s > 0 ; --s )
+    for ( size_t s = nbSegments(); s-- > 0 ; )
     {
-        real abs = planarIntersect(s-1, n, a);
+        real abs = planarIntersect(s, n, a);
         if ( 0 <= abs  &&  abs < 1 )
-            cuts.push_back(abscissaPoint(s-1+abs));
+            cuts.push_back(abscissaPoint(s+abs));
     }
     min_len = std::max(min_len, prop->min_length);
 
@@ -706,7 +706,8 @@ void Fiber::planarCut(Vector const& n, const real a,
         severNow(m, p, min_len, stateP, stateM);
         if ( prop == nullptr )
             return;
-        assert_true( length() >= min_len );
+        //std::cerr << "cut " << reference() << " " << length() << " " << min_len << "\n";
+        assert_true( length() + REAL_EPSILON >= min_len );
     }
 }
 
