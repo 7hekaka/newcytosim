@@ -80,7 +80,7 @@ void SpaceCylinderZ::resize(Glossary& opt)
         // back calculate length to match the given surface:
         real len = 2 * edg + ( suf - S ) / L;
         //std::clog << "CylinderZ surface " << surface_cylinder(rad, len, edg) << " " << suf << '\n';
-        std::clog << "CylinderZ:length=" << len << '\n';
+        std::clog << "CylinderZ:length <--- " << len << " to match given surface\n";
         bot = -0.5 * len;
         top =  0.5 * len;
     }
