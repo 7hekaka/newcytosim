@@ -315,7 +315,7 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, 
                 // assuming lower triangle is stored:
                 assert_true( col.inx_[n] > jj + start );
                 auto ij = col.inx_[n] - ( jj + start );
-                if ( ij < cnt )
+                if ( jj+ij < cnt )
                 {
                     //fprintf(stderr, "SMSBD %4lu %4lu\n", ii, jj); col[n].print(stderr);
                     col[n].addto(dst+ij*S_BLOCK_SIZE, ldd);

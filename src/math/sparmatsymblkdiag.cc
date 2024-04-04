@@ -105,7 +105,7 @@ void SparMatSymBlkDiag::Pilar::allocate(size_t alc)
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory, with some extra for SIMD burr:
-        void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+4);
+        void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+chunk);
         Block * blk_new  = new(ptr) Block[alc];
 
         if ( posix_memalign(&ptr, 32, alc*sizeof(unsigned)) )
@@ -301,7 +301,7 @@ void SparMatSymBlkDiag::addDiagonalBlock(real* mat, size_t ldd, const size_t sta
             // assuming lower triangle is stored:
             assert_true( col.inx_[n] > jj + start );
             auto ij = col.inx_[n] - ( jj + start );
-            if ( ij < cnt )
+            if ( jj+ij < cnt )
             {
                 //fprintf(stderr, "SMSBD %4lu %4lu\n", ii, jj); col[n].print(stderr);
                 col[n].addto(dst+ij*SD_BLOCK_SIZE, ldd);
