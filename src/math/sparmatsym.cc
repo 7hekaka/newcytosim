@@ -223,26 +223,26 @@ void SparMatSym::scale(const real alpha)
 
 
 void SparMatSym::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
-                                  const size_t mul, const size_t amp) const
+                                  const size_t mul) const
 {
-    start *= mul;
-    cnt = start + mul * cnt;
-    assert_true( cnt <= size_ );
+    assert_true( start + cnt <= size_ );
     
-    for ( size_t jj = start; jj < cnt; ++jj )
+    for ( size_t j = 0; j < cnt; ++j )
     {
-        size_t j = amp * ( jj - start );
-        for ( size_t n = 0; n < colsiz_[jj]; ++n )
+        Element * col = column_[j+start];
+        real * dst = mat + ( j + ldd * j ) * mul;
+        for ( size_t n = 0; n < colsiz_[j+start]; ++n )
         {
-            size_t ii = column_[jj][n].inx;
+            // assuming lower triangle is stored:
+            assert_true( col[n].inx > j + start );
+            size_t ii = col[n].inx;
             if ( start <= ii && ii < cnt )
             {
-                size_t i = amp * ( ii - start );
-                assert_true(i > j);
-                // address lower triangle of 'mat'
-                mat[i+ldd*j] += column_[jj][n].val;
-                if ( i != j )
-                    mat[j+ldd*i] += column_[jj][n].val;
+                size_t ij = ii - ( j + start );
+                //printf("SMS2 %4i %4i % .4f\n", j, ij, a);
+                dst[mul*ij] += col[n].val;
+                if ( ij )
+                    dst[mul*ldd*ij] += col[n].val;
             }
         }
     }

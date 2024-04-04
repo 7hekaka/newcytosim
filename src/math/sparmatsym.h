@@ -90,7 +90,7 @@ public:
     void scale(real);
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t amp=1) const;
+    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul) const;
     
     /// prepare matrix for multiplications by a vector (must be called)
     bool prepareForMultiply(int dim);

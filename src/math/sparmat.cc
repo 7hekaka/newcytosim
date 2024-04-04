@@ -179,29 +179,27 @@ void SparMat::scale( real a )
 
 
 void SparMat::addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt,
-                               const size_t mul, const size_t amp) const
+                               const size_t mul) const
 {
-    start *= mul;
-    cnt *= mul;
     assert_true( start + cnt <= size_ );
-    
-    for ( size_t jj = 0; jj < cnt; ++jj )
+    size_t end = start + cnt;
+
+    for ( size_t jj = start; jj < end; ++jj )
     {
-        size_t* row = mxRow[jj+start];
+        size_t* row = mxRow[jj];
         if ( row != nullptr )
         {
-            real* col = mxCol[jj+start];
+            real* col = mxCol[jj];
             for ( ; *row != LAST_IN_COLUMN; ++row, ++col )
             {
                 if ( *row > start )
                 {
-                    size_t ii = *row - start;
-                    if ( ii < cnt )
+                    size_t ii = *row;
+                    if ( start <= ii && ii < end )
                     {
-                        assert_true( ii <= jj );
-                        mat[amp*(ii+ldd*jj)] += *col;
+                        mat[mul*(ii+ldd*jj)] += *col;
                         if ( ii != jj )
-                            mat[amp*(jj+ldd*ii)] += *col;
+                            mat[mul*(jj+ldd*ii)] += *col;
                         //printf("Sp %4i %4i % .4f\n", ii, jj, a );
                     }
                 }

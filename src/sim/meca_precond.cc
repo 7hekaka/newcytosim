@@ -433,7 +433,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
         addBendingRigidity<1>(res, nbp, mec->nbPoints(), jR);
 #endif
 #if USE_ISO_MATRIX
-    mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp, 1, 1);
+    mISO.addDiagonalBlock(res, nbp, mec->matIndex(), nbp, 1);
     if ( useFullMatrix )
 #endif
     {
@@ -523,7 +523,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
     }
 #endif
 #if USE_ISO_MATRIX
-    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, 1, DIM);
+    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
 #endif
     copy_lower_subspace<DIM, true>(bks, res, bks);
 #if USE_ISO_MATRIX
@@ -569,7 +569,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     }
 #endif
 #if USE_ISO_MATRIX
-    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, 1, DIM);
+    mISO.addDiagonalBlock(res, bks, mec->matIndex(), nbp, DIM);
 #endif
     copy_lower_subspace<DIM, true>(bks, res, bks);
 #if USE_ISO_MATRIX

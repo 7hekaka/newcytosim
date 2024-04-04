@@ -292,32 +292,26 @@ void SparMatSym1::scale(const real alpha)
 
 
 void SparMatSym1::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
-                                   const size_t mul, const size_t amp) const
+                                   const size_t mul) const
 {
-    start *= mul;
-    cnt = start + mul * cnt;
-    assert_true( cnt <= size_ );
+    assert_true( start + cnt <= size_ );
     
-    for ( size_t jj = start; jj < cnt; ++jj )
+    for ( size_t j = 0; j < cnt; ++j )
     {
-        size_t j = amp * ( jj - start );
-        mat[j+ldd*j] += diagon_[jj];
-
-        for ( size_t n = 0; n < colsiz_[jj]; ++n )
+        Element * col = column_[j+start];
+        real * dst = mat + ( j + ldd * j ) * mul;
+        dst[0] += diagon_[j+start];
+        for ( size_t n = 0; n < colsiz_[j+start]; ++n )
         {
-            size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
-            assert_true( ii > jj );
-            if ( ii < cnt )
+            assert_true( col[n].inx > j + start );
+            size_t ij = col[n].inx - ( j + start );
+            if ( j + ij < cnt )
             {
-                size_t i = amp * ( ii - start );
-                real a = column_[jj][n].val;
-                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
-                mat[i+ldd*j] += a;
-                mat[j+ldd*i] += a;
+                //printf("SMS2 %4i %4i % .4f\n", j, ij, a);
+                dst[mul*ij] += col[n].val;
+                dst[mul*ldd*ij] += col[n].val;
             }
-            else
-                break;
         }
     }
 }
@@ -331,29 +325,25 @@ void SparMatSym1::addLowerBand(real alpha, real* mat, const size_t ldd, size_t s
                                const size_t mul, const size_t rank) const
 {
     start *= mul;
-    cnt = start + mul * cnt;
-    assert_true( cnt <= size_ );
-    
-    for ( size_t jj = start; jj < cnt; ++jj )
-    {
-        size_t j = jj - start;
-        mat[j+ldd*j] += alpha * diagon_[jj];
+    cnt *= mul;
+    assert_true( start + cnt <= size_ );
 
-        for ( size_t n = 0; n < colsiz_[jj]; ++n )
+    for ( size_t j = 0; j < cnt; ++j )
+    {
+        Element * col = column_[j+start];
+        size_t sup = std::min(cnt-j, rank+1);
+        real * dst = mat + ( j + ldd * j ) * mul;
+        dst[0] += alpha * diagon_[j+start];
+        for ( size_t n = 0; n < colsiz_[j+start]; ++n )
         {
-            size_t ii = column_[jj][n].inx;
-            assert_true( ii > jj );
             // assuming lower triangle is stored:
-            if ( ii < cnt )
+            assert_true( col[n].inx >= j + start );
+            size_t ij = col[n].inx - ( j + start );
+            if ( ij < sup )
             {
-                size_t i = ii - start;
-                //printf("SMS1 %4i %4i % .4f\n", ii, jj, a);
-                assert_true( i >= j );
-                if ( i <= j + rank )
-                    mat[i+ldd*j] += alpha * column_[jj][n].val;
+                //printf("SMS2 %4i %4i % .4f\n", ii, jj, a);
+                dst[ij] += alpha * col[n].val;
             }
-            else
-                break;
         }
     }
 }

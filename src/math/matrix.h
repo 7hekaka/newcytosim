@@ -68,7 +68,7 @@ public:
     void copyBlock(real* mat, size_t ldd, size_t sx, size_t nx, size_t sy, size_t ny) const;
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    virtual void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t amp=1) const;
+    virtual void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul) const;
     
     //----------------------------------------------------------------------
     

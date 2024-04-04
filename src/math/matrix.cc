@@ -66,15 +66,13 @@ void Matrix::copyBlock(real* mat, size_t ldd, size_t sx, size_t nx, size_t sy, s
 
 
 void Matrix::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
-                              const size_t mul, const size_t amp) const
+                              const size_t mul) const
 {
-    start *= mul;
-    cnt *= mul;
     assert_true( start + cnt < size() );
 
     for ( size_t jj = 0; jj < cnt; ++jj )
     for ( size_t ii = 0; ii < cnt; ++ii )
-        mat[amp*(ii+ldd*jj)] += value(start+ii, start+jj);
+        mat[mul*(ii+ldd*jj)] += value(start+ii, start+jj);
 }
 
 //------------------------------------------------------------------------------

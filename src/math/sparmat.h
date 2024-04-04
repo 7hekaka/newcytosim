@@ -63,7 +63,7 @@ public:
     void scale( real a );
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t amp=1) const;
+    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul) const;
     
     /// multiplication of a vector: Y = Y + M * X, dim(X) = dim(M)
     void vecMulAdd( const real* X, real* Y ) const;

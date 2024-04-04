@@ -321,8 +321,8 @@ void SparMatSymBlkDiag::addLowerBand(real alpha, real* mat, size_t ldd, const si
     for ( size_t jj = 0; jj < cnt; ++jj )
     {
         Pilar & col = pilar_[jj+start];
-        real * dst = mat + ( jj * ldd + jj ) * SD_BLOCK_SIZE;
         size_t sup = std::min(cnt-jj, rank+1);
+        real * dst = mat + ( jj * ldd + jj ) * SD_BLOCK_SIZE;
         col.dia_.addto_lower(dst, ldd, alpha);
         for ( size_t n = 0; n < col.noff_; ++n )
         {
@@ -350,8 +350,8 @@ void SparMatSymBlkDiag::addDiagonalTrace(real alpha, real* mat, size_t ldd,
     for ( size_t jj = 0; jj < cnt; ++jj )
     {
         Pilar & col = pilar_[jj+start];
-        real * dst = mat + ( jj * ldd + jj );
         size_t sup = std::min(cnt-jj, rank+1);
+        real * dst = mat + ( jj * ldd + jj );
         dst[0] += alpha * col.dia_.trace();   // diagonal term
         for ( size_t n = 0; n < col.noff_; ++n )
         {

@@ -289,59 +289,52 @@ void SparMatSym2::scale(const real alpha)
 
 
 void SparMatSym2::addDiagonalBlock(real* mat, const size_t ldd, size_t start, size_t cnt,
-                                   const size_t mul, const size_t amp) const
+                                   const size_t mul) const
 {
-    start *= mul;
-    cnt = start + mul * cnt;
-    assert_true( cnt <= size_ );
-    
-    for ( size_t jj = start; jj < cnt; ++jj )
+    assert_true( start + cnt <= size_ );
+
+    for ( size_t j = 0; j < cnt; ++j )
     {
-        size_t j = amp * ( jj - start );
-        for ( size_t n = 0; n < colsiz_[jj]; ++n )
+        Element * col = column_[j+start];
+        real * dst = mat + ( j + ldd * j ) * mul;
+        for ( size_t n = 0; n < colsiz_[j+start]; ++n )
         {
-            size_t ii = column_[jj][n].inx;
             // assuming lower triangle is stored:
-            assert_true( ii >= jj );
-            if ( ii < cnt )
+            assert_true( col[n].inx >= j + start );
+            size_t ij = col[n].inx - ( j + start );
+            if ( j + ij < cnt )
             {
-                size_t i = amp * ( ii - start );
-                //printf("SMS2 %4i %4i % .4f\n", ii, jj, a);
-                mat[i+ldd*j] += column_[jj][n].val;
-                if ( j != i )
-                    mat[j+ldd*i] += column_[jj][n].val;
+                //printf("SMS2 %4i %4i % .4f\n", j, ij, a);
+                dst[mul*ij] += col[n].val;
+                if ( ij )
+                    dst[mul*ldd*ij] += col[n].val;
             }
         }
     }
 }
 
 
-/*
-addresses `mat' using lower banded storage for a symmetric matrix
-mat(i, j) is stored in mat[i-j+ldd*j]
-*/
 void SparMatSym2::addLowerBand(real alpha, real* mat, const size_t ldd, size_t start, size_t cnt,
                                const size_t mul, const size_t rank) const
 {
     start *= mul;
-    cnt = start + mul * cnt;
-    assert_true( cnt <= size_ );
+    cnt *= mul;
+    assert_true( start + cnt <= size_ );
 
-    for ( size_t jj = start; jj < cnt; ++jj )
+    for ( size_t j = 0; j < cnt; ++j )
     {
-        size_t j = jj - start;
-        for ( size_t n = 0; n < colsiz_[jj]; ++n )
+        Element * col = column_[j+start];
+        size_t sup = std::min(cnt-j, rank+1);
+        real * dst = mat + ( j + ldd * j ) * mul;
+        for ( size_t n = 0; n < colsiz_[j+start]; ++n )
         {
-            size_t ii = column_[jj][n].inx;
-            assert_true( ii >= jj );
             // assuming lower triangle is stored:
-            if ( ii < cnt )
+            assert_true( col[n].inx >= j + start );
+            size_t ij = col[n].inx - ( j + start );
+            if ( ij < sup )
             {
-                size_t i = ii - start;
                 //printf("SMS2 %4i %4i % .4f\n", ii, jj, a);
-                assert_true( i >= j );
-                if ( i <= j + rank )
-                    mat[i+ldd*j] += alpha * column_[jj][n].val;
+                dst[ij] += alpha * col[n].val;
             }
         }
     }
