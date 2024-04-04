@@ -802,8 +802,10 @@ void View::setFog(GLint type, float param, gym_color color) const
     
     if ( gl_type == GL_LINEAR )
     {
-        glFogf(GL_FOG_START, (param)*view_scale);
-        glFogf(GL_FOG_END, (param*2+1)*view_scale);
+        // fog to start at the edge of Simulation's volume
+        float start = -eyeDistance - 0.5*view_scale;
+        glFogf(GL_FOG_START, start);
+        glFogf(GL_FOG_END, start+param*view_scale);
     }
     else
     {

@@ -608,15 +608,15 @@ int buildFogMenu()
     int menu = gym::createMenu(glApp::processMenuEvent);
     gym::addMenuEntry("Disable",          100);
     gym::addMenuEntry("Linear ",          101);
-    gym::addMenuEntry("Exponential 1/16", 102);
-    gym::addMenuEntry("Exponential 1/8",  103);
-    gym::addMenuEntry("Exponential 1/4",  104);
-    gym::addMenuEntry("Exponential 1/2",  105);
-    gym::addMenuEntry("Exponential 1",    106);
-    gym::addMenuEntry("Exponential 2",    107);
-    gym::addMenuEntry("Exponential 4",    108);
-    gym::addMenuEntry("Exponential 8",    109);
-    gym::addMenuEntry("Exponential 16",   110);
+    gym::addMenuEntry("Exponential 16x", 102);
+    gym::addMenuEntry("Exponential 8x",  103);
+    gym::addMenuEntry("Exponential 4x",  104);
+    gym::addMenuEntry("Exponential 2x",  105);
+    gym::addMenuEntry("Exponential 1x",  106);
+    gym::addMenuEntry("Exponential 1/2x", 107);
+    gym::addMenuEntry("Exponential 1/4x", 108);
+    gym::addMenuEntry("Exponential 1/8x", 109);
+    gym::addMenuEntry("Exponential 1/16x", 110);
     return menu;
 }
 
