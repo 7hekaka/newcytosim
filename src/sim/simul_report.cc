@@ -1877,7 +1877,7 @@ void Simul::reportInventory(std::ostream& out) const
 }
 
 template < typename SET >
-void reportSimulSet(std::ostream& out, SET& set, PropertyList const& properties)
+static void reportSet(std::ostream& out, SET& set, PropertyList const& properties)
 {
     for ( Property const* i : properties.find_all(set.title()) )
     {
@@ -1907,10 +1907,10 @@ void Simul::reportSimul(std::ostream& out) const
 {
     out << COM << ljust("class", 2, 2) << SEP << "objects" << SEP << "vertices";
     out << SEP << "largest" << SEP << "identity";
-    reportSimulSet(out,  fibers, properties);
-    reportSimulSet(out,  solids, properties);
-    reportSimulSet(out, spheres, properties);
-    reportSimulSet(out,   beads, properties);
+    reportSet(out,  fibers, properties);
+    reportSet(out,  solids, properties);
+    reportSet(out, spheres, properties);
+    reportSet(out,   beads, properties);
 }
 
 /**
