@@ -73,9 +73,6 @@ set hand activator
 {
     binding = 250, 0.020
     unbinding = 0.01, 4
-    activity = motor
-    unloaded_speed = 0
-    stall_force = 2
     display = ( color=green; size=5; width=3; )
 }
 
