@@ -628,7 +628,6 @@ void alsatian_xtbsvLTNK(const int N, const real* A, const int lda, real* X)
 void alsatian_xtbsvLNN6K(const int N, const real* A, const int lda, real* X)
 {
     const real * end = X + N - 6;
-    //constexpr int KD = 6;
     assert_true( lda > 6 );
     assert_true( N >= 6 );
     real tt = X[0];
@@ -672,7 +671,6 @@ void alsatian_xtbsvLNN6K(const int N, const real* A, const int lda, real* X)
 void alsatian_xtbsvLTN6K(const int N, const real* A, const int lda, real* X)
 {
     const real * end = X;
-    //constexpr int KD = 6;
     assert_true( lda > 6 );
     assert_true( N >= 6 );
     A += ( N - 1 ) * lda;
@@ -680,18 +678,13 @@ void alsatian_xtbsvLTN6K(const int N, const real* A, const int lda, real* X)
     real x0 = 0, x1 = 0, x2 = 0, x3 = 0, x4 = 0, x5 = 0;
     for ( ; X >= end; --X )
     {
-        real tt = x5 * A[6];
-        tt += x4 * A[5];
-        x5 = x4;
-        x4 = x3;
-        tt += x3 * A[4];
-        tt += x2 * A[3];
-        x3 = x2;
-        x2 = x1;
-        tt += x1 * A[2];
-        tt += x0 * A[1];
-        x1 = x0;
-        x0 = A[0] * X[0] - tt;
+        real tt = A[0] * X[0];
+        tt -= x5 * A[6]; x5 = x4;
+        tt -= x4 * A[5]; x4 = x3;
+        tt -= x3 * A[4]; x3 = x2;
+        tt -= x2 * A[3]; x2 = x1;
+        tt -= x1 * A[2]; x1 = x0;
+        x0 = -x0 * A[1] + tt;
         X[0] = x0;
         A -= lda;
     }

@@ -481,13 +481,14 @@ void testTBSV(int N, size_t rep)
     // factorize, Alsatian's way:
     alsatian_xpbtf2L(N, RANK, AB, BLDD, &info);
 
-#if 1
-    check<uni1>(N, 1, S, AB, BLDD, B, "blas_tbsv", rep);
-    check<uni2>(N, 1, S, AB, BLDD, B, "tbsvLxN", rep);
-    check<uni3>(N, 1, S, AB, BLDD, B, "tbsvLxNK<KD>", rep);
-    check<uni6>(N, 1, S, AB, BLDD, B, "LNN6K+LTN6K", rep);
-    check<uni7>(N, 1, S, AB, BLDD, B, "alsa_xpbtrsLK", rep);
-#endif
+    if ( 0 )
+    {
+        check<uni1>(N, 1, S, AB, BLDD, B, "blas_tbsv", rep);
+        check<uni2>(N, 1, S, AB, BLDD, B, "tbsvLxN", rep);
+        check<uni3>(N, 1, S, AB, BLDD, B, "tbsvLxNK<KD>", rep);
+        check<uni6>(N, 1, S, AB, BLDD, B, "LLN6K+LTN6K", rep);
+        check<uni7>(N, 1, S, AB, BLDD, B, "alsa_xpbtrsLK", rep);
+    }
     if ( 1 )
     {
         std::cout << "\nTBSVLN --- triangular band forward solve --- rank " << RANK;

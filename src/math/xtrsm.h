@@ -2026,6 +2026,17 @@ size_t count_swaps(int K1, int K2, const int* IPIV)
     return cnt;
 }
 
+void reset_pivot(int K1, int K2, int* IPIV)
+{
+    /*
+     as per LAPACK's convention, K1, K2 and IPIV contain one-based array indices
+     and by shifting IPIV we fall back on the C-convention of zero-based array
+     */
+    --IPIV;
+    for ( int I = K1; I <= K2; ++I )
+        IPIV[I] = I;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - LAPACK-STYLE ROUTINES for General Matrix LU factorization
 

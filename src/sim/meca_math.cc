@@ -143,6 +143,28 @@ static void project_matrix(size_t siz, real const* src, size_t lll, real* dst, s
 }
 
 
+/*
+ This averages the terms along X
+ */
+template < size_t ORD > [[maybe_unused]]
+static void modify_matrix(size_t lin, size_t col, real* mat, size_t ldd)
+{
+    //VecPrint::full("\nproject_matrix", ORD*siz, ORD*siz, src, lll);
+
+    for ( size_t jj = 0; jj < col; jj += ORD )
+    for ( size_t ii = 0; ii < lin; ++ii )
+    {
+        real * ptr = mat + ( ii + jj * ldd );
+        real val = ptr[0];
+        for ( size_t d = 1; d < ORD; ++d )
+            val += ptr[d*ldd];
+        val /= (real)ORD;
+        for ( size_t d = 0; d < ORD; ++d )
+            ptr[d*ldd] = val;
+    }
+    //VecPrint::full("Modified", siz, siz, dst, ldd);
+}
+
 
 /**
  reset terms that are below diagonal `kl`, or above diagonal `ku`

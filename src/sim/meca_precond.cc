@@ -221,7 +221,7 @@ size_t Meca::preconditionnerSize() const
 //------------------------------------------------------------------------------
 #pragma mark - Debug Preconditionner
 
-
+[[maybe_unused]]
 static void printPreconditionnerBlock(Mecable* mec, size_t sup)
 {
     const size_t bks = DIM * mec->nbPoints();
@@ -583,12 +583,12 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
     if ( mec->hasProjectionDiff() )
         mec->addProjectionDiff(res);
 #endif
-#if 0
+
     // include the projection, by applying it to each column vector:
     /* This could be vectorized */
     for ( size_t i = 0; i < bks; ++i )
         mec->projectForces(res+bks*i, res+bks*i);
-#endif
+
     // scale
     const real beta = -tau_ * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
@@ -789,6 +789,8 @@ void Meca::computePrecondBand(Mecable* mec)
 #if SAUERKRAUT
         alsatian_xpbtf2L(bks, BAND_NUD, blk, BAND_LDD, &info);
         //alsatian_xpbtf2L_lapack(bks, BAND_NUD, blk, BAND_LDD, &info);
+        //PRINT_MAT("factorizedBand", BAND_NUD+1, bks, blk, BAND_LDD, 2);
+        //modify_matrix<DIM>(BAND_NUD+1, bks, blk, BAND_LDD);
         //PRINT_MAT("factorizedBand", BAND_NUD+1, bks, blk, BAND_LDD, 2);
 #else
         lapack::xpbtf2('L', bks, BAND_NUD, blk, BAND_LDD, &info);
