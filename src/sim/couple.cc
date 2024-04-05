@@ -379,7 +379,7 @@ bool Couple::permitAttachment(FiberSite const& sit, Hand const* h) const
             
         case CoupleProp::BIND_ORTHOGONAL:
             sit.reinterpolate();
-            if ( abs_real(dot(sit.dirFiber(), that->dirFiber())) > 0.866025 )
+            if ( abs_real(dot(sit.dirFiber(), that->dirFiber())) > M_SQRT1_2 )
                 return false;
             break;
             
