@@ -17,7 +17,7 @@ class MatrixSymmetric final
 private:
     
     /// leading dimension of array
-    size_t dimension_;
+    size_t ldim_;
     
     /// size of matrix
     size_t size_;
@@ -26,10 +26,10 @@ private:
     size_t allocated_;
     
     // full upper triangle:
-    real* val;
+    real* sym_;
     
-    // if 'false', destructor will not call delete[] val;
-    bool in_charge;
+    // if 'false', the destructor will not delete the memory;
+    bool in_charge_;
     
 public:
     
@@ -49,22 +49,22 @@ public:
     /// constructor from an existing array
     MatrixSymmetric(size_t s)
     {
-        val = nullptr;
+        sym_ = nullptr;
         resize(s);
-        dimension_ = s;
-        val = new_real(s*s);
-        zero_real(s*s, val);
-        in_charge = true;
+        ldim_ = s;
+        sym_ = new_real(s*s);
+        zero_real(s*s, sym_);
+        in_charge_ = true;
     }
 
     /// constructor from an existing array
     MatrixSymmetric(size_t s, real* array, size_t ldd)
     {
-        free_real(val);
+        free_real(sym_);
         size_ = s;
-        dimension_ = ldd;
-        val = array;
-        in_charge = false;
+        ldim_ = ldd;
+        sym_ = array;
+        in_charge_ = false;
     }
     
     /// default destructor
@@ -77,7 +77,7 @@ public:
     void allocate(size_t alc);
     
     /// returns address of data array
-    real* data() const { return val; }
+    real* data() const { return sym_; }
 
     /// returns the address of element at (x, y), no allocation is done
     real* address(size_t x, size_t y) const;
