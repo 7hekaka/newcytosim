@@ -29,24 +29,26 @@ void Cutter::cut()
         {
             Vector P = pos();
             Vector Q = h->pos();
+            FiberProp const* FP = h->fiber()->prop;
+            const real cutoff = FP->steric_radius;
 #if ( 0 )
             // using Z works only if the boundary is aligned in XY with cell on top
             real PZ = P.ZZ;
             real QZ = Q.ZZ;
             // do not sever the fiber that is closest to the edge:
-            if ( PZ < QZ )
+            if ( PZ < QZ + cutoff )
                 return;
             std::clog << "cutting " << h->fiber()->reference() << " crossing at Z " << PZ << " over " << QZ << "\n";
 #else
+            Space const* spc = FP->confine_space;
             Vector PQ = 0.5 * ( P + Q );
-            Space const* spc = h->fiber()->prop->confine_space;
             Vector prj = spc->project(PQ);  // on the edge
             Vector dir = spc->normalToEdge(PQ); // directed outward
             // calculate distances to the edge:
             real PZ = dot(prj-P, dir);
             real QZ = dot(prj-Q, dir);
             // do not sever the fiber that is closest to the edge:
-            if ( PZ < QZ )
+            if ( PZ < QZ + cutoff )
                 return;
             std::clog << "cutting " << h->fiber()->reference() << " crossing at D " << PZ << " over " << QZ << "\n";
 #endif
