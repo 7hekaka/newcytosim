@@ -790,11 +790,13 @@ void CoupleSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector
 
 int CoupleSet::bad() const
 {
+#if ( 0 )
     if ( ffList.bad() ) return 1;
     if ( afList.bad() ) return 2;
     if ( faList.bad() ) return 3;
     if ( aaList.bad() ) return 4;
-
+#endif
+    
     int code = 0;
     Couple * obj;
     for ( obj=firstFF(); obj ; obj=obj->next() )

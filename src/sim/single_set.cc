@@ -531,9 +531,11 @@ void SingleSet::writeSet(Outputter& out, int skip) const
 
 int SingleSet::bad() const
 {
+#if ( 0 )
     if ( fList.bad() ) return 1;
     if ( aList.bad() ) return 2;
-
+#endif
+    
     int code = 0;
     Single * obj;
     for ( obj = firstF(); obj ; obj=obj->next() )
