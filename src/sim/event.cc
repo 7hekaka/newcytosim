@@ -114,7 +114,7 @@ void Event::step(Simul& sim)
                 sim.evaluate(activity);
             }
             catch( Exception & e ) {
-                std::cerr << "Error in code `" + activity + "' : " + e.message() << '\n';
+                std::cerr << "Buggy event:code `" + activity + "' : " + e.message() << '\n';
             }
             reload(nextTime);
         } while ( multiplexed && sim.time() >= nextTime );
