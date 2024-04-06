@@ -26,23 +26,17 @@ static int column_width = 10;
 #include "accumulator.h"
 
 /// pad string by adding white-space on the right up to size 'n * column_width - p'
-static std::string ljust(std::string const& str, size_t n, size_t p = 0)
+static std::string ljust(std::string const& str, int n, int p = 0)
 {
-    size_t s = n * (size_t)column_width - p;
-    if ( str.size() < s )
-        return str + std::string(s-str.size(), ' ');
-    else
-        return str;
+    int s = n * column_width - p - str.size();
+    return str + std::string(std::max(s, 0), ' ');
 }
 
 /// pad string by adding white-space on the left up to size 'n * column_width - p'
-static std::string rjust(std::string const& str, size_t n, size_t p = 1)
+static std::string rjust(std::string const& str, int n, int p = 1)
 {
-    size_t s = n * (size_t)column_width - p;
-    if ( str.size() < s )
-        return std::string(s-str.size(), ' ') + str;
-    else
-        return str;
+    int s = n * column_width - p - str.size();
+    return std::string(std::max(s, 0), ' ') + str;
 }
 
 /// repeat string DIM times with X, Y, Z endings as appropriate
