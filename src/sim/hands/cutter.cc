@@ -8,6 +8,7 @@
 #include "simul_part.h"
 #include "hand_monitor.h"
 #include "space.h"
+#include "smath.h"
 
 //------------------------------------------------------------------------------
 
@@ -49,7 +50,8 @@ void Cutter::cut()
             // do not sever the fiber that is closest to the edge:
             if ( PZ < QZ + cutoff )
                 return;
-            std::clog << "cut " << fib->reference() << " crossing at " << PZ << " over " << QZ << "\n";
+            std::clog << "cut " << fib->reference() << " crossing at ";
+            std::clog << Cymath::repr(PZ,8,4) << " over " << Cymath::repr(QZ,8,4) << "\n";
         }
     }
     /**

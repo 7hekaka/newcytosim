@@ -25,7 +25,7 @@ constexpr real M_E=2.7182818284590452354;
 
 
 /// simple mathematical functions, mostly templated
-namespace sMath
+namespace Cymath
 {
     /// minimum of three arguments
     template <typename T>
@@ -55,7 +55,7 @@ namespace sMath
         return std::max(std::max(a,b), std::max(c,d));
     }
     
-    /// sort in ascending order
+    /// sort in ascending order using min() and max() functions
     template <typename T>
     inline void mm_sort(T& a, T& b)
     {
@@ -256,20 +256,6 @@ namespace sMath
         return std::sqrt(n);
     }
 
-    //------------------------------------------------------------------------------
-
-#if ( 0 )
-
-    /// return the usual base-10 representation of a number
-    /** Note that with C++11, std::to_string() provides this functionality */
-    template <typename T> 
-    std::string repr(T const& x)
-    {
-        std::ostringstream oss;
-        oss << x;
-        return oss.str();
-    }
-    
     /// return the usual base-10 representation of a number
     template <typename T>
     std::string repr(T const& x, unsigned width, unsigned precision)
@@ -279,11 +265,9 @@ namespace sMath
         oss << std::setw(width) << std::fixed << x;
         return oss.str();
     }
-
-#endif
-
+    
     //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Function used for periodic boundary conditions
     /*
     /// used for periodic boundary conditions:
     inline void fold(real& x, const real p)
