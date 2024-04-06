@@ -631,14 +631,12 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
  This is meant to replace execute_new(cat, name, opt, cnt), when no option were specified
  to the command.
  */
-ObjectList Interface::execute_new(std::string const& name, size_t cnt)
+ObjectList Interface::execute_new(std::string const& name, size_t cnt, Space const* spc)
 {
     Property const* pp = sim_->properties.find_or_die(name);
     ObjectSet * set = sim_->findSet(pp->category());
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
-
-    Space const* spc = sim_->spaces.master();
 
     Glossary opt;
     ObjectList res;
@@ -648,7 +646,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt)
         ObjectList objs = set->newObjects(pp, opt);
         
         if ( objs.empty() )
-            throw InvalidSyntax("could not create object class of `"+name+"'");
+            throw InvalidSyntax("could not create any `"+name+"'");
 
         if ( spc )
         {

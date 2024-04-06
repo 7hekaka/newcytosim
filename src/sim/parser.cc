@@ -437,7 +437,7 @@ void Parser::parse_new(std::istream& is)
     {
         if ( opt.num_keys() == 0 )
         {
-            execute_new(name, cnt);
+            execute_new(name, cnt, sim_->spaces.master());
         }
         else
         {
