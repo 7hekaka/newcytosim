@@ -1994,7 +1994,7 @@ void Display::drawFiber(Fiber const& fib)
 
     if ( style && disp->line_width > 0 )
     {
-        //drawFiberBackbone(fib, gym_color(0,0,0), 2*disp->line_width);
+        //drawFiberBackbone(fib, gym::background_color, 2*disp->line_width);
         drawFiberLines(fib, style, disp->line_width);
     }
     

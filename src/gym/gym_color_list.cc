@@ -7,7 +7,9 @@
 
 namespace gym
 {
-    
+    // color used by bright_color
+    gym_color background_color(0,0,0,1);
+
     /// Holds the name and the RGBA components of a color
     class named_color
     {
@@ -1588,10 +1590,6 @@ namespace gym
         return res;
     }
     
-    
-    
-    // color used by bright_color
-    gym_color background_color(0,0,0,1);
     
     /**
      return `indx`-th color from the crayola list, that has a brightness between `minb` and `maxb`

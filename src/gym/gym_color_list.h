@@ -10,6 +10,9 @@
 namespace gym
 {
     class named_color;
+    
+    /// color used to select a 'bright_color()'
+    extern gym_color background_color;
 
     /// a small set of contrasted colors that can be changed
     gym_color get_color(size_t indx);
@@ -31,10 +34,7 @@ namespace gym
     
     /// set a list of colors that are different from `back`
     size_t filter_colors(gym_color list[], size_t list_size, const gym_color back);
-    
-    /// color used to select a 'bright_color()'
-    extern gym_color background_color;
-    
+
     /// one of the ~260 crayola color, that differs significantly from `back`
     gym_color bright_color(size_t indx, gym_color back=background_color);
 
