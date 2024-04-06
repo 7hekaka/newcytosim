@@ -44,8 +44,11 @@ public:
     /**
      Possible values of `style`:
      - 0 or 'line'        : line or cylinders for style=3 (this is the default),
-     - 1 or 'actin'       : actin-like rendering using beads for monomers,
-     - 2 or 'microtubule' : microtubule-like rendering using beads for monomers.
+     - 1 or 'backbone'    : thin broken line
+     - 2 or 'striped'     : tube with colored stripes every 24nm.
+     - 3 or 'filament'    : a stretch of beads rendering a proto-filament.
+     - 4 or 'actin'       : actin-like rendering using beads for monomers,
+     - 5 or 'microtubule' : microtubule-like rendering using beads for monomers.
      .
      */
     int style;
