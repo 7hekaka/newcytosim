@@ -29,16 +29,13 @@ void Cutter::cut()
         {
             Vector P = pos();
             Vector Q = h->pos();
-            FiberProp const* FP = h->fiber()->prop;
-            const real cutoff = FP->steric_radius;
+            Fiber const* fib = h->fiber();
+            FiberProp const* FP = fib->prop;
 #if ( 0 )
-            // using Z works only if the boundary is aligned in XY with cell on top
+            // This is old code: using Z works only for certain geometries
             real PZ = P.ZZ;
             real QZ = Q.ZZ;
-            // do not sever the fiber that is closest to the edge:
-            if ( PZ < QZ + cutoff )
-                return;
-            std::clog << "cutting " << h->fiber()->reference() << " crossing at Z " << PZ << " over " << QZ << "\n";
+            std::clog << "Z ";
 #else
             Space const* spc = FP->confine_space;
             Vector PQ = 0.5 * ( P + Q );
@@ -47,11 +44,12 @@ void Cutter::cut()
             // calculate distances to the edge:
             real PZ = dot(prj-P, dir);
             real QZ = dot(prj-Q, dir);
+#endif
+            const real cutoff = FP->steric_radius;
             // do not sever the fiber that is closest to the edge:
             if ( PZ < QZ + cutoff )
                 return;
-            std::clog << "cutting " << h->fiber()->reference() << " crossing at D " << PZ << " over " << QZ << "\n";
-#endif
+            std::clog << "cut " << fib->reference() << " crossing at " << PZ << " over " << QZ << "\n";
         }
     }
     /**
