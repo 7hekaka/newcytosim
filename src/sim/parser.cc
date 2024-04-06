@@ -421,13 +421,15 @@ void Parser::parse_new(std::istream& is)
     }
     
     Glossary opt;
-    // Syntax sugar: () specify only position
+    bool has_opt = false;
+    // Syntax sugar: ( XXXX ) is equivalent to { position = XXXX; }
     blok = Tokenizer::get_block(is, '(');
     
     if ( blok.empty() )
     {
         blok = Tokenizer::get_block(is, '{');
         opt.read(blok);
+        has_opt = ( opt.num_keys() > 0 );
     }
     else {
         opt.define("position", blok);
@@ -435,11 +437,7 @@ void Parser::parse_new(std::istream& is)
     
     if ( do_new && ( cnt > 0 ))
     {
-        if ( opt.num_keys() == 0 )
-        {
-            execute_new(name, cnt, sim_->spaces.master());
-        }
-        else
+        if ( has_opt )
         {
             // place each object independently from the others:
             execute_new(cat, name, opt, cnt);
@@ -448,6 +446,15 @@ void Parser::parse_new(std::istream& is)
                 throw InvalidParameter("display parameters should be specified within `set'");
             
             check_warnings(opt, is, ipos, ~0U);
+        }
+        else
+        {
+            std::string str;
+            Space const* spc = sim_->spaces.master();
+            if ( opt.set(str, "position", 1) )
+                spc = sim_->findSpace(str);
+            opt.set(str, "position");
+            execute_new(name, cnt, spc, str);
         }
     }
 }

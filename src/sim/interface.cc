@@ -626,12 +626,14 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
 //------------------------------------------------------------------------------
 /**
  Creates `cnt` objects of class `name`.
- The objects are distributed uniformly within the current Space, withrandom orientations.
+ The objects are distributed at the specified position in the given Space,
+ with random orientations.
  
- This is meant to replace execute_new(cat, name, opt, cnt), when no option were specified
- to the command.
+ This is meant to replace execute_new(cat, name, opt, cnt), when no fancy
+ option were specified to the command.
  */
-ObjectList Interface::execute_new(std::string const& name, size_t cnt, Space const* spc)
+ObjectList Interface::execute_new(std::string const& name, size_t cnt, 
+                                  Space const* spc, std::string const& position)
 {
     Property const* pp = sim_->properties.find_or_die(name);
     ObjectSet * set = sim_->findSet(pp->category());
@@ -650,19 +652,25 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt, Space con
 
         if ( spc )
         {
+            Vector pos;
+            if ( position.empty() )
+                pos = spc->place();
+            else
+                pos = Cytosim::readPosition(position, spc);
             if ( objs.size() == 1 )
             {
+                // here the random rotation is only generated if needed:
                 Object * obj = objs[0];
                 switch ( obj->mobile() )
                 {
                     case 2: obj->rotate(Rotation::randomRotation()); break;
                     case 3: obj->rotate(Rotation::randomRotation());
-                    case 1: obj->translate(spc->place());
+                    case 1: obj->translate(pos);
                 }
             }
             else
             {
-                Isometry iso(Rotation::randomRotation(), spc->place());
+                Isometry iso(Rotation::randomRotation(), pos);
                 for ( Object * obj : objs )
                     obj->move(iso);
             }
@@ -674,7 +682,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt, Space con
         res.append(objs);
     }
     
-    VLOG("-NEW " << cnt << " `" << name << "'");
+    VLOG("-NEW " << cnt << " `" << name << "' at `" << position << "'");
     //hold();
     return res;
 }

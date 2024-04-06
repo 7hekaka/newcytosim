@@ -99,7 +99,7 @@ public:
     ObjectList execute_new(std::string const& cat, std::string const& name, Glossary&, size_t cnt);
 
     /// create `cnt` objects of type `name`, randomly placed in space (no option)
-    ObjectList execute_new(std::string const& name, size_t cnt, Space const*);
+    ObjectList execute_new(std::string const& name, size_t cnt, Space const*, std::string const&);
     
     /// delete `cnt` objects of type `name`, following options in Glossary
     void execute_delete(std::string const& name, Glossary&, size_t cnt);
