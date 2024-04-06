@@ -363,6 +363,7 @@ void View::drawInteractiveFeatures() const
 
     if ( hasROI )
     {
+        gym::ref_view();
         gym::color(front_color);
         gle::strokeCuboid(mROI[0], mROI[1], 1);
     }
