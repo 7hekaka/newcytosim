@@ -194,7 +194,7 @@ public:
 
 
     /// draw thin lines joining the Fiber vertices
-    void drawFiberBackbone(Fiber const&, float width) const;
+    void drawFiberBackbone(Fiber const&, gym_color col, float width) const;
 
     /// draw Fiber minus end
     virtual void drawFiberEndMinus(Fiber const&, int style, float size) const;
@@ -206,7 +206,7 @@ public:
     void drawFiberGrowth(Fiber const&, float size) const;
 
     /// draw Fiber linear features
-    virtual void drawFiberLines(Fiber const&, int style) const;
+    virtual void drawFiberLines(Fiber const&, int style, float width) const;
     
     /// draw one segment of a Fiber (used to display transparent fibers)
     virtual void drawFiberSegmentT(Fiber const&, unsigned) const;

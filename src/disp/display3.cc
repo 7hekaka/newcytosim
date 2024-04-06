@@ -72,8 +72,9 @@ void Display3::drawObjects(Simul const& sim)
         {
             if ( fib->disp->visible )
             {
+                FiberDisp const* disp = fib->prop->disp;
                 glStencilFunc(GL_ALWAYS, ++val, ~0);
-                drawFiberLines(*fib, fib->prop->disp->line_style);
+                drawFiberLines(*fib, disp->line_style, disp->line_width);
             }
         }
         // set Stencil to 0 for outer surfaces:
@@ -447,10 +448,10 @@ void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
 #  define drawFiberSections drawFiberSectionsJoin
 #endif
 
-void Display3::drawFiberLines(Fiber const& fib, int style) const
+void Display3::drawFiberLines(Fiber const& fib, int style, float width) const
 {
     FiberDisp const*const disp = fib.prop->disp;
-    const float rad = pixscale(disp->line_width);
+    const float rad = pixscale(width);
 
     // set back color:
     if ( disp->coloring )

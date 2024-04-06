@@ -894,18 +894,18 @@ void Display::drawFiberGrowth(Fiber const& fib, float size) const
 }
 
 
-void Display::drawFiberBackbone(Fiber const& fib, float width) const
+void Display::drawFiberBackbone(Fiber const& fib, gym_color col, float width) const
 {
     gym::ref_view();
+    gym::color(col);
     gym::disableLighting();
-    gym::color(fib.disp->color);
     gym::loadPoints(fib.nbPoints(), fib.addrPoints());
     gym::drawLineStrip(width, 0, fib.nbPoints());
     gym::cleanupV();
 }
 
 
-void Display::drawFiberLines(Fiber const& fib, const int style) const
+void Display::drawFiberLines(Fiber const& fib, const int style, float width) const
 {
     if ( style == 8 && fib.endStateP() != STATE_GREEN )
         return;
@@ -981,7 +981,7 @@ void Display::drawFiberLines(Fiber const& fib, const int style) const
     gym::ref_view();
     gym::disableLighting();
     gym::unmapBufferC4VD();
-    float w = pixwidth(fib.prop->disp->line_width);
+    float w = pixwidth(width);
     if ( strip )
         gym::drawLineStrip(w, 0, ptr-flu);
     else
@@ -1933,7 +1933,7 @@ void Display::drawFiber(Fiber const& fib)
 #endif
 
     if ( disp->style == 1 )
-        drawFiberBackbone(fib, prop->bone_width);
+        drawFiberBackbone(fib, fib.disp->color, prop->bone_width);
     // if the Lattice was displayed, do not draw fancy styles:
     else if ( style && disp->style )
     {
@@ -1942,7 +1942,7 @@ void Display::drawFiber(Fiber const& fib)
         gym_color colE = fib.disp->end_color[0];
         
         // load backface color:
-        if ( fib.prop->disp->coloring )
+        if ( disp->coloring )
             gym::color_back(col1);
         else
             gym::color_back(disp->back_color);
@@ -1992,8 +1992,11 @@ void Display::drawFiber(Fiber const& fib)
     }
 #endif
 
-    if ( style && fib.prop->disp->line_width > 0 )
-        drawFiberLines(fib, style);
+    if ( style && disp->line_width > 0 )
+    {
+        //drawFiberBackbone(fib, gym_color(0,0,0), 2*disp->line_width);
+        drawFiberLines(fib, style, disp->line_width);
+    }
     
     if ( disp->end_style[0] )
     {
