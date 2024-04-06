@@ -532,7 +532,7 @@ int Simul::loadObjects(char const* filename)
      - 2 if the end marker of a frame is found
      - 0 otherwise
 */
-int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, ObjectSet* subset)
+int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, ObjectSet* subset)
 {
     std::string line = in.get_line();
     VLOG("      #|" << line << "|" << '\n');
@@ -570,18 +570,21 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
             }
             else if ( tok == "reheat" )
             {
-                size_t i = 0, cnt[16] = { 0 };
-                while ( i < 16 && iss >> cnt[i] )
-                    ++i;
-                if ( i > 0 )
+                if ( 0 == ( prop.skip_free_single & 4 ))
                 {
-                    singles.reheat(cnt, i);
-                    singles.makeSingles(cnt, i);
-                }
+                    size_t i = 0, cnt[16] = { 0 };
+                    while ( i < 16 && iss >> cnt[i] )
+                        ++i;
+                    if ( i > 0 )
+                    {
+                        singles.reheat(cnt, i);
+                        singles.makeSingles(cnt, i);
+                    }
 #if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                else if ( in.formatID() < 60 )
-                    singles.reheat();
+                    else if ( in.formatID() < 60 )
+                        singles.reheat();
 #endif
+                }
             }
             return 0;
         }
@@ -603,18 +606,21 @@ int Simul::readMetadata(Inputter& in, std::string& section, ObjectSet*& objset, 
             }
             else if ( tok == "reheat" )
             {
-                size_t i = 0, cnt[16] = { 0 };
-                while ( i < 16 && iss >> cnt[i] )
-                    ++i;
-                if ( i > 0 )
+                if ( 0 == ( prop.skip_free_couple & 4 ))
                 {
-                    couples.reheat(cnt, i);
-                    couples.makeCouples(cnt, i);
-                }
+                    size_t i = 0, cnt[16] = { 0 };
+                    while ( i < 16 && iss >> cnt[i] )
+                        ++i;
+                    if ( i > 0 )
+                    {
+                        couples.reheat(cnt, i);
+                        couples.makeCouples(cnt, i);
+                    }
 #if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                else if ( in.formatID() < 60 )
-                    couples.reheat();
+                    else if ( in.formatID() < 60 )
+                        couples.reheat();
 #endif
+                }
             }
         }
         return 0;
@@ -734,7 +740,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             c = in.get_char();
             if ( c == '#' )
             {
-                int h = readMetadata(in, section, objset, subset);
+                int h = readMetaData(in, section, objset, subset);
                 if ( h )
                 {
                     if ( h == 2 && has_frame )

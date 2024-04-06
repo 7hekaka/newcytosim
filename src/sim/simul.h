@@ -386,7 +386,7 @@ public:
     class InportLock;
     
     /// read objects from file, and add them to the simulation state
-    int readMetadata(Inputter&, std::string& section, ObjectSet*& objset, ObjectSet* subset);
+    int readMetaData(Inputter&, std::string& section, ObjectSet*& objset, ObjectSet* subset);
 
     /// read objects from file, and add them to the simulation state
     int readObjects(Inputter&, ObjectSet* subset);
