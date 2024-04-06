@@ -307,11 +307,11 @@ public:
     #pragma mark -
     
     /// define one value for the key at specified index: `key[inx] = val`.
-    void define(key_type const& key, std::string const& val, size_t inx);
+    void define(key_type const& key, std::string const& val, size_t inx = 0);
     
     /// define one value from class T, for the key: `key[inx] = to_string(val)`.
     template <typename T>
-    void define(key_type const& key, const T& val, size_t inx = 0)
+    void define(key_type const& key, T const& val, size_t inx = 0)
     {
         std::ostringstream oss;
         oss << val;

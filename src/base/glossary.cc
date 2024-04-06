@@ -14,15 +14,15 @@ const char PREF[] = "          : ";
 
 
 // Use the second definition to get some reports:
-#define VLOG0(ARG) ((void) 0)
-//#define VLOG0(ARG) std::clog << ARG;
-
-#define VLOG1(ARG) ((void) 0)
-//#define VLOG1(ARG) std::clog << ARG;
-
-#define VLOG2(ARG) ((void) 0)
-//#define VLOG2(ARG) std::clog << ARG;
-
+#if 0
+#  define VLOG0(ARG) std::clog << ARG;
+#  define VLOG1(ARG) std::clog << ARG;
+#  define VLOG2(ARG) std::clog << ARG;
+#else
+#  define VLOG0(ARG) ((void) 0)
+#  define VLOG1(ARG) ((void) 0)
+#  define VLOG2(ARG) ((void) 0)
+#endif
 
 //------------------------------------------------------------------------------
 
@@ -486,22 +486,25 @@ void Glossary::add_entry(Glossary::pair_type const& pair, int no_overwrite)
 
 
 /// define one value for the key at specified index: `key[inx]=val`.
-void Glossary::define(key_type const& key, const std::string& arg, size_t inx = 0)
+void Glossary::define(key_type const& key, const std::string& rhs, size_t inx)
 {
-    std::string val = Tokenizer::trim(arg);
     map_type::iterator w = mTerms.find(key);
     
     if ( w == mTerms.end() )
     {
         if ( inx > 0 )
             throw InvalidSyntax("index out of range in Glossary::define");
+        pair_type pair;
+        pair.first = Tokenizer::trim(key);
         // add new key and its value at index 0:
-        mTerms[key].emplace_back(val, true);
-
-        VLOG1("Glossary:DEFINE    " << key << " = |" << val << "|\n");
+        std::istringstream iss(rhs);
+        while ( read_value(pair, iss) );
+        mTerms.insert(pair);
+        VLOG1("Glossary:DEFINE   " << key << " = |" << rhs << "|\n");
     }
     else
     {
+        std::string val = Tokenizer::trim(rhs);
         // add new value to existing key:
         rec_type & rec = w->second;
         
