@@ -80,7 +80,7 @@ public:
      */
     double time_step;
         
-    /// the time at which the simulation should stop
+    /// the time at which the current run will halt
     double stop_time;
     
     /// the time at which the simulation is terminated

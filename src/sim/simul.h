@@ -178,11 +178,17 @@ public:
     /// true if `SimulProp::time < SimulProp::stop_time`
     bool incomplete() const { return prop.time < prop.stop_time; }
 
-    /// ask to halt the current series of 'run' immediately
+    /// ask to halt the current series of 'step' if time exceeds `t`
     void stop_at(double t) const { prop.stop_time = std::min(t, prop.end_time); }
     
-    /// ask to end simulation at the next recorded frame, if time exceeds 't'
+    /// ask to stop the 'run' at the next recorded frame, if time exceeds 't'
     void end_at(double t) const { prop.end_time = std::min(t, prop.end_time); }
+
+    /// true if `time >= end_time`
+    bool should_end() const { return prop.time >= prop.end_time; }
+
+    /// reset `end_time` such as to never terminate
+    void never_end() const { prop.end_time = INFINITY; }
 
     /// time step (shortcut to `SimulProp::time_step`)
     double time_step() const { return prop.time_step; }

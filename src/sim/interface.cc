@@ -1154,9 +1154,9 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
         }
         
         // check if ending the simulation was requested:
-        if ( sim_->time() >= sim_->prop.end_time )
+        if ( sim_->should_end() )
         {
-            sim_->prop.end_time = INFINITY;
+            sim_->never_end();
             break;
         }
     }
@@ -1196,9 +1196,9 @@ void Interface::execute_run(real sec)
         sim_->steps();
     }
     
-    // check if ending the simulation was requested:
-    if ( sim_->time() >= sim_->prop.end_time )
-        sim_->prop.end_time = INFINITY;
+    // reset termination time:
+    if ( sim_->should_end() )
+        sim_->never_end();
 
     sim_->relax();
     VLOG("-RUN END");
