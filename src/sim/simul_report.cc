@@ -3305,38 +3305,22 @@ void Simul::reportAshbya(std::ostream& out) const
 
 
 /**
- categorize the configuration of two microtubules, with respect to collisions
- This calculated 3 boolean values: K = catastrophe, X = crossing, Z = zippered
- 1.10.2021 -- 11.2022
+ Categorize the configuration of two microtubules, checking for possible collision
+ This calculates 3 boolean values: K = catastrophe, X = crossing, Z = zippered
+ 1.10.2021 -- 11.2022,
+ 7.04.2024: added case 'B' if `fib` crosses below `fox`
  */
-void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
+void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber const* fox, const int print) const
 {
-#if ( DIM == 1 )
-	throw InvalidParameter("fiber:collision meaningless in 1D");
-#endif
-    
-    int abort = 0, print = 0;
-    opt.set(print, "print");
+    int abort = 0;
     static int mode = 1;
     static real abs = -77; // abscissa of contact point
     static real ang = 777; // angle at first contact
     static real dis = INFINITY; // minimum distance reached
     static char kat = 'U'; // category
     bool K = 1, X = 0, T = 0, Z = 0;
-
-    if ( fibers.size() > 2 )
-        throw InvalidParameter("fiber:collision can only handle 2 fibers");
-    Fiber const * fib = nullptr, * fox = nullptr;
-    for ( Fiber const* f = fibers.first(); f; f = f->next() )
-    {
-        if ( f->prop == sel )
-            fib = f;
-        else
-            fox = f;
-    }
     
-    // do not consider data if fiber has reached its max length
-    if ( fox && fib && fib->length()+0.01 < fib->prop->max_length )
+    if ( fib && fox )
     {
         const real sup = 3 * fib->prop->steric_radius;
         
@@ -3371,7 +3355,7 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         {
             // the plus-tip may have crossed the other filament if it is not in contact
             // consider a point 1um back, and check if it is on opposite side of 'fox'
-            Vector bak = fib->posFrom(1, PLUS_END);
+            Vector bak = fib->posFrom(1.0, PLUS_END);
             real ddd, bbb = fox->projectPoint(bak, ddd);
             // bbb = 0.5 * ( aaa + bbb );  // OLD formula before 13.04.2023
             // the abscissa on `fox` below the intersection is estimated with Thales's theorem:
@@ -3442,6 +3426,36 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     {
         end_at(time());
         stop_at(time());
+    }
+}
+
+
+void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
+{
+#if ( DIM == 1 )
+    throw InvalidParameter("fiber:collision meaningless in 1D");
+#endif
+    
+    if ( fibers.size() > 2 )
+        throw InvalidParameter("fiber:collision can only handle 2 fibers");
+    
+    Fiber const * fib = nullptr, * fox = nullptr;
+    for ( Fiber const* f = fibers.first(); f; f = f->next() )
+    {
+        if ( f->prop == sel )
+            fib = f;
+        else
+            fox = f;
+    }
+    
+    if ( fox && fib )
+    {
+        int print = 0;
+        opt.set(print, "print");
+        // do not consider case where fiber has reached its max length
+        if ( fib->length()+0.01 > fib->prop->max_length )
+            fib = nullptr;
+        reportFiberCollision(out, fib, fox, print);
     }
 }
 
