@@ -494,17 +494,18 @@ void Glossary::define(key_type const& key, const std::string& rhs, size_t inx)
     {
         if ( inx > 0 )
             throw InvalidSyntax("index out of range in Glossary::define");
+        VLOG1("Glossary:DEFINE "+key+" = |"+rhs+"|\n");
         pair_type pair;
         pair.first = Tokenizer::trim(key);
         // add new key and its value at index 0:
         std::istringstream iss(rhs);
         while ( read_value(pair, iss) );
         mTerms.insert(pair);
-        VLOG1("Glossary:DEFINE   " << key << " = |" << rhs << "|\n");
     }
     else
     {
         std::string val = Tokenizer::trim(rhs);
+        VLOG1("Glossary:DEFINE "+key+"[" << inx << "] = |" << val << "|\n");
         // add new value to existing key:
         rec_type & rec = w->second;
         
@@ -514,8 +515,6 @@ void Glossary::define(key_type const& key, const std::string& rhs, size_t inx)
             rec.emplace_back(val, true);
         else
             throw InvalidSyntax("index out of range in Glossary::define");
-        
-        VLOG1("Glossary:DEFINE    " << key << "[" << inx << "] = |" << val << "|\n");
     }
 }
 

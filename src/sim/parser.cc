@@ -125,7 +125,7 @@ void Parser::parse_set(std::istream& is)
 
         if ( name == "display" || para == "display" )
         {
-            opt.define("display", blok);
+            opt.define("display", "("+blok+")");
             change_simul_property(opt);
         }
         else
@@ -331,7 +331,7 @@ void Parser::parse_change(std::istream& is)
     }
     else if ( para == "display" )
     {
-        opt.define("display", blok);
+        opt.define("display", "("+blok+")");
         if ( change_all )
             execute_change_all(name, opt);
         else
