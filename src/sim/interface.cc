@@ -641,7 +641,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
     Glossary opt;
-    ObjectList res;
+    ObjectList res(cnt, 8);
     set->reserve(cnt);
     for ( size_t n = 0; n < cnt; ++n )
     {
@@ -649,6 +649,10 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
         
         if ( objs.empty() )
             throw InvalidSyntax("could not create any `"+name+"'");
+        
+        Object * obj = nullptr;
+        if ( objs.size() == 1 )
+            obj = objs[0];
 
         if ( spc )
         {
@@ -657,10 +661,9 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
                 pos = spc->place();
             else
                 pos = Cytosim::readPosition(position, spc);
-            if ( objs.size() == 1 )
+            if ( obj )
             {
                 // here the random rotation is only generated if needed:
-                Object * obj = objs[0];
                 switch ( obj->mobile() )
                 {
                     case 2: obj->rotate(Rotation::randomRotation()); break;
@@ -671,15 +674,19 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
             else
             {
                 Isometry iso(Rotation::randomRotation(), pos);
-                for ( Object * obj : objs )
-                    obj->move(iso);
+                for ( Object * o : objs )
+                    o->move(iso);
             }
         }
         
-        /* Call sim_->add() rather than directly set->add(), because the objects
-         in ObjectList are not necessarily all of the same class */
-        sim_->add(objs);
-        res.append(objs);
+        /* Call sim_->add(), in case the list might contain heterogenous objects */
+        if ( obj ) {
+            set->add(obj);
+            res.push_back(obj);
+        } else {
+            sim_->add(objs);
+            res.append(objs);
+        }
     }
     
     VLOG("-NEW " << cnt << " `" << name << "' at `" << position << "'");
