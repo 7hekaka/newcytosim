@@ -5,15 +5,16 @@
 % `angle` is the collision angles in radians between the 2 microtubules
 % Maud Formanek 01.06.2020, FJN 1.10.2021, 1.11.2022
 
+
 set simul system
 {
     dim = 3
     time_step = 0.005
-    viscosity = 0.1
-    steric = 1, 708
+    viscosity = 1
+    steric = 1, 1537.7508549096237
     precondition = 1
 }
-
+ 
 set space cell
 {
     shape = disc
@@ -21,32 +22,48 @@ set space cell
 
 new cell
 {
-    radius = 4
+    radius = 6
     bottom = 0
     top = 0.5 
 }
 
 set fiber microtubule
 {
-    steric = 1, 0.025
+    steric = 1, 0.040360899315738025
     rigidity = 20   
     segmentation = 0.2
     activity = dynamic
-    growing_speed = 0.18
+    growing_speed = 0.18 
     shrinking_speed = -0.36
     growing_force = 1.67
-    hydrolysis_rate = 0.200
-    max_length = 8
+    hydrolysis_rate = 0.23910850439882697
+    max_length = 12
     min_length = 0.5
-    confine = in_out, 14.76, 1000 
+    confine = in_out, 7.382209188660801, 1000 
 }
 
 set fiber obstacle
 {
-    steric = 1, 0.025
+    steric = 1, 0.040360899315738025
     rigidity = 20   
     segmentation = 0.2
-    confine = in_out, 14.76, 1000 
+    confine = in_out, 7.382209188660801, 1000 
+}
+
+set hand binder  
+{
+    binding_rate = 0.005  % 0.005/s/um Allard free length = 5um
+    binding_range = 0.016629701481314388
+    unbinding_rate = 0.0004
+    unbinding_force = 3
+}
+
+set single grafted 
+{
+    hand = binder
+    stiffness = 230.1622678396872
+    length = 0.015753846153846156
+    activity = fixed
 }
 
 set hand keeper    
@@ -54,32 +71,12 @@ set hand keeper
     unbinding_rate = 0
     binding_range = 0.050
     unbinding_force = inf
-    display = ( size = 10 )
 }
-
-set hand binder  
-{
-    binding_rate = 0.264
-    binding_range = 0.050
-    unbinding_rate = 0.2
-    unbinding_force = 3
-    display = ( size = 5; color = 0x0072B2FF; )
-}
-
 
 set single pivot  
 {
     hand = keeper
     stiffness = 1000
-    length = 0.015
-    activity = fixed
-}
-
-set single grafted 
-{
-    hand = binder
-    stiffness = 464
-    length = 0.015
     activity = fixed
 }
 
@@ -89,48 +86,38 @@ new event
     code = ( report microtubule:collision * {verbose=0})
 }
 
-for A=-85:5:85
+for A=-39:1:89
 {
     new obstacle
     {
-        length = 8
+        length = 12
         position = 0 0 0
         direction = 0 1 0
-        attach1 = pivot, 0, minus_end
-        attach2 = pivot, 0, plus_end
     }
-    %new pivot { position = 0 -4 0; attach = obstacle, 0, minus_end }
-    %new pivot { position = 0 4 0; attach = obstacle, 0, plus_end }
-
-    new 2364 grafted
-    {
-        position = XY -0.015
-        placement = anywhere
-        nb_trials = 1
-    }
-
-    % allow for binding of grafted to obstacle:
-    run system
-    {
-        time = 20
-    }
-    report microtubule:collision * { verbose=0; print=2; }
+    
     new microtubule
     {
         mark = 1
         length = 1
-        position = [(-3.5)*cosd(A)-0.025] [(-3.5)*sind(A)] 0
+        position = [(-5.5)*cosd(A)-0.040361 ] [(-5.5)*sind(A)] 0
         direction = [cosd(A)] [sind(A)] 0
         end_state = grow
         attach1 = pivot, 0, minus_end
         attach2 = pivot, 1, minus_end
     }
+
+    new 30000 grafted (XY -0.015754 if (X < 0.5))
+
+    % allow for binding of grafted to obstacle:
+    call single:equilibrate
     
     run system
     {
-        time = 80
+        time = 100
     }
     report microtubule:collision * {verbose=0; print=1;}
+    %delete all couple
     delete all single
     delete all fiber
 }
+
