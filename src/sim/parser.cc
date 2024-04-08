@@ -125,14 +125,14 @@ void Parser::parse_set(std::istream& is)
 
         if ( name == "display" || para == "display" )
         {
-            opt.define("display", "("+blok+")");
+            opt.define("display", blok);
             change_simul_property(opt);
         }
         else
         {
 #if BACKWARD_COMPATIBILITY < 50
             if ( spec )
-                opt.define(para, blok);
+                opt.define_rhs(para, blok);
             else
 #endif
             opt.read(blok);
@@ -210,7 +210,7 @@ void Parser::parse_set(std::istream& is)
             if ( para.empty() )
                 opt.read(blok);
             else
-                opt.define(para, blok);
+                opt.define_rhs(para, blok);
             pp = execute_change(name, opt, do_set);
         }
         else if ( para == "display" )
@@ -319,7 +319,7 @@ void Parser::parse_change(std::istream& is)
         if ( para.empty() )
             opt.read(blok);
         else
-            opt.define(para, blok);
+            opt.define_rhs(para, blok);
         
         if ( change_all )
             execute_change_all(name, opt);
@@ -331,7 +331,7 @@ void Parser::parse_change(std::istream& is)
     }
     else if ( para == "display" )
     {
-        opt.define("display", "("+blok+")");
+        opt.define("display", blok);
         if ( change_all )
             execute_change_all(name, opt);
         else
@@ -432,7 +432,7 @@ void Parser::parse_new(std::istream& is)
         has_opt = ( opt.num_keys() > 0 );
     }
     else {
-        opt.define("position", blok);
+        opt.define_rhs("position", blok);
     }
     
     if ( do_new && ( cnt > 0 ))
@@ -589,7 +589,7 @@ void Parser::parse_move(std::istream& is)
     }
     
     Glossary opt;
-    // Syntax sugar: () specify only position
+    // Syntax sugar: ( XXXX ) is equivalent to { position = XXXX; }
     std::string blok = Tokenizer::get_block(is, '(');
     
     if ( blok.empty() )
@@ -598,7 +598,7 @@ void Parser::parse_move(std::istream& is)
         opt.read(blok);
     }
     else {
-        opt.define("position", blok);
+        opt.define_rhs("position", blok);
     }
 
     if ( do_run )

@@ -350,7 +350,7 @@ int Glossary::read_key(Glossary::pair_type& res, std::istream& is)
 /**
  push value at the back of `res.second`
  */
-void Glossary::add_value(Glossary::pair_type& res, std::string& str, bool def)
+void Glossary::add_rhs_value(Glossary::pair_type& res, std::string& str, bool def)
 {
     //remove any space at the end of the string:
     std::string val = Tokenizer::trim(str);
@@ -409,26 +409,26 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
     if ( c == EOF || c == '\n' || c == '\r' )
     {
         if ( k.size() || delimited )
-            add_value(res, k, true);
+            add_rhs_value(res, k, true);
         return 0;
     }
     
     if ( c == ';' )
     {
-        add_value(res, k, k.size() || delimited);
+        add_rhs_value(res, k, k.size() || delimited);
         return 0;
     }
 
     if ( c == ',' )
     {
-        add_value(res, k, k.size() || delimited);
+        add_rhs_value(res, k, k.size() || delimited);
         return 1;
     }
 
     if ( c == '%' )
     {
         if ( k.size() || delimited )
-            add_value(res, k, true);
+            add_rhs_value(res, k, true);
         Tokenizer::get_line(is);
         return 0;
     }
@@ -436,7 +436,7 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
     if ( c == '\\' )
     {
         if ( k.size() || delimited )
-            add_value(res, k, true);
+            add_rhs_value(res, k, true);
         // go to next line:
         Tokenizer::skip_space(is, true);
         return 1;
@@ -485,18 +485,43 @@ void Glossary::add_entry(Glossary::pair_type const& pair, int no_overwrite)
 }
 
 
-/// define one value for the key at specified index: `key[inx]=val`.
+/// define one value for the key at specified index: `key[inx]=rhs`.
 void Glossary::define(key_type const& key, const std::string& rhs, size_t inx)
 {
+    std::string val = Tokenizer::trim(rhs);
     map_type::iterator w = mTerms.find(key);
-    
+
     if ( w == mTerms.end() )
     {
         if ( inx > 0 )
             throw InvalidSyntax("index out of range in Glossary::define");
+        VLOG1("Glossary:DEFINE    " << key << " = |" << val << "|\n");
+        mTerms[key].emplace_back(val, true);
+    }
+    else
+    {
+        VLOG1("Glossary:DEFINE "+key+"[" << inx << "] = |" << val << "|\n");
+        rec_type & rec = w->second;
+        if ( rec.size() > inx )
+            rec[inx] = val_type(val, true);
+        else if ( rec.size() == inx )
+            rec.emplace_back(val, true);
+        else
+            throw InvalidSyntax("index out of range in Glossary::define");
+    }
+}
+
+
+/// define possibly muliple values for the key: `key = rhs`.
+void Glossary::define_rhs(key_type const& key, const std::string& rhs)
+{
+    map_type::iterator w = mTerms.find(key);
+    pair_type pair;
+    pair.first = Tokenizer::trim(key);
+
+    if ( w == mTerms.end() )
+    {
         VLOG1("Glossary:DEFINE "+key+" = |"+rhs+"|\n");
-        pair_type pair;
-        pair.first = Tokenizer::trim(key);
         // add new key and its value at index 0:
         std::istringstream iss(rhs);
         while ( read_value(pair, iss) );
@@ -504,17 +529,19 @@ void Glossary::define(key_type const& key, const std::string& rhs, size_t inx)
     }
     else
     {
-        std::string val = Tokenizer::trim(rhs);
         VLOG1("Glossary:DEFINE "+key+"[" << inx << "] = |" << val << "|\n");
         // add new value to existing key:
         rec_type & rec = w->second;
-        
-        if ( rec.size() > inx )
-            rec[inx] = val_type(val, true);
-        else if ( rec.size() == inx )
-            rec.emplace_back(val, true);
-        else
-            throw InvalidSyntax("index out of range in Glossary::define");
+        std::istringstream iss(rhs);
+        size_t inx = 0;
+        while ( read_value(pair, iss) )
+        {
+            if ( rec.size() > inx )
+                rec[inx] = pair.second[inx];
+            else
+                rec.push_back(pair.second[inx]);
+            ++inx;
+        }
     }
 }
 

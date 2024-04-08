@@ -111,7 +111,7 @@ private:
     static int read_value(pair_type&, std::istream&);
     
     /// add right-hand-side entry to pair.second
-    static void add_value(pair_type&, std::string&, bool);
+    static void add_rhs_value(pair_type&, std::string&, bool);
 
     /// register a new pair into the dictionnary
     void add_entry(pair_type const&, int no_overwrite);
@@ -307,7 +307,7 @@ public:
     #pragma mark -
     
     /// define one value for the key at specified index: `key[inx] = val`.
-    void define(key_type const& key, std::string const& val, size_t inx = 0);
+    void define(key_type const& key, std::string const& val, size_t inx);
     
     /// define one value from class T, for the key: `key[inx] = to_string(val)`.
     template <typename T>
@@ -318,6 +318,9 @@ public:
         define(key, oss.str(), inx);
     }
     
+    /// define possibly multiple values for the key at specified index: `key[inx] = val`.
+    void define_rhs(key_type const& key, std::string const& val);
+
     /// add value to key
     void add_value(key_type const&, std::string const& val);
 
