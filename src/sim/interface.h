@@ -34,7 +34,7 @@ private:
     void change_property(Property*, Glossary&);
     
     /// read the specification of position and orientation of an object
-    Isometry read_placement(Glossary&);
+    bool read_placement(Isometry&, Glossary&);
     
     /// set position and orientation of an object, according to 'placement'
     bool find_placement(Isometry&, Glossary&, int placement);

@@ -201,7 +201,7 @@ void warn_trail(std::istream& is)
 /**
  Define a placement = ( position, orientation ) from the parameters set in `opt'
  */
-Isometry Interface::read_placement(Glossary& opt)
+bool Interface::read_placement(Isometry& iso, Glossary& opt)
 {
     std::string str;
     Space const* spc = sim_->spaces.master();
@@ -226,48 +226,50 @@ Isometry Interface::read_placement(Glossary& opt)
     else if ( spc )
         vec = spc->place();
     
-    Isometry iso(vec);
-    if ( iso.valid() )
+    if ( !vec.valid() )
+        return false;
+    
+    iso.mov = vec;
+    
+    // Rotation applied before the translation
+    if ( opt.set_block(str, '[', "direction") )
     {
-        // Rotation applied before the translation
-        if ( opt.set_block(str, '[', "direction") )
-        {
-            // can specify another object to copy its orientation
-            Movable * obj = sim_->pickMovable(str);
-            if ( obj )
-                vec = obj->direction();
-            else
-                throw InvalidParameter("Could not find Object `"+str+"'");
-            iso.rot = Rotation::randomRotationToVector(vec);
-        }
-        else if ( opt.set_from_least_used_value(str, "direction") )
-        {
-            vec = Cytosim::readDirection(str, iso.mov, spc);
-            iso.rot = Rotation::randomRotationToVector(vec);
-        }
-        else if ( opt.set(str, "rotation") )
-        {
-            iso.rot = Cytosim::readRotation(str);
-        }
-        else if ( opt.set(str, "orientation") )
-        {
-            std::istringstream iss(str);
-            iso.rot = Cytosim::readOrientation(iss, iso.mov, spc);
-            if ( has_trail(iss) ) warn_trail(iss);
-        }
+        // can specify another object to copy its orientation
+        Movable * obj = sim_->pickMovable(str);
+        if ( obj )
+            vec = obj->direction();
         else
-            iso.rot = Rotation::randomRotation();
-        
-        // Second rotation applied after the translation
-        if ( opt.set(str, "orientation", 1) )
-        {
-            std::istringstream iss(str);
-            Rotation rot = Cytosim::readOrientation(iss, iso.mov, spc);
-            if ( has_trail(iss) ) warn_trail(iss);
-            iso.rotate(rot);
-        }
+            throw InvalidParameter("Could not find Object `"+str+"'");
+        iso.rot = Rotation::randomRotationToVector(vec);
     }
-    return iso;
+    else if ( opt.set_from_least_used_value(str, "direction") )
+    {
+        vec = Cytosim::readDirection(str, iso.mov, spc);
+        iso.rot = Rotation::randomRotationToVector(vec);
+    }
+    else if ( opt.set(str, "rotation") )
+    {
+        iso.rot = Cytosim::readRotation(str);
+    }
+    else if ( opt.set(str, "orientation") )
+    {
+        std::istringstream iss(str);
+        iso.rot = Cytosim::readOrientation(iss, iso.mov, spc);
+        if ( has_trail(iss) ) warn_trail(iss);
+    }
+    else
+        iso.rot = Rotation::randomRotation();
+    
+    // Second rotation applied after the translation
+    if ( opt.set(str, "orientation", 1) )
+    {
+        std::istringstream iss(str);
+        Rotation rot = Cytosim::readOrientation(iss, iso.mov, spc);
+        if ( has_trail(iss) ) warn_trail(iss);
+        iso.rotate(rot);
+    }
+    
+    return true;
 }
 
 
@@ -316,9 +318,9 @@ bool Interface::find_placement(Isometry& iso, Glossary& opt, int placement)
         spc = sim_->findSpace(str);
 
     // generate a new position:
-    iso = read_placement(opt);
+    bool valid = read_placement(iso, opt);
     
-    if ( !iso.valid() )
+    if ( !valid )
         return 0;
     
     // check any conditions to the position:
@@ -436,14 +438,18 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
         }
         else
         {
+            // no suitable placement found, delete new objects:
             for ( Object* i : objs )
                 if ( ! i->linked() )
                     delete(i);
             objs.clear();
             continue;
         }
+        /*
+         objects that were just created by newObjects() are not yet linked and
+         will be deleted. Older objects will be moved back to their original position
+         */
         iso.inverse();
-        // objects that were just created by newObjects() are not yet linked
         for ( Object* i : objs )
         {
             if ( ! i->linked() )
@@ -661,6 +667,13 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
                 pos = spc->place();
             else
                 pos = Cytosim::readPosition(position, spc);
+            
+            if ( !pos.valid() )
+            {
+                objs.destroy();
+                continue;
+            }
+            
             if ( obj )
             {
                 // here the random rotation is only generated if needed:

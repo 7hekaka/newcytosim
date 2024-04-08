@@ -305,8 +305,10 @@ void SingleSet::link(Object * obj)
 {
     assert_true( obj->tag()==Single::TAG || obj->tag()==Single::WRIST_TAG );
     assert_true( obj->objset() == this );
-
-    if ( static_cast<Single*>(obj)->attached() )
+    
+    Single * S = static_cast<Single*>(obj);
+    
+    if ( S->attached() )
         aList.push_front(obj);
     else
         fList.push_front(obj);

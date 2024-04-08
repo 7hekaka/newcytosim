@@ -439,7 +439,7 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
 Vector Cytosim::readPosition(std::istream& is, Space const* spc)
 {
     Vector pos = readPositionPrimitive(is, spc);
-    assert_true(pos==pos);
+    assert_true( pos.valid() );
     is.clear();
     return modifyPosition(is, spc, pos);
 }

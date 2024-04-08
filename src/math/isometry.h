@@ -71,9 +71,9 @@ public:
         mov = v;
     }
 
-    bool valid()
+    bool invalid()
     {
-        return mov.valid();
+        return ! mov.valid();
     }
 
     void reset()
