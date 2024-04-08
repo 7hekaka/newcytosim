@@ -648,7 +648,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
 
     Glossary opt;
     ObjectList res(cnt, 8);
-    set->reserve(cnt);
+    set->reserve(cnt+set->inventory_.highest());
     for ( size_t n = 0; n < cnt; ++n )
     {
         ObjectList objs = set->newObjects(pp, opt);
@@ -816,13 +816,21 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     ObjectSet * set = findClass(name, pp);
     if ( set )
     {
-        // multiple objects are specified, by matching the conditions
-        Filter filter(sim_, pp, opt);
-        ObjectList objs = set->collect(pass_filter, &filter, cnt);
-        if ( objs.size() > 0 )
-            sim_->erase(objs);
+        if ( !pp && opt.empty() )
+        {
+            // all objects from a class are deleted:
+            set->erase();
+        }
         else
-            Cytosim::warn << "found no `" << name << "' to delete\n";
+        {
+            // multiple objects are specified, by matching the conditions
+            Filter filter(sim_, pp, opt);
+            ObjectList objs = set->collect(pass_filter, &filter, cnt);
+            if ( objs.size() > 0 )
+                sim_->erase(objs);
+            else
+                Cytosim::warn << "found no `" << name << "' to delete\n";
+        }
     }
     else
     {
