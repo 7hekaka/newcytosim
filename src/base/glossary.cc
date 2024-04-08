@@ -350,14 +350,14 @@ int Glossary::read_key(Glossary::pair_type& res, std::istream& is)
 /**
  push value at the back of `res.second`
  */
-void Glossary::add_rhs_value(Glossary::pair_type& res, std::string& str, bool def)
+void Glossary::add_rhs_value(Glossary::key_type const& key, Glossary::rec_type& rec, std::string& str, bool def)
 {
     //remove any space at the end of the string:
     std::string val = Tokenizer::trim(str);
     
-    VLOG2("Glossary:SET" << std::setw(20) << res.first << "[" << res.second.size() << "] = |" << val << "|\n");
+    VLOG2("Glossary:SET" << std::setw(20) << key << "[" << rec.second.size() << "] = |" << val << "|\n");
 
-    res.second.emplace_back(val, def);
+    rec.emplace_back(val, def);
 }
 
 
@@ -376,7 +376,7 @@ bool valid_value(const int c)
  read one right-hand side value of an assignment
  return 1 if parsing should continue with the same key
  */
-int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
+int Glossary::read_rhs(Glossary::key_type const& key, Glossary::rec_type& rec, std::istream& is)
 {
     // skip spaces, but do not eat lines
     char c = Tokenizer::get_character(is);
@@ -409,26 +409,26 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
     if ( c == EOF || c == '\n' || c == '\r' )
     {
         if ( k.size() || delimited )
-            add_rhs_value(res, k, true);
+            add_rhs_value(key, rec, k, true);
         return 0;
     }
     
     if ( c == ';' )
     {
-        add_rhs_value(res, k, k.size() || delimited);
+        add_rhs_value(key, rec, k, k.size() || delimited);
         return 0;
     }
 
     if ( c == ',' )
     {
-        add_rhs_value(res, k, k.size() || delimited);
+        add_rhs_value(key, rec, k, k.size() || delimited);
         return 1;
     }
 
     if ( c == '%' )
     {
         if ( k.size() || delimited )
-            add_rhs_value(res, k, true);
+            add_rhs_value(key, rec, k, true);
         Tokenizer::get_line(is);
         return 0;
     }
@@ -436,7 +436,7 @@ int Glossary::read_value(Glossary::pair_type& res, std::istream& is)
     if ( c == '\\' )
     {
         if ( k.size() || delimited )
-            add_rhs_value(res, k, true);
+            add_rhs_value(key, rec, k, true);
         // go to next line:
         Tokenizer::skip_space(is, true);
         return 1;
@@ -495,12 +495,12 @@ void Glossary::define(key_type const& key, const std::string& rhs, size_t inx)
     {
         if ( inx > 0 )
             throw InvalidSyntax("index out of range in Glossary::define");
-        VLOG1("Glossary:DEFINE    " << key << " = |" << val << "|\n");
+        VLOG1("Glossary:DEFINE    "+key+" = |"+rhs+"|\n");
         mTerms[key].emplace_back(val, true);
     }
     else
     {
-        VLOG1("Glossary:DEFINE "+key+"[" << inx << "] = |" << val << "|\n");
+        VLOG1("Glossary:DEFINE    "+key+"[" << inx << "] = |" << val << "|\n");
         rec_type & rec = w->second;
         if ( rec.size() > inx )
             rec[inx] = val_type(val, true);
@@ -515,33 +515,22 @@ void Glossary::define(key_type const& key, const std::string& rhs, size_t inx)
 /// define possibly muliple values for the key: `key = rhs`.
 void Glossary::define_rhs(key_type const& key, const std::string& rhs)
 {
+    std::istringstream iss(rhs);
     map_type::iterator w = mTerms.find(key);
-    pair_type pair;
-    pair.first = Tokenizer::trim(key);
+    VLOG1("Glossary:DEFINE_RHS "+key+" = |"+rhs+"|\n");
 
     if ( w == mTerms.end() )
     {
-        VLOG1("Glossary:DEFINE "+key+" = |"+rhs+"|\n");
-        // add new key and its value at index 0:
-        std::istringstream iss(rhs);
-        while ( read_value(pair, iss) );
+        pair_type pair;
+        pair.first = Tokenizer::trim(key);
+        while ( read_rhs(pair.first, pair.second, iss) );
         mTerms.insert(pair);
     }
     else
     {
-        VLOG1("Glossary:DEFINE "+key+"[" << inx << "] = |" << val << "|\n");
-        // add new value to existing key:
-        rec_type & rec = w->second;
-        std::istringstream iss(rhs);
-        size_t inx = 0;
-        while ( read_value(pair, iss) )
-        {
-            if ( rec.size() > inx )
-                rec[inx] = pair.second[inx];
-            else
-                rec.push_back(pair.second[inx]);
-            ++inx;
-        }
+        // replace all values:
+        w->second.clear();
+        while ( read_rhs(key, w->second, iss) );
     }
 }
 
@@ -648,7 +637,7 @@ void Glossary::read_entry(std::istream& is, int no_overwrite)
         if ( code )
             throw InvalidParameter("syntax error");
         
-        while ( read_value(pair, is) );
+        while ( read_rhs(pair.first, pair.second, is) );
         
         if ( pair.second.empty() )
             throw InvalidSyntax("expected value in assignement");
@@ -715,7 +704,7 @@ void Glossary::read_string(const char arg[], int no_overwrite)
         std::istringstream iss(arg);
         if ( 0 == read_key(pair, iss) )
         {
-            while ( read_value(pair, iss) );
+            while ( read_rhs(pair.first, pair.second, iss) );
             if ( pair.second.empty() )
                 throw InvalidSyntax("expected value in assignement");
             add_entry(pair, no_overwrite);

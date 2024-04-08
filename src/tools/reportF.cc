@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     size_t period = 1;
 
     arg.set(input, ".cmo") || arg.set(input, "input");
-    if ( arg.use_key("-") ) arg.define("verbose", 0);
+    if ( arg.use_key("-") ) arg.define("verbose", "0");
 
     RNG.seed();
 

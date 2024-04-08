@@ -108,10 +108,10 @@ private:
     static int read_key(pair_type&, std::istream&);
     
     /// read one right-hand-side entry of an assignement
-    static int read_value(pair_type&, std::istream&);
+    static int read_rhs(key_type const&, rec_type&, std::istream&);
     
     /// add right-hand-side entry to pair.second
-    static void add_rhs_value(pair_type&, std::string&, bool);
+    static void add_rhs_value(key_type const&, rec_type&, std::string&, bool);
 
     /// register a new pair into the dictionnary
     void add_entry(pair_type const&, int no_overwrite);
