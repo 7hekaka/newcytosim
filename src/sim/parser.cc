@@ -132,7 +132,7 @@ void Parser::parse_set(std::istream& is)
         {
 #if BACKWARD_COMPATIBILITY < 50
             if ( spec )
-                opt.define_rhs(para, blok);
+                opt.define(para, blok);
             else
 #endif
             opt.read(blok);
@@ -210,7 +210,7 @@ void Parser::parse_set(std::istream& is)
             if ( para.empty() )
                 opt.read(blok);
             else
-                opt.define_rhs(para, blok);
+                opt.define(para, blok);
             pp = execute_change(name, opt, do_set);
         }
         else if ( para == "display" )
@@ -319,7 +319,7 @@ void Parser::parse_change(std::istream& is)
         if ( para.empty() )
             opt.read(blok);
         else
-            opt.define_rhs(para, blok);
+            opt.define(para, blok);
         
         if ( change_all )
             execute_change_all(name, opt);
