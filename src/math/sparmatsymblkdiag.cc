@@ -95,8 +95,6 @@ void SparMatSymBlkDiag::Pilar::allocate(size_t alc)
 {
     if ( alc > allo_ )
     {
-        //if ( inx_ ) fprintf(stderr, "SMSBD reallocates column %lu for %lu\n", inx_[0], alc);
-        //else fprintf(stderr, "SMSBD allocates column for %lu\n", alc);
         /*
          'chunk' can be adjusted to tune performance: by increasing 'chunk',
           more memory will be used, but reallocation will be less frequent
@@ -104,6 +102,9 @@ void SparMatSymBlkDiag::Pilar::allocate(size_t alc)
         constexpr size_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
+        //if ( inx_ ) fprintf(stderr, "SMSBD reallocates column %u: %lu\n", inx_[0], alc);
+        //else fprintf(stderr, "SMSBD allocates column: %lu\n", alc);
+
         // use aligned memory, with some extra for SIMD burr:
         void * ptr = new_real(alc*sizeof(Block)/sizeof(real)+chunk);
         Block * blk_new  = new(ptr) Block[alc];
@@ -137,7 +138,7 @@ void SparMatSymBlkDiag::Pilar::allocate(size_t alc)
 
 void SparMatSymBlkDiag::Pilar::deallocate()
 {
-    //if ( inx_ ) fprintf(stderr, "SMSBD deallocates column %lu of size %lu\n", inx_[0], allo_);
+    //if ( inx_ ) fprintf(stderr, "SMSBD deallocates column %u of size %lu\n", inx_[0], allo_);
     free(inx_);
     free_real(blk_);
     inx_ = nullptr;
@@ -596,7 +597,7 @@ bool SparMatSymBlkDiag::prepareForMultiply(int)
         {
             if ( pilar_[inx].noff_ > 0 )
                 nxt = inx;
-            else
+            else if ( pilar_[inx].allo_ > 32 )
                 pilar_[inx].deallocate();
             colix_[inx] = nxt;
         }
