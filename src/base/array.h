@@ -9,13 +9,6 @@
 #include <algorithm>
 
 
-/**
- set to 1 if Array is expected to hold more than UINT32_MAX elements.
- This is 4 294 967 295, a huge number!
- */
-#define HANDLE_HUGE_ARRAYS 0
-
-
 /** 
  Array<typename VAL> stores objects of class VAL.
  
@@ -229,7 +222,7 @@ public:
     /// reference to Object at index ii (val_[ii])
     VAL& at(const size_t ii) const
     {
-        assert_true( ii < nbo_ );
+        assert_true( ii < alc_ );
         return val_[ii];
     }
     
@@ -559,12 +552,8 @@ public:
     VAL& pick_one()
     {
         assert_true(nbo_>0);
-#if HANDLE_HUGE_ARRAYS
-        return val_[RNG.pint64(nbo_)];
-#else
         assert_true( nbo_ <= UINT32_MAX );
         return val_[RNG.pint32(static_cast<uint32_t>(nbo_))];
-#endif
     }
 
     /// Move the last Object on top, pushing all other values down by one slot
@@ -593,14 +582,9 @@ public:
     void permute()
     {
         assert_true(val_);
-#if HANDLE_HUGE_ARRAYS
-        size_t ii = RNG.pint64(nbo_);
-        size_t jj = RNG.pint64(nbo_);
-#else
         assert_true( nbo_ <= UINT32_MAX );
         size_t ii = RNG.pint32(static_cast<uint32_t>(nbo_));
         size_t jj = RNG.pint32(static_cast<uint32_t>(nbo_));
-#endif
         if ( ii != jj )
             swap(val_+ii, val_+jj);
     }
@@ -646,14 +630,7 @@ public:
     /// Randomly permutes all objects in the array
     void shuffle()
     {
-#if HANDLE_HUGE_ARRAYS
-        if ( nbo_ > UINT32_MAX )
-            shuffle64();
-        else
-            shuffle32();
-#else
         shuffle32();
-#endif
     }
     
     /// possibly reduce array to a maximum of 'cnt' objects, chosen randomly
