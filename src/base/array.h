@@ -219,18 +219,18 @@ public:
         return val_+nbo_;
     }
     
-    /// reference to Object at index ii (val_[ii])
-    VAL& at(const size_t ii) const
+    /// reference to Object at index i (val_[i])
+    VAL& at(const size_t i) const
     {
-        assert_true( ii < alc_ );
-        return val_[ii];
+        assert_true( i < alc_ );
+        return val_[i];
     }
     
-    /// reference to Object at index ii (val_[ii])
-    VAL& operator[](const size_t ii) const
+    /// reference to Object at index i (val_[i])
+    VAL& operator[](const size_t i) const
     {
-        assert_true( ii < nbo_ );
-        return val_[ii];
+        assert_true( i < nbo_ );
+        return val_[i];
     }
     
     /// return element at index 0
@@ -303,8 +303,8 @@ public:
         if ( res )
         {
             //set the newly allocated memory to zero
-            for ( size_t ii = nbo_; ii < alc_; ++ii )
-                val_[ii] = zero;
+            for ( size_t i = nbo_; i < alc_; ++i )
+                val_[i] = zero;
         }
         return res;
     }
@@ -346,8 +346,8 @@ public:
     /// Set the number of objects to zero
     inline void clear(VAL const& zero)
     {
-        for ( size_t ii=0; ii < nbo_; ++ii )
-            val_[ii] = zero;
+        for ( size_t i=0; i < nbo_; ++i )
+            val_[i] = zero;
         nbo_ = 0;
     }
     
@@ -355,19 +355,19 @@ public:
     void zero(VAL const& zero)
     {
         assert_true( val_ || alc_==0 );
-        for ( size_t ii=0; ii < alc_; ++ii )
-            val_[ii] = zero;
+        for ( size_t i=0; i < alc_; ++i )
+            val_[i] = zero;
     }
 
     /// Delete all values as if they were pointers to Object
     void destroy()
     {
         assert_true( val_ || nbo_==0 );
-        for ( size_t ii=0; ii < nbo_; ++ii )
+        for ( size_t i=0; i < nbo_; ++i )
         {
-            //std::clog << " delete " << val_[ii] << '\n';
-            delete(val_[ii]);
-            val_[ii] = nullptr;
+            //std::clog << " delete " << val_[i] << '\n';
+            delete(val_[i]);
+            val_[i] = nullptr;
         }
         nbo_ = 0;
     }
@@ -409,8 +409,8 @@ public:
     void append(const Array<VAL> array)
     {
         allocate(nbo_+array.nbo_);
-        for ( size_t ii = 0; ii < array.nbo_; ++ii )
-            val_[ii+nbo_] = array.val_[ii];
+        for ( size_t i = 0; i < array.nbo_; ++i )
+            val_[i+nbo_] = array.val_[i];
         nbo_ += array.nbo_;
     }
     
@@ -418,18 +418,18 @@ public:
     void append_except(const Array<VAL> array, VAL const& v)
     {
         allocate(nbo_+array.nbo_);
-        for ( size_t ii = 0; ii < array.nbo_; ++ii )
-            if ( array.val_[ii] != v )
-                val_[nbo_++] = array.val_[ii];
+        for ( size_t i = 0; i < array.nbo_; ++i )
+            if ( array.val_[i] != v )
+                val_[nbo_++] = array.val_[i];
     }
 
     /// Return index of `obj`, or ~0 if not found in the list (linear search)
     size_t index(const VAL obj) const
     {
         assert_true( val_ || nbo_==0 );
-        for ( size_t ii = 0; ii < nbo_; ++ii )
-            if ( val_[ii] == obj )
-                return ii;
+        for ( size_t i = 0; i < nbo_; ++i )
+            if ( val_[i] == obj )
+                return i;
         return ~0UL;
     }
     
@@ -437,11 +437,11 @@ public:
     bool replace(VAL const& old_value, VAL const& new_value)
     {
         assert_true( val_ || nbo_==0 );
-        for ( size_t ii=0; ii < nbo_; ++ii )
+        for ( size_t i=0; i < nbo_; ++i )
         {
-            if ( val_[ii] == old_value )
+            if ( val_[i] == old_value )
             {
-                val_[ii] = new_value;
+                val_[i] = new_value;
                 return true;
             }
         }
@@ -454,11 +454,11 @@ public:
     void push_pack(const VAL np, VAL const& zero)
     {
         assert_true( val_ || nbo_==0 );
-        for ( size_t ii = 0; ii < nbo_; ++ii )
+        for ( size_t i = 0; i < nbo_; ++i )
         {
-            if ( val_[ii] == zero )
+            if ( val_[i] == zero )
             {
-                val_[ii] = np;
+                val_[i] = np;
                 return;
             }
         }
@@ -472,8 +472,8 @@ public:
         if ( !val_ || nbo_==0 )
             return 0;
         size_t res = 0;
-        for ( size_t ii = 0; ii < nbo_; ++ii )
-            if ( val_[ii] == v ) ++res;
+        for ( size_t i = 0; i < nbo_; ++i )
+            if ( val_[i] == v ) ++res;
         return res;
     }
 
@@ -483,8 +483,8 @@ public:
         if ( val_ == 0 || nbo_==0 )
             return 0;
         size_t res = 0;
-        for ( size_t ii = 0; ii < nbo_; ++ii )
-            if ( val_[ii] != v ) ++res;
+        for ( size_t i = 0; i < nbo_; ++i )
+            if ( val_[i] != v ) ++res;
         return res;
     }
 
@@ -551,7 +551,7 @@ public:
     /// Return one of the value in the array, chosen randomly
     VAL& pick_one()
     {
-        assert_true(nbo_>0);
+        assert_true( nbo_ > 0 );
         assert_true( nbo_ <= UINT32_MAX );
         return val_[RNG.pint32(static_cast<uint32_t>(nbo_))];
     }
@@ -564,8 +564,8 @@ public:
             assert_true(val_);
         
             VAL * tmp = val_[0];
-            for ( size_t ii = 0; ii < nbo_-1; ++ii )
-                val_[ii] = val_[ii+1];
+            for ( size_t i = 0; i < nbo_-1; ++i )
+                val_[i] = val_[i+1];
             val_[nbo_-1] = tmp;
         }
     }
