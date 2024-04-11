@@ -46,7 +46,7 @@ public:
             real ZZ;
             real TT;
         };
-        vec4 vec;
+        vec4 xyzt;
     };
 #else
     real XX;
@@ -139,7 +139,7 @@ public:
     void load(const double b[])
     {
 #if VECTOR4_USES_AVX
-        vec = loadu4(b);
+        xyzt = loadu4(b);
 #else
         XX = b[0];
         YY = b[1];
@@ -161,7 +161,7 @@ public:
     void load_diff(const double b[])
     {
 #if VECTOR4_USES_AVX
-        vec = sub4(loadu4(b+3), loadu4(b));
+        xyzt = sub4(loadu4(b+3), loadu4(b));
 #else
         XX = b[4] - b[0];
         YY = b[5] - b[1];
@@ -183,7 +183,7 @@ public:
     void load_diff(const double a[], const double b[])
     {
 #if VECTOR4_USES_AVX
-        vec = sub4(loadu4(a), loadu4(b));
+        xyzt = sub4(loadu4(a), loadu4(b));
 #else
         XX = a[0] - b[0];
         YY = a[1] - b[1];
@@ -205,7 +205,7 @@ public:
     void store(double b[]) const
     {
 #if VECTOR4_USES_AVX
-        storeu4(b, vec);
+        storeu4(b, xyzt);
 #else
         b[0] = (double)XX;
         b[1] = (double)YY;
@@ -266,7 +266,7 @@ public:
     void reset()
     {
 #if VECTOR4_USES_AVX
-        vec = setzero4();
+        xyzt = setzero4();
 #else
         XX = 0;
         YY = 0;
@@ -297,7 +297,7 @@ public:
     void negate()
     {
 #if VECTOR4_USES_AVX
-        vec = flipsign4(vec);
+        xyzt = flipsign4(xyzt);
 #else
         XX = -XX;
         YY = -YY;
@@ -372,7 +372,7 @@ public:
     friend real distanceSqr(Vector4 const& a, Vector4 const& b)
     {
 #if VECTOR4_USES_AVX
-        return normsqr4(sub4(a.vec, b.vec))[0];
+        return normsqr4(sub4(a.xyzt, b.xyzt))[0];
 #else
         real x = a.XX - b.XX;
         real y = a.YY - b.YY;
@@ -416,7 +416,7 @@ public:
     void normalize()
     {
 #if VECTOR4_USES_AVX
-        vec = normalize4(vec);
+        xyzt = normalize4(xyzt);
 #else
         real s = norm();
         XX /= s;
@@ -430,7 +430,7 @@ public:
     void normalize(const real n)
     {
 #if VECTOR4_USES_AVX
-        vec = normalize4(vec, n);
+        xyzt = normalize4(xyzt, n);
 #else
         real s = n / norm();
         XX *= s;
@@ -444,7 +444,7 @@ public:
     Vector4 normalized(const real n = 1.0) const
     {
 #if VECTOR4_USES_AVX
-        return Vector4(normalize4(vec, n));
+        return Vector4(normalize4(xyzt, n));
 #else
         real s = n / norm();
         return Vector4(s*XX, s*YY, s*ZZ, s*TT);
@@ -455,7 +455,7 @@ public:
     friend Vector4 normalize(Vector4 const& V)
     {
 #if VECTOR4_USES_AVX
-        return Vector4(normalize4(V.vec));
+        return Vector4(normalize4(V.xyzt));
 #else
         const real s = V.norm();
         return Vector4(V.XX/s, V.YY/s, V.ZZ/s, V.TT/s);
@@ -478,7 +478,7 @@ public:
     {
 #if VECTOR4_USES_AVX
         vec4 A = loadu4(a), B = loadu4(b);
-        vec = fmadd4(set4(C), sub4(B, A), A);
+        xyzt = fmadd4(set4(C), sub4(B, A), A);
 #else
         XX = a[0] + C * ( b[0] - a[0] );
         YY = a[1] + C * ( b[1] - a[1] );
@@ -552,7 +552,7 @@ public:
     Vector4 e_squared() const
     {
 #if VECTOR4_USES_AVX
-        return Vector4(mul4(vec, vec));
+        return Vector4(mul4(xyzt, xyzt));
 #else
         return Vector4(XX*XX, YY*YY, ZZ*ZZ, TT*TT);
 #endif

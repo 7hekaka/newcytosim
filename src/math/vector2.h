@@ -41,7 +41,7 @@ public:
             real XX;
             real YY;
         };
-        vec2 vec;
+        vec2 xy;
     };
 #else
     real XX;
@@ -62,7 +62,7 @@ public:
     
 #if VECTOR2_USES_SSE
     /// construct from SIMD vector
-    Vector2(vec2 const& v) { vec = v; }
+    Vector2(vec2 const& v) { xy = v; }
 #elif defined(__SSE3__)
     /// construct from SIMD vector
     Vector2(vec2 const& v) { XX = v[0]; YY = v[1]; }
@@ -121,7 +121,7 @@ public:
     void load(const double b[])
     {
 #if VECTOR2_USES_SSE
-        vec = loadu2(b);
+        xy = loadu2(b);
 #else
         XX = b[0];
         YY = b[1];
@@ -139,7 +139,7 @@ public:
     void load_diff(const double b[])
     {
 #if VECTOR2_USES_SSE
-        vec = sub2(loadu2(b+2), loadu2(b));
+        xy = sub2(loadu2(b+2), loadu2(b));
 #else
         XX = b[2] - b[0];
         YY = b[3] - b[1];
@@ -157,7 +157,7 @@ public:
     void load_diff(const double a[], const double b[])
     {
 #if VECTOR2_USES_SSE
-        vec = sub2(loadu2(a), loadu2(b));
+        xy = sub2(loadu2(a), loadu2(b));
 #else
         XX = a[0] - b[0];
         YY = a[1] - b[1];
@@ -175,7 +175,7 @@ public:
     void store(double b[]) const
     {
 #if VECTOR2_USES_SSE
-        store2(b, vec);
+        store2(b, xy);
 #else
         b[0] = (double)XX;
         b[1] = (double)YY;
@@ -186,7 +186,7 @@ public:
     void add_to(real b[]) const
     {
 #if VECTOR2_USES_SSE
-        store2(b, add2(vec, load2(b)));
+        store2(b, add2(xy, load2(b)));
 #else
         b[0] += XX;
         b[1] += YY;
@@ -197,7 +197,7 @@ public:
     void add_to(real alpha, real b[]) const
     {
 #if VECTOR2_USES_SSE
-        store2(b, fmadd2(set2(alpha), vec, load2(b)));
+        store2(b, fmadd2(set2(alpha), xy, load2(b)));
 #else
         b[0] += alpha * XX;
         b[1] += alpha * YY;
@@ -218,7 +218,7 @@ public:
     void sub_to(real b[]) const
     {
 #if VECTOR2_USES_SSE
-        store2(b, sub2(load2(b), vec));
+        store2(b, sub2(load2(b), xy));
 #else
         b[0] -= XX;
         b[1] -= YY;
@@ -229,7 +229,7 @@ public:
     void sub_to(real alpha, real b[]) const
     {
 #if VECTOR2_USES_SSE
-        store2(b, fnmadd2(set2(alpha), vec, load2(b)));
+        store2(b, fnmadd2(set2(alpha), xy, load2(b)));
 #else
         b[0] -= alpha * XX;
         b[1] -= alpha * YY;
@@ -240,7 +240,7 @@ public:
     void reset()
     {
 #if VECTOR2_USES_SSE
-        vec = setzero2();
+        xy = setzero2();
 #else
         XX = 0;
         YY = 0;
@@ -251,7 +251,7 @@ public:
     void set(const real x, const real y)
     {
 #if VECTOR2_USES_SSE
-        vec = setr2(x, y);
+        xy = setr2(x, y);
 #else
         XX = x;
         YY = y;
@@ -262,7 +262,7 @@ public:
     void set(const real x, const real y, const real)
     {
 #if VECTOR2_USES_SSE
-        vec = setr2(x, y);
+        xy = setr2(x, y);
 #else
         XX = x;
         YY = y;
@@ -273,7 +273,7 @@ public:
     void negate()
     {
 #if VECTOR2_USES_SSE
-        vec = flipsign2(vec);
+        xy = flipsign2(xy);
 #else
         XX = -XX;
         YY = -YY;
@@ -347,7 +347,7 @@ public:
     friend real distanceSqr(Vector2 const& a, Vector2 const& b)
     {
 #if VECTOR2_USES_SSE
-        return normsqr2(sub2(a.vec, b.vec))[0];
+        return normsqr2(sub2(a.xy, b.xy))[0];
 #else
         real x = a.XX - b.XX;
         real y = a.YY - b.YY;
@@ -389,7 +389,7 @@ public:
     void normalize()
     {
 #if VECTOR2_USES_SSE
-        vec = normalize2(vec);
+        xy = normalize2(xy);
 #else
         real s = norm();
         XX /= s;
@@ -401,7 +401,7 @@ public:
     void normalize(const real n)
     {
 #if VECTOR2_USES_SSE
-        vec = normalize2(vec, n);
+        xy = normalize2(xy, n);
 #else
         real s = n / norm();
         XX *= s;
@@ -413,7 +413,7 @@ public:
     Vector2 normalized(const real n = 1.0) const
     {
 #if VECTOR2_USES_SSE
-        return Vector2(normalize2(vec, n));
+        return Vector2(normalize2(xy, n));
 #else
         real s = n / norm();
         return Vector2(s*XX, s*YY);
@@ -424,7 +424,7 @@ public:
     friend Vector2 normalize(Vector2 const& V)
     {
 #if VECTOR2_USES_SSE
-        return Vector2(normalize2(V.vec));
+        return Vector2(normalize2(V.xy));
 #else
         const real s = V.norm();
         return Vector2(V.XX/s, V.YY/s);
@@ -480,9 +480,9 @@ public:
 #if VECTOR2_USES_SSE
         vec2 A = loadu2(a), B = loadu2(b);
 #  ifdef __FMA__
-        vec = fmadd2(set2(C), sub2(B, A), A);
+        xy = fmadd2(set2(C), sub2(B, A), A);
 #  else
-        vec = add2(mul2(set2(C), sub2(B, A)), A);
+        xy = add2(mul2(set2(C), sub2(B, A)), A);
 #  endif
 #else
         XX = a[0] + C * ( b[0] - a[0] );
@@ -559,7 +559,7 @@ public:
     Vector2 e_squared() const
     {
 #if VECTOR2_USES_SSE
-        return Vector2(mul2(vec, vec));
+        return Vector2(mul2(xy, xy));
 #else
         return Vector2(XX*XX, YY*YY);
 #endif

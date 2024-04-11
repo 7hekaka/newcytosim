@@ -8,7 +8,7 @@
 Vector3::Vector3(const Vector1& arg) : XX(arg.XX), YY(0.0), ZZ(0.0)
 {
 #if VECTOR3_USES_AVX
-    vec[3] = 0;
+    xyz[3] = 0;
 #endif
 }
 
@@ -16,7 +16,7 @@ Vector3::Vector3(const Vector1& arg) : XX(arg.XX), YY(0.0), ZZ(0.0)
 Vector3::Vector3(const Vector2& arg) : XX(arg.XX), YY(arg.YY), ZZ(0.0)
 {
 #if VECTOR3_USES_AVX
-    vec[3] = 0;
+    xyz[3] = 0;
 #endif
 }
 
@@ -27,7 +27,7 @@ Vector3::Vector3(const Vector2& arg) : XX(arg.XX), YY(arg.YY), ZZ(0.0)
 std::istream& operator >> (std::istream& is, Vector3& v)
 {
 #if VECTOR3_USES_AVX
-    v.vec[3] = 0;
+    v.xyz[3] = 0;
 #endif
     if ( is >> v.XX )
     {

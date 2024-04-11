@@ -45,7 +45,7 @@ public:
             real ZZ;
             real TT;  // should be zero!
         };
-        vec4 vec;
+        vec4 xyz;
     };
 #else
     real XX;
@@ -61,7 +61,7 @@ public:
     explicit constexpr Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z), TT(0.0) {}
     
     /// construct from address
-    Vector3(const real v[]) : vec(load3Z(v)) {}
+    Vector3(const real v[]) : xyz(load3Z(v)) {}
 #else
     /// construct from 3 values
     explicit constexpr Vector3(real x, real y, real z) : XX(x), YY(y), ZZ(z) {}
@@ -72,9 +72,9 @@ public:
 
 #if VECTOR3_USES_AVX
     /// construct from SIMD vector
-    Vector3(vec4 const& v) : vec(v) { } //{ assert_true(v[3]==0); }
+    Vector3(vec4 const& v) : xyz(v) { } //{ assert_true(v[3]==0); }
     /// conversion to SIMD vector
-    operator vec4 () const { assert_true(vec[3]==0); return vec; }
+    operator vec4 () const { assert_true(xyz[3]==0); return xyz; }
 #elif defined(__AVX__) && REAL_IS_DOUBLE
     /// construct from SIMD vector
     Vector3(vec4 const& v) : XX(v[0]), YY(v[1]), ZZ(v[2]) { }
@@ -130,7 +130,7 @@ public:
         YY = ( d > 1 ) ? v[1] : 0;
         ZZ = ( d > 2 ) ? v[2] : 0;
 #if VECTOR3_USES_AVX
-        vec[3] = 0;
+        xyz[3] = 0;
 #endif
     }
     
@@ -141,7 +141,7 @@ public:
         YY = b[1];
         ZZ = b[2];
 #if VECTOR3_USES_AVX
-        vec[3] = 0;
+        xyz[3] = 0;
 #endif
     }
     
@@ -149,7 +149,7 @@ public:
     void load(const double b[])
     {
 #if VECTOR3_USES_AVX
-        vec = load3(b);
+        xyz = load3(b);
 #else
         XX = b[0];
         YY = b[1];
@@ -164,7 +164,7 @@ public:
         YY = b[4] - b[1];
         ZZ = b[5] - b[2];
 #if VECTOR3_USES_AVX
-        vec[3] = 0;
+        xyz[3] = 0;
 #endif
     }
     
@@ -172,7 +172,7 @@ public:
     void load_diff(const double b[])
     {
 #if VECTOR3_USES_AVX
-        vec = sub4(load3(b+3), load3(b));
+        xyz = sub4(load3(b+3), load3(b));
 #else
         XX = b[3] - b[0];
         YY = b[4] - b[1];
@@ -187,7 +187,7 @@ public:
         YY = a[1] - b[1];
         ZZ = a[2] - b[2];
 #if VECTOR3_USES_AVX
-        vec[3] = 0;
+        xyz[3] = 0;
 #endif
     }
     
@@ -195,7 +195,7 @@ public:
     void load_diff(const double a[], const double b[])
     {
 #if VECTOR3_USES_AVX
-        vec = sub4(load3(a), load3(b));
+        xyz = sub4(load3(a), load3(b));
 #else
         XX = a[0] - b[0];
         YY = a[1] - b[1];
@@ -215,7 +215,7 @@ public:
     void store(double b[]) const
     {
 #if VECTOR3_USES_AVX
-        store3(b, vec);
+        store3(b, xyz);
 #else
         b[0] = (double)XX;
         b[1] = (double)YY;
@@ -227,8 +227,8 @@ public:
     void add_to(real b[]) const
     {
 #if VECTOR3_USES_AVX
-        assert_true(vec[3] == 0);
-        storeu4(b, add4(vec, loadu4(b)));
+        assert_true(xyz[3] == 0);
+        storeu4(b, add4(xyz, loadu4(b)));
 #else
         b[0] += XX;
         b[1] += YY;
@@ -240,8 +240,8 @@ public:
     void add_to(real alpha, real b[]) const
     {
 #if VECTOR3_USES_AVX
-        assert_true(vec[3] == 0);
-        storeu4(b, add4(mul4(set4(alpha), vec), loadu4(b)));
+        assert_true(xyz[3] == 0);
+        storeu4(b, add4(mul4(set4(alpha), xyz), loadu4(b)));
 #else
         b[0] += alpha * XX;
         b[1] += alpha * YY;
@@ -264,8 +264,8 @@ public:
     void sub_to(real b[]) const
     {
 #if VECTOR3_USES_AVX
-        assert_true(vec[3] == 0);
-        storeu4(b, sub4(loadu4(b), vec));
+        assert_true(xyz[3] == 0);
+        storeu4(b, sub4(loadu4(b), xyz));
 #else
         b[0] -= XX;
         b[1] -= YY;
@@ -277,8 +277,8 @@ public:
     void sub_to(real alpha, real b[]) const
     {
 #if VECTOR3_USES_AVX
-        assert_true(vec[3] == 0);
-        storeu4(b, sub4(loadu4(b), mul4(set4(alpha), vec)));
+        assert_true(xyz[3] == 0);
+        storeu4(b, sub4(loadu4(b), mul4(set4(alpha), xyz)));
 #else
         b[0] -= alpha * XX;
         b[1] -= alpha * YY;
@@ -290,7 +290,7 @@ public:
     void reset()
     {
 #if VECTOR3_USES_AVX
-        vec = setzero4();
+        xyz = setzero4();
 #else
         XX = 0;
         YY = 0;
@@ -302,7 +302,7 @@ public:
     void set(const real x, const real y, const real z)
     {
 #if VECTOR3_USES_AVX
-        vec = setr4(x, y, z, 0);
+        xyz = setr4(x, y, z, 0);
 #else
         XX = x;
         YY = y;
@@ -314,7 +314,7 @@ public:
     void negate()
     {
 #if VECTOR3_USES_AVX
-        vec = flipsign4(vec);
+        xyz = flipsign4(xyz);
 #else
         XX = -XX;
         YY = -YY;
@@ -400,9 +400,9 @@ public:
     friend real distanceSqr(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
-        assert_true(a.vec[3] == 0);
-        assert_true(b.vec[3] == 0);
-        return normsqr4(sub4(a.vec, b.vec))[0];
+        assert_true(a.xyz[3] == 0);
+        assert_true(b.xyz[3] == 0);
+        return normsqr4(sub4(a.xyz, b.xyz))[0];
 #else
         real x = a.XX - b.XX;
         real y = a.YY - b.YY;
@@ -433,7 +433,7 @@ public:
     bool valid() const
     {
 #if VECTOR3_USES_AVX
-        if ( vec[3] != 0 ) return false;
+        if ( xyz[3] != 0 ) return false;
 #endif
         return ( XX == XX ) & ( YY == YY ) & ( ZZ == ZZ );
     }
@@ -448,8 +448,8 @@ public:
     void normalize()
     {
 #if VECTOR3_USES_AVX
-        assert_true(vec[3] == 0);
-        vec = normalize4(vec);
+        assert_true(xyz[3] == 0);
+        xyz = normalize4(xyz);
 #else
         real s = norm();
         XX /= s;
@@ -462,8 +462,8 @@ public:
     void normalize(const real n)
     {
 #if VECTOR3_USES_AVX
-        assert_true(vec[3] == 0);
-        vec = normalize4(vec, n);
+        assert_true(xyz[3] == 0);
+        xyz = normalize4(xyz, n);
 #else
         real s = n / norm();
         XX *= s;
@@ -476,8 +476,8 @@ public:
     friend Vector3 normalize(Vector3 const& V)
     {
 #if VECTOR3_USES_AVX
-        assert_true(V.vec[3] == 0);
-        return Vector3(normalize4(V.vec));
+        assert_true(V.xyz[3] == 0);
+        return Vector3(normalize4(V.xyz));
 #else
         const real s = V.norm();
         return Vector3(V.XX/s, V.YY/s, V.ZZ/s);
@@ -488,8 +488,8 @@ public:
     Vector3 normalized(const real n = 1.0) const
     {
 #if VECTOR3_USES_AVX
-        assert_true(vec[3] == 0);
-        return Vector3(normalize4(vec, n));
+        assert_true(xyz[3] == 0);
+        return Vector3(normalize4(xyz, n));
 #else
         real s = n / norm();
         return Vector3(s*XX, s*YY, s*ZZ);
@@ -739,19 +739,19 @@ public:
         // if you do not mind an inverted basis, use F.set(c, b - s*N, YY);
     }
     
-    /// rotate `vec` around `*this`, by angle defined by cosine and sine
+    /// rotate `xyz` around `*this`, by angle defined by cosine and sine
     /**
      It is assumed that norm(*this)==1
      The result is a Vector orthogonal to *this, of norm `C^2 + S^2`
      */
-    Vector3 rotateOrtho(Vector3 const& vec, real C, real S)
+    Vector3 rotateOrtho(Vector3 const& xyz, real C, real S)
     {
         // set two orthogonal vector to 'd' defining an orientated basis
         Vector3 ex, ey;
         orthonormal(ex, ey);
-        // compute coordinates of `vec` in the reference frame (ex, ey):
-        real x = dot(vec, ex);
-        real y = dot(vec, ey);
+        // compute coordinates of `xyz` in the reference frame (ex, ey):
+        real x = dot(xyz, ex);
+        real y = dot(xyz, ey);
         // normalization factor:
         real n = 1.0 / std::sqrt( x * x + y * y );
         x = x * n;
@@ -785,7 +785,7 @@ public:
         YY = a[1] + C * ( b[1] - a[1] );
         ZZ = a[2] + C * ( b[2] - a[2] );
 #if VECTOR3_USES_AVX
-        vec[3] = 0;
+        xyz[3] = 0;
 #endif
     }
 
@@ -794,7 +794,7 @@ public:
     {
 #if VECTOR3_USES_AVX
         vec4 A = load3(a), B = load3(b);
-        vec = fmadd4(set4(C), sub4(B, A), A);
+        xyz = fmadd4(set4(C), sub4(B, A), A);
 #else
         XX = a[0] + C * ( b[0] - a[0] );
         YY = a[1] + C * ( b[1] - a[1] );
@@ -831,7 +831,7 @@ public:
     friend Vector3 operator +(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
-        return Vector3(add4(a.vec, b.vec));
+        return Vector3(add4(a.xyz, b.xyz));
 #else
         return Vector3(a.XX+b.XX, a.YY+b.YY, a.ZZ+b.ZZ);
 #endif
@@ -841,7 +841,7 @@ public:
     friend Vector3 operator -(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
-        return Vector3(sub4(a.vec, b.vec));
+        return Vector3(sub4(a.xyz, b.xyz));
 #else
         return Vector3(a.XX-b.XX, a.YY-b.YY, a.ZZ-b.ZZ);
 #endif
@@ -857,7 +857,7 @@ public:
     friend Vector3 operator -(Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
-        return Vector3(flipsign4(b.vec));
+        return Vector3(flipsign4(b.xyz));
 #else
         return Vector3(-b.XX, -b.YY, -b.ZZ);
 #endif
@@ -867,7 +867,7 @@ public:
     Vector3 e_mul(Vector3 const& b) const
     {
 #if VECTOR3_USES_AVX
-        return Vector3(mul4(vec, b.vec));
+        return Vector3(mul4(xyz, b.xyz));
 #else
         return Vector3(XX*b.XX, YY*b.YY, ZZ*b.ZZ);
 #endif
@@ -883,7 +883,7 @@ public:
     Vector3 e_squared() const
     {
 #if VECTOR3_USES_AVX
-        return Vector3(mul4(vec, vec));
+        return Vector3(mul4(xyz, xyz));
 #else
         return Vector3(XX*XX, YY*YY, ZZ*ZZ);
 #endif
@@ -924,8 +924,8 @@ public:
     friend Vector3 cross(Vector3 const& a, Vector3 const& b)
     {
 #if VECTOR3_USES_AVX && defined(__AVX2__)
-        assert_true((a.vec[3] == 0) & (b.vec[3] == 0));
-        return Vector3(cross4(a.vec, b.vec));
+        assert_true((a.xyz[3] == 0) & (b.xyz[3] == 0));
+        return Vector3(cross4(a.xyz, b.xyz));
 #else
         return Vector3(a.YY * b.ZZ - a.ZZ * b.YY,
                        a.ZZ * b.XX - a.XX * b.ZZ,
@@ -950,7 +950,7 @@ public:
     friend Vector3 operator *(Vector3 const& a, const real s)
     {
 #if VECTOR3_USES_AVX
-        return Vector3(mul4(a.vec, set4(s)));
+        return Vector3(mul4(a.xyz, set4(s)));
 #else
         return Vector3(s*a.XX, s*a.YY, s*a.ZZ);
 #endif
@@ -960,7 +960,7 @@ public:
     friend Vector3 operator *(const real s, Vector3 const& a)
     {
 #if VECTOR3_USES_AVX
-        return Vector3(mul4(set4(s), a.vec));
+        return Vector3(mul4(set4(s), a.xyz));
 #else
         return Vector3(s*a.XX, s*a.YY, s*a.ZZ);
 #endif
@@ -970,7 +970,7 @@ public:
     friend Vector3 operator /(Vector3 const& a, const real s)
     {
 #if VECTOR3_USES_AVX
-        return Vector3(div4(a.vec, set4(s)));
+        return Vector3(div4(a.xyz, set4(s)));
 #else
         return Vector3(a.XX/s, a.YY/s, a.ZZ/s);
 #endif
@@ -980,7 +980,7 @@ public:
     void operator +=(Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
-        vec = add4(vec, b.vec);
+        xyz = add4(xyz, b.xyz);
 #else
         XX += b.XX;
         YY += b.YY;
@@ -992,7 +992,7 @@ public:
     void operator -=(Vector3 const& b)
     {
 #if VECTOR3_USES_AVX
-        vec = sub4(vec, b.vec);
+        xyz = sub4(xyz, b.xyz);
 #else
         XX -= b.XX;
         YY -= b.YY;
@@ -1004,7 +1004,7 @@ public:
     void operator *=(const real s)
     {
 #if VECTOR3_USES_AVX
-        vec = mul4(vec, set4(s));
+        xyz = mul4(xyz, set4(s));
 #else
         XX *= s;
         YY *= s;
@@ -1016,7 +1016,7 @@ public:
     void operator /=(const real s)
     {
 #if VECTOR3_USES_AVX
-        vec = div4(vec, set4(s));
+        xyz = div4(xyz, set4(s));
 #else
         XX /= s;
         YY /= s;
