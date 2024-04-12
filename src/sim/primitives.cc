@@ -14,7 +14,8 @@
 
 
 /* With C++11, the extracted value is zeroed even upon failure.
-This on the other hand will preserve the value of 'var' if it is not read */
+This on the other hand will preserve the value of 'var' if no read occurs.
+Returns `true` if a value was set. This is used with T=real and T=Vector */
 template < typename T >
 static bool extract(std::istream& is, T& var)
 {
@@ -71,7 +72,7 @@ static real get_angle(std::istream& is)
  `gradient S E R`     | Linear density gradient, contained inside a cylinder of radius R
  `exponential S L`    | Exponential density gradient of length scale L, starting at S
  `exponential S L R`  | Exponential density gradient, contained inside a cylinder of radius R
- `XY Z`               | randomly in the XY plane, at specified Z (value)
+ `XY Z`               | randomly in the XY plane and within the Space, at specified Z (a value)
 
  Each primitive describes a certain area in Space, and in most cases the returned position is
  chosen randomly inside this area following a uniform probability.
@@ -94,16 +95,16 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( tok == "inside" || tok == "random" )
                 return spc->place();
             
-#if ( DIM > 2 )
             if ( tok == "XY" )
             {
+                Vector V = spc->place();
                 real H = 0;
                 extract(is, H);
-                Vector V = spc->place();
+#if ( DIM > 2 )
                 V.ZZ = H;
+#endif
                 return V;
             }
-#endif
             if ( tok == "YZ" || tok == "XZ" )
             {
                 real H = 0;

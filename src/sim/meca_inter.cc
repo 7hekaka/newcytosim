@@ -4590,9 +4590,10 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
 #endif
 
 /**
- A link of stiffness `weight`, between offset_point on the side of `ptA`, and the fixed position `pos` (G).
+ A link of stiffness `weight`, between `offset_point` on the side of `ptA`,
+ and a fixed position `pos` (G).
 
- This uses the vector product x -> cross(arm, x) to offset the point on which the link is attached:
+ This uses the vector product to offset the point on which the link is attached:
  
      offset_point = fiber_point + cross(arm, fiber_dir)
  
@@ -4617,13 +4618,16 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     const real cc1 = ptA.coef1();
     const Torque leg = arm / ptA.len();
 
+    /* Since aR and bR only differ on their diagonals, the calculation here could
+     be largely bypassed: aR = cc0 - leg (x) Id; bR = cc1 + leg (x) Id */
+    
     MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
     MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
 
     MatrixBlock wAt = aR.transposed(-weight);
     MatrixBlock wBt = bR.transposed(-weight);
     
-    //the following 3 terms are symmetric but not diagonal
+    // the following 3 terms are symmetric but not diagonal
     add_block_diag(ii0, wAt.mul(aR));
     add_block(ii1, ii0, wBt.mul(aR));
     add_block_diag(ii1, wBt.mul(bR));
