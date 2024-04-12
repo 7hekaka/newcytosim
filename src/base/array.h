@@ -226,6 +226,19 @@ public:
         return val_[i];
     }
     
+    /// reference to Object that is beyond last one
+    VAL& past_back() const
+    {
+        return val_[nbo_];
+    }
+    
+    /// increase size by `arg`
+    void increase_size(const size_t arg)
+    {
+        assert_true( nbo_+arg < alc_ );
+        nbo_ += arg;
+    }
+ 
     /// reference to Object at index i (val_[i])
     VAL& operator[](const size_t i) const
     {
