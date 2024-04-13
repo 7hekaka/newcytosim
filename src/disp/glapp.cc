@@ -152,6 +152,7 @@ void glApp::toggleFullScreen()
 void glApp::toggleWindowSize()
 {
     int menuBar = 53;
+    int X = glutGet(GLUT_WINDOW_X);
     int W = glutGet(GLUT_WINDOW_WIDTH);
     int H = glutGet(GLUT_WINDOW_HEIGHT);
     
@@ -166,7 +167,7 @@ void glApp::toggleWindowSize()
     float zW((winW*S)/(float)W);
     float zH((winH*S)/(float)H);
     
-    glutPositionWindow(0, menuBar);
+    glutPositionWindow(X, menuBar);
     if ( zW < zH )
         glutReshapeWindow(winW*S, int(zW*H));
     else
