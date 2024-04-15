@@ -1376,7 +1376,7 @@ void Display::drawFiberLatticeBits(Fiber const& fib, FiberLattice const& lat) co
     for ( auto h = inf; h <= sup; ++h, abs += uni )
     {
 #if FIBER_HAS_LATTICE > 0
-        //sMath::binary_representation(str, sizeof(str), 4, lat.data(h));
+        //Cymath::binary_representation(str, sizeof(str), 4, lat.data(h));
         if ( lat.data(h) )
         {
             Vector vec = fib.posM(abs);
