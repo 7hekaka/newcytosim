@@ -266,7 +266,6 @@ void SimThread::stop()
  */
 void SimThread::cancel_join()
 {
-    bool iw = isWorker();
     if ( status_ == 0 )
     {
         assert_false( isWorker() );

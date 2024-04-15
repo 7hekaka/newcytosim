@@ -1203,8 +1203,13 @@ void Display3::drawCoupleB(Couple const* cx) const
     PointDisp const* pd1 = cx->disp1();
     PointDisp const* pd2 = cx->disp2();
     
+#if FIBER_HAS_FAMILY
+    Vector p1 = cx->hand1()->pos();
+    Vector p2 = cx->hand2()->pos();
+#else
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
+#endif
     if ( modulo ) modulo->fold(p2, p1);
     
     Vector dif = p2 - p1;
