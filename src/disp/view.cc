@@ -1061,7 +1061,7 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
             drawScaleHV(S, -S/10, 0, setLadderV);
             break;
         case 3: {
-            gym::eye_view(0, 0, eyeDistance, zoom);
+            gym::eye_view(0, 0, -eyeDistance, zoom);
             gym::color(color);
             drawScaleX(S);
         } break;
