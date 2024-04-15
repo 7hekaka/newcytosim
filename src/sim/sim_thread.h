@@ -69,7 +69,7 @@ private:
     
 public:
     
-    /// the size allocated for `code`
+    /// the size allocated for `config_code` below
     size_t code_size;
     
     /// the text of the config file, allocated externally

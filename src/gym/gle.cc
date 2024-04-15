@@ -1758,7 +1758,7 @@ namespace gle
         {
             /* Problem: glewInit failed, something is seriously wrong. */
             fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
-            exit(1);
+            _exit(1);
         }
 #endif
         // circle_[] covers 2 revolutions = 4 * PI

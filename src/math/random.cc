@@ -38,11 +38,6 @@ constexpr uint64_t BIT63 = 1ULL << 63;
  */
 Random::Random()
 {
-    if ( sizeof(uint32_t) != 4 )
-    {
-        fprintf(stderr, "Random can only work if sizeof(uint32_t) == 4\n");
-        exit(1);
-    }
     uintptr_t a = ((uintptr_t)this & 31);
     if ( a ) fprintf(stderr, "Random missaligned on 32 + %lu\n", a);
 

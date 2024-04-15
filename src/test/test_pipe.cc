@@ -23,14 +23,14 @@ pid_t child = 0;
 int fds[2];
 
 
-void start(const char* path, char *const command[])
+int start(const char* path, char *const command[])
 {
     // create communication pipe:
     if ( pipe(fds) < 0 )
     {
         perror("pipe");
         errno = 0;
-        exit(1);
+        return 1;
     }
     
     // create a child process
@@ -40,7 +40,7 @@ void start(const char* path, char *const command[])
     {
         perror("fork");
         errno = 0;
-        exit(1);
+        return 1;
     }
     
     if ( child == 0 )
@@ -155,7 +155,8 @@ int main(int argc, char* argv[])
         return 1;
     }
     
-    start(path, argv+1);
+    int err = start(path, argv+1);
+    if ( err ) return err;
     sleep(1);
 
     // start controlling:

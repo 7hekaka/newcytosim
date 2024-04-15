@@ -345,8 +345,7 @@ void SparMatSym2::addDiagonalTrace(real alpha, real* mat, const size_t ldd,
                                    const size_t start, const size_t cnt,
                                    const size_t mul, const size_t rank, const bool sym) const
 {
-    fprintf(stderr, "unfinished SparMatSym2::addDiagonalTrace()\n");
-    exit(1);
+    ABORT_NOW("unfinished SparMatSym2::addDiagonalTrace()");
 }
 
 

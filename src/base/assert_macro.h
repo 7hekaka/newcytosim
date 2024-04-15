@@ -10,6 +10,7 @@
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
+#include <unistd.h>
 
 /**
  Assertions are used extensively to check the validity of data and function arguments.
@@ -80,7 +81,7 @@
     {\
     fprintf(stderr, "Cytosim ERROR `%s'\n", message);\
     fprintf(stderr, "@ `%s' in %s:%d\n", SFUNC, SFILE, __LINE__);\
-    exit(EXIT_FAILURE);\
+    _exit(EXIT_FAILURE);\
     }
 
 #endif

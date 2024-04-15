@@ -200,7 +200,7 @@ public:
     /// Number of distance constraints applied to the movements of vertices
     size_t nbConstraints() const { return unconstrainLength ? 0 : nPoints - 1; }
 #else
-    void constrainLength(bool s) { if (!s) { std::cerr<<"NEW_UNCONSTRAINED_LENGTH is off\n"; exit(1); } }
+    void constrainLength(bool s) { if (!s) ABORT_NOW("NEW_UNCONSTRAINED_LENGTH is off"); }
     
     /// Number of distance constraints applied to the movements of vertices
     size_t nbConstraints() const { return nPoints - 1; }

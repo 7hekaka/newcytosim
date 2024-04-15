@@ -82,11 +82,7 @@ static void copy(size_t cnt, SparMatSym::Element * src, SparMatSym::Element * ds
 
 void SparMatSym::allocateColumn(const size_t jj, size_t alc)
 {
-    if ( jj >= size_ )
-    {
-        fprintf(stderr, "out of range index %lu for matrix of size %lu\n", jj, size_);
-        exit(1);
-    }
+    assert_true( jj < size_ );
 
     if ( alc > colmax_[jj] )
     {

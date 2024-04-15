@@ -323,7 +323,7 @@ int main(int argc, char *argv[])
     if ( tileX * tileY > TOP )
     {
         printf("Error: tile is limited to %i cells max\n", TOP);
-        exit(1);
+        return EXIT_FAILURE;
     }
     Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
@@ -336,7 +336,7 @@ int main(int argc, char *argv[])
     {
         const char * str = simul[0].prop.config_file.c_str();
         if ( !FilePath::read_file(str, config_code, code_size) )
-            exit(1);
+            return EXIT_FAILURE;
         for ( int i = 0; i < tileX*tileY; ++i )
             worker[i].config_code = config_code;
     }

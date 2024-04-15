@@ -121,6 +121,7 @@ void SimThread::run()
         std::string filename = simulProp().config_file;
         if ( config_code )
         {
+            // with code provided, we save opening/reading a file
             std::stringstream is(config_code);
             readConfig(is, filename);
         }
@@ -243,13 +244,13 @@ int SimThread::prolong()
 #pragma mark - Thread control & termination
 
 /**
- ask the slave thread to exit at the next spontaneous halt
+ signal the slave thread to exit at the next convenient pause
 */
 void SimThread::stop()
 {
-    assert_false( isWorker() );
     if ( status_ == 0 )
     {
+        assert_false( isWorker() );
         // request clean termination:
         repeat_ = -1;
         signal();
@@ -265,9 +266,10 @@ void SimThread::stop()
  */
 void SimThread::cancel_join()
 {
-    assert_false( isWorker() );
+    bool iw = isWorker();
     if ( status_ == 0 )
     {
+        assert_false( isWorker() );
         //debug("cancel...");
         // force termination:
         if ( 0 == pthread_cancel(child_) )
