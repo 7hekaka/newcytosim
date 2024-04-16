@@ -391,7 +391,7 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
         
         const Vector2 YZ = Vector2::randU();
         real u = std::max(1.0 - cap * RNG.preal(), -1.0);
-        real v = std::sqrt((1.0 - u)*(1.0 + u));
+        real v = std::sqrt(1.0 - u*u);
         Vector3 pos(u, v*YZ.XX, v*YZ.YY);
         
         for ( size_t i = 0; i < n; ++i )

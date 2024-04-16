@@ -143,6 +143,7 @@ The equation is formulated using linear-algebra:
 class Meca
 {
     friend class Simul;
+    friend class Display;
     
 private:
     
@@ -198,7 +199,7 @@ private:
     LinearSolvers::Allocator allocator_;
     
     /// secondary memory allocator for GMRES
-    LinearSolvers::Allocator temporary_;
+    //LinearSolvers::Allocator temporary_;
     
     /// grid used for steric interaction between Fiber/Solid/Bead/Sphere
     PointGrid pointGrid;

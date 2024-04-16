@@ -78,7 +78,7 @@ public:
         std::string to_string() const;
     };
 
-    /// list of SegmentHits used in tryToAttach()
+    /// list of SegmentHits used in `tryToAttach`
     mutable Array<BindingTarget> targets_;
     
 #endif
