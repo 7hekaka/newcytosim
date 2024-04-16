@@ -468,7 +468,10 @@ Vector Cytosim::readPosition(std::istream& is, Space const* spc)
     Vector pos = readPositionPrimitive(is, spc);
     assert_true( pos.valid() );
     is.clear();
-    return modifyPosition(is, spc, pos);
+    int c = Tokenizer::skip_space(is, false);
+    if ( isalpha(c) )
+        return modifyPosition(is, spc, pos);
+    return pos;
 }
 
 

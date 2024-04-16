@@ -39,8 +39,8 @@ size_t LocusGrid::setGrid(Vector inf, Vector sup, real min_width)
         {
             //extend in any dimension that is not periodic, adjusting cell size to min_width
             cnt[d] = n + 1;
-            real w = cnt[d] * 0.5 * min_width;
-            real m = inf[d] + sup[d];
+            real w = 0.5 * cnt[d] * min_width;
+            real m = 0.5 * ( inf[d] + sup[d] );
             inf[d] = m - w;
             sup[d] = m + w;
         }
@@ -56,7 +56,7 @@ void LocusGrid::createCells()
     if ( pGrid.createCells() )
         pGrid.printSummary(Cytosim::log, "   LocusGrid");
 
-    //Create side regions suitable for pairwise interactions:
+    // create side regions suitable for pairwise interactions:
     if ( !pGrid.hasRegions() )
         pGrid.createSideRegions(1);
 }
