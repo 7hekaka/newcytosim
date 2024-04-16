@@ -234,6 +234,9 @@ public:
     /// Stiffness for `attractive` steric interaction (set as steric[2])
     real steric_stiff_pull[2];
     
+    /// A rectangular volume where steric happens
+    Vector steric_region[2];
+
     /// Grid size used to determine steric interactions
     /**
      Cytosim uses a divide-and-conquer approach to find pairs of objects that are 

@@ -46,6 +46,10 @@ void Meca::selectStericEngine(Simul const& sim)
         Vector inf, sup;
         spc->boundaries(inf, sup);
 
+        // the steric area can be restricted by parameters:
+        inf = inf.e_max(sim.prop.steric_region[0]);
+        sup = sup.e_min(sim.prop.steric_region[1]);
+        
         // without attractive forces, the simpler LocusGrid will be used:
         steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
         

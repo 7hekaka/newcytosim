@@ -37,6 +37,9 @@ void SimulProp::clear()
     steric_stiff_push[1] = 0;
     steric_stiff_pull[1] = 0;
 
+    steric_region[0].set(-INFINITY, -INFINITY, -INFINITY);
+    steric_region[1].set(INFINITY, INFINITY, INFINITY);
+    
     steric_max_range  = -1;
     binding_grid_step = -1;
     
@@ -94,6 +97,8 @@ void SimulProp::read(Glossary& glos)
     glos.set(steric_stiff_push, 2, "steric_stiff_push");
     glos.set(steric_stiff_pull, 2, "steric_stiff_pull");
     glos.set(steric_max_range,     "steric_max_range");
+
+    glos.set(steric_region, 2, "steric_region");
 
     glos.set(binding_grid_step, "binding_grid_step");
     
@@ -197,6 +202,7 @@ void SimulProp::write_values(std::ostream& os) const
     std::endl(os);
     write_value(os, "steric", steric_mode, steric_stiff_push[0], steric_stiff_pull[0]);
     write_value(os, "steric_max_range",  steric_max_range);
+    write_value(os, "steric_region",     steric_region[0], steric_region[1]);
     write_value(os, "binding_grid_step", binding_grid_step);
     write_value(os, "verbose", verbose);
     std::endl(os);
