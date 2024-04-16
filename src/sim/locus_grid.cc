@@ -15,11 +15,9 @@
 
 //------------------------------------------------------------------------------
 
-size_t LocusGrid::setGrid(Space const* spc, real min_width)
+size_t LocusGrid::setGrid(Vector inf, Vector sup, real min_width)
 {
     assert_true( min_width > 0 );
-    Vector inf, sup;
-    spc->boundaries(inf, sup);
     
     size_t cnt[3] = { 1, 1, 1 };
     for ( size_t d = 0; d < DIM; ++d )
@@ -30,7 +28,6 @@ size_t LocusGrid::setGrid(Space const* spc, real min_width)
         if ( n < 0 )
             throw InvalidParameter("invalid space:boundaries");
         
-        assert_true( modulo == spc->getModulo() );
         if ( modulo && modulo->isPeriodic(d) )
         {
             assert_small( modulo->period_[d] - sup[d] + inf[d] );

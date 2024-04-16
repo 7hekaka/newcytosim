@@ -11,14 +11,13 @@ static bool has_steric(T const& obj, int sup)
 
 
 template < typename GRID >
-static void setStericGrid(GRID& grid, Space const* spc, real& range)
+static void setStericGrid(GRID& grid, Vector const& inf, Vector const& sup, real& range)
 {
-    assert_true(spc);
     real res = range;
 
     // adjust grid size to avoid excessive memory footprint:
-    const size_t sup = 1 << 17;
-    while ( grid.setGrid(spc, res) > sup )
+    const size_t top = 1 << 17;
+    while ( grid.setGrid(inf, sup, res) > top )
         res *= M_SQRT2;
 
     if ( res != range )
@@ -42,6 +41,11 @@ void Meca::selectStericEngine(Simul const& sim)
         if ( ! spc )
             throw InvalidParameter("simul:steric could not determine its Space");
 
+        /* initialize the Grid to cover 'spc' entirely, increasing the
+         cell size until we get acceptable memory requirements */
+        Vector inf, sup;
+        spc->boundaries(inf, sup);
+
         // without attractive forces, the simpler LocusGrid will be used:
         steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
         
@@ -52,18 +56,19 @@ void Meca::selectStericEngine(Simul const& sim)
         if ( sim.prop.steric_max_range <= REAL_EPSILON )
             throw InvalidParameter("simul:steric_max_range must be defined");
 
+        
         switch ( steric_ )
         {
             case 1:
                 pointGrid.stiffness(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
                 //if ( !pointGrid.hasGrid() )
-                setStericGrid(pointGrid, spc, sim.prop.steric_max_range);
+                setStericGrid(pointGrid, inf, sup, sim.prop.steric_max_range);
                 break;
                 
             case 2:
                 locusGrid.stiffness(sim.prop.steric_stiff_push[0]);
                 //if ( !locusGrid.hasGrid() )
-                setStericGrid(locusGrid, spc, sim.prop.steric_max_range);
+                setStericGrid(locusGrid, inf, sup, sim.prop.steric_max_range);
                 break;
         }
     }

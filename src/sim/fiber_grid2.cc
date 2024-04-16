@@ -11,7 +11,7 @@
 FiberGrid::SegmentList allSegments;
 
 
-size_t FiberGrid::setGrid(Space const*, real)
+size_t FiberGrid::setGrid(Vector, Vector, real)
 {
     LOG_ONCE("Cytosim is using a crude method to localize fibers!\n");
     return 1;

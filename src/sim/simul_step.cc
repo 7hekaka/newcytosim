@@ -39,8 +39,11 @@ void Simul::setFiberGrid(Space const* spc, real& grid_step) const
 
     /* initialize the Grid to cover 'spc' entirely, increasing the
      cell size until we get acceptable memory requirements */
-    const size_t sup = 1 << 17;
-    while ( fiberGrid.setGrid(spc, abs_real(res)) > sup )
+    Vector inf, sup;
+    spc->boundaries(inf, sup);
+
+    const size_t top = 1 << 17;
+    while ( fiberGrid.setGrid(inf, sup, abs_real(res)) > top )
         res *= M_SQRT2;
 
     if ( res > 0 && res != grid_step )

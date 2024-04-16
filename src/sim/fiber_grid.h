@@ -96,8 +96,8 @@ public:
     /// constructor
     FiberGrid() : modulo_(nullptr) { }
 
-    /// set a grid to cover the specified Space with cells of width `max_step` at most
-    size_t setGrid(Space const*, real max_step);
+    /// set a grid to cover the specified Volume with cells of width `max_step` at most
+    size_t setGrid(Vector inf, Vector sup, real max_step);
     
     /// true if the grid was initialized by setGrid(); return allocated size
     size_t hasGrid() const;

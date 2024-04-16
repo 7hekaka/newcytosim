@@ -27,12 +27,10 @@
      -if `max_step` is too large, tryToAttach() will be slow.
  A compromise is to adjust `max_step` to the length of the segments.
  */
-size_t FiberGrid::setGrid(Space const* space, real max_step)
+size_t FiberGrid::setGrid(Vector inf, Vector sup, real max_step)
 {
-    modulo_ = space->getModulo();
     assert_true(max_step > 0);
-    Vector inf, sup;
-    space->boundaries(inf, sup);
+    modulo_ = modulo;
     
     size_t cnt[3] = { 1, 1, 1 };
     

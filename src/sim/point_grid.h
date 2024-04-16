@@ -405,7 +405,7 @@ public:
     void stiffness(real h, real l) { push_ = h; pull_ = l; }
 
     /// define grid covering specified Space, given a minimal cell size requirement
-    size_t setGrid(Space const*, real min_width);
+    size_t setGrid(Vector inf, Vector sup, real min_width);
     
     /// allocate memory for grid
     void createCells();
