@@ -246,10 +246,14 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 throw InvalidParameter("radius R must be >= 0 in `cap R`");
             if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `cap R T`");
-            const Vector2 XY = Vector2::randU();
             real Z = std::max(R - T * RNG.preal(), -R);
             real r = std::sqrt(R*R - Z*Z);
-            return Vector3(r*XY.XX, r*XY.YY, Z);
+#if ( DIM >= 3 )
+            const Vector2 XY = Vector2::randU();
+            return Vector(r*XY.XX, r*XY.YY, Z);
+#else
+            return Vector(r*RNG.sflip(), Z, 0);
+#endif
         }
 
         if ( tok.compare(0, 8, "cylinder") == 0 )
