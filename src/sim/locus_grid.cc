@@ -65,13 +65,6 @@ void LocusGrid::createCells()
 }
 
 
-void LocusGrid::delimit() const
-{
-    for ( size_t i = 0; i < pGrid.nbCells(); ++i )
-        pGrid[i].delimit();
-}
-
-
 size_t LocusGrid::capacity() const
 {
     size_t res = 0;

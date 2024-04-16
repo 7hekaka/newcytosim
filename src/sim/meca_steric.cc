@@ -194,10 +194,7 @@ static void distributeStericMecables(LocusGrid& grid, Simul const& sim)
                 grid.add(F, i, rad, rge);
         }
     }
-    
-    // mark edge between Fiber segments and other type of elements
-    grid.delimit();
-    
+
     // include Spheres
     for ( Sphere const* O=sim.spheres.first(); O; O=O->next() )
     {
@@ -242,9 +239,6 @@ static void distributeStericMecablesModulo(LocusGrid& grid, Simul const& sim)
                 grid.add_modulo(F, i, rad, rge);
         }
     }
-    
-    // mark edge between Fiber segments and other type of elements
-    grid.delimit();
     
     // include Spheres
     for ( Sphere const* O=sim.spheres.first(); O; O=O->next() )
@@ -345,9 +339,6 @@ void Meca::addSomeStericInteractions(LocusGrid& grid)
                 grid.add(F, i, rad, rge);
         }
     }
-    
-    // mark edge between Fiber segments and other type of elements
-    grid.delimit();
 
 #if ( MAX_STERIC_PANES == 1 )
     

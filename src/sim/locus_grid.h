@@ -148,10 +148,7 @@ typedef BigLocus BigPoint;
 
 //------------------------------------------------------------------------------
 
-/// type for holding a lit of BioLocus
-typedef Array<BigLocus> BigLocusPane;
-
-/// a list containing BigLocus and BigPoint
+/// a list containing BigLocus and BigPoint in the same Array
 /**
  The Fiber segments are contained in the first part of the list, index in [0, border[
  The other elements are in the second part, index in [border, end[
@@ -161,43 +158,40 @@ class BigLocusList
     friend class LocusGrid;
 
     /// the list containing objects
-    BigLocusPane pane;
+    Array<BigLocus> pane;
     
     /// index of first non Fiber element in list
-    size_t border;
+    size_t locuses_;
     
 public:
     
     /// constructor
     BigLocusList()
     {
-        border = 0;
+        locuses_ = 0;
     }
     
     /// clear all panes
     void clear()
     {
         pane.clear();
-        border = 0;
+        locuses_ = 0;
     }
-    
-    /// mark the edge where non-Fiber elements start
-    void delimit() { border = pane.size(); }
     
     /// number of elements in list
     size_t size() const { return pane.size(); }
     
     /// number of BigLocus in list
-    size_t num_locus() const { return border; }
+    size_t num_locus() const { return locuses_; }
     
     /// number of BigPoints in list
-    size_t num_points() const { return pane.size() - border; }
+    size_t num_points() const { return pane.size() - locuses_; }
 
     /// first element in list
     BigLocus const* begin() const { return pane.begin(); }
 
     /// first BigPoint in list
-    BigLocus const* middle() const { return pane.data() + border; }
+    BigLocus const* middle() const { return pane.addr(locuses_); }
     
     /// one past last element in list
     BigLocus const* end() const { return pane.end(); }
@@ -242,12 +236,6 @@ public:
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return panes[p];
-    }
-    
-    void delimit() const
-    {
-        for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
-            panes[p].delimit();
     }
 
     size_t capacity() const
@@ -353,15 +341,15 @@ private:
 #if ( MAX_STERIC_PANES == 1 )
     
     /// cell corresponding to position `w`
-    BigLocusPane& cell_pane(Vector const& w) const
+    BigLocusList& cell_pane(Vector const& w) const
     {
-        return pGrid.cell(w).pane;
+        return pGrid.cell(w);
     }
     
     /// cell corresponding to index `w`
-    BigLocusPane& cell_pane(const size_t c) const
+    BigLocusList& cell_pane(const size_t c) const
     {
-        return pGrid.icell(c).pane;
+        return pGrid.icell(c);
     }
     
     /// cell corresponding to index `w`
@@ -379,17 +367,17 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    BigLocusPane& cell_pane(Vector const& w, const size_t p) const
+    BigLocusList& cell_pane(Vector const& w, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return pGrid.cell(w).panes[p].pane;
+        return pGrid.cell(w).panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    BigLocusPane& cell_pane(const size_t c, const size_t p) const
+    BigLocusList& cell_pane(const size_t c, const size_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
-        return pGrid.icell(c).panes[p].pane;
+        return pGrid.icell(c).panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
@@ -432,9 +420,6 @@ public:
     
     /// true if the grid was initialized by calling setGrid()
     size_t hasGrid() const { return pGrid.hasCells(); }
-    
-    // mark edge between Fiber segments and other type of elements
-    void delimit() const;
 
     /// sum of allocated size of lists for all cells
     size_t capacity() const;
@@ -447,10 +432,12 @@ public:
     {
         Vector w = fib->midPoint(inx);
 #if ( MAX_STERIC_PANES <= 1 )
-        cell_pane(w).emplace(fib, inx, rad, rge, w);
+        BigLocusList& bll = cell_pane(w);
 #else
-        cell_pane(w, fib->prop->steric_key).emplace(fib, inx, rad, rad, w);
+        BigLocusList& bll = cell_pane(w, fib->prop->steric_key);
 #endif
+        bll.pane.emplace(fib, inx, rad, rad, w);
+        bll.locuses_ += 1;
     }
     
     /// place Mecable vertex on the grid
@@ -459,10 +446,11 @@ public:
     {
         Vector w = mec->posPoint(inx);
 #if ( MAX_STERIC_PANES <= 1 )
-        cell_pane(w).emplace(mec, inx, rad, rad, w);
+        BigLocusList& bll = cell_pane(w);
 #else
-        cell_pane(w, mec->prop->steric_key).emplace(mec, inx, rad, rad, w);
+        BigLocusList& bll = cell_pane(w, mec->prop->steric_key);
 #endif
+        bll.pane.emplace(mec, inx, rad, rad, w);
     }
     
 #if ENABLE_PERIODIC_BOUNDARIES
@@ -474,10 +462,12 @@ public:
         size_t c = direct_index(w);
         //assert_true( c == pGrid.index(w) );
 #if ( MAX_STERIC_PANES <= 1 )
-        cell_pane(c).emplace(fib, inx, rad, rge, w);
+        BigLocusList& bll = cell_pane(c);
 #else
-        cell_pane(c, fib->prop->steric_key).emplace(fib, inx, rad, rad, w);
+        BigLocusList& bll = cell_pane(c, fib->prop->steric_key);
 #endif
+        bll.pane.emplace(fib, inx, rad, rad, w);
+        bll.locuses_ += 1;
     }
 
     /// place Mecable vertex on the grid
@@ -489,10 +479,11 @@ public:
         size_t c = direct_index(w);
         //assert_true( c == pGrid.index(w) );
 #if ( MAX_STERIC_PANES <= 1 )
-        cell_pane(c).emplace(mec, inx, rad, rad, w);
+        BigLocusList& bll = cell_pane(c);
 #else
-        cell_pane(c, mec->prop->steric_key).emplace(mec, inx, rad, rad, w);
+        BigLocusList& bll = cell_pane(c, mec->prop->steric_key);
 #endif
+        bll.pane.emplace(mec, inx, rad, rad, w);
     }
 #endif
     

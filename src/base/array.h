@@ -207,6 +207,12 @@ public:
         return val_;
     }
     
+    /// Address of the underlying C-array
+    VAL const * addr(const size_t i) const
+    {
+        return val_+i;
+    }
+
     /// pointer to first element
     iterator begin() const
     {
