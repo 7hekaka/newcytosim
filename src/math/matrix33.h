@@ -9,6 +9,7 @@
 
 #include <cstdio>
 #include <iostream>
+#include <charconv>
 
 /// BLD is the leading dimension of the matrix
 /**
@@ -279,6 +280,15 @@ public:
         }
     }
 
+    /// value of element at line i, column j
+    std::string format_value(const index i, const index j) const
+    {
+        char tmp[32];
+        real x = val[i+BLD*j];
+        snprintf(tmp, sizeof(tmp), " %+6.3f", x);
+        return std::string(tmp);
+    }
+
     /// print [ line1; line2; line3 ]
     void print_smart(std::ostream& os) const
     {
@@ -286,30 +296,29 @@ public:
         bool s1 = ( abs_real(value(0,2)-value(2,0)) < REAL_EPSILON );
         bool s2 = ( abs_real(value(1,2)-value(2,1)) < REAL_EPSILON );
         bool sym = ( s0 && s1 && s2 );
-        const int w = (int)os.width();
-        os << "[ " << std::setw(w) << std::fixed << value(0,0);
-        os << " " << std::setw(w) << std::fixed << value(1,0);
-        os << " " << std::setw(w) << std::fixed << value(2,0);
+        os << "[" << format_value(0,0);
+        os << format_value(1,0);
+        os << format_value(2,0);
         os << ";";
         if ( sym )
         {
-            os << " " << std::setw(w) << "sym";
-            os << " " << std::setw(w) << std::fixed << value(1,1);
-            os << " " << std::setw(w) << std::fixed << value(2,1);
+            os << " sym";
+            os << format_value(1,1);
+            os << format_value(2,1);
             os << ";";
-            os << " " << std::setw(w) << "sym";
-            os << " " << std::setw(w) << "sym";
+            os << " sym";
+            os << " sym";
         }
         else
         {
-            os << " " << std::setw(w) << std::fixed << value(0,1);
-            os << " " << std::setw(w) << std::fixed << value(1,1);
-            os << " " << std::setw(w) << std::fixed << value(2,1);
+            os << format_value(0,1);
+            os << format_value(1,1);
+            os << format_value(2,1);
             os << ";";
-            os << " " << std::setw(w) << std::fixed << value(0,2);
-            os << " " << std::setw(w) << std::fixed << value(1,2);
+            os << format_value(0,2);
+            os << format_value(1,2);
         }
-        os << " " << std::setw(w) << std::fixed << value(2,2) << " ]";
+        os << format_value(2,2) << " ]";
     }
 
     /// conversion to string
