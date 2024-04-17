@@ -327,10 +327,10 @@ public:
         val_ += alpha;
     }
     
-    /// add -alpha to diagonal
-    void sub_diag(real alpha)
+    /// return copy of *this, with `alpha` added to the diagonal
+    Matrix11 plus_diagonal(real alpha) const
     {
-        val_ -= alpha;
+        return Matrix11(val_+alpha);
     }
     
     /// add all elements of block 'S' to array 'M'

@@ -714,12 +714,17 @@ public:
         val[5] += alpha;
     }
     
-    /// add -alpha to diagonal
-    void sub_diag(real alpha)
+    /// return copy of *this, with `alpha` added to the diagonal
+    Matrix33sym plus_diagonal(real alpha) const
     {
-        val[0] -= alpha;
-        val[3] -= alpha;
-        val[5] -= alpha;
+        Matrix33sym res;
+        res.val[0] = val[0] + alpha;
+        res.val[1] = val[1];
+        res.val[2] = val[2];
+        res.val[3] = val[3] + alpha;
+        res.val[4] = val[4];
+        res.val[5] = val[5] + alpha;
+        return res;
     }
 
     /// add all elements of block 'S' to array 'M'

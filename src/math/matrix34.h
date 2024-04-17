@@ -844,12 +844,20 @@ public:
         val[2+LVD*2] += alpha;
     }
     
-    /// add -alpha to diagonal
-    void sub_diag(real alpha)
+    /// return copy of *this, with `alpha` added to the diagonal
+    Matrix34 plus_diagonal(real alpha) const
     {
-        val[0]       -= alpha;
-        val[1+LVD]   -= alpha;
-        val[2+LVD*2] -= alpha;
+        Matrix34 res;
+        res.val[0+LVD*0] = val[0+LVD*0] + alpha;
+        res.val[1+LVD*0] = val[1+LVD*0];
+        res.val[2+LVD*0] = val[2+LVD*0];
+        res.val[0+LVD*1] = val[0+LVD*1];
+        res.val[1+LVD*1] = val[1+LVD*1] + alpha;
+        res.val[2+LVD*1] = val[2+LVD*1];
+        res.val[0+LVD*2] = val[0+LVD*2];
+        res.val[1+LVD*2] = val[1+LVD*2];
+        res.val[2+LVD*2] = val[2+LVD*2] + alpha;
+        return res;
     }
 
     /// add all elements of block 'S' to array 'M'

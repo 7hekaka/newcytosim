@@ -741,13 +741,27 @@ public:
         val[0xF] += alpha;
     }
     
-    /// add -alpha to diagonal
-    void sub_diag(real alpha)
+    /// return copy of *this, with `alpha` added to the diagonal
+    Matrix44 plus_diagonal(real alpha) const
     {
-        val[0x0] -= alpha;
-        val[0x5] -= alpha;
-        val[0xA] -= alpha;
-        val[0xF] -= alpha;
+        Matrix44 res;
+        res.val[0x0] = val[0x0] + alpha;
+        res.val[0x1] = val[0x1];
+        res.val[0x2] = val[0x2];
+        res.val[0x3] = val[0x3];
+        res.val[0x4] = val[0x4];
+        res.val[0x5] = val[0x5] + alpha;
+        res.val[0x6] = val[0x6];
+        res.val[0x7] = val[0x7];
+        res.val[0x8] = val[0x8];
+        res.val[0x9] = val[0x9];
+        res.val[0xA] = val[0xA] + alpha;
+        res.val[0xB] = val[0xB];
+        res.val[0xC] = val[0xC];
+        res.val[0xD] = val[0xD];
+        res.val[0xE] = val[0xE];
+        res.val[0xF] = val[0xF] + alpha;
+        return res;
     }
 
     /// subtract lower triangle of matrix including diagonal: this <- this - M
