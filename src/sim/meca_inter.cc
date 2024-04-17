@@ -254,7 +254,7 @@ inline void Meca::sub_iso(size_t i, size_t j, real val)
 #if USE_ISO_MATRIX
     mISO.element(i,j) -= val;
 #elif USE_MATRIX_BLOCK
-    mFUL.block(i, j).sub_diag(val);
+    mFUL.block(i, j).add_diag(-val);
 #else
     for ( size_t x = 0; x < DIM; ++x )
         mFUL(DIM*i+x, DIM*j+x) -= val;
@@ -282,7 +282,7 @@ inline void Meca::sub_iso_diag(size_t i, real val)
 #if USE_ISO_MATRIX
     mISO.diagonal(i) -= val;
 #elif USE_MATRIX_BLOCK
-    mFUL.diag_block(i).sub_diag(val);
+    mFUL.diag_block(i).add_diag(-val);
 #else
     for ( size_t x = 0; x < DIM; ++x )
         mFUL(DIM*i+x, DIM*i+x) -= val;
@@ -4600,7 +4600,7 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
  with fiber_point = position(ptA) and fiber_dir = ptA.diff().normalized.
  `arm` must be perpendicular to link ( G - position(ptA) )
 
- F. Nedelec, March 2011
+ F. Nedelec, March 2011, April 2024
  
  */
 void Meca::addSidePointClamp3D(Interpolation const& ptA,
@@ -4618,25 +4618,49 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     const real cc1 = ptA.coef1();
     const Torque leg = arm / ptA.len();
 
-    /* Since aR and bR only differ on their diagonals, the calculation here could
-     be largely bypassed: aR = cc0 - leg (x) Id; bR = cc1 + leg (x) Id */
-    
+#if 0
     MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
     MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
 
-    MatrixBlock wAt = aR.transposed(-weight);
-    MatrixBlock wBt = bR.transposed(-weight);
-    
-    // the following 3 terms are symmetric but not diagonal
-    add_block_diag(ii0, wAt.mul(aR));
-    add_block(ii1, ii0, wBt.mul(aR));
-    add_block_diag(ii1, wBt.mul(bR));
+    MatrixBlock At = aR.transposed();
+    MatrixBlock Bt = bR.transposed();
+
+    // the diagonal blocs are symmetric but not diagonal
+    add_block_diag(ii0, -weight, At.mul(aR));
+    add_block(ii1, ii0, -weight, Bt.mul(aR)); // not symmetric
+    add_block_diag(ii1, -weight, Bt.mul(bR));
 
     if ( modulo )
         pos += modulo->offset( ptA.pos() - pos );
  
-    sub_base(ii0, wAt*pos);
-    sub_base(ii1, wBt*pos);
+    add_base(ii0, At*pos, weight);
+    add_base(ii1, Bt*pos, weight);
+#else
+    /* Since aR and bR only differ on their diagonals, the calculation above
+     can be simplified: aR = cc0 - leg (x) Id; bR = cc1 + leg (x) Id 
+     We used:
+         cc0 + cc1 = 1
+         cross(L,Id)^2 = L(x)L - normSqr(L)*Id
+     */
+
+    MatrixBlock LL = MatrixBlock::offsetOuterProduct(-leg.normSqr(), leg);
+    MatrixBlock MM = MatrixBlock::vectorProduct(0, leg); // anti-symmetric
+    
+    //std::clog << -At.mul(aR) << " " << -Bt.mul(bR) << " " << -Bt.mul(aR) << " \n";
+    //std::clog << LL.plus_diagonal(-cc0*cc0) << " " << LL.plus_diagonal(-cc1*cc1) << " " << MM-LL.plus_diagonal(cc0*cc1) << " /\n";
+
+    // the diagonal blocs are symmetric but not diagonal
+    add_block_diag(ii0, weight, LL.plus_diagonal(-cc0*cc0));
+    add_block(ii1, ii0, weight, MM-LL.plus_diagonal(cc0*cc1));
+    add_block_diag(ii1, weight, LL.plus_diagonal(-cc1*cc1));
+
+    if ( modulo )
+        pos += modulo->offset( ptA.pos() - pos );
+
+    Vector vec = cross(leg, pos);
+    add_base(ii0, cc0*pos+vec, weight);
+    add_base(ii1, cc1*pos-vec, weight);
+#endif
     
     DRAW_LINK(ptA, cross(arm, ptA.dir()), pos);
 }
