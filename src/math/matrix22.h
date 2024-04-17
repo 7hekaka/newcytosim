@@ -848,13 +848,22 @@ public:
         return Matrix22(xx+xx, xy, xy, yy+yy);
     }
 
+    /// return symmetric matrix block :  dia * I + [ dir (x) dir ]
+    static Matrix22 offsetOuterProduct(const real dia, Vector2 const& dir)
+    {
+        real X = dir.XX;
+        real Y = dir.YY;
+        real xy = X * Y;
+        return Matrix22(X * X + dia, xy, xy, Y * Y + dia);
+    }
+
     /// return symmetric matrix block :  dia * I + [ dir (x) dir ] * len
     static Matrix22 offsetOuterProduct(const real dia, Vector2 const& dir, const real len)
     {
-        real xl = dir.XX * len;
-        real yl = dir.YY * len;
-        real xy = dir.XX * yl;
-        return Matrix22(xl * dir.XX + dia, xy, xy, yl * dir.YY + dia);
+        real X = dir.XX * len;
+        real Y = dir.YY * len;
+        real xy = dir.XX * Y;
+        return Matrix22(X * dir.XX + dia, xy, xy, Y * dir.YY + dia);
     }
     
     /// build the matrix `dia * Id + vec (x) Id`

@@ -898,31 +898,44 @@ public:
                          zz+zz, D[3]*V[2] + D[2]*V[3],
                          tt+tt);
     }
- 
-    /// return symmetric matrix block :  dia * I + [ dir (x) dir ] * len
+    
+    /// return symmetric matrix block :  dia * I + [ dir (x) dir ]
+    static Matrix44 offsetOuterProduct(const real dia, Vector4 const& dir)
+    {
+        real X = dir.XX;
+        real Y = dir.YY;
+        real Z = dir.ZZ;
+        real T = dir.TT;
+        return symmetric(X * X + dia, Y * X, Z * X, T * X,
+                         Y * Y + dia, Z * Y, T * Y,
+                         Z * Z + dia, T * Z,
+                         T * T + dia);
+    }
+
+    /// return symmetric matrix block :  dia * I + [ dir (x) dir ]
     static Matrix44 offsetOuterProduct(const real dia, Vector4 const& dir, const real len)
     {
-        real xl = dir.XX * len;
-        real yl = dir.YY * len;
-        real zl = dir.ZZ * len;
-        real tl = dir.TT * len;
-        return symmetric(xl * dir.XX + dia, yl * dir.XX, zl * dir.XX, tl * dir.XX,
-                         yl * dir.YY + dia, zl * dir.YY, tl * dir.YY,
-                         zl * dir.ZZ + dia, tl * dir.ZZ,
-                         tl * dir.TT + dia);
+        real X = dir.XX * len;
+        real Y = dir.YY * len;
+        real Z = dir.ZZ * len;
+        real T = dir.TT * len;
+        return symmetric(X * dir.XX + dia, Y * dir.XX, Z * dir.XX, T * dir.XX,
+                         Y * dir.YY + dia, Z * dir.YY, T * dir.YY,
+                         Z * dir.ZZ + dia, T * dir.ZZ,
+                         T * dir.TT + dia);
     }
     
     /// return symmetric matrix block :  dia * I + [ dir (x) dir ] * len
     static Matrix44 offsetOuterProduct(const real dia, const real D[], const real len)
     {
-        real xl = D[0] * len;
-        real yl = D[1] * len;
-        real zl = D[2] * len;
-        real tl = D[3] * len;
-        return symmetric(xl * D[0] + dia, yl * D[0], zl * D[0], tl * D[0],
-                         yl * D[1] + dia, zl * D[1], tl * D[1],
-                         zl * D[2] + dia, tl * D[2],
-                         tl * D[3] + dia);
+        real X = D[0] * len;
+        real Y = D[1] * len;
+        real Z = D[2] * len;
+        real T = D[3] * len;
+        return symmetric(X * D[0] + dia, Y * D[0], Z * D[0], T * D[0],
+                         Y * D[1] + dia, Z * D[1], T * D[1],
+                         Z * D[2] + dia, T * D[2],
+                         T * D[3] + dia);
     }
 };
 

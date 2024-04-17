@@ -401,6 +401,12 @@ public:
         return Matrix11(dir.XX * vec.XX);
     }
     
+    /// return symmetric matrix block :  dia * I + [ dir (x) dir ]
+    static Matrix11 offsetOuterProduct(const real dia, Vector1 const& dir)
+    {
+        return Matrix11(dir.XX * dir.XX + dia);
+    }
+
     /// return symmetric matrix block :  dia * I + [ dir (x) dir ] * len
     static Matrix11 offsetOuterProduct(const real dia, Vector1 const& dir, const real len)
     {

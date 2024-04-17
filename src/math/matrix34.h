@@ -1052,7 +1052,18 @@ public:
                          Y+Y, dir.ZZ*vec.YY + dir.YY*vec.ZZ,
                          Z+Z);
     }
- 
+    
+    /// return symmetric matrix block :  dia * I + [ dir (x) dir ]
+    static Matrix34 offsetOuterProduct(const real dia, Vector3 const& dir)
+    {
+        real X = dir.XX;
+        real Y = dir.YY;
+        real Z = dir.ZZ;
+        return symmetric(X * X + dia, Y * X, Z * X,
+                         Y * Y + dia, Z * Y,
+                         Z * Z + dia);
+    }
+
     /// return symmetric matrix block :  dia * I + [ dir (x) dir ] * len
     static Matrix34 offsetOuterProduct(const real dia, Vector3 const& dir, const real len)
     {
