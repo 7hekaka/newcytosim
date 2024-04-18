@@ -52,23 +52,24 @@ static real get_angle(std::istream& is)
  `inside`             | A random position inside the current Space
  `edge E`             | At distance E from the edge of the current Space
  `surface E`          | On the surface of the current Space\n By projecting a point at distance E from the surface.
- `line L T`           | L = Length, T = thickness. Selected randomly with -L/2 < X < L/2; norm(Y,Z) < T
+ `line L T`           | L: Length, T: thickness. Selected randomly with `-L/2 < X < L/2; norm(Y,Z) < T`
  `sphere R T`         | At distance R +/- T/2 from the origin\n `R-T/2 < norm(X,Y,Z) < R+T/2`
  `ball R`             | At distance R at most from the origin\n `norm(X,Y,Z) < R`
  `disc R T`           | in 2D, a disc in the XY-plane \n in 3D, a disc in the XY-plane of thickness T in Z
  `discXZ R T`         | Disc in the XZ-plane of radius R, thickness T
  `discYZ R T`         | Disc in the YZ-plane of radius R, thickness T
- `equator R T`        | At distance R from the origin, and T from the XY plane:\n `norm(X,Y) < R` `norm(Z) < T`
- `circle R T`         | Circle of radius R and thickness T \n At distance T from the circle of radius R
- `cylinder L R`       | Cylinder of axis X, L=length in X, R=radius in YZ plane
- `cylinderZ L R`      | Cylinder of axis Z, L=length in Z, R=radius in XY plane
+ `equator R T`        | On the sphere of radius R, and at distance T from the plane `Z=0`
+ `cap R T`            | On the sphere of radius R, and at distance T from the plane `Z=R`
+ `circle R T`         | At distance T from the circle of radius R, in the plane `Z=0`
+ `cylinder L R`       | Cylinder of axis X, L: length in X, R: radius in YZ plane
+ `cylinderZ L R`      | Cylinder of axis Z, L: length in Z, R: radius in XY plane
  `ring L R T`         | Surface of a cylinder of axis X, L=length in X, R=radius in YZ, T = thickness
  `ellipse A B C`      | Inside the ellipse or ellipsoid of main axes 2A, 2B and 2C
  `arc L Theta`        | A piece of circle of length L and covering an angle Theta
- `stripe L R`         | Random vector with L < X < R
- `square R`           | Random vector with -R < X < R; -R < Y < R; -R < Z < R;
- `rectangle A B C`    | Random vector with -A < X < A; -B < Y < B; -C < Z < C;
- `gradient S E`       | Linear density gradient along X, of value 0 at X=S and 1 at X=E
+ `stripe L R`         | Random vector with `L < X < R`
+ `square R`           | Random vector with `-R < X < R`; `-R < Y < R`; `-R < Z < R`;
+ `rectangle A B C`    | Random vector with `-A < X < A`; `-B < Y < B`; `-C < Z < C`;
+ `gradient S E`       | Linear density gradient along X, of value 0 at `X=S` and 1 at `X=E`
  `gradient S E R`     | Linear density gradient, contained inside a cylinder of radius R
  `exponential S L`    | Exponential density gradient of length scale L, starting at S
  `exponential S L R`  | Exponential density gradient, contained inside a cylinder of radius R
