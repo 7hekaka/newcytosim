@@ -14,9 +14,9 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "BB7086392449CBE900C73273"
-               BuildableName = "test_xpttrs"
-               BlueprintName = "test_xpttrs"
+               BlueprintIdentifier = "BB51BC2205FA534000D4869F"
+               BuildableName = "test_glapp"
+               BlueprintName = "test_glapp"
                ReferencedContainer = "container:cytosim.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
@@ -27,6 +27,15 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       shouldUseLaunchSchemeArgsEnv = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "BB51BC2205FA534000D4869F"
+            BuildableName = "test_glapp"
+            BlueprintName = "test_glapp"
+            ReferencedContainer = "container:cytosim.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
       <Testables>
       </Testables>
    </TestAction>
@@ -44,12 +53,21 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BB7086392449CBE900C73273"
-            BuildableName = "test_xpttrs"
-            BlueprintName = "test_xpttrs"
+            BlueprintIdentifier = "BB2B25D4284CB48D003A5864"
+            BuildableName = "test_sphere"
+            BlueprintName = "test_sphere"
             ReferencedContainer = "container:cytosim.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "BB51BC2205FA534000D4869F"
+            BuildableName = "test_glapp"
+            BlueprintName = "test_glapp"
+            ReferencedContainer = "container:cytosim.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
    </LaunchAction>
    <ProfileAction
       buildConfiguration = "Release"
@@ -61,9 +79,9 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "BB7086392449CBE900C73273"
-            BuildableName = "test_xpttrs"
-            BlueprintName = "test_xpttrs"
+            BlueprintIdentifier = "BB51BC2205FA534000D4869F"
+            BuildableName = "test_glapp"
+            BlueprintName = "test_glapp"
             ReferencedContainer = "container:cytosim.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
