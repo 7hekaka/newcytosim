@@ -1876,7 +1876,7 @@ static void reportSet(std::ostream& out, SET& set, PropertyList const& propertie
     for ( Property const* i : properties.find_all(set.title()) )
     {
         ObjectID id = 0;
-        size_t points = 0, sup = 0;
+        unsigned points = 0, sup = 0;
         ObjectList objs = set.collect(i);
         for ( Object * o : objs )
         {

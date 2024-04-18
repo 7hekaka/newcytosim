@@ -420,7 +420,7 @@ public:
     void clear() { pGrid.clearCells(); }
         
     /// place FiberSegment on the grid
-    void add(Fiber const* fib, size_t inx, real rad, real rge, real sup) const
+    void add(Fiber const* fib, unsigned inx, real rad, real rge, real sup) const
     {
         // link in cell containing the middle of the segment
         Vector w = fib->midPoint(inx);
@@ -433,7 +433,7 @@ public:
     
     /// place Mecapoint on the grid
     template <typename MECABLE>
-    void add(MECABLE const* mec, size_t inx, real rad, real rge) const
+    void add(MECABLE const* mec, unsigned inx, real rad, real rge) const
     {
         Vector w = mec->posPoint(inx);
 #if ( NUM_STERIC_PANES <= 1 )

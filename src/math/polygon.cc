@@ -500,7 +500,7 @@ void Polygon::dump(std::ostream& os) const
 
 void Polygon::print(FILE * f) const
 {
-    fprintf(f, "polygon %lu\n", npts_);
+    fprintf(f, "polygon %u\n", npts_);
     for ( size_t n = 0; n < npts_; ++n )
     {
         fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].spot);

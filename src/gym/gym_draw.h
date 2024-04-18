@@ -9,7 +9,7 @@
 
 namespace gym
 {
-    inline void drawPoints(float size, size_t off, size_t cnt)
+    inline void drawPoints(float size, int off, int cnt)
     {
         if ( size > 0 )
         {
@@ -18,7 +18,7 @@ namespace gym
         }
     }
     
-    inline void drawSquarePoints(float size, size_t off, size_t cnt)
+    inline void drawSquarePoints(float size, int off, int cnt)
     {
         if ( size > 0 )
         {
@@ -29,7 +29,7 @@ namespace gym
         }
     }
     
-    inline void drawLines(float width, size_t off, size_t cnt)
+    inline void drawLines(float width, int off, int cnt)
     {
         if ( width > 0 )
         {
@@ -38,7 +38,7 @@ namespace gym
         }
     }
     
-    inline void drawLineStrip(float width, size_t off, size_t cnt)
+    inline void drawLineStrip(float width, int off, int cnt)
     {
         if ( width > 0 )
         {
@@ -47,22 +47,22 @@ namespace gym
         }
     }
     
-    inline void drawLineStrip(size_t off, size_t cnt)
+    inline void drawLineStrip(int off, int cnt)
     {
         glDrawArrays(GL_LINE_STRIP, off, cnt);
     }
 
-    inline void drawTriangles(size_t off, size_t cnt)
+    inline void drawTriangles(int off, int cnt)
     {
         glDrawArrays(GL_TRIANGLES, off, cnt);
     }
 
-    inline void drawTriangleStrip(size_t off, size_t cnt)
+    inline void drawTriangleStrip(int off, int cnt)
     {
         glDrawArrays(GL_TRIANGLE_STRIP, off, cnt);
     }
     
-    inline void drawArrays(GLenum mode, GLint first, GLsizei cnt)
+    inline void drawArrays(GLenum mode, int first, int cnt)
     {
         glDrawArrays(mode, first, cnt);
     }

@@ -142,7 +142,7 @@ public:
     void projectForces(const real* X, real* Y) const;
     
     /// Number of distance constraints applied to the movements of vertices
-    size_t nbConstraints() const { return DIM * nbRefPoints - ( DIM + DIM - 1 ) + nPoints - nbRefPoints; }
+    unsigned nbConstraints() const { return DIM * nbRefPoints - ( DIM + DIM - 1 ) + nPoints - nbRefPoints; }
 
     //--------------------------------------------------------------------------
 

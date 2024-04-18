@@ -95,13 +95,13 @@ public:
     Mecapoint vertex2() const { return Mecapoint(mec_, pt2_); }
     
     /// Index of point 1 in object
-    size_t point1() const { return pt1_; }
+    unsigned point1() const { return pt1_; }
   
     /// Index of point 2 in object
-    size_t point2() const { return pt2_; }
+    unsigned point2() const { return pt2_; }
     
     /// Index of point with the smallest weight (ie. point1 or point2)
-    size_t lightest_point() const { return ( coef_ > 0.5 ) ? pt1_ : pt2_; }
+    unsigned lightest_point() const { return ( coef_ > 0.5 ) ? pt1_ : pt2_; }
 
     /// interpolation coefficient on first point
     real coef0() const { return 1 - coef_; }

@@ -45,7 +45,7 @@ public:
     Point2D* pts_;
     
     /// number of points
-    size_t npts_;
+    unsigned npts_;
     
 public:
     
@@ -56,7 +56,7 @@ public:
     ~Polygon();
     
     /// number of points
-    size_t nbPoints() const { return npts_; }
+    unsigned nbPoints() const { return npts_; }
     
     /// set number of points and allocate memory
     void allocate(size_t s);

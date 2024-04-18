@@ -351,7 +351,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
  */
 void Mecafil::computeTensions(const real* force)
 {
-    const size_t nbs = nbSegments();
+    const unsigned nbs = nbSegments();
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     // iLLG is used as a temporary space to store nPoints * DIM scalars:
@@ -384,7 +384,7 @@ void Mecafil::printProjection(FILE * file) const
     }
     free_real(dst);
     free_real(src);
-    fprintf(file, " %s Projection ( %lu )\n", reference().c_str(), nbPoints());
+    fprintf(file, " %s Projection ( %u )\n", reference().c_str(), nbPoints());
     VecPrint::full(file, nbv, nbv, res, nbv);
     free_real(res);
 }

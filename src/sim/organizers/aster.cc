@@ -255,7 +255,7 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
  Dimensions will be scaled by 'asRadius' because that is the distance between
  the Solid points.
  */
-size_t Aster::placeAnchor(const Vector A, const Vector B, size_t ref)
+size_t Aster::placeAnchor(const Vector A, const Vector B, unsigned ref)
 {
     AsterLink & link = asLinks.new_val();
     //std::clog << asLinks.size() << "  AsterLink(" << A << " " << B << ")\n";
@@ -268,7 +268,7 @@ size_t Aster::placeAnchor(const Vector A, const Vector B, size_t ref)
 
 /** Create a new Fiber with minus-end in A and attached in B */
 void Aster::placeFiber(ObjectList& objs, Simul& sim, const Vector A, const Vector B,
-                       size_t ref, std::string const& fiber_type, std::string const& fos)
+                       unsigned ref, std::string const& fiber_type, std::string const& fos)
 {
     size_t i = placeAnchor(A, B, ref);
     FiberProp const* fip = sim.findProperty<FiberProp>("fiber", fiber_type);
@@ -340,7 +340,7 @@ size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
 
 
 /// fiber's anchor points specified directly
-void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, unsigned ref)
 {
     std::string tif, fos;
     opt.set(tif, "fibers", 1);
@@ -366,7 +366,7 @@ void Aster::build7(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
 
 
 /// This is a special case for Yeast's Spindle Pole Bodies
-void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, unsigned ref)
 {
     real dis = 0;
     real sep = 0.025; // 25 nm by default, corresponding to Microtubules
@@ -409,7 +409,7 @@ void Aster::build4(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
  and their orientation is radial
  initial code by GAELLE LETORT, 14.03.2017
  */
-void Aster::build3(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+void Aster::build3(ObjectList& objs, Glossary& opt, Simul& sim, unsigned ref)
 {
     real dis = 0;
     size_t nbf = 7;
@@ -452,7 +452,7 @@ void Aster::build3(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
 /**
  For type 'regular', fibers are regularly distributed on the surface,
  */
-void Aster::build2(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+void Aster::build2(ObjectList& objs, Glossary& opt, Simul& sim, unsigned ref)
 {
     real dis = 0;
     size_t nbf = 7;
@@ -495,7 +495,7 @@ void Aster::build2(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
  For type 'astral' we put fibers randomly on the surface,
  with a constrain based on the scalar product: position*direction > 0
  */
-void Aster::build1(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+void Aster::build1(ObjectList& objs, Glossary& opt, Simul& sim, unsigned ref)
 {
     real dis = 0;
     size_t nbf = 7;
@@ -521,7 +521,7 @@ void Aster::build1(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
  direction as purely radial. We require a separation of 25 nm by default,
  corresponding to Microtubule's size.
  */
-void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, size_t ref)
+void Aster::build0(ObjectList& objs, Glossary& opt, Simul& sim, unsigned ref)
 {
     real dis = 0;
     real sep = 0.025; // 25 nm by default, corresponding to Microtubules

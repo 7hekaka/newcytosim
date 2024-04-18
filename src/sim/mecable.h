@@ -110,16 +110,16 @@ public:
     void setNbPoints(const size_t n);
     
     /// Returns number of points
-    size_t nbPoints()  const { return nPoints; }
+    unsigned nbPoints()  const { return nPoints; }
     
     /// Index of the last point = nbPoints() - 1
-    size_t lastPoint() const { return nPoints - 1; }
+    unsigned lastPoint() const { return nPoints - 1; }
     
     /// size currently allocated
-    size_t allocated() const { return pAllocated; }
+    unsigned allocated() const { return pAllocated; }
     
     /// Number of distance constraints applied to the movements of vertices
-    virtual size_t nbConstraints() const { return 0; }
+    virtual unsigned nbConstraints() const { return 0; }
 
     //--------------------------------------------------------------------------
     

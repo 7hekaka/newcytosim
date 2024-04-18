@@ -81,7 +81,7 @@ static void write_color(FILE * f, uint8_t R, uint8_t G, uint8_t B)
     putc(0, f);
 }
 
-static size_t bytes_per_row(unsigned w, uint16_t BitsPerPixel)
+static uint32_t bytes_per_row(unsigned w, uint16_t BitsPerPixel)
 {
     return 4 * (((w * BitsPerPixel)+31)/32);
 }

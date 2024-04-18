@@ -446,7 +446,7 @@ void Meca::exportSystem() const
     os.close();
 #endif
         
-    size_t alc = 0;
+    unsigned alc = 0;
     for ( Mecable const* mec : mecables )
         alc = std::max(alc, mec->nbPoints());
 

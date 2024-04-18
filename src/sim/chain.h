@@ -162,10 +162,14 @@ public:
     ~Chain() {}
     
     /// Number of segments = nbPoints() - 1
-    size_t nbSegments()  const { return nPoints - 1; }
+    unsigned nbSegments()  const { return nPoints - 1; }
     
     /// Index of the last segment = nbPoints() - 2
-    size_t lastSegment() const { return nPoints - 2; }
+    unsigned lastSegment() const { return nPoints - 2; }
+    
+    /// return P where segment [ P, P+1 [ contains point at distance `a` from the minus end
+    /** returns 0 if `a < 0` and last point index if `a > lastSegment()` */
+    unsigned indexSegmentM(const real a) const { return std::min(unsigned(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
     
@@ -198,12 +202,12 @@ public:
     void constrainLength(bool s) { unconstrainLength = !s; }
 
     /// Number of distance constraints applied to the movements of vertices
-    size_t nbConstraints() const { return unconstrainLength ? 0 : nPoints - 1; }
+    unsigned nbConstraints() const { return unconstrainLength ? 0 : nPoints - 1; }
 #else
     void constrainLength(bool s) { if (!s) ABORT_NOW("NEW_UNCONSTRAINED_LENGTH is off"); }
     
     /// Number of distance constraints applied to the movements of vertices
-    size_t nbConstraints() const { return nPoints - 1; }
+    unsigned nbConstraints() const { return nPoints - 1; }
 #endif
     
     //---------------------
@@ -265,10 +269,6 @@ public:
 
     /// calculate the domain in which ab is located (near a FiberEnd, or central)
     FiberEnd whichEndDomain(real a, real lambda) const;
-    
-    /// return P where segment [ P, P+1 [ contains point at distance `a` from the minus end
-    /** returns 0 if ( a < 0 ) and last point index if ( a > lastSegment() ) */
-    size_t clampedIndexM(const real a) const { return std::min((size_t)(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
     

@@ -25,7 +25,7 @@ private:
     Fiber const * fib_;
     
     /// index of segment's first point
-    size_t sgi_;
+    unsigned sgi_;
     
 public:
     
@@ -33,19 +33,19 @@ public:
     FiberSegment() {}
     
     /// constructor
-    FiberSegment(Fiber const* f, size_t p) : fib_(f), sgi_(p) {}
+    FiberSegment(Fiber const* f, unsigned p) : fib_(f), sgi_(p) {}
     
     /// setter
-    void set(Fiber const* f, size_t p) { fib_ = f; sgi_ = p; }
+    void set(Fiber const* f, unsigned p) { fib_ = f; sgi_ = p; }
 
     /// the Fiber
     Fiber const* fiber() const { return fib_; }
     
     /// index of segment
-    size_t point() const { return sgi_; }
+    unsigned point() const { return sgi_; }
     
     /// set segment index
-    void point(size_t p) { sgi_ = p; }
+    void point(unsigned p) { sgi_ = p; }
 
     /// Index of segment's first vertex in the isotropic matrix (Meca::mISO)
     size_t matIndex0()  const { return fib_->matIndex() + sgi_; }

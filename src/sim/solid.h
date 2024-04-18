@@ -166,7 +166,7 @@ public:
     real pointMobility() const { return nbPoints() / dragCoefficient(); }
     
     /// Number of distance constraints applied to the movements of vertices
-    size_t nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
+    unsigned nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
 
     /// add the interactions due to confinement
     void setInteractions(Meca&) const;

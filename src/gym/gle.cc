@@ -44,14 +44,14 @@ namespace gle
     /// index of first vertex index in buffer object
     size_t ico_idx_[8] = { 0 };
     /// number of faces in icosahedrons
-    size_t ico_cnt_[8] = { 0 };
+    unsigned ico_cnt_[8] = { 0 };
     
     /// index of first vertex in buffer object
     size_t icoid_pts_ = 0;
     /// index of first vertex index in buffer object
     size_t icoid_idx_ = 0;
     /// number of faces in icosahedrons
-    size_t icoid_cnt_ = 0;
+    unsigned icoid_cnt_ = 0;
     
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle

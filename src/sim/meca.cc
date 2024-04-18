@@ -153,25 +153,25 @@ void Meca::release()
 }
 
 
-size_t Meca::largestMecable() const
+unsigned Meca::largestMecable() const
 {
-    size_t res = 0;
+    unsigned res = 0;
     for ( Mecable * mec : mecables )
         res = std::max(res, mec->nbPoints());
     return res;
 }
 
-size_t Meca::smallestMecable() const
+unsigned Meca::smallestMecable() const
 {
-    size_t res = ~0;
+    unsigned res = ~0;
     for ( Mecable * mec : mecables )
         res = std::min(res, mec->nbPoints());
     return res;
 }
 
-size_t Meca::nbConstraints() const
+unsigned Meca::nbConstraints() const
 {
-    size_t res = 0;
+    unsigned res = 0;
     for ( Mecable * mec : mecables )
         res += mec->nbConstraints();
     return res;

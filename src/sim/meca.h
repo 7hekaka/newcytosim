@@ -388,13 +388,13 @@ public:
     size_t nbMecables() const { return mecables.size(); }
     
     /// Number of points in the Mecable that has the most number of points
-    size_t largestMecable() const;
+    unsigned largestMecable() const;
     
     /// Number of points in the Mecable that has the most number of points
-    size_t smallestMecable() const;
+    unsigned smallestMecable() const;
 
     /// Number of distance constraints applied to the movements of vertices
-    size_t nbConstraints() const;
+    unsigned nbConstraints() const;
 
     /// true if system does not contain any object
     bool empty() const { return nPoints_ == 0; }

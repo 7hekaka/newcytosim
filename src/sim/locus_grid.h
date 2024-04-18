@@ -428,7 +428,7 @@ public:
     void clear() { pGrid.clearCells(); }
     
     /// link in the cell containing the middle of the segment
-    void add(Fiber const* fib, size_t inx, real rad, real rge)
+    void add(Fiber const* fib, unsigned inx, real rad, real rge)
     {
         Vector w = fib->midPoint(inx);
 #if ( MAX_STERIC_PANES <= 1 )
@@ -442,7 +442,7 @@ public:
     
     /// place Mecable vertex on the grid
     template <typename MECABLE>
-    void add(MECABLE const* mec, size_t inx, real rad)
+    void add(MECABLE const* mec, unsigned inx, real rad)
     {
         Vector w = mec->posPoint(inx);
 #if ( MAX_STERIC_PANES <= 1 )
@@ -455,7 +455,7 @@ public:
     
 #if ENABLE_PERIODIC_BOUNDARIES
     /// link in the cell containing the middle of the segment:
-    void add_modulo(Fiber const* fib, size_t inx, real rad, real rge)
+    void add_modulo(Fiber const* fib, unsigned inx, real rad, real rge)
     {
         Vector w = fib->midPoint(inx);
         modulo->fold(w);
@@ -472,7 +472,7 @@ public:
 
     /// place Mecable vertex on the grid
     template <typename MECABLE>
-    void add_modulo(MECABLE const* mec, size_t inx, real rad)
+    void add_modulo(MECABLE const* mec, unsigned inx, real rad)
     {
         Vector w = mec->posPoint(inx);
         modulo->fold(w);

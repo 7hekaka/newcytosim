@@ -510,7 +510,7 @@ public:
 
     /// try to set `var` from `key[inx]`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */
-    static int least_used_index(rec_type const* rec)
+    static size_t least_used_index(rec_type const* rec)
     {
         size_t i = 0;
         size_t r = ~0;

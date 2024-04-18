@@ -32,14 +32,14 @@ private:
      1 = the interpolation corresponds exactly to point 'prime_'
      2 or 3 = link fiber-end with coef1_, fiber-side with coef2_
      */
-    size_t rank_;
+    unsigned rank_;
 
     /// index of first point on the Solid
-    size_t prime_;
+    unsigned prime_;
 
 #if BACKWARD_COMPATIBILITY < 47
     /// index used for backward compatibility
-    size_t alt_;
+    unsigned alt_;
 #endif
     
     /// set coefficients
@@ -83,7 +83,7 @@ public:
     }
 
     /// set to interpolate from A to B
-    void set(Vector const& A, Vector const& B, size_t P)
+    void set(Vector const& A, Vector const& B, unsigned P)
     {
         prime_ = P;
         len_ = ( A - B ).norm();
@@ -198,10 +198,10 @@ private:
     Fiber * makeFiber(ObjectList&, Simul&, Vector, Vector, FiberProp const*, std::string const&);
 
     /// define the attachment position of fiber 'inx'
-    size_t placeAnchor(Vector, Vector, size_t origin);
+    size_t placeAnchor(Vector, Vector, unsigned origin);
 
     /// create a new fiber
-    void placeFiber(ObjectList&, Simul&, Vector, Vector, size_t ref, std::string const&, std::string const&);
+    void placeFiber(ObjectList&, Simul&, Vector, Vector, unsigned ref, std::string const&, std::string const&);
     
     /// position on Solid of the first link to n-th fiber
     Vector posSolid1(size_t n) const;
@@ -215,12 +215,12 @@ private:
     /// position of Fiber's point involved in second link
     Vector posFiber2(size_t n) const;
     
-    void build0(ObjectList&, Glossary& opt, Simul&, size_t);
-    void build1(ObjectList&, Glossary& opt, Simul&, size_t);
-    void build2(ObjectList&, Glossary& opt, Simul&, size_t);
-    void build3(ObjectList&, Glossary& opt, Simul&, size_t);
-    void build4(ObjectList&, Glossary& opt, Simul&, size_t);
-    void build7(ObjectList&, Glossary& opt, Simul&, size_t);
+    void build0(ObjectList&, Glossary& opt, Simul&, unsigned);
+    void build1(ObjectList&, Glossary& opt, Simul&, unsigned);
+    void build2(ObjectList&, Glossary& opt, Simul&, unsigned);
+    void build3(ObjectList&, Glossary& opt, Simul&, unsigned);
+    void build4(ObjectList&, Glossary& opt, Simul&, unsigned);
+    void build7(ObjectList&, Glossary& opt, Simul&, unsigned);
 
 public:
     

@@ -67,7 +67,7 @@ public:
     virtual ~SphericalCode();
     
     /// number of points in the configuration
-    size_t nbPoints()  const { return num_points_;  }
+    unsigned nbPoints()  const { return num_points_;  }
     
     /// the 'virtual' total energy of the configuration
     real finalEnergy() const { return energy_; }
@@ -85,13 +85,13 @@ public:
     void putPoint(real ptr[3], size_t inx);
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void putPoint(double* x, double* y, double* z, size_t inx);
+    void putPoint(double* x, double* y, double* z, unsigned inx);
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void putPoint(float* x, float* y, float* z, size_t inx);
+    void putPoint(float* x, float* y, float* z, unsigned inx);
     
     /// copy the points coordinates onto `x[]`, allocated to hold `ptr_n` elements
-    void putPoints(real ptr[], const size_t ptr_n);
+    void putPoints(real ptr[], const unsigned ptr_n);
     
     /// write points coordinates
     void printAllPositions(FILE* file = stdout);
@@ -102,7 +102,7 @@ private:
     static constexpr size_t SEVEN = 7;
     
     /// number of point on the sphere
-    size_t num_points_;
+    unsigned num_points_;
     
     /// coordinates of the points in a array
     /** in the array all the coordinates are together (x,y,z) point 1, (x,y,z) point 2, etc.

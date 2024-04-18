@@ -1007,7 +1007,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
     switch ( mode )
     {
         case CONFINE_INSIDE:
-            for ( size_t i = 0; i < nPoints; ++i )
+            for ( unsigned i = 0; i < nPoints; ++i )
             {
                 Vector pos = posP(i);
                 if ( spc->outside(pos) )
@@ -1016,7 +1016,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             break;
             
         case CONFINE_OUTSIDE:
-            for ( size_t i = 0; i < nPoints; ++i )
+            for ( unsigned i = 0; i < nPoints; ++i )
             {
                 Vector pos = posP(i);
                 if ( spc->inside(pos) )
@@ -1025,12 +1025,12 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             break;
             
         case CONFINE_ON:
-            for ( size_t i = 0; i < nPoints; ++i )
+            for ( unsigned i = 0; i < nPoints; ++i )
                 spc->setConfinement(posP(i), Mecapoint(this, i), meca, stiff);
             break;
         
         case CONFINE_IN_OUT:
-            for ( size_t i = 0; i < nPoints; ++i )
+            for ( unsigned i = 0; i < nPoints; ++i )
             {
                 Vector pos = posP(i);
                 real S = ( spc->inside(pos) ? stiff : stiff2 );
@@ -1044,13 +1044,13 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             
         case CONFINE_PLUS_END:
         {
-            const size_t L = lastPoint();
+            const unsigned L = lastPoint();
             spc->setConfinement(posP(L), Mecapoint(this, L), meca, stiff);
         } break;
             
         case CONFINE_BOTH_ENDS:
         {
-            const size_t L = lastPoint();
+            const unsigned L = lastPoint();
             spc->setConfinement(posP(0), Mecapoint(this, 0), meca, stiff);
             spc->setConfinement(posP(L), Mecapoint(this, L), meca, stiff);
         } break;
@@ -1064,7 +1064,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
 
         case CONFINE_PLUS_OUT:
         {
-            const size_t L = lastPoint();
+            const unsigned L = lastPoint();
             Vector pos = posP(L);
             if ( spc->inside(pos) )
                 spc->setConfinement(pos, Mecapoint(this, L), meca, stiff);
@@ -1073,8 +1073,8 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
         case CONFINE_RANGE:
         {
             // we use here the minus end as a reference... which maybe problematic
-            size_t S = clampedIndexM(prop->confine_range[0]);
-            size_t E = clampedIndexM(prop->confine_range[1]);
+            size_t S = indexSegmentM(prop->confine_range[0]);
+            size_t E = indexSegmentM(prop->confine_range[1]);
             for ( size_t i = S; i < E; ++i )
                 spc->setConfinement(posP(i), Mecapoint(this, i), meca, stiff);
         } break;
