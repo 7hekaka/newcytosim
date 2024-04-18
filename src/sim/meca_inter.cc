@@ -2891,20 +2891,21 @@ void Meca::testSideLink(Interpolation const& ptA,
 {
     mFUL.reset();
     addSideLink3D(ptA, ptB, arm, weight);
-    
     {
         std::ofstream o("x");
         o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex0() << "\n";
         mFUL.printSparse(o, REAL_EPSILON);
     }
     
-    mFUL.reset();
-    size_t P = ptB.point();
-    if ( P > 0 )
-        addSideLink3D(ptA, Interpolation(ptB.mecable(), real(1.0), P-1), arm, weight);
-    else
-        addSideLink3D(ptA, Interpolation(ptB.mecable(), real(0.0), P), arm, weight);
+    real alpha = 0;
+    unsigned P = ptB.point();
+    if ( P > 0 ) {
+        alpha = 1;
+        P -= 1;
+    }
     
+    mFUL.reset();
+    addSideLink3D(ptA, Interpolation(ptB.mecable(), alpha, P), arm, weight);
     {
         std::ofstream o("y");
         o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex0() << "\n";
@@ -4646,8 +4647,8 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     MatrixBlock LL = MatrixBlock::offsetOuterProduct(-leg.normSqr(), leg);
     MatrixBlock MM = MatrixBlock::vectorProduct(0, leg); // anti-symmetric
     
-    //std::clog << -At.mul(aR) << " " << -Bt.mul(bR) << " " << -Bt.mul(aR) << " \n";
-    //std::clog << LL.plus_diagonal(-cc0*cc0) << " " << LL.plus_diagonal(-cc1*cc1) << " " << MM-LL.plus_diagonal(cc0*cc1) << " /\n";
+    //std::clog<<-At.mul(aR)<<" "<<-Bt.mul(bR)<<" "<<-Bt.mul(aR)<<" \n";
+    //std::clog<<LL.plus_diagonal(-cc0*cc0)<<" "<<LL.plus_diagonal(-cc1*cc1)<<" "<<MM-LL.plus_diagonal(cc0*cc1)<<" /\n";
 
     // the diagonal blocs are symmetric but not diagonal
     add_block_diag(ii0, weight, LL.plus_diagonal(-cc0*cc0));
