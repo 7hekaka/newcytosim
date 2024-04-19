@@ -4619,7 +4619,8 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     const real cc1 = ptA.coef1();
     const Torque leg = arm / ptA.len();
 
-#if 0
+#if ( DIM == 1 )
+    // this implementation works in any dimension, but is slower than the one below
     MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
     MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
 
@@ -4630,21 +4631,20 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     add_block_diag(ii0, -weight, At.mul(aR));
     add_block(ii1, ii0, -weight, Bt.mul(aR)); // not symmetric
     add_block_diag(ii1, -weight, Bt.mul(bR));
-
-    if ( modulo )
-        pos += modulo->offset( ptA.pos() - pos );
- 
-    add_base(ii0, At*pos, weight);
-    add_base(ii1, Bt*pos, weight);
 #else
     /* Since aR and bR only differ on their diagonals, the calculation above
      can be simplified: aR = cc0 - leg (x) Id; bR = cc1 + leg (x) Id 
      We used:
          cc0 + cc1 = 1
          cross(L,Id)^2 = L(x)L - normSqr(L)*Id
+     and:
+     
      */
-
+#if ( DIM >= 3 )
     MatrixBlock LL = MatrixBlock::offsetOuterProduct(-leg.normSqr(), leg);
+#else
+    MatrixBlock LL = MatrixBlock(0, -leg * leg);
+#endif
     MatrixBlock MM = MatrixBlock::vectorProduct(0, leg); // anti-symmetric
     
     //std::clog<<-At.mul(aR)<<" "<<-Bt.mul(bR)<<" "<<-Bt.mul(aR)<<" \n";
@@ -4654,15 +4654,18 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     add_block_diag(ii0, weight, LL.plus_diagonal(-cc0*cc0));
     add_block(ii1, ii0, weight, MM-LL.plus_diagonal(cc0*cc1));
     add_block_diag(ii1, weight, LL.plus_diagonal(-cc1*cc1));
-
-    if ( modulo )
-        pos += modulo->offset( ptA.pos() - pos );
-
-    Vector vec = cross(leg, pos);
-    add_base(ii0, cc0*pos+vec, weight);
-    add_base(ii1, cc1*pos-vec, weight);
 #endif
     
+    if ( modulo )
+        pos += modulo->offset( ptA.pos() - pos );
+ 
+    //add_base(ii0, At*pos, weight); // At * pos = cc0 * pos + cross(len, pos)
+    //add_base(ii1, Bt*pos, weight); // Bt * pos = cc1 * pos - cross(len, pos)
+
+    Vector vec = cross(leg, pos);
+    add_base(ii0, vec.extrapolated(cc0, pos), weight);
+    add_base(ii1, vec.extrapolated(-cc1, pos), -weight);
+
     DRAW_LINK(ptA, cross(arm, ptA.dir()), pos);
 }
 
