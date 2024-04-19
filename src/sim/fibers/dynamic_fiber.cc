@@ -327,6 +327,9 @@ int DynamicFiber::stepPlusEnd()
         // antagonistic force (< 0) decreases assembly rate exponentially
         if (( forceP < 0 ) & ( growth > 0 ))
             growth *= std::exp(forceP*prop()->growing_force_inv[P]);
+        
+        //real ten = tension(lastSegment());
+        //printf("%04u : %8.3f  %8.3f : %8.3f\n", identity(), forceP, ten, growth);
 
 #if NEW_STALL_OUTSIDE
         // Growth is reduced if the plus end is outside
