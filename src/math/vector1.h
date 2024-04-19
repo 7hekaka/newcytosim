@@ -346,10 +346,10 @@ public:
         XX = a[0] + C * ( b[0] - a[0] );
     }
     
-    /// linear interpolation, returning a + C * b
-    friend Vector1 interpolated(const Vector1& a, real C, const Vector1& b)
+    /// linear interpolation, returning *this + alpha * b
+    Vector1 extrapolated(real alpha, const Vector1& b) const
     {
-        return Vector1(a.XX+C*b.XX);
+        return Vector1(XX+alpha*b.XX);
     }
     
     /// Calculate intermediate position = A + C * ( B - A )

@@ -487,10 +487,10 @@ public:
 #endif
     }
     
-    /// linear interpolation, returning a + x * b
-    friend Vector4 interpolated(const Vector4& a, real C, const Vector4& b)
+    /// linear interpolation, returning *this + alpha * b
+    Vector4 extrapolated(real alpha, const Vector4& b) const
     {
-        return Vector4(a.XX+C*b.XX, a.YY+C*b.YY, a.ZZ+C*b.ZZ, a.TT+C*b.TT);
+        return Vector4(XX+alpha*b.XX, YY+alpha*b.YY, ZZ+alpha*b.ZZ, TT+alpha*b.TT);
     }
     
     /// Calculate intermediate position = A + C * ( B - A )

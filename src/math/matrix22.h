@@ -869,7 +869,7 @@ public:
         return Matrix22(X * dir.XX + dia, xy, xy, Y * dir.YY + dia);
     }
     
-    /// build the matrix `dia * Id + vec (x) Id`
+    /// build the matrix `dia * Id + vec (x) Id`, with `vec = off * eZ`
     static Matrix22 vectorProduct(const real dia, const real off)
     {
         return Matrix22(dia, off, -off, dia);
