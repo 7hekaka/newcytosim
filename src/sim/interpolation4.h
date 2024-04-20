@@ -45,13 +45,13 @@ public:
     Interpolation4() { clear(); }
 
     /// set as pointing to vertex `p` of `mec`
-    void set(Mecable const* mec, size_t p);
+    void set(Mecable const* mec, unsigned p);
     
     /// set as interpolated between vertices `p` and `q` of `mec`
-    void set(Mecable const* mec, size_t p, size_t q, real coef);
+    void set(Mecable const* mec, unsigned p, unsigned q, real coef);
 
     /// set as interpolated over 4 vertices, defined by position 'vec'
-    void set(Mecable const*, size_t, Vector const& vec);
+    void set(Mecable const*, unsigned, Vector const& vec);
 
     /// attachment mecable
     Mecable const* mecable() const { return mec_; }
@@ -67,9 +67,6 @@ public:
 
     /// first attachement point
     Mecapoint vertex0() const { return Mecapoint(mec_, prime_); }
-    
-    /// index of first interpolated point in matrix
-    size_t matIndex0() const { return mec_->matIndex() + (size_t)prime_; }
 
     /// interpolation coefficients
     const real* coef() const { return coef_; }

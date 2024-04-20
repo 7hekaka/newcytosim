@@ -270,7 +270,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Store the index where coordinates are located in Meca
-    void setIndex(size_t inx) { pIndex = static_cast<unsigned>(inx); }
+    void setIndex(unsigned i) { pIndex = i; }
     
     /// Index of the first vertex in the isotropic matrix (Meca::mISO)
     /**
@@ -280,7 +280,7 @@ public:
      The index can be used directly to address the isotropic matrix (Meca::mISO)
      and should be multiplied by DIM to address the general matrix (Meca::mFUL)
      */
-    size_t matIndex()   const { return pIndex; }
+    unsigned matIndex() const { return pIndex; }
     
     /// set size of preconditionner block, allocating memory for 'alc' scalars
     void blockSize(size_t, size_t alc, size_t pivot);

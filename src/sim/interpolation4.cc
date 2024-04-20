@@ -20,7 +20,7 @@ void Interpolation4::polish()
     // ensures that sum of coefficients is 1
     coef_[0] = ( real(1) - coef_[1] ) - ( coef_[2] + coef_[3] );
 
-    size_t R = 4;
+    unsigned R = 4;
     while ((R > 0) & (abs_real(coef_[R-1]) < REAL_EPSILON))
         --R;
     rank_ = R;
@@ -29,6 +29,7 @@ void Interpolation4::polish()
     if ( mec_ && prime_+rank_ > mec_->nbPoints() )
         throw InvalidParameter("out-of-range Interpolation4");
 }
+
 
 /// (position of interpolation) - (position of prime point = center of sphere)
 Vector Interpolation4::normal() const
@@ -42,7 +43,7 @@ Vector Interpolation4::normal() const
 /**
 Set a point of index 'P' on Mecable
 */
-void Interpolation4::set(Mecable const* m, size_t p)
+void Interpolation4::set(Mecable const* m, unsigned p)
 {
     assert_true( !m || p < m->nbPoints() );
     
@@ -57,7 +58,7 @@ Coefficient 'c' determines the position between 'P' and 'Q':
 - with ( c == 1 ) the point is equal to P
 .
 */
-void Interpolation4::set(Mecable const* m, size_t p, size_t q, real c)
+void Interpolation4::set(Mecable const* m, unsigned p, unsigned q, real c)
 {
     assert_true(m);
     assert_true(q < m->nbPoints());
@@ -85,7 +86,7 @@ This is used when the four vertices [P ... P+3] define a orthonormal reference,
 as the components of 'vec' are then simply the coordinates of the position of the
 interpolation in this reference frame.
 */
-void Interpolation4::set(Mecable const* m, size_t p, Vector const& vec)
+void Interpolation4::set(Mecable const* m, unsigned p, Vector const& vec)
 {
     assert_true(m);
     

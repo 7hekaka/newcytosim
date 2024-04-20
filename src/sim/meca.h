@@ -423,7 +423,7 @@ public:
     void addForce(Mecapoint const&, Vector const& force);
     
     /// Add a constant force on Mecapoint
-    void addForce(Mecable const*, size_t inx, Vector const& force);
+    void addForce(Mecable const*, unsigned inx, Vector const& force);
     
     /// Add a constant force on Interpolated point
     void addForce(Interpolation const&, Vector const& force);
@@ -624,7 +624,7 @@ public:
     void addSideLink(Interpolation const&, Mecapoint const&, real arm, real weight);
     
     /// Specialized version, where `leg` is already multiplied by the segment length
-    void addSideLink(Fiber const*, size_t, real alpha, Mecapoint const&, Torque const& arm, real weight);
+    void addSideLink(Fiber const*, unsigned, real alpha, Mecapoint const&, Torque const& arm, real weight);
 
     
 #if ( DIM == 2 )
