@@ -1116,8 +1116,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     std::string code;
     
 #if BACKWARD_COMPATIBILITY < 50
-    // check if 'event' is specified within the 'run' command,
-    // and convert to a registered Event object
+    // create an Event if 'event' is specified within the 'run' command:
     Event * event = nullptr;
     if ( opt.has_key("event") )
     {

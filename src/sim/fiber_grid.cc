@@ -217,7 +217,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real range)
         Vector P, Q = fib->posP(0);
         const real iPQ = 1.0 / fib->segmentation();
 
-        for ( size_t n = 1; n < fib->nbPoints(); ++n )
+        for ( unsigned n = 1; n < fib->nbPoints(); ++n )
         {
             P = Q;
             Q = fib->posP(n);
@@ -484,7 +484,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
     //check all the segments to find those close enough from pos:
     for ( Fiber const* fib=set.first(); fib; fib=fib->next() )
     {
-        for ( size_t p = 0; p < fib->nbSegments(); ++p )
+        for ( unsigned p = 0; p < fib->nbSegments(); ++p )
         {
             FiberSegment seg(fib, p);
             real dis = INFINITY;

@@ -188,7 +188,7 @@ public:
     SparMatSymBlkDiag();
     
     /// default destructor
-    ~SparMatSymBlkDiag()  { deallocate(); }
+    ~SparMatSymBlkDiag() { deallocate(); }
     
     /// set to zero
     void reset();
