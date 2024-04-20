@@ -1054,9 +1054,8 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
 
 
 /**
- Allocates a reserve list for each CoupleProp.
- Return true if at least one couple:fast_diffusion is true,
- */
+ Sets the list `uniCouples` with couple class concerned with `fast_diffusion`
+*/
 void CoupleSet::uniPrepare(PropertyList const& properties)
 {
     uniCouples.clear();

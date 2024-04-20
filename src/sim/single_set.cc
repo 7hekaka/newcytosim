@@ -57,7 +57,7 @@ void SingleSet::uniStepCollect(Single * obj)
     {
         nxt = obj->next();
         SingleProp const* P = obj->prop;
-        if ( P->fast_diffusion > 0 && !obj->base() )
+        if ( P->fast_diffusion && !obj->base() )
         {
             fList.pop(obj);
             inventory_.unassign(obj);
@@ -789,11 +789,12 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleStock& can)
             i.reinterpolate();
             Vector pos = i.pos();
 
-            if ( S->prop->confine == CONFINE_ON )
+            Space const* spc = S->confineSpace();
+            if ( spc )
             {
                 // Only attach if position is near the edge of the Space:
-                Vector prj = S->confineSpace()->project(pos);
-                if ( distanceSqr(pos, prj) >= square(h->property()->binding_range) )
+                Vector prj = spc->project(pos);
+                if ( distanceSqr(pos, prj) > square(h->property()->binding_range) )
                     continue;
                 // Single will be placed on the edge of the Space:
                 pos = prj;
@@ -883,17 +884,16 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 
 
 /**
- Allocates one reserve list for each SingleProp.
-
- Return true if at least one single:fast_diffusion is true,
- */
+ Sets the list `uniSingles` with single class concerned with `fast_diffusion`
+*/
 void SingleSet::uniPrepare(PropertyList const& properties)
 {
     uniSingles.clear();
     for ( Property const* i : properties.find_all("single") )
     {
         SingleProp const* P = static_cast<SingleProp const*>(i);
-        if ( P->fast_diffusion > 0 )
+        //std::clog << i->name() << "  " << P->fast_diffusion << "\n";
+        if ( P->fast_diffusion )
             uniSingles.push_back(P);
     }
 }
