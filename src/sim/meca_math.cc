@@ -245,7 +245,7 @@ static void truncate_floats(size_t num, float* mat)
 [[maybe_unused]]
 static void tile_doubles(size_t num, double const* src, float * dst)
 {
-    assert_true(sizeof(double) == 2*sizeof(uint32_t));
+    static_assert(sizeof(double) == 2*sizeof(uint32_t));
     uint32_t * fast = (uint32_t*)src;
     uint32_t * slow = (uint32_t*)dst;
     uint32_t * end = (uint32_t*)(src+num);
