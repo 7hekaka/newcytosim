@@ -140,7 +140,8 @@ void SingleProp::read(Glossary& glos)
         // change the default value for confinement
         if ( activity == "fixed" )
         {
-            fast_diffusion = -1;
+            if ( fast_diffusion )
+                fast_diffusion = -1;
             confine = CONFINE_OFF;
         }
     }

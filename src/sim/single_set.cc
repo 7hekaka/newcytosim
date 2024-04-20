@@ -83,7 +83,7 @@ was first before any transfer could occur, we process each Couple only once.
 */
 void SingleSet::steps()
 {
-    //Cytosim::log("SingleSet::step entry : F %5i A %5i\n", fList.size(), aList.size());
+    //Cytosim::log("SingleSet::step entry : F %5lu A %5lu\n", fList.size(), aList.size());
     
     Single *const fHead = firstF();
     bool fOdd = sizeF() & 1;
