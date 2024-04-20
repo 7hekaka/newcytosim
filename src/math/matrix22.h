@@ -532,7 +532,7 @@ public:
     Vector2 vecmul(Vector2 const& V) const
     {
 #if MATRIX22_USES_AVX
-        return Vector2(vecmul2_avx(mat, V.vec));
+        return Vector2(vecmul2_avx(mat, V.xy));
 #else
         return vecmul_(V);
 #endif

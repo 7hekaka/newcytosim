@@ -617,7 +617,7 @@ public:
     Vector3 vecmul(Vector3 const& vec) const
     {
 #if MATRIX34_USES_AVX && VECTOR3_USES_AVX
-        return vecmul3_avx(vec.vec);
+        return vecmul3_avx(vec.xyz);
 #elif MATRIX34_USES_AVX
         return vecmul3_avx(vec.data());
 #else

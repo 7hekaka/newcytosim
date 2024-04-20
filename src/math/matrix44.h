@@ -541,7 +541,7 @@ public:
     Vector3 vecmul3(Vector3 const& vec) const
     {
 #if MATRIX44_USES_AVX && VECTOR3_USES_AVX
-        return vecmul3_avx(vec.vec);
+        return vecmul3_avx(vec.xyz);
 #elif MATRIX44_USES_AVX
         return vecmul3_avx(vec.data());
 #else
@@ -607,7 +607,7 @@ public:
     Vector4 vecmul(Vector4 const& vec) const
     {
 #if MATRIX44_USES_AVX && VECTOR3_USES_AVX
-        return vecmul4_avx(vec.vec);
+        return vecmul4_avx(vec.xyzt);
 #elif MATRIX44_USES_AVX
         return vecmul4_avx(vec.data());
 #else
@@ -619,7 +619,7 @@ public:
     Vector4 trans_vecmul(Vector4 const& vec) const
     {
 #if MATRIX44_USES_AVX && VECTOR3_USES_AVX
-        return trans_vecmul4_avx(vec.vec);
+        return trans_vecmul4_avx(vec.xyzt);
 #elif MATRIX44_USES_AVX
         return trans_vecmul4_avx(vec.data());
 #else

@@ -503,7 +503,7 @@ public:
     Vector3 vecmul(Vector3 const& vec) const
     {
 #if MATRIX33SYM_USES_SSE && VECTOR3_USES_AVX
-        return vecmul3_sse(vec.vec);
+        return vecmul3_sse(vec.xyz);
 #else
         return vecmul_(vec);
 #endif
