@@ -311,7 +311,7 @@ public:
     Parser * parser() const { return parser_; }
 
     /// Parse a text containing cytosim commands
-    void evaluate(std::string const&);
+    void perform(std::string const&);
 
     //---------------------------- PROPERTIES ----------------------------------
 

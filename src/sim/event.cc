@@ -111,7 +111,7 @@ void Event::step(Simul& sim)
         // if 'multiplexed', the event can fire multiple times within a time step
         do {
             try {
-                sim.evaluate(activity);
+                sim.perform(activity);
             }
             catch( Exception & e ) {
                 std::cerr << "Buggy event:code `" + activity + "' : " + e.message() << '\n';

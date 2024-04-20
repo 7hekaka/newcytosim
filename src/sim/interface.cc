@@ -1174,7 +1174,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
         {
             sim_->relax();
             if ( has_code )
-                sim_->evaluate(code);
+                sim_->perform(code);
             sim_->writeObjects(sim_->prop.system_file, true, binary);
             reportCPUtime(sim_->time());
             sim_->sMeca.doNotify = 2;  // to print convergence parameters
