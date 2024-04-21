@@ -28,6 +28,31 @@ void convert_to_floats(size_t cnt, double const* src, float* dst)
         dst[i] = (float)src[i];
 }
 
+template < size_t ORD >
+static void clarify_matrix(size_t lin, size_t col, real* mat, size_t ldd)
+{
+    for ( size_t jj = 0; jj < col; ++jj )
+    {
+        real * ptr = mat + jj * ldd;
+        for ( size_t ii = 0; ii < lin; ++ii )
+        {
+            if ( ii % ORD )
+                ptr[ii] = 0;
+        }
+    }
+}
+
+template < size_t ORD >
+static void modify_matrix(size_t lin, size_t col, real* mat, size_t ldd)
+{
+    real * ptr = mat;
+    for ( size_t jj = 0; jj < col; ++jj )
+    {
+        for ( size_t ii = 0; ii < lin; ++ii )
+            *ptr++ = mat[ORD*ii+jj*ldd];
+    }
+}
+
 
 /// print 12 scalars from `vec[]` of dimension `num`
 inline void print_vector(int num, real const* vec)
@@ -63,10 +88,12 @@ template < void (*FUNC)(int, real const*, int, real*) >
 void check(int N, int ORD, real const* S, real const* AB, int LDA, real* B, char const str[], size_t rep, size_t sub=128)
 {
     printf("\n");
+    // verification:
     copy_real(ORD*N, S, B);
     nan_spill(B+ORD*N);
     FUNC(N, AB, LDA, B);
     print_vector(ORD*N, B);
+    // performance:
     tick();
     for ( size_t n = 0; n < rep; ++n )
     {
@@ -395,6 +422,11 @@ void uniLN4(int N, real const* AB, int LDA, real* B)
 }
 #endif
 
+void uniLN5(int N, real const* AB, int LDA, real* B)
+{
+    alsatian_striped_xtbsvLNN6K_3D(N, AB, 3, B);
+}
+
 // this gives wrong results
 void uniLTB(int N, real const* AB, int LDA, real* B)
 {
@@ -433,6 +465,11 @@ void uniLT4(int N, real const* AB, int LDA, real* B)
 }
 #endif
 
+void uniLT5(int N, real const* AB, int LDA, real* B)
+{
+    alsatian_striped_xtbsvLTN6K_3D(N, AB, 3, B);
+}
+
 /**
  Test Lapack and custom implementation of routines used to factorize
  a symmetric tri-diagonal matrix and solve the associated system.
@@ -446,7 +483,8 @@ void testTBSV(int N, size_t rep)
     /// rank of diagonal matrices:
     const int BLDD = RANK+2;
 
-    real * AB = new_real(N*std::max(N, BLDD)+4);
+    real * AB = new_real(N*BLDD+4);
+    real * MC = new_real(N*BLDD+4);
     real * S = new_real(N);
     real * B = new_real(N+4);
 
@@ -457,32 +495,29 @@ void testTBSV(int N, size_t rep)
     nan_spill(AB+N*BLDD);
     for ( int i = 0; i < N; ++i )
     {
-        real s = 0, r = 0.0625 * RNG.sreal();
-        for ( size_t j = 1; j < BLDD; ++j )
-        {
-            real x = -0.0625;
-            AB[j+BLDD*i] = x;
-            s += x;
-        }
-        AB[  BLDD*i] = 1.0 - 2*s; //diagonal term
-        AB[1+BLDD*i] += r;
-        AB[2+BLDD*i] -= r;
+        real * col = AB + BLDD * i;
+        real R = 5, r = 0.0125;
+        for ( size_t j = 1; j <= RANK; ++j )
+            col[j] = r * RNG.sreal();
+        col[0] = R - r * RANK; //diagonal term
+        col[DIM] -= R / 2;
+        col[DIM*2] += R / 4;
     }
+    //VecPrint::full("mat", RANK+1, N, AB, BLDD, 1);
+    copy_real(N*BLDD, AB, MC);
     
-    int info = 0;
-    if ( 1 )
-    {
-        real * ABc = new_real(N*std::max(N, BLDD)+4);
-        copy_real(N*BLDD, AB, ABc);
-        lapack::xpbtf2('L', N, RANK, ABc, BLDD, &info);
-        check<uni0>(N, 1, S, ABc, BLDD, B, "blas:tbsv", rep);
-        free_real(ABc);
-    }
     // factorize, Alsatian's way:
+    int info = 0;
     alsatian_xpbtf2L(N, RANK, AB, BLDD, &info);
+    //VecPrint::full("factorized", RANK+1, N, AB, BLDD, 1);
+    //clarify_matrix<DIM>(RANK+1, N, AB, BLDD);
+    //VecPrint::full("clarified", RANK+1, N, AB, BLDD, 1);
 
     if ( 0 )
     {
+        lapack::xpbtf2('L', N, RANK, MC, BLDD, &info);
+        check<uni0>(N, 1, S, MC, BLDD, B, "blas:tbsv", rep);
+        // our implementations:
         check<uni1>(N, 1, S, AB, BLDD, B, "blas_tbsv", rep);
         check<uni2>(N, 1, S, AB, BLDD, B, "tbsvLxN", rep);
         check<uni3>(N, 1, S, AB, BLDD, B, "tbsvLxNK<KD>", rep);
@@ -503,6 +538,10 @@ void testTBSV(int N, size_t rep)
 #if REAL_IS_DOUBLE && USE_SIMD
         check<uniLN4>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", rep);
 #endif
+        copy_real(N*BLDD, AB, MC);
+        modify_matrix<3>(3, N, MC, BLDD);
+        //VecPrint::full("modified", 3, N, MC, 3, 1);
+        check<uniLN5>(N, 1, S, MC, BLDD, B, "LNN6K/3", rep);
     }
     if ( 1 )
     {
@@ -518,10 +557,14 @@ void testTBSV(int N, size_t rep)
 #if REAL_IS_DOUBLE && USE_SIMD
         check<uniLT4>(N, 1, S, AB, BLDD, B, "LTN6K_SSE", rep);
 #endif
+        copy_real(N*BLDD, AB, MC);
+        modify_matrix<3>(3, N, MC, BLDD);
+        check<uniLT5>(N, 1, S, MC, BLDD, B, "LTN6K/3", rep);
     }
     free_real(B);
     free_real(S);
     free_real(AB);
+    free_real(MC);
 }
 
 //------------------------------------------------------------------------------
@@ -697,7 +740,7 @@ void testGETRS(int N, size_t rep)
 
 int main(int argc, char* argv[])
 {
-    int CNT = 31;
+    int CNT = 37;
     if ( argc > 1 )
         CNT = std::max(1, atoi(argv[1]));
     size_t REP = 1024;
