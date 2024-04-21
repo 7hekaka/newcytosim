@@ -155,7 +155,8 @@ namespace VecPrint
             fprintf(file, " void");
         {
             const T threshold = std::pow(0.1, digits);
-            char zer[32] = { 0 }, fmt[32] = " %4.0f";
+            char zer[32] = { 0 }, eps[32] = { 0 };
+            char fmt[32] = " %4.0f";
             
             { // build format strings:
                 snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+4, digits);
@@ -167,6 +168,9 @@ namespace VecPrint
                     dot |= ( *c == '.' );
                 }
                 if ( !dot ) *d = '.';
+                memcpy(eps, zer, sizeof(eps));
+                for ( char * c = eps; *c; ++c )
+                    if ( *c == '.' ) *c = '*';
             }
             
             for ( size_t ii = 0; ii < lin; ++ii )
@@ -174,8 +178,10 @@ namespace VecPrint
                 for ( size_t jj = 0; jj < col; ++jj )
                 {
                     T val = mat[ii+ldd*jj];
-                    if ( std::fabs(val) < threshold )
+                    if ( std::fabs(val) < FLT_EPSILON )
                         fputs(zer, file);
+                    else if ( std::fabs(val) < threshold )
+                        fputs(eps, file);
                     else
                         fprintf(file, fmt, mat[ii+ldd*jj]);
                 }
