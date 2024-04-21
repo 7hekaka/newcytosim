@@ -65,15 +65,15 @@ protected:
     /// collect objects from ObjectPool for which func(obj, val) == true
     static ObjectList collect(ObjectPool const&, bool (*func)(Object const*, void const*), void const*);
     
-    /// record number of objects
-    void writeRecords(Outputter&, size_t tot, size_t sup) const;
+    /// print summary: nb of objects by class
+    void writeReport(std::ostream&, const std::string& title) const;
 
+    /// record number of objects, and topmost identity
+    void writeRecords(Outputter&, size_t tot, size_t sup) const;
+    
     /// write Object in ObjectPool to file
     void writePool(Outputter&, ObjectPool const&) const;
-    
-    /// print a list of the content (nb of objects, class)
-    void writeReport(std::ostream&, const std::string& title) const;
-    
+
     /// delete  Objects from sub list
     static void erasePool(ObjectPool&);
 

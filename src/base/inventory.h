@@ -33,7 +33,7 @@ private:
     /// size of memory allocated minus one
     size_t alloca_;
     
-    /// lowest i > 0 for which `record_[i] != nullptr`
+    /// lowest `i > 0` for which `record_[i] != nullptr`
     ObjectID lowest_;
     
     /// highest given identity
