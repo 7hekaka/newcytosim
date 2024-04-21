@@ -913,6 +913,199 @@ void alsatian_xtbsvLTN6K_SSE_ALT(const int N, const double* A, const int lda, do
 #endif
 
 //------------------------------------------------------------------------------
+#pragma mark - Optimized SSE versions for KD==6, single precision matrix
+
+#if USE_SIMD
+/**
+ Optimized version for KD == 6
+ Beware: this works assuming that N >= KD, and it will in particular write
+ to X[i] for i = 0 ... 6 for any value of N.
+*/
+void alsatian_xtbsvLNN6K_SSE(const int N, const float* A, const int lda, double* X)
+{
+    constexpr int KD = 6;
+    assert_true( lda > KD );
+    assert_true( N >= KD );
+    const double * end = X + N - KD;
+    vec2 x0, x2, x4, tt;
+    // first iteration with j = 0
+    tt = loaddup2(X);
+    x0 = fnmadd2(tt, load2d(A+1), loadu2(X+1));
+    x2 = fnmadd2(tt, load2d(A+3), loadu2(X+3));
+    x4 = fnmadd2(tt, load2d(A+5), loadu2(X+5)); // may load garbage if N <= KD
+    store1(X, mul1(tt, load1d(A)));
+    A += lda;
+    X += 1;
+    // general case:
+    for ( ; X < end; ++X ) //for ( int j = 1; j < nkd; ++j )
+    {
+        tt = unpacklo2(x0, x0);
+        store1(X, mul1(load1d(A), x0));
+        x0 = catshift(x0, x2);
+        x2 = catshift(x2, x4);
+        x4 = catshift(x4, load1(X+KD));
+        x0 = fnmadd2(tt, load2d(A+1), x0);
+        x2 = fnmadd2(tt, load2d(A+3), x2);
+        x4 = fnmadd2(tt, load2d(A+5), x4);
+        A += lda;
+    }
+    /*
+     The ending sequence avoids loading elements of X beyond X+N, and elements
+     of A in the last column that should normally be equal to zero, but otherwise
+     it performs the same calculation than the normal iteration six times.
+     */
+    // process truncated case: j = N - 6
+    tt = unpacklo2(x0, x0);
+    vec2 yy = mul1(load1d(A), x0);
+    x0 = catshift(x0, x2);
+    x2 = catshift(x2, x4);
+    x4 = unpackhi2(x4, setzero2());
+    x0 = fnmadd2(tt, load2d(A+1), x0);
+    x2 = fnmadd2(tt, load2d(A+3), x2);
+    x4 = fnmadd1(tt, load1d(A+5), x4);
+    A += lda;
+    // process truncated case: j = N - 5
+    tt = unpacklo2(x0, x0);
+    storeu2(X, unpacklo2(yy, mul1(load1d(A), x0)));
+    x0 = catshift(x0, x2);
+    x2 = catshift(x2, x4);
+    x0 = fnmadd2(tt, load2d(A+1), x0);
+    x2 = fnmadd2(tt, load2d(A+3), x2);
+    A += lda;
+    // process truncated case: j = N - 4
+    tt = unpacklo2(x0, x0);
+    yy = mul1(load1d(A), x0);
+    x0 = catshift(x0, x2);
+    x2 = catshift(x2, setzero2());
+    x0 = fnmadd2(tt, load2d(A+1), x0);
+    x2 = fnmadd1(tt, load1d(A+3), x2);
+    A += lda;
+    // process truncated case: j = N - 3
+    tt = unpacklo2(x0, x0);
+    storeu2(X+2, unpacklo2(yy, mul1(load1d(A), x0)));
+    x0 = catshift(x0, x2);
+    x0 = fnmadd2(tt, load2d(A+1), x0);
+    A += lda;
+    // process last two scalars:
+    if ( N <= KD ) {
+        yy = mul1(load1d(A), x0);
+        store1(X+4, yy);
+        return;
+    }
+    yy = mul1(load1d(A), x0);
+    x2 = unpackhi2(x0, x0);
+    x2 = fnmadd1(x0, load1d(A+1), x2);
+    x2 = mul1(load1d(A+lda), x2);
+    storeu2(X+4, unpacklo2(yy, x2));
+}
+
+
+/**
+ Optimized version for KD == 6
+ Beware: this works assuming that N >= KD, and it will in particular write
+ to X[i] for i = 0 ... 6 for any value of N.
+*/
+void alsatian_xtbsvLTN6K_SSE(const int N, const float* A, const int lda, double* X)
+{
+    const double * end = X;
+    //constexpr int KD = 6;
+    assert_true( lda > 6 );
+    assert_true( N >= 6 );
+    A += ( N - 1 ) * lda;
+    X += N - 1;
+    vec2 x0 = setzero2();
+    vec2 x1 = setzero2();
+    vec2 x2 = setzero2();
+    vec2 x3 = setzero2();
+    vec2 x4 = setzero2();
+    vec2 x5 = setzero2();
+#if 1
+    /*
+     The starting sequence avoids loading elements of X beyond X+N, and elements
+     of A in the last column that should normally be equal to zero, but otherwise
+     it performs the same calculation than the normal iteration six times.
+     */
+    // truncated round at j = N-1
+    {
+        x0 = mul1(load1d(A), load1(X));
+        A -= lda;
+    }
+    // truncated round at j = N-2
+    {
+        vec2 tt = mul1(load1d(A), load1(X-1));
+        x1 = x0;
+        x0 = fnmadd1(x0, load1d(A+1), tt);
+        storeu2(X-1, unpacklo2(x0, x1));
+        A -= lda;
+    }
+    // truncated round at j = N-3
+    {
+        vec2 tt = mul1(load1d(A), load1(X-2));
+        vec2 ab = load2d(A+1);
+        x2 = x1;
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        A -= lda;
+    }
+    // truncated round at j = N-4
+    {
+        vec2 tt = mul1(load1d(A), load1(X-3));
+        x3 = x2;
+        tt = fnmadd1(x2, load1d(A+3), tt); x2 = x1;
+        vec2 ab = load2d(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        storeu2(X-3, unpacklo2(x0, x1));
+        A -= lda;
+    }
+    // truncated round at j = N-5
+    {
+        vec2 tt = mul1(load1d(A), load1(X-4));
+        x4 = x3;
+        vec2 ab = load2d(A+3);
+        tt = fnmadd1(x3, unpackhi2(ab, ab), tt); x3 = x2;
+        tt = fnmadd1(x2, unpacklo2(ab, ab), tt); x2 = x1;
+        ab = load2d(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        A -= lda;
+    }
+    // truncated round at j = N-6
+    {
+        vec2 tt = mul1(load1d(A), load1(X-5));
+        x5 = x4;
+        tt = fnmadd1(x4, load1d(A+5), tt); x4 = x3;
+        vec2 ab = load2d(A+3);
+        tt = fnmadd1(x3, unpackhi2(ab, ab), tt); x3 = x2;
+        tt = fnmadd1(x2, unpacklo2(ab, ab), tt); x2 = x1;
+        ab = load2d(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        storeu2(X-5, unpacklo2(x0, x1));
+        A -= lda;
+    }
+    // update pointer
+    X -= 6;
+#endif
+    for ( ; X >= end; --X )
+    {
+        vec2 tt = mul1(load1d(A), load1(X));
+        vec2 ab = load2d(A+5);
+        tt = fnmadd1(x5, unpackhi2(ab, ab), tt); x5 = x4;
+        tt = fnmadd1(x4, unpacklo2(ab, ab), tt); x4 = x3;
+        ab = load2d(A+3);
+        tt = fnmadd1(x3, unpackhi2(ab, ab), tt); x3 = x2;
+        tt = fnmadd1(x2, unpacklo2(ab, ab), tt); x2 = x1;
+        ab = load2d(A+1);
+        tt = fnmadd1(x1, unpackhi2(ab, ab), tt); x1 = x0;
+        x0 = fnmadd1(x0, unpacklo2(ab, ab), tt);
+        store1(X, x0);
+        A -= lda;
+    }
+}
+#endif
+
+//------------------------------------------------------------------------------
 #pragma mark - Isotropic Alsatian Solve xTBSV, using C-array buffer
 
 template < int ORD >
