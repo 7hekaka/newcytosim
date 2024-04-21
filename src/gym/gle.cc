@@ -28,28 +28,28 @@ namespace gle
     GLuint buf_[4] = { 0 };
 
     /// offset for object's data stored in buffers
-    size_t tubes_[32] = { 0 };
+    unsigned tubes_[32] = { 0 };
 
     /// offset for object's data with 6 floats / vertex
-    size_t cubes_[12] = { 0 };
+    unsigned cubes_[12] = { 0 };
     
     /// offset for object's data with 3 floats / vertex
-    size_t blobs_[4] = { 0 };
+    unsigned blobs_[4] = { 0 };
     
     /// offset for object's data stored in buffers
-    size_t discs_[8] = { 0 };
+    unsigned discs_[8] = { 0 };
 
-    /// index of first vertex in buffer object
-    size_t ico_pts_[8] = { 0 };
-    /// index of first vertex index in buffer object
-    size_t ico_idx_[8] = { 0 };
-    /// number of faces in icosahedrons
+    /// offset of first vertex coordinate in buffer object
+    unsigned ico_pts_[8] = { 0 };
+    /// offset of first index in buffer object
+    unsigned ico_idx_[8] = { 0 };
+    /// number of triangles making up the faces in icosahedrons
     unsigned ico_cnt_[8] = { 0 };
     
     /// index of first vertex in buffer object
-    size_t icoid_pts_ = 0;
+    unsigned icoid_pts_ = 0;
     /// index of first vertex index in buffer object
-    size_t icoid_idx_ = 0;
+    unsigned icoid_idx_ = 0;
     /// number of faces in icosahedrons
     unsigned icoid_cnt_ = 0;
     
