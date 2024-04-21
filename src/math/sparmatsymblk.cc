@@ -352,7 +352,7 @@ void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start
                     //fprintf(stderr, "SMSB %4i %4i % .4f\n", ii, jj, a);
                     col[n].addto(dst+ij*S_BLOCK_SIZE, ldd, alpha);
                     //col[n].addto_trans(dst+ij*ldd*S_BLOCK_SIZE, ldd, alpha);
-                }
+                } else break; // assuming the column is sorted
             }
         }
     }
@@ -387,7 +387,7 @@ void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
                     //fprintf(stderr, "SMSB %4lu %4lu : %.4f\n", i, j, a);
                     dst[ij] += a;
                     if ( sym ) dst[ldd*ij] += a;
-                }
+                } else break; // assuming the column is sorted
             }
         }
     }
