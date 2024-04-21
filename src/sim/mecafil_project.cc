@@ -455,8 +455,8 @@ inline void addProjectionDiff_(const size_t nbs, const real* mul, const real* X,
 /// Add projection-diff matrix
 void Mecafil::addProjectionDiff(real* mat) const
 {
-    size_t nbs = nbSegments();
-    size_t bks = DIM * nPoints;
+    unsigned nbs = nbSegments();
+    unsigned bks = DIM * nPoints;
 #if CHECK_PROJECTION_DIFF
     real * dup = new_real(bks*bks);
     real * tmp = new_real(bks*bks);

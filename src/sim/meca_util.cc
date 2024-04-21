@@ -457,7 +457,7 @@ void Meca::exportSystem() const
     
     for ( Mecable * mec : mecables )
     {
-        const size_t bks = DIM * mec->nbPoints();
+        const unsigned bks = DIM * mec->nbPoints();
         extractBlock(mec, tmp2);
         VecPrint::sparse_off(f, bks, bks, tmp2, bks, DIM*mec->matIndex());
     }
