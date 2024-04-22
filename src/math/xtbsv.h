@@ -441,35 +441,38 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, int LDAB, int* INFO)
 //------------------------------------------------------------------------------
 #pragma mark - Alsatian DTBSV with KD as argument
 
-#if 0
-//The original LAPACK implementation loads and stores X[] at every operation
-void alsatian_xtbsvLNN_ORI(const int N, const int KD, const real* A, const int lda, real* X)
+#if 1
+
+void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
 {
     for ( int j = 0; j < N; ++j )
     {
         const real tmp = X[j];
         X[j] = tmp * A[0];
-        const int sup = std::min(N-1, j+KD);  // sup=N-1 if N-1<j+KD : j >= N-KD
+        // sup = N-1 if N-1 < j+KD, which is j >= N-KD
+        const int sup = std::min(N-1, j+KD);
         for ( int i = j + 1; i <= sup; ++i )
-            X[i] -= tmp * A[i];
+            X[i] -= tmp * A[i-j];
         A += lda;
     }
 }
 
-void alsatian_xtbsvLTN_ORI(const int N, const int KD, const real* A, const int lda, real* X)
+void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, real* X)
 {
-    A += (N-1)*(lda-1);
+    A += (N-1) * lda;
     for ( int j = N-1; j >= 0; --j )
     {
-        real tmp = X[j] * A[0];
-        const int sup = std::min(N-1, j+KD);  // sup=N-1 if N-1<j+KD : j >= N-KD
+        real tmp = A[0] * X[j];
+        // sup = N-1 if N-1 < j+KD, that is j >= N-KD
+        const int sup = std::min(N-1, j+KD);
         for ( int i = sup; i > j; --i )
-            tmp -= A[i] * X[i];
+            tmp -= A[i-j] * X[i];
         X[j] = tmp;
         A -= lda;
     }
 }
-#endif
+
+#else
 
 void alsatian_xtbsvLNN(const int N, const int KD, const real* A, const int lda, real* X)
 {
@@ -517,8 +520,7 @@ void alsatian_xtbsvLTN(const int N, const int KD, const real* A, const int lda, 
         A -= lda;
     }
 }
-
-
+#endif
 //------------------------------------------------------------------------------
 #pragma mark - Alsatian, KD as template argument, using C-array as buffer
 
