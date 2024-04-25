@@ -20,7 +20,7 @@ class Object;
  A function mix() randomize the order of the Objects in the list, which is
  necessary in a simulation to avoid any bias which could derive from fixed ordering.
  
- The list is zero-terminated on both sides, and it can be traversed in either ways:
+ The list is null-terminated on both sides, and it can be traversed in either ways:
  for ( Object * n = front(); n ; n = n->next() );
  for ( Object * n = back() ; n ; n = n->prev() );
  
@@ -78,7 +78,13 @@ public:
     /// put Object last in the list
     void push_back(Object *);
     
-    /// import all objects from given list, emptying it
+    /// add `n` before `p`
+    void push_before(Object * p, Object * n);
+
+    /// add `n` after `p`
+    void push_after(Object * p, Object * n);
+
+    /// transfer object and following ones
     void grab(ObjectPool& list, Object*);
     
     /// import all objects from given list, emptying it

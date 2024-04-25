@@ -44,8 +44,34 @@ void ObjectPool::push_back(Object * n)
 }
 
 
+void ObjectPool::push_before(Object * p, Object * n)
+{
+    n->next(p);
+    n->prev(p->prev());
+    if ( p->prev() )
+        p->prev()->next(n);
+    else
+        frontO = n;
+    p->prev(n);
+    ++nSize;
+}
+
+
+void ObjectPool::push_after(Object * p, Object * n)
+{
+    n->prev(p);
+    n->next(p->next());
+    if ( p->next() )
+        p->next()->prev(n);
+    else
+        backO = n;
+    p->next(n);
+    ++nSize;
+}
+
+
 /**
- Transfer objects in `list` to the end of `this`, emptying `list`
+ Transfer obj and any following objects the end of `this`
  */
 void ObjectPool::grab(ObjectPool& list, Object * obj)
 {

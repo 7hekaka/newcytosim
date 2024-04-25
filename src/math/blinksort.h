@@ -99,7 +99,7 @@ void split_list(OBJECT*& head, OBJECT*& tail)
 
 template<typename OBJECT>
 void merge_lists(OBJECT*& head, OBJECT* node, OBJECT* from, OBJECT*& tail,
-                    int (*comp)(const OBJECT*, const OBJECT*))
+                 int (*comp)(const OBJECT*, const OBJECT*))
 {
     assert_true( head && from );
     if ( comp(head, from) < 0 )
@@ -130,7 +130,7 @@ void merge_lists(OBJECT*& head, OBJECT* node, OBJECT* from, OBJECT*& tail,
 
 template<typename OBJECT>
 void mergesort(OBJECT *& head, OBJECT *& tail,
-                  int (*comp)(const OBJECT*, const OBJECT*))
+               int (*comp)(const OBJECT*, const OBJECT*))
 {
     if ( head && head != tail )
     {
@@ -180,6 +180,12 @@ void move_behind(OBJECT*& front, OBJECT*& back,
  From `Partition Algorithms for the Doubly Linked List`
  John M. Boyer, University of Southern Mississippi; ACM 1990
  Blink Sort is O(NlogN) for random data and 0(N) for reversed order and sorted lists.
+ 
+ This uses the comp() function provided, 
+ comp(A, B) should return:
+     - a positive integer if 'A > B'
+     - a negative integer if 'B < A'
+ for the list to be sorted in order of increasing values
  */
 template<typename OBJECT>
 void blinksort(OBJECT*& front, OBJECT*& back,
@@ -188,9 +194,11 @@ void blinksort(OBJECT*& front, OBJECT*& back,
     OBJECT * pvt2 = subF->next();
     if ( comp(subF, pvt2) > 0 )
         move_behind(front, back, subF, subL, subF, pvt2);
+    
     OBJECT * pvt1 = subF;
     while ((pvt2 != subL) and comp(pvt2->next(), pvt2) >= 0 )
         pvt2 = pvt2->next();
+    
     if ( pvt2 != subL )
     {
         OBJECT * down = subL;
@@ -205,8 +213,10 @@ void blinksort(OBJECT*& front, OBJECT*& back,
         }
         if ((pvt1 != subF) and (pvt1->prev() != subF))
             blinksort(front, back, comp, subF, pvt1->prev());
+        
         if ((pvt1->next() != pvt2) and (pvt1->next() != pvt2->prev()))
             blinksort(front, back, comp, pvt1->next(), pvt2->prev());
+        
         if ((pvt2 != subL) and (pvt2->next() != subL))
             blinksort(front, back, comp, pvt2->next(), subL);
     }
