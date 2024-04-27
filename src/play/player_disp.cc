@@ -165,15 +165,15 @@ void Player::autoFocus(Simul const& sim, View& view) const
     if ( mode & 2 )
     {
         // align with mean nematic direction
-        static Vector3 dir(0, 0, 0);
+        static Vector3 dir(1, 0, 0);
         real S = FiberSet::infoNematic(sim.fibers.collect(), mat);
         //flashText("Nematic order S = %5.3f", S);
         if ( S > 0.1 )
         {
             Vector3 vec(mat);
-            real alpha = std::copysign(0.125, dot(dir, vec));
+            real alpha = std::copysign(0.05, dot(dir, vec));
             // time-average the direction vector:
-            dir = ( dir * 0.875 + vec * alpha ).normalized();
+            dir = ( dir + vec * alpha ).normalized();
             //std::clog << "nematic direction: " << dir << '\n';
             view.align_with(dir);
         }
