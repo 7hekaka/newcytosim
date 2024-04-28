@@ -342,6 +342,7 @@ static void flashTracking(unsigned mode)
         case 4: flashText("tracking fiber position spread"); break;
         case 5: flashText("tracking fiber position & spread"); break;
         case 8: flashText("tracking solids position"); break;
+        case 10: flashText("tracking solids position & nematic direction"); break;
     }
 }
 
@@ -1030,14 +1031,14 @@ void processKey(unsigned char key, int modifiers = 0)
 
         case 't':
             if ( altKeyDown )
-                view.track_fibers = ( view.track_fibers ? 0 : 10 );
+                view.track_fibers ^= 3;
             else
                 view.track_fibers ^= 1;
             flashTracking(view.track_fibers);
             break;
             
         case 'T':
-            view.track_fibers ^= 3;
+            view.track_fibers = ( view.track_fibers ? 0 : 10 );
             flashTracking(view.track_fibers);
             break;
             
