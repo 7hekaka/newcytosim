@@ -5,17 +5,18 @@
 
 /// holds a list of Single/Couple with identical Property.
 /**
- This list is build using 'Object::next()' and thus can only hold
+ The `freezer` list is built using `Object::next()` and thus can only hold
  objects that are not linked in SingleSet/CoupleSet already (see below).
- It is a single-linked list and addition/removal is made at the head only.
- The Reserve list are used to buffer creation/deletion of Single/Couple.
+ The single-linked list permits addition/removal at end only, the head.
+ These lists are used to buffer creation/deletion of Single/Couple.
  */
 template < typename OBJECT >
 class Freezer
 {
-    /// Pointer to first member in list
+    /// Pointer to first member in freezer
     OBJECT * head_;
-    /// Number of elements in list
+    
+    /// Number of elements in freezer
     size_t count_;
 
 public:
@@ -46,6 +47,13 @@ public:
         assert_true( count_ > 0 || head_ == nullptr );
     }
     
+    /// reset count and head
+    void clear()
+    {
+        head_ = nullptr;
+        count_ = 0;
+    }
+
     /// delete all objects
     void erase()
     {
