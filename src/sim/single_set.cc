@@ -83,7 +83,7 @@ was first before any transfer could occur, we process each Couple only once.
 */
 void SingleSet::steps()
 {
-    //Cytosim::log("SingleSet::step entry : F %5lu A %5lu\n", fList.size(), aList.size());
+    //Cytosim::log("SingleSet: F %5lu A %5lu\n", sizeF(), sizeA());
     
     Single *const fHead = firstF();
     bool fOdd = sizeF() & 1;
@@ -386,12 +386,19 @@ void SingleSet::detachAll()
 
 void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
 {
-    while ( cnt-- > 0 )
+    if ( P->fast_diffusion > 0 )
     {
-        Single * S = makeSingle(P);
-        if ( P->fast_diffusion > 0 )
+        while ( cnt-- > 0 )
+        {
+            Single * S = makeSingle(P);
             S->randomizePosition();
-        addFreeSingle(S);
+            addFreeSingle(S);
+        }
+    }
+    else
+    {
+        while ( cnt-- > 0 )
+            addFreeSingle(makeSingle(P));
     }
 }
 
