@@ -59,8 +59,9 @@ LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return _mm_sub_ps(c, _mm_mul_p
 typedef __m128 vec4f;
 typedef __m128i vec4i;
 
-LOCAL vec4i cast4fi(vec4f a) { return _mm_castps_si128(a); }
-LOCAL vec4f cast4if(vec4i a) { return _mm_castsi128_ps(a); }
+LOCAL vec4i cvt4f4i(vec4f a) { return _mm_cvtps_epi32(a); }
+LOCAL vec4i cast4f4i(vec4f a) { return _mm_castps_si128(a); }
+LOCAL vec4f cast4i4f(vec4i a) { return _mm_castsi128_ps(a); }
 
 LOCAL vec4f setzero4f()    { return _mm_setzero_ps(); }
 LOCAL vec4f set4f(float a) { return _mm_set1_ps(a); }
@@ -116,11 +117,11 @@ LOCAL vec2f getlo2f(vec4f a) { return (vec2f)a; }
 LOCAL vec2f gethi2f(vec4f a) { return (vec2f)_mm_movehl_ps(a, a); }
 
 // return { A1, A2, A3, B0 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-LOCAL vec4f catshift1f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4fi(b), cast4fi(a), 4)); }
+LOCAL vec4f catshift1f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4f4i(b), cast4f4i(a), 4)); }
 // return { A2, A3, B0, B1 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
 LOCAL vec4f catshift2f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
 // return { A3, B0, B1, B2 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-LOCAL vec4f catshift3f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4fi(b), cast4fi(a), 12)); }
+LOCAL vec4f catshift3f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4f4i(b), cast4f4i(a), 12)); }
 
 LOCAL vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
 LOCAL vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }
@@ -133,8 +134,8 @@ LOCAL int lower_mask4f(vec4f a, vec4f b) { return _mm_movemask_ps(_mm_cmplt_ps(a
 /// true if any float component is non-zero
 LOCAL int any_true4f(vec4f a) { return !_mm_test_all_zeros((__m128i)a, (__m128i{-1l, -1l})); }
 
-LOCAL vec4i shiftbitsR4(vec4f a, int b) { return _mm_srli_epi32(cast4fi(a), b); }
-LOCAL vec4i shiftbitsL4(vec4f a, int b) { return _mm_slli_epi32(cast4fi(a), b); }
+LOCAL vec4i shiftbitsR4(vec4f a, int b) { return _mm_srli_epi32(cast4f4i(a), b); }
+LOCAL vec4i shiftbitsL4(vec4f a, int b) { return _mm_slli_epi32(cast4f4i(a), b); }
 
 /// extract component
 //LOCAL int32_t getlane4i(vec4i a, int i) { return _mm_extract_epi32(a, i); }

@@ -46,7 +46,7 @@ static real * makeGaussians_SIMD(real dst[], size_t cnt, const uint32_t arg[])
         // the log() will be negative if `n < 1`, returning 0 if n == 0:
         vec4f l = log_approx4f(n);
         // set valid[i] to 2 whenever `l[i] < 0`, and 0 otherwise:
-        vec4i valid = cast4fi(and4f(negative4f(l), two));
+        vec4i valid = cast4f4i(and4f(negative4f(l), two));
         // n = sqrt( log(n) / ( -0.5 * n ) );
         n = sqrt4f(div4f(l, mul4f(half, n)));
         vec4f z;

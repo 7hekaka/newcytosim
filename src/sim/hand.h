@@ -213,8 +213,9 @@ public:
          which is problematic if 'unbinding_rate==0' and 'unbinding_force' is finite.
          This issue is handled in HandProp::complete()
          */
-        //std::cerr << prop->name() << " " << std::exp(force*prop->unbinding_force_inv) << "\n";
-        nextDetach -= prop->unbinding_rate_dt * std::exp(force*prop->unbinding_force_inv);
+        real x = force * prop->unbinding_force_inv;
+        //std::clog << prop->name() << " " << x << "   " << std::exp(x) << "\n";
+        nextDetach -= prop->unbinding_rate_dt * std::exp(x);
         
         return ( nextDetach < 0 );
     }

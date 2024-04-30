@@ -11,6 +11,48 @@ inline vec8f log8f(vec8f const x) { return _mm256_log_ps(x); }
 
 
 #if USE_SIMD
+
+/* Relative error bounded by 1e-5 for normalized outputs in the interval [-10, 10]
+   Returns invalid outputs for nan inputs
+   Continuous error
+ SIMD by FJN 30.04.2024 derived from:
+    https://github.com/jhjourdan/SIMD-math-prims
+ */
+inline vec4f exp_approx4f(vec4f arg)
+{
+    const vec4f cst1 = set4f(2139095040.f);
+    const vec4f cst2 = set4f(0.f);
+    // polynomial coefficients
+    const vec4f a = set4f(12102203.1615614f);
+    const vec4f b = set4f(1065353216.f);
+    
+    vec4f t = fmadd4f(a, arg, b); // a * arg + b;
+    vec4f i = cvt4f4i(max4f(min4f(t, cst1), cst2));
+    vec4f m = cast4i4f(and4f(i, set4fi(0x7F800000)));
+    vec4i x = cast4i4f(or4f(and4f(i, set4fi(0x7FFFFF)), set4fi(0x3F800000)));
+    
+    /* Generated in Sollya with:
+     > f=remez(1-x*exp(-(x-1)*log(2)),
+     [|(x-1)*(x-2), (x-1)*(x-2)*x, (x-1)*(x-2)*x*x|],
+     [1.000001,1.999999], exp(-(x-1)*log(2)));
+     > plot(exp((x-1)*log(2))/(f+x)-1, [1,2]);
+     > f+x;
+     */
+    const vec4f c = set4f(0.509871020f);
+    const vec4f d = set4f(0.312146713f);
+    const vec4f e = set4f(0.166617139f);
+    const vec4f f = set4f(-2.190619930e-3f);
+    const vec4f g = set4f(1.3555747234e-2f);
+    
+    //return m * (c + x * (d + x * (e + x * (f + x * g))));
+    vec4f tmp = fmadd4f(x, g, f); // (f + x * g)
+    tmp = fmadd4f(x, tmp, e); // (e + x * tmp)
+    tmp = fmadd4f(x, tmp, d); // (d + x * tmp)
+    tmp = fmadd4f(x, tmp, c); // (c + x * tmp)
+    return mul4f(m, tmp); // m * tmp
+}
+
+
 /// Approximate natural logarithm by Jacques-Henri Jourdan
 /**
  Absolute error bounded by 1e-5 for normalized inputs

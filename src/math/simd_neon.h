@@ -220,8 +220,9 @@ LOCAL vec2f fnmadd2f(vec2f a, vec2f b, vec2f c) { return vfms_f32(c,a,b); }
 typedef float32x4_t vec4f;
 typedef int32x4_t vec4i;
 
-LOCAL vec4i cast4fi(vec4f a) { return vreinterpretq_s32_f32(a); }
-LOCAL vec4f cast4if(vec4i a) { return vreinterpretq_f32_s32(a); }
+LOCAL vec4i cvt4f4i(vec4f a) { return vcvtnq_s32_f32(a); }
+LOCAL vec4i cast4f4i(vec4f a) { return vreinterpretq_s32_f32(a); }
+LOCAL vec4f cast4i4f(vec4i a) { return vreinterpretq_f32_s32(a); }
 
 LOCAL vec4f setzero4f() { return vdupq_n_f32(0); }
 LOCAL vec4f negate4f(vec4f a) { return vnegq_f32(a); }
@@ -283,7 +284,6 @@ LOCAL vec4f hadd4f(vec4f a, vec4f b) { return vpaddq_f32(a, b); }
 LOCAL vec4i or4f(vec4i a, vec4i b) { return vorrq_s32(a, b); }
 LOCAL vec4i and4f(vec4i a, vec4i b) { return vandq_s32(a, b); }
 LOCAL vec4i andnot4f(vec4i a, vec4i b) { return vbicq_s32(a, b); }
-LOCAL vec4i and4i(vec4i a, vec4i b) { return vandq_u32(a,b); }
 
 LOCAL vec4f abs4f(vec4f a)          { return vabsq_f32(a); }
 LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}); }
