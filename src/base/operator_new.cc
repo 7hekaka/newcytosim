@@ -14,7 +14,7 @@ void* operator new(std::size_t size)
 {
     //printf("new(%lu)\n", size);
     void * ptr = nullptr;
-#if ( 1 )
+#if ( 0 )
     constexpr std::size_t sup = 1 << 30;
     if ( size > sup )
     {
