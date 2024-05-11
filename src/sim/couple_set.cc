@@ -143,10 +143,10 @@ void CoupleSet::steps()
  
  This is only used if POOL_UNATTACHED > 1
  */
-void CoupleSet::stepSkipUnattached()
+void CoupleSet::stepsSkippingUnattached()
 {
     /*
-    Cytosim::log("CoupleSet::stepSkipUnattached : FF %5i AF %5i FA %5i AA %5i\n",
+    Cytosim::log("CoupleSet::stepsSkippingUnattached : FF %5i AF %5i FA %5i AA %5i\n",
                  ffList.size(), afList.size(), faList.size(), aaList.size());
     */
     
@@ -158,7 +158,7 @@ void CoupleSet::stepSkipUnattached()
     bool const afOdd = afList.size() & 1;
     
     //size_t cnt = sizeFF();
-    //printf(" CoupleSet::stepSkipUnattached %lu -> %lu\n", cnt, sizeFF());
+    //printf(" CoupleSet::stepsSkippingUnattached %lu -> %lu\n", cnt, sizeFF());
 
     step_couples<&Couple::stepAA>(firstAA(), aaOdd);
     if ( RNG.flip() )

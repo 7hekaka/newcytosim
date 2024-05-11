@@ -120,9 +120,9 @@ void SingleSet::steps()
 
  This is only used if POOL_UNATTACHED > 1
 */
-void SingleSet::stepSkipUnattached()
+void SingleSet::stepsSkippingUnattached()
 {
-    //Cytosim::log("SingleSet::stepSkipUnattached : F %5i A %5i\n", fList.size(), aList.size());
+    //Cytosim::log("SingleSet::stepsSkippingUnattached : F %5i A %5i\n", fList.size(), aList.size());
     
     step_singles<&Single::stepA>(firstA(), sizeA() & 1);
     if ( aList.size() > 1 ) aList.shuffle();

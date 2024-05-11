@@ -166,7 +166,7 @@ public:
     void steps();
     
     /// Monte-Carlo step without Hand attachment
-    void stepSkipUnattached();
+    void stepsSkippingUnattached();
 
     /// cleanup at end of simulation period
     void relax() { uniRelax(); }

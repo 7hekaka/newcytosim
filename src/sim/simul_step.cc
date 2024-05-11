@@ -134,8 +134,8 @@ void Simul::steps()
     doAttachCounter = ( doAttachCounter + 1 ) % POOL_UNATTACHED;
     if ( doAttachCounter )
     {
-        couples.stepSkipUnattached();
-        singles.stepSkipUnattached();
+        couples.stepsSkippingUnattached();
+        singles.stepsSkippingUnattached();
         //printf("     ::noattach %16llu\n", (timer()-rdt)>>3);
     }
     else
