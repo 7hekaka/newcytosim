@@ -245,7 +245,7 @@ public:
     void makeCouples(CoupleProp const*, size_t cnt);
 
     /// create unattached Couples
-    void makeCouples(size_t cnt[], size_t n_cnt);
+    void makeCouples(size_t cnt[], PropertyID n_cnt);
     
     /// return a Couple from the reserve, or made by newCouple()
     void addFreeCouple(Couple*);
@@ -259,7 +259,7 @@ public:
     void defrostStore();
 
     /// detach objects that were not updated during import
-    void reheat(size_t cnt[], size_t n_cnt);
+    void reheat(size_t cnt[], PropertyID n_cnt);
     
     /// detach objects that were not updated during import
     void reheat();

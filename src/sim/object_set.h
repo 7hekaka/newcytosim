@@ -145,8 +145,8 @@ public:
     /// remove Object, and delete it
     void eraseObject(Object *);
 
-    /// allocate to be ready to handle `cnt` objects
-    void reserve(size_t cnt) { inventory_.reserve(cnt); }
+    /// allocate to be ready to handle indentities up to `sup`
+    void reserve(size_t sup) { inventory_.reserve(sup); }
     
     /// register Object, adding it at the end of the list
     void add(Object *);

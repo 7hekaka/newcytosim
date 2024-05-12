@@ -74,7 +74,7 @@ public:
     /// current size of array
     size_t capacity() const { return alloca_; }
 
-    /// allocate to handle references in [1, sup]
+    /// allocate to handle ObjectID in [1, sup]
     void reserve(const size_t sup) { if ( sup > alloca_ ) allocate(sup); }
     
     /// remember `obj`, assign a new ID if necessary

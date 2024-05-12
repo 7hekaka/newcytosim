@@ -572,7 +572,8 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
             {
                 if ( 0 == ( prop.skip_free_single & 4 ))
                 {
-                    size_t i = 0, cnt[16] = { 0 };
+                    PropertyID i = 0;
+                    size_t cnt[16] = { 0 };
                     while ( i < 16 && iss >> cnt[i] )
                         ++i;
                     if ( i > 0 )
@@ -608,7 +609,8 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
             {
                 if ( 0 == ( prop.skip_free_couple & 4 ))
                 {
-                    size_t i = 0, cnt[16] = { 0 };
+                    PropertyID i = 0;
+                    size_t cnt[16] = { 0 };
                     while ( i < 16 && iss >> cnt[i] )
                         ++i;
                     if ( i > 0 )

@@ -196,7 +196,7 @@ public:
     void makeSingles(SingleProp const*, size_t cnt);
 
     /// create unattached Singles
-    void makeSingles(size_t cnt[], size_t n_cnt);
+    void makeSingles(size_t cnt[], PropertyID n_cnt);
     
     /// link unattached Single
     void addFreeSingle(Single*);
@@ -210,7 +210,7 @@ public:
     void defrostStore();
 
     /// detach objects that were not updated during import
-    void reheat(size_t cnt[], size_t n_cnt);
+    void reheat(size_t cnt[], PropertyID n_cnt);
     
     /// detach objects that were not updated during import
     void reheat();

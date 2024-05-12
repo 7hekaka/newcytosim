@@ -542,9 +542,9 @@ void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
 }
 
 
-void CoupleSet::makeCouples(size_t cnt[], size_t n_cnt)
+void CoupleSet::makeCouples(size_t cnt[], PropertyID n_cnt)
 {
-    for ( size_t i = 1; i < n_cnt; ++i )
+    for ( PropertyID i = 1; i < n_cnt; ++i )
     {
         if ( cnt[i] > 0 )
         {
@@ -591,7 +591,7 @@ void CoupleSet::freeze()
 
 
 /** cnt[i] is the number of Couples of type `i` to be released */
-void CoupleSet::reheat(size_t cnt[], size_t n_cnt)
+void CoupleSet::reheat(size_t cnt[], PropertyID n_cnt)
 {
 #if 0
     std::clog << "Couple::reheat";

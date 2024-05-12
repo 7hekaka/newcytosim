@@ -152,6 +152,7 @@ Single * SingleSet::makeSingle(SingleProp const* P)
         P->stocks.pop();
     else
         S = P->newSingle();
+    //std::clog << "makeSingle(" << S->reference() << ") ";
     return S;
 }
 
@@ -386,6 +387,7 @@ void SingleSet::detachAll()
 
 void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
 {
+    reserve(inventory_.highest()+cnt);
     if ( P->fast_diffusion > 0 )
     {
         while ( cnt-- > 0 )
@@ -403,11 +405,11 @@ void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
 }
 
 
-void SingleSet::makeSingles(size_t cnt[], size_t n_cnt)
+void SingleSet::makeSingles(size_t cnt[], PropertyID n_cnt)
 {
     //std::clog << "makeSingles " << cnt[0] << " " << cnt[1] << " " << cnt[2] << "\n";
     // note that id=0 is invalid
-    for ( size_t i = 1; i < n_cnt; ++i )
+    for ( PropertyID i = 1; i < n_cnt; ++i )
     {
         Property * sp = simul_.properties.find("single", i);
         if ( sp )
@@ -448,7 +450,7 @@ void SingleSet::freeze()
 
 
 /** cnt[i] is the number of Singles of type `i` to be released */
-void SingleSet::reheat(size_t cnt[], size_t n_cnt)
+void SingleSet::reheat(size_t cnt[], PropertyID n_cnt)
 {
     //std::clog << "Single::reheat " << ice_.size() << " " << cnt[1] << "\n";
     Object * i = ice_.front();
