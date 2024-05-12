@@ -18,7 +18,7 @@ namespace Cytosim
         /// prefix to all messages
         std::string pref_;
 
-        /// pointer to the current destination of output
+        /// destination of output
         std::ostream out_;
         
         /// file stream, if open
