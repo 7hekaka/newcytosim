@@ -1,9 +1,9 @@
 # How to compile Cytosim
 
-The core of Cytosim is written in [C++17](https://en.wikipedia.org/wiki/C%2B%2B14) and it is necessary to recompile the programs after each modification of the source code. Some of the accessory tools use [Python](https://www.python.org).
- 
-Compilation requires a C++ compiler: e.g. [`gcc`](http://gcc.gnu.org/), [`clang`](http://clang.llvm.org) or the [Intel compiler](http://en.wikipedia.org/wiki/Intel_C%2B%2B_Compiler), together with a few libraries.
-Compilation is started from a terminal, with a program called [`make`](http://www.gnu.org/software/make/). Optionally, [`cmake`](https://cmake.org) can be used to configure `make`.
+The core of Cytosim is written using standard [C++17](https://en.wikipedia.org/wiki/C%2B%2B17) and it is necessary to recompile the programs after each modification of the source code. Some code is platform specific, in particular optimizations relying on [SIMD](https://en.wikipedia.org/wiki/Single_instruction,_multiple_data), but this code is automatically disabled if the feature is not available. Most of the accessory tools use [Python](https://www.python.org).
+
+Compilation requires a C++ compiler: e.g. [The GNU compiler `g++`](http://gcc.gnu.org/), [`clang`](http://clang.llvm.org) or the [`Intel compiler`](http://en.wikipedia.org/wiki/Intel_C%2B%2B_Compiler), together with a few libraries.
+Compilation is started from a terminal, with a program called [`make`](http://www.gnu.org/software/make/). Optionally, [`cmake`](https://cmake.org) can be used to configure `make` on your platform. On MacOS, we recommend using [`Xcode`](https://en.wikipedia.org/wiki/Xcode), which is used for development.
 
 ### Dimensionality
 
