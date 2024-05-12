@@ -291,6 +291,9 @@ private:
     /// sub vector to vBAS at index `i`
     void sub_base(size_t, Vector const&) const;
 
+    /// sub vector to vBAS at index `i`
+    void sub_base(size_t, Vector const&, real) const;
+
 private:
     
     /// allocate memory

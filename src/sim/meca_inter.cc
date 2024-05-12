@@ -311,6 +311,13 @@ inline void Meca::sub_base(size_t i, Vector const& vec) const
     vec.sub_to(vBAS+DIM*i);
 }
 
+/// add `-alpha * vec` to the base
+inline void Meca::sub_base(size_t i, Vector const& vec, real alpha) const
+{
+    CHECK_INDEX(i);
+    vec.sub_to(alpha, vBAS+DIM*i);
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Explicit (constant) Forces
 //------------------------------------------------------------------------------
@@ -1106,8 +1113,8 @@ void Meca::addTorque3Long(Mecapoint const& ptA,
     {
         real ab = std::sqrt(ab2);
         const real wla = weightL * len / ab;
-        add_base(iiA, AB, -wla);
-        add_base(iiB, AB,  wla);
+        sub_base(iiA, AB, wla);
+        add_base(iiB, AB, wla);
 
         // regularize interaction to avoid creating negative eigen values
         if ( ab < len )
@@ -1284,7 +1291,7 @@ void Meca::addLink(Mecapoint const& ptA,
 #endif
         if ( off.is_not_zero() )
         {
-            add_base(ii0, off,-weight);
+            sub_base(ii0, off, weight);
             add_base(ii1, off, weight);
         }
     }
@@ -2230,7 +2237,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
 
     add_base(ii0, axi, cc0 * wla);
     add_base(ii1, axi, cc1 * wla);
-    add_base(ii2, axi, -wla);
+    sub_base(ii2, axi, wla);
 
     MatrixBlock wT;
     /* To stabilize the matrix with compression, we remove negative eigenvalues
@@ -4662,7 +4669,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
 
     Vector vec = cross(leg, pos);
     add_base(ii0, vec.extrapolated(cc0, pos), weight);
-    add_base(ii1, vec.extrapolated(-cc1, pos), -weight);
+    sub_base(ii1, vec.extrapolated(-cc1, pos), weight);
 
     DRAW_LINK(ptA, cross(arm, ptA.dir()), pos);
 }
@@ -4798,8 +4805,8 @@ void Meca::addLineClamp(Interpolation const& pti,
     add_block(ii1, ii0, cc0*cc1, wT);
     
     //add the constant term:
-    add_base(ii0, wT*pos, -cc0);
-    add_base(ii1, wT*pos, -cc1);
+    sub_base(ii0, wT*pos, cc0);
+    sub_base(ii1, wT*pos, cc1);
 }
 
 
@@ -4891,8 +4898,8 @@ void Meca::addPlaneClamp(Interpolation const& pti,
     add_block(ii1, ii0, cc1*cc0, wT);
     
     //add the constant term:
-    add_base(ii0, wT*pos, -cc0);
-    add_base(ii1, wT*pos, -cc1);
+    sub_base(ii0, wT*pos, cc0);
+    sub_base(ii1, wT*pos, cc1);
 }
 
 
@@ -4958,7 +4965,7 @@ void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
     real abn3 = weight / abnSqr;
     real abn5 = weight / ( abnSqr * abn );
     
-    add_base(ii0, ab,-3*abn3);
+    sub_base(ii0, ab, 3*abn3);
     add_base(ii1, ab, 3*abn3);
     
     // abn5 * I + [ ab (x) ab ] * (-3))
