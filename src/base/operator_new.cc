@@ -22,13 +22,14 @@ void* operator new(std::size_t size)
         throw std::bad_alloc();
     }
 #endif
-#if ( 1 )
+#if ( 0 )
     // get memory aligned to 32 bytes
     if ( posix_memalign(&ptr, 32, size) )
         throw std::bad_alloc();
 #else
-    // system's default (unaligned) memory
+    // system's default allocation, not necessarily aligned
     ptr = std::malloc(size);
+    //if ( size > 2048 ) std::printf("Cytosim:new(%5zu) %p %+li\n", size, ptr, ((uintptr_t)ptr & 63));
 #endif
     if ( !ptr )
         throw std::bad_alloc();

@@ -563,7 +563,7 @@ std::string Tokenizer::get_block_text(std::istream& is, char c_in, const char c_
 {
     assert_true(c_out);
     std::string res;
-    res.reserve(2048);
+    res.reserve(2032);
     char c = 0;
     
     if ( c_in )

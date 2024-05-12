@@ -76,7 +76,7 @@ inline static real* new_real(size_t cnt)
      We need to align to 4 doubles (of size 8 bytes), hence 32 bytes
      Allocating to 64 bytes matches the cache boundary on most CPUs
      */
-    if ( posix_memalign(&ptr, 64, cnt*sizeof(real)) )
+    if ( posix_memalign(&ptr, 4*sizeof(real), cnt*sizeof(real)) )
         throw std::bad_alloc();
     real* res = (real*)ptr;
     //printf("   new_real(%5zu) %p\n", cnt, ptr);
