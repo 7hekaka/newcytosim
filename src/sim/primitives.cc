@@ -13,8 +13,8 @@
 #include "space.h"
 
 
-/* With C++11, the extracted value is zeroed even upon failure.
-This on the other hand will preserve the value of 'var' if no read occurs.
+/** With C++11, the extracted value is zeroed even upon failure.
+extract(), on the other hand, will preserve the value of 'var' if no read occurs.
 Returns `true` if a value was set. This is used with T=real and T=Vector */
 template < typename T >
 static bool extract(std::istream& is, T& var)
@@ -26,6 +26,34 @@ static bool extract(std::istream& is, T& var)
     is.clear();
     is.seekg(isp);
     var = backup;
+    return false;
+}
+
+
+/** Specialized version for floating point values: `var` is unchanged upon failure.
+ This should be equivalent to the extract() above, using strtod() for speed */
+static bool extract(std::istream& is, real& var)
+{
+    std::streampos isp = is.tellg();
+    char str[64];
+    if ( is >> str )
+    {
+        errno = 0;
+        char * end = nullptr;
+#if REAL_IS_DOUBLE
+        real x = strtod(str, &end);
+#else
+        real x = strtof(str, &end);
+#endif
+        if ( errno == 0 && end > str )
+        {
+            var = x;
+            //printf("%s : %f\n", str, var);
+            return true;
+        }
+    }
+    is.clear();
+    is.seekg(isp);
     return false;
 }
 
