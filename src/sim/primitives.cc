@@ -556,7 +556,7 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
             extract(is, blur);
             pos += Vector::randG(blur);
         }
-        // extend long the X axis
+        // extend along the X axis
         else if ( tok == "extend" )
         {
             real B = 0, T = 0;
@@ -565,7 +565,7 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
             pos.XX += B + ( T - B ) * RNG.preal();
         }
 #if ( DIM > 2 )
-        // extend long the Z axis
+        // extend along the Z axis
         else if ( tok == "extendZ" )
         {
             real B = 0, T = 0;

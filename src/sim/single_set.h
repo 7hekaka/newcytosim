@@ -113,10 +113,10 @@ public:
     /// create Single attached to the beads
     ObjectList distributeWrists(SingleProp const*, size_t cnt, std::string const&) const;
     
-    ///returns the first free Single
+    /// return the first free Single
     Single * firstF() const { return static_cast<Single*>(fList.front()); }
     
-    ///returns the first bound Single
+    /// return the first bound Single
     Single * firstA() const { return static_cast<Single*>(aList.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found

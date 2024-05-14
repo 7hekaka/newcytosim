@@ -21,10 +21,10 @@ namespace Tokenizer
     /// same as block_delimiter()
     //inline char block_delimiter(int c) { return block_delimiter((char)c); }
     
-    /// skip space and new-line if `eat_line`==true, return the next character
+    /// skip space and new-line if `eat_line==true`, returning the next character
     int skip_space(std::istream&, bool eat_line);
     
-    /// skip upcomming characters for which isspace() is true, and new-line if `eat_line`==true
+    /// skip upcomming space-like characters, including new-line if `eat_line`==true
     int get_character(std::istream&, bool eat_space=true, bool eat_line=false);
     
     /// read one signed integer, and throw exception if spacing character does not follow
