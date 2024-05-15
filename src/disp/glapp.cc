@@ -13,15 +13,15 @@
 #include "offscreen.h"
 #include "save_image_gl.h"
 
-
+/** A layer on top of GLUT adding some user interface */
 namespace glApp
 {
     std::vector<View> views;
     
-    int mDIM        = 3;     ///< current dimensionality mode
-    int mFullScreen = false; ///< flag indicating full-screen mode
-    int specialKeys = 0;     ///< state of special keys given by GLUT
-    int drawRefresh = 0;     ///< true if display needs to be updated
+    int mDIM        = 3;  ///< current dimensionality mode
+    int mFullScreen = 0;  ///< flag indicating full-screen mode
+    int specialKeys = 0;  ///< state of special keys given by GLUT
+    int drawRefresh = 0;  ///< true if display needs to be updated
     
     // --------------- MOUSE
     
