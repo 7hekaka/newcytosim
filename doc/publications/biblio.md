@@ -8,6 +8,10 @@
 
 *Please, let us know of any citation we could add. This is important for our funders!*
 
+2024
+
+- [Wave-like oscillations of clamped microtubules driven by collective dynein transport](https://doi.org/10.1016/j.bpj.2024.01.016)
+
 2023
 
 - [Kinetic trapping organizes actin filaments within liquid-like protein droplets](https://doi.org/10.1101/2023.05.26.542517)
