@@ -716,7 +716,7 @@ void SingleSet::deleteWrists(Object const* arg)
 }
 
 
-void SingleSet::deleteInvalidWrists()
+void SingleSet::deleteInvalidSingles()
 {
     Single *nxt, *obj;
 

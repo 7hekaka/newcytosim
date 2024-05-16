@@ -216,7 +216,7 @@ public:
     void reheat();
     
     /// check the anchoring Mecables of Wrists
-    void deleteInvalidWrists();
+    void deleteInvalidSingles();
     
     /// check internal consistency, returns 0 if everything is OK
     int bad() const;
