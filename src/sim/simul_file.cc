@@ -391,7 +391,7 @@ private:
     
 public:
     
-    /// move objects on ice buckets
+    /// mark objects to later be able to tell if they have been updated
     InportLock(Simul * s)
     : sim(s)
     {
@@ -409,7 +409,7 @@ public:
         //sim->events.freeze();
     }
     
-    /// erase objects in ice buckets
+    /// erase objects which have not been upated
     void prune_all()
     {
         //sim->events.defrost();
@@ -426,7 +426,7 @@ public:
         sim = nullptr;
     }
     
-    /// move objects from ice buckets back to normal lists
+    /// move back all objects to normal lists, even if they have not been updated
     void thaw_all()
     {
         /*
@@ -484,13 +484,13 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
     try
     {
         VLOG("readObjects start at [" << in.peek() << "]\n");
-        int res = readObjects(in, subset);
+        int err = readObjects(in, subset);
         VLOG("readObjects end\n");
         in.unlock();
 
         primed_ = 0;
         // if no error occurred, process objects that have not been updated
-        if ( 0 == res && prune )
+        if ( 0 == err && prune )
             lock.prune_all();
         else
             lock.thaw_all();
@@ -501,7 +501,7 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
 
         assert_false(singles.bad());
         assert_false(couples.bad());
-        return res;
+        return err;
     }
     catch(Exception & e)
     {
