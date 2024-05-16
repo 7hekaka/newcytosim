@@ -50,11 +50,8 @@ int main(int argc, char* argv[])
     
     // check extension of output file:
     char const* ext = strrchr(argv[2], '.');
-    if ( ext )
-    {
-        if ( 0 == memcmp(ext, ".txt", 4) )
-            binary = 0;
-    }
+    if ( ext && 0 == memcmp(ext, ".txt", 4) )
+        binary = 0;
     
     if ( arg.read_strings(argc-3, argv+3) )
         return EXIT_FAILURE;
@@ -82,7 +79,8 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
-    std::clog << ">>>>>> Sieve `" << argv[1] << "' -> `" << argv[2] << "'\n";
+    std::clog << ">>>>>> Sieve `" << argv[1] << "' -> `" << argv[2];
+    std::clog << "'  binary: " << binary << "\n";
     
     size_t frm = 0, frame = ~0;
     // the index for a single frame can be specified:
