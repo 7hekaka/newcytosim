@@ -26,7 +26,7 @@ protected:
 public:
     
     /// Construct object anchored at one Mecapoint
-    Wrist(SingleProp const*, Mecable const*, size_t point);
+    Wrist(SingleProp const*, Mecable const*, unsigned point);
 
     /// destructor
     ~Wrist();
@@ -50,14 +50,14 @@ public:
     /// Object to which this is anchored
     Mecable const* base() const { return base_.mecable(); }
 
-    /// attach at one Mecapoint
-    void rebase(Mecable const* mec, size_t pti) { base_.set(mec, pti); }
+    /// attach at Mecapoint of specified index
+    void rebase(Mecable const* mec, unsigned pti) { base_.set(mec, pti); }
     
-    /// attach between two Mecapoint
-    void rebase(Mecable const* mec, size_t a, size_t b, real c) { base_.set(mec, a, b, c); }
+    /// attach between two Mecapoints of indices `a` and `b`
+    void rebase(Mecable const* mec, unsigned a, unsigned b, real c) { base_.set(mec, a, b, c); }
     
-    /// attach over a triad of Mecapoint
-    void rebase(Mecable const* mec, size_t ref, Vector pos) { base_.set(mec, ref, pos); }
+    /// attach over a triad of Mecapoints starting at `ref`
+    void rebase(Mecable const* mec, unsigned ref, Vector pos) { base_.set(mec, ref, pos); }
     
     
     /// true if Single creates a link

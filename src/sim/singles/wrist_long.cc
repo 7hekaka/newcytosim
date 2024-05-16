@@ -6,7 +6,7 @@
 
 
 
-WristLong::WristLong(SingleProp const* sp, Mecable const* mec, const size_t pti)
+WristLong::WristLong(SingleProp const* sp, Mecable const* mec, const unsigned pti)
 : Wrist(sp, mec, pti)
 {
 #if WRIST_USES_LONGLINK

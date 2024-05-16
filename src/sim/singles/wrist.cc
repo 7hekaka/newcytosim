@@ -7,7 +7,7 @@
 
 
 
-Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const size_t pti)
+Wrist::Wrist(SingleProp const* sp, Mecable const* mec, const unsigned pti)
 : Single(sp)
 {
     // 'mec' can be Null when reading from file
@@ -81,7 +81,7 @@ void Wrist::setInteractions(Meca& meca) const
          to the 'south-north' axis of the kinetochore.
          To keep the angular stiffness constant, we scale `weight` by the distance.
          */
-        size_t j = i.lightest_point();
+        unsigned j = i.lightest_point();
         base_.addAlignedOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiff/seg);
     }
 #endif
