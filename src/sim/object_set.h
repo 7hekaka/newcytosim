@@ -217,7 +217,7 @@ public:
     void loadObject(Inputter&, ObjectTag tag, int bin);
     
     /// read meta data from file
-    virtual void readMetaData(Inputter&, int) {}
+    virtual void readObjectTypes(Inputter&) {}
 
     /// print a summary of the content (nb of objects, class)
     virtual void report(std::ostream&) const = 0;

@@ -715,6 +715,11 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
 }
 
 
+static bool isAlpha(int i)
+{
+    return ( 'a' <= i && i <= 'z' ) || ( 'A' <= i && i <= 'Z' );
+}
+
 /**
  Read file, updating existing objects, and creating new ones for those not 
  already present in the Simul.
@@ -733,14 +738,14 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
     std::string section;
     size_t nb_objects = 0;
     int has_frame = 0;
-    int tag = 0, c = 0;
+    int tag = 0;
     int fat = 0;
 
     while ( 1 )
     {
         do {
-            c = in.get_char();
-            if ( c == '#' )
+            tag = in.get_char();
+            if ( tag == '#' )
             {
                 int h = readMetaData(in, section, objset, subset);
                 if ( h )
@@ -756,32 +761,33 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                     if ( has_frame )
                         fresh_ = 1;
                 }
-            }
-            else if ( c == '%' )
-            {
-                c = in.get_char();
-                ObjectSet * set = findSetT(c);
-                if ( set )
-                    set->readMetaData(in, c);
-                else
-                    throw InvalidIO("unknown objset TAG |"+std::string(1,(char)tag)+"|");
                 continue;
             }
-            else if ( c == EOF )
+            if ( tag == '%' )
+            {
+                if ( objset )
+                    objset->readObjectTypes(in);
+                else
+                    throw InvalidIO("unset objset with `%`");
+                continue;
+            }
+            if ( tag == '\n' )
+                continue;
+            if ( tag == EOF )
                 return 1;
-            tag = ( c & LOW_BITS );
-            fat = ( c & HIGH_BIT ) + in.binary();
 #if BACKWARD_COMPATIBILITY < 50
             // detect fat header, formatID() < 50
-            if ( c == '$' )
+            if ( tag == '$' )
             {
                 fat = 1 + in.binary();
                 tag = in.get_char();
             }
 #endif
-        } while ( !isalpha(tag) );
+            // extract ASCII from character:
+            fat = ( tag & HIGH_BIT ) + in.binary();
+            tag = ( tag & LOW_BITS );
+        } while ( !isAlpha(tag) );
         
-        assert_true( isalpha(tag) );
         //VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));
 
         try
