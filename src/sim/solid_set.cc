@@ -30,12 +30,12 @@ void SolidSet::steps()
             Vector pos = S->posPoint(0) + Vector::randU(S->radius(0));
             if ( S->prop->source_couple )
             {
-                Couple * C = simul_.couples.addCouple(S->prop->source_couple, pos);
+                Couple * C = simul_.couples.addFreeCouple(S->prop->source_couple, pos);
                 C->activate();
             }
             else
             {
-                simul_.singles.addSingle(S->prop->source_single, pos);
+                simul_.singles.addFreeSingle(S->prop->source_single, pos);
             }
         }
     }

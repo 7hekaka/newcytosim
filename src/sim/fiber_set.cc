@@ -278,7 +278,7 @@ void FiberSet::steps()
         {
             nextCreation += RNG.exponential();
             Vector pos = obj->posM(len*RNG.preal());
-            Couple * C = simul_.couples.addCouple(obj->prop->source_prop, pos);
+            Couple * C = simul_.couples.addFreeCouple(obj->prop->source_prop, pos);
             C->activate();
             simul_.couples.add(C);
         }

@@ -188,9 +188,6 @@ public:
     
     /// return a Single from the reserve, or made by newSingle()
     Single * makeSingle(SingleProp const*);
-    
-    /// create a Single at given position
-    Single * addSingle(SingleProp const*, Vector const&);
 
     /// create unattached Singles
     void makeSingles(SingleProp const*, size_t cnt);
@@ -200,6 +197,9 @@ public:
     
     /// link unattached Single
     void addFreeSingle(Single*);
+    
+    /// create a Single at given position
+    Single * addFreeSingle(SingleProp const*, Vector const&);
 
     //--------------------------
 

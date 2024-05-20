@@ -168,7 +168,7 @@ void SingleSet::addFreeSingle(Single * obj)
 }
 
 
-Single * SingleSet::addSingle(SingleProp const* P, Vector const& pos)
+Single * SingleSet::addFreeSingle(SingleProp const* P, Vector const& pos)
 {
     Single * S = makeSingle(P);
     S->setPosition(pos);

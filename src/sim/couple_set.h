@@ -239,7 +239,7 @@ public:
     Couple * makeCouple(CoupleProp const*);
     
     /// create a Couple at given position
-    Couple * addCouple(CoupleProp const*, Vector const&);
+    Couple * addFreeCouple(CoupleProp const*, Vector const&);
 
     /// create unattached Couples
     void makeCouples(CoupleProp const*, size_t cnt);

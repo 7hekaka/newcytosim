@@ -267,7 +267,7 @@ void CoupleSet::addFreeCouple(Couple * obj)
 }
 
 
-Couple * CoupleSet::addCouple(CoupleProp const* P, Vector const& pos)
+Couple * CoupleSet::addFreeCouple(CoupleProp const* P, Vector const& pos)
 {
     Couple * C = makeCouple(P);
     C->setPosition(pos);

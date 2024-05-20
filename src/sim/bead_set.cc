@@ -30,12 +30,12 @@ void BeadSet::steps()
             Vector pos = B->position() + Vector::randU(B->radius());
             if ( B->prop->source_couple )
             {
-                Couple * C = simul_.couples.addCouple(B->prop->source_couple, pos);
+                Couple * C = simul_.couples.addFreeCouple(B->prop->source_couple, pos);
                 C->activate();
             }
             else
             {
-                simul_.singles.addSingle(B->prop->source_single, pos);
+                simul_.singles.addFreeSingle(B->prop->source_single, pos);
             }
         }
     }

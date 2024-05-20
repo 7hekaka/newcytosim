@@ -371,7 +371,7 @@ Single * SimThread::createHandle(Vector3 const& pos3, real range)
     SingleProp * sip = getHandleProperty();
     if ( !sip )
         sip = makeHandleProperty(range);
-    handle_ = sim_->singles.addSingle(sip, Vector(pos3));
+    handle_ = sim_->singles.addFreeSingle(sip, Vector(pos3));
     return handle_;
 }
 
