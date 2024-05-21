@@ -543,87 +543,85 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
     // section heading
     if ( tok == "section" )
     {
-        iss >> section >> tok;
-        VLOG("section <---|" << section << "|\n");
-        if ( section == "end" )
-            return 0;
-        objset = findSet(section);
-        if ( !objset )
-            throw InvalidIO("unknown section |"+section+"|");
+        std::string sec;
+        iss >> sec >> tok;
+        if ( sec != section )
+        {
+            section = sec;
+            VLOG("section <---|" << sec << "|\n");
+            if ( sec == "end" )
+                return 0;
+            objset = findSet(sec);
+            if ( !objset )
+                throw InvalidIO("unknown section |"+sec+"|");
+        }
         if ( subset && objset != subset )
             in.skip_until("#section ");
-        else if ( section == "single" )
+        if ( tok == "reheat" )
         {
-            if ( tok == "F" )
+            bool skip = ( objset != &couples && objset != &singles );
+            if ( section == "couple" && ( prop.skip_free_couple & 4 ) )
+                skip = true;
+            if ( section == "single" && ( prop.skip_free_single & 4 ) )
+                skip = true;
+            if ( skip )
+                in.skip_until("#section ");
+            else
             {
-                if ( prop.skip_free_single & 4 )
-                    in.skip_until("#section ");
-#if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
-                if ( in.formatID() < 58 )
+                PropertyID i = 0;
+                size_t cnt[16] = { 0 };
+                while ( i < 16 && iss >> cnt[i] )
+                    ++i;
+                if ( i > 0 )
                 {
-                    int mod = 0;
-                    iss >> mod;
-                    if ( iss.good() && mod == 1 )
-                        singles.reheat();
-                }
-#endif
-            }
-            else if ( tok == "reheat" )
-            {
-                if ( 0 == ( prop.skip_free_single & 4 ))
-                {
-                    PropertyID i = 0;
-                    size_t cnt[16] = { 0 };
-                    while ( i < 16 && iss >> cnt[i] )
-                        ++i;
-                    if ( i > 0 )
-                    {
-                        singles.reheat(cnt, i);
-                        singles.makeSingles(cnt, i);
-                    }
-#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                    else if ( in.formatID() < 60 )
-                        singles.reheat();
-#endif
-                }
-            }
-            return 0;
-        }
-        else if ( section == "couple" )
-        {
-            if ( tok == "FF" )
-            {
-                if ( prop.skip_free_couple & 4 )
-                    in.skip_until("#section ");
-#if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
-                if ( in.formatID() < 58 )
-                {
-                    int mod = 0;
-                    iss >> mod;
-                    if ( iss.good() && mod == 1 )
-                        couples.reheat();
-                }
-#endif
-            }
-            else if ( tok == "reheat" )
-            {
-                if ( 0 == ( prop.skip_free_couple & 4 ))
-                {
-                    PropertyID i = 0;
-                    size_t cnt[16] = { 0 };
-                    while ( i < 16 && iss >> cnt[i] )
-                        ++i;
-                    if ( i > 0 )
+                    if ( section == "couple" )
                     {
                         couples.reheat(cnt, i);
                         couples.makeCouples(cnt, i);
+                    } else if ( section == "single" ) {
+                        singles.reheat(cnt, i);
+                        singles.makeSingles(cnt, i);
                     }
-#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
-                    else if ( in.formatID() < 60 )
-                        couples.reheat();
-#endif
                 }
+#if BACKWARD_COMPATIBILITY < 60 // until 2.04.2023
+                else if ( in.formatID() < 60 )
+                {
+                    if ( section == "couple" )
+                        couples.reheat();
+                    else if ( section == "single" )
+                        singles.reheat();
+                }
+#endif
             }
+        }
+        else if ( section == "single" && tok == "F" )
+        {
+            if ( prop.skip_free_single & 4 )
+                in.skip_until("#section ");
+#if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
+            if ( in.formatID() < 58 )
+            {
+                int mod = 0;
+                iss >> mod;
+                if ( iss.good() && mod == 1 )
+                    singles.reheat();
+            }
+#endif
+            return 0;
+        }
+        else if ( section == "couple" && tok == "FF" )
+        {
+            if ( prop.skip_free_couple & 4 )
+                in.skip_until("#section ");
+#if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
+            if ( in.formatID() < 58 )
+            {
+                int mod = 0;
+                iss >> mod;
+                if ( iss.good() && mod == 1 )
+                    couples.reheat();
+            }
+#endif
         }
         return 0;
     }
