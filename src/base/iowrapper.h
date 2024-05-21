@@ -120,7 +120,7 @@ class Outputter : public FileWrapper
 private:
         
     /// Flag for binary output
-    bool binary_;
+    int binary_;
 
 public:
 
@@ -128,19 +128,19 @@ public:
     Outputter();
     
     /// constructor which opens a file, in binary mode if 'b==true'
-    Outputter(FILE* f, bool b) : FileWrapper(f, nullptr), binary_(b) {};
+    Outputter(FILE* f, int b) : FileWrapper(f, nullptr), binary_(b) {};
 
     /// constructor which opens a file where `a` specifies append and `b` binary mode.
-    Outputter(const char* name, bool a, bool b=false);
+    Outputter(const char* name, bool a, int b=0);
     
     /// Open a file where `a` specifies append and `b` binary mode.
-    int open(const char* name, bool a, bool b=false);
+    int open(const char* name, bool a, int b=0);
     
     /// Sets to write in binary format
-    void binary(bool b) { binary_ = b; }
+    void binary(int b) { binary_ = b; }
     
     /// Return the current binary format
-    bool binary() const { return binary_; }
+    int binary() const { return binary_; }
 
     /// Puts given string, and '01' or '10', to specify the byte order 
     void writeEndianess();
