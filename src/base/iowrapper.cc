@@ -232,7 +232,7 @@ float Inputter::readAngle()
         throw InvalidIO("readAngle() failed");
     if ( binary_ == 2 )
         i = byteswap16(i);
-    return float(i) * 0x1p-10;
+    return float(i) * 1.e-4f;
 }
 
 
@@ -247,8 +247,8 @@ void Inputter::readEulerAngles(float& a, float& b)
         iu[0] = byteswap16(iu[0]);
         iu[1] = byteswap16(iu[1]);
     }
-    a = float(*((int16_t*)iu)) * 1e-4;
-    b = float(iu[1]) * 5e-5;
+    a = float(*((int16_t*)iu)) * 1.e-4f;
+    b = float(iu[1]) * 5.e-5f;
 }
 
 
@@ -662,13 +662,13 @@ void Outputter::writeSignedFixed(const float x)
 
 
 /*
- Since the angle is within [-PI, PI], we can use 2 bytes and scale by 1024,
- which covers the range [-3.2, 3.2]. The delta is about ~ 10-3 radian
+ Since the angle is within [-PI, PI], using int16_t (max 32767), by scaling by 10000,
+ expanding to the range [-31416, 31416]. The delta is about ~ 10-4 radian
  */
 void Outputter::writeAngle(const float x)
 {
     assert_true( binary_ );
-    int16_t i = int16_t(x * 1024.f);
+    int16_t i = int16_t(x * 10000.f);
     if ( 1 != fwrite(&i, 2, 1, mFile) )
         throw InvalidIO("writeAngle() failed");
 }

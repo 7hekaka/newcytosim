@@ -2315,9 +2315,9 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
         {
             float a, b;
             in.readEulerAngles(a, b);
-            pos[0] += L * std::cos(a) * std::sin(b);
-            pos[1] += L * std::sin(a) * std::sin(b);
-            pos[2] += L * std::cos(b);
+            pos[0] += L * std::cosf(a) * std::sinf(b);
+            pos[1] += L * std::sinf(a) * std::sinf(b);
+            pos[2] += L * std::cosf(b);
             for ( int d = 0; d < DIM; ++d )
                 pPos[DIM*i+d] = pos[d];
         }
@@ -2328,8 +2328,8 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
         for ( size_t i = 1; i <= cnt; ++i )
         {
             float a = in.readAngle();
-            pos[0] += L * std::cos(a);
-            pos[1] += L * std::sin(a);
+            pos[0] += L * std::cosf(a);
+            pos[1] += L * std::sinf(a);
             for ( int d = 0; d < DIM; ++d )
                 pPos[DIM*i+d] = pos[d];
         }
