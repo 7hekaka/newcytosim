@@ -214,7 +214,7 @@ void sizeFrame(FILE* in, int details)
                         if ( bytes > 1024 )
                             printf(" %24s : %6lu kB\n", str, bytes>>10);
                         else
-                            printf(" %24s : %9lu B\n", str, bytes);
+                            printf(" %24s : %7lu B\n", str, bytes);
                     }
                     strncpy(str, buf, sizeof(str));
                     if ( isspace(str[strlen(buf)-1]) )
