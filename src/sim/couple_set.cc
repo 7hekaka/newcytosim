@@ -58,7 +58,7 @@ void CoupleSet::uniStepCollect(Couple * obj)
     {
         nxt = obj->next();
         CoupleProp const* P = obj->prop;
-        if ( P->fast_diffusion )
+        if ( P->fast_diffusion > 0 )
         {
             ffList.pop(obj);
             inventory_.unassign(obj);
@@ -463,7 +463,7 @@ void CoupleSet::shuffle()
     if ( c )
     switch( c->state() )
     {
-        case 0: if ( !c->prop->fast_diffusion ) ffList.shuffle(c); break;
+        case 0: if ( c->prop->fast_diffusion <= 0 ) ffList.shuffle(c); break;
         case 1: afList.shuffle(c); break;
         case 2: faList.shuffle(c); break;
         case 3: aaList.shuffle(c); break;
@@ -474,7 +474,7 @@ void CoupleSet::shuffle()
     if ( c )
     switch( c->state() )
     {
-        case 0: if ( !c->prop->fast_diffusion ) ffList.permute(c); break;
+        case 0: if ( c->prop->fast_diffusion <= 0 ) ffList.permute(c); break;
         case 1: afList.permute(c); break;
         case 2: faList.permute(c); break;
         case 3: aaList.permute(c); break;
@@ -613,7 +613,7 @@ void CoupleSet::reheat(size_t cnt[], PropertyID n_cnt)
         if ( id < n_cnt && 0 < cnt[id] )
         {
             --cnt[id];
-            if ( C->prop->fast_diffusion )
+            if ( C->prop->fast_diffusion > 0 )
                 C->randomizePosition();
             addFreeCouple(C);
         }
@@ -1063,7 +1063,7 @@ void CoupleSet::uniPrepare(PropertyList const& properties)
     {
         CoupleProp const * P = static_cast<CoupleProp const*>(i);
         //assert_true( P->stocks.size() == P->stocks.recount() );
-        if ( P->fast_diffusion )
+        if ( P->fast_diffusion > 0 )
             uniCouples.push_back(P);
     }
 }

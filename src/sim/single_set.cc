@@ -57,7 +57,7 @@ void SingleSet::uniStepCollect(Single * obj)
     {
         nxt = obj->next();
         SingleProp const* P = obj->prop;
-        if ( P->fast_diffusion && !obj->base() )
+        if ( P->fast_diffusion > 0 && !obj->base() )
         {
             fList.pop(obj);
             inventory_.unassign(obj);
@@ -902,7 +902,7 @@ void SingleSet::uniPrepare(PropertyList const& properties)
     {
         SingleProp const* P = static_cast<SingleProp const*>(i);
         //std::clog << i->name() << "  " << P->fast_diffusion << "\n";
-        if ( P->fast_diffusion )
+        if ( P->fast_diffusion > 0 )
             uniSingles.push_back(P);
     }
 }
