@@ -468,7 +468,7 @@ void ObjectSet::writePool(Outputter& out, ObjectPool const& list) const
 
 
 /**  read Object's mark in binary format. This should match Object::writeMarker() */
-static void readMarker(Inputter& in, PropertyID& ix, ObjectID& id, ObjectMark& mk)
+static void readMarker(Inputter& in, PropertyID& ix, ObjectID& id)
 {
     union { uint16_t u; uint8_t c[2]; } u16;
 
@@ -544,12 +544,12 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
     ObjectID id = 0;
     ObjectMark mk = 0;
     
-    if ( !bin )
-        readMarkerASCII(in, pid, id, mk);
-    else if ( bin == 1 )
-        readMarker(in, pid, id, mk);
-    else
-        readMarkerFat(in, pid, id, mk);
+    switch ( bin )
+    {
+        case 0: readMarkerASCII(in, pid, id, mk); break;
+        case 1: readMarker(in, pid, id); break;
+        default: readMarkerFat(in, pid, id, mk); break;
+    }
 
     if ( id == 0 )
         throw InvalidIO("Invalid ObjectID referenced in file");
