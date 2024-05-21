@@ -1109,9 +1109,9 @@ inline void Interface::step_simul()
 void Interface::execute_run(real sec, Glossary& opt, bool do_write)
 {
     int solve = 1;
+    int binary = 1;
     long frames = 0;
     bool prune = true;
-    bool binary = true;
     bool has_code = false;
     std::string code;
     
@@ -1324,8 +1324,8 @@ void Interface::execute_export(std::string const& name, std::string const& what,
     {
         if ( name != "*" )
         {
+            int binary = 1;
             bool append = true;
-            bool binary = true;
             opt.set(append, "append");
             opt.set(binary, "binary");
             sim_->writeObjects(name, append, binary);

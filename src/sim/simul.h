@@ -407,7 +407,7 @@ public:
     void writeObjects(Outputter&) const;
     
     /// write sim-world in binary or text mode, appending to existing file or creating new file
-    void writeObjects(std::string const& filename, bool append, bool binary) const;
+    void writeObjects(std::string const& filename, bool append, int binary) const;
     
     //----------------------------- REPORTING ----------------------------------
     

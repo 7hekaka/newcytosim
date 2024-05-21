@@ -121,7 +121,7 @@ void Simul::writeObjects(Outputter& out) const
  If `append == true` the state is added to the file, otherwise it is cleared.
  If `binary == true` a binary format is used, otherwise a text-format is used.
 */
-void Simul::writeObjects(std::string const& name, bool append, bool binary) const
+void Simul::writeObjects(std::string const& name, bool append, int binary) const
 {
     if ( prop.clear_system_file && name==prop.system_file )
     {

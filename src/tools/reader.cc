@@ -87,7 +87,7 @@ int main(int argc, char* argv[])
     arg.set(output, "output");
     arg.set(input, "input") || arg.set(input, ".cmo");
 
-    bool binary = true;
+    int binary = 1;
     arg.set(binary, "binary");
     
     try {

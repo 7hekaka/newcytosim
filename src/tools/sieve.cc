@@ -35,10 +35,10 @@ void help(std::ostream& os)
 
 int main(int argc, char* argv[])
 {
+    int binary = 1;
     unsigned dim = DIM;
     Simul simul;
     Glossary arg;
-    bool binary = true;
     ObjectSet * skip_set = nullptr;
     std::string skip;
 

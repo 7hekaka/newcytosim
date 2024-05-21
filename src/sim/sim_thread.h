@@ -184,7 +184,7 @@ public:
     void evaluate(std::string const&);
     
     /// export simulation Propertes and Objects to file
-    void exportObjects(bool binary);
+    void exportObjects(int binary);
     
     /// export properties to file
     void writeProperties(std::ostream&, bool prune);

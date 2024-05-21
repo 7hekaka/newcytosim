@@ -509,7 +509,7 @@ void SimThread::evaluate(std::string const& code)
 /**
  Save current state in two files
  */
-void SimThread::exportObjects(bool binary)
+void SimThread::exportObjects(const int binary)
 {
     lock();
     try {
