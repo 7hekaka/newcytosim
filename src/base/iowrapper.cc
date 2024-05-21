@@ -239,16 +239,16 @@ float Inputter::readAngle()
 void Inputter::readEulerAngles(float& a, float& b)
 {
     assert_true( binary_ );
-    uint16_t i[2];
-    if ( 2 != fread(&i, 2, 2, mFile) )
+    uint16_t iu[2];
+    if ( 2 != fread(&iu, 2, 2, mFile) )
         throw InvalidIO("readEulerAngles() failed");
     if ( binary_ == 2 )
     {
-        i[0] = byteswap16(i[0]);
-        i[1] = byteswap16(i[1]);
+        iu[0] = byteswap16(iu[0]);
+        iu[1] = byteswap16(iu[1]);
     }
-    a = float(*((int16_t*)i)) * 0x1p-10;
-    b = float(i[1]) * 0x1p-11;
+    a = float(*((int16_t*)iu)) * 1e-4;
+    b = float(iu[1]) * 5e-5;
 }
 
 
@@ -415,14 +415,14 @@ Outputter::Outputter()
 }
 
 
-Outputter::Outputter(const char* name, const bool a, const bool b)
+Outputter::Outputter(const char* name, const bool a, const int b)
 {
     open(name, a, b);
     sanityCheck();
 }
 
 
-int Outputter::open(const char* name, const bool a, const bool b)
+int Outputter::open(const char* name, const bool a, const int b)
 {
     binary_ = b;
     
@@ -673,22 +673,22 @@ void Outputter::writeAngle(const float x)
         throw InvalidIO("writeAngle() failed");
 }
 
-/*
- Store `a` in [-PI, PI], using 2 bytes, by scaling by 1024,
- which covers the range [-3.2, 3.2]. The delta is about ~ 10-3 radian
+/**
+ Store `a` in [-PI, PI], using int16_t (max 32767), by scaling by 10000,
+ expanding to the range [-31416, 31416]. The delta is about ~ 10-4 radian
 
- Store `b` in [0, PI] using 2 bytes, by scaling by 2048,
- which covers the range [0, 3.2]. The delta is about ~ 5.10-4 radian
+ Store `b` in [0, PI] using uint16_t (max 65535), by scaling by 20000,
+ expanding to the range [0, 62832]. The delta is about ~ 5.10-5 radian
  */
 void Outputter::writeEulerAngles(const float a, const float b)
 {
     assert_true( binary_ );
-    constexpr float sup = 3.1999f;
+    const float sup = 3.1999f;
     bool valid = ( std::fabs(a) < sup ) & ( 0 <= b ) & ( b < sup );
-    uint16_t u[2];
-    *((int16_t*)u) = int16_t(a * 1024.f);
-    u[1] = uint16_t(b * 2048.f);
-    if ( !valid || 2 != fwrite(u, 2, 2, mFile) )
+    uint16_t iu[2];
+    *(int16_t*)iu = int16_t(a * 10000.f);
+    iu[1] = uint16_t(b * 20000.f);
+    if ( !valid || 2 != fwrite((int16_t*)iu, 2, 2, mFile) )
         throw InvalidIO("writeEulerAngles() failed");
 }
 
