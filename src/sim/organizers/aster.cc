@@ -200,7 +200,7 @@ ObjectList Aster::build(Glossary& opt, Simul& sim)
     }
 #endif
     ObjectList objs;
-    size_t origin = makeSolid(objs, sim, opt);
+    unsigned origin = makeSolid(objs, sim, opt);
     
     unsigned type = 7 * opt.has_key("fiber1");
     opt.set(type, "type", {{"radial", 0}, {"astral", 1}, {"regular", 2},
@@ -279,7 +279,7 @@ void Aster::placeFiber(ObjectList& objs, Simul& sim, const Vector A, const Vecto
 }
 
 
-size_t Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
+unsigned Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
 {
     Solid * sol = nullptr;
     // find the Solid specified:

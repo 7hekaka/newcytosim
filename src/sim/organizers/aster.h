@@ -192,7 +192,7 @@ private:
 
     
     /// create and configure the Solid
-    size_t makeSolid(ObjectList&, Simul&, Glossary& opt);
+    unsigned makeSolid(ObjectList&, Simul&, Glossary& opt);
 
     /// create a Fiber and store additional objects in list
     Fiber * makeFiber(ObjectList&, Simul&, Vector, Vector, FiberProp const*, std::string const&);
