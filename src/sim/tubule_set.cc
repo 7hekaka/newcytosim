@@ -1,5 +1,4 @@
-// Cytosim was created by Francois Nedelec.
-// Copyright Cambridge University, 2019
+// Cytosim was created by Francois Nedelec. Copyright 2024
 
 #include "event_set.h"
 #include "iowrapper.h"
@@ -7,18 +6,6 @@
 #include "simul.h"
 #include "tubule_prop.h"
 #include "tubule.h"
-
-
-Tubule * TubuleSet::first() const
-{
-    return static_cast<Tubule*>(pool_.front());
-}
-
-
-Tubule * TubuleSet::findID(ObjectID n) const
-{
-    return static_cast<Tubule*>(inventory_.get(n));
-}
 
 
 void TubuleSet::steps()

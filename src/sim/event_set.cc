@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2024
 
 #include "event_set.h"
 #include "iowrapper.h"
@@ -6,16 +6,6 @@
 #include "simul.h"
 #include "event.h"
 
-
-Event * EventSet::first() const
-{
-    return static_cast<Event*>(pool_.front());
-}
-
-Event * EventSet::findID(ObjectID n) const
-{
-    return static_cast<Event*>(inventory_.get(n));
-}
 
 void EventSet::steps()
 {

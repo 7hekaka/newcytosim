@@ -1,12 +1,12 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2024
 
 #ifndef FIELD_SET_H
 #define FIELD_SET_H
 
 #include "object_set.h"
+#include "field.h"
 
 class Simul;
-class Field;
 
 /// a list of Field
 /**
@@ -43,10 +43,10 @@ public:
     //--------------------------
     
     /// first object
-    Field * first() const;
+    Field * first() const { return static_cast<Field*>(pool_.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found
-    Field * findID(ObjectID n) const;
+    Field * findID(ObjectID n) const { return static_cast<Field*>(inventory_.get(n)); }
     
     /// get ready to do steps()
     void prepare();

@@ -1,13 +1,12 @@
-// Cytosim was created by Francois Nedelec.
-// Copyright Cambridge University, 2019
+// Cytosim was created by Francois Nedelec. Copyright 2024
 
 #ifndef TUBULE_SET_H
 #define TUBULE_SET_H
 
 #include "object_set.h"
+#include "tubule.h"
 
 class Simul;
-class Tubule;
 
 /// a list of Tubules
 /**
@@ -42,11 +41,11 @@ public:
     //--------------------------
 
     /// first object
-    Tubule * first() const;
+    Tubule * first() const { return static_cast<Tubule*>(pool_.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found
-    Tubule * findID(ObjectID n) const;
-    
+    Tubule * findID(ObjectID n) const { return static_cast<Tubule*>(inventory_.get(n)); }
+
     /// Monte-Carlo simulation step for every Object
     void steps();
 
