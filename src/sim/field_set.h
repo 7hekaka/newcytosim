@@ -46,7 +46,7 @@ public:
     Field * first() const { return static_cast<Field*>(pool_.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found
-    Field * findID(ObjectID n) const { return static_cast<Field*>(inventory_.get(n)); }
+    Field * identifyObject(ObjectID n) const { return static_cast<Field*>(inventory_.get(n)); }
     
     /// get ready to do steps()
     void prepare();

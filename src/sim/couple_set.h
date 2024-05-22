@@ -173,7 +173,7 @@ public:
     
     
     /// return pointer to the Object of given ID, or zero if not found
-    Couple * findID(ObjectID n) const { return static_cast<Couple*>(inventory_.get(n)); }
+    Couple * identifyObject(ObjectID n) const { return static_cast<Couple*>(inventory_.get(n)); }
     
     /// first Couple in inventory
     Couple * firstID() const { return static_cast<Couple*>(inventory_.first()); }

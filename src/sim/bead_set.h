@@ -54,7 +54,7 @@ public:
     Bead * nextID(Bead const* obj) const { return static_cast<Bead*>(inventory_.next(obj)); }
 
     /// find object from its Number
-    Bead * findID(ObjectID n) const { return static_cast<Bead*>(inventory_.get(n)); }
+    Bead * identifyObject(ObjectID n) const { return static_cast<Bead*>(inventory_.get(n)); }
     
     /// bring all objects to centered image using periodic boundary conditions
     void foldPositions(Modulo const*) const;

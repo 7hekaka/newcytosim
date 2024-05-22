@@ -120,7 +120,7 @@ public:
     Single * firstA() const { return static_cast<Single*>(aList.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found
-    Single * findID(ObjectID n) const { return static_cast<Single*>(inventory_.get(n)); }
+    Single * identifyObject(ObjectID n) const { return static_cast<Single*>(inventory_.get(n)); }
     
     /// first Single in inventory
     Single * firstID() const { return static_cast<Single*>(inventory_.first()); }

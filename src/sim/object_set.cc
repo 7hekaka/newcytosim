@@ -555,7 +555,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
         throw InvalidIO("Invalid ObjectID referenced in file");
     //std::clog << "- load " << Object::make_reference(tag, pid, id) << '\n';
 
-    Object * obj = findID(id);
+    Object * obj = identifyObject(id);
     
     /*
      A lowercase TAG indicates a new object, while uppercase describes some

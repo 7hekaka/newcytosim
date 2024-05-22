@@ -1776,7 +1776,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
         in.readFloat();
 #if NEW_SOLID_HAS_TWIN
         /* This only works if the twin Solid is already loaded */
-        soTwin = sim.solids.findID(id);
+        soTwin = sim.solids.identifyObject(id);
         if ( id && !soTwin )
             std::clog << "Warning: could not find Solid twin " << id << "\n";
 #endif

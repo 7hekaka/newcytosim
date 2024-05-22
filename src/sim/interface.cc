@@ -496,7 +496,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
     ObjectID id = 0;
     if ( opt.set(id, "identity") )
     {
-        if ( set->findID(id) )
+        if ( set->identifyObject(id) )
             throw InvalidParameter("identity "+std::to_string(id)+" is already assigned");
         objs.front()->setIdentity(id);
     }

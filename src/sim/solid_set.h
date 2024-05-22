@@ -56,7 +56,7 @@ public:
     Solid * nextID(Solid const* obj) const { return static_cast<Solid*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found
-    Solid * findID(ObjectID n) const { return static_cast<Solid*>(inventory_.get(n)); }
+    Solid * identifyObject(ObjectID n) const { return static_cast<Solid*>(inventory_.get(n)); }
     
     /// bring all objects to centered image using periodic boundary conditions
     void foldPositions(Modulo const*) const;

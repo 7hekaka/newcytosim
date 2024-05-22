@@ -44,7 +44,7 @@ public:
     Tubule * first() const { return static_cast<Tubule*>(pool_.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found
-    Tubule * findID(ObjectID n) const { return static_cast<Tubule*>(inventory_.get(n)); }
+    Tubule * identifyObject(ObjectID n) const { return static_cast<Tubule*>(inventory_.get(n)); }
 
     /// Monte-Carlo simulation step for every Object
     void steps();

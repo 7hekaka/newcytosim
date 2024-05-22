@@ -414,7 +414,7 @@ Fiber * Simul::readFiberReference(Inputter& in, ObjectTag& tag, ObjectID& id)
         case Fiber::TAG:
         case Fiber::COMPACT_TAG:
         case Fiber::LATTICE_TAG:
-            fib = fibers.findID(id);
+            fib = fibers.identifyObject(id);
             if ( !fib )
                 std::clog << "unknown fiber ID " << id << " (" << tag << ")\n";
              //throw InvalidIO("unknown fiber ID "+std::to_string(id));
@@ -455,7 +455,7 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
         throw InvalidIO("`"+std::string(1,tag)+"' is not a known class TAG");
     }
     
-    Object * res = set->findID(id);
+    Object * res = set->identifyObject(id);
     
     if ( !res )
     {

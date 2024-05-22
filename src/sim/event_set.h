@@ -44,7 +44,7 @@ public:
     Event * first() const { return static_cast<Event*>(pool_.front()); }
     
     /// return pointer to the Object of given ID, or zero if not found
-    Event * findID(ObjectID n) const { return static_cast<Event*>(inventory_.get(n)); }
+    Event * identifyObject(ObjectID n) const { return static_cast<Event*>(inventory_.get(n)); }
     
     /// Monte-Carlo simulation step for every Object
     void steps();

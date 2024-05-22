@@ -538,7 +538,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
         {
             ObjectID id = hit.first >> 16;    // opposite of mingle()
             unsigned pt = hit.first & 65535;  // opposite of mingle()
-            Fiber const* fib = set.findID(id);
+            Fiber const* fib = set.identifyObject(id);
             FiberSegment seg(fib, pt);
             real dis = INFINITY;
             real abs = seg.projectPoint(pos, dis);

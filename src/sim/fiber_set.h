@@ -70,7 +70,7 @@ public:
     Fiber * nextID(Fiber const* obj) const { return static_cast<Fiber*>(inventory_.next(obj)); }
 
     /// return pointer to the Object of given ID, or zero if not found
-    Fiber * findID(ObjectID n) const { return static_cast<Fiber*>(inventory_.get(n)); }
+    Fiber * identifyObject(ObjectID n) const { return static_cast<Fiber*>(inventory_.get(n)); }
 
     /// Cut all segments intersecting the plane defined by <em> n.pos + a = 0 </em>
     void planarCut(Vector const& n, real a, state_t stateP, state_t stateM, real min_len);

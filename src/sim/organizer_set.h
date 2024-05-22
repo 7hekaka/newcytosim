@@ -40,7 +40,7 @@ public:
     Organizer * first() const { return static_cast<Organizer*>(pool_.front()); }
     
     /// find object with given ID
-    Organizer * findID(ObjectID n) const { return static_cast<Organizer*>(inventory_.get(n)); }
+    Organizer * identifyObject(ObjectID n) const { return static_cast<Organizer*>(inventory_.get(n)); }
     
     /// find highest ObjectID among Organizers containing given Mecable
     ObjectID findOrganizerID(Mecable const*) const;

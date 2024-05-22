@@ -173,7 +173,7 @@ public:
     Object * last() const { return static_cast<Object*>(pool_.back()); }
     
     /// find Object of given serial-number (see Inventory)
-    Object * findID(ObjectID n) const { return static_cast<Object*>(inventory_.get(n)); }
+    Object * identifyObject(ObjectID n) const { return static_cast<Object*>(inventory_.get(n)); }
     
     /// check if object's identity match the inventory record (for debugging)
     bool badIdentity(Object const* obj) const { return obj != inventory_.get(obj->identity()); }
