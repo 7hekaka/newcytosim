@@ -151,7 +151,93 @@ void Simul::writeObjects(std::string const& name, bool append, int binary) const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Read from file
+#pragma mark - Accessory functions to read file
+
+/// InportLock is a helper class used to import a cytosim state from a file
+class Simul::ImportLock
+{
+private:
+    
+    /// pointer
+    Simul * sim;
+    
+public:
+    
+    /// mark objects to later be able to tell if they have been updated
+    ImportLock(Simul * s)
+    : sim(s)
+    {
+        //Cytosim::log("Simul::ImportLock created with %i objects\n", sim->nbObjects());
+        sim->couples.freeze();
+        sim->singles.freeze();
+        sim->fibers.freeze();
+        sim->beads.freeze();
+        sim->solids.freeze();
+        sim->spheres.freeze();
+        sim->tubules.freeze();
+        sim->organizers.freeze();
+        sim->fields.freeze();
+        sim->spaces.freeze();
+        //sim->events.freeze();
+    }
+    
+    /// erase objects which have not been upated
+    void prune_all()
+    {
+        //sim->events.defrost();
+        sim->organizers.defrost();
+        sim->tubules.defrost();
+        sim->couples.defrostStore();
+        sim->singles.defrostStore();
+        sim->beads.defrostMore();
+        sim->solids.defrostMore();
+        sim->spheres.defrost();
+        sim->fibers.defrost();
+        sim->spaces.defrost();
+        sim->fields.defrost();
+        sim = nullptr;
+    }
+    
+    /// move back all objects to normal lists, even if they have not been updated
+    void thaw_all()
+    {
+        /*
+         Attention: The order of the thaw() below is important:
+         destroying a Fiber will detach any motor attached to it,
+         and thus automatically move them to the 'unattached' list,
+         as if they had been updated from reading the file.
+         Destroying couples and singles before the fibers avoids this problem.
+         */
+        //sim->events.thaw();
+        sim->couples.thaw();
+        sim->singles.thaw();
+        sim->organizers.thaw();
+        sim->tubules.thaw();
+        sim->beads.thaw();
+        sim->solids.thaw();
+        sim->spheres.thaw();
+        sim->fibers.thaw();
+        sim->spaces.thaw();
+        sim->fields.thaw();
+        sim = nullptr;
+    }
+
+    /// reset flags
+    ~ImportLock()
+    {
+        if ( sim )
+            thaw_all();
+        sim = nullptr;
+        //Cytosim::log("Simul::ImportLock deleted with %i objects\n", sim->nbObjects());
+    }
+};
+
+
+static bool isAlpha(int i)
+{
+    return ( 'a' <= i && i <= 'z' ) || ( 'A' <= i && i <= 'Z' );
+}
+
 
 /** Compatibility function for formats < 50 */
 static ObjectID readObjectID_old(Inputter& in, ObjectTag& tag)
@@ -380,86 +466,8 @@ Object * Simul::readReference(Inputter& in, ObjectTag& tag)
     return res;
 }
 
-
-/// InportLock is a helper class used to import a cytosim state from a file
-class Simul::InportLock
-{
-private:
-    
-    /// pointer
-    Simul * sim;
-    
-public:
-    
-    /// mark objects to later be able to tell if they have been updated
-    InportLock(Simul * s)
-    : sim(s)
-    {
-        //Cytosim::log("Simul::InportLock created with %i objects\n", sim->nbObjects());
-        sim->couples.freeze();
-        sim->singles.freeze();
-        sim->fibers.freeze();
-        sim->beads.freeze();
-        sim->solids.freeze();
-        sim->spheres.freeze();
-        sim->tubules.freeze();
-        sim->organizers.freeze();
-        sim->fields.freeze();
-        sim->spaces.freeze();
-        //sim->events.freeze();
-    }
-    
-    /// erase objects which have not been upated
-    void prune_all()
-    {
-        //sim->events.defrost();
-        sim->organizers.defrost();
-        sim->tubules.defrost();
-        sim->couples.defrostStore();
-        sim->singles.defrostStore();
-        sim->beads.defrostMore();
-        sim->solids.defrostMore();
-        sim->spheres.defrost();
-        sim->fibers.defrost();
-        sim->spaces.defrost();
-        sim->fields.defrost();
-        sim = nullptr;
-    }
-    
-    /// move back all objects to normal lists, even if they have not been updated
-    void thaw_all()
-    {
-        /*
-         Attention: The order of the thaw() below is important:
-         destroying a Fiber will detach any motor attached to it,
-         and thus automatically move them to the 'unattached' list,
-         as if they had been updated from reading the file.
-         Destroying couples and singles before the fibers avoids this problem.
-         */
-        //sim->events.thaw();
-        sim->couples.thaw();
-        sim->singles.thaw();
-        sim->organizers.thaw();
-        sim->tubules.thaw();
-        sim->beads.thaw();
-        sim->solids.thaw();
-        sim->spheres.thaw();
-        sim->fibers.thaw();
-        sim->spaces.thaw();
-        sim->fields.thaw();
-        sim = nullptr;
-    }
-
-    /// reset flags
-    ~InportLock()
-    {
-        if ( sim )
-            thaw_all();
-        sim = nullptr;
-        //Cytosim::log("Simul::InportLock deleted with %i objects\n", sim->nbObjects());
-    }
-};
-
+//------------------------------------------------------------------------------
+#pragma mark - Read Objects
 
 /**
  This will update the current state to make it identical to what has been saved
@@ -480,7 +488,7 @@ public:
 int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
 {
     in.lock();
-    InportLock lock(this);
+    ImportLock lock(this);
     try
     {
         VLOG("readObjects start at [" << in.peek() << "]\n");
@@ -712,11 +720,6 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
     return 0;
 }
 
-
-static bool isAlpha(int i)
-{
-    return ( 'a' <= i && i <= 'z' ) || ( 'A' <= i && i <= 'Z' );
-}
 
 /**
  Read file, updating existing objects, and creating new ones for those not 

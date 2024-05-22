@@ -381,15 +381,15 @@ public:
     void loadProperties();
 
     //---------------------------- LOAD OBJECTS --------------------------------
+    
+    /// class for reading trajectory file
+    class ImportLock;
 
     /// default name for output trajectory file
     static const char TRAJECTORY[];
 
     /// current file format (check history in `simul_file.cc`)
     static constexpr unsigned currentFormatID = 60;
-    
-    /// class for reading trajectory file
-    class InportLock;
     
     /// read objects from file, and add them to the simulation state
     int readMetaData(Inputter&, std::string& section, ObjectSet*& objset, ObjectSet* subset);
