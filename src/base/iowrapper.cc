@@ -477,6 +477,13 @@ void Outputter::writeUInt(const unsigned n, char before)
 }
 
 
+void Outputter::writeUInt(const unsigned long n, char before)
+{
+    if ( 2 > fprintf(mFile, "%c%lu", before, n) )
+        throw InvalidIO("writeUInt failed");
+}
+
+
 void Outputter::writeInt8(const int n)
 {
     if ( !binary_ )

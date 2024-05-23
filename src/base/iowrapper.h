@@ -151,6 +151,8 @@ public:
     void writeUInt(unsigned);
     /// Write unsigned integer in ASCII
     void writeUInt(unsigned, char before);
+    /// Write unsigned integer in ASCII
+    void writeUInt(unsigned long, char before);
 
     /// Write integer on 1 byte
     void writeInt8(int);
