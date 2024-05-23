@@ -2230,7 +2230,7 @@ void Simul::reportSingleLink(std::ostream& out, Property const* sel) const
  */
 void Simul::reportSingle(std::ostream& out, Property const* sel) const
 {
-    constexpr unsigned SUP = 128;
+    constexpr PropertyID SUP = 128;
     
     size_t free[SUP+1] = { 0 };
     size_t bound[SUP+1] = { 0 };
@@ -2239,7 +2239,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
     for ( Single const* i = singles.firstF(); i ; i = i->next() )
     {
         assert_true(!i->attached());
-        unsigned x = std::min(i->prop->number(), SUP);
+        PropertyID x = std::min(i->prop->number(), SUP);
         ++free[x];
         based[x] += ( i->base() != nullptr );
     }
@@ -2247,7 +2247,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
     for ( Single const* i=singles.firstA(); i ; i=i->next() )
     {
         assert_true(i->attached());
-        unsigned x = std::min(i->prop->number(), SUP);
+        PropertyID x = std::min(i->prop->number(), SUP);
         ++bound[x];
         based[x] += ( i->base() != nullptr );
     }
@@ -2263,7 +2263,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
         if ( sel && i != sel )
             continue;
         out << LIN << ljust(i->name(), 2);
-        size_t x = i->number();
+        PropertyID x = i->number();
         if ( x < SUP )
         {
             out << SEP << free[x] + bound[x];
@@ -2282,7 +2282,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
  */
 void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
 {
-    constexpr unsigned SUP = 8;
+    constexpr PropertyID SUP = 8;
     real cnt[SUP+1] = { 0 };
     real avg[SUP+1] = { 0 };
     real sup[SUP+1] = { 0 };
@@ -2293,7 +2293,7 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
     {
         if ( i->hasLink() && ( !sel || sel == i->prop ))
         {
-            unsigned x = std::min(i->prop->number(), SUP);
+            PropertyID x = std::min(i->prop->number(), SUP);
             real f = i->force().norm();
             avg[x] += f;
             cnt[x] += 1;
@@ -2303,7 +2303,7 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
     }
     
     out << COM << ljust("single", 2, 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
-    for ( size_t i = 0; i < SUP; ++i )
+    for ( PropertyID i = 0; i < SUP; ++i )
     {
         if ( cnt[i] > 0 )
         {
@@ -2497,7 +2497,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
  */
 void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
 {
-    constexpr unsigned SUP = 8;
+    constexpr PropertyID SUP = 8;
     real cnt[SUP+1] = { 0 };
     real avg[SUP+1] = { 0 };
     real sup[SUP+1] = { 0 };
@@ -2508,7 +2508,7 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
     {
         if ( !sel || sel == i->prop )
         {
-            unsigned x = std::min(i->prop->number(), SUP);
+            PropertyID x = std::min(i->prop->number(), SUP);
             real f = i->force().norm();
             avg[x] += f;
             cnt[x] += 1;
@@ -2518,7 +2518,7 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
     }
         
     out << COM << ljust("couple", 2) << SEP << "count" << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
-    for ( size_t i = 0; i < SUP; ++i )
+    for ( PropertyID i = 0; i < SUP; ++i )
     {
         if ( cnt[i] > 0 )
         {
@@ -2538,7 +2538,7 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
  */
 void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
 {
-    const unsigned SUP = 8;
+    const PropertyID SUP = 8;
     const unsigned MAX = 256;
     size_t cnt[SUP+1][MAX+1];
 
@@ -2549,14 +2549,14 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
     nbin = std::min(nbin, MAX);
 
     // reset counts:
-    for ( size_t ii = 0; ii <  MAX; ++ii )
-    for ( size_t jj = 0; jj <= nbin; ++jj )
+    for ( PropertyID ii = 0; ii < SUP; ++ii )
+    for ( unsigned jj = 0; jj <= nbin; ++jj )
         cnt[ii][jj] = 0;
     
     // accumulate counts:
     for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
-        unsigned x = std::min(i->prop->number(), SUP);
+        PropertyID x = std::min(i->prop->number(), SUP);
         unsigned f = (unsigned)( i->force().norm() / delta );
         if ( f < nbin )
             ++cnt[x][f];
@@ -2574,17 +2574,17 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
         out.precision(p);
     }
     
-    for ( size_t ii = 0; ii < SUP; ++ii )
+    for ( PropertyID x = 0; x < SUP; ++x )
     {
         size_t sum = 0;
         for ( size_t jj = 0; jj <= nbin; ++jj )
-            sum += cnt[ii][jj];
+            sum += cnt[x][jj];
         if ( sum )
         {
-            Property const* p = properties.find_or_die("couple", ii);
+            Property const* p = properties.find_or_die("couple", x);
             out << LIN << ljust(p->name(), 2);
             for ( size_t jj = 0; jj <= nbin; ++jj )
-                out << ' ' << std::setw(5) << cnt[ii][jj];
+                out << ' ' << std::setw(5) << cnt[x][jj];
         }
     }
 }
@@ -2595,11 +2595,11 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
  */
 void Simul::reportCouple(std::ostream& out, Property const* sel) const
 {
-    constexpr unsigned SUP = 128;
+    constexpr PropertyID SUP = 128;
     int act[SUP] = { 0 }, cnt[SUP][4];
     
     //reset counts:
-    for ( unsigned i = 0; i < SUP; ++i )
+    for ( PropertyID i = 0; i < SUP; ++i )
     {
         cnt[i][0] = 0;
         cnt[i][1] = 0;
@@ -2610,7 +2610,7 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
     for ( Couple const* i=couples.firstFF(); i ; i = i->next() )
     {
         assert_true(!i->attached1() && !i->attached2());
-        unsigned x = std::min(i->prop->number(), SUP);
+        PropertyID x = std::min(i->prop->number(), SUP);
         act[x] += ( i->active() );
         ++(cnt[x][0]);
     }
@@ -2618,14 +2618,14 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
     for ( Couple const* i=couples.firstAF(); i ; i = i->next() )
     {
         assert_true(i->attached1() && !i->attached2());
-        unsigned x = std::min(i->prop->number(), SUP);
+        PropertyID x = std::min(i->prop->number(), SUP);
         act[x] += ( i->active() );
         ++(cnt[x][1]);
     }
     for ( Couple const* i=couples.firstFA(); i ; i = i->next() )
     {
         assert_true(!i->attached1() && i->attached2());
-        unsigned x = std::min(i->prop->number(), SUP);
+        PropertyID x = std::min(i->prop->number(), SUP);
         act[x] += ( i->active() );
         ++(cnt[x][2]);
     }
@@ -2633,7 +2633,7 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
     for ( Couple const* i=couples.firstAA(); i ; i = i->next() )
     {
         assert_true(i->attached1() && i->attached2());
-        unsigned x = std::min(i->prop->number(), SUP);
+        PropertyID x = std::min(i->prop->number(), SUP);
         act[x] += ( i->active() );
         ++(cnt[x][3]);
     }
@@ -2651,7 +2651,7 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
         if ( sel && i != sel )
             continue;
         out << LIN << ljust(i->name(), 2);
-        size_t x = i->number();
+        PropertyID x = i->number();
         if ( x < SUP )
         {
             out << SEP << cnt[x][0]+cnt[x][1]+cnt[x][2]+cnt[x][3];

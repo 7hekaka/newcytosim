@@ -511,17 +511,19 @@ static void readMarkerFat(Inputter& in, PropertyID& ix, ObjectID& id, ObjectMark
 /**  read Object's mark in text format. This should match Object::writeMarker() */
 static void readMarkerASCII(Inputter& in, PropertyID& ix, ObjectID& id, ObjectMark& mk)
 {
+    unsigned u = 0;
     FILE * f = in.file();
-    if ( 1 != fscanf(f, "%u", &ix) )
+    if ( 1 != fscanf(f, "%u", &u) )
         throw InvalidIO("invalid Object header");
+    ix = (PropertyID)u;
     if ( in.get_char() != ':' )
         throw InvalidIO("invalid Object header");
-    if ( 1 != fscanf(f, "%u", &id) )
+    if ( 1 != fscanf(f, "%u", &u) )
         throw InvalidIO("invalid Object header");
+    id = (ObjectID)u;
     int c = in.get_char();
     if ( c == ':' )
     {
-        unsigned u = 0;
         if ( 1 != fscanf(f, "%u", &u) )
             throw InvalidIO("invalid Object header");
         mk = (ObjectMark)u;
