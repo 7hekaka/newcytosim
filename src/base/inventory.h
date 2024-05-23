@@ -105,11 +105,17 @@ public:
     Inventoried * last() const;
     
     /// return object just before given object
-    Inventoried * previous(Inventoried const*) const;
+    Inventoried * previous(ObjectID) const;
+    
+    /// return object just before given object
+    Inventoried * previous(Inventoried const* obj) const { return previous(obj->identity()); }
+
+    /// return object found just after given object
+    Inventoried * next(ObjectID) const;
     
     /// return object found just after given object
-    Inventoried * next(Inventoried const*) const;
-    
+    Inventoried * next(Inventoried const* obj) const { return next(obj->identity()); }
+
     /// Human friendly ouput
     void print(std::ostream&) const;
     

@@ -216,9 +216,8 @@ Inventoried* Inventory::last() const
 }
 
 
-Inventoried* Inventory::next(Inventoried const* i) const
+Inventoried* Inventory::next(ObjectID n) const
 {
-    ObjectID n = i->identity();
     assert_true(n <= alloca_);
     assert_true(highest_ <= alloca_);
     for ( ++n; n <= highest_; ++n )
@@ -228,14 +227,14 @@ Inventoried* Inventory::next(Inventoried const* i) const
 }
 
 
-Inventoried* Inventory::previous(Inventoried const* i) const
+Inventoried* Inventory::previous(ObjectID n) const
 {
-    ObjectID n = i->identity() - 1;
-    if ( lowest_ <= n )
+    if ( lowest_ < n )
     {
         assert_true(record_[lowest_]);
-        while ( !record_[n] )
+        do
             --n;
+        while ( !record_[n] );
         return record_[n];
     }
     return nullptr;
