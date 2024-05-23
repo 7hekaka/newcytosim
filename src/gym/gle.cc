@@ -983,7 +983,7 @@ namespace gle
 
     size_t setBlobBuffers(flute3* ptr, flute3* const ori)
     {
-        size_t i = 0, s = ptr - ori;
+        unsigned i = 0, s = ptr - ori;
         blobs_[0] = i+s; i += setBlob(ptr+i);
         blobs_[1] = i+s; i += setPin(ptr+i);
         blobs_[2] = i+s; i += setCuboid(ptr+i, 1.0);
