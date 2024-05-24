@@ -16,12 +16,12 @@
  
  http://en.wikipedia.org/wiki/Quaternion
 
- The unit bases of the Quaternion space are called 1, i, j and k.
- A quaternion is therefore q[0] + i * q[1] + j * q[2] + k * q[3],
- where q[?] are four real scalars.
- q[0] is the real part, and the other parts are imaginary.
+ We note here the unit bases of the Quaternion space: 1, i, j and k.
+ A quaternion is therefore defined as `q[0] + i * q[1] + j * q[2] + k * q[3]`,
+ from four real scalars `q[?]`.
+ `q[0]` is the real part, and the other parts are imaginary.
  
- While addition is standard, multiplication is anti-commutative:
+ While the addition is standard, multiplication is anti-commutative:
  - i*i = -1,
  - i*j =  k,
  - j*i = -k,
@@ -29,13 +29,13 @@
  .
  
  Unit quaternions are handy to represent rotations in 3D space:
- The group of 3D rotations has three degrees of freedom,
- and is mapped directly onto the quaternions of norm 1.
+ The group of 3D rotations, with its three degrees of freedom,
+ can be mapped directly onto the quaternions of norm 1.
  
- A rotation is represented by a symmetric matrix using 6 scalar numbers, 
- but only 4 scalars are used when a Quaternion is used.
- Thus one economize spurious scalars, and moreover quaternions are easier 
- to normalize than rotation matrices as necessary to correct for numerical errors.
+ A 3D rotation is represented by a symmetric matrix using 6 scalar numbers,
+ but only 4 scalars are used when a unit Quaternion is used. Thus one saves
+ spurious scalars, and moreover quaternions are easier to normalize than
+ rotation matrices, meaning that it is easier to correct for numerical errors.
  
  The rotation associated to a unit quaternion Q is:
  
@@ -55,9 +55,8 @@
  - norm of imaginary part of Q = std::sin(A/2).
  The rotation axis is defined by the imaginary components of Q.
  
- Quaternion<real> implements the standard mathematical operations, 
- conversions to and from 3x3 real matrices, 
- and to 4x4 transformation matrices used in OpenGL.
+ This class `Quaternion<real>` implements the standard mathematical operations,
+ plus conversions to and from 3x3 real matrices, and 4x4 OpenGL matrices.
  */
 
 
@@ -102,7 +101,7 @@ public:
     REAL& operator[] (size_t n) { return q[n]; }
     
     /// access to a non-modifiable coordinate 
-    REAL  operator[] (size_t n) const  { return q[n]; };
+    REAL  operator[] (size_t n) const { return q[n]; };
     
     /// conversion operator to a "real array"
     operator REAL*() { return q; }
@@ -110,7 +109,7 @@ public:
     /// conversion to a 'real array'
     REAL *    data() { return q; }
     
-    /// opposition: change sign in all coordinates 
+    /// opposition: change sign of all coordinates
     Quaternion operator - () const
     {
         return Quaternion(-q[0], -q[1], -q[2], -q[3]);
@@ -140,7 +139,7 @@ public:
         q[0] -= f;
     }
     
-    /// multiply for a real value in place
+    /// multiply by a real value in place
     void operator *= (REAL f)
     {
         q[0] *= f;
@@ -158,14 +157,14 @@ public:
         q[3] /= f;
     }
     
-    /// sum two quaternions
-    const Quaternion  operator + (const Quaternion & X) const
+    /// add two quaternions
+    const Quaternion operator + (const Quaternion & X) const
     {
         return Quaternion(q[0]+X[0], q[1]+X[1], q[2]+X[2], q[3]+X[3]);
     }
     
     /// subtract two quaternions
-    const Quaternion  operator - (const Quaternion & X) const
+    const Quaternion operator - (const Quaternion & X) const
     {
         return Quaternion(q[0]-X[0], q[1]-X[1], q[2]-X[2], q[3]-X[3]);
     }
@@ -211,7 +210,7 @@ public:
     /// division between quaternions
     const Quaternion operator / (const Quaternion & X) const
     {
-        Quaternion  result(q[0], q[1], q[2], q[3]);
+        Quaternion result(q[0], q[1], q[2], q[3]);
         result.rightMult(X.inverted());
         return result;
     }
@@ -470,16 +469,16 @@ public:
     /// set from given 3x3 rotation matrix `m`
     void setFromMatrix3(const REAL m[9])
     {
-        REAL  s, trace = m[0] + m[4] + m[8];
+        REAL S, trace = m[0] + m[4] + m[8];
         
         // check the diagonal
-        if (trace > 0 ) {
-            s = std::sqrt( trace + 1.0 );
-            q[0] = s * 0.5;
-            s = 0.5 / s;
-            q[1] = (m[5] - m[7]) * s;
-            q[2] = (m[6] - m[2]) * s;
-            q[3] = (m[1] - m[3]) * s;
+        if ( trace > 0 ) {
+            S = std::sqrt( trace + 1.0 );
+            q[0] = S * 0.5;
+            S = 0.5 / S;
+            q[1] = S * (m[5] - m[7]);
+            q[2] = S * (m[6] - m[2]);
+            q[3] = S * (m[1] - m[3]);
         }
         else {
             // trace is negative
@@ -488,14 +487,14 @@ public:
             if (m[1+3*1] > m[0+3*0]) i = 1;
             if (m[2+3*2] > m[i+3*i]) i = 2;
             
-            s = std::sqrt( 1.0 + 2*m[i+3*i] - trace );
-            q[i+1] = s * 0.5;
-            if (s != 0) s = 0.5 / s;
+            S = std::sqrt( 1.0 + 2*m[i+3*i] - trace );
+            q[i+1] = S * 0.5;
+            if (S != 0) S = 0.5 / S;
             int j = (i+1) % 3;
             int k = (j+1) % 3;
-            q[j+1] = s * ( m[j+3*i] + m[i+3*j] );
-            q[k+1] = s * ( m[i+3*k] + m[k+3*i] );
-            q[0]   = s * ( m[k+3*j] - m[j+3*k] );
+            q[j+1] = S * ( m[j+3*i] + m[i+3*j] );
+            q[k+1] = S * ( m[i+3*k] + m[k+3*i] );
+            q[0]   = S * ( m[k+3*j] - m[j+3*k] );
         }
     }
     
@@ -659,7 +658,7 @@ public:
     REAL getAngle() const
     {
         REAL n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
-        return  2 * std::atan2(n, q[0]);
+        return 2 * std::atan2(n, q[0]);
     }
     
     /// compute the axis and return the angle of the rotation
