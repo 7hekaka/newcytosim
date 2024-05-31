@@ -1041,21 +1041,21 @@ namespace gle
     {
         float Y = R * 0.5 * M_SQRT3;
         float H = R * 0.5;
-        flu[0] = { 1+R, 0 };
-        flu[1] = { 1+Y, H };
-        flu[2] = { 1+H, Y };
-        flu[3] = { 1, R };
-        flu[4] = { -1, R };
-        flu[5] = { -1-H, Y };
-        flu[6] = { -1-Y, H };
-        flu[7] = { -1-R, 0 };
-        flu[8] = { -1-Y, -H };
-        flu[9] = { -1-H, -Y };
-        flu[10] = { -1, -R };
-        flu[11] = { 1, -R };
-        flu[12] = { 1+H, -Y };
-        flu[13] = { 1+Y, -H };
-        flu[14] = { 1+R, 0 };
+        flu[0] = { 0, 1+R };
+        flu[1] = { H, 1+Y };
+        flu[2] = { Y, 1+H };
+        flu[3] = { R, 1 };
+        flu[4] = { R, -1 };
+        flu[5] = { Y, -1-H };
+        flu[6] = { H, -1-Y };
+        flu[7] = { 0, -1-R };
+        flu[8] = { -H, -1-Y };
+        flu[9] = { -Y, -1-H };
+        flu[10] = { -R, -1 };
+        flu[11] = { -R, 1 };
+        flu[12] = { -Y, 1+H };
+        flu[13] = { -H, 1+Y };
+        flu[14] = { 0, 1+R };
         return 15;
     }
     
@@ -1064,21 +1064,21 @@ namespace gle
     {
         float Y = R * 0.5 * M_SQRT3;
         float H = R * 0.5;
-        flu[0] = { 1+R, 0 };
-        flu[1] = { 1+Y, H };
-        flu[2] = { 1+Y, -H };
-        flu[3] = { 1+H, Y };
-        flu[4] = { 1+H, -Y };
-        flu[5] = { 1, R };
-        flu[6] = { 1, -R };
-        flu[7] = { -1, R };
-        flu[8] = { -1, -R };
-        flu[9] = { -1-H, Y };
-        flu[10] = { -1-H, -Y };
-        flu[11] = { -1-Y, H };
-        flu[12] = { -1-Y, -H };
-        flu[13] = { -1-R, 0 };
-        flu[14] = { 1+R, 0 };
+        flu[0] = { 0, 1+R };
+        flu[1] = { -H, 1+Y };
+        flu[2] = { H, 1+Y };
+        flu[3] = { -Y, 1+H };
+        flu[4] = { Y, 1+H };
+        flu[5] = { -R, 1 };
+        flu[6] = { R, 1 };
+        flu[7] = { -R, -1 };
+        flu[8] = { R, -1 };
+        flu[9] = { -Y, -1-H };
+        flu[10] = { Y, -1-H };
+        flu[11] = { -H, -1-Y };
+        flu[12] = { H, -1-Y };
+        flu[13] = { 0, -1-R };
+        flu[14] = { 0, 1+R };
         return 15;
     }
     
@@ -1136,8 +1136,8 @@ namespace gle
         discs_[0] = i+s; i += setCircle(ptr+i, 1, 1);
         discs_[1] = i+s; i += setCircle(ptr+i, 2, 1);
         discs_[2] = i+s; i += setSquare(ptr+i, 1, 1);
-        discs_[4] = i+s; i += setCapsuleStroke(ptr+i, 0.75);
-        discs_[5] = i+s; i += setCapsulePaint(ptr+i, 0.75);
+        discs_[4] = i+s; i += setCapsuleStroke(ptr+i, 0.5);
+        discs_[5] = i+s; i += setCapsulePaint(ptr+i, 0.5);
         discs_[6] = i+s; i += setCrossStroke(ptr+i);
         discs_[7] = i+s; i += setCrossPaint(ptr+i);
         assert_true( i <= sizeCircBuffers() );
