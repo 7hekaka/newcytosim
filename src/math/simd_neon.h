@@ -288,6 +288,10 @@ LOCAL vec4i andnot4f(vec4i a, vec4i b) { return vbicq_s32(a, b); }
 LOCAL vec4f abs4f(vec4f a)          { return vabsq_f32(a); }
 LOCAL vec4f flipsign4f(vec4f a)     { return veorq_s32(a, vec4f{-0.,-0.,-0.,-0.}); }
 
+LOCAL vec4i or4i(vec4i a, vec4i b) { return vorrq_s32(a, b); }
+LOCAL vec4i and4i(vec4i a, vec4i b) { return vandq_s32(a, b); }
+LOCAL vec4i andnot4i(vec4i a, vec4i b) { return vbicq_s32(a, b); }
+
 /// select 'b' if 'k==1' and 'a' otherwise
 LOCAL vec4f blendv4f(vec4f a, vec4f b, vec4f k) { return vbslq_f32(k,b,a); }
 /// return `neg` if `val < 0` and `pos` otherwise

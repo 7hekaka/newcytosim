@@ -95,6 +95,9 @@ LOCAL vec4f andnot4f(vec4f a, vec4f b) { return _mm_andnot_ps(a,b); }
 
 LOCAL vec4f abs4f(vec4f a)             { return _mm_andnot_ps(_mm_set1_ps(-0.0f), a); }
 
+LOCAL vec4i or4i(vec4i a, vec4i b)     { return _mm_or_si128(a,b); }
+LOCAL vec4i and4i(vec4i a, vec4i b)    { return _mm_and_si128(a,b); }
+LOCAL vec4i andnot4i(vec4i a, vec4i b) { return _mm_andnot_si128(a,b); }
 
 // returns { a[0], b[0], a[1], b[1] }
 LOCAL vec4f unpacklo4f(vec4f a, vec4f b) { return _mm_unpacklo_ps(a,b); }
@@ -334,7 +337,6 @@ LOCAL vec8f signselect8f(vec8f val, vec8f neg, vec8f pos) { return _mm256_blendv
 
 #if defined(__AVX2__)
 
-LOCAL vec4i and4i(vec4i a, vec4i b) { return (vec4i)_mm_and_ps((vec4f)a,(vec4f)b); }
 LOCAL vec8i shiftbitsR8(vec8f a, int b) { return _mm256_srli_epi32(_mm256_castps_si256(a), b); }
 LOCAL vec8i shiftbitsL8(vec8f a, int b) { return _mm256_slli_epi32(_mm256_castps_si256(a), b); }
 
