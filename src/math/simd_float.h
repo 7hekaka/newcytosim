@@ -66,7 +66,7 @@ LOCAL vec4f cast4i4f(vec4i a) { return _mm_castsi128_ps(a); }
 LOCAL vec4f setzero4f()    { return _mm_setzero_ps(); }
 LOCAL vec4f set4f(float a) { return _mm_set1_ps(a); }
 LOCAL vec4i set4i(int a)   { return _mm_set1_epi32(a); }
-LOCAL vec4f set4fi(int a)  { return cast4if(_mm_set1_epi32(a)); }
+LOCAL vec4f set4fi(int a)  { return cast4i4f(_mm_set1_epi32(a)); }
 
 /// _mm_load_ss loads a single element and zero the upper three:
 LOCAL vec4f load4f(float const* a)     { return _mm_load_ps(a); }
@@ -117,11 +117,11 @@ LOCAL vec2f getlo2f(vec4f a) { return (vec2f)a; }
 LOCAL vec2f gethi2f(vec4f a) { return (vec2f)_mm_movehl_ps(a, a); }
 
 // return { A1, A2, A3, B0 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-LOCAL vec4f catshift1f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4f4i(b), cast4f4i(a), 4)); }
+LOCAL vec4f catshift1f(vec4f a, vec4f b) { return cast4i4f(_mm_alignr_epi8(cast4f4i(b), cast4f4i(a), 4)); }
 // return { A2, A3, B0, B1 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
 LOCAL vec4f catshift2f(vec4f a, vec4f b) { return _mm_shuffle_ps(a, b, 0x4E); }
 // return { A3, B0, B1, B2 } from a = { A0, A1, A2, A3 } and b = { B0, B1, B2, B3 }
-LOCAL vec4f catshift3f(vec4f a, vec4f b) { return cast4if(_mm_alignr_epi8(cast4f4i(b), cast4f4i(a), 12)); }
+LOCAL vec4f catshift3f(vec4f a, vec4f b) { return cast4i4f(_mm_alignr_epi8(cast4f4i(b), cast4f4i(a), 12)); }
 
 LOCAL vec4f cmplt4f(vec4f a, vec4f b) { return _mm_cmplt_ps(a, b); }
 LOCAL vec4f cmpgt4f(vec4f a, vec4f b) { return _mm_cmpgt_ps(a, b); }
@@ -218,7 +218,7 @@ LOCAL vec4f broadcastZf(vec4f a) { return _mm_permute_ps(a,0xAA); }
 LOCAL vec4f broadcastTf(vec4f a) { return _mm_permute_ps(a,0xFF); }
 
 // non-temporal load
-LOCAL vec4f streamload4f(float const* a) { return cast4if(_mm_stream_load_si128((__m128i*)a)); }
+LOCAL vec4f streamload4f(float const* a) { return cast4i4f(_mm_stream_load_si128((__m128i*)a)); }
 
 #define permute4f(a,k) _mm_permute_ps(a,k)
 // Convert between single and double types

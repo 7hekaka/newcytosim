@@ -1175,7 +1175,7 @@ public:
         /*
          This is using Rodrigues's formula:
              Id + sine * K + ( 1 - cosine ) * K^2
-             K = -Id (X) axis       (-K is the cross product matrix)
+             K = -Id (x) axis       (-K is the cross product matrix)
              K^2 = axis (x) axis - Id
          
          https://en.wikipedia.org/wiki/Rodrigues%27_rotation_formula
