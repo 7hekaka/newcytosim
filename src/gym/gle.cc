@@ -685,7 +685,7 @@ namespace gle
     }
     
     /// set 12 pentagon as on a football constructed as a truncated icosahedron
-    size_t setFootballPentagons(flute6* flu, float R)
+    size_t setFootballPentagons(flute6* flu, float R, float P)
     {
         const float K = std::sqrt(0.2);
         float C = std::cos(M_PI * 0.4); // 0.31
@@ -712,10 +712,10 @@ namespace gle
             { 1,  0, -K },
         };
 
-        C *= R;
-        S *= R;
-        D *= R;
-        T *= R;
+        C *= P;
+        S *= P;
+        D *= P;
+        T *= P;
         size_t i = 0;
         for ( int u = 0; u < 12; ++u )
         {
@@ -723,16 +723,26 @@ namespace gle
             flute3 X = normalize(vex[u+1] - dot(vex[u+1], Z) * Z);
             flute3 Y = cross(Z, X);
 
-            //float pentagon[] = { R,0, C,S, C,-S, D,T, D,-T };
-            flu[i+0] = { Z+R*X, normalize(Z+R*X) };
-            flu[i+1] = flu[i];
-            flu[i+2] = { Z+C*X-S*Y, normalize(Z+C*X-S*Y) };
-            flu[i+3] = { Z+C*X+S*Y, normalize(Z+C*X+S*Y) };
-            flu[i+4] = { Z+D*X-T*Y, normalize(Z+D*X-T*Y) };
-            flu[i+5] = { Z+D*X+T*Y, normalize(Z+D*X+T*Y) };
-            flu[i+6] = flu[i+5];
-            flu[i+7] = flu[i+6];
-            i += 8;
+            //float pentagon[] = { R,0, C,S, D,T, D,-T, C,-S };
+            flute3 M = normalize(Z+P*X);
+            flute3 N = normalize(Z+C*X-S*Y);
+            flute3 O = normalize(Z+D*X-T*Y);
+            flute3 P = normalize(Z+D*X+T*Y);
+            flute3 Q = normalize(Z+C*X+S*Y);
+            
+            flu[i+0] = { R * M, M };
+            flu[i+1] = { R * M, M };
+            flu[i+2] = { R * N, N };
+            flu[i+3] = { R * Z, Z };
+            flu[i+4] = { R * O, O };
+            flu[i+5] = { R * P, P };
+            flu[i+6] = { R * P, P };
+            flu[i+7] = { R * Z, Z };
+            flu[i+8] = { R * Q, Q };
+            flu[i+9] = { R * M, M };
+            flu[i+10] = { R * M, M };
+            flu[i+11] = { R * M, M };
+            i += 12;
         }
         return i;
     }
@@ -762,7 +772,7 @@ namespace gle
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12*2 + 36 + 60 + 45 + 36*2 + 22*3 + 12*8 );
+        return ( 12*2 + 36 + 60 + 45 + 36*2 + 22*3 + 12*12 );
     }
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori)
@@ -778,7 +788,7 @@ namespace gle
         cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
         cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
         cubes_[9] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
-        cubes_[10] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 0.333);
+        cubes_[10] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 1.02, 0.333);
         assert_true( i <= sizeCubeBuffers() );
         return i;
     }
@@ -828,7 +838,7 @@ namespace gle
     void hexTube()      { doCubeStrip(7, 22); }
     void thinTube()     { doCubeStrip(8, 22); }
     void thinLongTube() { doCubeStrip(9, 22); }
-    void footballPentagons() { doCubeStrip(10, 8*12); }
+    void footballPentagons() { doCubeStrip(10, 12*12); }
     
     void ICOSAHEDRON()
     {
