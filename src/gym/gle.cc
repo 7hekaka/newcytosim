@@ -777,7 +777,7 @@ namespace gle
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori)
     {
-        size_t i = 0, s = ptr - ori;
+        unsigned i = 0, s = ptr - ori;
         cubes_[0] = i+s; i += setTetrahedron(ptr);
         cubes_[1] = i+s; i += invTetrahedron(ptr+i);
         cubes_[2] = i+s; i += setOctahedron(ptr+i);
@@ -1142,7 +1142,7 @@ namespace gle
     
     size_t setCircBuffers(flute2* ptr, flute2* const ori)
     {
-        size_t i = 0, s = ptr - ori;
+        unsigned i = 0, s = ptr - ori;
         discs_[0] = i+s; i += setCircle(ptr+i, 1, 1);
         discs_[1] = i+s; i += setCircle(ptr+i, 2, 1);
         discs_[2] = i+s; i += setSquare(ptr+i, 1, 1);
@@ -1469,7 +1469,7 @@ namespace gle
     {
         /* The value of T limits the aspect ratio of tubes that can be drawn */
         const float B = -32.f, T = 256.f, E = 0.03125;
-        size_t i = 0, s = ptr - ori;
+        unsigned i = 0, s = ptr - ori;
         tubes_[0] = i+s; i += setTube(ptr+i, 1, 0, 1);
         tubes_[1] = i+s; i += setTube(ptr+i, 2, 0, 1);
         tubes_[2] = i+s; i += setTube(ptr+i, 4, 0, 1);
