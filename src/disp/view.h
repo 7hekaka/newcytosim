@@ -23,8 +23,8 @@ private:
     /// projection matrix
     mutable float projection_[16];
     
-    /// half-size of the OpenGL visible region in OpenGL units
-    mutable float visRange[2];
+    /// dimension of camera window if `zoom=1`
+    mutable float viewScale[2];
     
     /// translation between origin and camera plane
     mutable float eyeDistance;
@@ -86,7 +86,7 @@ public:
     void loadViewport() const;
     
     /// reset viewport
-    void setViewport(int, int, size_t, size_t) const;
+    void setViewport(int, int, unsigned, unsigned) const;
     
     /// height of display area in pixels
     void copyViewport(GLint vp[4]) const { for(int i=0; i<4; ++i) vp[i] = viewport_[i]; }
@@ -130,7 +130,7 @@ public:
     float pixelSize() const;
     
     /// half visible range in X or Y
-    float range(int i) const { return 0.5f * visRange[i] / zoom; }
+    float range(int i) const { return 0.5f * viewScale[i] / zoom; }
     
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;

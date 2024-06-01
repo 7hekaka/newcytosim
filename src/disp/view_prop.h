@@ -29,7 +29,7 @@ public:
     /// pixel magnification
     unsigned magnify;
 
-    /// range that is visible with zoom=1, in sim-units (default=10)
+    /// range that is visible if `zoom=1`, in sim-units (default=10)
     float view_scale;
     
     /// enables the display area to be set from the size of the simulation space

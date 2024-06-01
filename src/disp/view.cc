@@ -27,8 +27,8 @@ View::View(const std::string& n, int depth)
     drawMagFunc = nullptr;
     depth_test = depth;
     
-    visRange[0] = view_scale;
-    visRange[1] = view_scale;
+    viewScale[0] = view_scale;
+    viewScale[1] = view_scale;
     eyeDistance = 0.25f * view_scale;
 
     viewport_[0] = 0;
@@ -467,7 +467,7 @@ void View::loadViewport() const
     glViewport(viewport_[0], viewport_[1], viewport_[2], viewport_[3]);
 }
 
-void View::setViewport(int x, int y, size_t w, size_t h) const
+void View::setViewport(int x, int y, unsigned w, unsigned h) const
 {
     glViewport(x, y, w, h);
 }
@@ -475,10 +475,10 @@ void View::setViewport(int x, int y, size_t w, size_t h) const
 
 void View::resize(int mag)
 {
-    //std::clog << "View::reshaped " << W << " " << H << '\n';
     viewport_[2] = mag * window_size[0];
     viewport_[3] = mag * window_size[1];
     adjust(viewport_[2], viewport_[3]);
+    //printf(" View::resize(%6i, %6i)\n", viewport_[2], viewport_[3]);
 }
 
 
@@ -486,6 +486,7 @@ void View::reshape(int W, int H)
 {
     window_size[0] = W;
     window_size[1] = H;
+    adjust(W, H);
     resize(1);
     loadView();
     loadViewport();
@@ -497,21 +498,22 @@ void View::adjust(int W, int H) const
 {
     if ( W > H )
     {
-        visRange[0] = view_scale;
-        visRange[1] = H * view_scale / W;
+        viewScale[0] = view_scale;
+        viewScale[1] = H * view_scale / W;
     }
     else
     {
-        visRange[0] = W * view_scale / H;
-        visRange[1] = view_scale;
+        viewScale[0] = W * view_scale / H;
+        viewScale[1] = view_scale;
     }
+    //printf(" View::viewScale(%6.3f, %6.3f)\n", viewScale[0], viewScale[1]);
 }
 
 
 void View::setProjection() const
 {
-    float X = visRange[0] * 0.5f;
-    float Y = visRange[1] * 0.5f;
+    float X = viewScale[0] * 0.5f;
+    float Y = viewScale[1] * 0.5f;
     float S = view_scale;
 
     if ( perspective == 3 )
@@ -574,9 +576,8 @@ void View::setModelView() const
 float View::pixelSize() const
 {
     //float a = view_scale / ( zoom * std::max(width(), height()) );
-    float b = visRange[0] / ( zoom * viewport_[2] );
-    //float c = visRange[1] / ( zoom * viewport_[3] );
-    assert_small(b - visRange[1] / ( zoom * viewport_[3] ));
+    float b = viewScale[0] / ( zoom * viewport_[2] );
+    //float c = viewScale[1] / ( zoom * viewport_[3] );
     return b;
 }
 
@@ -1047,12 +1048,12 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
         case 0:
             break;
         case 1:
-            gym::eye_view(0, shift-0.5*visRange[1], -eyeDistance, zoom);
+            gym::eye_view(0, shift-0.5*viewScale[1], -eyeDistance, zoom);
             gym::color(color);
             drawScaleHV(S, S/10, 0, setLadderH);
             break;
         case 2:
-            gym::eye_view(0.5*visRange[0]-shift, 0, -eyeDistance, zoom);
+            gym::eye_view(0.5*viewScale[0]-shift, 0, -eyeDistance, zoom);
             gym::color(color);
             drawScaleHV(S, -S/10, 0, setLadderV);
             break;
