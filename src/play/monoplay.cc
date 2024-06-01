@@ -14,7 +14,7 @@
 
 #include "view.h"
 #include "display_prop.h"
-#include "display1.h"
+#include "display3.h"
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_flat.h"
@@ -37,7 +37,7 @@ int bugH = 1024;
 
 View view("monoplay", DIM==3);
 DisplayProp disp("monoplay");
-Display1 display(&disp);
+Display3 display(&disp);
 PropertyList allDisp;
 
 //------------------------------------------------------------------------------
@@ -214,12 +214,55 @@ GLFWwindow * initWindow(int W, int H)
 }
 
 
+/**
+ Adjust to see the biggest Space in simul
+ */
+void autoScale(SpaceSet const& spaces)
+{
+    real rad = 0;
+    for ( Space const* spc = spaces.first(); spc; spc=spc->next() )
+        rad = std::max(rad, spc->max_extension());
+    if ( rad > 0 )
+        view.set_scale(2*rad);
+}
+
+
+//set pixel size, unit-size and direction:
+void prepareDisplay(Simul const& sim)
+{
+    if ( sim.prop.display_fresh )
+    {
+        Glossary glos(sim.prop.display);
+        disp.read(glos);
+        view.read(glos);
+        sim.prop.display_fresh = false;
+    }
+    float mag = view.magnify;
+    float pix = view.pixelSize() / mag;
+    /*
+     if `disp.point_value` is set, widths of lines and point sizes are understood to
+     be specified in 'real' units, while by default, they are understood in pixels.
+     */
+    if ( disp.point_value > 0 )
+        mag = disp.point_value / pix;
+    
+    display.setParameters(pix, mag, view.depthAxis());
+    display.setStencil(view.stencil);
+
+    for ( Property * p : allDisp )
+    {
+        if ( p->category() != "fiber:display" )
+            static_cast<PointDisp*>(p)->setPixels(pix, mag, disp.style==2);
+    }
+    display.prepareDrawing(sim, allDisp);
+}
+
+
 /* draw System */
 void drawCytosim(Simul const& sim)
 {
+    prepareDisplay(sim);
     view.openDisplay();
-    display.setParameters(view.pixelSize(), 1, view.depthAxis());
-    display.prepareDrawing(sim, allDisp);
     display.drawSimul(sim);
     view.closeDisplay();
 }

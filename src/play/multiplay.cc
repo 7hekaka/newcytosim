@@ -16,7 +16,7 @@
 
 #include "view.h"
 #include "display_prop.h"
-#include "display1.h"
+#include "display3.h"
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_flat.h"
@@ -44,7 +44,7 @@ int winH = bugH * tileY;
 unsigned period = 16;
 View view("multiplay", DIM==3);
 DisplayProp disp("multiplay");
-Display1 display(&disp);
+Display3 display(&disp);
 PropertyList allDisp;
 
 int selected = 0;
@@ -250,12 +250,37 @@ GLFWwindow * initWindow(int W, int H)
 #pragma mark -
 
 /* get ready to draw System */
-void prepareDraw()
+void prepareView()
 {
     view.setLights();
     view.adjust(bugW, bugH);
     view.loadView();
     //printf("allDisp: %lu\n", allDisp.size());
+}
+
+
+//set pixel size, unit-size and direction:
+void prepareDisplay(Simul const& sim)
+{
+    if ( sim.prop.display_fresh )
+    {
+        Glossary glos(sim.prop.display);
+        disp.read(glos);
+        view.read(glos);
+        sim.prop.display_fresh = false;
+    }
+    float mag = view.magnify;
+    float pix = view.pixelSize() / mag;
+    /*
+     if `disp.point_value` is set, widths of lines and point sizes are understood to
+     be specified in 'real' units, while by default, they are understood in pixels.
+     */
+    if ( disp.point_value > 0 )
+        mag = disp.point_value / pix;
+    
+    display.setParameters(pix, mag, view.depthAxis());
+    display.setStencil(view.stencil);
+    display.prepareDrawing(sim, allDisp);
 }
 
 
@@ -270,8 +295,7 @@ inline void selectPanel(int x, int y)
 /* draw System */
 void drawCytosim(Simul const& sim)
 {
-    display.setParameters(view.pixelSize(), 1, view.depthAxis());
-    display.prepareDrawing(sim, allDisp);
+    prepareDisplay(sim);
     gym::clearPixels(view.back_color);
     display.drawSimul(sim);
     //gym::enableLighting(); gym::scale(0.2); gle::star();
@@ -364,7 +388,7 @@ int main(int argc, char *argv[])
         worker[i].start();
     }
 
-    prepareDraw();
+    prepareView();
     glEnable(GL_SCISSOR_TEST);
     while ( !glfwWindowShouldClose(win) )
     {
