@@ -234,7 +234,7 @@ public:
     /// Stiffness for `attractive` steric interaction (set as steric[2])
     real steric_stiff_pull[2];
     
-    /// A rectangular volume where steric happens
+    /// A rectangular volume where steric happens ( infX infY infZ, supX supY supZ )
     Vector steric_region[2];
 
     /// Grid size used to determine steric interactions

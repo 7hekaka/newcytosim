@@ -38,7 +38,7 @@ void SimulProp::clear()
     steric_stiff_pull[1] = 0;
 
     steric_region[0].set(-INFINITY, -INFINITY, -INFINITY);
-    steric_region[1].set(INFINITY, INFINITY, INFINITY);
+    steric_region[1].set(+INFINITY, +INFINITY, +INFINITY);
     
     steric_max_range  = -1;
     binding_grid_step = -1;
