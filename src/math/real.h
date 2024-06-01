@@ -186,11 +186,7 @@ constexpr inline static real sign_select(real const val, real const neg, real co
 /// sign of a 'real': -1 or +1; result is +1 if ( x == 0 ) and -1 if ( x == -0 )
 inline static real sign_real(const real x)
 {
-#if REAL_IS_DOUBLE
-    return std::copysign(1.0, x);
-#else
-    return std::copysign(1.0f, x);
-#endif
+    return std::copysign(real(1), x);
 }
 
 /// absolute value of `x`
