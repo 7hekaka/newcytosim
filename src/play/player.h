@@ -142,11 +142,11 @@ public:
     std::string buildMemo(int) const;
 
     
-    /// set View::focus and quat to match the center of gravity of the Fibers
-    void autoFocus(Simul const&, View&) const;
+    /// set View::focus and rotation to track objects in the simulation
+    void autoFocus(View&, Simul const&, unsigned) const;
     
     /// adjust the viewing area
-    void autoScale(SpaceSet const&, View&) const;
+    void autoScale(View&, SpaceSet const&) const;
     
     /// adjust the model view and load frame if asked
     void setPixelSize(View&);

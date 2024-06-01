@@ -149,9 +149,8 @@ std::string Player::buildMemo(int type) const
 //------------------------------------------------------------------------------
 #pragma mark - Display
 
-void Player::autoFocus(Simul const& sim, View& view) const
+void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
 {
-    unsigned mode = view.track_fibers;
     real mat[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
     
     if ( mode & 1 )
@@ -210,7 +209,7 @@ void Player::autoFocus(Simul const& sim, View& view) const
 /**
  Adjust to see the biggest Space in simul
  */
-void Player::autoScale(SpaceSet const& spaces, View& view) const
+void Player::autoScale(View& view, SpaceSet const& spaces) const
 {
     real rad = 0;
     for ( Space const* spc = spaces.first(); spc; spc=spc->next() )
@@ -249,12 +248,12 @@ void Player::prepareDisplay(View& view)
     //-------- automatic adjustment of viewing area:
 
     if ( view.auto_scale > 0 )
-        autoScale(simul.spaces, view);
+        autoScale(view, simul.spaces);
     
     //-------- auto-track:
     
     if ( view.track_fibers )
-        autoFocus(simul, view);
+        autoFocus(view, simul, view.track_fibers);
     
     //-------- texts:
     

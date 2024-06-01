@@ -392,15 +392,13 @@ public:
     /** This assumes that norm(*this) = 1 */
     void setMatrix3(REAL mat[], int ldd) const
     {
-        REAL rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+        REAL x2 = q[1] + q[1];
+        REAL y2 = q[2] + q[2];
+        REAL z2 = q[3] + q[3];
         
-        x2 = q[1] + q[1];
-        y2 = q[2] + q[2];
-        z2 = q[3] + q[3];
-        
-        rx = q[0] * x2; ry = q[0] * y2; rz = q[0] * z2;
-        xx = q[1] * x2; xy = q[1] * y2; xz = q[1] * z2;
-        yy = q[2] * y2; yz = q[2] * z2; zz = q[3] * z2;
+        REAL rx = q[0] * x2, ry = q[0] * y2, rz = q[0] * z2;
+        REAL xx = q[1] * x2, xy = q[1] * y2, xz = q[1] * z2;
+        REAL yy = q[2] * y2, yz = q[2] * z2, zz = q[3] * z2;
         
         mat[0      ] = 1.0 - (yy + zz);
         mat[1      ] = xy + rz;
@@ -420,15 +418,13 @@ public:
     template < typename Matrix >
     void setMatrix3(Matrix & mat) const
     {
-        REAL rx, ry, rz, xx, yy, yz, xy, xz, zz, x2, y2, z2;
+        REAL x2 = q[1] + q[1];
+        REAL y2 = q[2] + q[2];
+        REAL z2 = q[3] + q[3];
         
-        x2 = q[1] + q[1];
-        y2 = q[2] + q[2];
-        z2 = q[3] + q[3];
-        
-        rx = q[0] * x2; ry = q[0] * y2; rz = q[0] * z2;
-        xx = q[1] * x2; xy = q[1] * y2; xz = q[1] * z2;
-        yy = q[2] * y2; yz = q[2] * z2; zz = q[3] * z2;
+        REAL rx = q[0] * x2, ry = q[0] * y2, rz = q[0] * z2;
+        REAL xx = q[1] * x2, xy = q[1] * y2, xz = q[1] * z2;
+        REAL yy = q[2] * y2, yz = q[2] * z2, zz = q[3] * z2;
         
         mat(0,0) = 1.0 - (yy + zz);
         mat(1,0) = xy + rz;
@@ -445,10 +441,8 @@ public:
     
     /// Rotate a 3D vector: des = Q * src * Q.conjugated()
     /** This assumes that norm(*this) = 1 */
-    void rotateVector(REAL des[3], const REAL src[3]) const
+    void rotateVector(REAL dst[3], const REAL src[3]) const
     {
-        REAL two(2.0);
-        
         REAL rx =  q[0]*q[1];
         REAL ry =  q[0]*q[2];
         REAL rz =  q[0]*q[3];
@@ -459,10 +453,11 @@ public:
         REAL yz =  q[2]*q[3];
         REAL zz = -q[3]*q[3];
         
+        const REAL two(2.0);
         REAL X = src[0], Y = src[1], Z = src[2];
-        des[0] = two * ((yy + zz)*X + (xy - rz)*Y + (ry + xz)*Z ) + X;
-        des[1] = two * ((rz + xy)*X + (xx + zz)*Y + (yz - rx)*Z ) + Y;
-        des[2] = two * ((xz - ry)*X + (rx + yz)*Y + (xx + yy)*Z ) + Z;
+        dst[0] = X + two * ((yy + zz)*X + (xy - rz)*Y + (ry + xz)*Z );
+        dst[1] = Y + two * ((rz + xy)*X + (xx + zz)*Y + (yz - rx)*Z );
+        dst[2] = Z + two * ((xz - ry)*X + (rx + yz)*Y + (xx + yy)*Z );
     }
     
     
@@ -635,18 +630,25 @@ public:
         q[axis+1] = std::sin(a);
     }
     
-    /// set as rotation transforming `A` into `B`, assuming norm(B)==1
+    /// set as rotation transforming `A` into `B`, assuming norm(A)==norm(B)==1
     void setRotationToVector(const REAL A[3], const REAL B[3])
     {
         // axis is obtained by vector product: axis = cross(B, A)
-        // and norm(axis) = sin(angle) * norm(A) = 2 * S * C * N
+        // and norm(axis) = sin(angle) * norm(A) = 2 * S * C * nA
         REAL X[3] = { A[1]*B[2]-A[2]*B[1], A[2]*B[0]-A[0]*B[2], A[0]*B[1]-A[1]*B[0] };
-        //REAL N = std::sqrt( A[0]*A[0] + A[1]*A[1] + A[2]*A[2] );
+        //REAL nA = std::sqrt( A[0]*A[0] + A[1]*A[1] + A[2]*A[2] );
+        //REAL nX = std::sqrt( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
         // cosine(angle) = scalar product(A, B):
-        REAL d = ( A[0]*B[0] + A[1]*B[1] + A[2]*B[2] );// / N;
-        // need half-angle for Quaternion: cos(x/2)=sqrt(0.5*[1+cos(x)])
-        REAL C = std::sqrt(std::max(REAL(0), REAL(0.5)+REAL(0.5)*d));
-        setFromAxis(X, C, 0.5/(d)); // since S / norm(X) = 0.5 / C * N
+        REAL d = ( A[0]*B[0] + A[1]*B[1] + A[2]*B[2] );// / nA;
+        
+        // need half-angle for Quaternion: cos(x/2) = sqrt(0.5*[1+cos(x)])
+        // sin(x/2) = sqrt(0.5*[1-cos(x)])
+        REAL half(0.5);
+        REAL C = std::sqrt(std::max(REAL(0), half+half*d));
+        REAL S = std::sqrt(std::max(REAL(0), half-half*d));
+        //REAL S = half * nX / C; // since half * nX = S * C
+        //printf(" rot( %+9.3f %+9.3f %+9.3f  %9.3f )", X[0], X[1], X[2], C*C+S*S);
+        setFromAxis(X, C, S);
 #if 0
         real V[3] = { A[0], A[1], A[2] };
         rotateVector(V, V);
