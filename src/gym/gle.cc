@@ -1293,9 +1293,9 @@ namespace gle
     {
         const float H(T-B), W(R-1);
         const float Z = std::copysign(1.f, H);
-        const float tg(Z/sqrtf(H*H+W*W));
+        const float tg(1.f/sqrtf(H*H+W*W));
         const float X(tg*H);
-        const float Y(tg*R);
+        const float Y(tg*W);
         size_t i = 0;
         size_t p = pi_once - inc;
         // bottom disc, from PI to 0:
@@ -1489,8 +1489,8 @@ namespace gle
         
         tubes_[13] = i+s; i += setCylinder(ptr+i, 1, 0, 1, 1, 1);
         tubes_[14] = i+s; i += setCylinder(ptr+i, 1, -1, 1, 1, 1);
-        tubes_[15] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 1);
-        tubes_[16] = i+s; i += setCylinder(ptr+i, 2, 0, T, 1);
+        tubes_[15] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 1); //shutTube2
+        tubes_[16] = i+s; i += setCylinder(ptr+i, 2, 0, T, 1); //shutLongTube2
 
         tubes_[17] = i+s; i += setCylinder(ptr+i, 1, 0, 1, 0); // cone1
         tubes_[18] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 0); // cone2

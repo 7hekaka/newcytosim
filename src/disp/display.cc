@@ -1658,6 +1658,60 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
         gym::color_load(lor);
         abs += inc;
     }
+    // draw first segment near the minus end:
+    gym::stretchAlignZ(old, pos, rad);
+    gle::tube2(); gle::dome();
+
+    // draw middle segments:
+    while ( abs < len )
+    {
+        abs += (cnt&1)?inc:onc;
+        old = pos;
+        pos = nxt;
+        nxt = fib.displayPosM(abs);
+        // alternate different tones:
+        gym::color_load((++cnt&1)?col:lor);
+        if ( (cnt & 15) == 1 ) gym::color_load(black);
+        gym::stretchAlignZ(old, pos, rad);
+        gle::tube2();
+    }
+
+    // draw last segment, which may be truncated:
+    gym::color_load((++cnt&1)?col:lor);
+    gym::stretchAlignZ(fib.posEndP(), pos, rad);
+    gle::shutTube2();
+}
+
+
+/**
+ Draw segments of length 'inc, onc' of alternating colors, in register with Fiber's abscissa
+ Every 16th stripe is drawn in black, hence with separation of 256 nm for microtubules
+*/
+void Display::drawFiberStripedClip(Fiber const& fib, float rad, real inc,
+                               gym_color col, real onc, gym_color lor) const
+{
+    const gym_color black(0,0,0,1);
+    const real uni = inc + onc;
+    Vector pos, nxt, old = fib.displayPosM(0);
+    const real len = fib.length();
+    int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
+    real abs = uni * cnt - fib.abscissaM();
+    // abs in [0, uni] is now relative to minus end
+    if ( abs > onc )
+    {
+        cnt = 2*cnt - 1; // drawing first slice of size `inc`
+        pos = fib.displayPosM(abs-onc);
+        nxt = fib.displayPosM(abs);
+        gym::color_load(col);
+    }
+    else
+    {
+        cnt = 2*cnt; // drawing second slice of size `onc`
+        pos = fib.displayPosM(abs);
+        nxt = fib.displayPosM(abs+inc);
+        gym::color_load(lor);
+        abs += inc;
+    }
     Vector dir = normalize(nxt-old);
     
     gym::enableClipPlane(4);
