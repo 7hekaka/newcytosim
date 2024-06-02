@@ -268,6 +268,7 @@ void prepareDisplay(Simul const& sim)
         disp.read(glos);
         view.read(glos);
         sim.prop.display_fresh = false;
+        view.setModelView();
     }
     float mag = view.magnify;
     float pix = view.pixelSize() / mag;
