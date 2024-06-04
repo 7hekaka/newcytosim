@@ -50,7 +50,7 @@ int start(const char* path, char *const command[])
         close(fds[1]);
         // map the standard-input to the pipe exit:
         while ((dup2(fds[0], STDIN_FILENO) == -1) && (errno == EINTR)) {}
-        // execv() should not return, except if error occurred
+        // execv() should not return, except in case of error
         execv(path, command);
         // the command failed, and error is indicated by 'errno':
         perror("execv");
@@ -69,6 +69,7 @@ int start(const char* path, char *const command[])
     // this code executed by the parent process
     // close pipe entry:
     close(fds[0]);
+    return 0;
 }
 
 
