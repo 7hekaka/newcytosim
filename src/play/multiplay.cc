@@ -45,7 +45,7 @@ unsigned period = 16;
 View view("multiplay", DIM==3);
 DisplayProp disp("multiplay");
 Display3 display(&disp);
-PropertyList allDisp;
+PropertyList mFiberDisp, mPointDisp;
 
 int selected = 0;
 int fate[TOP] = { 0 };
@@ -281,7 +281,7 @@ void prepareDisplay(Simul const& sim)
     
     display.setParameters(pix, mag, view.depthAxis());
     display.setStencil(view.stencil);
-    display.prepareDrawing(sim, allDisp);
+    display.prepareDrawing(sim, mFiberDisp, mPointDisp);
 }
 
 

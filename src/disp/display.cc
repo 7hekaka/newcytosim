@@ -302,19 +302,19 @@ void Display::drawTiled(Simul const& sim, int tile)
 /**
  Create a FiberDisp for this Property if necessary
  */
-void Display::initFiberDisp(FiberProp* fp, PropertyList& alldisp, gym_color col)
+void Display::initFiberDisp(FiberProp* fp, PropertyList& depot, gym_color col)
 {
     FiberDisp *& disp = fp->disp;
     
     // recover existing property:
     if ( !disp )
-        disp = static_cast<FiberDisp*>(alldisp.find("fiber:display", fp->name()));
+        disp = static_cast<FiberDisp*>(depot.find("fiber:display", fp->name()));
 
     // create new property with default values:
     if ( !disp )
     {
         disp = new FiberDisp(fp->name());
-        alldisp.push_back(disp);
+        depot.push_back(disp);
         // set default:
         disp->color      = col;
         disp->back_color = col.darken(0.5);
@@ -485,7 +485,7 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
  Create a PointDisp for this Property if necessary
  */
 template < typename T >
-void Display::initPointDisp(T * p, PropertyList& alldisp, gym_color col)
+void Display::initPointDisp(T * p, PropertyList& depot, gym_color col)
 {
     PointDisp *& disp = p->disp;
     
@@ -493,12 +493,12 @@ void Display::initPointDisp(T * p, PropertyList& alldisp, gym_color col)
     if ( !disp )
     {
         // search for matching property:
-        disp = static_cast<PointDisp*>(alldisp.find(p->category()+":display", p->name()));
+        disp = static_cast<PointDisp*>(depot.find(p->category()+":display", p->name()));
         if ( !disp )
         {
             //std::clog <<" new " << p->category() << ":display " << p->name() << "\n";
             disp = new PointDisp(p->category()+":display", p->name());
-            alldisp.push_back(disp);
+            depot.push_back(disp);
             // set default:
             disp->clear();
             disp->color  = col;
@@ -556,7 +556,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
  - parse display strings
  .
 */
-void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
+void Display::prepareDrawing(Simul const& sim, PropertyList& fiberDisp, PropertyList& alldisp)
 {
     // counter to give different colors to the objects
     size_t idx = 0;
@@ -566,7 +566,7 @@ void Display::prepareDrawing(Simul const& sim, PropertyList& alldisp)
     prep_flag = 0;
     // create a FiberDisp for each FiberProp:
     for ( Property* p : plist )
-        initFiberDisp(static_cast<FiberProp*>(p), alldisp, gym::get_color(idx++));
+        initFiberDisp(static_cast<FiberProp*>(p), fiberDisp, gym::get_color(idx++));
 
     // create a LineDisp for each Fiber:
     attributeLineDisp(sim.fibers);

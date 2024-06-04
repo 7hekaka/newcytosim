@@ -147,7 +147,7 @@ public:
     void attributeLineDisp(FiberSet const&);
 
     /// get ready to display
-    void prepareDrawing(Simul const&, PropertyList&);
+    void prepareDrawing(Simul const&, PropertyList&, PropertyList&);
 
     /// display the whole simulation
     void drawSimul(Simul const&);

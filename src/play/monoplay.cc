@@ -38,7 +38,7 @@ int bugH = 1024;
 View view("monoplay", DIM==3);
 DisplayProp disp("monoplay");
 Display3 display(&disp);
-PropertyList allDisp;
+PropertyList mFiberDisp, mPointDisp;
 
 //------------------------------------------------------------------------------
 #pragma mark -
@@ -249,12 +249,9 @@ void prepareDisplay(Simul const& sim)
     display.setParameters(pix, mag, view.depthAxis());
     display.setStencil(view.stencil);
 
-    for ( Property * p : allDisp )
-    {
-        if ( p->category() != "fiber:display" )
-            static_cast<PointDisp*>(p)->setPixels(pix, mag, disp.style==2);
-    }
-    display.prepareDrawing(sim, allDisp);
+    for ( Property * p : mPointDisp )
+        static_cast<PointDisp*>(p)->setPixels(pix, mag, disp.style==2);
+    display.prepareDrawing(sim, mFiberDisp, mPointDisp);
 }
 
 

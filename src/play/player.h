@@ -33,9 +33,12 @@ public:
     /// the parameters for play
     PlayerProp   prop;
     
-    /// container for object's display properties
-    PropertyList allDisp;
+    /// container for fiber's display properties
+    PropertyList mFiberDisp;
     
+    /// container for object's display properties
+    PropertyList mPointDisp;
+
     /// SimThread to control the live simulation
     SimThread    worker;
     
