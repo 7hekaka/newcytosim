@@ -31,6 +31,8 @@ int tileX = 2;
 int tileY = 3;
 constexpr int TOP = 128;
 
+inline int nbBugs() { return std::min(tileX*tileY, TOP); }
+
 // size of each cell (updated if window is resized)
 int bugW = 320;
 int bugH = 128;
@@ -50,8 +52,8 @@ PropertyList mFiberDisp, mPointDisp;
 int selected = 0;
 int fate[TOP] = { 0 };
 
-// pointers to hold the Config text:
-char *config_code = nullptr;
+// pointers to hold the Config text, same for all simuls:
+char *config_text = nullptr;
 size_t code_size = 0;
 
 //------------------------------------------------------------------------------
@@ -346,10 +348,7 @@ int main(int argc, char *argv[])
     if ( argc > 1 && readDimensions(tileX, tileY, argv[1]) )
         *argv[1] = 0;
     if ( tileX * tileY > TOP )
-    {
-        printf("Error: tile is limited to %i cells max\n", TOP);
-        return EXIT_FAILURE;
-    }
+        printf("Error: the number of cells is limited to %i\n", TOP);
     Glossary arg;
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
@@ -360,10 +359,10 @@ int main(int argc, char *argv[])
     if ( n < 2 )
     {
         const char * str = simul[0].prop.config_file.c_str();
-        if ( !FilePath::read_file(str, config_code, code_size) )
+        if ( !FilePath::read_file(str, config_text, code_size) )
             return EXIT_FAILURE;
-        for ( int i = 0; i < tileX*tileY; ++i )
-            worker[i].config_code = config_code;
+        for ( int i = 0; i < nbBugs(); ++i )
+            worker[i].config_code = config_text;
     }
     arg.clear(".cym");
     if ( !arg.empty() )
@@ -380,7 +379,7 @@ int main(int argc, char *argv[])
     // seed all RNGs used by sim using a common random generator:
     pcg32_state = get_random_seed();
 
-    for ( int i = 0; i < tileX*tileY; ++i )
+    for ( int i = 0; i < nbBugs(); ++i )
     {
         simul[i].prop.read(arg);
         simul[i].prop.random_seed = pcg32(pcg32_state);
@@ -420,7 +419,7 @@ int main(int argc, char *argv[])
                     ++refresh;
                     selectPanel(x, y);
                     gym::clearPixels(0.5f, 0.5f, 0.5f, 1.0f);
-                    fate[i] = -1-RNG.pint32(tileX*tileY);
+                    fate[i] = -1 - 5 * RNG.pint32(tileX*tileY);
                 }
                 else if ( fate[i] < 0 )
                 {
@@ -442,12 +441,12 @@ int main(int argc, char *argv[])
     }
     //stopPreconfig();
     glDisable(GL_SCISSOR_TEST);
-    for ( int i = 0; i < tileX*tileY; ++i )
+    for ( int i = 0; i < nbBugs(); ++i )
         worker[i].cancel();
-    for ( int i = 0; i < tileX*tileY; ++i )
+    for ( int i = 0; i < nbBugs(); ++i )
         worker[i].join();
     glfwDestroyWindow(win);
     glfwTerminate();
-    free(config_code);
+    free(config_text);
 }
 

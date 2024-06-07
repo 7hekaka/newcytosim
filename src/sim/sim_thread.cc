@@ -53,6 +53,8 @@ SimThread::~SimThread()
         pthread_join(child_, nullptr);
     pthread_cond_destroy(&condition_);
     pthread_mutex_destroy(&mutex_);
+    // release memory only if it was allocated by us:
+    if ( code_size > 0 ) free(config_code);
 }
 
 //------------------------------------------------------------------------------
