@@ -353,8 +353,8 @@ int main(int argc, char *argv[])
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
     
-    int n = arg.num_values(".cym");
-    for ( int i = 0; i < std::min(tileX*tileY, n); ++i )
+    int n = std::min(nbBugs(), arg.num_values(".cym"));
+    for ( int i = 0; i < n; ++i )
         arg.set(simul[i].prop.config_file, ".cym", i);
     if ( n < 2 )
     {
@@ -419,7 +419,7 @@ int main(int argc, char *argv[])
                     ++refresh;
                     selectPanel(x, y);
                     gym::clearPixels(0.5f, 0.5f, 0.5f, 1.0f);
-                    fate[i] = -1 - 5 * RNG.pint32(tileX*tileY);
+                    fate[i] = -1 - RNG.pint32(5*tileX*tileY);
                 }
                 else if ( fate[i] < 0 )
                 {
