@@ -448,5 +448,7 @@ int main(int argc, char *argv[])
     glfwDestroyWindow(win);
     glfwTerminate();
     free(config_text);
+    mFiberDisp.erase();
+    mPointDisp.erase();
 }
 

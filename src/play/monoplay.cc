@@ -326,5 +326,7 @@ int main(int argc, char *argv[])
     worker.join();
     glfwDestroyWindow(win);
     glfwTerminate();
+    mFiberDisp.erase();
+    mPointDisp.erase();
 }
 
