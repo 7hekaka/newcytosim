@@ -584,7 +584,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         SingleProp const* sp = static_cast<SingleProp const*>(pp);
         std::string str;
         if ( opt.set(str, "multi_base") )
-            res.append(sim_->singles.distributeWrists(sp, cnt, str));
+            sim_->singles.distributeWrists(res, sp, cnt, str);
     }
     else
     {

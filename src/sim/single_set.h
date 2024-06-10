@@ -98,20 +98,20 @@ public:
     /// reassign Single to different sublist following detachment of Hand
     void relinkD(Single *);
 
-    /// create Wrists anchored on given Mecable
-    void makeWrists(ObjectList&, Mecable const*, size_t, size_t, std::string&);
-
-    /// return all Wrists anchored on `obj`
+    /// return all Wrists anchored on given object
     SingleList collectWrists(Object const*) const;
     
-    /// detach all Wrists anchored on `obj`
+    /// detach all Wrists anchored on given object
     void detachWrists(Object const*);
 
-    /// delete all Wrists anchored on `obj`
+    /// delete all Wrists anchored on given object
     void deleteWrists(Object const*);
-    
+
+    /// create Wrists anchored on given Mecable
+    void makeWrists(ObjectList&, Mecable const*, size_t, size_t, std::string const&);
+
     /// create Single attached to the beads
-    ObjectList distributeWrists(SingleProp const*, size_t cnt, std::string const&) const;
+    void distributeWrists(ObjectList&, SingleProp const*, size_t cnt, std::string const&) const;
     
     /// return the first free Single
     Single * firstF() const { return static_cast<Single*>(fList.front()); }

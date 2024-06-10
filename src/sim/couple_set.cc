@@ -244,18 +244,6 @@ Property* CoupleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-/// pick from reserves if possible
-Couple * CoupleSet::makeCouple(CoupleProp const* P)
-{
-    Couple * C = P->stocks.head();
-    if ( C )
-        P->stocks.pop();
-    else
-        C = P->newCouple();
-    return C;
-}
-
-
 void CoupleSet::addFreeCouple(Couple * obj)
 {
     assert_true(!obj->attached());
@@ -345,6 +333,51 @@ ObjectList CoupleSet::newObjects(Property const* p, Glossary& opt)
 #endif
     
     return ObjectList(obj);
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
+
+/// pick from reserves if possible
+Couple * CoupleSet::makeCouple(CoupleProp const* P)
+{
+    Couple * C = P->stocks.head();
+    if ( C )
+        P->stocks.pop();
+    else
+        C = P->newCouple();
+    return C;
+}
+
+
+void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
+{
+    while ( cnt-- > 0 )
+    {
+        Couple * C = makeCouple(P);
+        C->randomizePosition();
+        addFreeCouple(C);
+    }
+}
+
+
+void CoupleSet::makeCouples(size_t cnt[], PropertyID n_cnt)
+{
+    for ( PropertyID i = 1; i < n_cnt; ++i )
+    {
+        if ( cnt[i] > 0 )
+        {
+            Property * cp = simul_.properties.find("couple", i);
+            if ( cp )
+            {
+                CoupleProp * P = static_cast<CoupleProp*>(cp);
+                // renew pointers to 'confine_space'
+                P->complete(simul_);
+                makeCouples(P, cnt[i]);
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -528,36 +561,6 @@ void CoupleSet::detachAll()
         ffList.push_back(C);
     }
     afList.clear();
-}
-
-
-void CoupleSet::makeCouples(CoupleProp const* P, size_t cnt)
-{
-    while ( cnt-- > 0 )
-    {
-        Couple * C = makeCouple(P);
-        C->randomizePosition();
-        addFreeCouple(C);
-    }
-}
-
-
-void CoupleSet::makeCouples(size_t cnt[], PropertyID n_cnt)
-{
-    for ( PropertyID i = 1; i < n_cnt; ++i )
-    {
-        if ( cnt[i] > 0 )
-        {
-            Property * cp = simul_.properties.find("couple", i);
-            if ( cp )
-            {
-                CoupleProp * P = static_cast<CoupleProp*>(cp);
-                // renew pointers to 'confine_space'
-                P->complete(simul_);
-                makeCouples(P, cnt[i]);
-            }
-        }
-    }
 }
 
 
@@ -790,55 +793,65 @@ void CoupleSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector
 
 int CoupleSet::bad() const
 {
-#if ( 0 )
-    if ( ffList.bad() ) return 1;
-    if ( afList.bad() ) return 2;
-    if ( faList.bad() ) return 3;
-    if ( aaList.bad() ) return 4;
-#endif
-    
-    int code = 0;
+    int err = 0;
     Couple * obj;
+    size_t cnt = sizeFF();
     for ( obj=firstFF(); obj ; obj=obj->next() )
     {
         if ( obj->attached1() || obj->attached2() )
-            code |= 8;
+            err |= 8;
+        if ( cnt-- == 0 )
+            return 1;
     }
+    if ( cnt ) return 1;
     
+    cnt = sizeAF();
     for ( obj=firstAF(); obj ; obj=obj->next() )
     {
         if ( !obj->attached1() || obj->attached2() )
-            code |= 16;
+            err |= 16;
         if ( simul_.fibers.badIdentity(obj->fiber1()) )
-            code |= 512;
+            err |= 512;
         if ( obj->hand1()->bad() )
-            code |= 128;
+            err |= 128;
+        if ( cnt-- == 0 )
+            return 2;
     }
-    
+    if ( cnt ) return 2;
+
+    cnt = sizeFA();
     for ( obj=firstFA(); obj ; obj=obj->next() )
     {
         if ( obj->attached1() || !obj->attached2() )
-            code |= 32;
+            err |= 32;
         if ( simul_.fibers.badIdentity(obj->fiber2()) )
-            code |= 512;
+            err |= 512;
         if ( obj->hand2()->bad() )
-            code |= 128;
+            err |= 128;
+        if ( cnt-- == 0 )
+            return 3;
     }
-    
+    if ( cnt ) return 3;
+
+    cnt = sizeAA();
     for ( obj=firstAA(); obj ; obj=obj->next() )
     {
         if ( !obj->attached1() || !obj->attached2() )
-            code |= 64;
+            err |= 64;
         if ( simul_.fibers.badIdentity(obj->fiber1()) )
-            code |= 512;
+            err |= 512;
         if ( simul_.fibers.badIdentity(obj->fiber2()) )
-            code |= 512;
+            err |= 512;
         if ( obj->hand1()->bad() )
-            code |= 256;
+            err |= 256;
         if ( obj->hand2()->bad() )
-            code |= 256;
+            err |= 256;
+        if ( cnt-- == 0 )
+            return 4;
     }
-    return code;
+    if ( cnt ) return 4;
+
+    return err;
 }
 
 

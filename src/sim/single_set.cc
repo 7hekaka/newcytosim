@@ -144,19 +144,6 @@ Property* SingleSet::newProperty(const std::string& cat, const std::string& nom,
 }
 
 
-/// pick from reserves if possible
-Single * SingleSet::makeSingle(SingleProp const* P)
-{
-    Single * S = P->stocks.head();
-    if ( S )
-        P->stocks.pop();
-    else
-        S = P->newSingle();
-    //std::clog << "makeSingle(" << S->reference() << ") ";
-    return S;
-}
-
-
 void SingleSet::addFreeSingle(Single * obj)
 {
     assert_true(!obj->attached());
@@ -267,21 +254,58 @@ ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
 }
 
 
-ObjectList SingleSet::distributeWrists(SingleProp const* sp, size_t cnt,
-                                       std::string const& name) const
+//------------------------------------------------------------------------------
+#pragma mark -
+
+
+/// pick from reserves if possible
+Single * SingleSet::makeSingle(SingleProp const* P)
 {
-    ObjectList objs;
-    BeadProp * bip = simul_.findProperty<BeadProp>("bead", name);
-    if ( !bip )
-        throw InvalidParameter("could not find Bead type `"+name+"'");
-    ObjectList list = simul_.beads.collect(bip);
-    if ( list.empty() )
-        throw InvalidParameter("could not find Bead of type `"+name+"'");
-    list.shuffle_truncate(cnt);
-    // create one Single on each of 'cnt' Beads:
-    for ( Object const* i : list )
-        objs.push_back(sp->newWrist(static_cast<Bead const*>(i), 0));
-    return objs;
+    Single * S = P->stocks.head();
+    if ( S )
+        P->stocks.pop();
+    else
+        S = P->newSingle();
+    //std::clog << "makeSingle(" << S->reference() << ") ";
+    return S;
+}
+
+
+void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
+{
+    reserve(inventory_.highest()+cnt);
+    if ( P->fast_diffusion > 0 )
+    {
+        while ( cnt-- > 0 )
+        {
+            Single * S = makeSingle(P);
+            S->randomizePosition();
+            addFreeSingle(S);
+        }
+    }
+    else
+    {
+        while ( cnt-- > 0 )
+            addFreeSingle(makeSingle(P));
+    }
+}
+
+
+void SingleSet::makeSingles(size_t cnt[], PropertyID n_cnt)
+{
+    //std::clog << "makeSingles " << cnt[0] << " " << cnt[1] << " " << cnt[2] << "\n";
+    // note that id=0 is invalid
+    for ( PropertyID i = 1; i < n_cnt; ++i )
+    {
+        Property * sp = simul_.properties.find("single", i);
+        if ( sp )
+        {
+            SingleProp * P = static_cast<SingleProp*>(sp);
+            // renew pointers to 'confine_space'
+            P->complete(simul_);
+            makeSingles(P, cnt[i]);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -382,44 +406,6 @@ void SingleSet::detachAll()
         fList.push_back(S);
     }
     aList.clear();
-}
-
-
-void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
-{
-    reserve(inventory_.highest()+cnt);
-    if ( P->fast_diffusion > 0 )
-    {
-        while ( cnt-- > 0 )
-        {
-            Single * S = makeSingle(P);
-            S->randomizePosition();
-            addFreeSingle(S);
-        }
-    }
-    else
-    {
-        while ( cnt-- > 0 )
-            addFreeSingle(makeSingle(P));
-    }
-}
-
-
-void SingleSet::makeSingles(size_t cnt[], PropertyID n_cnt)
-{
-    //std::clog << "makeSingles " << cnt[0] << " " << cnt[1] << " " << cnt[2] << "\n";
-    // note that id=0 is invalid
-    for ( PropertyID i = 1; i < n_cnt; ++i )
-    {
-        Property * sp = simul_.properties.find("single", i);
-        if ( sp )
-        {
-            SingleProp * P = static_cast<SingleProp*>(sp);
-            // renew pointers to 'confine_space'
-            P->complete(simul_);
-            makeSingles(P, cnt[i]);
-        }
-    }
 }
 
 
@@ -539,32 +525,6 @@ void SingleSet::writeSet(Outputter& out, int skip) const
     }
 }
 
-
-int SingleSet::bad() const
-{
-#if ( 0 )
-    if ( fList.bad() ) return 1;
-    if ( aList.bad() ) return 2;
-#endif
-    
-    int code = 0;
-    Single * obj;
-    for ( obj = firstF(); obj ; obj=obj->next() )
-    {
-        if ( obj->attached() )
-            code |= 8;
-    }
-    
-    for ( obj = firstA();  obj ; obj=obj->next() )
-    {
-        if ( !obj->attached() )
-            code |= 16;
-        if ( obj->hand()->bad() )
-            code |= 32;
-    }
-    return code;
-}
-
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -611,12 +571,61 @@ size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* ar
     return f + a;
 }
 
+
+int SingleSet::bad() const
+{
+    int err = 0;
+    Single * obj;
+    size_t cnt = sizeF();
+    for ( obj = firstF(); obj ; obj=obj->next() )
+    {
+        if ( obj->attached() )
+            err |= 8;
+        if ( cnt-- == 0 )
+            return 1;
+    }
+    if ( cnt ) return 1;
+    
+    cnt = sizeA();
+    for ( obj = firstA();  obj ; obj=obj->next() )
+    {
+        if ( !obj->attached() )
+            err |= 16;
+        if ( simul_.fibers.badIdentity(obj->fiber()) )
+            err |= 64;
+        if ( obj->hand()->bad() )
+            err |= 32;
+        if ( cnt-- == 0 )
+            return 2;
+    }
+    if ( cnt ) return 2;
+    return err;
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Wrists
 
+
+/** Create Wrists anchored, and distributed to beads `name` */
+void SingleSet::distributeWrists(ObjectList& objs, SingleProp const* sp,
+                                 size_t cnt, std::string const& name) const
+{
+    BeadProp * bip = simul_.findProperty<BeadProp>("bead", name);
+    if ( !bip )
+        throw InvalidParameter("could not find bead type `"+name+"'");
+    ObjectList list = simul_.beads.collect(bip);
+    if ( list.empty() )
+        throw InvalidParameter("could not find any bead of type `"+name+"'");
+    list.shuffle_truncate(cnt);
+    // create one Single on each of 'cnt' Beads:
+    for ( Object const* i : list )
+        objs.push_back(sp->newWrist(static_cast<Bead const*>(i), 0));
+}
+
+
 /**
- This will create Wrists with `obj` as Base, following the specifications given in `arg`.
- These Wrists will be anchored on points `fip` to `fip+nbp-1` of `obj`.
+ This will create Wrists with `mec` as Base, following the specifications given in `arg`.
+ These Wrists will be anchored on points `[fip, fip+nbp[` of `mec`.
  
  The syntax understood for `arg` is as follows:
 
@@ -629,7 +638,7 @@ size_t SingleSet::count(bool (*func)(Object const*, void const*), void const* ar
  
  This is used to attach Single to Bead, Solid and Sphere
  */
-void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, size_t fip, size_t nbp, std::string& arg)
+void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, size_t fip, size_t nbp, std::string const& arg)
 {
     size_t num = 1;
     std::istringstream iss(arg);
