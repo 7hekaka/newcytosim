@@ -259,7 +259,7 @@ int FiberSite::checkAbscissa() const
 
 int FiberSite::bad() const
 {
-    if ( hFiber->betweenMP(hAbs) )
+    if ( hFiber && hFiber->betweenMP(hAbs) )
     {
         // the abscissa of the interpolated point:
         real a = hFiber->abscissaPoint(real(segix_)+inter_);

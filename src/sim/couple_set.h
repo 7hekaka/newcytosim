@@ -43,13 +43,12 @@ private:
     /// return one of ffList, afList, faList, aaList, corresponding to given states
     ObjectPool& sublist(bool attached1, bool attached2)
     {
-        if ( attached1 )
+        switch (( attached2 << 1 ) | attached1 )
         {
-            if ( attached2 ) return aaList; else return afList;
-        }
-        else
-        {
-            if ( attached2 ) return faList; else return ffList;
+            case 0: return ffList;
+            case 1: return afList;
+            case 2: return faList;
+            default: return aaList;
         }
     }
     

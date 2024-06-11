@@ -424,23 +424,23 @@ void Couple::beforeDetachment(Hand const* h)
         if ( h == cHand1 )
         {
             // cHand1 will detach
-            set->relinkD1(this);
             if ( cHand2->unattached() )
             {
                 cHand1->reinterpolate();
                 cPos = cHand1->unbindingPosition();
             }
+            set->relinkD1(this);
         }
         else
         {
             assert_true( h == cHand2 );
             // cHand2 will detach
-            set->relinkD2(this);
             if ( cHand1->unattached() )
             {
                 cHand2->reinterpolate();
                 cPos = cHand2->unbindingPosition();
             }
+            set->relinkD2(this);
         }
     }
 }

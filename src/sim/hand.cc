@@ -238,7 +238,6 @@ void Hand::do_attach(Fiber const* f, real a)
 
 void Hand::attach(FiberSite const& s)
 {
-    assert_true(s.attached());
     assert_true(!hFiber);
 
     do_attach(s.fiber(), s.abscissa());

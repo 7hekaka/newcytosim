@@ -69,8 +69,7 @@ void Single::beforeDetachment(Hand const* h)
     {
         sHand->reinterpolate();
         sPos = h->unbindingPosition();
-        
-        // link into correct SingleSet sublist:
+        // move to correct SingleSet sublist:
         set->relinkD(this);
     }
 }

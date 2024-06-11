@@ -34,22 +34,22 @@ void HandList::remove(Hand * n)
     //std::clog << this << " rem " << n->prop->name() << " " << n << '\n';
     Hand * x = n->next();
     if ( n->prev() )
+    {
         n->prev()->next(x);
-    else {
+    } else {
         assert_true( haFront == n );
         haFront = x;
     }
     
-    if ( x )
+    if ( x ) {
         x->prev(n->prev());
-    else {
+    } else {
         assert_true( haBack == n );
         haBack = n->prev();
     }
     //assert_false(bad());
-    // this cleanup is not necessary:
-    //n->prev(nullptr);
-    //n->next(nullptr);
+    n->prev(nullptr); // is this necessary?
+    n->next(nullptr); // is this necessary?
 }
 
 
