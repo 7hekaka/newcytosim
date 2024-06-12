@@ -268,8 +268,8 @@ void Hand::detachHand()
 void Hand::detach()
 {
     assert_true( attached() );
-    hMonitor->beforeDetachment(this);
     hFiber->removeHand(this);
+    hMonitor->beforeDetachment(this);
     hFiber = nullptr;
 #if FIBER_HAS_LATTICE
     hLattice = nullptr;
