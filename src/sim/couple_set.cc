@@ -156,9 +156,6 @@ void CoupleSet::stepsSkippingUnattached()
     bool const aaOdd = aaList.size() & 1;
     bool const faOdd = faList.size() & 1;
     bool const afOdd = afList.size() & 1;
-    
-    //size_t cnt = sizeFF();
-    //printf(" CoupleSet::stepsSkippingUnattached %lu -> %lu\n", cnt, sizeFF());
 
     step_couples<&Couple::stepAA>(firstAA(), aaOdd);
     if ( RNG.flip() )
