@@ -15,7 +15,7 @@ Object::~Object()
     if ( set_ )
     {
         //std::clog << "unlinking deleted Object " << this << '\n';
-        set_->remove(this);
+        //set_->remove(this);
     }
 }
 

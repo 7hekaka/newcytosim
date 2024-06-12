@@ -28,9 +28,6 @@ Couple::Couple(CoupleProp const* p, Vector const& w)
 
 Couple::~Couple()
 {
-    if ( linked() )
-        objset()->remove(this);
-
     if ( cHand1 )
     {
         cHand1->detachHand();

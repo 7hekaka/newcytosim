@@ -24,10 +24,6 @@ Single::Single(SingleProp const* p, Vector const& w)
 
 Single::~Single()
 {
-    //std::clog << " delete single " << reference() << "\n";
-    if ( linked() )
-        objset()->remove(this);
-
     if ( sHand )
     {
         sHand->detachHand();

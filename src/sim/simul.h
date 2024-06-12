@@ -141,7 +141,7 @@ public:
     void eraseObject(Object *);
     
     /// remove and delete all objects from given list
-    void erase(ObjectList const&);
+    void eraseObjects(ObjectList const&);
 
     /// mark objects from given list
     static void mark(ObjectList const&, ObjectMark);

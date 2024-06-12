@@ -544,7 +544,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         if ( target < amount )
         {
             ObjectList objs = set->collect(amount-target);
-            sim_->erase(objs);
+            set->eraseObjects(objs);
             return res;
         }
         // create enough objects to reach target:
@@ -827,7 +827,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
             Filter filter(sim_, pp, opt);
             ObjectList objs = set->collect(pass_filter, &filter, cnt);
             if ( objs.size() > 0 )
-                sim_->erase(objs);
+                set->eraseObjects(objs);
             else
                 Cytosim::warn << "found no `" << name << "' to delete\n";
         }
@@ -836,9 +836,13 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     {
         // a single object is specified
         Object * obj = findObject(name, pp);
-        if ( !obj )
+        if ( obj )
+        {
+            sim_->remove(obj);
+            delete(obj);
+        }
+        else
             throw InvalidParameter("invalid object specified in command `delete'");
-        sim_->erase(obj);
     }
 }
 

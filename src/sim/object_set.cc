@@ -182,7 +182,7 @@ void ObjectSet::erasePool(ObjectPool & list)
     while (( i = list.front() ))
     {
         list.pop_front();
-        static_cast<Object*>(i)->objset(nullptr);
+        //i->objset(nullptr);
         delete(i);
     }
 }
@@ -193,6 +193,23 @@ void ObjectSet::erase()
     erasePool(pool_);
     inventory_.clear();
 }
+
+
+void ObjectSet::eraseObjects(ObjectList const& objs)
+{
+    //std::clog << " ObjectSet::erase(" << objs.size() << " objects):\n";
+    for ( Object * obj : objs )
+    {
+        if ( obj )
+        {
+            assert_true( obj->objset() == this );
+            inventory_.unassign(obj);
+            unlink(obj);
+            delete(obj);
+        }
+    }
+}
+
 
 Object* ObjectSet::findObject(Property const* pp, long num) const
 {

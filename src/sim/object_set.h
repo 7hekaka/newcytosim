@@ -154,8 +154,11 @@ public:
     /// add multiple Objects
     void add(ObjectList const&);
 
-    /// remove all Objects in list
+    /// remove Objects from list
     void remove(ObjectList const&);
+
+    /// delete Objects from list
+    void eraseObjects(ObjectList const&);
 
     /// delete all Objects in list and forget all serial numbers
     virtual void erase();

@@ -458,7 +458,7 @@ void SimThread::deleteHandles()
     lock();
     SingleProp * sip = getHandleProperty();
     if ( sip )
-        sim_->erase(allHandles(sip));
+        sim_->singles.eraseObjects(allHandles(sip));
     handle_ = nullptr;
     unlock();
 }

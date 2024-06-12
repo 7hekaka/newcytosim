@@ -241,16 +241,18 @@ void Simul::eraseObject(Object * w)
 }
 
 
-void Simul::erase(ObjectList const& objs)
+void Simul::eraseObjects(ObjectList const& objs)
 {
-    //std::clog << " Simul::erase(" << objs.size() << " objects):\n";
+    //std::clog << " Simul::eraseObjects(" << objs.size() << " objects):\n";
     for ( Object * obj : objs )
+    {
         if ( obj )
         {
             //std::clog << " Simul::erase(" << obj << ")\n";
             remove(obj);
             delete(obj);
         }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -267,15 +269,15 @@ void Simul::mark(ObjectList const& objs, ObjectMark mrk)
 
 ObjectFlag Simul::setUniqueFlags() const
 {
-    size_t f = 1;
+    size_t f = 0;
     for ( Fiber * F = fibers.firstID(); F; F = fibers.nextID(F) )
-        F->flag(f++);
+        F->flag(++f);
     for ( Solid * S = solids.firstID(); S; S = solids.nextID(S) )
-        S->flag(f++);
+        S->flag(++f);
     for ( Bead  * B = beads.firstID(); B; B = beads.nextID(B) )
-        B->flag(f++);
+        B->flag(++f);
     for ( Sphere* O = spheres.firstID(); O; O = spheres.nextID(O) )
-        O->flag(f++);
+        O->flag(++f);
     if ( f != (ObjectFlag)f )
         throw InvalidParameter("ObjectFlag overflow in setUniqueFlags()");
     return f;
