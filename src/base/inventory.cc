@@ -97,7 +97,7 @@ void Inventory::assign(Inventoried * obj)
     assert_true(!record_[n]);
 
     record_[n] = obj;
-    //std::clog << highest_ << "  identity(" << obj << ") = " << n << "\n";
+    //std::clog << "  identity(" << obj << ") = " << n << " ";
 
     lowest_ = std::min(lowest_, n);
     //assert_false(bad());

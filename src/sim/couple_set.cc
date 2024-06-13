@@ -341,9 +341,13 @@ Couple * CoupleSet::makeCouple(CoupleProp const* P)
 {
     Couple * C = P->stocks.head();
     if ( C )
+    {
+        //std::clog << "stock -> " << C->reference() << " ";
         P->stocks.pop();
-    else
+    } else {
         C = P->newCouple();
+        //std::clog << "new " << C->reference() << " ";
+    }
     return C;
 }
 
@@ -1056,7 +1060,8 @@ void CoupleSet::uniAttach(FiberSet const& fibers)
                 
                 uniAttach2(loc, can);
             }
-            P->uni_counts -= size() - total;
+            if ( !fixed )
+                P->uni_counts -= size() - total;
         }
     }
 }

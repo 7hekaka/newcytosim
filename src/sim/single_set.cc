@@ -895,7 +895,8 @@ void SingleSet::uniAttach(FiberSet const& fibers)
 
             size_t total = size();
             uniAttach(loc, can);
-            P->uni_counts -= size() - total;
+            if ( !fixed )
+                P->uni_counts -= size() - total;
         }
     }
 }
