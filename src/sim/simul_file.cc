@@ -100,18 +100,14 @@ void Simul::writeObjects(Outputter& out) const
     solids.writeSet(out);
     beads.writeSet(out);
     spheres.writeSet(out);
-    singles.writeSet(out, prop.skip_free_single&3);
-    couples.writeSet(out, prop.skip_free_couple&3);
+    singles.writeSet(out);
+    couples.writeSet(out);
     organizers.writeSet(out);
     tubules.writeSet(out);
     //events.write(out);
 
     out.write("\n#section end");
     out.write("\n#end cytosim\n");
-    
-    // set to skip next time (clear 2d bit):
-    prop.skip_free_single &= ~2;
-    prop.skip_free_couple &= ~2;
 }
 
 

@@ -10,7 +10,6 @@ set simul system
     precondition = 1
     steric = 1, 5000
     tolerance = 1
-    skip_free_single = 1
     display = ( point_value=0.010; )
 }
 
@@ -62,6 +61,7 @@ set single grafted
     confine = off, 0, cell
     stiffness = 200
     activity = fixed
+    store_unbound = 1
 }
 
 

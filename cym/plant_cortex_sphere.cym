@@ -10,7 +10,6 @@ set simul system
     precondition = 4
     verbose = 7
     display = ( fog=1; )
-    skip_free_single = 3
 }
 
 set space cell
@@ -55,6 +54,7 @@ set single grafted
     stiffness = 463.86
     length = 0.0148
     activity = fixed
+    store_unbound = 1
 }
 
 set hand nucleator

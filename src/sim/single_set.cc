@@ -347,7 +347,6 @@ void SingleSet::link(Object * obj)
 void SingleSet::unlink(Object * obj)
 {
     Single * s = static_cast<Single*>(obj);
-    assert_true(obj->objset() == nullptr);
 
     if ( s->attached() )
     {
@@ -473,25 +472,29 @@ void SingleSet::reheat()
 }
 
 
-void SingleSet::writeSomeFreeObjects(Outputter& out) const
+/**
+ This will save some of the objects in the normal way, using `write()`
+ and will also save a count of the objects that were skipped
+ */
+void SingleSet::writeSomeObjects(Outputter& out) const
 {
     writeRecords(out, fList.size(), inventory_.highest());
     
     std::map<PropertyID, size_t> cnt;
-    // count all the elements that are not written:
+    // count all the elements that are virtually present:
     for ( SingleProp const* P : uniSingles )
     {
         PropertyID i = P->number();
         cnt[i] = P->uni_counts;
     }
-    // write Single without `fast_diffusion`:
+    // write Single if `store_unbound > 0`:
     for ( Single const* n=firstF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
-        if ( n->prop->fast_diffusion )
-            ++cnt[i];
-        else
+        if ( n->prop->store_unbound )
             n->write(out);
+        else
+            ++cnt[i];
     }
     if ( !cnt.empty() )
     {
@@ -501,14 +504,20 @@ void SingleSet::writeSomeFreeObjects(Outputter& out) const
         {
             // write counts for each class of unwritten Single:
             out.write("\n#section single reheat");
-            for ( size_t i = 0; i <= sup; ++i )
-                out.writeInt(cnt[i], ' ');
+            for ( PropertyID i = 0; i <= sup; ++i )
+                out.writeUInt(cnt[i], ' ');
         }
+    }
+    // decrease `store_unbound`:
+    for ( Property * i : simul_.properties.find_all("single") )
+    {
+        SingleProp * P = static_cast<SingleProp *>(i);
+        P->store_unbound -= ( P->store_unbound > 0 );
     }
 }
 
 
-void SingleSet::writeSet(Outputter& out, int skip) const
+void SingleSet::writeSet(Outputter& out) const
 {
     if ( sizeA() > 0 )
     {
@@ -518,10 +527,8 @@ void SingleSet::writeSet(Outputter& out, int skip) const
     if ( sizeF() > 0 )
     {
         out.write("\n#section single F");
-        if ( skip == 1 )
-            writeSomeFreeObjects(out);
-        else
-            writePool(out, fList);
+        writeSomeObjects(out);
+        //writePool(out, fList);
     }
 }
 

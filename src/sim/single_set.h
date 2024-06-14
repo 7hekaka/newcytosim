@@ -53,8 +53,8 @@ private:
     /// release Single from reserve lists
     void uniRelax();
 
-    /// save free Single for which `fast_diffusion == 0`
-    void writeSomeFreeObjects(Outputter&) const;
+    /// save free Single for which `store_unbound > 0`
+    void writeSomeObjects(Outputter&) const;
 
 public:
 
@@ -79,7 +79,7 @@ public:
     void report(std::ostream&) const;
 
     /// write objects
-    void writeSet(Outputter&, int skip) const;
+    void writeSet(Outputter&) const;
 
     //--------------------------
     

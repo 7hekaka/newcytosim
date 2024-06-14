@@ -76,8 +76,8 @@ private:
     /// release Couples from reserve lists
     void uniRelax();
     
-    /// save free Couples for which `fast_diffusion == 0`
-    void writeSomeFreeObjects(Outputter&) const;
+    /// save free Couple for which `store_unbound > 0`
+    void writeSomeObjects(Outputter&) const;
 
 public:
 
@@ -99,7 +99,7 @@ public:
     Object * newObject(ObjectTag, PropertyID);
 
     /// save objects
-    void writeSet(Outputter&, int skip) const;
+    void writeSet(Outputter&) const;
 
     //--------------------------
 

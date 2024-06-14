@@ -106,6 +106,15 @@ public:
     /// if > 0, the number of candidates for binding considered for `fast_diffusion`
     size_t fast_reservoir;
 
+    /// flag to save unbound couples in trajectory files (default = infinite)
+    /**
+     With the default value (infinite), cytosim will save unbound couples in all frames
+     - set to 1, to save them only once in the trajectory file,
+     - set to 0, for not saving objects in the trajectory file.
+     This only affects couples in the unattached-unattached (FF) state.
+     */
+    unsigned store_unbound;
+
     /// if ( trans_activated == 1 ), Hand2 is active only if Hand1 is bound
     /**
      If the couple is `trans_activated`, the activity of Hand2 is conditioned on Hand1 being attached.

@@ -85,6 +85,15 @@ public:
     /// if > 0, the number of candidates for binding considered for `fast_diffusion`
     size_t fast_reservoir;
 
+    /// flag to save unbound singles in trajectory files (default = infinite)
+    /**
+     With the default value (infinite), cytosim will save unbound singles in all frames
+     - set to 1, to save them only once in the trajectory file,
+     - set to 0, for not saving objects in the trajectory file.
+     This only affects singles in the unattached (F) state.
+     */
+    unsigned store_unbound;
+    
 #if NEW_MOBILE_SINGLE
     /// constant drift
     Vector speed;

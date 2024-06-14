@@ -642,25 +642,29 @@ void CoupleSet::reheat()
 //------------------------------------------------------------------------------
 #pragma mark -
 
-void CoupleSet::writeSomeFreeObjects(Outputter& out) const
+/**
+ This will save some of the objects in the normal way, using `write()`
+ and will also save a count of the objects that were skipped
+ */
+void CoupleSet::writeSomeObjects(Outputter& out) const
 {
     writeRecords(out, ffList.size(), inventory_.highest());
     
     std::map<PropertyID, size_t> cnt;
-    // count all the elements that are not written:
+    // count all the elements that are virtually present:
     for ( CoupleProp const* P : uniCouples )
     {
         PropertyID i = P->number();
         cnt[i] = P->uni_counts;
     }
-    // write Couple without `fast_diffusion`:
+    // write Couple if `store_unbound > 0`:
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
         PropertyID i = n->property()->number();
-        if ( n->prop->fast_diffusion )
-            ++cnt[i];
-        else
+        if ( n->prop->store_unbound )
             n->write(out);
+        else
+            ++cnt[i];
     }
     if ( !cnt.empty() )
     {
@@ -670,14 +674,20 @@ void CoupleSet::writeSomeFreeObjects(Outputter& out) const
         {
             // write counts for each class of unwritten Couple:
             out.write("\n#section couple reheat");
-            for ( size_t i = 0; i <= sup; ++i )
-                out.writeInt(cnt[i], ' ');
+            for ( PropertyID i = 0; i <= sup; ++i )
+                out.writeUInt(cnt[i], ' ');
         }
+    }
+    // decrease `store_unbound`:
+    for ( Property * i : simul_.properties.find_all("couple") )
+    {
+        CoupleProp * P = static_cast<CoupleProp *>(i);
+        P->store_unbound -= ( P->store_unbound > 0 );
     }
 }
 
 
-void CoupleSet::writeSet(Outputter& out, int skip) const
+void CoupleSet::writeSet(Outputter& out) const
 {
     if ( sizeAA() > 0 )
     {
@@ -697,10 +707,8 @@ void CoupleSet::writeSet(Outputter& out, int skip) const
     if ( sizeFF() > 0 )
     {
         out.write("\n#section couple FF");
-        if ( skip == 1 )
-            writeSomeFreeObjects(out);
-        else
-            writePool(out, ffList);
+        writeSomeObjects(out);
+        //writePool(out, ffList);
     }
 }
 

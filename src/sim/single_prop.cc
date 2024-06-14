@@ -103,6 +103,7 @@ void SingleProp::clear()
     diffusion      = 0;
     fast_diffusion = 0;
     fast_reservoir = 0;
+    store_unbound  = ~0;
 #if NEW_MOBILE_SINGLE
     speed.reset();
 #endif
@@ -132,6 +133,7 @@ void SingleProp::read(Glossary& glos)
         glos.set(diffusion,  "diffusion");
     glos.set(fast_diffusion, "fast_diffusion");
     glos.set(fast_reservoir, "fast_diffusion", 1);
+    glos.set(store_unbound, "store_unbound");
 #if NEW_MOBILE_SINGLE
     glos.set(speed,          "speed");
 #endif
