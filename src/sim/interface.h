@@ -12,10 +12,10 @@ class Property;
 class SimulProp;
 class Simul;
 
-/// Cytosim Application Programming Interface
+/// Cytosim's Application Programming Interface
 /*
  A reduced set of commands to control and simulate
- a system of objects within cytosim.
+ a system of objects within Cytosim.
  */
 class Interface
 {

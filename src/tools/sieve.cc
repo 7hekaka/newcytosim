@@ -79,6 +79,13 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
     
+    // read parameters from command line
+    for ( int n = 3; n < argc; ++n )
+    {
+        if ( simul.readParameter(argv[n]) )
+            std::cerr << ">>>>>> `" << argv[n] << "'\n";
+    }
+    
     std::clog << ">>>>>> Sieve `" << argv[1] << "' -> `" << argv[2];
     std::clog << "'  binary: " << binary << "\n";
     

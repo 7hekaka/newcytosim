@@ -379,6 +379,9 @@ public:
 
     /// load the properties contained in the standard output property file
     void loadProperties();
+   
+    /// read and set parameter for some object; syntax is `CLASS:PARAMETER=VALUE`
+    bool readParameter(const char*) const;
 
     //---------------------------- LOAD OBJECTS --------------------------------
     

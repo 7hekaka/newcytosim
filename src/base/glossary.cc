@@ -41,6 +41,11 @@ Glossary::Glossary(const std::string& arg)
     read(iss);
 }
 
+Glossary::Glossary(const std::string& key, const std::string& val)
+{
+    define(key, val);
+}
+
 
 /** If successful, `var` is set to the content of the block without delimiters */
 int Glossary::set_block(std::string & var, char c_in, key_type const& key, size_t inx) const
@@ -188,7 +193,7 @@ void Glossary::clear_except(key_type const& key)
 }
 
 
-void Glossary::clear_counts()
+void Glossary::clear_reads()
 {
     for ( auto& i : mTerms )
     {
@@ -198,8 +203,21 @@ void Glossary::clear_counts()
 }
 
 
+unsigned Glossary::num_reads(std::string const& key) const
+{
+    unsigned res = 0;
+    map_type::const_iterator w = mTerms.find(key);
+    if ( w != mTerms.end() )
+    {
+        for ( val_type const& v : w->second )
+            res += v.read_;
+    }
+    return res;
+}
+
+
 /** transfer read counts from 'opt' to 'this' */
-void Glossary::add_counts(Glossary const& opt)
+void Glossary::add_reads(Glossary const& opt)
 {
     for ( auto& i : mTerms )
     {
@@ -207,7 +225,7 @@ void Glossary::add_counts(Glossary const& opt)
         if ( w != opt.mTerms.end() )
         {
             size_t sup = std::min(i.second.size(), w->second.size());
-            //std::clog << " Glossary::add_counts `" << w->first << "' " << sup << "\n";
+            //std::clog << " Glossary::add_reads `" << w->first << "' " << sup << "\n";
             for ( size_t n = 0; n < sup; ++n )
                 i.second[n].read_ = std::max(i.second[n].read_, w->second[n].read_);
         }

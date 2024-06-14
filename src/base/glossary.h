@@ -65,7 +65,7 @@ public:
         bool defined_;
         
         /// the number of times this value has been read
-        mutable size_t read_;
+        mutable unsigned read_;
 
         /// constructor
         val_type() { defined_=false; read_=0; }
@@ -244,10 +244,13 @@ public:
     /// this constructor calls read(string)
     explicit Glossary(const std::string&);
 
+    /// this constructor calls define(key, val)
+    explicit Glossary(const std::string& key, const std::string& val);
+
     //-------------------------------------------------------------------------------
 
     /// true if no key were set
-    bool empty()   const { return mTerms.empty(); }
+    bool empty() const { return mTerms.empty(); }
 
     /// total number of keys
     size_t num_keys() const { return mTerms.size(); }
@@ -268,10 +271,13 @@ public:
     void clear_except(key_type const&);
 
     /// clear usage counts for all entries
-    void clear_counts();
+    void clear_reads();
     
+    /// return number of times some value was read
+    unsigned num_reads(key_type const&) const;
+
     /// add usage counts from another Glossary
-    void add_counts(Glossary const&);
+    void add_reads(Glossary const&);
 
     /// create a new Glossary with only the given key
     Glossary get_term(key_type const&) const;

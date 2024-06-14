@@ -94,7 +94,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
                 Glossary glos(opt);
                 glos.read(blk, 0);
                 mono_report(out, arg, glos, ver);
-                opt.add_counts(glos);
+                opt.add_reads(glos);
             }
         }
         catch( Exception & e )

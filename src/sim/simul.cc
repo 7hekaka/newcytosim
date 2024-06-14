@@ -572,3 +572,26 @@ Property* Simul::makeProperty(const std::string& cat, const std::string& nom, Gl
     return p;
 }
 
+
+/**
+ read and set parameter for some object in the simulation,
+ syntax is `CLASS:PARAMETER=VALUE`
+*/
+bool Simul::readParameter(const char* arg) const
+{
+    char tmp[256];
+    strncpy(tmp, arg, sizeof(tmp));
+    char * val = tmp;
+    char * cls = strsep(&val, ":");
+    char * tok = strsep(&val, "=");
+    //printf("%s|%s|%s\n", cls, tok, val);
+    Property * P = findProperty(cls);
+    if ( P && val ) {
+        Glossary glos(tok, val);
+        P->read(glos);
+        //std::cerr << " understood `" << argv[n] << "' :\n";
+        //P->write_values_diff(std::clog, true);
+        return glos.num_reads(tok);
+    }
+    return 0;
+}

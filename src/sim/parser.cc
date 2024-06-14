@@ -571,7 +571,7 @@ void Parser::parse_delete(std::istream& is)
  
      move all CLASS ( POSITION )
 
- NAME can be '*', and 'position' is a Vector.
+ NAME can be '*', and 'POSITION' is a Vector.
  */
 
 void Parser::parse_move(std::istream& is)
