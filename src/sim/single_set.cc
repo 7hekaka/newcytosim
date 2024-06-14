@@ -483,18 +483,14 @@ void SingleSet::writeSomeObjects(Outputter& out) const
     std::map<PropertyID, size_t> cnt;
     // count all the elements that are virtually present:
     for ( SingleProp const* P : uniSingles )
-    {
-        PropertyID i = P->number();
-        cnt[i] = P->uni_counts;
-    }
+        cnt[P->number()] = P->uni_counts;
     // write Single if `store_unbound > 0`:
     for ( Single const* n=firstF(); n; n=n->next() )
     {
-        PropertyID i = n->property()->number();
         if ( n->prop->store_unbound )
             n->write(out);
         else
-            ++cnt[i];
+            ++cnt[n->prop->number()];
     }
     if ( !cnt.empty() )
     {
@@ -508,10 +504,11 @@ void SingleSet::writeSomeObjects(Outputter& out) const
                 out.writeUInt(cnt[i], ' ');
         }
     }
-    // decrease `store_unbound`:
+    // decrement `store_unbound`:
     for ( Property * i : simul_.properties.find_all("single") )
     {
         SingleProp * P = static_cast<SingleProp *>(i);
+        //printf("%s %u %lu\n", P->name().c_str(), P->store_unbound, cnt[P->number()]);
         P->store_unbound -= ( P->store_unbound > 0 );
     }
 }

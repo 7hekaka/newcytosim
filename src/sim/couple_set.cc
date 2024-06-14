@@ -653,18 +653,14 @@ void CoupleSet::writeSomeObjects(Outputter& out) const
     std::map<PropertyID, size_t> cnt;
     // count all the elements that are virtually present:
     for ( CoupleProp const* P : uniCouples )
-    {
-        PropertyID i = P->number();
-        cnt[i] = P->uni_counts;
-    }
+        cnt[P->number()] = P->uni_counts;
     // write Couple if `store_unbound > 0`:
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
-        PropertyID i = n->property()->number();
         if ( n->prop->store_unbound )
             n->write(out);
         else
-            ++cnt[i];
+            ++cnt[n->prop->number()];
     }
     if ( !cnt.empty() )
     {
@@ -678,7 +674,7 @@ void CoupleSet::writeSomeObjects(Outputter& out) const
                 out.writeUInt(cnt[i], ' ');
         }
     }
-    // decrease `store_unbound`:
+    // decrement `store_unbound`:
     for ( Property * i : simul_.properties.find_all("couple") )
     {
         CoupleProp * P = static_cast<CoupleProp *>(i);

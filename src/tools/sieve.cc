@@ -83,7 +83,7 @@ int main(int argc, char* argv[])
     for ( int n = 3; n < argc; ++n )
     {
         if ( simul.readParameter(argv[n]) )
-            std::cerr << ">>>>>> `" << argv[n] << "'\n";
+            std::cerr << ">>>>>> " << argv[n] << "\n";
     }
     
     std::clog << ">>>>>> Sieve `" << argv[1] << "' -> `" << argv[2];
