@@ -320,10 +320,10 @@ double Inputter::readDouble()
  This will read `vecsize_` floats, and set `dim` values in ptr[], filling in with zeros.
  The default vector size can be changed by calling `vectorSize(INT)`
  */
-void Inputter::readFloats(float flt[], const size_t dim)
+void Inputter::readFloats(float flt[], const unsigned dim)
 {
-    size_t stop = std::min(vecsize_, dim);
-    size_t d = 0;
+    unsigned stop = std::min(vecsize_, dim);
+    unsigned d = 0;
     while ( d < stop )
         flt[d++] = readFloat();
     while ( d < dim )
@@ -336,10 +336,10 @@ void Inputter::readFloats(float flt[], const size_t dim)
 /**
  This will read `vecsize_` floats, and set `dim` values in ptr[], filling in with zeros.
  */
-void Inputter::readFloats(double ptr[], const size_t dim)
+void Inputter::readFloats(double ptr[], const unsigned dim)
 {
-    size_t stop = std::min(vecsize_, dim);
-    size_t d = 0;
+    unsigned stop = std::min(vecsize_, dim);
+    unsigned d = 0;
     while ( d < stop )
         ptr[d++] = readFloat();
     while ( d < dim )
@@ -352,33 +352,33 @@ void Inputter::readFloats(double ptr[], const size_t dim)
 /**
 This will read `n * vecsize_` floats, and store `n * dim` values in ptr[].
 */
-void Inputter::readFloats(const size_t cnt, float flt[], const size_t dim)
+void Inputter::readFloats(const unsigned cnt, float flt[], const unsigned dim)
 {
     if ( dim < vecsize_ || ! binary_ )
     {
         // read values sequentially
-        for ( size_t i = 0; i < cnt ; ++i )
+        for ( unsigned i = 0; i < cnt ; ++i )
             readFloats(flt+dim*i, dim);
         return;
     }
 
     // read all values in one call to fread()
-    size_t n = cnt * vecsize_;
+    unsigned n = cnt * vecsize_;
     if ( n != fread(flt, 4, n, mFile) )
         throw InvalidIO("readFloats(D) failed");
 
     if ( binary_ == 2 )
     {
-        for ( size_t i = 0; i < n; ++i )
+        for ( unsigned i = 0; i < n; ++i )
             flt[i] = byteswap32(flt[i]);
     }
     if ( vecsize_ < dim )
     {
         // pad data to match dimensionality
-        size_t u = cnt;
+        unsigned u = cnt;
         while ( u-- > 0 )
         {
-            size_t i = dim;
+            unsigned i = dim;
             while ( i-- > vecsize_ )
                 flt[u*dim+i] = 0.f;
             while ( i-- > 0 )
@@ -392,10 +392,10 @@ void Inputter::readFloats(const size_t cnt, float flt[], const size_t dim)
 /**
  This will read `vecsize_` doubles, and set `cnt` values in ptr[], filling in with zeros.
  */
-void Inputter::readDoubles(double ptr[], const size_t cnt)
+void Inputter::readDoubles(double ptr[], const unsigned cnt)
 {
-    size_t stop = std::min(vecsize_, cnt);
-    size_t d = 0;
+    unsigned stop = std::min(vecsize_, cnt);
+    unsigned d = 0;
     while ( d < stop )
         ptr[d++] = readDouble();
     while ( d < cnt )

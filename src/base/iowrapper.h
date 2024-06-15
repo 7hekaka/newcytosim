@@ -15,10 +15,10 @@ class Inputter : public FileWrapper
 private:
         
     /// The format ID of the input: this allow backward compatibility with older formats
-    size_t format_;
+    unsigned format_;
     
     /// The dimensionality of vectors stored in the file
-    size_t vecsize_;
+    unsigned vecsize_;
     
     /** if the state is stored in a binary format, binary_ is 1 or 2.
         with 'binary_==2', byte order is swapped automatically
@@ -32,25 +32,25 @@ public:
     void reset();
     
     /// Constructor
-    Inputter(size_t d) : FileWrapper(nullptr) { reset(); vecsize_=d; }
+    Inputter(unsigned d) : FileWrapper(nullptr) { reset(); vecsize_=d; }
     
     /// Constructor
-    Inputter(size_t d, FILE* f, const char* path=nullptr) : FileWrapper(f, path) { reset(); vecsize_=d; }
+    Inputter(unsigned d, FILE* f, const char* path=nullptr) : FileWrapper(f, path) { reset(); vecsize_=d; }
     
     /// constructor which opens a file
     Inputter(size_t d, const char* name, bool bin) : FileWrapper(name, bin?"rb":"r") { reset(); vecsize_=d; }
 
     /// return dimensionnally of vectors
-    size_t vectorSize() const { return vecsize_; }
+    unsigned vectorSize() const { return vecsize_; }
     
     /// Set dimentionnality of vectors
-    void vectorSize(size_t d) { vecsize_ = d; }
+    void vectorSize(unsigned d) { vecsize_ = d; }
     
     /// return file format version identification number
-    size_t formatID() const { return format_; }
+    int formatID() const { return format_; }
 
     /// set file format version identification number
-    void setFormatID(size_t f) { format_ = f; }
+    void setFormatID(unsigned f) { format_ = f; }
 
     /// Returns 1 for native binary format, 2 for non-native binary format, and 0 if not binary
     int binary() const { return binary_; }
@@ -95,17 +95,17 @@ public:
     double readDouble();
     
     /// Reads one vector, setting `cnt` coordinates in the array
-    void readFloats(float[], size_t dim);
+    void readFloats(float[], unsigned dim);
     /// Reads one vector, setting `cnt` coordinates in the array
-    void readFloats(double[], size_t dim);
+    void readFloats(double[], unsigned dim);
 
     /// Reads one vector, setting `cnt` coordinates in the array
-    void readFloats(size_t cnt, float[], size_t dim);
+    void readFloats(unsigned cnt, float[], unsigned dim);
     /// Reads one vector, setting `cnt` coordinates in the array
-    void readFloats(size_t cnt, double[], size_t dim);
+    void readFloats(unsigned cnt, double[], unsigned dim);
 
     /// Reads one vector, setting `cnt` coordinates in the array
-    void readDoubles(double[], size_t D);
+    void readDoubles(double[], unsigned D);
 
 };
 
