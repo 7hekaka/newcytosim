@@ -47,6 +47,7 @@ void Player::refresh()
 
 void Player::previousFrame()
 {
+    //printf("<frame %lu\n", worker.currentFrame());
     if ( worker.currentFrame() > 0 )
         worker.loadFrame(worker.currentFrame()-1);
     else {
@@ -62,6 +63,7 @@ void Player::previousFrame()
  */
 void Player::nextFrame()
 {
+    //printf(">frame %lu\n", worker.currentFrame());
     if ( !worker.goodFile() )
     {
         flashText("Error cannot read from `"+simul.prop.system_file+"'\n");

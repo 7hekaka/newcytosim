@@ -204,6 +204,9 @@ public:
     
     /// attempt to load specified frame from file (0 = first frame; -1 = last frame)
     int loadFrame(size_t f);
+    
+    /// load previous frame in file
+    int loadPreviousFrame();
 
     /// load next frame in file
     int loadNextFrame();

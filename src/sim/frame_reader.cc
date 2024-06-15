@@ -291,18 +291,19 @@ int FrameReader::loadNextFrame(Simul& sim)
     int res = sim.reloadObjects(inputter);
     if ( res == 0 )
     {
-        if ( frameIndex != NO_FRAME )
-        {
+        if ( frameIndex == NO_FRAME )
+            frameIndex = 0;
+        else
             ++frameIndex;
-            VLOG("FrameReader: loadNextFrame() read frame "<<frameIndex<<'\n');
-            // the position we used was good, to read this frame
-            if ( has_pos )
-                savePos(frameIndex, pos, 4);
-            
-            // the next frame should normally start from the current position:
-            if ( !inputter.get_pos(pos) )
-                savePos(frameIndex+1, pos, 1);
-        }
+        VLOG("FrameReader: loadNextFrame() got frame "<<frameIndex<<'\n');
+        // the position we used was good, to read this frame
+        if ( has_pos )
+            savePos(frameIndex, pos, 4);
+        
+        // the next frame should normally start from the current position:
+        if ( !inputter.get_pos(pos) )
+            savePos(frameIndex+1, pos, 1);
+        
         return SUCCESS;
     }
     else

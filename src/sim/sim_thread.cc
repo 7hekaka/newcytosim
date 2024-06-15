@@ -302,6 +302,15 @@ int SimThread::loadFrame(size_t f)
     return r;
 }
 
+
+int SimThread::loadPreviousFrame()
+{
+    if ( reader_.currentFrame() > 0 )
+        return loadFrame(reader_.currentFrame()-1);
+    return 7;
+}
+
+
 int SimThread::loadNextFrame()
 {
     int r = 7;
