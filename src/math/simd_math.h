@@ -76,7 +76,7 @@ inline vec4f log_approx4f(vec4f x)
     /* -89.970756366f = -127 * log(2) + constant term of polynomial approx.
     deducted cst_term = -1.941064434886946f */
     const vec4f f = set4f(-89.970756366f);
-    const vec4f g = set4f(0.6931471805f); // log(2)
+    const vec4f g = set4f(0.693147182464599609375f); // log(2)
     // used to clear invalid results:
     //vec4f invalid = notpositive4f(x);
     vec4f valid = positive4f(x); // > 0
@@ -116,7 +116,7 @@ inline vec4f minuslog_approx4f32(vec4f x)
     //const vec4f f = set4f(112.15158843994140625f);
     // we use a slightly larger constant to avoid negative output:
     const vec4f f = set4f(112.15148162841796875f);
-    const vec4f g = set4f(-0.6931471805f); // log(2)
+    const vec4f g = set4f(-0.693147182464599609375f); // -log(2)
     // extract exponent:
     vec4f cst = cvt4if(shiftbitsR4(x, 23));
     cst = fmadd4f(cst, g, f);
@@ -210,7 +210,7 @@ inline vec8f log_approx8f(vec8f x)
     const vec8f a4 = set8f(-0.288739945f);
     const vec8f a5 = set8f(+3.110401639e-2f);
     const vec8f F = set8f(-89.970756366f);
-    const vec8f G = set8f(0.6931471805f);
+    const vec8f G = set8f(0.693147182464599609375f);
     // used to clear negative / NaN arguments:
     vec8f invalid = cmp8f(x, setzero8f(), _CMP_NGT_UQ);
     // extract exponent:

@@ -226,6 +226,29 @@ void run(sfmt_t& sfmt, size_t cnt, const char str[], REAL* (*FUNC)(REAL*, size_t
 }
 
 
+template < typename REAL >
+void scan(size_t chunk, const char str[], REAL* (*FUNC)(REAL*, size_t, const uint32_t*))
+{
+    void * src = nullptr;
+    void * dst = nullptr;
+
+    if ( 0 == posix_memalign(&dst, 32, sizeof(REAL)*chunk)
+        && 0 == posix_memalign(&src, 32, 4*chunk) )
+    {
+        uint32_t * rnd = (uint32_t*)src;
+        REAL * vec = (REAL*)dst;
+        for ( uint32_t i = 0; i < chunk; ++i )
+            rnd[i] = ~(32*i);
+        FUNC(vec, chunk, rnd);
+        for ( uint32_t i = 0; i < chunk; ++i )
+            printf("%.4e ", vec[i]);
+        printf("\n");
+        std::free(src);
+        std::free(dst);
+    }
+}
+
+
 
 int main(int argc, char* argv[])
 {
@@ -240,7 +263,7 @@ int main(int argc, char* argv[])
     printf("sfmt.refill  %5.2f\n", tock(cnt>>10));
     //print(vec, end);
     
-    run(sfmt, cnt, "Gauss.STD", makeGaussians_std);
+    //run(sfmt, cnt, "Gauss.STD", makeGaussians_std);
     run(sfmt, cnt, "Gauss", makeGaussians_);
 #if USE_SIMD
     run(sfmt, cnt, "Gauss.SIMD", makeGaussians_SIMD);
@@ -256,6 +279,8 @@ int main(int argc, char* argv[])
     run(sfmt, cnt, "Exponential", makeExponentials_);
 #if USE_SIMD
     run(sfmt, cnt, "Expon.SIMD", makeExponentials_SIMD);
+    scan(16, "Exponential", makeExponentials_SIMD);
 #endif
+    scan(16, "Exponential", makeExponentials_);
 }
 
