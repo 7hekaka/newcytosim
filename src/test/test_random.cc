@@ -209,29 +209,25 @@ void check_flip()
 template < typename REAL >
 void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)())
 {
-    REAL ix = INFINITY, iy = INFINITY, iz = INFINITY, it = INFINITY;
+    REAL ix = INFINITY, iy = INFINITY, iz = INFINITY;
     real avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
         REAL x = (RNG.*FUNC)();
         REAL y = (RNG.*FUNC)();
         REAL z = (RNG.*FUNC)();
-        REAL t = (RNG.*FUNC)();
         ix = std::min(ix, x);
         iy = std::min(iy, y);
         iz = std::min(iz, z);
-        it = std::min(it, t);
         x -= off;
         y -= off;
         z -= off;
-        t -= off;
-        avg += ( x + y ) + ( z + t );
-        var += x*x + y*y + z*z + t*t;
+        avg = ( x + y ) + ( z + avg );
+        var = ( x*x + y*y ) + ( z*z + var );
         //printf("%12.8f  %12.8f  %12.8f  %12.8f\n", x, y, z, t);
-
     }
-    ix = std::min(std::min(ix, iy), std::min(iz, it));
-    cnt *= 4;
+    ix = std::min(std::min(ix, iy), iz);
+    cnt *= 3;
     if ( cnt > 0 )
     {
         avg /= cnt;

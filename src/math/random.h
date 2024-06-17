@@ -315,7 +315,7 @@ public:
     /// signed real number, following a normal law N(0,1), slower algorithm
     void gauss_boxmuller(real &, real&);
     
-    /// refill array `exponential_[]`, resetting `next_exponential_`
+    /// refill array `exponentials_[]`, resetting `next_exponential_`
     void refill_exponentials();
 
     /// random in [0, inf[, distributed as P(x>m) = exp(-m); mean = 1.0, variance = 1.0
