@@ -15,7 +15,7 @@
  The rate, the type of fiber and the characteristics of the fiber are set
  as three values in property @ref NucleatorPar "nucleate".
  
- If the nucleator is part of a Couple, the paramter "nucleation_angle"
+ If the nucleator is part of a Couple, the parameter "nucleation_angle"
  can be set to define the direction of the new fiber with respect to the
  preexisting fiber (the one that is bound by the other Hand of the Couple).
  

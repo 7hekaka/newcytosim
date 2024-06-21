@@ -215,9 +215,6 @@ public:
     /// detach objects that were not updated during import
     void reheat();
     
-    /// check the anchoring Mecables of Wrists
-    void deleteInvalidSingles();
-    
     /// check internal consistency, returns 0 if everything is OK
     int bad() const;
 

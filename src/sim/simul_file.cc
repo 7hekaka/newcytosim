@@ -501,7 +501,6 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
         // renew pointers to objects, particularly 'confine_label'
         prop.complete(*this);
         fibers.updateFibers();
-        singles.deleteInvalidSingles();
 
         assert_false(singles.bad());
         assert_false(couples.bad());

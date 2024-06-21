@@ -632,7 +632,14 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
         throw;
     }
     
-    if ( update )
+    if ( obj->invalid() )
+    {
+        inventory_.unassign(obj);
+        if ( !update )
+            unlink(obj);
+        delete(obj);
+    }
+    else if ( update )
     {
         link(obj);
         if ( mk ) obj->mark(mk);

@@ -222,7 +222,7 @@ public:
     virtual void readBase(Inputter& out, Simul& sim) { ABORT_NOW("readBase == 0"); }
 
     /// check validity
-    virtual int invalid() const { return !sPos.valid(); }
+    int invalid() const { return !sPos.valid(); }
 };
 
 

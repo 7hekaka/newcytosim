@@ -115,6 +115,9 @@ public:
     
     /// return some characteristics of the object, used for reporting
     virtual void report(std::ostream&) const { }
+    
+    /// return non-zero value if underlying data is invalid somehow
+    virtual int invalid() const { return 0; }
 
     //--------------------------
     
