@@ -64,7 +64,7 @@ Single * SingleProp::newSingle() const
 /**
  Create Wrist anchored to a Mecable vertex
  */
-Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
+Wrist * SingleProp::newWrist(Mecable const* mec, const unsigned point) const
 {
     //std::clog << "SingleProp::newWrist(length=" << length << ")\n";
     if ( length > 0 )
@@ -76,7 +76,7 @@ Wrist * SingleProp::newWrist(Mecable const* mec, const size_t point) const
 /**
  Create Wrist anchored on points interpolated from the Mecable's vertices
  */
-Wrist * SingleProp::newWrist(Mecable const* mec, const size_t ref, Vector const& vec) const
+Wrist * SingleProp::newWrist(Mecable const* mec, const unsigned ref, Vector const& vec) const
 {
     //std::clog << "SingleProp::newWrist(length=" << length << ")\n";
     Wrist * w;

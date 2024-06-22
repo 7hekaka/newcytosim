@@ -150,10 +150,10 @@ public:
     virtual Single * newSingle() const;
 
     /// create a Wrist attached to a Mecable vertex
-    Wrist * newWrist(Mecable const*, size_t inx) const;
+    Wrist * newWrist(Mecable const*, unsigned inx) const;
     
     /// create a Wrist attached to a point interpolated from Mecable's vertices
-    Wrist * newWrist(Mecable const*, size_t ref, Vector const&) const;
+    Wrist * newWrist(Mecable const*, unsigned ref, Vector const&) const;
 
     /// identifies the property
     std::string category() const { return "single"; }
