@@ -808,7 +808,7 @@ void Meca::computePrecondBand(Mecable* mec, real* tmp)
     }
     else
     {
-        getHalfBlock(mec, tmp);
+        getHalfBlock(mec, blk);
         // calculate Cholesky factorization:
 #if SAUERKRAUT
         alsatian_xpotf2L(bks, blk, bks, &info);

@@ -1820,7 +1820,9 @@ void alsatian_xpotf2L(const int N, real* A, const int LDA, int* INFO)
 {
     lapack::xpotf2('L', N, A, LDA, INFO);
     if ( *INFO )
-        std::cerr << "lapack::xpotf2 failed: " << *INFO << "\n";
+    {
+        std::cerr << "lapack::xpotf2 failed (code " << *INFO << ")\n";
+    }
     else
     {
         const int S = LDA+1;
