@@ -151,6 +151,19 @@ void Random::sreal4(real& a, real& b, real& c, real& d)
     d = TWO_POWER_MINUS_31 * static_cast<real>(ptr[3]);
 }
 
+void Random::urand2(real& C, real& S)
+{
+    real d, x, y;
+    do {
+        sreal2(x, y);
+        d = x*x + y*y;
+    } while (( d > 1.0 )|( d == 0 ));
+    // we can avoid the square root here by using the half angle formula:
+    // consider the imaginary number a = x + i*y = sqrt(d) * exp(i*angle), then
+    // a*a = d * exp(i*2*angle), thus a*a/d is uniformly distributed in the unit disc:
+    C = ( x*x - y*y ) / d;
+    S = x*y*2 / d;
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Gaussian derivates
@@ -395,7 +408,7 @@ uint32_t Random::pint32_ratio(const uint32_t n, const uint32_t ratio[])
 
 
 /**
- Return Poisson distributed integer, with expectation=E  variance=E
+ Return Poisson distributed integer, with expectation=E and variance=E
  http://en.wikipedia.org/wiki/Poisson_distribution
  
  This routine is slow for large values of E.
@@ -434,16 +447,16 @@ uint32_t Random::poisson_knuth(const real E)
  
  This method fails for E > 700, in double precision
  */
-uint32_t Random::poisson(const real E)
+uint32_t Random::poisson(const double E)
 {
     if ( E > 256 )
         return static_cast<uint32_t>( gauss() * std::sqrt(E) + E );
     if ( E < 0 )
         return 0;
-    real p = std::exp(-E);
-    real s = p;
+    double p = std::exp(-E);
+    double s = p;
     uint32_t k = 0;
-    real u = preal();
+    double u = preal();
     while ( u > s )
     {
         ++k;
@@ -459,9 +472,9 @@ uint32_t Random::poisson(const real E)
  The argument is EL = exp(-E)
  expectation=E  variance=E (see wikipedia, Poisson Distribution)
  */
-uint32_t Random::poissonE(const real EL)
+uint32_t Random::poissonE(const double EL)
 {
-    real p = preal();
+    double p = preal();
     uint32_t k = 0;
     while ( p > EL )
     {

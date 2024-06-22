@@ -201,10 +201,10 @@ public:
     uint32_t pint32_ratio(uint32_t n, const uint32_t ratio[]);
 
     /// integer k of probability distribution p(k,E) = exp(-E) * pow(E,k) / factorial(k)
-    uint32_t poisson(real E);
+    uint32_t poisson(double E);
     
     /// integer k of probability distribution p(k,E) = EL * pow(E,k) / factorial(k)
-    uint32_t poissonE(real EL);
+    uint32_t poissonE(double EL);
     
     /// integer k of probability distribution p(k,E) = exp(-E) * pow(E,k) / factorial(k)
     uint32_t poisson_knuth(real E);
@@ -276,6 +276,9 @@ public:
     /// set 4 random number in [-1, 1]
     void sreal4(real&, real&, real&, real&);
 
+    /// set 2 random numbers such that C*C + S*S = 1
+    void urand2(real&, real&);
+    
     /// real number uniformly distributed in [a,b[
     real real_uniform(real a, real b) { return a + preal() * ( b - a ); }
     

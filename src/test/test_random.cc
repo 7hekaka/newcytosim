@@ -248,6 +248,16 @@ void check_poisson(size_t sup)
     }
 }
 
+void check_vector(const size_t MAX)
+{
+    for ( size_t i=0; i < MAX; ++i )
+    {
+        real x, y;
+        RNG.urand2(x, y);
+        printf(" %+f %+f : %+f\n", x, y, x*x+y*y);
+    }
+}
+
 //==============================================================================
 
 /**
@@ -336,6 +346,7 @@ int main(int argc, char* argv[])
     switch ( mode )
     {
         case 0:
+            check_vector(32);
             check_poisson(1024);
             check_flip();
             break;

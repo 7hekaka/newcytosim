@@ -75,6 +75,7 @@ Vector2 Vector2::randU()
         y = RNG.sreal();
         d = x*x + y*y;
     } while (( d > 1.0 )|( d == 0 ));
+    // avoiding the square-root!
     return Vector2(x*x-y*y, 2*x*y) / d;
 }
 
