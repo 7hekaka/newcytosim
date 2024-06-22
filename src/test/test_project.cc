@@ -779,10 +779,12 @@ void projectForcesFused_SSE(UINT nbs, const double* X, real* Y)
 }
 #endif
 
+#if REAL_IS_DOUBLE
 void projectForcesFused(UINT nbs, const double* X, real* Y)
 {
     projectForces(nbs, dir_, X, lag_, diag_, upper_, Y);
 }
+#endif
 
 #if REAL_IS_DOUBLE && defined(__AVX__)
 void projectForces_AVX(UINT nbs, const double* X, real* Y)
@@ -1027,7 +1029,7 @@ void testProjectionD(UINT cnt)
     testD<projectForcesD_RIV>(cnt, "D_RIV");
     testD<projectForcesD_FMA>(cnt, "D_FMA");
     testD<projectForcesD_PTR>(cnt, "D_PTR");
-#if ( DIM == 3 ) && USE_SIMD
+#if REAL_IS_DOUBLE && ( DIM == 3 ) && USE_SIMD
     testD<projectForcesD3D_SSE>(cnt, "D_SSE");
 #endif
 #if REAL_IS_DOUBLE && ( DIM == 3 ) && USE_SIMD
@@ -1055,15 +1057,15 @@ void testProjection(UINT cnt)
     setProjection(NSEG);
     setAnisotropy(NSEG);
     timeProject<projectForces>(cnt,    "projF");
-#if USE_SIMD
-    timeProject<projectForces_SSE>(cnt, "prSSE");
-#endif
+#if REAL_IS_DOUBLE
     timeProject<projectForcesFused>(cnt, "fused");
-#if REAL_IS_DOUBLE && USE_SIMD
+#  if USE_SIMD
+    timeProject<projectForces_SSE>(cnt, "prSSE");
     timeProject<projectForcesFused_SSE>(cnt, "fusedSSE");
-#endif
-#if REAL_IS_DOUBLE && defined(__AVX__)
+#  endif
+#  if defined(__AVX__)
     timeProject<projectForces_AVX>(cnt, "prAVX");
+#  endif
 #endif
     timeProject<onlyDPTTS>(cnt, "*dptts");
     timeProject<onlyScale>(cnt, "*scale");
@@ -1098,17 +1100,17 @@ int main(int argc, char* argv[])
     //enable_floating_point_exceptions();
     if ( 0 )
     {
-#if REAL_IS_DOUBLE && defined(__AVX__)
-        for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
-            checkProject<projectForces_AVX>(nbs, "AVX");
-#endif
-#if USE_SIMD
-        for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
-            checkProject<projectForces_SSE>(nbs, "SSE");
-#endif
-#if REAL_IS_DOUBLE && USE_SIMD
+#if REAL_IS_DOUBLE
+#  if defined(__AVX__)
         for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
             checkProject<projectForcesFused>(nbs, "Fus");
+        for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
+            checkProject<projectForces_AVX>(nbs, "AVX");
+#  endif
+#  if USE_SIMD
+        for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
+            checkProject<projectForces_SSE>(nbs, "SSE");
+#  endif
 #endif
     }
     if ( 0 )
