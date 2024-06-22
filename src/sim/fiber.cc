@@ -2038,7 +2038,7 @@ int Fiber::bad() const
         return 2;
     if ( abscissaM() > abscissaP() )
         return 4;
-    if ( ! valid() )
+    if ( invalid() )
         return 8;
     if ( ! objset() )
         return 16;

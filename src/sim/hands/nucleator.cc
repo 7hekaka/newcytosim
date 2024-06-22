@@ -106,7 +106,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     //std::clog << "nucleated fiber in direction " << fib->dirEndM() << "\n";
 
     opt.print_warnings(std::cerr, 1, " in nucleator:spec\n");
-    assert_true(fib->valid());
+    assert_false(fib->invalid());
     return objs;
 }
 
