@@ -324,8 +324,19 @@ void Inputter::readFloats(float flt[], const unsigned dim)
 {
     unsigned stop = std::min(vecsize_, dim);
     unsigned d = 0;
-    while ( d < stop )
-        flt[d++] = readFloat();
+    if ( binary_ )
+    {
+        if ( stop != fread(flt, 4, stop, mFile) )
+            throw InvalidIO("readFloats(float) failed");
+        if ( binary_ == 2 ) {
+            for ( int i = 0; i < stop; ++i )
+                flt[i] = byteswap32(flt[i]);
+        }
+        d = stop;
+    } else {
+        while ( d < stop )
+            flt[d++] = readFloat();
+    }
     while ( d < dim )
         flt[d++] = 0.0f;
     for ( d = stop; d < vecsize_; ++d )
@@ -344,7 +355,7 @@ void Inputter::readFloats(double ptr[], const unsigned dim)
     {
         float flt[4] = { 0 };
         if ( stop != fread(flt, 4, stop, mFile) )
-            throw InvalidIO("readFloats() failed");
+            throw InvalidIO("readFloats(double) failed");
         if ( binary_ == 2 ) {
             while ( d < stop )
                 ptr[d++] = byteswap32(flt[d]);
