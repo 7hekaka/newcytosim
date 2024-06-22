@@ -563,9 +563,9 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
         if ( tok == "reheat" )
         {
             bool skip = ( objset != &couples && objset != &singles );
-            if ( section == "couple" && ( prop.skip_free_couple & 4 ) )
+            if ( section == "couple" && prop.skip_free_couple )
                 skip = true;
-            if ( section == "single" && ( prop.skip_free_single & 4 ) )
+            if ( section == "single" && prop.skip_free_single )
                 skip = true;
             if ( skip )
                 in.skip_until("#section ");
@@ -599,7 +599,7 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
         }
         else if ( section == "single" && tok == "F" )
         {
-            if ( prop.skip_free_single & 4 )
+            if ( prop.skip_free_single )
                 in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
             if ( in.formatID() < 58 )
@@ -614,7 +614,7 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
         }
         else if ( section == "couple" && tok == "FF" )
         {
-            if ( prop.skip_free_couple & 4 )
+            if ( prop.skip_free_couple )
                 in.skip_until("#section ");
 #if BACKWARD_COMPATIBILITY < 58 // until 11.11.2022
             if ( in.formatID() < 58 )
