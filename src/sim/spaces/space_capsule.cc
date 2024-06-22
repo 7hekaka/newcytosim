@@ -96,8 +96,9 @@ Vector SpaceCapsule::project(Vector const& pos) const
         n = radius_ / std::sqrt(n);
         return Vector( X + n * ( pos.XX - X ), n * pos.YY, n * pos.ZZ);
     }
-    Vector2 YZ = Vector2::randU(radius_);
-    return Vector(0, YZ.XX, YZ.YY);
+    real C, S;
+    RNG.urand2(C, S);
+    return Vector(0, C * radius_, S * radius_);
 #elif ( DIM >= 2 )
     real n = square(pos.XX-X) + square(pos.YY);
     if ( n > 0 )
@@ -147,8 +148,9 @@ Vector SpaceCapsule::normalToEdge(Vector const& pos) const
         n = 1.0 / std::sqrt(n);
         return Vector(n * ( pos.XX - X ), n * pos.YY, n * pos.ZZ);
     }
-    Vector2 YZ = Vector2::randU();
-    return Vector(0, YZ.XX, YZ.YY);
+    real C, S;
+    RNG.urand2(C, S);
+    return Vector(0, C, S);
 #elif ( DIM >= 2 )
     real n = square(pos.XX-X) + square(pos.YY);
     if ( n > 0 )
@@ -170,8 +172,9 @@ Vector SpaceCapsule::placeOnEdge(real) const
     const real P = RNG.preal() * ( S0 + S1 );
     if ( P < S0 )
     {
-        Vector2 YZ = Vector2::randU(radius_);
-        return Vector(RNG.sreal()*half_, YZ.XX, YZ.YY);
+        real C, S;
+        RNG.urand2(C, S);
+        return Vector(RNG.sreal()*half_, C * radius_, S * radius_);
     }
 #else
     // length elements divided by 2

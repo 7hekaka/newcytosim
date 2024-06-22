@@ -190,8 +190,8 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
         
             if ( tok == "gradient" )
             {
-                real S = -10, E = 10, R = 0;
-                extract(is, S);
+                real B = -10, E = 10, R = 0;
+                extract(is, B);
                 extract(is, E);
                 extract(is, R);
                 if ( R == 0 )
@@ -200,7 +200,7 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                     real p;
                     do {
                         vec = spc->place();
-                        p = ( vec.XX - S ) / ( E - S );
+                        p = ( vec.XX - B ) / ( E - B );
                     } while ( p < 0 || p > 1 || p < RNG.preal() );
                     return vec;
                 }
@@ -208,15 +208,16 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
 #if ( DIM < 3 )
                 return Vector(S+(E-S)*x, R*RNG.sreal(), 0);
 #else
-                const Vector2 V = Vector2::randU();
-                return Vector(S+(E-S)*x, R*V.XX, R*V.YY);
+                real C, S;
+                RNG.urand2(C, S);
+                return Vector(S+(E-S)*x, R*C, R*S);
 #endif
             }
         
             if ( tok == "exponential" )
             {
-                real S = -10, E = 1, R = 0;
-                extract(is, S);
+                real B = -10, E = 1, R = 0;
+                extract(is, B);
                 extract(is, E);
                 extract(is, R);
                 if ( R == 0 )
@@ -225,7 +226,7 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                     real p;
                     do {
                         vec = spc->place();
-                        p = std::exp( ( S - vec.XX ) / E );
+                        p = std::exp( ( B - vec.XX ) / E );
                     } while ( p < 0 || p > 1 || p < RNG.preal() );
                     return vec;
                 }
@@ -233,8 +234,9 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
 #if ( DIM < 3 )
                 return Vector(S+E*x, R*RNG.sreal(), 0);
 #else
-                const Vector2 V = Vector2::randU();
-                return Vector(S+E*x, R*V.XX, R*V.YY);
+                real C, S;
+                RNG.urand2(C, S);
+                return Vector(S+E*x, R*C, R*S);
 #endif
             }
         }
@@ -264,8 +266,9 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 throw InvalidParameter("radius R must be >= 0 in `equator R T`");
             if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `equator R T`");
-            const Vector2 V = Vector2::randU();
-            return Vector(R*V.XX, R*V.YY, T*RNG.shalf());
+            real C, S;
+            RNG.urand2(C, S);
+            return Vector(R*C, R*S, T*RNG.shalf());
         }
         
         if ( tok == "cap" )
@@ -278,8 +281,9 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             real Z = std::max(R - T * RNG.preal(), -R);
             real r = std::sqrt(R*R - Z*Z);
 #if ( DIM >= 3 )
-            const Vector2 XY = Vector2::randU();
-            return Vector(r*XY.XX, r*XY.YY, Z);
+            real C, S;
+            RNG.urand2(C, S);
+            return Vector(r*C, r*S, Z);
 #else
             return Vector(r*RNG.sflip(), Z, 0);
 #endif
@@ -327,15 +331,16 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `circle R T`");
 #if ( DIM >= 3 )
-            Vector2 V = Vector2::randU(R);
+            real C, S;
+            RNG.urand2(C, S);
             Vector3 W = (0.5*T) * Vector3::randU();
             std::string axis = tok.substr(6);
             if ( axis == "X" )
-                return Vector3(0, V.XX, V.YY) + W;
+                return Vector3(0, C, S) + W;
             else if ( axis == "Y" )
-                return Vector3(V.XX, 0, V.YY) + W;
+                return Vector3(C, 0, S) + W;
             else
-                return Vector3(V.XX, V.YY, 0) + W;
+                return Vector3(C, S, 0) + W;
 #endif
             return Vector::randU(R) + Vector::randU(T*0.5);
         }
@@ -719,21 +724,24 @@ Vector Cytosim::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
             return Vector(0, RNG.sflip(), 0);
         if ( tok == "XY" )
         {
-            const Vector2 V = Vector2::randU();
-            return Vector(V.XX, V.YY, 0);
+            real C, S;
+            RNG.urand2(C, S);
+            return Vector(C, S, 0);
         }
 #if ( DIM >= 3 )
         if ( tok == "Z" )
             return Vector(0, 0, RNG.sflip());
         if ( tok == "XZ" )
         {
-            const Vector2 V = Vector2::randU();
-            return Vector(V.XX, 0, V.YY);
+            real C, S;
+            RNG.urand2(C, S);
+            return Vector(C, 0, S);
         }
         if ( tok == "YZ" )
         {
-            const Vector2 V = Vector2::randU();
-            return Vector(0, V.XX, V.YY);
+            real C, S;
+            RNG.urand2(C, S);
+            return Vector(0, C, S);
         }
 #endif
 
@@ -764,7 +772,9 @@ Vector Cytosim::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
         if ( tok == "horizontal" )
         {
 #if ( DIM >= 3 )
-            return Vector(Vector2::randU());
+            real C, S;
+            RNG.urand2(C, S);
+            return Vector(C, S, 0);
 #else
             return Vector(RNG.sflip(), 0, 0);
 #endif

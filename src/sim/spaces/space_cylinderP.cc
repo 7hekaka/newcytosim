@@ -109,8 +109,9 @@ Vector SpaceCylinderP::normalToEdge(Vector const& pos) const
 Vector SpaceCylinderP::placeOnEdge(real) const
 {
 #if ( DIM >= 3 )
-    const Vector2 YZ = Vector2::randU(radius_);
-    return Vector(half_*RNG.sreal(), YZ.XX, YZ.YY);
+    real C, S;
+    RNG.urand2(C, S);
+    return Vector(half_*RNG.sreal(), C * radius_, S * radius_);
 #endif
     return Vector(half_*RNG.sreal(), radius_*RNG.sflip(), 0);
 }
@@ -130,9 +131,10 @@ Vector SpaceCylinderP::project(Vector const& W) const
     }
     else
     {
-        const Vector2 V = Vector2::randU();
-        P.YY = radius_ * V.XX;
-        P.ZZ = radius_ * V.YY;
+        real C, S;
+        RNG.urand2(C, S);
+        P.YY = radius_ * C;
+        P.ZZ = radius_ * S;
     }
 #endif
     return P;

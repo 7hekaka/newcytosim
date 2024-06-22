@@ -192,9 +192,10 @@ Vector SpaceCylinderZ::placeOnEdge(real) const
     const real P = RNG.preal() * ( S0 + S1 + S2 );
     if ( P <= S0 )
     {
-        Vector2 XY = Vector2::randU(radius_);
+        real C, S;
+        RNG.urand2(C, S);
         real Z = bot_ + edge_ + LE * RNG.preal();
-        return Vector(XY.XX, XY.YY, Z);
+        return Vector(C*radius_, S*radius_, Z);
     }
     else if ( P < S0+S1 )
     {
@@ -220,9 +221,11 @@ Vector SpaceCylinderZ::placeOnEdge(real) const
         } while ( N > 1.0 );
         // normalize to get a point on the surface:
         N = edge_ / std::sqrt(N);
-        Vector2 XY = Vector2::randU(RE+R*N);
+        real C, S;
+        RNG.urand2(C, S);
+        real REN = RE + R*N;
         Z = N * Z + sign_select(Z, bot_+edge_, top_-edge_);
-        return Vector(XY.XX, XY.YY, Z);
+        return Vector(C*REN, S*REN, Z);
     }
 #else
     // surface elements divided by M_PI * square(radius_)
@@ -231,9 +234,10 @@ Vector SpaceCylinderZ::placeOnEdge(real) const
     const real P = RNG.preal() * ( S0 + S1 );
     if ( P < S0 )
     {
-        Vector2 XY = Vector2::randU(radius_);
+        real C, S;
+        RNG.urand2(C, S);
         real Z = bot_ + ( top_ - bot_ ) * RNG.preal();
-        return Vector(XY.XX, XY.YY, Z);
+        return Vector(C*radius_, S*radius_, Z);
     }
     else
     {

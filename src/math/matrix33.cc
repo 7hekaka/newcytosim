@@ -207,8 +207,9 @@ Matrix33 Matrix33::randomRotationToVector(const Vector3& vec)
     real c = std::cos(a), s = std::sin(a);
     res.setColumns(Z, X*c+Y*s, Y*c-X*s);
 #else
-    const Vector2 V = Vector2::randU();
-    res.setColumns(Z, X*V.XX+Y*V.YY, Y*V.XX-X*V.YY);
+    real C, S;
+    RNG.urand2(C, S);
+    res.setColumns(Z, X*C+Y*S, Y*C-X*S);
 #endif
     return res;
 }
