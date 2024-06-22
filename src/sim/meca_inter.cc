@@ -867,7 +867,7 @@ void Meca::addTorque(Interpolation const& pt1,
     sub_block(iiD, iiC, dvFv);
     add_block_diag(iiD, dvFv);
     
-    // remaining part of the force (these vectors should be small near equilibrium)
+    // remaining part of the force (should be small near equilibrium)
     Vector Fu0 = Fu - duFu.vecmul(AB) - duFv.trans_vecmul(CD);
     Vector Fv0 = Fv - duFv.vecmul(AB) - dvFv.vecmul(CD);
 
@@ -910,6 +910,79 @@ void Meca::addTorque(Interpolation const& pt1,
     addTorque(pt1, pt2, rot, weight);
 #endif
 }
+
+
+/// derived from above, with R = Identity, 22.06.2024
+void Meca::addTorque(Interpolation const& pt1,
+                     Interpolation const& pt2,
+                     const real weight)
+{
+    assert_true( weight >= 0 );
+
+    const Vector AB = pt1.diff();
+    const Vector CD = pt2.diff();
+    const real iU = AB.inv_norm();
+    const real iV = CD.inv_norm();
+    const real wU = weight * iU;
+    const real wV = weight * iV;
+    const Vector u = AB * iU;
+    const Vector v = CD * iV;
+
+    real uv = dot(v, u);
+    // current forces, exact formula
+    Vector Fu = ( v - uv * u ) * wU;
+    Vector Fv = ( u - uv * v ) * wV;
+
+    const real wUU = wU * iU;
+    const real wUV = wU * iV;
+    const real wVV = wV * iV;
+    
+    const MatrixBlock Id(0, 1);
+
+    // directly setting the matrices
+    const MatrixBlock duFu = MatrixBlock::offsetOuterProduct(-wUU, u, wUU);
+    const MatrixBlock duFv = ( Id - MatrixBlock::outerProduct(v,u) ) * wUV;
+    const MatrixBlock dvFv = MatrixBlock::offsetOuterProduct(-wVV, v, wVV);
+    
+    // indices:
+    const size_t iiA = pt1.matIndex1();
+    const size_t iiB = pt1.matIndex2();
+    const size_t iiC = pt2.matIndex1();
+    const size_t iiD = pt2.matIndex2();
+
+    add_block_diag(iiA, duFu);
+    sub_block(iiB, iiA, duFu);
+    add_block_diag(iiB, duFu);
+    if ( iiC > iiA )
+    {
+        add_block(iiC, iiA, duFv);
+        sub_block(iiD, iiA, duFv);
+        sub_block(iiC, iiB, duFv);
+        add_block(iiD, iiB, duFv);
+    }
+    else
+    {
+        const MatrixBlock dvFu = duFv.transposed();
+        add_block(iiA, iiC, dvFu);
+        sub_block(iiA, iiD, dvFu);
+        sub_block(iiB, iiC, dvFu);
+        add_block(iiB, iiD, dvFu);
+    }
+    add_block_diag(iiC, dvFv);
+    sub_block(iiD, iiC, dvFv);
+    add_block_diag(iiD, dvFv);
+    
+    // remaining part of the force (should be small near equilibrium)
+    Vector Fu0 = Fu - duFu.vecmul(AB) - duFv.trans_vecmul(CD);
+    Vector Fv0 = Fv - duFv.vecmul(AB) - dvFv.vecmul(CD);
+
+    // add constant terms into vBAS[]:
+    sub_base(iiA, Fu0); // F(A) = -Fu
+    add_base(iiB, Fu0); // F(B) = +Fu
+    sub_base(iiC, Fv0); // F(C) = -Fv
+    add_base(iiD, Fv0); // F(D) = +Fv
+}
+
 
 #endif
 
