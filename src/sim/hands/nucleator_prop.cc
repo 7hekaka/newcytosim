@@ -29,6 +29,7 @@ void NucleatorProp::clear()
     stabilize = 0;
     nucleation_angle = 0;
     nucleation_limit = 0;
+    nucleate_in_plane = 0;
     specificity = NUCLEATE_UNSPECIFIC;
 }
 
@@ -47,6 +48,7 @@ void NucleatorProp::read(Glossary& glos)
 
     glos.set(nucleation_angle, "nucleation_angle");
     glos.set(nucleation_limit, "nucleation_limit");
+    glos.set(nucleate_in_plane, "nucleate_in_plane");
 
 #if BACKWARD_COMPATIBILITY < 100
     glos.set(fiber_spec, "nucleation_spec");
@@ -110,6 +112,8 @@ void NucleatorProp::write_values(std::ostream& os) const
     write_value(os, "nucleate",  nucleation_rate, fiber_type, "("+fiber_spec+")");
     write_value(os, "nucleation_angle", nucleation_angle);
     write_value(os, "nucleation_limit", nucleation_limit);
+    write_value(os, "nucleate_in_plane", nucleate_in_plane);
+
     write_value(os, "hold_end",  hold_end);
     write_value(os, "track_end", track_end);
     write_value(os, "addictive", addictive, addictive_state);

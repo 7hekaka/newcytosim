@@ -25,7 +25,7 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Glossary& opt)
 {
     // determine direction of nucleation:
-    Vector dir;
+    Vector dir(1, 0, 0);
     Hand const* h = otherHand();
     if ( h && h->attached() )
     {
@@ -48,7 +48,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
             dir = hMonitor->linkDir(this);
         }
     }
-    // flip if nucleator is at the PLUS_END
+    // flip direction if nucleator will stay at the plus end:
     if ( prop()->hold_end == PLUS_END )
         dir.negate();
     
@@ -58,23 +58,38 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
             dir.negate();
     }
 
+    // specified angle between extant and nucleated filament:
+    const real A = prop()->nucleation_angle;
+    const real L = hMonitor->linkRestingLength();
+    // can flip the side in 2D or when nucleating 'in-plane'
+    const real F = RNG.sflip();
+
     ObjectList objs;
     Fiber * fib = sim.fibers.newFiber(objs, fip, opt);
     // select rotation to align with direction of nucleation:
-    Rotation rot = Rotation::randomRotationToVector(dir);
-
-    const real A = prop()->nucleation_angle;
-    const real L = hMonitor->linkRestingLength();
+    Rotation rot(0, 1);
+    if ( prop()->nucleate_in_plane )
+    {
+        Space const* spc = fip->confine_space;
+        Vector out = spc->normalToEdge(pos);
+        // make 'dir' tangent to the Space's edge
+        dir = ( dir - dot(dir, out) * out ).normalized();
+        //
+        rot = Rotation::rotationAroundAxis(out, std::cos(A), F*std::sin(A));
+        rot = rot * Rotation::randomRotationToVector(dir);
+    }
+    else
+    {
+        rot = Rotation::randomRotationToVector(dir);
 #if ( DIM == 2 )
-    // shift position by the length of the interaction:
-    real F = RNG.sflip();
-    pos += rot * Vector(0, L*F, 0);
-    rot = rot * Rotation::rotation(std::cos(A), std::sin(A)*F);
+        rot = rot * Rotation::rotation(std::cos(A), F*std::sin(A));
 #elif ( DIM == 3 )
-    // shift position by the length of the interaction:
-    pos += rot * Vector(0, L, 0);
-    rot = rot * Rotation::rotationAroundZ(A);
+        rot = rot * Rotation::rotationAroundZ(A);
 #endif
+    }
+
+    // shift position by the length of the interaction:
+    pos += rot * Vector(0, L*F, 0);
 
     // mark fiber to highlight mode of nucleation:
     ObjectMark mk = 0;
@@ -103,8 +118,10 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     
     assert_true(pos.valid());
     ObjectSet::translateObjects(objs, pos);
-    //std::clog << "nucleated fiber in direction " << fib->dirEndM() << "\n";
-
+#if 0
+    real a = std::acos(dot(fib->dirEndM(), dir));
+    std::clog << "nucleated with angle " << std::setw(8) << a << " along " << fib->dirEndM() << "\n";
+#endif
     opt.print_warnings(std::cerr, 1, " in nucleator:spec\n");
     assert_false(fib->invalid());
     return objs;

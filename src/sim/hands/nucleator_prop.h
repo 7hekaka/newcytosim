@@ -51,6 +51,9 @@ public:
     /// angle of newly made fiber, relative to mother filament for Nucleator in Couple
     real nucleation_angle;
     
+    /// if true, new fiber is nucleated in the surface of the Space
+    bool nucleate_in_plane;
+    
     ///
     real nucleation_limit;
     
