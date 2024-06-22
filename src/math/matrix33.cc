@@ -193,6 +193,10 @@ Matrix33 Matrix33::rotationToVector(const Vector3& vec)
 }
 
 
+/**
+ The rotation is chosen uniformly among all rotations transforming (1,0,0) into `vec`.
+ The function will fail if ( vec == 0 ), but vec does not need to be normalized.
+ */
 Matrix33 Matrix33::randomRotationToVector(const Vector3& vec)
 {
     Matrix33 res;

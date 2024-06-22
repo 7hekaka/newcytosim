@@ -820,28 +820,28 @@ Vector Cytosim::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
             {
                 real ang = 0;
                 extract(is, ang);
-                Vector vec = spc->normalToEdge(pos);
-                Vector tan = cross(Vector(0,0,1), vec);
+                Vector out = spc->normalToEdge(pos);
+                Vector tan = cross(Vector(0,0,1), out);
                 real C = std::cos(ang), S = std::sin(ang);
                 Vector dir(C*tan.XX, C*tan.YY, S);
                 real n = dir.norm();
                 if ( n > REAL_EPSILON )
                     return dir.normalized();
-                return vec.randOrthoU(1.0);
+                return out.randOrthoU(1.0);
             }
             
             if ( tok == "anticlockwise" )
             {
                 real ang = 0;
                 extract(is, ang);
-                Vector vec = spc->normalToEdge(pos);
-                Vector tan = cross(Vector(0,0,-1), vec);
+                Vector out = spc->normalToEdge(pos);
+                Vector tan = cross(Vector(0,0,-1), out);
                 real C = std::cos(ang), S = std::sin(ang);
                 Vector dir(C*tan.XX, C*tan.YY, S);
                 real n = dir.norm();
                 if ( n > REAL_EPSILON )
                     return dir.normalized();
-                return vec.randOrthoU(1.0);
+                return out.randOrthoU(1.0);
             }
 #elif ( DIM == 2 )
             if ( tok == "clockwise" )
