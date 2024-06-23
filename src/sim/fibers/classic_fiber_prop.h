@@ -120,7 +120,7 @@ public:
     real catastrophe_outside;
 
     /// space used for `catastrophe_outside'
-    std::string catastrophe_label;
+    std::string catastrophe_spec;
 
 #endif
     
