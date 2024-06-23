@@ -47,7 +47,7 @@ void CoupleProp::clear()
     
     confine = CONFINE_INSIDE;
     //confine_stiff = 0;
-    confine_label = "first";
+    confine_spec = "first";
     confine_space = nullptr;
     uni_counts = 0;
 }
@@ -95,33 +95,33 @@ void CoupleProp::read(Glossary& glos)
         throw InvalidParameter(name()+":confine[1] is ignored");
 
     //glos.set(confine_stiff, "confine", 1);
-    glos.set(confine_label, "confine", 2);
+    glos.set(confine_spec, "confine", 2);
 
     //glos.set(confine_stiff, "confine_stiff");
-    glos.set(confine_label, "confine_label");
+    glos.set(confine_spec, "confine_spec");
 
 #if BACKWARD_COMPATIBILITY < 50
-    if ( confine_label == "current" )
-        confine_label = "last";
+    if ( confine_spec == "current" )
+        confine_spec = "last";
 #endif
 }
 
 
 void CoupleProp::complete(Simul const& sim)
 {
-    confine_space = sim.findSpace(confine_label);
+    confine_space = sim.findSpace(confine_spec);
     if ( confine != CONFINE_OFF )
     {
         if ( confine_space )
         {
-            if ( confine_label.empty() )
-                confine_label = confine_space->name();
+            if ( confine_spec.empty() )
+                confine_spec = confine_space->name();
         }
         else
         {
             // this condition may occur when the Property is created before the Space
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine_space `"+confine_label+"' was not found");
+                throw InvalidParameter(name()+":confine_space `"+confine_spec+"' was not found");
         }
     }
 
@@ -184,7 +184,7 @@ void CoupleProp::write_values(std::ostream& os) const
     write_value(os, "trans_activated", trans_activated);
     write_value(os, "min_loop",        min_loop);
     write_value(os, "specificity",     specificity);
-    write_value(os, "confine",         confine, 0, confine_label);
+    write_value(os, "confine",         confine, 0, confine_spec);
     write_value(os, "activity",        activity);
 }
 

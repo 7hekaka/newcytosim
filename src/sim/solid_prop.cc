@@ -17,7 +17,7 @@ void SolidProp::clear()
     
     confine = CONFINE_OFF;
     confine_stiff = 0;
-    confine_label = "first";
+    confine_spec = "first";
     confine_space = nullptr;
     
 #if NEW_RADIAL_FLOW
@@ -62,14 +62,14 @@ void SolidProp::read(Glossary& glos)
                                          {"all_inside",   CONFINE_ALL_INSIDE}});
     
     glos.set(confine_stiff, "confine", 1);
-    glos.set(confine_label, "confine", 2);
+    glos.set(confine_spec, "confine", 2);
     
     glos.set(confine_stiff, "confine_stiff");
-    glos.set(confine_label, "confine_label");
+    glos.set(confine_spec, "confine_spec");
     
 #if BACKWARD_COMPATIBILITY < 50
-    if ( confine_label == "current" )
-        confine_label = "last";
+    if ( confine_spec == "current" )
+        confine_spec = "last";
     
     glos.set(confine, "confined",{{"none",    CONFINE_OFF},
                                   {"inside",  CONFINE_INSIDE},
@@ -105,19 +105,19 @@ void SolidProp::complete(Simul const& sim)
     if ( viscosity <= 0 )
         throw InvalidParameter("bead:viscosity or simul:viscosity should be defined > 0");
     
-    confine_space = sim.findSpace(confine_label);
+    confine_space = sim.findSpace(confine_spec);
     if ( confine != CONFINE_OFF )
     {
         if ( confine_space )
         {
-            if ( confine_label.empty() )
-                confine_label = confine_space->name();
+            if ( confine_spec.empty() )
+                confine_spec = confine_space->name();
         }
         else
         {
             // this condition may occur when the Property is created before the Space
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine_space `"+confine_label+"' was not found");
+                throw InvalidParameter(name()+":confine_space `"+confine_spec+"' was not found");
         }
     }
     
@@ -157,7 +157,7 @@ void SolidProp::write_values(std::ostream& os) const
     if ( drag > 0 )  write_value(os, "drag", drag);
     write_value(os, "viscosity", viscosity);
     write_value(os, "steric",    steric_key, steric_range);
-    write_value(os, "confine",   confine, confine_stiff, confine_label);
+    write_value(os, "confine",   confine, confine_stiff, confine_spec);
 #if NEW_RADIAL_FLOW
     write_value(os, "flow_center", flow_center);
     write_value(os, "flow_time",   flow_time, 2);

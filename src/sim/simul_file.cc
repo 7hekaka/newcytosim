@@ -498,7 +498,7 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
             lock.prune_all();
         else
             lock.thaw_all();
-        // renew pointers to objects, particularly 'confine_label'
+        // renew pointers to objects, particularly 'confine_spec'
         prop.complete(*this);
         fibers.updateFibers();
 

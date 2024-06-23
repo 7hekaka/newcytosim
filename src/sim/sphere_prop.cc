@@ -23,7 +23,7 @@ void SphereProp::clear()
     
     confine = CONFINE_OFF;
     confine_stiff = 0;
-    confine_label = "first";
+    confine_spec = "first";
     confine_space = nullptr;
     
     display       = "";
@@ -48,14 +48,14 @@ void SphereProp::read(Glossary& glos)
                                   {"all_inside", CONFINE_ALL_INSIDE}});
     
     glos.set(confine_stiff, "confine", 1);
-    glos.set(confine_label, "confine", 2);
+    glos.set(confine_spec, "confine", 2);
 
     glos.set(confine_stiff, "confine_stiff");
-    glos.set(confine_label, "confine_label");
+    glos.set(confine_spec, "confine_spec");
 
 #if BACKWARD_COMPATIBILITY < 50
-    if ( confine_label == "current" )
-        confine_label = "last";
+    if ( confine_spec == "current" )
+        confine_spec = "last";
 
     glos.set(confine, "confined",{{"none",    CONFINE_OFF},
                                   {"inside",  CONFINE_INSIDE},
@@ -76,19 +76,19 @@ void SphereProp::complete(Simul const& sim)
     if ( viscosity <= 0 )
         throw InvalidParameter("sphere:viscosity or simul:viscosity should be defined > 0");
     
-    confine_space = sim.findSpace(confine_label);
+    confine_space = sim.findSpace(confine_spec);
     if ( confine != CONFINE_OFF )
     {
         if ( confine_space )
         {
-            if ( confine_label.empty() )
-                confine_label = confine_space->name();
+            if ( confine_spec.empty() )
+                confine_spec = confine_space->name();
         }
         else
         {
             // this condition may occur when the Property is created before the Space
             if ( primed(sim) )
-                throw InvalidParameter(name()+":confine_space `"+confine_label+"' was not found");
+                throw InvalidParameter(name()+":confine_space `"+confine_spec+"' was not found");
         }
     }
 
@@ -109,7 +109,7 @@ void SphereProp::write_values(std::ostream& os) const
     write_value(os, "point_mobility", point_mobility);
     write_value(os, "piston_effect",  piston_effect);
     write_value(os, "steric",         steric_key, steric_range);
-    write_value(os, "confine",        confine, confine_stiff, confine_label);
+    write_value(os, "confine",        confine, confine_stiff, confine_spec);
     write_value(os, "display",        "("+display+")");
 }
 

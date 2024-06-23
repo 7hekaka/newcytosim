@@ -1450,7 +1450,7 @@ void Simul::reportFiberConfineForce(std::ostream& out) const
      for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
      {
          out << COM << "fiber " << fib->reference();
-         Space const* spc = findSpace(fib->prop->confine_label);
+         Space const* spc = findSpace(fib->prop->confine_spec);
          const real stiff = fib->prop->confine_stiff[0];
          const Confinement mode = fib->prop->confine;
 
@@ -1483,7 +1483,7 @@ real Simul::reportFiberConfinement(std::ostream& out) const
 #if ( DIM > 1 )
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
-        Space const* spc = findSpace(fib->prop->confine_label);
+        Space const* spc = findSpace(fib->prop->confine_spec);
         const real stiff = fib->prop->confine_stiff[0];
         const Confinement mode = fib->prop->confine;
 

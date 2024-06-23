@@ -57,7 +57,7 @@ public:
     real confine_stiff;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string confine_label;
+    std::string confine_spec;
     
     /// display parameters (see @ref PointDispPar)
     std::string display;
@@ -72,7 +72,7 @@ public:
 
 private:
     
-    /// pointer to actual confinement Space, derived from `confine_label`
+    /// pointer to actual confinement Space, derived from `confine_spec`
     Space const* confine_space;
 
 public:

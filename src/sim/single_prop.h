@@ -106,7 +106,7 @@ public:
     real confine_stiff;
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string confine_label;
+    std::string confine_spec;
     
     /// specialization
     /**
@@ -127,7 +127,7 @@ public:
 
 protected:
     
-    /// pointer to actual confinement Space, derived from `confine_label`
+    /// pointer to actual confinement Space, derived from `confine_spec`
     Space const* confine_space;
 
     /// displacement in one time step
@@ -173,7 +173,7 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
 
-    /// return volume of confine_label
+    /// return volume of confine_spec
     real spaceVolume() const;
 
 };

@@ -237,7 +237,7 @@ public:
     real confine_stiff[2];
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string confine_label;
+    std::string confine_spec;
     
 #if NEW_FIBER_CONFINE2
     /// flag controlling the forces exerted by Space on fiber points
@@ -255,7 +255,7 @@ public:
     real confine2_stiff[2];
     
     /// name of space used for confinement (also known as `confine[2]`)
-    std::string confine2_label;
+    std::string confine2_spec;
 #endif
 #if NEW_CONFINE_RANGE
     real confine_range[2];
@@ -364,11 +364,11 @@ public:
     /// derived variable: display
     FiberDisp * disp;
     
-    /// pointer to actual confinement Space, derived from `confine_label`
+    /// pointer to actual confinement Space, derived from `confine_spec`
     Space const* confine_space;
    
 #if NEW_FIBER_CONFINE2
-    /// pointer to actual confinement Space, derived from `confine_label`
+    /// pointer to actual confinement Space, derived from `confine2_spec`
     Space const* confine2_space;
 #endif
 #if NEW_FIBER_MAKE_COUPLE
