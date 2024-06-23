@@ -78,7 +78,7 @@ void speedBLAS(int cnt, MATRIX const& mat, real* src, real * x, real * y, real *
         mem[i+N*j] = mat(i,j);
     
     blas::xgemv('N', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
-    VecPrint::head(N, x);
+    VecPrint::head(N, x, 2);
     tick();
     for ( int n = 0; n < cnt; ++n )
     {
@@ -98,7 +98,7 @@ void speedBLAS(int cnt, MATRIX const& mat, real* src, real * x, real * y, real *
     }
     
     blas::xgemv('T', N, N, 1.0, mem, N, src, 1, 0.0, x, 1);
-    VecPrint::head(N, x);
+    VecPrint::head(N, x, 2);
     tick();
     for ( int n = 0; n < cnt; ++n )
     {
@@ -132,7 +132,7 @@ void speedMatrix(int size, int cnt)
     printf("Matrix %s size %i\n", mat.what().c_str(), size);
 
     mat.vecMul0(s, x);
-    VecPrint::head(size, x);
+    VecPrint::head(size, x, 2);
     tick();
     for ( int n = 0; n < cnt; ++n )
     {
@@ -143,7 +143,7 @@ void speedMatrix(int size, int cnt)
     printf(" SCALAR %5.2f\n", tock(cnt));
 
     mat.vecMul(s, x);
-    VecPrint::head(size, x);
+    VecPrint::head(size, x, 2);
     tick();
     for ( int n = 0; n < cnt; ++n )
     {
@@ -157,7 +157,7 @@ void speedMatrix(int size, int cnt)
     
     mat.transpose();
     mat.transVecMul(s, x);
-    VecPrint::head(size, x);
+    VecPrint::head(size, x, 2);
     tick();
     for ( int n = 0; n < cnt; ++n )
     {
