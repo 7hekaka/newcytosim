@@ -127,7 +127,7 @@ void SpacePeriodic::read(Inputter& in, Simul&, ObjectTag)
 #include "gym_view.h"
 #include "gym_cap.h"
 
-// draw periodic edges of the box
+/// draw periodic edges of the box with lines
 void SpacePeriodic::draw2D(float width) const
 {
     const float X(half_[0]);
@@ -147,7 +147,7 @@ void SpacePeriodic::draw2D(float width) const
 }
 
 
-// draw periodic edges of the box
+/// draw periodic edges of the box with lines
 void SpacePeriodic::draw3D() const
 {
     const float X(half_[0]);
@@ -160,6 +160,7 @@ void SpacePeriodic::draw3D() const
     gle::cubeEdges(2);
     gym::disableLineStipple();
     gym::restoreLighting();
+    gym::ref_view();
 }
 
 #else
