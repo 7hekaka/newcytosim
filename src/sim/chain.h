@@ -184,7 +184,7 @@ public:
     void setStraight(Vector const& pos, Vector const& dir, real len);
     
     /// set position of 'ref', direction and length of Fiber
-    void setCircular(Vector const& cen, Vector const& dir, real rad, real len);
+    void setCurved(Vector dir, real rad, real len);
 
     /// translate Fiber to place 'ref' at the position where the CENTER is located
     void placeEnd(FiberEnd ref);

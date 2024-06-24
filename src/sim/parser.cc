@@ -1220,6 +1220,7 @@ void Parser::parse_for(std::istream& is)
     
     for ( long v = start; v < end; v += inc )
     {
+        //std::clog << "for |" << v << "| <-- |" << var << "|\n";
         std::string str = replace_bracketed_code(code, Evaluator{{var, v}});
         std::istringstream iss(str);
         std::streampos ipos(0);

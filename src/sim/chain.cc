@@ -105,21 +105,68 @@ void Chain::setStraight(Vector const& pos, Vector const& dir, real len)
 }
 
 
-void Chain::setCircular(Vector const& cen, Vector const& dir, real rad, real len)
+void Chain::setCurved(Vector dir, real rad, real len)
 {
     assert_true( fnSegmentation > REAL_EPSILON );
     if ( len <= 0 )
         throw InvalidParameter("fiber:length must be > 0");
+    // make sure `dir` is orthogonal to X
+    dir.XX = 0;
+    dir.normalize(rad);
     size_t np = bestNumberOfPoints(len/fnSegmentation);
-    
     setNbPoints(np);
-    real S = len / ( np-1 );
+    real S = len / ( np - 1 );
     setSegmentation(S);
     fnAbscissaP = fnAbscissaM + len;
     real delta = 2 * std::asin(0.5*S/rad);
     real angle = -delta * np * 0.5;
-    for ( size_t p = 0 ; p < nPoints; ++p, angle+=delta )
-        setPoint(p, cen + rad * Vector(std::cos(angle), std::sin(angle), 0));
+    for ( size_t p = 0 ; p < np; ++p, angle += delta )
+    {
+        real S = std::sin(angle);
+        real C = std::cos(angle);
+        setPoint(p, Vector(rad*S, 0, 0) + C*dir);
+    }
+}
+
+
+/**
+ The filament is set as a random walk with given persistence length
+
+ This return a filament with the center of gravity at zero
+ and the average orientation aligned with (1, 0, 0)
+ */
+void Chain::setEquilibrated(real len, real persistence_length)
+{
+    size_t np = bestNumberOfPoints(len/fnSegmentation);
+    assert_true( np > 1 );
+    
+    setNbPoints(np);
+    setSegmentation(len/(np-1));
+    fnAbscissaP = fnAbscissaM + len;
+    
+    real sigma = std::sqrt(2*fnCut/persistence_length);
+    
+    Vector pos(0,0,0);
+    Vector dir(1,0,0);
+    setPoint(0, pos);
+    
+    for ( size_t p = 1 ; p < np; ++p )
+    {
+        pos += fnCut * dir;
+        setPoint(p, pos);
+        //rotate dir in a random direction:
+        real a = sigma * RNG.gauss();
+        dir = std::cos(a) * dir + dir.randOrthoU(std::sin(a));
+    }
+    
+    // cancel out mean orientation and position:
+    translate(-0.5*pos);
+    if ( pos.normSqr() > 0.01 * fnCut )
+    {
+        Rotation rot = Rotation::rotationToVector(pos).transposed();
+        rotate(rot);
+    }
+    updateFiber();
 }
 
 
@@ -206,46 +253,6 @@ void Chain::setShape(const real pts[], size_t n_pts, size_t np)
     b.load(pts+DIM*n_pts-DIM);
     setPoint(np, b);
     reshape();
-}
-
-/**
- The filament is set as a random walk with given persistence length
-
- This return a filament in a random direction, with the center of gravity at zero
- and the average orientation aligned with (1, 0, 0)
- */
-void Chain::setEquilibrated(real len, real persistence_length)
-{
-    size_t np = bestNumberOfPoints(len/fnSegmentation);
-    assert_true( np > 1 );
-    
-    setNbPoints(np);
-    setSegmentation(len/(np-1));
-    fnAbscissaP = fnAbscissaM + len;
-    
-    real sigma = std::sqrt(2*fnCut/persistence_length);
-    
-    Vector pos(0,0,0);
-    Vector dir(1,0,0);
-    setPoint(0, pos);
-    
-    for ( size_t p = 1 ; p < np; ++p )
-    {
-        pos += fnCut * dir;
-        setPoint(p, pos);
-        //rotate dir in a random direction:
-        real a = sigma * RNG.gauss();
-        dir = std::cos(a) * dir + dir.randOrthoU(std::sin(a));
-    }
-    
-    // cancel out mean orientation and position:
-    translate(-0.5*pos);
-    if ( pos.normSqr() > 0.01 * fnCut )
-    {
-        Rotation rot = Rotation::rotationToVector(pos).transposed();
-        rotate(rot);
-    }
-    updateFiber();
 }
 
 

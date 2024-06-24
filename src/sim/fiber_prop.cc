@@ -178,12 +178,14 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     }
     else
 #endif
-    if ( opt.value_is("shape", 0, "circle") )
+    if ( opt.value_is("shape", 0, "curved") )
     {
         real rad = 1;
+        Vector dir(0, 1, 0);
         opt.set(rad, "shape", 1);
+        opt.set(dir, "shape", 2);
         const real len = newFiberLength(opt);
-        fib->setCircular(Vector(0,0,0), Vector(1,0,0), rad, len);
+        fib->setCurved(dir, rad, len);
     }
     else
     if ( opt.has_key("shape") )
