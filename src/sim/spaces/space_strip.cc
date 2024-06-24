@@ -12,6 +12,9 @@
 SpaceStrip::SpaceStrip(SpaceProp const* p)
 : Space(p)
 {
+#if !ENABLE_PERIODIC_BOUNDARIES
+    throw InvalidParameter("Cytosim was made without PERIODIC BOUNDARIES");
+#endif
     if ( DIM == 1 )
         throw InvalidParameter("strip is not usable in 1D");
     half_[0] = 0;

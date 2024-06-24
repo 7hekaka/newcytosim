@@ -10,6 +10,9 @@
 SpaceCylinderP::SpaceCylinderP(SpaceProp const* p)
 : Space(p)
 {
+#if !ENABLE_PERIODIC_BOUNDARIES
+    throw InvalidParameter("Cytosim was made without PERIODIC BOUNDARIES");
+#endif
     if ( DIM < 3 )
         throw InvalidParameter("cylinderP is only valid in 3D: use strip instead");
     half_ = 0;
