@@ -32,6 +32,7 @@ public:
     /// initialize matrix
     System()
     {
+        dim = 0;
         mat = nullptr;
     }
     

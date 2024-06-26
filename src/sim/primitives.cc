@@ -1098,7 +1098,7 @@ Rotation Cytosim::readRotation(std::string const& arg)
     Rotation rot(0, 1);
     try {
         rot = Cytosim::readRotation(iss);
-        // can combine a second rotation:
+        // can combine another rotation:
         if ( iss.good() )
             rot = Cytosim::readRotation(iss) * rot;
     }

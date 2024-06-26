@@ -260,8 +260,12 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
     else
         iso.rot = Rotation::randomRotation();
     
-    // Second rotation applied after the translation
-    if ( opt.set(str, "orientation", 1) )
+    // Another rotation can be specified, to be applied after the translation
+    if ( opt.set(str, "rotation", 1) )
+    {
+        iso.rotate(Cytosim::readRotation(str));
+    }
+    else if ( opt.set(str, "orientation", 1) )
     {
         std::istringstream iss(str);
         Rotation rot = Cytosim::readOrientation(iss, iso.mov, spc);
