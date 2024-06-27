@@ -68,17 +68,18 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     Fiber * fib = sim.fibers.newFiber(objs, fip, opt);
     // select rotation to align with direction of nucleation:
     Rotation rot(0, 1);
+#if ( DIM >= 3 )
     if ( prop()->nucleate_in_plane )
     {
         Space const* spc = fip->confine_space;
         Vector out = spc->normalToEdge(pos);
         // make 'dir' tangent to the Space's edge
         dir = ( dir - dot(dir, out) * out ).normalized();
-        //
         rot = Rotation::rotationAroundAxis(out, std::cos(A), F*std::sin(A));
         rot = rot * Rotation::randomRotationToVector(dir);
     }
     else
+#endif
     {
         rot = Rotation::randomRotationToVector(dir);
 #if ( DIM == 2 )

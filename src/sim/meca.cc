@@ -185,7 +185,7 @@ unsigned Meca::nbConstraints() const
  
      F <- B + mISO * X + mFUL * X
 
- If `B == 0`, this term is ommited. With `B = vBAS` and `X = vPTS`, this
+ If `B == 0`, this term is omitted. With `B = vBAS` and `X = vPTS`, this
  function calculates the forces in the system in `F`:
  
      F <- vBAS + mISO * vPTS + mFUL * vPTS

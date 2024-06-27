@@ -206,11 +206,11 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 }
                 real x = std::sqrt(RNG.preal());
 #if ( DIM < 3 )
-                return Vector(S+(E-S)*x, R*RNG.sreal(), 0);
+                return Vector(B+(E-B)*x, R*RNG.sreal(), 0);
 #else
                 real C, S;
                 RNG.urand2(C, S);
-                return Vector(S+(E-S)*x, R*C, R*S);
+                return Vector(B+(E-B)*x, R*C, R*S);
 #endif
             }
         
@@ -232,11 +232,11 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 }
                 real x = RNG.exponential();
 #if ( DIM < 3 )
-                return Vector(S+E*x, R*RNG.sreal(), 0);
+                return Vector(B+E*x, R*RNG.sreal(), 0);
 #else
                 real C, S;
                 RNG.urand2(C, S);
-                return Vector(S+E*x, R*C, R*S);
+                return Vector(B+E*x, R*C, R*S);
 #endif
             }
         }
