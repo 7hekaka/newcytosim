@@ -60,11 +60,16 @@ namespace gym
     /// Francois's list of named colors
     gym::named_color std_colors[] = {
         {"gray",          0x707070FF},
+        {"blue",          0x0000FFFF},
+        {"yellow",        0xFFFF00FF},
+        {"green",         0x00EE00FF},
+        {"red_orange",    0xFF4500FF},
+        {"cyan",          0x00FFFFFF},
+        {"sienna",        0x8A4117FF},
         {"aquamarine",    0x66DDAAFF},
         {"azur",          0x0080FFFF},
         {"beige",         0x908470FF},
         {"black",         0x000000FF},
-        {"blue",          0x0000FFFF},
         {"blue_tint",     0xAFD7FFFF},
         {"brick_red",     0x990000FF},
         {"brown",         0xAF7559FF},
@@ -73,7 +78,6 @@ namespace gym
         {"coral",         0xF76541FF},
         {"citron",        0x839436FF},
         {"crimson",       0xCC0033FF},
-        {"cyan",          0x00FFFFFF},
         {"dark_blue",     0x000080FF},
         {"dark_gray",     0x404040FF},
         {"dark_green",    0x008000FF},
@@ -102,7 +106,6 @@ namespace gym
         {"gold",          0xD4A017FF},
         {"grass_green",   0x408080FF},
         {"grey",          0x707070FF},
-        {"green",         0x00EE00FF},
         {"green_blue",    0x2E8B57FF},
         {"green_tint",    0x98FFB3FF},
         {"hot_pink",      0xFF66CCFF},
@@ -131,19 +134,16 @@ namespace gym
         {"pumpkin",       0xFF9933FF},
         {"purple",        0x8E35EFFF},
         {"red",           0xFF0000FF},
-        {"red_orange",    0xFF4500FF},
         {"royal_blue",    0x2B60DEFF},
         {"russet",        0xAF5861FF},
         {"sage",          0x84656BFF},
         {"salmon",        0xFA8072FF},
         {"sea_green",     0x00FA6DFF},
-        {"sienna",        0x8A4117FF},
         {"sky_blue",      0x3A90FFFF},
         {"steel_blue",    0x4863A0FF},
         {"turquoise",     0x00FFFFFF},
         {"violet",        0x8D38C9FF},
         {"white",         0xFFFFFFFF},
-        {"yellow",        0xFFFF00FF},
         {"yellow_tint",   0xF6F675FF}
     };
     
@@ -1520,18 +1520,18 @@ namespace gym
     };
     
     
-    gym_color std_color(size_t indx)
+    gym_color std_color(unsigned indx)
     {
-        const size_t max = sizeof(std_colors) / sizeof(named_color);
+        const unsigned max = sizeof(std_colors) / sizeof(named_color);
         return std_colors[ indx % max ].hex;
     }
     
     
     gym_color std_color(const std::string& name)
     {
-        const size_t max = sizeof(std_colors) / sizeof(named_color);
+        const unsigned max = sizeof(std_colors) / sizeof(named_color);
         
-        for ( size_t c = 0; c < max; ++c )
+        for ( unsigned c = 0; c < max; ++c )
             if ( std_colors[c].name == name )
                 return std_colors[c].hex;
         
@@ -1548,15 +1548,15 @@ namespace gym
     }
     
     
-    size_t nb_alt_color()
+    unsigned nb_alt_color()
     {
         return sizeof(xkcd_colors) / sizeof(named_color);
     }
     
     
-    gym_color alt_color(size_t indx)
+    gym_color alt_color(unsigned indx)
     {
-        const size_t max = sizeof(xkcd_colors) / sizeof(named_color);
+        const unsigned max = sizeof(xkcd_colors) / sizeof(named_color);
         return xkcd_colors[ indx % max ].hex;
     }
     
@@ -1564,12 +1564,12 @@ namespace gym
     /**
      Extract colors from the crayola list that are significantly different from `back`
      */
-    size_t filter_colors(gym_color* list, size_t list_size, const gym_color back)
+    unsigned filter_colors(gym_color* list, unsigned list_size, const gym_color back)
     {
-        const size_t max = sizeof(crayola_colors) / sizeof(named_color);
+        const unsigned max = sizeof(crayola_colors) / sizeof(named_color);
         
-        size_t res = 0;
-        for ( size_t c = 0; c < max; ++c )
+        unsigned res = 0;
+        for ( unsigned c = 0; c < max; ++c )
         {
             gym_color col = crayola_colors[c].hex;
             if ( col.difference(back) >= 0.25 )
@@ -1594,13 +1594,13 @@ namespace gym
     /**
      return `indx`-th color from the crayola list, that has a brightness between `minb` and `maxb`
      */
-    gym_color bright_color(size_t indx, const gym_color back)
+    gym_color bright_color(unsigned indx, const gym_color back)
     {
-        const size_t max = sizeof(crayola_colors) / sizeof(named_color);
+        const unsigned max = sizeof(crayola_colors) / sizeof(named_color);
         
         static gym_color scolor[max];
         static gym_color ref(0,0,0,1);
-        static size_t num = filter_colors(scolor, max, ref);
+        static unsigned num = filter_colors(scolor, max, ref);
         
         if ( back != ref )
         {
@@ -1613,7 +1613,7 @@ namespace gym
     }
     
     
-    gym_color get_color(size_t indx)
+    gym_color get_color(unsigned indx)
     {
         static constexpr unsigned max = sizeof(nice_colors) / sizeof(gym_color);
         
@@ -1621,7 +1621,7 @@ namespace gym
     }
     
     
-    void set_color(size_t indx, const gym_color& col)
+    void set_color(unsigned indx, const gym_color& col)
     {
         static constexpr unsigned max = sizeof(nice_colors) / sizeof(gym_color);
         
@@ -1629,9 +1629,9 @@ namespace gym
     }
 
     
-    void print_colors(std::ostream& os, named_color list[], size_t max)
+    void print_colors(std::ostream& os, named_color list[], unsigned max)
     {
-        for ( size_t c = 0; c < max; ++c )
+        for ( unsigned c = 0; c < max; ++c )
         {
             os << std::setw(16) << list[c].name << "  ";
             os << gym_color( list[c].hex ) << '\n';

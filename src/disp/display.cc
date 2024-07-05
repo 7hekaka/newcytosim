@@ -379,7 +379,7 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
             break;
 #endif
         case FiberDisp::COLORING_CLUSTER:
-            col = gym::alt_color(fib->flag());
+            col = gym::std_color(fib->flag());
             break;
         case FiberDisp::COLORING_AGE:
             col = gym_color::jet_color((fib->age()-age_start)*age_scale, 1.0);

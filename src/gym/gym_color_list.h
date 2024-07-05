@@ -15,31 +15,31 @@ namespace gym
     extern gym_color background_color;
 
     /// a small set of contrasted colors that can be changed
-    gym_color get_color(size_t indx);
+    gym_color get_color(unsigned indx);
   
     /// change indx-th color
-    void set_color(size_t indx, gym_color const&);
+    void set_color(unsigned indx, gym_color const&);
 
     /// a set of ~150 standard colors (indx is wrapped to the number of colors)
-    gym_color std_color(size_t indx);
+    gym_color std_color(unsigned indx);
 
     /// a set of ~150 standard named html colors
     gym_color std_color(const std::string& name);
 
     /// number of colors from the XKCD project
-    size_t nb_alt_color();
+    unsigned nb_alt_color();
 
     /// one of People's 949 popular colors, from the XKCD project
-    gym_color alt_color(size_t indx);
+    gym_color alt_color(unsigned indx);
     
     /// set a list of colors that are different from `back`
-    size_t filter_colors(gym_color list[], size_t list_size, const gym_color back);
+    unsigned filter_colors(gym_color list[], unsigned list_size, const gym_color back);
 
     /// one of the ~260 crayola color, that differs significantly from `back`
-    gym_color bright_color(size_t indx, gym_color back=background_color);
+    gym_color bright_color(unsigned indx, gym_color back=background_color);
 
     /// print a list of colors with names and values
-    void print_colors(std::ostream&, named_color* list, size_t list_size);
+    void print_colors(std::ostream&, named_color* list, unsigned list_size);
     
     /// print the list of standard colors
     void print_std_colors(std::ostream&);
