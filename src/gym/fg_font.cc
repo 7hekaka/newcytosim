@@ -110,9 +110,9 @@ static SFG_Font const* fghFont( int font )
 
 
 
-static size_t countBits(size_t n_bytes, const unsigned char* bytes)
+static unsigned countBits(size_t n_bytes, const unsigned char* bytes)
 {
-    size_t n = 0;
+    unsigned n = 0;
     for ( unsigned b = 0; b < n_bytes; ++b )
         n += __builtin_popcount(bytes[b]);
     return n;
@@ -134,14 +134,14 @@ void fgBitmapCharacter(float X, float Y, float S, int fontID, const float col[4]
         unsigned W = face[0];
         unsigned H = font->Height;
         if ( col ) gym::setColor(col);
-#if 0
+#if 1
         unsigned char pixels[W*H+8];
         gym::unpackBitmap(pixels, W, H, face+1, W);
         gym::drawPixels(W, H, S*X-font->xorig, S*Y-font->yorig, S, pixels);
 #else
-        size_t n_bits = countBits(H*((W+7)>>3), 1+face);
+        unsigned n_bits = countBits(H*((W+7)>>3), 1+face);
         flute2* flu = gym::mapBufferV2(6*n_bits);
-        size_t cnt = gym::unpackBitmap(flu, W, H, S*X-font->xorig, S*Y-font->yorig, S, 1+face);
+        unsigned cnt = gym::unpackBitmap(flu, W, H, S*X-font->xorig, S*Y-font->yorig, S, 1+face);
         gym::unmapBufferV2();
         gym::drawTriangleStrip(0, cnt);
 #endif
@@ -172,60 +172,39 @@ static inline void setTextColor(char c, char& d, const float color[4])
 }
 
 
-/* Converts every character into a pixel map (1 byte/pixel) and then render */
-void fgBitmapString0(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
+/** Converts every character into a pixel map (1 byte/pixel) and then render */
+void fgBitmapToken0(float X, float Y, float scale, SFG_Font const* font, const char *string)
 {
-    SFG_Font const* font = fghFont(fontID);
-    if ( !font )
-        return;
-
-    char * str = strdup(string);
-    char * token = NULL;
-    
-    if ( vshift == 0 )
-        vshift = font->Height;
-
-    X = scale * ( X - font->xorig );
-    Y = scale * ( Y - font->yorig );
-
-    unsigned char * pixels = NULL;
-    while ((token = strsep(&str, "\n")) != NULL)
+    float H = font->Height;
+    // calculate total string length in pixels:
+    unsigned L = 7;
+    for ( char const* ptr = string; *ptr; ++ptr )
     {
-        //printf("%s\n", token);
-        const unsigned H = font->Height;
-        // calculate total string length in pixels:
-        unsigned L = 7;
-        for ( char * ptr = token; *ptr; ++ptr )
-        {
-            unsigned char c = *ptr;
-            if ( isprint(c) && c < font->Quantity )
-                L += font->Characters[c][0];
-        }
-        pixels = (unsigned char*)realloc(pixels, L*H);
-        memset(pixels, 0, L*H);
-        unsigned W = 0;
-        for ( char * ptr = token; *ptr; ++ptr )
-        {
-            unsigned char c = *ptr;
-            if ( isprint(c) )
-            {
-                const uByte* face = font->Characters[c];
-                gym::unpackBitmap(pixels+W, face[0], H, 1+face, L);
-                W += face[0];
-            }
-        }
-        gym::drawPixels(L, H, X, Y, scale, pixels);
-        // move down one line.
-        Y += scale * vshift;
+        unsigned char c = *ptr;
+        if ( isprint(c) && c < font->Quantity )
+            L += font->Characters[c][0];
     }
+    unsigned char * pixels = (unsigned char*)malloc(L*H);
+    memset(pixels, 0, L*H);
+    unsigned W = 0;
+    for ( char const* ptr = string; *ptr; ++ptr )
+    {
+        unsigned char c = *ptr;
+        if ( isprint(c) )
+        {
+            const uByte* face = font->Characters[c];
+            gym::unpackBitmap(pixels+W, face[0], H, 1+face, L);
+            W += face[0];
+        }
+    }
+    gym::drawPixels(L, H, X, Y, scale, pixels);
     free(pixels);
-    free(str);
 }
 
 
 
-/* Faster: this converts every character into a triangle strip */
-void fgBitmapString(float X, float Y, float scale, SFG_Font const* font, const char *string)
+/** Faster: this converts every character into a triangle strip */
+void fgBitmapToken(float X, float Y, float scale, SFG_Font const* font, const char *string)
 {
     const unsigned H = font->Height;
 
@@ -255,23 +234,23 @@ void fgBitmapString(float X, float Y, float scale, SFG_Font const* font, const c
 }
 
 
-void fgBitmapString(float X, float Y, float scale, int fontID, const char *string)
+void fgBitmapToken(float X, float Y, float scale, int fontID, const char *string)
 {
     SFG_Font const* font = fghFont(fontID);
     if ( font )
-        fgBitmapString(X, Y, scale, font, string);
+        fgBitmapToken(X, Y, scale, font, string);
 }
 
 
-/* Faster: this converts every character into a triangle strip */
-void fgBitmapText(float X, float Y, float scale, int fontID, const float color[4], const char *string, float vshift)
+/** Can handle multi-lines strings containing `\n` characters */
+void fgBitmapText(float X, float Y, float scale, int fontID, const float color[4], const char *string, float dY)
 {
     SFG_Font const* font = fghFont(fontID);
     if ( !font )
         return;
     
-    if ( vshift == 0 )
-        vshift = font->Height;
+    if ( dY == 0 )
+        dY = font->Height;
 
     char * str = strdup(string);
     for ( char * c = str; *c; ++c )
@@ -282,9 +261,9 @@ void fgBitmapText(float X, float Y, float scale, int fontID, const float color[4
     while ((token = strsep(&str, "\n")) != NULL)
     {
         setTextColor(token[0], col, color);
-        fgBitmapString(X, Y, scale, font, token);
-        // move down one line.
-        Y += vshift;
+        fgBitmapToken(X, Y, scale, font, token);
+        // move down one line:
+        Y += dY;
     }
     free(str);
 }

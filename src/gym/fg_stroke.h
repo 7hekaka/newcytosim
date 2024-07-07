@@ -63,7 +63,7 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ch
 /*
 * Draw a stroke string. With `scale=pixel_size` the font is ~15 pixels high.
 */
-float fgStrokeString(float x, float y, float scale, int mono, const char *string,
+void fgStrokeString(float x, float y, float scale, int mono, const char *string,
                      float stroke_width, float stroke_size = 0, float vshift = 0.);
 
 /*

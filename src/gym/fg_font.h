@@ -19,7 +19,7 @@ void fgBitmapCharacter(float x, float y, float S, int font, const float color[4]
 /*
  * Draw a bitmap string at position (x, y) with pixel-size S
  */
-void fgBitmapString(float x, float y, float S, int font, const char *string);
+void fgBitmapToken(float x, float y, float S, int font, const char *string);
 
 
 /*

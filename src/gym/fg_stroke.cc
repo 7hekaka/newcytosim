@@ -81,10 +81,10 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
             strip = schar->Strips;
             for( unsigned i = 0; i < schar->Number; i++, strip++ )
             {
-                const size_t num = strip->Number;
+                const unsigned num = strip->Number;
                 const SFG_StrokeVertex* ptr = strip->Vertices;
                 flute2* flu = gym::mapBufferV2(num);
-                for ( size_t j = 0; j < num; ++j )
+                for ( unsigned j = 0; j < num; ++j )
                     flu[j] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
                 gym::unmapBufferV2();
                 if ( line_width > 0 )
@@ -97,23 +97,23 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
 }
 
 
-float fgStrokeString(float X, float Y, float scale, int mono, const char *string,
+void fgStrokeString(float X0, float Y, float scale, int mono, const char *string,
                      float line_width, float point_size, float vshift)
 {
-    const size_t ONE = 32;
-    const size_t MAX = 16;
+    const unsigned ONE = 32;
+    const unsigned MAX = 16;
     scale *= 0.1;
-    float X0 = X;
+    float X = X0;
     SFG_StrokeFont const* font = fghStrokeByID( mono );
     if ( font && string )
     {
-        size_t inx = 0, cnt = 0;
-        size_t start[MAX] = { 0 };
+        unsigned inx = 0, cnt = 0;
+        unsigned start[MAX] = { 0 };
         flute2* flu = gym::mapBufferV2(ONE*MAX);
         /*
          * Step through the string, drawing each character.
          * A newline will simply translate the next character's insertion
-         * point back to the start of the line and down one line.
+         * point back to X0, the alignment X-coordinate and down one line.
          */
         unsigned char c;
         while( ( c = *string++) ) if ( c < font->Quantity )
@@ -133,7 +133,7 @@ float fgStrokeString(float X, float Y, float scale, int mono, const char *string
                     const SFG_StrokeStrip *strip = schar->Strips;
                     for ( unsigned i = 0; i < schar->Number; i++, strip++ )
                     {
-                        const size_t num = strip->Number;
+                        const unsigned num = strip->Number;
                         const SFG_StrokeVertex* ptr = strip->Vertices;
                         if ( cnt >= MAX )
                         {
@@ -151,7 +151,7 @@ float fgStrokeString(float X, float Y, float scale, int mono, const char *string
                             flu = gym::mapBufferV2(ONE*MAX);
                         }
                         // we translate and scale in CPU:
-                        for ( size_t j = 0; j < num; ++j )
+                        for ( unsigned j = 0; j < num; ++j )
                             flu[inx++] = { X+scale*ptr[j].X, Y+scale*ptr[j].Y };
                         start[cnt++] = inx;
                     }
@@ -169,7 +169,6 @@ float fgStrokeString(float X, float Y, float scale, int mono, const char *string
         if ( point_size > 0 )
             gym::drawPoints(point_size, 0, inx);
     }
-    return X;
 }
 
 /*

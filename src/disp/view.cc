@@ -275,12 +275,12 @@ void View::frameText(int position, FontType font, const float color[4],
     int width = fgTextWidth(font, text, lines);
     
     float X, Y;
-    float vshift = textPosition(X, Y, width, height, lines, W, H, position);
+    float dY = textPosition(X, Y, width, height, lines, W, H, position);
     
     if ( back && back[3] > 0 )
     {
         float E = height;
-        float T = Y + lines * vshift;
+        float T = Y + lines * dY;
         float B = std::min(Y, T) - E/4;
         T = std::max(Y, T) + E + E/4;
         float R = X + width + E;
@@ -289,7 +289,7 @@ void View::frameText(int position, FontType font, const float color[4],
             gym::drawOctagon(X-E, B, R, T, color, 5, 1);
     }
     
-    fgBitmapText(X, Y, 1.f, font, color, text, vshift);
+    fgBitmapText(X, Y, 1.f, font, color, text, dY);
     //fgStrokeString(X, Y, 1.f, 0, text, 1, 0, 0);
 }
 
