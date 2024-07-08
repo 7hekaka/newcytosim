@@ -113,6 +113,9 @@ public:
     /// string at start of `message` (if `none` is specified, no message is shown)
     std::string label;
     
+    /// text shown near the bottom of window
+    std::string subtitle;
+
     /// automatically adjust view to keep fibers in window
     /**
      Possible values:
@@ -200,7 +203,7 @@ public:
     
     /// flag to display information on screen
     int draw_memo;
-
+    
 public:
    
     /// constructor

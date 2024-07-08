@@ -219,34 +219,30 @@ static float textPosition(float& px, float& py, int width, int height, int lines
     
     switch( position )
     {
-        case 0:
-            //bottom-left, text going up
+        case 0: //bottom-left, text going up
             px = height/2;
             py = height/2;
             return height;
-        case 1:
-            //bottom-right, text going up
-            px = W - width - height/2;
-            if ( px < 0 ) px = 0;
+        case 1: //bottom-right, text going up
+            px = std::max(0, W - width - height/2);
             py = height/2;
             return height;
-        case 2:
-            //top-right, text going down
-            px = W - width - height/2;
-            if ( px < 0 ) px = 0;
+        case 2: //top-right, text going down
+            px = std::max(0, W - width - height/2);
             py = H - height;
             return -height;
         default:
-        case 3:
-            //top-left, text going down
+        case 3: //top-left, text going down
             px = height/2;
             py = H - height;
             return -height;
-        case 4:
-            //center, text going down
-            px = ( W - width ) / 2;
-            if ( px < 0 ) px = 0;
+        case 4: //centered, text going down
+            px = std::max(0, ( W - width ) / 2);
             py = ( H + lines*height ) / 2;
+            return -height;
+        case 5: //centered, 3/4 down the window
+            px = std::max(0, ( W - width ) / 2);
+            py = ( H + (lines-1)*height ) / 8;
             return -height;
     }
     return height;
@@ -281,12 +277,12 @@ void View::frameText(int position, FontType font, const float color[4],
     {
         float E = height;
         float T = Y + lines * dY;
-        float B = std::min(Y, T) - E/4;
+        float B = std::min(Y, T) + E/4;
         T = std::max(Y, T) + E + E/4;
         float R = X + width + E;
-        gym::paintOctagon(X-E, B, R, T, back, 5);
+        gym::paintOctagon(X-E, B, R, T, back, 6);
         if ( position == 4 )
-            gym::drawOctagon(X-E, B, R, T, color, 5, 1);
+            gym::drawOctagon(X-E, B, R, T, color, 6, 1);
     }
     
     fgBitmapText(X, Y, 1.f, font, color, text, dY);
@@ -382,6 +378,13 @@ void View::drawInteractiveFeatures() const
         frameText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
     }
     
+    if ( subtitle.size() )
+    {
+        float white[4] = {1,1,1,1};
+        float black[4] = {0,0,0,0.9};
+        frameText(5, BITMAP_TIMES_ROMAN_24, white, subtitle.c_str(), black, W, H);
+    }
+
     if ( draw_memo && memo.size() )
     {
         float white[4] = {1,1,1,1};

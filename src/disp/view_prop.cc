@@ -26,6 +26,7 @@ void ViewProp::clear()
     multisample  = 0;
     
     label        = "Cytosim";
+    subtitle     = "";
     memo         = "Please, visit www.cytosim.org";
     draw_memo    = 0;
 
@@ -104,6 +105,7 @@ void ViewProp::read(Glossary& glos)
     glos.set(multisample, "gl_samples");
     glos.set(label,       "label");
     glos.set(draw_memo,   "draw_memo");
+    glos.set(subtitle, "subtitle");
     
     glos.set(track_fibers,        "track_fibers");
     glos.set(window_position, 2,  "window_position");
