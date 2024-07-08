@@ -211,41 +211,42 @@ void View::strokeString(float X, float Y, float Z, const char str[]) const
 
 
 /// width = text_width; height = text_heigth, (W, H) = window_size
-static float textPosition(float& px, float& py, int width, int height, int lines,
+static float textPosition(float& X, float& Y, int width, int height, int lines,
                           int W, int H, const int position)
 {
+    float B = 12;
     assert_true( W > 0 );
     assert_true( H > 0 );
     
     switch( position )
     {
         case 0: //bottom-left, text going up
-            px = height/2;
-            py = height/2;
+            X = B;
+            Y = B;
             return height;
         case 1: //bottom-right, text going up
-            px = std::max(0, W - width - height/2);
-            py = height/2;
+            X = std::max(0, W - width - height/2);
+            Y = B;
             return height;
         case 2: //top-right, text going down
-            px = std::max(0, W - width - height/2);
-            py = H - height;
+            X = std::max(0, W - width - height/2);
+            Y = H - height;
             return -height;
         default:
         case 3: //top-left, text going down
-            px = height/2;
-            py = H - height;
+            X = B;
+            Y = H - height;
             return -height;
         case 4: //centered, text going down
-            px = std::max(0, ( W - width ) / 2);
-            py = ( H + lines*height ) / 2;
+            X = std::max(0, ( W - width ) / 2);
+            Y = ( H + lines*height ) / 2;
             return -height;
         case 5: //centered, 3/4 down the window
-            px = std::max(0, ( W - width ) / 2);
-            py = ( H + (lines-1)*height ) / 8;
+            X = std::max(0, ( W - width ) / 2);
+            Y = ( H + (lines-1)*height ) / 8;
             return -height;
     }
-    return height;
+    return 0;
 }
 
     
@@ -266,11 +267,12 @@ static float textPosition(float& px, float& py, int width, int height, int lines
 void View::frameText(int position, FontType font, const float color[4],
                      const char text[], const float back[4], int W, int H) const
 {
+    float mag = 1.f;
     int lines = 1;
     int height = fgFontHeight(font);
     int width = fgTextWidth(font, text, lines);
     
-    float X, Y;
+    float X = 0, Y = 0;
     float dY = textPosition(X, Y, width, height, lines, W, H, position);
     
     if ( back && back[3] > 0 )
@@ -284,9 +286,8 @@ void View::frameText(int position, FontType font, const float color[4],
         if ( position == 4 )
             gym::drawOctagon(X-E, B, R, T, color, 6, 1);
     }
-    
-    fgBitmapText(X, Y, 1.f, font, color, text, dY);
-    //fgStrokeString(X, Y, 1.f, 0, text, 1, 0, 0);
+    fgBitmapText(X, Y, mag, font, color, text, dY);
+    //fgStrokeString(X, Y, mag, 0, text, 1, 0, 0);
 }
 
 /**

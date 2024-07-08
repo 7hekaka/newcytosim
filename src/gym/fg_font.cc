@@ -70,13 +70,13 @@ int fgFontHeight(int font)
 {
     switch ( font )
     {
-        case BITMAP_8_BY_13:        return 15;
-        case BITMAP_9_BY_15:        return 16;
-        case BITMAP_TIMES_ROMAN_10: return 12;
-        case BITMAP_TIMES_ROMAN_24: return 27;
-        case BITMAP_HELVETICA_10:   return 13;
-        case BITMAP_HELVETICA_12:   return 15;
-        case BITMAP_HELVETICA_18:   return 22;
+        case BITMAP_8_BY_13:        return 13;
+        case BITMAP_9_BY_15:        return 15;
+        case BITMAP_TIMES_ROMAN_10: return 10;
+        case BITMAP_TIMES_ROMAN_24: return 24;
+        case BITMAP_HELVETICA_10:   return 10;
+        case BITMAP_HELVETICA_12:   return 12;
+        case BITMAP_HELVETICA_18:   return 18;
     }
     return 13;
 }
@@ -120,7 +120,7 @@ static unsigned countBits(size_t n_bytes, const unsigned char* bytes)
 
 
 /*
- * Draw a bitmap character
+ * Draw one bitmap character
  */
 void fgBitmapCharacter(float X, float Y, float S, int fontID, const float col[4], int character)
 {
@@ -134,7 +134,7 @@ void fgBitmapCharacter(float X, float Y, float S, int fontID, const float col[4]
         unsigned W = face[0];
         unsigned H = font->Height;
         if ( col ) gym::setColor(col);
-#if 1
+#if 0
         unsigned char pixels[W*H+8];
         gym::unpackBitmap(pixels, W, H, face+1, W);
         gym::drawPixels(W, H, S*X-font->xorig, S*Y-font->yorig, S, pixels);
@@ -211,14 +211,15 @@ void fgBitmapToken(float X, float Y, float scale, SFG_Font const* font, const ch
     X = scale * ( X - font->xorig );
     Y = scale * ( Y - font->yorig );
 
-    size_t n_bits = 0;
+    unsigned n_bits = 0;
     for ( char const* c = string; *c; ++c )
     {
         const uByte* face = font->Characters[(unsigned char)*c];
         unsigned cW = face[0];
         n_bits += countBits(H*((cW+7)>>3), 1+face);
     }
-    flute2* flu = gym::mapBufferV2(6*n_bits);
+    const unsigned sup = 4 * n_bits; // empirical upper limit
+    flute2* flu = gym::mapBufferV2(sup);
     unsigned cnt = 0;
     unsigned W = 0;
     for ( char const* c = string; *c; ++c )
@@ -228,7 +229,8 @@ void fgBitmapToken(float X, float Y, float scale, SFG_Font const* font, const ch
         cnt += gym::unpackBitmap(flu+cnt, cW, H, X+scale*W, Y, scale, 1+face);
         W += cW;
     }
-    //printf("`%s' %lu %u\n", token, n_bits, cnt);
+    //if ( cnt > sup )
+    //printf("%6u bits %6u vertex: %s\n", n_bits, cnt, string);
     gym::unmapBufferV2();
     gym::drawTriangleStrip(0, cnt);
 }
@@ -248,9 +250,6 @@ void fgBitmapText(float X, float Y, float scale, int fontID, const float color[4
     SFG_Font const* font = fghFont(fontID);
     if ( !font )
         return;
-    
-    if ( dY == 0 )
-        dY = font->Height;
 
     char * str = strdup(string);
     for ( char * c = str; *c; ++c )

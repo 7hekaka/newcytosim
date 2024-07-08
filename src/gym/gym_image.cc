@@ -46,6 +46,18 @@ size_t gym::unpackBitmap(flute2* flu, unsigned W, unsigned H, float X0, float Y0
         unsigned byte = row[0];
         for ( unsigned b = 1; b < Wb; ++b )
             byte = ( byte << 8 ) | row[b];
+#if 1
+        // join next rows if identical to current one:
+        while ( i+1 < H  &&  bits[i*Wb+Wb] == *row )
+        {
+            unsigned next = row[Wb];
+            for ( unsigned b = 1; b < Wb; ++b )
+                next = ( next << 8 ) | row[Wb+b];
+            if ( byte != next ) break;
+            T += S;
+            ++i;
+        }
+#endif
         byte <<= 8 * ( sizeof(unsigned) - Wb );
         unsigned p, k = 0;
         while ( byte )
