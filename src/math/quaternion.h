@@ -455,9 +455,9 @@ public:
         
         const REAL two(2.0);
         REAL X = src[0], Y = src[1], Z = src[2];
-        dst[0] = X + two * ((yy + zz)*X + (xy - rz)*Y + (ry + xz)*Z );
-        dst[1] = Y + two * ((rz + xy)*X + (xx + zz)*Y + (yz - rx)*Z );
-        dst[2] = Z + two * ((xz - ry)*X + (rx + yz)*Y + (xx + yy)*Z );
+        dst[0] = X + two * ((yy + zz)*X + (xy - rz)*Y + (ry + xz)*Z);
+        dst[1] = Y + two * ((rz + xy)*X + (xx + zz)*Y + (yz - rx)*Z);
+        dst[2] = Z + two * ((xz - ry)*X + (rx + yz)*Y + (xx + yy)*Z);
     }
     
     

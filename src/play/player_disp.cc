@@ -344,7 +344,7 @@ void Player::readDisplayString(View& view, std::string const& str)
 /**
  Display the full Scene for export, skipping some features
  */
-void Player::drawSystem(View const& view)
+void Player::drawSystem(View& view)
 {
     CHECK_GL_ERROR("drawSystem");
     view.openDisplay();
@@ -357,10 +357,10 @@ void Player::drawSystem(View const& view)
         if ( prop.saved_image_time != t )
         {
             prop.saved_image_time = t;
+            size_t frame_index = worker.currentFrame();
             if ( goLive )
-                saveView(view, prop.image_index++, prop.downsample);
-            else
-                saveView(view, worker.currentFrame(), prop.downsample);
+                frame_index = prop.image_index++;
+            saveView(view, frame_index, prop.downsample);
             // exit if this was the last image requested:
             if ( --prop.save_images == 0 && ( prop.auto_exit & 2 ))
             {
@@ -429,7 +429,7 @@ void fixFileName(char str[], size_t len, const char format[], size_t indx)
  in the folder specified in `PlayerProp::image_dir`.
  The file name is derived from `PlayerProp::image_name` by including `indx`.
  */
-int Player::saveView(View const& view, size_t indx, int downsample) const
+int Player::saveView(View& view, size_t indx, int downsample) const
 {
     char str[1024] = { 0 };
     char const* name = prop.image_name.c_str();
@@ -439,6 +439,12 @@ int Player::saveView(View const& view, size_t indx, int downsample) const
     int cwd = FilePath::change_dir(prop.image_dir, true);
     int err = saveView(view, str, format, downsample);
     FilePath::change_dir(cwd);
+    
+    if ( prop.auto_pilot )
+    {
+        view.zoom_in(prop.auto_zoom);
+        view.rotate_by(prop.auto_rotate);
+    }
     return err;
 }
 

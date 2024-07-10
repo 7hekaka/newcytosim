@@ -164,13 +164,13 @@ public:
     void drawCytosim();
     
     /// draw system calling drawCytosim
-    void drawSystem(View const&);
+    void drawSystem(View&);
     
     /// export current viewport to image file 'filename'
     int saveView(View const&, const char* filename, const char* format, int downsample) const;
 
     /// export current viewport to an image file
-    int saveView(View const&, size_t indx, int downsample) const;
+    int saveView(View&, size_t indx, int downsample) const;
     
     /// save high-resolution image of the current scene to 'filename'
     int saveScene(int mag, const char* filename, const char* format, int downsample);

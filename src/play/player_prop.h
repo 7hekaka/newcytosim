@@ -3,7 +3,9 @@
 #ifndef PLAYER_PROP_H
 #define PLAYER_PROP_H
 
+#include "real.h"
 #include "property.h"
+#include "quaternion.h"
 
 
 /// Parameters for the Player
@@ -81,11 +83,20 @@ public:
      */
     char magic_key[NB_MAGIC_KEYS];
 
-    /** @} */
+    /// if true, program will quit when end-of-file is reached
+    int auto_pilot;
 
     /// if true, program will quit when end-of-file is reached
     unsigned auto_exit;
     
+    /// zoom applied after reading
+    float auto_zoom;
+    
+    /// rotation applied after reading
+    Quaternion<real> auto_rotate;
+    
+    /** @} */
+
     /// index of report which is displayed
     unsigned report_index;
 

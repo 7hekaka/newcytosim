@@ -12,7 +12,10 @@ void PlayerProp::clear()
     period = 1;
     delay = 32;
     auto_exit = 0;
-
+    auto_zoom = 1;
+    auto_rotate.set(1,0,0,0);
+    auto_pilot = 0;
+    
     for ( int k = 0; k < NB_MAGIC_KEYS; ++k )
     {
         magic_key[k] = 0;
@@ -50,7 +53,10 @@ void PlayerProp::read(Glossary& glos)
     glos.set(downsample,   "downsample");
     glos.set(report,       "report");
     glos.set(auto_exit,    "auto_exit");
-
+    glos.set(auto_zoom,    "auto_zoom");
+    glos.set(auto_rotate,  "auto_rotate");
+    auto_pilot = ( auto_zoom != 1 || auto_rotate != Quaternion<real>(1,0,0,0) );
+    
     if ( ! SaveImage::supported(image_format.c_str()) )
         throw InvalidParameter("unsupported image format");
     
@@ -75,6 +81,8 @@ void PlayerProp::write_values(std::ostream& os) const
     write_value(os, "image_format", image_format);
     write_value(os, "image_dir", image_dir);
     write_value(os, "downsample", downsample);
+    write_value(os, "auto_zoom", auto_zoom);
+    write_value(os, "auto_rotate", auto_rotate);
 
     for ( int k = 0; k < NB_MAGIC_KEYS; ++k )
     {

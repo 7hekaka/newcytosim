@@ -576,7 +576,8 @@ void glApp::processSpecialKey(int key, int modifiers)
         view.rotation.rotateVector(dxy, view.focus);
         rot.setFromAxis(vec, F * (M_PI/8));
         view.rotate_by(rot);
-        view.rotation.conjugated().rotateVector(vec, dxy);
+        rot = view.rotation.conjugated();
+        rot.rotateVector(vec, dxy);
         view.focus = vec;
     }
     else
