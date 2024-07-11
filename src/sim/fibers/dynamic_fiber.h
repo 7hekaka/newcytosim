@@ -159,7 +159,7 @@ public:
     /// simulate dynamic instability of plus end
     int stepPlusEnd();
     
-    /// simulate dynamic instability of plus end
+    /// simulate dynamic instability for a stabilized plus end 
     int stepPlusEndStabilized(real);
 
     /// simulate dynamic instability of minus end

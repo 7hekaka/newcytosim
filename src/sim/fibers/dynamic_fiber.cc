@@ -331,6 +331,7 @@ int DynamicFiber::stepPlusEnd()
         //real ten = tension(lastSegment());
         //printf("%04u : %8.3f  %8.3f : %8.3f\n", identity(), forceP, ten, growth);
 
+        //printf("  %s %8.4f : %6.4f\n", reference().c_str(), forceP, growth);
 #if NEW_STALL_OUTSIDE
         // Growth is reduced if the plus end is outside
         if ( prop()->stall_space && prop()->stall_space->outside(posEndP()) )
@@ -411,25 +412,29 @@ int DynamicFiber::stepPlusEndStabilized(real factor)
     
     // calculate the force acting on the point at the end:
     real forceP = projectedForceEndP();
-
-    // Special case for Kinetochores: grow slowly with no catastrophe...
-    real growth = prop()->growing_rate_dt[P] * prop()->free_polymer / factor;
-    
     //real fP = tension(lastSegment());
-    //std::clog << prop()->name() << " stabilized P " << factor << " " << forceP << " " << fP << "\n";
+
+    // get growth parameter scaled for available monomers:
+    real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
+    
     // force modulates assembly rate exponentially
     if ( growth > 0 )
     {
+        real f = std::max(0.0, forceP);
         // we use tanh(force) which is bounded, scaled to approach exp(-F):
-        real e = std::exp(-M_SQRT2 * forceP * prop()->growing_force_inv[P]);
-        growth *= 2 / ( 1 + e );
-    }
-    
-    nextGrowthP -= growth;
-    while ( nextGrowthP < 0 )
-    {
-        addUnitP();
-        ++res;
+        real e = std::exp(-M_SQRT2 * f * prop()->growing_force_inv[P]);
+        real g = 1 + e * ( factor - 1 );
+        //printf("* %s Vg %8.4f +end_force %+6.4f growth_reduction %+6.4f\n", reference().c_str(), growth, forceP, g);
+        growth /= g;
+        
+        nextGrowthP -= growth;
+        
+        while ( nextGrowthP < 0 )
+        {
+            //printf("* %s %8.4f : %6.4f\n", reference().c_str(), forceP*prop()->growing_force_inv[P], growth/prop()->growing_rate_dt[P]);
+            addUnitP();
+            ++res;
+        }
     }
     return res;
 }
