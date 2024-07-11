@@ -282,24 +282,58 @@ size_t Meca::countTerms(const real threshold) const
     return cnt;
 }
 
+
+/** This is the same as Meca::multiply() without the projection */
+void Meca::multiplyElasticity(const real* X, real* Y) const
+{
+#if USE_ISO_MATRIX
+    // Y <- mFUL * X
+    if ( useFullMatrix )
+        mFUL.vecMul(X, Y);
+    else
+        zero_real(dimension(), Y);
+    // Y <- Y + mISO * X
+    mISO.VECMULADDISO(X, Y);
+#else
+    mFUL.vecMul(X, Y);
+#endif
+    
+    for ( Mecable * mec : mecables )
+    {
+        const size_t inx = DIM * mec->matIndex();
+#if SEPARATE_RIGIDITY_TERMS
+        mec->addRigidity(X+inx, Y+inx);
+#endif
+#if ADD_PROJECTION_DIFF
+        if ( mec->hasProjectionDiff() )
+            mec->addProjectionDiff(X+inx, Y+inx);
+#endif
+        // Y <- X + beta * Y
+        const real beta = -tau_ * mec->leftoverMobility();
+        blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
+    }
+}
+
+
 /**
- Extract the full matrix associated with Meca::multiply().
+ Extract the matrix associated defined by MULTIPLY().
  The array `mat[]` should be preallocated to hold `dim*lda` real scalars,
- with `dim >= Meca::dimension()`, and `lda >= dim` the leading dimension of
- the array.
+ with `dim >= Meca::dimension()`, and `lda >= dim` should be the leading
+ dimension of the array.
  */
+template < Meca::MultiplyFuncPtr MULTIPLY >
 void Meca::getMatrix(real * mat, size_t lda) const
 {
     size_t dim = dimension();
     if ( lda < dim )
-        throw InvalidIO("invalid matrix dimensions");
+        throw InvalidIO("insufficient matrix dimension");
     real * src = new_real(dim);
     zero_real(dim, src);
     
     for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1;
-        multiply(src, mat+j*lda);
+        (this->*MULTIPLY)(src, mat+j*lda);
         src[j] = 0;
     }
     
@@ -349,6 +383,7 @@ void Meca::saveMobility(FILE * fp) const
  https://math.nist.gov/MatrixMarket/formats.html
  This is a Sparse text format
  */
+template < Meca::MultiplyFuncPtr MULTIPLY >
 void Meca::saveMatrix(FILE * fp, real threshold) const
 {
     fprintf(fp, "%%%%MatrixMarket matrix coordinate real general\n");
@@ -371,7 +406,7 @@ void Meca::saveMatrix(FILE * fp, real threshold) const
     for ( size_t j = 0; j < dim; ++j )
     {
         src[j] = 1;
-        multiply(src, dst);
+        (this->*MULTIPLY)(src, dst);
         for ( size_t i = 0; i < dim; ++i )
             if ( abs_real(dst[i]) > threshold )
             {
@@ -390,14 +425,19 @@ void Meca::saveMatrix(FILE * fp, real threshold) const
 
 
 /**
- Save Matrix and Right-hand-side Vector
+ Save full matrix, elasticity matrix and right-hand-side vector
  */
 void Meca::saveSystem() const
 {
     FILE * f = FilePath::open_file("matrix.mtx", "w");
-    saveMatrix(f, 0);
+    MultiplyFuncPtr x = &Meca::multiply;
+    saveMatrix<&Meca::multiply>(f, 0);
     fclose(f);
     
+    f = FilePath::open_file("elasticity.mtx", "w");
+    saveMatrix<&Meca::multiplyElasticity>(f, 0);
+    fclose(f);
+
     f = FilePath::open_file("vector.mtx", "w");
     saveVector(f, dimension(), vRHS);
     fclose(f);
@@ -538,6 +578,7 @@ void Meca::dumpMobility(FILE * fp, bool nat) const
 /**
  Save the full matrix associated with multiply(), in binary format
  */
+template < Meca::MultiplyFuncPtr MULTIPLY >
 void Meca::dumpMatrix(FILE * fp, bool nat) const
 {
     const size_t dim = dimension();
@@ -549,50 +590,7 @@ void Meca::dumpMatrix(FILE * fp, bool nat) const
     for ( size_t ii = 0; ii < dim; ++ii )
     {
         src[ii] = 1;
-        multiply(src, res);
-        dumpVector(fp, dim, res, nat);
-        src[ii] = 0;
-    }
-    
-    free_real(res);
-    free_real(src);
-}
-
-
-/**
- Save the elasticity matrix, in binary format
- */
-void Meca::dumpElasticity(FILE * fp, bool nat) const
-{
-    const size_t dim = dimension();
-    real * src = new_real(dim);
-    real * res = new_real(dim);
-    
-    zero_real(dim, src);
-    
-    for ( size_t ii = 0; ii < dim; ++ii )
-    {
-        src[ii] = 1;
-        
-        mFUL.vecMul(src, res);
-#if USE_ISO_MATRIX
-        mISO.VECMULADDISO(src, res);
-#endif
-#if SEPARATE_RIGIDITY_TERMS
-        addAllRigidity(src, res);
-#endif
-
-#if ADD_PROJECTION_DIFF
-        for ( Mecable const* mec : mecables )
-        {
-            if ( mec->hasProjectionDiff() )
-            {
-                const size_t inx = DIM * mec->matIndex();
-                mec->addProjectionDiff(src+inx, res+inx);
-            }
-        }
-#endif
-        
+        (this->*MULTIPLY)(src, res);
         dumpVector(fp, dim, res, nat);
         src[ii] = 0;
     }
@@ -716,11 +714,11 @@ void Meca::dumpSystem(bool nat) const
     fclose(f);
     
     f = FilePath::open_file("sys.bin", "wb");
-    dumpMatrix(f, nat);
+    dumpMatrix<&Meca::multiply>(f, nat);
     fclose(f);
     
     f = FilePath::open_file("ela.bin", "wb");
-    dumpElasticity(f, nat);
+    dumpMatrix<&Meca::multiplyElasticity>(f, nat);
     fclose(f);
     
     f = FilePath::open_file("prj.bin", "wb");

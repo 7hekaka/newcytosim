@@ -746,17 +746,22 @@ public:
 
     //----------------------- EXPORT/DEBUG FUNCTIONS ---------------------------
 
+    /// member function pointer
+    using MultiplyFuncPtr = void (Meca::*)(const real*, real*) const;
+
+    /// linear operator, corresponding to the elasticity part of the dynamic matrix
+    void multiplyElasticity(const real* X, real* Y) const;
+
     /// Count number of non-zero entries in the full system matrix
     size_t countTerms(real threshold) const;
 
-    /// Extract the complete dynamic matrix in column-major format in a C-array
-    void getMatrix(real * matrix, size_t lda) const;
+    /// Extract matrix defined by template function in a preallocated C-array
+    template < MultiplyFuncPtr >
+    void getMatrix(real * mat, size_t lda) const;
 
-    /// Save complete matrix in binary format
+    /// Save matrix defined by template function in binary format
+    template < MultiplyFuncPtr >
     void dumpMatrix(FILE *, bool nat=true) const;
-    
-    /// Save elasticity matrix in binary format
-    void dumpElasticity(FILE *, bool nat=true) const;
     
     /// Save mobility/projection matrix in binary format
     void dumpProjection(FILE *, bool nat=true) const;
@@ -780,7 +785,8 @@ public:
     /// Save drag coefficients associated with each degree of freedom in binary format
     void saveMobility(FILE *) const;
 
-    /// Save complete matrix in Matrix Market format
+    /// Save matrix defined by template function in Matrix Market format
+    template < MultiplyFuncPtr >
     void saveMatrix(FILE *, real threshold) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
