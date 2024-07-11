@@ -2000,7 +2000,8 @@ void Display::drawFiber(Fiber const& fib)
             gym::color_back(col1);
         else
             gym::color_back(disp->back_color);
-        
+        gym::enableLighting();
+
         switch( disp->style )
         {
             case 2: drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2); break;
@@ -2079,9 +2080,7 @@ void Display::drawFiber(Fiber const& fib)
 
     // draw other fiber elements only if fiber is fully visible:
     if ( disp->force_style && fib.disp->visible > 0 )
-    {
         drawFiberForces(fib, disp->force_scale, pixwidth(disp->point_size));
-    }
 }
 
 
