@@ -194,18 +194,17 @@ void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, c
 
 /**
  This creates a second link, which is offset with respect to the point defined by `this`,
- in the direction (-1,-1,-1) relative to the local reference system of the Solid.
+ in the direction (-1,-1,-1) expressed in the local reference system of the Solid.
  Thus together with addLink() this will align a fiber with the diagonal axis of the Solid.
  */
 void Interpolation4::addAlignedOffsetLink(Meca& meca, real len, Mecapoint const& arg, const real weight) const
 {
     assert_true(mec_);
     size_t off = mec_->matIndex() + prime_;
-    // coefficients to extract ( surface_point - center )
-    real alp[4] = { coef_[0] - real(1), coef_[1], coef_[2], coef_[3] };
+    // coefficients to calculate the radius of the bead:
+    real alp[2] = { real(-1), real(1) };
     // extract distance in current configuration:
-    real rad = mec_->interpolatePoints(prime_, alp, rank_).norm();
-    // coefficients to offset the point by 'len' along the diagonal:
+    real rad = mec_->interpolatePoints(prime_, alp, 2).norm();
     switch ( rank_ )
     {
         case 0:
