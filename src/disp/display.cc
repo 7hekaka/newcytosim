@@ -1452,7 +1452,7 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
     gym::ref_view();
     gym_color col = fib.prop->disp->force_color;
     gym_color lor = col.alpha_scaled(0.5f);
-    size_t cnt = 2 * fib.nbPoints();
+    unsigned cnt = 2 * fib.nbPoints();
     flute4D* flu = gym::mapBufferC4VD(cnt);
     for ( size_t i = 0; i < fib.nbPoints(); ++i )
     {

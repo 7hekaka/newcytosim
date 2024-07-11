@@ -313,7 +313,7 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 
 void SpacePolygon::drawPolygon(float lines, float points) const
 {
-    const size_t nbp = poly_.nbPoints();
+    const unsigned nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     flute2 * flt = gym::mapBufferV2(nbp+1);
     for ( size_t n = 0; n <= nbp; ++n )
@@ -340,7 +340,7 @@ void SpacePolygon::drawPolygon(float lines, float points) const
 /*
 void SpacePolygon::drawPolygonPoints() const
 {
-    const size_t nbp = poly_.nbPoints();
+    const unsigned nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     // indicate index of each point:
     char tmp[32];
@@ -356,7 +356,7 @@ void SpacePolygon::drawPolygonPoints() const
 void SpacePolygon::draw3D() const
 {
     const float H(-height_);
-    const size_t nbp = poly_.nbPoints();
+    const unsigned nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     flute3 * flt = gym::mapBufferV3(2*nbp+2);
     for ( size_t i = 0; i < nbp; ++i )

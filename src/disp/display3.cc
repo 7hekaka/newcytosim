@@ -828,7 +828,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         {
             gym::enableLighting();
             // display vertices:
-            for ( size_t i = 0; i < fib.nbPoints(); ++i )
+            for ( unsigned i = 0; i < fib.nbPoints(); ++i )
                 drawObject(fib.posP(i), rad, gle::cube);
         }
         else if ( style == 2 )

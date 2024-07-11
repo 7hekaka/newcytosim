@@ -58,15 +58,15 @@ static int buildMenuFiber()
     FiberDisp * FD = player.firstFiberDisp();
     if ( FD )
     {
-        gym::addMenuEntry(FD->visible       ?"Hide"             :"Show",             10);
-        gym::addMenuEntry(FD->line_style    ?"Hide Lines"       :"Show Lines",        1);
-        gym::addMenuEntry(FD->line_style==2 ?"Hide Tensions"    :"Show Tensions",     2);
-        gym::addMenuEntry(FD->point_style   ?"Hide Points"      :"Show Points",       3);
-        gym::addMenuEntry(FD->point_style==2?"Hide Arrows"      :"Show Arrows",       5);
-        gym::addMenuEntry(FD->point_style==3?"Hide Chevrons"    :"Show Chevrons",     6);
-        gym::addMenuEntry(FD->end_style[1]  ?"Hide Minus-ends"  :"Show Minus-end",    7);
-        gym::addMenuEntry(FD->end_style[0]  ?"Hide Plus-ends"   :"Show Plus-end",     8);
-        gym::addMenuEntry(FD->force_style   ?"Hide Point-forces":"Show Point-Forces", 9);
+        gym::addMenuEntry(FD->visible       ?"Hide"           :"Show",          10);
+        gym::addMenuEntry(FD->line_style    ?"Hide Lines"     :"Show Lines",     1);
+        gym::addMenuEntry(FD->line_style==2 ?"Hide Tensions"  :"Show Tensions",  2);
+        gym::addMenuEntry(FD->point_style   ?"Hide Points"    :"Show Points",    3);
+        gym::addMenuEntry(FD->point_style==2?"Hide Arrows"    :"Show Arrows",    5);
+        gym::addMenuEntry(FD->point_style==3?"Hide Chevrons"  :"Show Chevrons",  6);
+        gym::addMenuEntry(FD->end_style[1]  ?"Hide Minus-ends":"Show Minus-end", 7);
+        gym::addMenuEntry(FD->end_style[0]  ?"Hide Plus-ends" :"Show Plus-end",  8);
+        gym::addMenuEntry(FD->force_style   ?"Hide Forces"    :"Show Forces", 9);
         gym::addMenuEntry("No coloring",           20);
         gym::addMenuEntry("Coloring by number",    21);
         gym::addMenuEntry("Coloring by mark",      22);

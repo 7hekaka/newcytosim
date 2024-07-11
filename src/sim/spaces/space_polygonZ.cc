@@ -198,10 +198,10 @@ void SpacePolygonZ::setInteractions(Meca& meca, Simul const&) const
 
 void SpacePolygonZ::draw3D() const
 {
-    const size_t npts = poly_.nbPoints();
+    const unsigned nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     
-    for ( size_t n = 0; n < npts; n++ )
+    for ( size_t n = 0; n < nbp; n++ )
     {
         // do not display special edges
         if ( pts[n].spot )
@@ -233,10 +233,10 @@ void SpacePolygonZ::draw3D() const
 //display rings around:
 void SpacePolygonZ::drawRings(float width) const
 {
-    const size_t npts = poly_.nbPoints();
+    const unsigned nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     
-    for ( size_t n = 0; n < npts; n++ )
+    for ( size_t n = 0; n < nbp; n++ )
     {
         float R(pts[n].xx);
         float Z(pts[n].yy);
