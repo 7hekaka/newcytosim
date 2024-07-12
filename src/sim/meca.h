@@ -741,7 +741,7 @@ public:
     /// set connectivity matrix according to mFUL and mISO
     void setAdjacencyMatrix(int[], size_t) const;
 
-    /// reorder Mecables according to connectivity
+    /// reorder Mecables according to connectivity, to minimize the matrix bandwidth
     void reorderMecables();
 
     //----------------------- EXPORT/DEBUG FUNCTIONS ---------------------------

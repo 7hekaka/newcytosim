@@ -3,7 +3,7 @@
 #include "../base/bitmap.cc"
 
 //------------------------------------------------------------------------------
-#pragma mark - Mecable ordering
+#pragma mark - Mecable reordering (ie. index permutation) to minimize matrix bandwidth
 
 
 template < typename MATRIX >
@@ -26,7 +26,7 @@ static void setAdjacency(int mat[], const size_t lld, unsigned table[], MATRIX c
 /**
  Calculates the Adjacency matrix defined by the force matrices mFUL and mISO
  mat[i+lld*j] is set to 1 if i-th and j-th Mecables interact, ie. if some
- element of the matrices is not null at the right indices.
+ element of the matrices is not null at the mecable's indices.
  */
 void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
 {
@@ -46,10 +46,10 @@ void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
     }
     assert_true(u == nbv);
 
-    setAdjacency(mat, sup, table, mFUL);
 #if USE_ISO_MATRIX
     setAdjacency(mat, sup, table, mISO);
 #endif
+    setAdjacency(mat, sup, table, mFUL);
 #if 0
     printf("Adjacency:\n");
     for ( size_t i = 0; i < sup; ++i )
@@ -91,8 +91,11 @@ static int compareOrder(const void * A, const void * B)
 }
 
 
-/// calculate the order of each node, and place lowest order first
-static void calculateOrder(IndexOrder res[], const size_t sup, int mat[])
+/**
+ Calculate the order of each node, and place lowest order first.
+ Used by the Reverse CutHill McKee algorithm
+ */
+static void calculateOrder(IndexOrder res[], const unsigned sup, int mat[])
 {
     unsigned inx = 0, val = sup;
     for ( unsigned f = 0; f < sup; ++f )
@@ -119,19 +122,20 @@ static void calculateOrder(IndexOrder res[], const size_t sup, int mat[])
  Calculate permutation of the indices to minimize matrix bandwidth,
  according to the Reverse CutHill McKee algorithm
  https://en.wikipedia.org/wiki/Cuthill%E2%80%93McKee_algorithm
+ FJN, La Foret Fouesnant, 29.7.2022
  */
-static void reverseCutHillMcKee(Mecable* order[], const size_t sup, int mat[], Mecable* mecables[])
+static void reverseCuthillMcKee(Mecable* order[], const unsigned sup, int mat[], Mecable* mecables[])
 {
     IndexOrder *obj = new IndexOrder[sup];
     calculateOrder(obj, sup, mat);
     IndexOrder * cap = obj;
     IndexOrder * far = cap+1;
     IndexOrder const* end = obj+sup;
-    unsigned u = sup-1;
+    unsigned U = sup;
     while ( 1 )
     {
         unsigned f = cap->inx;
-        order[u--] = mecables[f]; // reverse order!
+        order[--U] = mecables[f]; // reverse order!
         if ( ++cap == end )
             break;
         IndexOrder * red = far;
@@ -161,16 +165,16 @@ static void reverseCutHillMcKee(Mecable* order[], const size_t sup, int mat[], M
 
 void Meca::reorderMecables()
 {
-    const size_t sup = nbMecables();
+    const unsigned sup = nbMecables();
     Mecable ** order = new Mecable*[sup]{nullptr};
     
     int * mat = new int[sup*sup]{0};
     setAdjacencyMatrix(mat, sup);
-    reverseCutHillMcKee(order, sup, mat, mecables.data());
+    reverseCuthillMcKee(order, sup, mat, mecables.data());
     delete[] mat;
 
-    size_t cnt = 0;
-    for ( size_t i = 0; i < sup; ++i )
+    unsigned cnt = 0;
+    for ( unsigned i = 0; i < sup; ++i )
     {
         Mecable * mec = order[i];
         mecables[i] = mec;
