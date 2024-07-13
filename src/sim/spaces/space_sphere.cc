@@ -19,6 +19,8 @@ void SpaceSphere::resize(Glossary& opt)
     
     if ( opt.set(rad, "diameter") )
         rad *= 0.5;
+    else if ( opt.set(rad, "surface") )
+        rad = std::sqrt(rad*0.25*M_1_PI);
     else opt.set(rad, "radius");
     
     if ( rad < 0 )

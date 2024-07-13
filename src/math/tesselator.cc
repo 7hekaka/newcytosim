@@ -631,8 +631,8 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
     setGeometry(ICOSAHEDRON, 12, 30, 20, div);
     
     const FLOAT Z = std::sqrt(0.2);
-    const FLOAT C = std::cos(M_PI/2.5);
-    const FLOAT S = std::sin(M_PI/2.5);
+    const FLOAT C = std::cos(M_PI*0.4);
+    const FLOAT S = std::sin(M_PI*0.4);
     const FLOAT D = C*C - S*S;
     const FLOAT T = C*S + C*S;
     const FLOAT H = std::sqrt(1 + Z*Z);
@@ -700,8 +700,8 @@ void Tesselator::buildCylinder(unsigned div, int make)
     setGeometry(CYLINDER, 21, 55, 35, div);
 
     const FLOAT Z = std::sqrt(0.2);
-    const FLOAT C = std::cos(M_PI/2.5);
-    const FLOAT S = std::sin(M_PI/2.5);
+    const FLOAT C = std::cos(M_PI*0.4);
+    const FLOAT S = std::sin(M_PI*0.4);
     const FLOAT D = C*C - S*S;
     const FLOAT T = C*S + C*S;
     const FLOAT H = 3 * Z; // first row added
@@ -788,7 +788,7 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     setGeometry(HEMISPHERE, 26, 75, 40, div);
     
     const FLOAT P = M_PI/10.;
-    const FLOAT D = M_PI/2.5;
+    const FLOAT D = M_PI*0.4;
     FLOAT C[5], S[5];
     for ( int i = 0; i < 5; ++i )
     {

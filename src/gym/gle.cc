@@ -657,8 +657,8 @@ namespace gle
     {
         const float U = 1.0;
         const float Z = std::sqrt(0.2);
-        const float C = std::cos(M_PI/2.5);
-        const float S = std::sin(M_PI/2.5);
+        const float C = std::cos(M_PI*0.4);
+        const float S = std::sin(M_PI*0.4);
         const float D = C*C - S*S;
         const float T = C*S + S*C;
         const float H = std::sqrt(1 + Z*Z);
