@@ -498,7 +498,7 @@ public:
     void reportFiberExtension(std::ostream&) const;
     
     /// document nematic order (alignement) of Fiber
-    void reportFiberNematic(std::ostream&) const;
+    void reportFiberNematic(std::ostream&, Glossary& opt) const;
 
     
     /// print component of forces experienced by Fibers due to confinement

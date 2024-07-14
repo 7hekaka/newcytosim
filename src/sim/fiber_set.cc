@@ -936,61 +936,9 @@ real FiberSet::infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector
     return S;
 }
 
-/**
- Each Fiber segment is weigthed by its length.
- The Nematic direction is an eigenvector of the second rank tensor order parameter.
- 
- @sets `res`, a 9-elements matrix containing the two principal eigenvectors
- @return the scalar nematic order parameter S, the eigenvalue of direction 1
- 
- if DIM == 2:
-     direction 1 is { res[0], res[1] }
- if DIM == 3:
-     direction 1 is { res[0], res[1], res[2] }
-     direction 2 is { res[3], res[4], res[5] }
- */
-real FiberSet::infoNematic(ObjectList const& objs, real res[9])
+
+static real computeNematicEigenvectors(real res[9], real sum, real M[9])
 {
-    real sum = 0;
-    real M[9] = { 0 };
-    
-    for ( Object * i : objs )
-    {
-        Fiber * fib = Fiber::toFiber(i);
-        if ( fib )
-        {
-            const size_t cnt = fib->nbSegments();
-            real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
-            for ( size_t n = 0; n < cnt; ++n )
-            {
-                Vector p = fib->diffPoints(n);
-                XX += p.XX * p.XX;
-#if ( DIM > 1 )
-                XY += p.YY * p.XX;
-                YY += p.YY * p.YY;
-#endif
-#if ( DIM > 2 )
-                XZ += p.ZZ * p.XX;
-                YZ += p.ZZ * p.YY;
-                ZZ += p.ZZ * p.ZZ;
-#endif
-            }
-            // we should normalize by 1/L^2, but to weigth by length, we use 1/L
-            real w = fib->segmentation();
-            sum += cnt * w;
-            w = 1.0 / w;
-            // update lower triangle of 3x3 second rank traceless tensor:
-            M[0] += w * XX;
-            M[1] += w * XY;
-            M[2] += w * XZ;
-            M[4] += w * YY;
-            M[5] += w * YZ;
-            M[8] += w * ZZ;
-        }
-    }
-    
-    if ( sum == 0 )
-        return 0;
     // rescale matrix, to ensure eigenvalue = 1 in perfect order
     real beta = ( DIM >= 3 ) ? 0.5 : 1.0;
     sum = beta * DIM / sum;
@@ -1043,8 +991,119 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
     res[8] = 1;
 #endif
 
-    // return highest eigen value, which is the scalar order parameter
+    // return highest eigenvalue, which is the scalar order parameter
     return val[nbv-1];
+}
+
+
+/**
+ Each Fiber segment is weigthed by its length.
+ The Nematic direction is an eigenvector of the second rank tensor order parameter.
+ 
+ @sets `res`, a 9-elements matrix containing the two principal eigenvectors
+ @return the scalar nematic order parameter S, the eigenvalue of direction 1
+ 
+ if DIM == 2:
+     direction 1 is { res[0], res[1] }
+ if DIM == 3:
+     direction 1 is { res[0], res[1], res[2] }
+     direction 2 is { res[3], res[4], res[5] }
+ */
+real FiberSet::infoNematic(ObjectList const& objs, real res[9])
+{
+    real sum = 0;
+    real M[9] = { 0 };
+    
+    for ( Object * i : objs )
+    {
+        Fiber * fib = Fiber::toFiber(i);
+        if ( fib )
+        {
+            const size_t cnt = fib->nbSegments();
+            real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
+            for ( size_t n = 0; n < cnt; ++n )
+            {
+                Vector p = fib->diffPoints(n);
+                XX += p.XX * p.XX;
+#if ( DIM > 1 )
+                XY += p.YY * p.XX;
+                YY += p.YY * p.YY;
+#endif
+#if ( DIM > 2 )
+                XZ += p.ZZ * p.XX;
+                YZ += p.ZZ * p.YY;
+                ZZ += p.ZZ * p.ZZ;
+#endif
+            }
+            // we should normalize by 1/L^2, but to weight by length, we use 1/L
+            real w = fib->segmentation();
+            sum += cnt * w; // length of fiber
+            w = 1.0 / w;
+            // update lower triangle of 3x3 second-rank traceless tensor:
+            M[0] += w * XX;
+            M[1] += w * XY;
+            M[2] += w * XZ;
+            M[4] += w * YY;
+            M[5] += w * YZ;
+            M[8] += w * ZZ;
+        }
+    }
+    
+    if ( sum > 0 )
+        return computeNematicEigenvectors(res, sum, M);
+    return 0;
+}
+
+
+/**
+This computes a nematic order parameter, and principal directions, like infoNematic,
+ but using a vector that is orthogonal
+ */
+real FiberSet::infoOrthoNematic(ObjectList const& objs, real res[9], Space const* spc)
+{
+    real sum = 0;
+    real M[9] = { 0 };
+    
+    for ( Object * i : objs )
+    {
+        Fiber * fib = Fiber::toFiber(i);
+        if ( fib )
+        {
+            const size_t cnt = fib->nbSegments();
+            real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
+            for ( size_t n = 0; n < cnt; ++n )
+            {
+                Vector pos = fib->posPoint(n);
+                Vector dir = fib->dirSegment(n);
+                Vector nor = spc->normalToEdge(pos);
+                Vector p = cross(nor, dir);
+                XX += p.XX * p.XX;
+#if ( DIM > 1 )
+                XY += p.YY * p.XX;
+                YY += p.YY * p.YY;
+#endif
+#if ( DIM > 2 )
+                XZ += p.ZZ * p.XX;
+                YZ += p.ZZ * p.YY;
+                ZZ += p.ZZ * p.ZZ;
+#endif
+            }
+            // we weight each segment by its length
+            real w = fib->segmentation();
+            sum += cnt * w; // length of fiber
+            // update lower triangle of 3x3 second-rank traceless tensor:
+            M[0] += w * XX;
+            M[1] += w * XY;
+            M[2] += w * XZ;
+            M[4] += w * YY;
+            M[5] += w * YZ;
+            M[8] += w * ZZ;
+        }
+    }
+    
+    if ( sum > 0 )
+        return computeNematicEigenvectors(res, sum, M);
+    return 0;
 }
 
 

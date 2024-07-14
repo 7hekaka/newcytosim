@@ -340,7 +340,7 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
         if ( what == "extension" )
             return reportFiberExtension(out);
         if ( what == "nematic" )
-            return reportFiberNematic(out);
+            return reportFiberNematic(out, opt);
         if ( what == "end_state" || what == "dynamic" )
         {
             reportFiberEndState(out, PLUS_END, sel);
@@ -812,10 +812,15 @@ void Simul::reportFiberExtension(std::ostream& out) const
 }
 
 
-void Simul::reportFiberNematic(std::ostream& out) const
+void Simul::reportFiberNematic(std::ostream& out, Glossary& opt) const
 {
     out << COM << ljust("class",2,2) << SEP << "count" << SEP << "order";
     out << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
+    
+    std::string str;
+    Space const* spc = nullptr;
+    if ( opt.set(str, "space") )
+        spc = findSpace(opt.value("space"));
     
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -823,8 +828,12 @@ void Simul::reportFiberNematic(std::ostream& out) const
         ObjectList objs = fibers.collect(p);
         if ( objs.size() > 0 )
         {
+            real S = 0;
             real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-            real S = FiberSet::infoNematic(objs, vec);
+            if ( spc )
+                S = FiberSet::infoOrthoNematic(objs, vec, spc);
+            else
+                S = FiberSet::infoNematic(objs, vec);
             out << LIN << ljust(p->name(), 2);
             out << SEP << objs.size();
             out << SEP << S;

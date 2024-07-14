@@ -146,6 +146,9 @@ public:
     /// calculate the nematic directors, return the nematic scalar order parameter
     static real infoNematic(ObjectList const&, real vec[9]);
 
+    /// calculate the nematic directors, return the nematic scalar order parameter
+    static real infoOrthoNematic(ObjectList const&, real vec[9], Space const*);
+
     /// calculate center of gravity G, and principal components axes
     static int infoComponents(ObjectList const&, real& sum, real avg[3], real mom[9], real vec[9]);
 
