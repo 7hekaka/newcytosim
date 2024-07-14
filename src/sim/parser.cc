@@ -452,7 +452,11 @@ void Parser::parse_new(std::istream& is)
             std::string str;
             Space const* spc = sim_->spaces.master();
             if ( opt.set(str, "position", 1) )
+            {
                 spc = sim_->findSpace(str);
+                if ( ! spc )
+                    throw InvalidParameter("Could not find Space `"+str+"'");
+            }
             opt.set(str, "position");
             execute_new(name, cnt, spc, str);
         }

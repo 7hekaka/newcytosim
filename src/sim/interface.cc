@@ -208,7 +208,11 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
     
     // Space specified as second argument to 'position'
     if ( opt.set(str, "position", 1) )
+    {
         spc = sim_->findSpace(str);
+        if ( ! spc )
+            throw InvalidParameter("unknown Space `"+str+"'");
+    }
     
     // Position
     Vector vec(0,0,0);

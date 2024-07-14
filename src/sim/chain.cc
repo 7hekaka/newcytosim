@@ -92,12 +92,8 @@ void Chain::setStraight(Vector const& pos, Vector const& dir)
 void Chain::setStraight(Vector const& pos, Vector const& dir, real len)
 {
     assert_true( fnSegmentation > REAL_EPSILON );
-
-    if ( len <= 0 )
-        throw InvalidParameter("fiber:length must be > 0");
-
+    assert_true( len > 0 );
     size_t np = bestNumberOfPoints(len/fnSegmentation);
-    
     setNbPoints(np);
     setSegmentation(len/(np-1));
     fnAbscissaP = fnAbscissaM + len;
@@ -108,9 +104,8 @@ void Chain::setStraight(Vector const& pos, Vector const& dir, real len)
 void Chain::setCurved(Vector dir, real rad, real len)
 {
     assert_true( fnSegmentation > REAL_EPSILON );
-    if ( len <= 0 )
-        throw InvalidParameter("fiber:length must be > 0");
-    // make sure `dir` is orthogonal to X
+    assert_true( len > 0 );
+    // ensure that `dir` is orthogonal to X:
     dir.XX = 0;
     dir.normalize(rad);
     size_t np = bestNumberOfPoints(len/fnSegmentation);
@@ -124,8 +119,9 @@ void Chain::setCurved(Vector dir, real rad, real len)
     {
         real S = std::sin(angle);
         real C = std::cos(angle);
-        setPoint(p, Vector(rad*S, 0, 0) + C*dir);
+        setPoint(p, Vector(rad*S, 0, 0) + dir*C);
     }
+    updateFiber();
 }
 
 
