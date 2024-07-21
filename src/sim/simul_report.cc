@@ -814,14 +814,16 @@ void Simul::reportFiberExtension(std::ostream& out) const
 
 void Simul::reportFiberNematic(std::ostream& out, Glossary& opt) const
 {
-    out << COM << ljust("class",2,2) << SEP << "count" << SEP << "order";
-    out << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
-    
     std::string str;
     Space const* spc = nullptr;
     if ( opt.set(str, "space") )
         spc = findSpace(opt.value("space"));
     
+    out << COM << ljust("class",2,2) << SEP << "count";
+    out << SEP << "order" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
+    if ( spc )
+        out << SEP << "ortho" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
+
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* p = static_cast<FiberProp const*>(i);
@@ -830,14 +832,17 @@ void Simul::reportFiberNematic(std::ostream& out, Glossary& opt) const
         {
             real S = 0;
             real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-            if ( spc )
-                S = FiberSet::infoOrthoNematic(objs, vec, spc);
-            else
-                S = FiberSet::infoNematic(objs, vec);
+            S = FiberSet::infoNematic(objs, vec);
             out << LIN << ljust(p->name(), 2);
             out << SEP << objs.size();
             out << SEP << S;
             out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];
+            if ( spc )
+            {
+                S = FiberSet::infoOrthoNematic(objs, vec, spc);
+                out << SEP << S;
+                out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];
+            }
         }
     }
 }

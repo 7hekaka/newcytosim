@@ -165,8 +165,17 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
     {
         // align with mean nematic direction
         static Vector3 dir(1, 0, 0);
-        real S = FiberSet::infoNematic(sim.fibers.collect(), mat);
-        //flashText("Nematic order S = %5.3f", S);
+        ObjectList objs = sim.fibers.collect();
+        real S = FiberSet::infoNematic(objs, mat);
+        real T = -1;
+        Space const* spc = sim.spaces.master();
+        if ( spc )
+        {
+            T = FiberSet::infoOrthoNematic(objs, mat, spc);
+            flashText("Nematic order %5.3f %5.3f", S, T);
+        }
+        else
+            flashText("Nematic order %5.3f", S);
         if ( S > 0.1 )
         {
             Vector3 vec(mat);

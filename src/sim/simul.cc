@@ -316,11 +316,14 @@ void Simul::changeFlags(ObjectFlag f, ObjectFlag g) const
 Space const* Simul::findSpace(std::string spec) const
 {
     if ( spec == "first" )
-        return static_cast<Space*>(spaces.inventory_.first());
+        return static_cast<Space const*>(spaces.inventory_.first());
 
     if ( spec == "last" )
-        return static_cast<Space*>(spaces.inventory_.last());
+        return static_cast<Space const*>(spaces.inventory_.last());
     
+    if ( spec == "master" )
+        return static_cast<Space const*>(spaces.master());
+
     // get a Space if specified:
     long num = 0;
     if ( Tokenizer::split_polysymbol(spec, num) )
