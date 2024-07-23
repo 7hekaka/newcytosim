@@ -254,14 +254,12 @@ void Hand::attach(FiberSite const& s)
 
 void Hand::detachHand()
 {
-    if ( attached() )
-    {
-        hFiber->removeHand(this);
-        hFiber = nullptr;
+    assert_true( attached() );
+    hFiber->removeHand(this);
+    hFiber = nullptr;
 #if FIBER_HAS_LATTICE
-        hLattice = nullptr;
+    hLattice = nullptr;
 #endif
-    }
 }
 
 

@@ -572,8 +572,10 @@ void CoupleSet::defrostStore()
         ice_.pop_front();
         inventory_.unassign(i);
         Couple * C = static_cast<Couple*>(i);
-        C->hand1()->detachHand();
-        C->hand2()->detachHand();
+        if ( C->hand1()->attached() )
+            C->hand1()->detachHand();
+        if ( C->hand2()->attached() )
+            C->hand2()->detachHand();
         C->prop->stocks.push(C);
     }
     //infoStocks(std::clog);
@@ -610,8 +612,10 @@ void CoupleSet::reheat(size_t cnt[], PropertyID n_cnt)
         i = i->next();
         ice_.pop(C);
         // we want to skip the 'beforeDetachment' here:
-        C->hand1()->detachHand();
-        C->hand2()->detachHand();
+        if ( C->hand1()->attached() )
+            C->hand1()->detachHand();
+        if ( C->hand2()->attached() )
+            C->hand2()->detachHand();
         PropertyID id = C->prop->number();
         if ( id < n_cnt && 0 < cnt[id] )
         {

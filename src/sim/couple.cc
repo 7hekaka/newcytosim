@@ -30,14 +30,16 @@ Couple::~Couple()
 {
     if ( cHand1 )
     {
-        cHand1->detachHand();
+        if ( cHand1->attached() )
+            cHand1->detachHand();
         delete(cHand1);
         cHand1 = nullptr;
     }
     
     if ( cHand2 )
     {
-        cHand2->detachHand();
+        if ( cHand2->attached() )
+            cHand2->detachHand();
         delete(cHand2);
         cHand2 = nullptr;
     }

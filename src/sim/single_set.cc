@@ -416,7 +416,8 @@ void SingleSet::defrostStore()
         ice_.pop_front();
         inventory_.unassign(i);
         Single * S = static_cast<Single*>(i);
-        S->hand()->detachHand();
+        if ( S->hand()->attached() )
+            S->hand()->detachHand();
         S->prop->stocks.push(S);
     }
     //infoStocks(std::clog);
@@ -445,7 +446,8 @@ void SingleSet::reheat(size_t cnt[], PropertyID n_cnt)
         i = i->next();
         ice_.pop(S);
         // we want to skip the 'beforeDetachment' here:
-        S->hand()->detachHand();
+        if ( S->attached() )
+            S->hand()->detachHand();
         PropertyID id = S->prop->number();
         if ( id < n_cnt && 0 < cnt[id] )
         {
