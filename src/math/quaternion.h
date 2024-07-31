@@ -275,7 +275,7 @@ public:
         q[3] = -q[3];
     }
     
-    /// inversed quaternion:  1/*this
+    /// inversed quaternion:  1/this
     const Quaternion inverted() const
     {
         REAL x = -normSqr();
@@ -292,7 +292,7 @@ public:
         q[3] /=  x;
     }
     
-    /// the opposed quaternion:  -*this
+    /// the opposed quaternion:  -this
     const Quaternion opposed() const
     {
         return Quaternion( -q[0], -q[1], -q[2], -q[3] );
@@ -389,7 +389,7 @@ public:
     
     
     /// generate the associated 3x3 rotation matrix for unit Quaternion
-    /** This assumes that norm(*this) = 1 */
+    /** This assumes that norm(this) = 1 */
     void setMatrix3(REAL mat[], int ldd) const
     {
         REAL x2 = q[1] + q[1];
@@ -414,7 +414,7 @@ public:
     }
     
     /// generate the associated 3x3 rotation matrix for unit Quaternion
-    /** This assumes that norm(*this) = 1 */
+    /** This assumes that norm(this) = 1 */
     template < typename Matrix >
     void setMatrix3(Matrix & mat) const
     {
@@ -440,7 +440,7 @@ public:
     }
     
     /// Rotate a 3D vector: des = Q * src * Q.conjugated()
-    /** This assumes that norm(*this) = 1 */
+    /** This assumes that norm(this) = 1 */
     void rotateVector(REAL dst[3], const REAL src[3]) const
     {
         REAL rx =  q[0]*q[1];
@@ -590,7 +590,7 @@ public:
     }
     
     
-    /// set as rotation of axis v, angle defined by cosine & sine of half-angle
+    /// set as rotation of axis v, angle defined by cosine & sine of HALF-ANGLE
     /** argument `v` should be unitary (norm=1), or S should be divided by the norm */
     void setFromAxis(const REAL v[3], REAL C, REAL S)
     {
@@ -634,25 +634,28 @@ public:
     void setRotationToVector(const REAL A[3], const REAL B[3])
     {
         // axis is obtained by vector product: axis = cross(B, A)
-        // and norm(axis) = sin(angle) * norm(A) = 2 * S * C * nA
+        // and norm(axis) = sin(angle) * norm(A) = 2 * S * C * norm(A)
         REAL X[3] = { A[1]*B[2]-A[2]*B[1], A[2]*B[0]-A[0]*B[2], A[0]*B[1]-A[1]*B[0] };
-        //REAL nA = std::sqrt( A[0]*A[0] + A[1]*A[1] + A[2]*A[2] );
+        REAL nA = std::sqrt( A[0]*A[0] + A[1]*A[1] + A[2]*A[2] );
         //REAL nX = std::sqrt( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
+        //printf("A: %+9.3f %+9.3f %+9.3f : %+9.3f\n", A[0], A[1], A[2], nA);
+        //printf("B: %+9.3f %+9.3f %+9.3f\n", B[0], B[1], B[2]);
         // cosine(angle) = scalar product(A, B):
         REAL d = ( A[0]*B[0] + A[1]*B[1] + A[2]*B[2] );// / nA;
-        
-        // need half-angle for Quaternion: cos(x/2) = sqrt(0.5*[1+cos(x)])
-        // sin(x/2) = sqrt(0.5*[1-cos(x)])
+        /* calculate half-angle for Quaternion:
+             C = cos(x/2) = sqrt(0.5*[1+cos(x)])
+             S = sin(x/2) = sqrt(0.5*[1-cos(x)])
+             divide sin(x/2) by norm(axis) = 2 * S * C * norm(A)
+         */
         REAL half(0.5);
         REAL C = std::sqrt(std::max(REAL(0), half+half*d));
-        REAL S = std::sqrt(std::max(REAL(0), half-half*d));
-        //REAL S = half * nX / C; // since half * nX = S * C
-        //printf(" rot( %+9.3f %+9.3f %+9.3f  %9.3f )", X[0], X[1], X[2], C*C+S*S);
-        setFromAxis(X, C, S);
+        //REAL S = std::sqrt(std::max(REAL(0), half-half*d));
+        //printf(" axis( %+9.3f %+9.3f %+9.3f  %9.3f )", X[0], X[1], X[2], C*C+S*S);
+        setFromAxis(X, C, half/(nA*C));
 #if 0
         real V[3] = { A[0], A[1], A[2] };
         rotateVector(V, V);
-        std::clog<<"quat: "<<V[0]<<" "<<V[1]<<" "<<V[2]<<" | "<<norm()<<'\n';
+        printf("rotated: %+9.3f %+9.3f %+9.3f norm_quat %9.3f\n", V[0], V[1], V[2], norm());
 #endif
     }
 
@@ -728,7 +731,7 @@ public:
         }
         
         REAL tmp = std::acos(dot) * u;
-        //build v2 ortogonal to *this:
+        //build v2 ortogonal to `this`:
         Quaternion v2 = normalize( X - (*this)*dot );
         return (*this)*std::cos(tmp) + v2*std::sin(tmp);
     }
