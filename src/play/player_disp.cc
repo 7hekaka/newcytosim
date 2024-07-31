@@ -166,36 +166,35 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
         // align with mean nematic direction
         static Vector3 dir(1, 0, 0);
         ObjectList objs = sim.fibers.collect();
-        real S = FiberSet::infoNematic(objs, mat);
-        real T = -1;
         Space const* spc = sim.spaces.master();
+        real T = -1;
         if ( spc )
-        {
             T = FiberSet::infoOrthoNematic(objs, mat, spc);
+        real S = FiberSet::infoNematic(objs, mat);
+        if ( spc )
             flashText("Nematic order %5.3f %5.3f", S, T);
-        }
         else
             flashText("Nematic order %5.3f", S);
         if ( S > 0.1 )
         {
             Vector3 vec(mat);
-            real alpha = std::copysign(0.05, dot(dir, vec));
-            // time-average the direction vector:
-            dir = ( dir + vec * alpha ).normalized();
-            //std::clog << "nematic direction: " << dir << '\n';
+            real damp = ( mode & 16 ? 20 : 0 );
+            real flip = std::copysign(1.0, dot(dir, vec));
+            // if `damp>0`, time-average the direction vector:
+            dir = ( dir * damp + vec * flip ).normalized();
             view.align_with(dir);
         }
     }
 
     if ( mode & 4 )
     {
+        // align with the main axis of the cloud of fiber-vertices
         real sum = 0;
         real avg[3] = { 0 };
         real mom[9] = { 0 };
         FiberSet::infoComponents(sim.fibers.collect(), sum, avg, mom, mat);
         view.rotation.setFromMatrix3(mat);
-        // inverse rotation:
-        view.rotation.conjugate();
+        view.rotation.conjugate(); // inverse rotation
         //std::clog << "auto quat: " << view.rotation << '\n';
     }
 
