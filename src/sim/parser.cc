@@ -1516,7 +1516,7 @@ size_t Parser::read_input(int fd)
         char buf[1024];
         constexpr ssize_t chunk = 16;
         char *ptr = buf, *nxt = ptr;
-        char const*end = buf + sizeof(buf) - 1;
+        char const* end = buf + sizeof(buf) - 1;
         fcntl(fd, F_SETFL, fcntl(fd, F_GETFL)|O_NONBLOCK);
         ssize_t s = 0;
         do {

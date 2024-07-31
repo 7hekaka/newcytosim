@@ -1124,10 +1124,10 @@ real FiberSet::infoOrthoNematic(ObjectList const& objs, real res[9], Space const
  @set res[], a 9-elements matrix containing the first two principal component vectors
  
  if DIM == 2:
-   Component 1 is { vec[0], vec[1] }
+   Component 1 is { res[0], res[1] }
  if DIM == 3:
-   Component 1 is { vec[0], vec[1], vec[2] }
-   Component 2 is { vec[3], vec[4], vec[5] }
+   Component 1 is { res[0], res[1], res[2] }
+   Component 2 is { res[3], res[4], res[5] }
  
  @return 0 if everything proceeded without error
  */
