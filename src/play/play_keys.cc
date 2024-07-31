@@ -1038,7 +1038,7 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
             
         case 'T':
-            view.track_fibers = ( view.track_fibers ? 0 : 10 );
+            view.track_fibers = ( view.track_fibers ? 0 : 26 );
             flashTracking(view.track_fibers);
             break;
             

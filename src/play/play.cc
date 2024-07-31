@@ -55,7 +55,7 @@ int drawNot(View& view)
 {
     //std::clog << " drawNot(" << std::setprecision(3) << simul.time() << "s)\n";
     //view.clearPixels();
-    player.prepareDisplay(view);
+    //player.prepareDisplay(view);
     return 0;
 }
 
@@ -90,14 +90,6 @@ int drawSimul(View& view)
     return 0;
 }
 
-
-int drawSimulWithLabel(View& view)
-{
-    drawSimul(view);
-    if ( view.label != "off" )
-        view.drawLabel();
-    return 0;
-}
 
 /**
  call drawSimul() if data can be accessed by current thread
@@ -440,7 +432,9 @@ int main(int argc, char* argv[])
                 // only save requested frames:
                 if ( worker.currentFrame() == frm )
                 {
-                    drawSimulWithLabel(view);
+                    drawSimul(view);
+                    if ( view.label != "off" )
+                        view.drawLabel();
                     if ( multi )
                         blitBuffers(multi, fbo, W, H);
                     player.saveView(view, frm, prop.downsample);
