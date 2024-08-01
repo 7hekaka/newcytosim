@@ -353,10 +353,10 @@ int main(int argc, char *argv[])
     if ( arg.read_strings(argc-1, argv+1) )
         return 1;
     
-    int n = std::min(nbBugs(), arg.num_values(".cym"));
-    for ( int i = 0; i < n; ++i )
+    int cnt = std::min(nbBugs(), (int)arg.num_values(".cym"));
+    for ( int i = 0; i < cnt; ++i )
         arg.set(simul[i].prop.config_file, ".cym", i);
-    if ( n < 2 )
+    if ( cnt < 2 )
     {
         const char * str = simul[0].prop.config_file.c_str();
         if ( !FilePath::read_file(str, config_text, code_size) )
