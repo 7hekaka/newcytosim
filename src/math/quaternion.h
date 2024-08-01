@@ -630,7 +630,26 @@ public:
         q[axis+1] = std::sin(a);
     }
     
-    /// set as rotation transforming `A` into `B`, assuming norm(A)==norm(B)==1
+    /// set as rotation to transform `dir` into (1, 0, 0), assuming norm(dir)==1
+    void setRotationToVector(const REAL dir[3])
+    {
+        // axis is obtained by vector product: axis = cross(X, dir)
+        REAL axis[3] = { 0, dir[2], -dir[1] };
+        // norm(axis) = sin(angle) = 2 * S * C
+        // cosine(angle) = scalar product(dir, X) = dir[0]
+        // need half-angle for Quaternion, obtained by trigonometric identity:
+        REAL half(0.5);
+        REAL C = std::max(REAL(0), std::sqrt(half+half*dir[0]));
+        if ( C > FLT_EPSILON )
+            setFromAxis(axis, C, half/C); // since S / n = 0.5 / C
+        else
+        {
+            REAL nX = std::sqrt(dir[1]*dir[1] + dir[2]*dir[2]);
+            setFromAxis(axis, 0, REAL(1)/nX);
+        }
+    }
+
+    /// set as rotation transforming `A` into `B`, assuming norm(B)==1
     void setRotationToVector(const REAL A[3], const REAL B[3])
     {
         // axis is obtained by vector product: axis = cross(B, A)
@@ -641,7 +660,7 @@ public:
         //printf("A: %+9.3f %+9.3f %+9.3f : %+9.3f\n", A[0], A[1], A[2], nA);
         //printf("B: %+9.3f %+9.3f %+9.3f\n", B[0], B[1], B[2]);
         // cosine(angle) = scalar product(A, B):
-        REAL d = ( A[0]*B[0] + A[1]*B[1] + A[2]*B[2] );// / nA;
+        REAL d = ( A[0]*B[0] + A[1]*B[1] + A[2]*B[2] );
         /* calculate half-angle for Quaternion:
              C = cos(x/2) = sqrt(0.5*[1+cos(x)])
              S = sin(x/2) = sqrt(0.5*[1-cos(x)])
@@ -651,7 +670,13 @@ public:
         REAL C = std::sqrt(std::max(REAL(0), half+half*d));
         //REAL S = std::sqrt(std::max(REAL(0), half-half*d));
         //printf(" axis( %+9.3f %+9.3f %+9.3f  %9.3f )", X[0], X[1], X[2], C*C+S*S);
-        setFromAxis(X, C, half/(nA*C));
+        if ( C > FLT_EPSILON )
+            setFromAxis(X, C, half/(nA*C));
+        else
+        {
+            REAL nX = std::sqrt( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
+            setFromAxis(X, 0, REAL(1)/nX);
+        }
 #if 0
         real V[3] = { A[0], A[1], A[2] };
         rotateVector(V, V);

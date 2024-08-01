@@ -759,7 +759,7 @@ void FiberSet::shortenSpindle(real dL, real dR) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Measurments/Quantification
 
 
 real FiberSet::totalLength() const
@@ -1057,7 +1057,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
 
 /**
 This computes a nematic order parameter, and principal directions, like infoNematic,
- but using a vector that is orthogonal
+ but using a vector that is orthogonal and tangent to the Space's edge
  */
 real FiberSet::infoOrthoNematic(ObjectList const& objs, real res[9], Space const* spc)
 {
@@ -1289,7 +1289,7 @@ void FiberSet::infoPlane(int& np, int& na, Vector const& n, real a) const
  - `ixa =  0, ixp = 0`:   anti-parallel overlap (50/50).
  .
  */
-void FiberSet::infoSpindle(real& ixa, real& ixp, Vector const& n, real a, real m, real dm) const
+void FiberSet::infoSpindle(real& ixa, real& ixp, Vector const& dir, real a, real m, real dm) const
 {
     ixa = 0;
     ixp = 0;
@@ -1298,7 +1298,7 @@ void FiberSet::infoSpindle(real& ixa, real& ixp, Vector const& n, real a, real m
     for ( real p = dm/2 ; p < m ; p += dm )
     {
         // left side
-        infoPlane(ni, no, n, a+p);
+        infoPlane(ni, no, dir, a+p);
         nio = ni + no;
         if ( nio )
         {
@@ -1308,7 +1308,7 @@ void FiberSet::infoSpindle(real& ixa, real& ixp, Vector const& n, real a, real m
         }
     
         // right side: arguments are swapped!
-        infoPlane(no, ni, n, a-p);
+        infoPlane(no, ni, dir, a-p);
         nio = ni + no;
         if ( nio )
         {
