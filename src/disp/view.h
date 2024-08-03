@@ -215,13 +215,13 @@ public:
     //---------------------------------------------------------------------------
     
     /// position 'pos' in the center of the display
-    void move_to(const Vector3&);
+    void move_to(Vector3 const&);
     
     /// set additional translation of focal point
-    void move_shift(real X, real Y, real Z) { focus_shift.set(X, Y, Z);}
+    void move_shift(Vector3 const& vec) { focus_shift = vec;}
 
     /// translate view
-    void move_by(const Vector3& trans) { move_to( focus - trans ); }
+    void move_by(Vector3 const& trans) { move_to( focus - trans ); }
 
     //---------------------------------------------------------------------------
     

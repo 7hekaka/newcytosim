@@ -157,7 +157,7 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
     {
         Vector M, G, P;
         FiberSet::infoPosition(sim.fibers.collect(), M, G, P);
-        view.move_shift(G.x(), G.y(), G.z());
+        view.move_shift(G);
         //std::clog << "auto center: " << G << '\n';
     }
     
@@ -209,7 +209,7 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
             pos += B->position();
         }
         if ( cnt > 0 )
-            view.move_shift(pos.x()/cnt, pos.y()/cnt, pos.z()/cnt);
+            view.move_shift(pos/cnt);
     }
 }
 
