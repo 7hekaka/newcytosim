@@ -1123,7 +1123,8 @@ void Display3::drawCouplesA(CoupleSet const& set) const
     }
 }
 
-void Display3::drawCoupleBplain(Couple const* cx) const
+/** two blobs joined by a tube */
+void Display3::drawCoupleBcrude(Couple const* cx) const
 {
     PointDisp const* pd1 = cx->disp1();
     PointDisp const* pd2 = cx->disp2();
@@ -1134,8 +1135,51 @@ void Display3::drawCoupleBplain(Couple const* cx) const
     gym::color_both(pd1->color);
     gym::stretchAlignZ(p1, p2, pixscale(pd1->width));
     gle::hexTube();
+    
     if ( pd1->visible ) drawHand(p1, pd1);
     if ( pd2->visible ) drawHand(p2, pd2);
+}
+
+
+void Display3::drawCoupleBhomo(Couple const* cx) const
+{
+    assert_true( cx->disp1() == cx->disp2() );
+    PointDisp const* dis = cx->disp1();
+    
+    if ( ! dis->visible )
+        return;
+    
+    Vector p1 = cx->posHand1();
+    Vector p2 = cx->posHand2();
+
+#if !FIBER_HAS_FAMILY
+    Vector dif = p2 - p1;
+    real dns = dif.normSqr();
+    if ( dns > 1e-6 )
+    {
+        // moving the 'hands' to the surface of the fiber:
+        dns = sizeScale / std::sqrt(dns);
+        // position the heads at the surface of the filaments:
+        const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * dis->size;
+        const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * dis->size;
+        // move points along the link
+        //p1 += dif * min_real(0.45, rad1*dns);
+        //p2 -= dif * min_real(0.45, rad2*dns);
+        // move points orthogonal to the fiber's axis
+        Vector dir1 = cx->dirFiber1();
+        Vector dir2 = cx->dirFiber2();
+        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
+        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
+    }
+#endif
+    float R = pixscale(dis->size);
+    gym::color_both(dis->color);
+    //gym::stretchAlignZ(p1, p2, R);
+    gym::transAlignZ(p1, R, p2-p1);
+    gle::droplet();
+    //gym::stretchAlignZ(p2, p1, R);
+    gym::transAlignZ(p2, R, p1-p2);
+    gle::droplet();
 }
 
 
@@ -1198,20 +1242,14 @@ void Display3::drawCoupleBside(Couple const* cx) const
 
 
 
-void Display3::drawCoupleB(Couple const* cx) const
+void Display3::drawCoupleBori(Couple const* cx) const
 {
     PointDisp const* pd1 = cx->disp1();
     PointDisp const* pd2 = cx->disp2();
     
-#if FIBER_HAS_FAMILY
-    Vector p1 = cx->hand1()->pos();
-    Vector p2 = cx->hand2()->pos();
-#else
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
-#endif
     if ( modulo ) modulo->fold(p2, p1);
-    
     Vector dif = p2 - p1;
     real dns = dif.normSqr();
     
@@ -1231,13 +1269,14 @@ void Display3::drawCoupleB(Couple const* cx) const
         Vector dir2 = cx->dirFiber2();
         p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
         p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
+        dif = p2 - p1;
 #endif
         if ( pd1->visible )
         {
             float R1 = pixscale(pd1->size);
             gym::color_both(pd1->color);
             //gym::stretchAlignZ(p1, p2, R1);
-            gym::transAlignZ(p1, R1, p2-p1);
+            gym::transAlignZ(p1, R1, dif);
             gle::droplet();
         }
         if ( pd2->visible )
@@ -1245,7 +1284,7 @@ void Display3::drawCoupleB(Couple const* cx) const
             float R2 = pixscale(pd2->size);
             gym::color_both(pd2->color);
             //gym::stretchAlignZ(p2, p1, R2);
-            gym::transAlignZ(p2, R2, p1-p2);
+            gym::transAlignZ(p2, -R2, dif);
             gle::droplet();
         }
     }
@@ -1286,18 +1325,6 @@ void Display3::drawCoupleBalt(Couple const* cx) const
         p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
     }
 #endif
-
-#if ( 0 ) // ENDOCYTOSIS 2015
-    if ( cx->fiber1()->disp->color.transparent() )
-    {
-        gym::color_both(pd1->color, cx->fiber1()->disp->color.transparency());
-        gym::closeDepthMask();
-        gym::stretchAlignZ(p1, p2, pixscale(pd2->width));
-        gle::hexTube();
-        gym::openDepthMask();
-        return;
-    }
-#endif
     
     float wid = pixscale(pd1->width);
     float R = pixscale(pd1->size) / wid;
@@ -1319,3 +1346,37 @@ void Display3::drawCoupleBalt(Couple const* cx) const
     }
 }
 
+
+void Display3::drawCoupleB(Couple const* cx) const
+{
+    PointDisp const* pd1 = cx->disp1();
+    PointDisp const* pd2 = cx->disp2();
+    
+    if ( pd1 == pd2 )
+        drawCoupleBhomo(cx);
+    else
+    {
+        Vector p1 = cx->posHand1();
+        Vector p2 = cx->posHand2();
+        if ( modulo ) modulo->fold(p2, p1);
+        
+        Vector dif = p2 - p1;
+        
+        if ( pd1->visible )
+        {
+            float R1 = pixscale(pd1->size);
+            gym::color_both(pd1->color);
+            //gym::stretchAlignZ(p1, p2, R1);
+            gym::transAlignZ(p1, R1, dif);
+            gle::droplet();
+        }
+        if ( pd2->visible )
+        {
+            float R2 = pixscale(pd2->size);
+            gym::color_both(pd2->color);
+            //gym::stretchAlignZ(p2, p1, R2);
+            gym::transAlignZ(p2, -R2, dif);
+            gle::droplet();
+        }
+    }
+}

@@ -119,8 +119,14 @@ public:
     void drawCoupleB(Couple const*) const;
  
     /// draw one bridging Couple
-    void drawCoupleBplain(Couple const*) const;
+    void drawCoupleBcrude(Couple const*) const;
     
+    /// draw one bridging Couple made of two identical hands
+    void drawCoupleBhomo(Couple const*) const;
+    
+    /// draw one bridging Couple
+    void drawCoupleBori(Couple const*) const;
+
     /// draw one bridging Couple
     void drawCoupleBside(Couple const*) const;
     

@@ -8,17 +8,17 @@
  Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
  optimized by Marc B. Reynolds
  */
-void gym::orthonormal(const float z[3], float n, float x[3], float y[3])
+void gym::orthonormal(const float z[3], float N, float x[3], float y[3])
 {
     const float s = std::copysign(1.f, z[2]);
-    const float a = z[1] / ( z[2] + s * n );
+    const float a = z[1] / ( z[2] + s * N );
     const float b = z[1] * a;
     const float c = z[0] * a;
     x[0] = -z[2] - b;
     x[1] = c;
     x[2] = z[0];
     y[0] = s * c;
-    y[1] = s * b - n;
+    y[1] = s * b - N;
     y[2] = s * z[1];
 }
 
@@ -73,7 +73,7 @@ void gym::stretchAlignZ(Vector3 const& A, Vector3 const& B, float R)
         0, 0, 0, 0,
         X, Y, Z, 0,
         float(A.XX), float(A.YY), float(A.ZZ), 1};
-    gym::orthonormal(vec, R, mat, mat+4);
+    gym::orthonormal(vec, std::fabs(R), mat, mat+4);
     apply(mat);
 }
 
@@ -208,7 +208,7 @@ void gym::transAlignZ(Vector3 const& P, float R, Vector3 const& D)
         0, 0, 0, 0,
         vec[0], vec[1], vec[2], 0,
         float(P.XX), float(P.YY), float(P.ZZ), 1};
-    gym::orthonormal(vec, R, mat, mat+4);
+    gym::orthonormal(vec, std::fabs(R), mat, mat+4);
     apply(mat);
 }
 
