@@ -229,7 +229,7 @@ public:
     void rotate_to(const Quaternion<real>&);
     
     /// rotate to have `dir` aligned with the X-axis
-    void align_with(const real dir[3]);
+    void align_with(const real dir[3], real angle_scale);
 
     /// rotate view
     void rotate_by(const Quaternion<real>& Q) { rotate_to( rotation * Q ); }

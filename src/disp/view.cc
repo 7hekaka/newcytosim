@@ -694,15 +694,14 @@ void View::rotate_to(const Quaternion<real> & q)
 
 
 /// adjust the current rotation to align with `dir`:
-void View::align_with(const real dir[3])
+void View::align_with(const real dir[3], real scale)
 {
-    real xxx[3] = { 1, 0, 0 };
     real vec[3] = { 0, 0, 0 };
     rotation.rotateVector(vec, dir);
     //printf("\ndir: %+9.3f %+9.3f %+9.3f", dir[0], dir[1], dir[2]);
     //printf("  : %+9.3f %+9.3f %+9.3f  ", vec[0], vec[1], vec[2]);
     Quaternion<real> R;
-    R.setRotationToVector(vec, xxx);
+    R.setRotationToVector(vec, scale);
     rotation = ( R * rotation ).normalized();
     //R.print(stdout, true); rotation.print(stdout, true);
     setModelView();

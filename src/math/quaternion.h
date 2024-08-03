@@ -648,6 +648,16 @@ public:
             setFromAxis(axis, 0, REAL(1)/nX);
         }
     }
+    
+    /// set as rotation to transform `dir` into (1, 0, 0), assuming norm(dir)==1
+    void setRotationToVector(const REAL dir[3], const REAL scale)
+    {
+        // axis is obtained by vector product: axis = cross(X, dir)
+        REAL axis[3] = { 0, dir[2], -dir[1] };
+        REAL N = std::sqrt(dir[1]*dir[1] + dir[2]*dir[2]);
+        REAL A = std::atan2(N, dir[0]) * ( 0.5 * scale );
+        setFromAxis(axis, std::cos(A), std::sin(A)/N);
+    }
 
     /// set as rotation transforming `A` into `B`, assuming norm(B)==1
     void setRotationToVector(const REAL A[3], const REAL B[3])
