@@ -256,11 +256,13 @@ namespace gle
     void hemisphere1();
     /// draw a nice half-sphere of radius 1 in Z < 0
     void hemisphere2();
-    /// draw a flattened dome of radius 1 in Z < 0
+    /// draw a flattened dome of radius 1 in XY and 0.5 in Z < 0
     void dome();
-
     /// draw a blob with a pointy ends up in Z
+    void pin();
+    /// draw a sphere stretched in Z
     void droplet();
+
     /// draw nicest sphere available
     inline void sphere() { sphere1(); }
     /// draw nicest hemisphere available

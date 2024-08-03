@@ -40,11 +40,11 @@ namespace gle
     unsigned discs_[8] = { 0 };
 
     /// offset of first vertex coordinate in buffer object
-    unsigned ico_pts_[8] = { 0 };
+    unsigned ico_pts_[10] = { 0 };
     /// offset of first index in buffer object
-    unsigned ico_idx_[8] = { 0 };
+    unsigned ico_idx_[10] = { 0 };
     /// number of triangles making up the faces in icosahedrons
-    unsigned ico_cnt_[8] = { 0 };
+    unsigned ico_cnt_[10] = { 0 };
     
     /// index of first vertex in buffer object
     unsigned icoid_pts_ = 0;
@@ -1591,24 +1591,17 @@ namespace gle
 #pragma mark - Spheres made from refined Icosahedrons
     
     /// using icosahedrons to render the sphere:
-    void setIcoBuffer(Tesselator& ico, int i, float*& ptr, float* const ptr0, Tesselator::INDEX*& idx, Tesselator::INDEX* const idx0)
+    static unsigned setIcoBuffer(Tesselator& ico, float*& ptr, Tesselator::INDEX*& idx)
     {
-        /*
-         check pointer alignment, which is required to get indices
-         by substracting pointer values below */
-        assert_true( 0 == ( ptr - ptr0 ) % 3 );
         //fprintf(stderr, "setIcoBuffer %i: %u %u\n", i, ico.max_vertices(), ico.num_vertices());
-        ico_pts_[i] = ptr - ptr0;
-        ico_idx_[i] = idx - idx0;
-        ico_cnt_[i] = 3 * ico.num_faces();
-        
+        assert_true(ico.num_vertices() <= 65535);
         ico.store_vertices(ptr);
         ptr += 3 * ico.num_vertices();
         
-        assert_true(ico.num_vertices() <= 65535);
-        size_t cnt = 3 * ico.num_faces();
+        unsigned cnt = 3 * ico.num_faces();
         memcpy(idx, ico.face_data(), cnt*sizeof(Tesselator::INDEX));
         idx += cnt;
+        return cnt;
     }
     
     void drawIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
@@ -1651,8 +1644,9 @@ namespace gle
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
     void dome() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
 
-    void droplet() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
-    
+    void pin() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
+    void droplet() { drawIcoBuffer(ico_pts_[8], ico_idx_[8], ico_cnt_[8]); }
+
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
@@ -1678,7 +1672,7 @@ namespace gle
     
     void createBuffers()
     {
-        Tesselator ico[8];
+        Tesselator ico[10];
         ico[0].buildIcosahedron(finesse*8);
         ico[1].buildIcosahedron(finesse*4);
         ico[2].buildIcosahedron(finesse*2);
@@ -1687,11 +1681,13 @@ namespace gle
         ico[4].buildHemisphere(finesse*2);
         ico[5].buildHemisphere(finesse);
         ico[6].buildDome(finesse);
-        ico[7].buildDroplet(finesse);
-        
-        size_t f = 32; // for setIcoidBuffer
+        ico[7].buildPin(finesse*2);
+        ico[8].buildDroplet(finesse*2);
+        ico[9].buildDroplet(finesse);
+
+        size_t f = 32; // reserve for setIcoidBuffer
         size_t s = 12;
-        for ( int i = 0; i < 8; ++i )
+        for ( int i = 0; i < 10; ++i )
         {
             f += 3 * ico[i].max_faces();
             s += 3 * ico[i].max_vertices();
@@ -1720,8 +1716,14 @@ namespace gle
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
         assert_true( ptr < ptr0 + c + t );
 
-        for ( int i = 0; i < 8; ++i )
-            setIcoBuffer(ico[i], i, ptr, ptr0, idx, idx0);
+        for ( int i = 0; i < 10; ++i )
+        {
+            ico_pts_[i] = ptr - ptr0;
+            ico_idx_[i] = idx - idx0;
+            unsigned cnt = setIcoBuffer(ico[i], ptr, idx);
+            assert_true( 0 == cnt % 3 );
+            ico_cnt_[i] = cnt;
+        }
 
         icoid_pts_ = ptr - ptr0;
         icoid_idx_ = idx - idx0;

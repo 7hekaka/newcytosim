@@ -32,7 +32,7 @@ public:
 
     /// starting shapes
     enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3,
-        ICOSAHEDRONX=4, HEMISPHERE=5, DOME=6, CYLINDER=7, DICE=8, DROPLET=9 };
+        ICOSAHEDRONX=4, HEMISPHERE=5, DOME=6, CYLINDER=7, DICE=8, DROPLET=9, PIN=10 };
     
     /// One of the vertex of the unrefined template model
     struct Apex
@@ -138,7 +138,8 @@ private:
 
     void interpolate(Vertex const&, float vec[3]) const;
     void interpolate(Vertex const&, double vec[3]) const;
-    
+    template < typename REAL > void projectVertices(REAL*) const;
+
 public:
 
     /// build as empty structure
@@ -159,6 +160,7 @@ public:
     void buildDome(unsigned div, int make = 1);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
     void buildDroplet(unsigned div, int make = 1);
+    void buildPin(unsigned div, int make = 1);
 
     /// set array of indices that define the edges
     void setEdges();
@@ -181,7 +183,7 @@ public:
     unsigned max_vertices() const { return max_vertices_; }
        
     /// number of faces (each face is a triangle of 3 vertices)
-    unsigned int max_faces() const { return max_faces_; }
+    unsigned max_faces() const { return max_faces_; }
 
     
     /// number of derived vertices
@@ -194,13 +196,13 @@ public:
     const float* vertex_data(int v) const { return vex_ + 3 * v; }
     
     /// number of points in the edges = 2 * nb-of-edges
-    unsigned int num_edges() const { return num_edges_; }
+    unsigned num_edges() const { return num_edges_; }
     
     /// array of indices to the vertices in each edge (2 per edge)
     INDEX * edge_data() const { return edges_; }
     
     /// number of faces (each face is a triangle of 3 vertices)
-    unsigned int num_faces() const { return num_faces_; }
+    unsigned num_faces() const { return num_faces_; }
     
     /// array of indices to the vertices in each face (3 vertices per face)
     INDEX * face_data() const { return faces_; }

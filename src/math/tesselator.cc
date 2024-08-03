@@ -195,13 +195,12 @@ static void scale_(size_t num, FLOAT* ptr, FLOAT X, FLOAT Y, FLOAT Z)
 
 /** This transforms the sphere into a 'pin'-like smooth surface */
 template < typename FLOAT >
-static void dropletify_(size_t num, FLOAT* ptr)
+static void dropletify_(size_t num, FLOAT* ptr, FLOAT alpha)
 {
-    const FLOAT m = 0.75f;
     for ( unsigned n = 0; n < num; ++n )
     {
         FLOAT Z = ptr[3*n+2];
-        FLOAT W = 0.75f * ( 1.f + std::tanh(-m*Z) );
+        FLOAT W = 0.75f * ( 1.f + std::tanh(-alpha*Z) );
         ptr[3*n  ] *= W;
         ptr[3*n+1] *= W;
         ptr[3*n+2] *= 1.5;
@@ -496,6 +495,7 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case CYLINDER: buildCylinder(div, make); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div, make); break;
         case DROPLET: buildDroplet(div, make); break;
+        case PIN: buildPin(div, make); break;
     }
 }
 
@@ -761,10 +761,17 @@ void Tesselator::buildCylinder(unsigned div, int make)
     if ( make & 4 ) setEdges();
 }
 
-void Tesselator::buildDroplet(unsigned div, int make)
+void Tesselator::buildPin(unsigned div, int make)
 {
     div = std::max(div, 1U);
     buildCylinder(div, make);
+    kind_ = PIN;
+}
+
+void Tesselator::buildDroplet(unsigned div, int make)
+{
+    div = std::max(div, 1U);
+    buildIcosahedron(div, make);
     kind_ = DROPLET;
 }
 
@@ -1044,59 +1051,54 @@ void Tesselator::interpolate(Vertex const& vex, float ptr[3]) const
 }
 
 
-void Tesselator::store_vertices(float * vec) const
+template < typename REAL >
+void Tesselator::projectVertices(REAL * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
         interpolate(vertices_[n], vec+3*n);
     
     if ( kind_ == DICE )
     {
-        float len[4] = { (float)dim_[0], (float)dim_[1], (float)dim_[2], (float)dim_[3] };
+        REAL len[4] = { dim_[0], dim_[1], dim_[2], dim_[3] };
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectDice(vec+3*n, len);
     }
-    else if ( kind_ == CYLINDER || kind_ == DROPLET )
+    else if ( kind_ == CYLINDER || kind_ == PIN )
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectCylinder(vec+3*n);
-        if ( kind_ == DROPLET )
-            dropletify_(num_vertices_, vec);
+        if ( kind_ == PIN )
+            dropletify_(num_vertices_, vec, REAL(0.75));
+    }
+    else if ( kind_ == DROPLET )
+    {
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            projectSphere(vec+3*n);
+        dropletify_(num_vertices_, vec, REAL(0.75));
     }
     else
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectSphere(vec+3*n);
         if ( kind_ == DOME )
-            scale_(num_vertices_, vec, 1., 1., 0.75);
+            scale_(num_vertices_, vec, 1., 1., REAL(0.75));
     }
 }
 
+void Tesselator::store_vertices(float * vec) const
+{
+    for ( unsigned n = 0; n < num_vertices_; ++n )
+        interpolate(vertices_[n], vec+3*n);
+    
+    projectVertices(vec);
+}
 
 void Tesselator::store_vertices(double * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
         interpolate(vertices_[n], vec+3*n);
     
-    if ( kind_ == DICE )
-    {
-        double len[4] = { dim_[0], dim_[1], dim_[2], dim_[3] };
-        for ( unsigned n = 0; n < num_vertices_; ++n )
-            projectDice(vec+3*n, len);
-    }
-    else if ( kind_ == CYLINDER || kind_ == DROPLET )
-    {
-        for ( unsigned n = 0; n < num_vertices_; ++n )
-            projectCylinder(vec+3*n);
-        if ( kind_ == DROPLET )
-            dropletify_(num_vertices_, vec);
-    }
-    else
-    {
-        for ( unsigned n = 0; n < num_vertices_; ++n )
-            projectSphere(vec+3*n);
-        if ( kind_ == DOME )
-            scale_(num_vertices_, vec, 1., 1., 0.75);
-    }
+    projectVertices(vec);
 }
 
 
