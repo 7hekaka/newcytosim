@@ -51,7 +51,8 @@ namespace glApp
     View savedView("savedView", 0);
 
     UserMode mouseAction = MOUSE_MOVE;  ///< the action being performed by the mouse
-    int      mouseX, mouseY;    ///< current position of mouse in pixels
+    int mouseS = 1;     ///< current state of mouse button (up/down)
+    int mouseX, mouseY; ///< current position of mouse in pixels
     Vector3  mouseDown(0,0,0);  ///< position where mouse button was pressed down
     Vector3  axle(0,0,0);       ///< vector normal to desired rotation
     Vector3  pole(0,0,0);       ///< axis of rotation for MOUSE_SPIN
@@ -867,6 +868,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
 
     //printf("mouse button %i (%4i %4i) state %i key %i\n", button, mx, my, state, specialKeys);
 
+    mouseS = state;
     mouseX = mX;
     mouseY = view.height()-mY;
     

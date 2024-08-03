@@ -16,6 +16,9 @@ namespace glApp
     /// different View associated with the display windows
     extern std::vector<View> views;
     
+    /// state of mouse button: up/down
+    extern int mouseS;
+    
     /// flag indicating that display should be redone
     extern int drawRefresh;
     

@@ -182,7 +182,8 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
             real flip = std::copysign(1.0, dot(dir, vec));
             // if `damp>0`, time-average the direction vector:
             dir = ( dir * damp + vec * flip ).normalized();
-            view.align_with(dir, 0.01);
+            if ( glApp::mouseS ) // only track if mouse button is up!
+                view.align_with(dir, 0.01);
         }
     }
 
