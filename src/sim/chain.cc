@@ -119,7 +119,7 @@ void Chain::setCurved(Vector dir, real rad, real len)
     {
         real S = std::sin(angle);
         real C = std::cos(angle);
-        setPoint(p, Vector(rad*S, 0, 0) + dir*C);
+        setPoint(p, Vector(rad*S, 0, 0) + dir*(C-1));
     }
     updateFiber();
 }

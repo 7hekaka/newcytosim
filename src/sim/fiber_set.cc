@@ -359,11 +359,11 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
 
     for ( Fiber * fib1 = first(); fib1; fib1 = fib1->next() )
     {
-        for ( size_t s1 = 0; s1 < fib1->nbSegments(); ++s1 )
+        for ( unsigned s1 = 0; s1 < fib1->nbSegments(); ++s1 )
         {
             FiberSegment seg(fib1, s1);
             // check against other segments of this fiber
-            for ( size_t s2 = s1+2; s2 < fib1->nbSegments(); ++s2 )
+            for ( unsigned s2 = s1+2; s2 < fib1->nbSegments(); ++s2 )
             {
                 FiberSegment soc(fib1, s2);
                 real abs1, abs2;
@@ -377,7 +377,7 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
             // check against other fibers:
             for ( Fiber * fib2 = fib1->next(); fib2; fib2 = fib2->next() )
             {
-                for ( size_t s2 = 0; s2 < fib2->nbSegments(); ++s2 )
+                for ( unsigned s2 = 0; s2 < fib2->nbSegments(); ++s2 )
                 {
                     FiberSegment soc(fib2, s2);
                     real abs1, abs2;
@@ -437,7 +437,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
     for ( Fiber const* fib = first(); fib; fib = fib->next() )
     {
         //std::clog << fib->reference() << ":\n";
-        for ( size_t s = 0; s < fib->nbSegments(); ++s )
+        for ( unsigned s = 0; s < fib->nbSegments(); ++s )
         {
             FiberSegment seg(fib, s);
             list = grid.cellTargets(seg.middle());
