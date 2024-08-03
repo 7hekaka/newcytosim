@@ -1685,24 +1685,24 @@ namespace gle
         ico[8].buildDroplet(finesse*2);
         ico[9].buildDroplet(finesse);
 
-        size_t f = 32; // reserve for setIcoidBuffer
-        size_t s = 12;
+        size_t F = 32; // reserve for setIcoidBuffer
+        size_t S = 12;
         for ( int i = 0; i < 10; ++i )
         {
-            f += 3 * ico[i].max_faces();
-            s += 3 * ico[i].max_vertices();
+            F += 3 * ico[i].max_faces();
+            S += 3 * ico[i].max_vertices();
         }
 
         // required buffer size:
-        size_t t = 6 * sizeTubeBuffers();
-        size_t c = 6 * sizeCubeBuffers();
-        size_t b = 3 * sizeBlobBuffers();
-        size_t o = 2 * sizeCircBuffers();
+        size_t T = 6 * sizeTubeBuffers();
+        size_t C = 6 * sizeCubeBuffers();
+        size_t B = 3 * sizeBlobBuffers();
+        size_t O = 2 * sizeCircBuffers();
 
-        glBufferData(GL_ARRAY_BUFFER, (s+t+c+b+o)*sizeof(float), nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, (S+T+C+B+O)*sizeof(float), nullptr, GL_STATIC_DRAW);
         float* ptr = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, f*sizeof(Tesselator::INDEX), nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, F*sizeof(Tesselator::INDEX), nullptr, GL_STATIC_DRAW);
         Tesselator::INDEX* idx = (unsigned short*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
 
         float*const ptr0 = ptr;
@@ -1710,11 +1710,11 @@ namespace gle
         
         ptr += 6 * setTubeBuffers((flute6*)ptr, (flute6*)ptr0);
         //fprintf(stderr, "setTubeBuffers : %li %li\n", ptr-ptr0, t); float* sub=ptr;
-        assert_true( ptr < ptr0 + t );
+        assert_true( ptr < ptr0 + T );
 
         ptr += 6 * setCubeBuffers((flute6*)ptr, (flute6*)ptr0);
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
-        assert_true( ptr < ptr0 + c + t );
+        assert_true( ptr < ptr0 + C + T );
 
         for ( int i = 0; i < 10; ++i )
         {
@@ -1732,12 +1732,12 @@ namespace gle
         idx += icoid_cnt_;
         
         //fprintf(stderr, "setIcoBuffer : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
-        assert_true( ptr < ptr0 + s + c + t );
-        assert_true( idx < idx0 + f );
+        assert_true( ptr < ptr0 + S + C + T );
+        assert_true( idx < idx0 + F );
 
         ptr += 3 * setBlobBuffers((flute3*)ptr, (flute3*)ptr0);
         //fprintf(stderr, "setBlobBuffers : %li %li\n", ptr-sub, b); sub=ptr;
-        assert_true( ptr < ptr0 + s + t + c + b );
+        assert_true( ptr < ptr0 + B + S + C + T );
 
         // align pointer:
         ptr += (ptr-ptr0) & 1;
@@ -1745,7 +1745,7 @@ namespace gle
         ptr += 2 * setCircBuffers((flute2*)ptr, (flute2*)ptr0);
         //fprintf(stderr, "setCircBuffers : %li %li\n", ptr-sub, o);
 
-        assert_true( ptr < ptr0 + (s+t+c+b+o) );
+        assert_true( ptr < ptr0 + O + B + S + C + T );
         glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
         glUnmapBuffer(GL_ARRAY_BUFFER);
     }

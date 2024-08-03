@@ -951,28 +951,28 @@ void Display3::drawSinglesF(SingleSet const& set) const
 
 void Display3::drawSingleA(Single const* obj) const
 {
-    PointDisp const* disp = obj->disp();
+    PointDisp const* dis = obj->disp();
     Vector ph = obj->posHand();
-    gym::color_both(disp->color);
-    drawHand(ph, disp);
+    gym::color_both(dis->color);
+    drawHand(ph, dis);
 }
 
 
 void Display3::drawSingleB(Single const* obj) const
 {
-    PointDisp const* disp = obj->disp();
+    PointDisp const* dis = obj->disp();
 
-    if ( disp->perceptible )
+    if ( dis->perceptible )
     {
         Vector ph = obj->posHand();
         Vector pf = obj->posFoot();
         if ( modulo ) modulo->fold(pf, ph);
-        const float wid = pixscale(disp->width);
-        const float rad = pixscale(disp->size);
+        const float wid = pixscale(dis->width);
+        const float rad = pixscale(dis->size);
 
-        gym::color_both(disp->color2);
+        gym::color_both(dis->color2);
 #if ( 0 )
-        if ( obj->disp()->style == 2 && obj->confineSpace() )
+        if ( dis->style == 2 && obj->confineSpace() )
         {
             // draw a disc tangent to the Space:
             drawObject(pf, obj->confineSpace()->normalToEdge(pf), rad, gle::disc);
@@ -983,7 +983,7 @@ void Display3::drawSingleB(Single const* obj) const
             gym::transScale(pf, wid);
             gle::blob(); // the foot
         }
-        gym::color_both(disp->color);
+        gym::color_both(dis->color);
 #if ( DIM > 2 )
         Vector diff = pf - ph;
         float L = norm(diff);
@@ -1002,8 +1002,8 @@ void Display3::drawSingleB(Single const* obj) const
         if ( obj->base() )
             drawObject(ph, rad, gle::octahedron);
         else
-            drawHand(ph, disp);
-        gle::drawBand(ph, wid, disp->color, pf, wid, disp->color.alpha_scaled(0.5f));
+            drawHand(ph, isp);
+        gle::drawBand(ph, wid, dis->color, pf, wid, dis->color.alpha_scaled(0.5f));
 #endif
     }
 }

@@ -1081,7 +1081,7 @@ void Tesselator::projectVertices(REAL * vec) const
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectSphere(vec+3*n);
         if ( kind_ == DOME )
-            scale_(num_vertices_, vec, 1., 1., REAL(0.75));
+            scale_(num_vertices_, vec, 1., 1., REAL(0.5));
     }
 }
 

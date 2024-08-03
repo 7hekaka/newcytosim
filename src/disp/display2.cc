@@ -103,14 +103,14 @@ void Display2::drawSinglesA(const SingleSet & set) const
     // display the Hands
     for ( Single * obj=set.firstA(); obj ; obj=obj->next() )
     {
-        PointDisp const* disp = obj->disp();
-        if ( disp->perceptible  &&  obj->fiber()->disp->visible )
+        PointDisp const* dis = obj->disp();
+        if ( dis->perceptible  &&  obj->fiber()->disp->visible )
         {
             Vector ph = obj->posHand();
             
-            disp->drawA(ph);
+            dis->drawA(ph);
             
-            if ( obj->hasLink() && disp->width > 0 )
+            if ( obj->hasLink() && dis->width > 0 )
             {
                 Vector ps = obj->sidePos();
                 Vector pf = obj->posFoot();
@@ -120,9 +120,9 @@ void Display2::drawSinglesA(const SingleSet & set) const
                     modulo->fold(ps, ph);
                 }
                 
-                gym::color(disp->color);
+                gym::color(dis->color);
 #if ( DIM >= 3 )
-                gym::stretchAlignZ(pf, ph, pixscale(disp->width));
+                gym::stretchAlignZ(pf, ph, pixscale(dis->width));
                 gle::truncatedCone();
                 //drawCone(pf, ph-pf, pixscale(disp->width));
 #else
