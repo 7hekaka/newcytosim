@@ -753,12 +753,13 @@ void View::setROI(Vector3 a, Vector3 b)
 #pragma mark -
 
 /**
- return axis orthogonal to the display plane, and corresponding to depth
- obtained from the current modelview transformation
+ return axis orthogonal to the display plane, and corresponding to depth axis
+ corresponding to the current modelview transformation
  */
 Vector3 View::depthAxis() const
 {
-    return normalize(Vector3(modelview_[2], modelview_[6], modelview_[10]));
+    const float * ptr = modelview_;
+    return normalize(Vector3(ptr[2], ptr[6], ptr[10]));
 }
 
 
@@ -777,9 +778,10 @@ void View::project(float& H, float& V, const real XYZ[3]) const
  */
 Vector3 View::unproject(float x, float y, float z) const
 {
+    float pt[4] = { x, y, z, 0 };
     float un[4] = { 0 };
-    gym::unproject(x, y, z, modelview_, projection_, viewport_, un);
-    return Vector3(un[0], un[1], un[2]);
+    gym::unproject(pt, modelview_, projection_, viewport_, un);
+    return Vector3(un[0], un[1], un[2]) - focus_shift;
 }
 
 
@@ -899,8 +901,8 @@ void View::drawMagnifier(float mag, Vector3 foc, Vector3 cen, int mX, int mY, in
         view.magnify = mag;
         view.zoom *= mag;
         view.focus = foc;
-        view.focus_shift = ( cen - foc ) / mag;
         view.focus.ZZ = 0;
+        view.focus_shift = ( cen - foc ) / mag;
         view.focus_shift.ZZ = 0;
         glEnable(GL_SCISSOR_TEST);
         glScissor(mX-R, mY-R, 2*R, 2*R);

@@ -28,29 +28,29 @@ namespace glApp
     /// actions that can be performed with the mouse
     enum UserMode
     {
-        MOUSE_ROTATE     = 0,
-        MOUSE_TRANSLATE  = 1,
-        MOUSE_ACTIVE     = 2,
-        MOUSE_TRANSLATEZ = 3,
-        MOUSE_SPIN       = 4,
-        MOUSE_MAGNIFIER  = 5,
-        MOUSE_EDIT_ROI   = 6,
-        MOUSE_SELECT     = 7,
-        MOUSE_PASSIVE    = 8
+        MOUSE_TURN      = 0,
+        MOUSE_MOVE      = 1,
+        MOUSE_ACTIVE    = 2,
+        MOUSE_PUSH      = 3,
+        MOUSE_SPIN      = 4,
+        MOUSE_MAGNIFIER = 5,
+        MOUSE_EDIT_ROI  = 6,
+        MOUSE_SELECT    = 7,
+        MOUSE_PASSIVE   = 8
     };
     
     /// Specifies in which dimensionality each action is valid
     int actionDimensionality[] = { 3, 1, 1, 3, 2, 1, 1, 4, 4, 4, 0 };
     
     /// the action controlled with the mouse
-    UserMode userMode = MOUSE_ROTATE;
+    UserMode userMode = MOUSE_TURN;
 
     /// change action
     void switchUserMode(int dir);
     
     View savedView("savedView", 0);
 
-    UserMode mouseAction = MOUSE_TRANSLATE;  ///< the action being performed by the mouse
+    UserMode mouseAction = MOUSE_MOVE;  ///< the action being performed by the mouse
     int      mouseX, mouseY;    ///< current position of mouse in pixels
     Vector3  mouseDown(0,0,0);  ///< position where mouse button was pressed down
     Vector3  axle(0,0,0);       ///< vector normal to desired rotation
@@ -103,7 +103,7 @@ void glApp::setDimensionality(const int d)
     {
         //flashText("dimensionality changed to %i", d);
         mDIM = d;
-        userMode = ( d == 3 ) ? MOUSE_ROTATE : MOUSE_TRANSLATE;
+        userMode = ( d == 3 ) ? MOUSE_TURN : MOUSE_MOVE;
     }
     
     if ( 0 == views.size() )
@@ -379,10 +379,10 @@ void glApp::switchUserMode(int dir)
     userMode = (UserMode)u;
     switch ( userMode )
     {
-        case MOUSE_ROTATE:    flashText("Mouse: Rotate");       break;
-        case MOUSE_TRANSLATE: flashText("Mouse: Translate");    break;
+        case MOUSE_TURN:      flashText("Mouse: Rotate");       break;
+        case MOUSE_MOVE:      flashText("Mouse: Translate");    break;
         case MOUSE_ACTIVE:    flashText("Mouse: Active");       break;
-        case MOUSE_TRANSLATEZ:flashText("Mouse: Translate-Z");  break;
+        case MOUSE_PUSH:      flashText("Mouse: Translate-Z");  break;
         case MOUSE_SPIN:      flashText("Mouse: Spin & Zoom");  break;
         case MOUSE_MAGNIFIER: flashText("Mouse: Magnifier");    break;
         case MOUSE_EDIT_ROI:  flashText("Mouse: Edit ROI");     break;
@@ -582,8 +582,8 @@ void glApp::processSpecialKey(int key, int modifiers)
     }
     else
     {
-        // Translate view
-        if ( (modifiers & GLUT_ACTIVE_CTRL) ^ (userMode == MOUSE_TRANSLATEZ) )
+        // Translate view in the depth direction
+        if ( (modifiers & GLUT_ACTIVE_CTRL) ^ (userMode == MOUSE_PUSH) )
             dxy.set(0.5*dxy.XX, 0, -0.5*dxy.YY);
         rot.rotateVector(vec, dxy);
         //std::clog << "vec " << dxy << " >>> " << vec << "\n";
@@ -608,8 +608,8 @@ void glApp::specialKeyFunc(void (*func)(int, int, int))
 int buildFogMenu()
 {
     int menu = gym::createMenu(glApp::processMenuEvent);
-    gym::addMenuEntry("Disable",          100);
-    gym::addMenuEntry("Linear ",          101);
+    gym::addMenuEntry("Disable",         100);
+    gym::addMenuEntry("Linear ",         101);
     gym::addMenuEntry("Exponential 16x", 102);
     gym::addMenuEntry("Exponential 8x",  103);
     gym::addMenuEntry("Exponential 4x",  104);
@@ -871,7 +871,7 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     mouseY = view.height()-mY;
     
     savedView = view; // copy the current Model-View transformation
-    savedView.move_shift(0,0,0);
+    //savedView.move_shift(0,0,0);
     
     if ( state == GLUT_UP )
     {
@@ -916,11 +916,11 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     {
         switch ( userMode )
         {
-            case MOUSE_TRANSLATE: mouseAction = (mDIM==2)?MOUSE_SPIN:MOUSE_ROTATE; break;
-            case MOUSE_SPIN:      mouseAction = (mDIM==2)?MOUSE_TRANSLATE:MOUSE_TRANSLATEZ; break;
-            case MOUSE_EDIT_ROI:  mouseAction = MOUSE_TRANSLATE; break;
-            case MOUSE_ROTATE:    mouseAction = MOUSE_TRANSLATE; break;
-            case MOUSE_TRANSLATEZ:mouseAction = (mDIM==2)?MOUSE_TRANSLATE:MOUSE_ROTATE;  break;
+            case MOUSE_MOVE: mouseAction = (mDIM==2)?MOUSE_SPIN:MOUSE_TURN; break;
+            case MOUSE_SPIN: mouseAction = (mDIM==2)?MOUSE_MOVE:MOUSE_PUSH; break;
+            case MOUSE_EDIT_ROI: mouseAction = MOUSE_MOVE; break;
+            case MOUSE_TURN: mouseAction = MOUSE_MOVE; break;
+            case MOUSE_PUSH:mouseAction = (mDIM==2)?MOUSE_MOVE:MOUSE_TURN;  break;
             default: break;
         }
     }
@@ -940,17 +940,17 @@ void glApp::processMouseClick(int button, int state, int mX, int mY)
     
     switch( mouseAction )
     {
-        case MOUSE_TRANSLATE:
+        case MOUSE_MOVE:
             return;
             
-        case MOUSE_TRANSLATEZ:
+        case MOUSE_PUSH:
         {
             axle = normalize(viewFocus - savedView.focus);
             Vector3 U = savedView.unproject(cenX, 2*cenY, nearZ);
             pole = normalize(U - viewFocus);
         } break;
             
-        case MOUSE_ROTATE:
+        case MOUSE_TURN:
         {
             /* 
             Choose the amplification factor for mouse controlled rotation:
@@ -1014,7 +1014,7 @@ void glApp::processMouseDrag(int mX, int mY)
 
     switch( mouseAction )
     {
-        case MOUSE_ROTATE:
+        case MOUSE_TURN:
         {
             /* we should rotate after: Q <- dQ * sQ, however dQ is defined in the
             reference frame rotated by sQ already, so dQ = sQ * dM * inv(sQ).
@@ -1037,13 +1037,13 @@ void glApp::processMouseDrag(int mX, int mY)
         } break;
 
         
-        case MOUSE_TRANSLATE:
+        case MOUSE_MOVE:
         {
             view.move_to(savedView.focus - ( mouse - mouseDown ));
         } break;
         
         
-        case MOUSE_TRANSLATEZ:
+        case MOUSE_PUSH:
         {
             real S = dot(mouse - mouseDown, pole);
             Vector3 move = mouse - mouseDown - S * ( axle + pole );

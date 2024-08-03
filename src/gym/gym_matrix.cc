@@ -313,7 +313,7 @@ int gym::mat3x3_inverse(float inv[9], const float m[9])
 /*
  Assuming GLint == int for 'viewport'
  */
-int gym::unproject(float winx, float winy, float winz,
+int gym::unproject(float win[4],
                    const float modelMatrix[16],
                    const float projMatrix[16],
                    const int viewport[4],
@@ -329,9 +329,9 @@ int gym::unproject(float winx, float winy, float winz,
     if ( gym::mat4x4_inverse(inv, mat) )
         return 1;
     
-    in[0] = winx;
-    in[1] = winy;
-    in[2] = winz;
+    in[0] = win[0];
+    in[1] = win[1];
+    in[2] = win[2];
     in[3] = 1;
     
     /* Map x and y from window coordinates */
