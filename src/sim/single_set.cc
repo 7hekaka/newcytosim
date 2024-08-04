@@ -396,15 +396,10 @@ void SingleSet::erase()
 
 void SingleSet::detachAll()
 {
-    Object * i = aList.front();
-    while ( i )
-    {
-        Single * S = static_cast<Single*>(i);
-        i = i->next();
+    for ( Single * S=firstA(); S; S=S->next() )
         S->hand()->detachHand();
-        fList.push_back(S);
-    }
-    aList.clear();
+    fList.grab(aList);
+    assert_true(aList.empty());
 }
 
 

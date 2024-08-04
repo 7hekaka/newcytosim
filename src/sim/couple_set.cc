@@ -533,34 +533,23 @@ void CoupleSet::erase()
 
 void CoupleSet::detachAll()
 {
-    Object * i = aaList.front();
-    while ( i )
+    for ( Couple * C=firstAA(); C; C=C->next() )
     {
-        Couple * C = static_cast<Couple*>(i);
-        i = i->next();
         C->hand1()->detachHand();
         C->hand2()->detachHand();
-        ffList.push_back(C);
     }
-    aaList.clear();
-    i = faList.front();
-    while ( i )
-    {
-        Couple * C = static_cast<Couple*>(i);
-        i = i->next();
-        C->hand2()->detachHand();
-        ffList.push_back(C);
-    }
-    faList.clear();
-    i = afList.front();
-    while ( i )
-    {
-        Couple * C = static_cast<Couple*>(i);
-        i = i->next();
+    ffList.grab(aaList);
+    assert_true(aaList.empty());
+    
+    for ( Couple * C=firstAF(); C; C=C->next() )
         C->hand1()->detachHand();
-        ffList.push_back(C);
-    }
-    afList.clear();
+    ffList.grab(afList);
+    assert_true(afList.empty());
+    
+    for ( Couple * C=firstFA(); C; C=C->next() )
+        C->hand2()->detachHand();
+    ffList.grab(faList);
+    assert_true(faList.empty());
 }
 
 
