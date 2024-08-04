@@ -34,7 +34,7 @@ void ViewProp::clear()
     
     window_size[0] = 800;
     window_size[1] = 800;
-    window_position[0] = 8;
+    window_position[0] = 0;
     window_position[1] = 32;
     
     scalebar        = 0;

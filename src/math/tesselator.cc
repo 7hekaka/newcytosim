@@ -197,13 +197,13 @@ static void scale_(size_t num, FLOAT* ptr, FLOAT X, FLOAT Y, FLOAT Z)
 template < typename FLOAT >
 static void dropletify_(size_t num, FLOAT* ptr, FLOAT alpha)
 {
-    for ( unsigned n = 0; n < num; ++n )
+    for ( size_t n = 0; n < num; ++n )
     {
         FLOAT Z = ptr[3*n+2];
         FLOAT W = 0.75f * ( 1.f + std::tanh(-alpha*Z) );
         ptr[3*n  ] *= W;
         ptr[3*n+1] *= W;
-        ptr[3*n+2] = 1.5 * ptr[3*n+2] + 0.5;
+        ptr[3*n+2] = Z * 1.5f + 0.5f;
     }
 }
 
