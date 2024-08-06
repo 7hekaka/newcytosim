@@ -343,8 +343,7 @@ void SpaceDice::draw3D() const
 
     static_assert(sizeof(Tesselator::INDEX) == sizeof(unsigned short));
     glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_SHORT, nullptr);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    gym::unbind2();
 #endif
 
 #if 1

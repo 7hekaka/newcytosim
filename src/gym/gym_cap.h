@@ -28,7 +28,7 @@ namespace gym
     inline void restoreBlending() { if ( blend_ ) glEnable(GL_BLEND); else glDisable(GL_BLEND); }
     /// initialize blending for standard transparency
     inline void initializeBlending() { glEnable(GL_BLEND); glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); }
-    /// initialize blending for standard transparency
+    /// initialize blending for inverted transparency
     inline void invertedBlending() { glEnable(GL_BLEND); glBlendFunc(GL_ONE_MINUS_DST_COLOR, GL_ZERO); }
 
 

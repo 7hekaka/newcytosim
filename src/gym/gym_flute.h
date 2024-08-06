@@ -58,6 +58,13 @@ namespace gym
     inline void unmap() { glUnmapBuffer(GL_ARRAY_BUFFER); }
     /// private
     inline void rebind() { glBindBuffer(GL_ARRAY_BUFFER, currStream()); }
+
+    /// it is not necessary to unbind buffer, but might be useful for debugging
+    inline void unbind() { } //glBindBuffer(GL_ARRAY_BUFFER, 0); }
+    
+    /// it is not necessary to unbind buffer, but might be useful for debugging
+    inline void unbind2() { } //glBindBuffer(GL_ARRAY_BUFFER, 0); glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }
+
     ///
     inline void subdata(size_t size, float const* ptr) { glBufferSubData(currStream(), 0, size, ptr); }
     
