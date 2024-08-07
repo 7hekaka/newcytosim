@@ -51,6 +51,7 @@ void reshape(int ww, int wh)
 //------------------------------------------------------------------------------
 void initGL()
 {
+    glClearDepth(1);
     glClearColor(0.f, 0.f, 0.f, 0.f);
     glEnable(GL_DEPTH_TEST);
     
