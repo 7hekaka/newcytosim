@@ -20,9 +20,6 @@ Mecafil::Mecafil()
 #if NEW_ANISOTROPIC_FIBER_DRAG
     iAni = nullptr;
 #endif
-#if ADD_PROJECTION_DIFF
-    useProjectionDiff = false;
-#endif
 }
 
 void Mecafil::release()
