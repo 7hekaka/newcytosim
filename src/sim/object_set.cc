@@ -487,12 +487,16 @@ void ObjectSet::writePool(Outputter& out, ObjectPool const& list) const
 /**  read Object's mark in binary format. This should match Object::writeMarker() */
 static void readMarker(Inputter& in, PropertyID& ix, ObjectID& id)
 {
+#if 1
     union { uint16_t u; uint8_t c[2]; } u16;
-
     ix = in.get_char();
     u16.c[0] = in.get_char();
     u16.c[1] = in.get_char();
     id = u16.u;
+#else
+    ix = in.readUInt8();
+    id = in.readUInt16();
+#endif
 }
 
 
@@ -569,10 +573,13 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
         case 1: readMarker(in, pid, id); break;
         default: readMarkerFat(in, pid, id, mk); break;
     }
+    
+#if BACKWARD_COMPATIBILITY < 45
+    // before 18/09/2015, Property IDs started at zero:
+    pid += ( in.formatID() < 45 );
+#endif
 
-    if ( id == 0 )
-        throw InvalidIO("Invalid ObjectID referenced in file");
-    //std::clog << "- load " << Object::make_reference(tag, pid, id) << '\n';
+    //std::clog << "- loading " << Object::make_reference(tag, pid, id) << '\n';
 
     Object * obj = identifyObject(id);
     
@@ -608,6 +615,8 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
     
     if ( !obj )
     {
+        if ( id == 0 )
+            throw InvalidIO("Invalid ObjectID referenced in file");
         assert_true(update);
         assert_true(isprint(tag));
         //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';

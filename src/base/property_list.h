@@ -89,9 +89,6 @@ public:
     /// complete all objects
     void complete(Simul const&) const;
     
-    /// decrease all index by 1 (used for backward compatibility)
-    void decrement_all();
-
     //-------------------------------------------------------------------------------
     
     /// return property which has the provided name, or zero if it cannot be found

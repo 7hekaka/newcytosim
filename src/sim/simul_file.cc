@@ -692,8 +692,6 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
                         in.setFormatID(i);
                         if ( i < BACKWARD_COMPATIBILITY )
                             std::clog << "Cytosim is attempting to read old format " << i << "\n";
-                        if ( in.formatID() < 45 )
-                            properties.decrement_all();
                     }
                 }
             }
