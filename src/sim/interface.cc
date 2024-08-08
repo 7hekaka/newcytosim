@@ -1129,14 +1129,14 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     
 #if BACKWARD_COMPATIBILITY < 50
     // create an Event if 'event' is specified within the 'run' command:
-    Event * event = nullptr;
+    Event * evt = nullptr;
     if ( opt.has_key("event") )
     {
-        event = new Event();
-        opt.set(event->rate, "event");
-        opt.set(event->activity, "event", 1);
-        event->reload(sim_->time());
-        sim_->events.add(event);
+        evt = new Event();
+        opt.set(evt->rate, "event");
+        opt.set(evt->activity, "event", 1);
+        evt->reload(sim_->time());
+        sim_->events.add(evt);
     }
 #endif
     opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
@@ -1201,8 +1201,11 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     }
 
 #if BACKWARD_COMPATIBILITY < 50
-    if ( event )
-        sim_->events.erase(event);
+    if ( evt )
+    {
+        sim_->events.remove(evt);
+        delete(evt);
+    }
 #endif
     
     sim_->relax();
