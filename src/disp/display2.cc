@@ -126,8 +126,8 @@ void Display2::drawSinglesA(const SingleSet & set) const
                 gle::truncatedCone();
                 //drawCone(pf, ph-pf, pixscale(disp->width));
 #else
-                gle::drawBand(ph, pixscale(disp->width), ps, pixscale(disp->width));
-                gle::drawBand(ps, pixscale(disp->width), disp->color, pf, pixscale(disp->width), disp->color.alpha_scaled(0.5f));
+                gle::drawBand(ph, pixscale(dis->width), ps, pixscale(dis->width));
+                gle::drawBand(ps, pixscale(dis->width), dis->color, pf, pixscale(dis->width), dis->color.alpha_scaled(0.5f));
 #endif
             }
         }

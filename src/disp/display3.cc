@@ -1002,7 +1002,7 @@ void Display3::drawSingleB(Single const* obj) const
         if ( obj->base() )
             drawObject(ph, rad, gle::octahedron);
         else
-            drawHand(ph, isp);
+            drawHand(ph, dis);
         gle::drawBand(ph, wid, dis->color, pf, wid, dis->color.alpha_scaled(0.5f));
 #endif
     }
