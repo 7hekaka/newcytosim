@@ -1057,7 +1057,8 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
 
 /**
 This computes a nematic order parameter, and principal directions, like infoNematic,
- but using a vector that is orthogonal and tangent to the Space's edge
+ but using a vector that is orthogonal and tangent to the Space's edge.
+ This quantification only makes sense in 3D
  */
 real FiberSet::infoOrthoNematic(ObjectList const& objs, real res[9], Space const* spc)
 {
@@ -1076,13 +1077,11 @@ real FiberSet::infoOrthoNematic(ObjectList const& objs, real res[9], Space const
                 Vector pos = fib->posPoint(n);
                 Vector dir = fib->dirSegment(n);
                 Vector nor = spc->normalToEdge(pos);
+#if ( DIM > 2 )
                 Vector p = cross(nor, dir);
                 XX += p.XX * p.XX;
-#if ( DIM > 1 )
                 XY += p.YY * p.XX;
                 YY += p.YY * p.YY;
-#endif
-#if ( DIM > 2 )
                 XZ += p.ZZ * p.XX;
                 YZ += p.ZZ * p.YY;
                 ZZ += p.ZZ * p.ZZ;
