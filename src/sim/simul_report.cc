@@ -158,7 +158,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
 
 
 /**
- Split 'arg' into who:what and call report_one()
+ Split 'arg' into `who:what` and call report_one() accordingly
  Surround the report with comments to identify start/end
  */
 void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt) const
@@ -216,7 +216,7 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
     }
     else
     {
-        // check if name corresponds to a property:
+        // check if `who` is the name of a property:
         Property const* sel = nullptr;
         sel = properties.find(who);
         if ( sel )
@@ -286,10 +286,10 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
  `spindle:profile`       | Number of right- and left-pointing fiber as a function of position
  `single:all`            | Position and force of singles
  `single:force`          | Average and maximum force of singles
- `single:NAME`           | Position and force of singles of class NAME
+ `NAME_OF_SINGLE`        | Position and force of singles of given class
  `NAME:position`         | Position and force of singles of class NAME
  `couple:state`          | Position and state of all couples
- `couple:NAME`           | Position and state of couples of class NAME
+ `NAME_OF_COUPLE`        | Position and state of couples of given class
  `couple:link`           | detailed information on doubly-attached couples
  `couple:configuration`  | number of Couples in { X, P, A, V, T } states
  `couple:force`          | Average and maximum of tension in the couple links
