@@ -68,6 +68,14 @@ static real get_angle(std::istream& is)
     return RNG.sreal() * M_PI;
 }
 
+
+static char get_axis(std::string const& str, size_t pos)
+{
+    if ( str.length() > pos )
+        return str.at(pos);
+    return 'Z';
+}
+
 //------------------------------------------------------------------------------
 #pragma mark - Position
 
@@ -209,8 +217,8 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 return Vector(B+(E-B)*x, R*RNG.sreal(), 0);
 #else
                 real C, S;
-                RNG.urand2(C, S);
-                return Vector(B+(E-B)*x, R*C, R*S);
+                RNG.urand2(C, S, R);
+                return Vector(B+(E-B)*x, C, S);
 #endif
             }
         
@@ -235,8 +243,8 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 return Vector(B+E*x, R*RNG.sreal(), 0);
 #else
                 real C, S;
-                RNG.urand2(C, S);
-                return Vector(B+E*x, R*C, R*S);
+                RNG.urand2(C, S, R);
+                return Vector(B+E*x, C, S);
 #endif
             }
         }
@@ -267,11 +275,11 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `equator R T`");
             real C, S;
-            RNG.urand2(C, S);
-            return Vector(R*C, R*S, T*RNG.shalf());
+            RNG.urand2(C, S, R);
+            return Vector(C, S, T*RNG.shalf());
         }
         
-        if ( tok == "cap" )
+        if ( tok.compare(0, 3, "cap") == 0 )
         {
             real R = 0, T = 0;
             if ( !extract(is, R) || R < 0 )
@@ -280,10 +288,16 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 throw InvalidParameter("thickness T must be >= 0 in `cap R T`");
             real Z = std::max(R - T * RNG.preal(), -R);
             real r = std::sqrt(R*R - Z*Z);
+            const char axis = get_axis(tok, 3);
 #if ( DIM >= 3 )
             real C, S;
-            RNG.urand2(C, S);
-            return Vector(r*C, r*S, Z);
+            RNG.urand2(C, S, r);
+            if ( axis == 'Z' )
+                return Vector(C, S, Z);
+            else if ( axis == 'Y' )
+                return Vector(C, Z, S);
+            else
+                return Vector(Z, C, S);
 #else
             return Vector(r*RNG.sflip(), Z, 0);
 #endif
@@ -297,12 +311,13 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( !extract(is, R) || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
             const Vector2 V = Vector2::randB(R);
-            std::string axis = tok.substr(8);
-            if ( axis == "Z" )
+            const char axis = get_axis(tok, 8);
+            if ( axis == 'Z' )
                 return Vector(V.XX, V.YY, L*RNG.shalf());
-            else if ( axis == "Y" )
+            else if ( axis == 'Y' )
                 return Vector(V.XX, L*RNG.shalf(), V.YY);
-            return Vector(L*RNG.shalf(), V.XX, V.YY);
+            else
+                return Vector(L*RNG.shalf(), V.XX, V.YY);
         }
         
         if ( tok.compare(0, 4, "ring") == 0 )
@@ -315,12 +330,13 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `ring L R T`");
             const Vector2 V = Vector2::randU(R) * ( 1.0 + RNG.shalf()*T );
-            std::string axis = tok.substr(4);
-            if ( axis == "Z" )
+            const char axis = get_axis(tok, 4);
+            if ( axis == 'Z' )
                 return Vector(V.XX, V.YY, L*RNG.shalf());
-            else if ( axis == "Y" )
+            else if ( axis == 'Y' )
                 return Vector(V.XX, L*RNG.shalf(), V.YY);
-            return Vector(L*RNG.shalf(), V.XX, V.YY);
+            else
+                return Vector(L*RNG.shalf(), V.XX, V.YY);
         }
 
         if ( tok.compare(0, 6, "circle") == 0 )
@@ -334,10 +350,10 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             real C, S;
             RNG.urand2(C, S);
             Vector3 W = (0.5*T) * Vector3::randU();
-            std::string axis = tok.substr(6);
-            if ( axis == "X" )
+            const char axis = get_axis(tok, 6);
+            if ( axis == 'X' )
                 return Vector3(0, C, S) + W;
-            else if ( axis == "Y" )
+            else if ( axis == 'Y' )
                 return Vector3(C, 0, S) + W;
             else
                 return Vector3(C, S, 0) + W;
@@ -355,10 +371,10 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
 #if ( DIM >= 3 )
             //in 3D, a disc in the XY-plane of thickness T in Z-direction
             Vector2 V = Vector2::randB(R);
-            std::string axis = tok.substr(4);
-            if ( axis == "X" )
+            const char axis = get_axis(tok, 4);
+            if ( axis == 'X' )
                 return Vector(T*RNG.shalf(), V.XX, V.YY);
-            else if ( axis == "Y" )
+            else if ( axis == 'Y' )
                 return Vector(V.XX, T*RNG.shalf(), V.YY);
             else
                 return Vector(V.XX, V.YY, T*RNG.shalf());
