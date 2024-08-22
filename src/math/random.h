@@ -278,7 +278,10 @@ public:
 
     /// set 2 random numbers such that C*C + S*S = 1
     void urand2(real&, real&);
-    
+ 
+    /// set 2 random numbers such that C*C + S*S = R
+    void urand2(real&, real&, real R);
+
     /// real number uniformly distributed in [a,b[
     real real_uniform(real a, real b) { return a + preal() * ( b - a ); }
     
