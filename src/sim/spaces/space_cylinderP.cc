@@ -113,8 +113,8 @@ Vector SpaceCylinderP::placeOnEdge(real) const
 {
 #if ( DIM >= 3 )
     real C, S;
-    RNG.urand2(C, S);
-    return Vector(half_*RNG.sreal(), C * radius_, S * radius_);
+    RNG.urand2(C, S, radius_);
+    return Vector(half_*RNG.sreal(), C, S);
 #endif
     return Vector(half_*RNG.sreal(), radius_*RNG.sflip(), 0);
 }
@@ -135,9 +135,9 @@ Vector SpaceCylinderP::project(Vector const& W) const
     else
     {
         real C, S;
-        RNG.urand2(C, S);
-        P.YY = radius_ * C;
-        P.ZZ = radius_ * S;
+        RNG.urand2(C, S, radius_);
+        P.YY = C;
+        P.ZZ = S;
     }
 #endif
     return P;

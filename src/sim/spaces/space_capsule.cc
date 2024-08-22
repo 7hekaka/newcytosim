@@ -97,8 +97,8 @@ Vector SpaceCapsule::project(Vector const& pos) const
         return Vector( X + n * ( pos.XX - X ), n * pos.YY, n * pos.ZZ);
     }
     real C, S;
-    RNG.urand2(C, S);
-    return Vector(0, C * radius_, S * radius_);
+    RNG.urand2(C, S, radius_);
+    return Vector(0, C, S);
 #elif ( DIM >= 2 )
     real n = square(pos.XX-X) + square(pos.YY);
     if ( n > 0 )
@@ -173,8 +173,8 @@ Vector SpaceCapsule::placeOnEdge(real) const
     if ( P < S0 )
     {
         real C, S;
-        RNG.urand2(C, S);
-        return Vector(RNG.sreal()*half_, C * radius_, S * radius_);
+        RNG.urand2(C, S, radius_);
+        return Vector(RNG.sreal()*half_, C, S);
     }
 #else
     // length elements divided by 2

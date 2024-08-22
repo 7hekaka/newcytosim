@@ -259,8 +259,8 @@ Vector3 Vector3::randB(const real n)
 Vector3 Vector3::randOrthoU(const real len) const
 {
     real C, S;
-    RNG.urand2(C, S);
-    return orthogonal(1.0, len * C, len * S);
+    RNG.urand2(C, S, len);
+    return orthogonal(1.0, C, S);
 }
 
 /** this assumes norm(*this) == 1 **/
@@ -384,18 +384,18 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
     const real ss = sep * sep;
     size_t ouf = 0;
     size_t n = 0;
-    
+    real C, S;
+
     for ( Vector3& vec : pts )
     {
     toss:
         if ( ++ouf > max_trials )
             break;
         
-        real C, S;
-        RNG.urand2(C, S);
         real u = std::max(1.0 - cap * RNG.preal(), -1.0);
         real v = std::sqrt(1.0 - u*u);
-        Vector3 pos(u, v*C, v*S);
+        RNG.urand2(C, S, v);
+        Vector3 pos(u, C, S);
         
         for ( size_t i = 0; i < n; ++i )
             if ( distanceSqr(pos, pts[i]) < ss )
