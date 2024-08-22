@@ -1058,7 +1058,7 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
 /**
 This computes a nematic order parameter, and principal directions, like infoNematic,
  but using a vector that is orthogonal and tangent to the Space's edge.
- This quantification only makes sense in 3D
+ This is meaningfull only in 3D
  */
 real FiberSet::infoOrthoNematic(ObjectList const& objs, real res[9], Space const* spc)
 {
