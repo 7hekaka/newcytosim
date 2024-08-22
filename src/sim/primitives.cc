@@ -288,16 +288,15 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 throw InvalidParameter("thickness T must be >= 0 in `cap R T`");
             real Z = std::max(R - T * RNG.preal(), -R);
             real r = std::sqrt(R*R - Z*Z);
-            const char axis = get_axis(tok, 3);
 #if ( DIM >= 3 )
             real C, S;
             RNG.urand2(C, S, r);
-            if ( axis == 'Z' )
-                return Vector(C, S, Z);
-            else if ( axis == 'Y' )
-                return Vector(C, Z, S);
-            else
-                return Vector(Z, C, S);
+            switch ( get_axis(tok, 3) )
+            {
+                case 'Z': return Vector(C, S, Z);
+                case 'Y': return Vector(C, Z, S);
+                default : return Vector(Z, C, S);
+            }
 #else
             return Vector(r*RNG.sflip(), Z, 0);
 #endif
@@ -311,13 +310,12 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( !extract(is, R) || R < 0 )
                 throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
             const Vector2 V = Vector2::randB(R);
-            const char axis = get_axis(tok, 8);
-            if ( axis == 'Z' )
-                return Vector(V.XX, V.YY, L*RNG.shalf());
-            else if ( axis == 'Y' )
-                return Vector(V.XX, L*RNG.shalf(), V.YY);
-            else
-                return Vector(L*RNG.shalf(), V.XX, V.YY);
+            switch ( get_axis(tok, 8) )
+            {
+                case 'Z': return Vector(V.XX, V.YY, L*RNG.shalf());
+                case 'Y': return Vector(V.XX, L*RNG.shalf(), V.YY);
+                default : return Vector(L*RNG.shalf(), V.XX, V.YY);
+            }
         }
         
         if ( tok.compare(0, 4, "ring") == 0 )
@@ -330,13 +328,12 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `ring L R T`");
             const Vector2 V = Vector2::randU(R) * ( 1.0 + RNG.shalf()*T );
-            const char axis = get_axis(tok, 4);
-            if ( axis == 'Z' )
-                return Vector(V.XX, V.YY, L*RNG.shalf());
-            else if ( axis == 'Y' )
-                return Vector(V.XX, L*RNG.shalf(), V.YY);
-            else
-                return Vector(L*RNG.shalf(), V.XX, V.YY);
+            switch ( get_axis(tok, 4) )
+            {
+                case 'Z': return Vector(V.XX, V.YY, L*RNG.shalf());
+                case 'Y': return Vector(V.XX, L*RNG.shalf(), V.YY);
+                default : return Vector(L*RNG.shalf(), V.XX, V.YY);
+            }
         }
 
         if ( tok.compare(0, 6, "circle") == 0 )
@@ -350,13 +347,12 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             real C, S;
             RNG.urand2(C, S);
             Vector3 W = (0.5*T) * Vector3::randU();
-            const char axis = get_axis(tok, 6);
-            if ( axis == 'X' )
-                return Vector3(0, C, S) + W;
-            else if ( axis == 'Y' )
-                return Vector3(C, 0, S) + W;
-            else
-                return Vector3(C, S, 0) + W;
+            switch( get_axis(tok, 6) )
+            {
+                case 'X': return Vector3(0, C, S) + W;
+                case 'Y': return Vector3(C, 0, S) + W;
+                default : return Vector3(C, S, 0) + W;
+            }
 #endif
             return Vector::randU(R) + Vector::randU(T*0.5);
         }
@@ -371,13 +367,12 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
 #if ( DIM >= 3 )
             //in 3D, a disc in the XY-plane of thickness T in Z-direction
             Vector2 V = Vector2::randB(R);
-            const char axis = get_axis(tok, 4);
-            if ( axis == 'X' )
-                return Vector(T*RNG.shalf(), V.XX, V.YY);
-            else if ( axis == 'Y' )
-                return Vector(V.XX, T*RNG.shalf(), V.YY);
-            else
-                return Vector(V.XX, V.YY, T*RNG.shalf());
+            switch( get_axis(tok, 4) )
+            {
+                case 'X': return Vector(T*RNG.shalf(), V.XX, V.YY);
+                case 'Y': return Vector(V.XX, T*RNG.shalf(), V.YY);
+                default: return Vector(V.XX, V.YY, T*RNG.shalf());
+            }
 #endif
             //in 2D, a disc in the XY-plane
             return Vector::randB(R);
