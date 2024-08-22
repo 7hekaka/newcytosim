@@ -85,19 +85,19 @@ void Couple::changeProperty(CoupleProp * p)
  */
 int Couple::configuration(real len, real max_cos) const
 {
-    int p = (cHand1->abscissaFrom(PLUS_END) < len) + (cHand2->abscissaFrom(PLUS_END) < len);
-    int m = (cHand1->abscissaFrom(MINUS_END) < len) + (cHand2->abscissaFrom(MINUS_END) < len);
+    int P = (cHand1->abscissaFrom(PLUS_END) < len) + (cHand2->abscissaFrom(PLUS_END) < len);
+    int M = (cHand1->abscissaFrom(MINUS_END) < len) + (cHand2->abscissaFrom(MINUS_END) < len);
     
-    if ( p > 0 )
-        return 2+p; // T-plus and V-plus
+    if ( P > 0 )
+        return 2+P; // T-plus and V-plus
     
-    if ( m > 0 )
-        return 4+m; // T-minus and V-minus
+    if ( M > 0 )
+        return 4+M; // T-minus and V-minus
 
-    real c = cosAngle();
-    if ( c > max_cos ) // angle < PI/3
+    real C = cosAngle();
+    if ( C > max_cos ) // angle < PI/3, if max_cos = 0.5
         return 0; // P = parallel
-    if ( c < -max_cos ) // angle > 2PI/3
+    if ( C < -max_cos ) // angle > 2PI/3, if max_cos = 0.5
         return 1; // A = anti-parallel
     
     return 2; // X
