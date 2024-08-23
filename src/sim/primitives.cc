@@ -69,10 +69,15 @@ static real get_angle(std::istream& is)
 }
 
 
+/// return 'X' 'Y' or 'Z' if this is the last character of the string
 static char get_axis(std::string const& str, size_t pos)
 {
     if ( str.length() > pos )
-        return str.at(pos);
+    {
+        char c = str.at(pos);
+        if ( 'X' <= c && c <= 'Z' )
+            return c;
+    }
     return 'Z';
 }
 
@@ -293,9 +298,9 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             RNG.urand2(C, S, r);
             switch ( get_axis(tok, 3) )
             {
-                case 'Z': return Vector(C, S, Z);
+                case 'X': return Vector(Z, C, S);
                 case 'Y': return Vector(C, Z, S);
-                default : return Vector(Z, C, S);
+                default : return Vector(C, S, Z);
             }
 #else
             return Vector(r*RNG.sflip(), Z, 0);
@@ -312,9 +317,9 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             const Vector2 V = Vector2::randB(R);
             switch ( get_axis(tok, 8) )
             {
-                case 'Z': return Vector(V.XX, V.YY, L*RNG.shalf());
+                case 'X': return Vector(L*RNG.shalf(), V.XX, V.YY);
                 case 'Y': return Vector(V.XX, L*RNG.shalf(), V.YY);
-                default : return Vector(L*RNG.shalf(), V.XX, V.YY);
+                default : return Vector(V.XX, V.YY, L*RNG.shalf());
             }
         }
         
@@ -327,12 +332,13 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 throw InvalidParameter("radius R must be >= 0 in `ring L R`");
             if ( extract(is, T) && T < 0 )
                 throw InvalidParameter("thickness T must be >= 0 in `ring L R T`");
-            const Vector2 V = Vector2::randU(R) * ( 1.0 + RNG.shalf()*T );
+            real C, S;
+            RNG.urand2(C, S, R * ( 1.0 + RNG.shalf()*T ));
             switch ( get_axis(tok, 4) )
             {
-                case 'Z': return Vector(V.XX, V.YY, L*RNG.shalf());
-                case 'Y': return Vector(V.XX, L*RNG.shalf(), V.YY);
-                default : return Vector(L*RNG.shalf(), V.XX, V.YY);
+                case 'X': return Vector(L*RNG.shalf(), C, S);
+                case 'Y': return Vector(C, L*RNG.shalf(), S);
+                default : return Vector(C, S, L*RNG.shalf());
             }
         }
 
@@ -371,7 +377,7 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
             {
                 case 'X': return Vector(T*RNG.shalf(), V.XX, V.YY);
                 case 'Y': return Vector(V.XX, T*RNG.shalf(), V.YY);
-                default: return Vector(V.XX, V.YY, T*RNG.shalf());
+                default : return Vector(V.XX, V.YY, T*RNG.shalf());
             }
 #endif
             //in 2D, a disc in the XY-plane
@@ -572,24 +578,24 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
             extract(is, blur);
             pos += Vector::randG(blur);
         }
-        // extend along the X axis
-        else if ( tok == "extend" )
+        // extend along one of the main axis
+        if ( tok.compare(0, 6, "extend") == 0 )
         {
             real B = 0, T = 0;
             extract(is, B);
             extract(is, T);
+#if ( DIM >= 3 )
+            switch ( get_axis(tok, 6) )
+            {
+                case 'Z': pos.ZZ += B + ( T - B ) * RNG.preal(); break;
+                case 'Y': pos.YY += B + ( T - B ) * RNG.preal(); break;
+                default : pos.XX += B + ( T - B ) * RNG.preal(); break;
+
+            }
+#else
             pos.XX += B + ( T - B ) * RNG.preal();
-        }
-#if ( DIM > 2 )
-        // extend along the Z axis
-        else if ( tok == "extendZ" )
-        {
-            real B = 0, T = 0;
-            extract(is, B);
-            extract(is, T);
-            pos.ZZ += B + ( T - B ) * RNG.preal();
-        }
 #endif
+        }
         // returns a random position between the two points specified
         else if ( tok == "to" )
         {
