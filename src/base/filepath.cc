@@ -23,7 +23,7 @@ FILE * FilePath::open_file(const char name[], const char mode[2])
     {
         fclose(f);
         f = nullptr;
-        throw InvalidIO("file `"+std::string(name)+"'  opened with error");
+        throw InvalidIO("file `"+std::string(name)+"' opened with error");
     }
     return f;
 }
