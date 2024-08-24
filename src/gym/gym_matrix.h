@@ -59,7 +59,7 @@ namespace gym
     void mat_pick(float [16], float X, float Y, float W, float H, const int[4]);
 
     
-    /// multiply Matrix Vector
+    /// multiply Matrix and Vector
     void mat_mulvec(float[4], const float[16], const float[4]);
 
     /// multiply matrices
@@ -98,9 +98,9 @@ namespace gym
     /// inverse matrix
     int mat3x3_inverse(float[9], const float[9]);
 
-    /// unproject a 3D point
-    int unproject(float win[4], const float modelMatrix[16],
-                  const float projMatrix[16], const int viewport[4], float XYZ[4]);
+    /// unproject a 3D point from window coordinates to world coordinates
+    int unproject(float vec[4], const float modelMatrix[16],
+                  const float projMatrix[16], const int viewport[4]);
 
 }
 

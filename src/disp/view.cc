@@ -778,10 +778,9 @@ void View::project(float& H, float& V, const real XYZ[3]) const
  */
 Vector3 View::unproject(float x, float y, float z) const
 {
-    float pt[4] = { x, y, z, 0 };
-    float un[4] = { 0 };
-    gym::unproject(pt, modelview_, projection_, viewport_, un);
-    return Vector3(un[0], un[1], un[2]) - focus_shift;
+    float pt[4] = { x, y, z, 1 };
+    gym::unproject(pt, modelview_, projection_, viewport_);
+    return Vector3(pt[0], pt[1], pt[2]) - focus_shift;
 }
 
 

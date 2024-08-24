@@ -311,46 +311,41 @@ int gym::mat3x3_inverse(float inv[9], const float m[9])
 
 
 /*
+ The vector `vec` is both input and output. Note that vec[3] should be 1
  Assuming GLint == int for 'viewport'
  */
-int gym::unproject(float win[4],
+int gym::unproject(float vec[4],
                    const float modelMatrix[16],
                    const float projMatrix[16],
-                   const int viewport[4],
-                   float XYZ[4])
+                   const int viewport[4])
 {
     float mat[16];
     float inv[16];
-    float in[4];
-    float out[4];
     
     gym::mat_multiply(mat, projMatrix, modelMatrix);
     
     if ( gym::mat4x4_inverse(inv, mat) )
         return 1;
     
-    in[0] = win[0];
-    in[1] = win[1];
-    in[2] = win[2];
-    in[3] = 1;
-    
     /* Map x and y from window coordinates */
-    in[0] = (in[0] - viewport[0]) / viewport[2];
-    in[1] = (in[1] - viewport[1]) / viewport[3];
+    vec[0] = (vec[0] - viewport[0]) / viewport[2];
+    vec[1] = (vec[1] - viewport[1]) / viewport[3];
     
     /* Map to range -1 to 1 */
-    in[0] = in[0] * 2 - 1;
-    in[1] = in[1] * 2 - 1;
-    in[2] = in[2] * 2 - 1;
+    vec[0] = vec[0] * 2.f - 1.f;
+    vec[1] = vec[1] * 2.f - 1.f;
+    vec[2] = vec[2] * 2.f - 1.f;
     
-    gym::mat_mulvec(out, inv, in);
+    float out[4];
+    gym::mat_mulvec(out, inv, vec);
 
     if ( out[3] == 0 )
         return 2;
 
-    XYZ[0] = out[0] / out[3];
-    XYZ[1] = out[1] / out[3];
-    XYZ[2] = out[2] / out[3];
+    vec[0] = out[0] / out[3];
+    vec[1] = out[1] / out[3];
+    vec[2] = out[2] / out[3];
+    vec[3] = 1;
     return 0;
 }
 

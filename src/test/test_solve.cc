@@ -228,15 +228,15 @@ void windowReshaped(int w, int h)
 
 //------------------------------------------------------------------------------
 
-void unproject(int x, int y)
+void unproject(float x, float y)
 {
     GLfloat mat_model[16];
     GLfloat mat_proj[16];
-    float un[4];
+    float pt[4] = { x, viewport[3]-y, 0, 1 };
     glGetFloatv(GL_MODELVIEW_MATRIX, mat_model);
     glGetFloatv(GL_PROJECTION_MATRIX, mat_proj);
-    gym::unproject(x, viewport[3]-y, 0, mat_model, mat_proj, viewport, un);
-    pg.set(un[0], un[1], un[2]);
+    gym::unproject(pt, mat_model, mat_proj, viewport);
+    pg.set(pt[0], pt[1], pt[2]);
     glutPostRedisplay();
 }
 
