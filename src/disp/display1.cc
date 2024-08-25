@@ -180,7 +180,7 @@ void Display1::drawSinglesF(const SingleSet & set) const
                 ++ptr;
             }
         }
-        assert_true( size_t(ptr-flu) <= cnt );
+        assert_true( ptr <= flu+cnt );
         gym::unmapBufferC4VD();
         gym::drawPoints(pointSize, 0, ptr-flu);
     }
@@ -216,7 +216,7 @@ void Display1::drawSinglesA(const SingleSet & set) const
             ptr += 2;
         }
     }
-    assert_true( size_t(ptr-flu) <= cnt );
+    assert_true( ptr <= flu+cnt );
     gym::unmapBufferC4VD();
 
     if ( prop->link_width > 0 )
@@ -267,7 +267,7 @@ void Display1::drawCouplesF1(CoupleSet const& set) const
             shiftVertex(f4d, obj);
         }
     }
-    assert_true( size_t(ptr-flu) <= cnt );
+    assert_true( ptr <= flu+cnt );
     gym::unmapBufferC4VD();
     gym::drawPoints(pointSize, 0, ptr-flu);
     // display inactive Couples with square dots:
@@ -318,7 +318,7 @@ void Display1::drawCouplesF2(CoupleSet const& set) const
             ++ptr;
         }
     }
-    assert_true( size_t(ptr-flu) <= cnt );
+    assert_true( ptr <= flu+cnt );
     gym::unmapBufferC4VD();
     gym::drawPoints(pointSize, 0, ptr-flu);
     gym::cleanupCV();
@@ -353,7 +353,7 @@ void Display1::drawCouplesA(CoupleSet const& set) const
                 ++ptr;
             }
         }
-        assert_true( size_t(ptr-flu) <= cnt );
+        assert_true( ptr <= flu+cnt );
         gym::unmapBufferC4VD();
         gym::drawPoints(pointSize, 0, ptr-flu);
         gym::cleanupCV();
@@ -404,7 +404,7 @@ void Display1::drawCouplesB1(CoupleSet const& set) const
         }
 #endif
     }
-    assert_true( size_t(ptr-flu) <= cnt );
+    assert_true( ptr <= flu+cnt );
     gym::unmapBufferC4VD();
     
     if ( prop->link_width > 0 )
@@ -440,7 +440,7 @@ void Display1::drawCouplesB0(CoupleSet const& set) const
         ptr[1] = { obj->disp2()->color, Q };
         ptr += 2;
     }
-    assert_true( size_t(ptr-flu) <= cnt );
+    assert_true( ptr <= flu+cnt );
     gym::unmapBufferC4VD();
     if ( prop->link_width > 0 )
         gym::drawLines(linkWidth, 0, ptr-flu);

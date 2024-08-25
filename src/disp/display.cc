@@ -1154,7 +1154,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
             ptr[3] = pos + dir + off;
             ptr += 4;
         }
-        assert_true( size_t(ptr-flu) <= cnt );
+        assert_true( ptr <= flu+cnt );
         gym::unmapBufferVD();
         gym::ref_view();
         gym::disableLighting();
@@ -1301,7 +1301,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
         ptr[-1] = {c, P};
         *ptr++ = {c, fib.posEndP()};
     }
-    assert_true( size_t(ptr-flu) <= cnt );
+    assert_true( ptr <= flu+cnt );
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLines(rad, 0, ptr-flu);
@@ -1332,7 +1332,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     real abs = (inf+1) * uni - fib.abscissaM();
     for ( auto h = inf+1; h <= sup; ++h, abs += uni )
         *ptr++ = fib.posM(abs);
-    assert_true( size_t(ptr-flu) <= cnt );
+    assert_true( ptr <= flu+cnt );
     gym::unmapBufferVD();
     gym::ref_view();
     gym::disableLighting();
@@ -1554,7 +1554,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     ptr[2] = { col, nxt - off };
     ptr[3] = { col, pos - off };
     ptr += 4;
-    assert_true( size_t(ptr-flu) <= top );
+    assert_true( ptr <= flu+top );
 
     gym::unmapBufferC4VD();
     gym::ref_view();
@@ -1619,7 +1619,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     ptr[0] = { clr, pos - off };
     ptr[1] = { clr, pos + off };
     ptr += 2;
-    assert_true( size_t(ptr-flu) <= top );
+    assert_true( ptr <= flu+top );
 
     gym::unmapBufferC4VD();
     gym::ref_view();

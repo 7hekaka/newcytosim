@@ -365,7 +365,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
                 }
             }
         }
-        assert_true( size_t(ptr-flu) <= sup );
+        assert_true( ptr <= flu+sup );
         gym::unmapBufferV3();
         gym::drawLines(0.5, 0, ptr-flu);
     }

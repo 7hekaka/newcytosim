@@ -1166,7 +1166,7 @@ namespace gle
             ptr += 2;
         }
         gym::unmapBufferV2();
-        assert_true( size_t(ptr-buf) <= 2*pi_twice+2 );
+        assert_true( ptr <= buf+2*pi_twice+2 );
         gym::drawTriangleStrip(0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1192,7 +1192,7 @@ namespace gle
         }
         *ptr++ = { L-rad, 0 };
         gym::unmapBufferV2();
-        assert_true( size_t(ptr-buf) <= pi_twice+4 );
+        assert_true( ptr <= buf+pi_twice+4 );
         gym::drawTriangleStrip(0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1207,7 +1207,7 @@ namespace gle
             *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
         *ptr++ = { L, rad };
         gym::unmapBufferV2();
-        assert_true( size_t(ptr-buf) <= pi_twice+4 );
+        assert_true( ptr <= buf+pi_twice+4 );
         gym::drawLineStrip(width, 0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1249,7 +1249,7 @@ namespace gle
         }
         *ptr++ = { L-rad, 0 };
         gym::unmapBufferV2();
-        assert_true( size_t(ptr-buf) <= 2*pi_twice+4 );
+        assert_true( ptr <= buf+2*pi_twice+4 );
         gym::drawTriangleStrip(0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
@@ -1274,7 +1274,7 @@ namespace gle
             *ptr++ = { F*cos_(j) - X, F*sin_(j) + G };
         *ptr++ = { L, rad };
         gym::unmapBufferV2();
-        assert_true( size_t(ptr-buf) <= 2*pi_twice+8 );
+        assert_true( ptr <= buf+2*pi_twice+8 );
         gym::drawLineStrip(width, 0, ptr-buf);
         //gym::drawPoints(width, 0, ptr-buf);
     }
