@@ -391,7 +391,7 @@ bool Tokenizer::split_integer(long& val, std::string& arg)
     if ( !errno && (end > ptr) && isspace(*end) )
     {
         val = num;
-        // skip any additional space characters:
+        // skip any additional space-like characters:
         while ( isspace(*end) )
             ++end;
         // remove consumed characters:
@@ -414,11 +414,26 @@ bool Tokenizer::split_integer(unsigned long& val, std::string& arg)
     if ( !errno && (end > ptr) && isspace(*end) )
     {
         val = num;
-        // skip any additional space characters:
+        // skip any additional space-like characters:
         while ( isspace(*end) )
             ++end;
         // remove consumed characters:
         arg.erase(0, (size_t)(end-ptr));
+        return true;
+    }
+    return false;
+}
+
+
+/// like the other split_integer, but check for range
+bool Tokenizer::split_integer(unsigned& val, std::string& arg)
+{
+    unsigned long ul = val;
+    if ( split_integer(ul, arg) )
+    {
+        val = static_cast<unsigned>(ul);
+        if ( static_cast<unsigned long>(val) != ul )
+            throw InvalidParameter("out-of-range split_integer(unsigned)");
         return true;
     }
     return false;

@@ -473,7 +473,7 @@ public:
     /// try to set `var` from `key[inx]`, using `dict`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */
     template <typename T>
-    int set(T & var, key_type const& key, size_t inx, dict_type<T> const& dict, bool accept_all = false) const
+    int set(T & var, key_type const& key, unsigned inx, dict_type<T> const& dict, bool accept_all = false) const
     {
         rec_type const* rec = values(key);
         
@@ -494,7 +494,7 @@ public:
     /// try to set `var` from `key[inx]` or `alt[jax]`, using the dictionary `dict`
     /** An internal counter is incremented to record that the value was read */
     template <typename T>
-    int set(T & var, key_type const& key, size_t inx, key_type const& alt, size_t jax,
+    int set(T & var, key_type const& key, unsigned inx, key_type const& alt, unsigned jax,
             dict_type<T> const& dict, bool accept_all = false) const
     {
         int res = set(var, key, inx, dict, accept_all);
@@ -516,11 +516,11 @@ public:
 
     /// try to set `var` from `key[inx]`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */
-    static size_t least_used_index(rec_type const* rec)
+    static unsigned least_used_index(rec_type const* rec)
     {
-        size_t i = 0;
-        size_t r = ~0;
-        for ( size_t v = 0; v < rec->size(); ++v )
+        unsigned i = 0;
+        unsigned r = ~0;
+        for ( unsigned v = 0; v < rec->size(); ++v )
         {
             if ( rec->at(v).defined_ && rec->at(v).read_ < r )
             {
@@ -540,7 +540,7 @@ public:
         
         if ( rec  &&  0 < rec->size() )
         {
-            size_t i = least_used_index(rec);
+            unsigned i = least_used_index(rec);
             //std::clog << key << " least used " << i << "\n";
             val_type const& val = rec->at(i);
             if ( val.defined_ )
@@ -554,7 +554,7 @@ public:
     }
 
     /// true if value of `key[inx]` is composed of alpha characters and '_'
-    int is_alpha(key_type const& key, size_t inx) const
+    int is_alpha(key_type const& key, unsigned inx) const
     {
         rec_type const* rec = values(key);
         if ( !rec || inx >= rec->size() )
@@ -572,7 +572,7 @@ public:
      .
      eg. result is 0 if not a number; result is 3 for a positive integer
      */
-    int is_number(key_type const& key, size_t inx) const
+    int is_number(key_type const& key, unsigned inx) const
     {
         rec_type const* rec = values(key);
         if ( !rec || inx >= rec->size() )
@@ -580,13 +580,13 @@ public:
         return is_number(rec->at(inx).value_);
     }
     
-    int is_positive_integer(key_type const& key, size_t inx) const
+    int is_positive_integer(key_type const& key, unsigned inx) const
     {
         return is_number(key, inx) == 3;
     }
     
     template <typename T>
-    int set_positive_integer(T & var, key_type const& key, size_t inx = 0) const
+    int set_positive_integer(T & var, key_type const& key, unsigned inx = 0) const
     {
         rec_type const* rec = values(key);
         if ( rec && inx < rec->size() )

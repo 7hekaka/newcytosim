@@ -36,18 +36,20 @@ namespace Tokenizer
     /// split string using the given separator.
     std::vector<std::string> split(std::string&, char sep, bool get_empty_fields);
     
-    /// read symbol from string if possible, truncating the argument in that case
+    /// read symbol from string if possible, truncating string if successful
     std::string split_symbol(std::string&);
 
-    /// read integer from string if possible, truncating the string in that case
-    bool split_integer(long&, std::string&);
-    
-    /// read unsigned integer from string if possible, truncating the string in that case
-    bool split_integer(unsigned long&, std::string&);
-    
     /// split a polysymbol 'symbol:num' or 'work:num' such as 'filament1'
     bool split_polysymbol(std::string&, long& num);
+
+    /// read integer from string if possible, truncating string if successful
+    bool split_integer(long&, std::string&);
     
+    /// read unsigned integer from string if possible, truncating string if successful
+    bool split_integer(unsigned long&, std::string&);
+    
+    /// read unsigned integer from string if possible, truncating string if successful
+    bool split_integer(unsigned&, std::string&);
     
     /// read multiple forms of integer numbers
     std::string get_integer(std::istream&);

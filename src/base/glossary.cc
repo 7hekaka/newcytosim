@@ -84,7 +84,7 @@ std::string format_value(std::string const& str)
 }
 
 
-std::string format_count(size_t c)
+std::string format_count(unsigned c)
 {
     if ( c == 0 )
         return " (unread)";
@@ -100,7 +100,7 @@ std::string format(Glossary::pair_type const& pair)
     if ( pair.second.size() > 0 )
     {
         res += " = " + format_value(pair.second[0].value_);
-        for ( size_t i = 1; i < pair.second.size(); ++i )
+        for ( unsigned i = 1; i < pair.second.size(); ++i )
             res += ", " + format_value(pair.second[i].value_);
         res += ";";
     }
@@ -117,7 +117,7 @@ std::string format_counts(Glossary::pair_type const& pair)
     if ( pair.second.size() > 0 )
     {
         res += " = " + pair.second[0].value_ + format_count(pair.second[0].read_);
-        for ( size_t i = 1; i < pair.second.size(); ++i )
+        for ( unsigned i = 1; i < pair.second.size(); ++i )
             res += ", " + pair.second[i].value_ + format_count(pair.second[i].read_);
         res += ";";
     }
@@ -486,7 +486,7 @@ void Glossary::add_entry(Glossary::pair_type const& pair, int no_overwrite)
         // the key already exists:
         rec_type & rec = w->second;
         // check every value of the argument:
-        for ( size_t i = 0; i < pair.second.size(); ++i )
+        for ( unsigned i = 0; i < pair.second.size(); ++i )
         {
             if ( rec.size() <= i )
                 rec.push_back(pair.second[i]);
@@ -601,7 +601,7 @@ std::string Glossary::to_string() const
         if ( i.second.size() > 0 )
         {
             ss << '=' << i.second[0].value_;
-            for ( size_t x = 1; x < i.second.size(); ++x )
+            for ( unsigned x = 1; x < i.second.size(); ++x )
                 ss << ", " + i.second[x].value_;
         }
         ss << "; ";
