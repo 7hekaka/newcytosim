@@ -15,7 +15,7 @@ class Inputter : public FileWrapper
 private:
         
     /// The format ID of the input: this allow backward compatibility with older formats
-    unsigned format_;
+    int format_;
     
     /// The dimensionality of vectors stored in the file
     unsigned vecsize_;
@@ -50,7 +50,7 @@ public:
     int formatID() const { return format_; }
 
     /// set file format version identification number
-    void setFormatID(unsigned f) { format_ = f; }
+    void setFormatID(int f) { format_ = f; }
 
     /// Returns 1 for native binary format, 2 for non-native binary format, and 0 if not binary
     int binary() const { return binary_; }

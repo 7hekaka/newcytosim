@@ -87,7 +87,7 @@ namespace Cytosim
             {
                 --cnt_;
                 if ( pref_.size() > 0 )
-                    out_.write(pref_.data(), pref_.size());
+                    out_ << pref_;
                 out_ << x;
                 return out_;
             }

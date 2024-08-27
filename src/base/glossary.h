@@ -518,8 +518,8 @@ public:
     /** An internal counter is incremented to record that the value was read */
     static unsigned least_used_index(rec_type const* rec)
     {
-        unsigned i = 0;
-        unsigned r = ~0;
+        unsigned i = 0U;
+        unsigned r = ~0U;
         for ( unsigned v = 0; v < rec->size(); ++v )
         {
             if ( rec->at(v).defined_ && rec->at(v).read_ < r )
