@@ -241,8 +241,8 @@ LOCAL void storeu4f(float* a, vec4f b) { vst1q_f32(a, b); }
 LOCAL void store2d(double* a, vec2f b) { vst1q_f64(a, vcvt_f64_f32(b)); }
 
 LOCAL vec4f set4f(float a) { return vdupq_n_f32(a); }
-LOCAL vec4i set4i(int a)   { return vdupq_n_u32(a); }
-LOCAL vec4f set4fi(int a) { return vdupq_n_u32(a); }
+LOCAL vec4f set4fi(int a) { return vdupq_n_s32(a); }
+LOCAL vec4i set4u(unsigned a) { return vdupq_n_u32(a); }
 
 LOCAL vec4f load4f(float const* a) { return vld1q_f32(a); }
 LOCAL vec4f loadu4f(float const* a) { return vld1q_f32(a); }
@@ -356,11 +356,11 @@ LOCAL vec4f fmadd4f(vec4f a, vec4f b, vec4f c)  { return vfmaq_f32(c,a,b); }
 LOCAL vec4f fnmadd4f(vec4f a, vec4f b, vec4f c) { return vfmsq_f32(c,a,b); }
 
 /// set i-th bit in returned value to ( a[i] < b[i] ), for i = {0, 1, 2, 3}
-LOCAL int lower_mask4f(vec4f a, vec4f b)
+LOCAL unsigned lower_mask4f(vec4f a, vec4f b)
 {
     uint32x4_t lowerthan = vcltq_f32(a, b); // all bits set in each component
     constexpr int32x4_t mask = { 1, 2, 4, 8 };
-    int res = vaddvq_u32(vandq_u32(lowerthan, mask));
+    unsigned res = vaddvq_u32(vandq_u32(lowerthan, mask));
     return res;
 }
 

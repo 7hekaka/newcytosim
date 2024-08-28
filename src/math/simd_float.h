@@ -65,8 +65,8 @@ LOCAL vec4f cast4i4f(vec4i a) { return _mm_castsi128_ps(a); }
 
 LOCAL vec4f setzero4f()    { return _mm_setzero_ps(); }
 LOCAL vec4f set4f(float a) { return _mm_set1_ps(a); }
-LOCAL vec4i set4i(int a)   { return _mm_set1_epi32(a); }
 LOCAL vec4f set4fi(int a)  { return cast4i4f(_mm_set1_epi32(a)); }
+LOCAL vec4i set4u(unsigned a) { return _mm_set1_epi32(a); }
 
 /// _mm_load_ss loads a single element and zero the upper three:
 LOCAL vec4f load4f(float const* a)     { return _mm_load_ps(a); }

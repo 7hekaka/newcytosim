@@ -28,8 +28,8 @@ inline vec4f exp_approx4f(vec4f arg)
     
     vec4f t = fmadd4f(a, arg, b); // a * arg + b;
     vec4i i = cvt4f4i(max4f(min4f(t, cst1), zero));
-    vec4f m = cast4i4f(and4i(i, set4i(0x7F800000)));
-    vec4f x = cast4i4f(or4i(and4i(i, set4i(0x7FFFFF)), set4i(0x3F800000)));
+    vec4f m = cast4i4f(and4i(i, set4u(0x7F800000)));
+    vec4f x = cast4i4f(or4i(and4i(i, set4u(0x7FFFFF)), set4u(0x3F800000)));
     
     /* Generated in Sollya with:
      > f=remez(1-x*exp(-(x-1)*log(2)),
