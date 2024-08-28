@@ -75,7 +75,7 @@ private:
         
         size_t n_cell[3] = { 0, 0, 0 };
         // we use square cells:
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( int d = 0; d < DIM; ++d )
         {
             n_cell[d] = (size_t)std::ceil( (sup[d]-inf[d]+extra) / step );
             real mid = 0.5 * ( inf[d] + sup[d] );
@@ -86,7 +86,7 @@ private:
         mGrid.setDimensions(inf, sup, n_cell);
         
         //verify the cell size:
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( int d = 0; d < DIM; ++d )
         {
             real dif = abs_real( step - mGrid.cellWidth(d) );
             if ( abs_real(dif) > 1e-3 )
@@ -143,7 +143,7 @@ public:
             
             if ( prop->field_periodic )
             {
-                for ( size_t d = 0; d < DIM; ++d )
+                for ( int d = 0; d < DIM; ++d )
                     mGrid.setPeriodic(d, true);
                 setGrid(inf, sup, prop->step, true);
             }
@@ -269,7 +269,7 @@ public:
         {
             writeMarker(out, Field::TAG);
             out.writeUInt16(DIM);
-            for ( size_t d = 0; d < DIM; ++d )
+            for ( int d = 0; d < DIM; ++d )
             {
                 out.writeUInt32(mGrid.breadth(d), ' ');
                 out.writeFloat(mGrid.inf(d));
@@ -328,7 +328,7 @@ public:
         
         if ( prop )
         {
-            for ( size_t d = 0; d < DIM; ++d )
+            for ( int d = 0; d < DIM; ++d )
             {
                 real dif = abs_real( prop->step - mGrid.cellWidth(d) );
                 if ( abs_real(dif) > 1e-3 )

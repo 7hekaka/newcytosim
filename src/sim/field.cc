@@ -59,7 +59,7 @@ void Field::prepareDiffusion(real theta, unsigned char * domain)
     {
         if ( domain[c] )
         {
-            for ( size_t d = 0; d < DIM; ++d )
+            for ( int d = 0; d < DIM; ++d )
             {
                 size_t n = c + mGrid.stride(d);
                 
