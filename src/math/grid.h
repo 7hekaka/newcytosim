@@ -71,7 +71,7 @@ public:
         {
             delete[] gCell;
             // allocate one more than necessary, and use a multiple of 4:
-            gAllocated = ( MAP::mNbCells + 4 ) & ~3;
+            gAllocated = ( MAP::mNbCells + 4 ) & ~3UL;
             //printf("Grid %p allocated %lu cells\n", this, gAllocated);
             gCell = new CELL[gAllocated];
             return gAllocated;
@@ -241,9 +241,9 @@ public:
         int nb = 0;
         for ( int d = ORD-1; d >= 0; --d )
         {
-            real a = MAP::map(d, w[d]) + 0.5;
+            real a = MAP::mapC(d, w[d]);
             int ia = (int)std::floor(a);
-            a     -= ia;
+            a -= ia;
             int  l = MAP::ind_(d, ia-1);
             int  u = MAP::ind_(d, ia  );
             
@@ -283,7 +283,7 @@ public:
     {
         assert_true( ORD == 1 );
         
-        real ax = 0.5 + MAP::map(0, xx);
+        real ax = MAP::mapC(0, xx);
         
 #if ENABLE_PERIODIC_BOUNDARIES
         int ix = (int)std::floor(ax);
@@ -305,8 +305,8 @@ public:
     {
         assert_true( ORD == 2 );
         
-        real ax = 0.5 + MAP::map(0, w[0]);
-        real ay = 0.5 + MAP::map(1, w[1]);
+        real ax = MAP::mapC(0, w[0]);
+        real ay = MAP::mapC(1, w[1]);
         
 #if ENABLE_PERIODIC_BOUNDARIES
         int ix = (int)std::floor(ax);
@@ -319,11 +319,11 @@ public:
         ax -= ix;
         ay -= iy;
         
-        size_t lx = MAP::ind_(0, ix-1);
-        size_t ux = MAP::ind_(0, ix  );
-        
         size_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
         size_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
+
+        size_t lx = MAP::ind_(0, ix-1);
+        size_t ux = MAP::ind_(0, ix  );
         
         //sum weighted cells to get interpolation
         CELL  rl = gCell[lx+ly] + ay * ( gCell[lx+uy] - gCell[lx+ly] );
@@ -338,9 +338,9 @@ public:
     {
         assert_true( ORD == 3 );
         
-        real ax = 0.5 + MAP::map(0, w[0]);
-        real ay = 0.5 + MAP::map(1, w[1]);
-        real az = 0.5 + MAP::map(2, w[2]);
+        real ax = MAP::mapC(0, w[0]);
+        real ay = MAP::mapC(1, w[1]);
+        real az = MAP::mapC(2, w[2]);
         
 #if ENABLE_PERIODIC_BOUNDARIES
         int ix = (int)std::floor(ax);
@@ -355,24 +355,25 @@ public:
         ax -= ix;
         ay -= iy;
         az -= iz;
-
-        size_t lx = MAP::ind_(0, ix-1);
-        size_t ux = MAP::ind_(0, ix  );
-        
-        size_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
-        size_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
         
         size_t lz = MAP::ind_(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
         size_t uz = MAP::ind_(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
+        
+        size_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
+        size_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
 
-        CELL * cul = gCell + (uy+lz), rul = cul[lx] + ( cul[ux] - cul[lx] ) * ax;
-        CELL * cuu = gCell + (uy+uz), ruu = cuu[lx] + ( cuu[ux] - cuu[lx] ) * ax;
-        CELL * cll = gCell + (ly+lz), rll = cll[lx] + ( cll[ux] - cll[lx] ) * ax;
-        CELL * clu = gCell + (ly+uz), rlu = clu[lx] + ( clu[ux] - clu[lx] ) * ax;
+        size_t lx = MAP::ind_(0, ix-1);
+        size_t ux = MAP::ind_(0, ix  );
 
-        CELL x = rll + ( rlu - rll ) * az;
-        return x + ( rul + ( ruu - rul ) * az - x ) * ay;
-        //return (1-ay) * ( rll + az * (rlu-rll) ) + ay * ( rul + az * (ruu-rul) );
+        CELL * cul = gCell + (ux+ly), rul = cul[lz] + ( cul[uz] - cul[lz] ) * az;
+        CELL * cuu = gCell + (ux+uy), ruu = cuu[lz] + ( cuu[uz] - cuu[lz] ) * az;
+        CELL * cll = gCell + (lx+ly), rll = cll[lz] + ( cll[uz] - cll[lz] ) * az;
+        CELL * clu = gCell + (lx+uy), rlu = clu[lz] + ( clu[uz] - clu[lz] ) * az;
+
+        CELL ru = rul + ( ruu - rul ) * ay;
+        CELL rl = rll + ( rlu - rll ) * ay;
+
+        return rl + ( ru - rl ) * ax;
     }
 
 

@@ -140,40 +140,42 @@ protected:
 protected:
     
     /// return closest integer to `c` in the segment [ 0, s-1 ]
-    inline size_t image_(int d, long c) const
+    inline size_t image_(int d, long x) const
     {
-        size_t s = mDim[d];
+        size_t S(mDim[d]);
         ///@todo use remainder() function for branchless code?
-        while ( c <  0 ) c += s;
-        size_t u = (size_t) c;
-        while ( u >= s ) u -= s;
+        while ( x <  0 ) x += S;
+        size_t u(static_cast<size_t>(x));
+        while ( u >= S ) u -= S;
         return u;
     }
 
-    inline size_t clamp_(int d, long c) const
+    inline size_t clamp_(int d, long x) const
     {
-        return std::min((size_t)std::max(0L, c), mDim[d]-1);
+        size_t S(mDim[d]-1);
+        size_t u(static_cast<size_t>(std::max(0L, x)));
+        return std::min(u, S);
         //return c <= 0 ? 0 : ( c >= s ? s-1 : c );
     }
     
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
-    inline size_t ind_(const int d, long c) const
+    inline size_t ind_(const int d, long x) const
     {
 #if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
-            return image_(d, c);
+            return image_(d, x);
         else
 #endif
-            return clamp_(d, c);
+            return clamp_(d, x);
     }
 
 
     /// return f modulo s in [ 0, s-1 ]
     static inline size_t imagef_periodic(size_t s, real f)
     {
-        while ( f <  0 )  f += (real)s;
-        size_t u = (size_t) f;
-        while ( u >= s )  u -= s;
+        while ( f <  0 ) f += (real)s;
+        size_t u((size_t)f);
+        while ( u >= s ) u -= s;
         return u;
     }
 
@@ -181,42 +183,46 @@ protected:
     {
         if ( f > 0 )
         {
-            size_t u = (size_t) f;
-            //return ( u >= s ? s-1 : u );
-            return std::min(u, s-1);
+            return std::min(size_t(f), s);
         }
         return 0;
     }
     
     
     /// returns  ( f - mInf[d] ) / cWidth[d]
-    inline real map(const int d, real f) const
+    inline long map_(const int d, real f) const
     {
-        return f * cDelta[d] - mStart[d];
+        return static_cast<long>( f * cDelta[d] - mStart[d] );
+    }
+    
+    /// returns  0.5 + ( f - mInf[d] ) / cWidth[d]
+    inline real mapC(const int d, real f) const
+    {
+        return f * cDelta[d] - ( mStart[d] - 0.5 );
     }
 
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
     inline size_t imagef(const int d, real f) const
     {
-        real x = map(d, f);
+        real x = f * cDelta[d] - mStart[d];
 #if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
             return imagef_periodic(mDim[d], x);
         else
 #endif
-            return imagef_clamped(mDim[d], x);
+            return imagef_clamped(mDim[d]-1, x);
     }
 
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
     inline size_t imagef(const int d, real f, real offset) const
     {
-        real x = map(d, f) + offset;
+        real x = f * cDelta[d] - ( mStart[d] - offset );
 #if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
             return imagef_periodic(mDim[d], x);
         else
 #endif
-            return imagef_clamped(mDim[d], x);
+            return imagef_clamped(mDim[d]-1, x);
     }
 
 //--------------------------------------------------------------------------
@@ -298,7 +304,7 @@ public:
     }
     
     /// change boundary conditions
-    void setPeriodic(size_t d, bool p)
+    void setPeriodic(int d, bool p)
     {
 #if ENABLE_PERIODIC_BOUNDARIES
         if ( d < ORD )
@@ -324,37 +330,40 @@ public:
 #pragma mark -
 
     /// total number of cells in the map
-    size_t nbCells()           const { return mNbCells; }
+    size_t nbCells()      const { return mNbCells; }
 
     /// number of cells in dimensionality `d`
-    size_t breadth(size_t d)   const { return mDim[d]; }
+    size_t breadth(int d) const { return mDim[d]; }
     
     /// offset to the next cell in the direction `d`
-    size_t stride(size_t d)    const { return mStride[d]; }
+    size_t stride(int d)  const { return mStride[d]; }
+
+    /// position of the inferior (left/bottom/front) edge
+    real inf(int d)   const { return mInf[d]; }
     
-    /// position of the inferior (left/bottom/etc) edge
-    const real*  inf()               const { return mInf;    }
-    real         inf(size_t d)       const { return mInf[d]; }
-    
-    /// position of the superior (right/top/etc) edge
-    const real*  sup()               const { return mSup;    }
-    real         sup(size_t d)       const { return mSup[d]; }
+    /// position of the superior (right/top/back) edge
+    real sup(int d)   const { return mSup[d]; }
     
     /// the widths of a cell
-    const real*  delta()             const { return cDelta;    }
-    real         delta(size_t d)     const { return cDelta[d]; }
+    real cellWidth(int d) const { return cWidth[d]; }
     
-    const real*  cellWidth()         const { return cWidth;    }
-    real         cellWidth(size_t d) const { return cWidth[d]; }
+    /// inverse of the widths of a cell
+    real delta(int d)     const { return cDelta[d]; }
     
+    /// access to data of the same
+    const real*  inf()        const { return mInf; }
+    const real*  sup()        const { return mSup; }
+    const real*  cellWidth()  const { return cWidth; }
+    const real*  delta()      const { return cDelta; }
+
     /// the volume of a cell
-    real cellVolume()        const { return cVolume; }
+    real cellVolume() const { return cVolume; }
 
     /// position in dimension `d`, of the cell of index `c`
-    real position(size_t d, real c) const { return mInf[d] + c * cWidth[d]; }
+    real position(int d, real c) const { return mInf[d] + c * cWidth[d]; }
     
     /// index in dimension `d` corresponding to position `w`
-    int index(size_t d, real w) const { return (int)map(d, w); }
+    long index(int d, real w) const { return map_(d, w); }
 
     /// half the diagonal length of the unit cell
     real cellRadius() const
@@ -528,13 +537,13 @@ public:
     /// convert coordinate to array index, if ORD==2
     size_t pack2D(const int x, const int y) const
     {
-        return ind_(0, x) + mDim[0]*ind_(1, y);
+        return ind_(1, y) * mDim[0] + ind_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==3
     size_t pack3D(const int x, const int y, const int z) const
     {
-        return ind_(0, x) + mDim[0]*( ind_(1, y) + mDim[1]*ind_(2, z) );
+        return ( ind_(2, z) * mDim[1] + ind_(1, y) ) * mDim[0] + ind_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==1
@@ -546,53 +555,54 @@ public:
     /// convert coordinate to array index, if ORD==2
     size_t pack2D_clamped(const int x, const int y) const
     {
-        return clamp_(0, x) + mDim[0]*clamp_(1, y);
+        return clamp_(1, y) * mDim[0] + clamp_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==3
     size_t pack3D_clamped(const int x, const int y, const int z) const
     {
-        return clamp_(0, x) + mDim[0]*( clamp_(1, y) + mDim[1]*clamp_(2, z) );
+        return ( clamp_(2, z) * mDim[1] + clamp_(1, y) ) * mDim[0] + clamp_(0, x);
     }
 
     
     /// return index of cell corresponding to position (x), if ORD==1
     size_t index1D(const real x) const
     {
-        return ind_(0, map(0, x));
+        return ind_(0, map_(0, x));
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
     size_t index2D(const real x, const real y) const
     {
-        return ind_(0, map(0, x))
-               + mDim[0] * ind_(1, map(1, y));
+        size_t X = ind_(0, map_(0, x));
+        size_t Y = ind_(1, map_(1, y));
+        return  Y * mDim[0] + X;
     }
     
     /// return index of cell corresponding to position (x, y, z), if ORD==3
     size_t index3D(const real x, const real y, const real z) const
     {
-        return ind_(0, map(0, x))
-               + mDim[0]*( ind_(1, map(1, y))
-               + mDim[1]*  ind_(2, map(2, z)) );
+        size_t X = ind_(0, map_(0, x));
+        size_t Y = ind_(1, map_(1, y));
+        size_t Z = ind_(2, map_(2, z));
+        return ( Z * mDim[1] + Y ) * mDim[0] + X;
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
     size_t direct_index2D(const real x, const real y) const
     {
-        assert_true( map(0, x) < mDim[0] );
-        // clamping is necessary for semi-periodic condition
-        size_t Y = clamp_(1, map(1, y));
-        return (size_t)map(0, x) + mDim[0]*Y;
+        size_t X = static_cast<size_t>(map_(0, x)); assert_true( X < mDim[0] );
+        size_t Y = static_cast<size_t>(map_(1, y)); assert_true( Y < mDim[1] );
+        return Y * mDim[0] + X;
     }
 
     /// return index of cell corresponding to position (x, y, z), if ORD==3
     size_t direct_index3D(const real x, const real y, const real z) const
     {
-        // periodic may occurr in X with semi-periodic condition
-        size_t Y = clamp_(1, map(1, y));
-        size_t Z = clamp_(2, map(2, z));
-        return map(0, x) + mDim[0] * ( Y + mDim[1] * Z );
+        size_t X = static_cast<size_t>(map_(0, x)); assert_true( X < mDim[0] );
+        size_t Y = static_cast<size_t>(map_(1, y)); assert_true( Y < mDim[1] );
+        size_t Z = static_cast<size_t>(map_(2, z)); assert_true( Z < mDim[2] );
+        return ( Z * mDim[1] + Y ) * mDim[0] + X;
     }
 
     //--------------------------------------------------------------------------
@@ -895,15 +905,14 @@ public:
     /// write total number of cells and number of subdivision in each dimension
     void printSummary(std::ostream& os, const char arg[])
     {
-        char str[512], *ptr = str;
-        char*const end = str+sizeof(str);
-        ptr += snprintf(ptr, end-ptr, "%s of dim %i has %lu cells: ", arg, ORD, mNbCells);
+        os << arg << " of dim " << ORD << " has " << mNbCells << " cells: ";
         for ( int d = 0; d < ORD; ++d )
         {
-            if ( mPeriodic[d] ) *ptr++ = 'P';
-            ptr += snprintf(ptr, end-ptr, "[%9.3f,%9.3f]/%lu = %4.3f ", mInf[d], mSup[d], mDim[d], cWidth[d]);
+            if ( mPeriodic[d] ) os << 'P';
+            os << "[" << mInf[d] << ", " << mSup[d];
+            os << "]/" << mDim[d] << " = " << cWidth[d];
         }
-        os << str << std::endl;
+        os << std::endl;
     }
 };
 
