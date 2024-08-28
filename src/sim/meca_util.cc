@@ -400,12 +400,11 @@ void Meca::saveMatrix(FILE * fp, real threshold) const
     real * dst = new_real(dim);
     zero_real(dim, src);
     
-    fprintf(fp, "%lu %lu ", dim, dim);
-
     fpos_t pos;
+    size_t cnt = 0, top = 0;
+    fprintf(fp, "%lu %lu ", dim, dim);
     fgetpos(fp, &pos);
-    size_t cnt = 0;
-    fprintf(fp, "%10lu\n", cnt);
+    fprintf(fp, "%12lu\n", cnt);
 
     for ( size_t j = 0; j < dim; ++j )
     {
@@ -416,12 +415,14 @@ void Meca::saveMatrix(FILE * fp, real threshold) const
             {
                 fprintf(fp, "%3lu %3lu %f\n", i, j, dst[i]);
                 ++cnt;
+                top += ( i > j );
             }
         src[j] = 0;
     }
     
     fsetpos(fp, &pos);
-    fprintf(fp, "%10lu\n", cnt);
+    fprintf(fp, "%12lu\n", cnt);
+    printf("saveMatrix size %lu (%lu, %lu)\n", dim, cnt-dim-top, top);
 
     free_real(dst);
     free_real(src);
