@@ -21,7 +21,7 @@ Polygon::~Polygon()
 }
 
 
-void Polygon::allocate(size_t s)
+void Polygon::allocate(unsigned s)
 {
     delete[] pts_;
     pts_  = new Point2D[s+2];
@@ -292,7 +292,7 @@ int Polygon::complete(real epsilon)
     int res = 0;
     if ( npts_ > 1 )
     {
-        size_t i = 0, n = 0, p = 0;
+        unsigned i = 0, n = 0, p = 0;
         do {
             real dx = 0, dy = 0, d = 1;
             // skip consecutive points that are too close from each other:

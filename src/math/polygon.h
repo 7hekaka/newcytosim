@@ -59,7 +59,7 @@ public:
     unsigned nbPoints() const { return npts_; }
     
     /// set number of points and allocate memory
-    void allocate(size_t s);
+    void allocate(unsigned s);
     
     /// copy first two points to end of list
     void wrap();
