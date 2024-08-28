@@ -41,7 +41,7 @@ public:
     {
         const real P = period_[i];
         //return std::remainder(x, P);
-        int q = std::nearbyint(x * inv_period_[i]);
+        long q = (long)std::nearbyint(x * inv_period_[i]);
         /*
         real y = std::remainder(x, P);
         if ( std::fabs(y-x+w*P) > 0.001 )
@@ -53,10 +53,9 @@ public:
     /// adjust 'x' to canonical image in dimension i
     inline float foldf(const float x, int i) const
     {
-        const float P = period_[i];
-        //return std::remainderf(x, P);
-        int q = std::nearbyintf(x * inv_period_[i]);
-        return x - q * P;
+        const real P = period_[i];
+        long q = (long)std::nearbyint(x * inv_period_[i]);
+        return float(x - q * P);
     }
 
 public:

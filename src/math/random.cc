@@ -26,10 +26,10 @@ thread_local Random RNG;
 
 
 /// the most significant bit in a 32-bits integer
-constexpr uint32_t BIT31 = 1U << 31;
+[[maybe_unused]] constexpr uint32_t BIT31 = 1U << 31;
 
 /// sign bit in double precision (double)
-constexpr uint64_t BIT63 = 1ULL << 63;
+[[maybe_unused]] constexpr uint64_t BIT63 = 1ULL << 63;
 
 
 /**
@@ -274,7 +274,7 @@ real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
 void Random::refill_gaussians()
 {
 #if ( RANDOM_USES_SIMD )
-    next_gaussian_ = makeGaussians_SIMD(gaussians_, SFMT_N32, (uint32_t*)twister_.state);
+    next_gaussian_ = makeGaussiansBM_SIMD(gaussians_, SFMT_N32, (uint32_t*)twister_.state);
 #else
     next_gaussian_ = makeGaussians(gaussians_, SFMT_N32, (int32_t*)twister_.state);
 #endif
@@ -359,9 +359,9 @@ float * makeExponentials(float dst[], size_t cnt, const uint32_t src[])
     const float alpha(TWO_POWER_MINUS_32);
     for ( size_t i = 0; i < cnt; ++i )
     {
-        real x = static_cast<real>(src[i]);
+        float x = static_cast<float>(src[i]);
         // since x < 2^32, the argument to log should be > 0:
-        dst[i] = -std::log( 1 - alpha * x );
+        dst[i] = -logf( 1.f - alpha * x );
     }
     return dst + cnt;
 }
@@ -406,18 +406,15 @@ uint32_t Random::pint32_slow(const uint32_t n)
 
 
 /**
- returns an integer in [0 n], with the ratios given in the array of ints
+ returns an integer in [0 n], with the probabilities given as arguments
+ The sum of `ratio[]` is calculated
  */
 uint32_t Random::pint32_ratio(const uint32_t n, const uint32_t ratio[])
 {
-    uint32_t ii, sum = 0;
+    uint32_t ii = 0, sum = 0;
     for ( ii = 0; ii < n; ++ii )
         sum += ratio[ii];
-    // `sum==0` may be caused by wrong arguments; might be safer to throw an exception
-    if ( sum == 0 )
-        return 0; //throw InvalidParameter("invalid argument to Random::pint32_ratio");
-    sum = (int) std::floor( preal() * sum );
-    ii = 0;
+    sum = (uint32_t) std::floor( preal() * sum );
     while ( sum >= ratio[ii] )
         sum -= ratio[ii++];
     return ii;

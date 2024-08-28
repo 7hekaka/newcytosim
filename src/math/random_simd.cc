@@ -14,7 +14,7 @@ static inline void fold_corners4f(vec4f& x, vec4f& y)
     // test if point is close to a corner, crossing lines |x|+|y| > sqrt(2)
     vec4f mut = greaterequal4f(add4f(abs4f(x), abs4f(y)), set4f(M_SQRT2));
     // coordinates of nearest corner, scaled by S: copysign(S, x)
-    constexpr float S = M_SQRT2 + 1.0f;
+    constexpr float S = float(M_SQRT2 + 1.0);
     constexpr vec4f pos{S, S, S, S};
     constexpr vec4f neg{-S, -S, -S, -S};
     vec4f cx = signselect4f(x, neg, pos);
@@ -79,7 +79,8 @@ static real * makeGaussiansBM_SIMD(real dst[], size_t cnt, const uint32_t* arg)
     const uint32_t* src = arg;
     const uint32_t* end = src + cnt;
 
-    constexpr vec4f PI{M_PI*0x1p-31, M_PI*0x1p-31, M_PI*0x1p-31, M_PI*0x1p-31};
+    constexpr float tmp(M_PI*0x1p-31);
+    constexpr vec4f PI{tmp, tmp, tmp, tmp};
 
     while ( src < end )
     {
@@ -163,7 +164,7 @@ static inline void fold_corners8f(vec8f& x, vec8f& y)
     // test if point is close to corner, separated by line |x|+|y| > sqrt(2)
     vec8f mut = cmp8f(add8f(abs8f(x), abs8f(y)), set8f(M_SQRT2), _CMP_GE_OQ);
     // coordinates of nearest corner, scaled: copysign(S, x)
-    constexpr float S = M_SQRT2 + 1.0f;
+    constexpr float S = float(M_SQRT2 + 1.0);
     const vec8f pos = set8f(S), neg = set8f(-S);
     vec8f cx = blendv8f(pos, neg, x); //use the sign of 'x'
     vec8f cy = blendv8f(pos, neg, y); //use the sign of 'y'

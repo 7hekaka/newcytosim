@@ -63,10 +63,10 @@ void SphericalCode::putPoint(float* x, float* y, float* z, const size_t i)
 }
 
 
-void SphericalCode::putPoints(real ptr[], const size_t ptr_n)
+void SphericalCode::putPoints(real ptr[], const size_t sup)
 {
-    size_t sup = std::min(3*num_points_, ptr_n);
-    for ( size_t i = 0; i < sup; ++i )
+    size_t end = std::min(3*num_points_, sup);
+    for ( size_t i = 0; i < end; ++i )
         ptr[i] = coord_[i];
 }
 

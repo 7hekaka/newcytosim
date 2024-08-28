@@ -235,10 +235,10 @@ public:
     bool flip_8th()       { return URAND32() < 1<<29; }
 
     /// random float in [0,1[, requires IEEE Standard 754 
-    float pfloat()        { return float(URAND32() >> 8) * 0x1.0p-24; }
+    float pfloat()        { return float(URAND32() >> 8) * float(0x1.fp-24); }
     
     /// random float in ]-1,1[, requires IEEE Standard 754
-    float sfloat()        { return float(SRAND32() >> 8) * 0x1.0p-23; }
+    float sfloat()        { return float(SRAND32() >> 8) * float(0x1.fp-23); }
     
     /// slow random double in [0,1[, using two uint32_t to set all the fraction bits, requires IEEE Standard 754
     double pdouble()       { return double(URAND64() >> 11) * 0x1.0p-53; }

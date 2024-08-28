@@ -90,8 +90,8 @@ public:
     /// copy the coordinates from point `inx` onto x,y,z
     void putPoint(float* x, float* y, float* z, size_t inx);
     
-    /// copy the points coordinates onto `x[]`, allocated to hold `ptr_n` elements
-    void putPoints(real ptr[], const size_t ptr_n);
+    /// copy the points coordinates onto `x[]`, allocated to hold `sup` elements
+    void putPoints(real ptr[], const size_t sup);
     
     /// write points coordinates
     void printAllPositions(FILE* file = stdout);
@@ -99,7 +99,7 @@ public:
 private:
 
     /// This number affects convergence speed but not the result
-    static constexpr size_t SEVEN = 7;
+    static constexpr size_t SEVEN = 7U;
     
     /// number of point on the sphere
     size_t num_points_;
