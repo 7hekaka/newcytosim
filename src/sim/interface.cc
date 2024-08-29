@@ -576,13 +576,11 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         }
     }
     // syntax sugar: positions specified for multiple objects
-    else if ( opt.has_key("positions") )
+    else if ( opt.num_values("positions") > 0 )
     {
         for ( size_t n = 0; n < cnt; ++n )
         {
-            Vector pos(0, 0, 0);
-            opt.set_from_least_used_value(pos, "positions");
-            opt.define("position", pos);
+            opt.define("position", opt.least_used_value("positions"));
             res.append(new_object(set, pp, opt));
         }
     }

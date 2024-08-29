@@ -530,7 +530,20 @@ public:
         }
         return i;
     }
-
+    
+    std::string least_used_value(key_type const& key)
+    {
+        rec_type const* rec = values(key);
+        if ( rec  &&  0 < rec->size() )
+        {
+            unsigned i = least_used_index(rec);
+            val_type const& val = rec->at(i);
+            ++val.read_;
+            return val.value_;
+        }
+        return "";
+    }
+    
     /// try to set `var` from `key[inx]`. @return 1 if `var` was set, 0 otherwise
     /** An internal counter is incremented to record that the value was read */
     template <typename T>
