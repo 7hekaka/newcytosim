@@ -17,7 +17,7 @@ extern "C"
 {
     static void fpe_signal_handler(int sig)
     {
-        psignal((unsigned)sig, "FPE Exception");
+        psignal(sig, "FPE Exception");
         exit(sig);
     }
     

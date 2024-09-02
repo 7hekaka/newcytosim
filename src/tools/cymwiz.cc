@@ -25,7 +25,7 @@ void signal_handler(int sig)
 {
     ssize_t __attribute__((unused)) u;
     u = write(STDERR_FILENO, "\n* * * * *\n", 11);
-    psignal((unsigned)sig, "CYMWIZ");
+    psignal(sig, "CYMWIZ");
     u = write(STDERR_FILENO, "* * * * *\n", 10);
 }
 

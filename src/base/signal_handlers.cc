@@ -35,7 +35,7 @@ static void signal_handler(int sig)
 {
     ssize_t __attribute__((unused)) u;
     u = write(STDERR_FILENO, "\n*  *  *  *  *\n", 15);
-    psignal((unsigned)sig, "Cytosim");
+    psignal(sig, "Cytosim");
     u = write(STDERR_FILENO, "*  *  *  *  *\n", 14);
     print_backtrace();
     _exit(sig);

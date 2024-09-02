@@ -16,7 +16,7 @@
 
 static void thread_signal_handler(int sig)
 {
-    psignal((unsigned)sig, "SimThread");
+    psignal(sig, "SimThread");
     _exit(sig);
 }
 
