@@ -11,8 +11,8 @@ Inventory::Inventory()
 {
     alloca_ = 30;
     record_ = new Inventoried*[2+alloca_];
-    lowest_ = ~0;
-    highest_ = 0;
+    lowest_ = ~0U;
+    highest_ = 0U;
 
     for ( ObjectID n = 0; n <= alloca_; ++n )
         record_[n] = nullptr;
@@ -50,8 +50,8 @@ void Inventory::release()
     delete[] record_;
     record_ = nullptr;
     alloca_ = 0;
-    lowest_ = ~0;
-    highest_ = 0;
+    lowest_ = ~0U;
+    highest_ = 0U;
 }
 
 
@@ -61,8 +61,8 @@ void Inventory::clear()
         record_[n] = nullptr;
     for ( ObjectID n = highest_; n <= alloca_; ++n )
         record_[n] = nullptr;
-    lowest_ = ~0;
-    highest_ = 0;
+    lowest_ = ~0U;
+    highest_ = 0U;
 }
 
 //------------------------------------------------------------------------------
@@ -155,7 +155,7 @@ void Inventory::reassign()
             ++nxt;
         }
     }
-    lowest_ = 1;
+    lowest_ = 1U;
     highest_ = nxt-1;
 }
 
@@ -172,7 +172,7 @@ ObjectID Inventory::first_unassigned() const
         ++n;
     assert_true(n <= 1+alloca_);
     if ( n == 1+alloca_ )
-        return ~0;
+        return ~0U;
     return n;
 }
 
@@ -184,7 +184,7 @@ ObjectID Inventory::next_identity(ObjectID n) const
     for ( ++n; n <= highest_; ++n )
         if ( record_[n] )
             return n;
-    return 0;
+    return 0U;
 }
 
 
