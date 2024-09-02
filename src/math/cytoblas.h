@@ -249,19 +249,19 @@ inline real difference(const size_t N, const real* X, const real* Y)
 /**
 Set N values of `X` to value `alpha`
  */
-inline void xfill(const size_t N, real alpha, real* X)
+inline void xfill(const int N, real alpha, real* X)
 {
-    for ( size_t u = 0; u < N; ++u )
+    for ( int u = 0; u < N; ++u )
         X[u] = alpha;
 }
 
 /**
  Set N values of `X` to value `alpha`
 */
-inline void xfill(const size_t N, real alpha, real* X, const int inc)
+inline void xfill(const int N, real alpha, real* X, const int inc)
 {
-    for ( size_t u = 0; u < N; ++u )
-        X[u*inc] = alpha;
+    for ( int u = 0; u < N*inc; u += inc )
+        X[u] = alpha;
 }
 
 }
