@@ -197,9 +197,9 @@ Object * Simul::pickMovable(const std::string& arg) const
 void Simul::add(Object * w)
 {
     assert_true(w);
-    //std::clog << " Simul::add(" << w->reference() << ")" << '\n';
     ObjectSet * set = findSetT(w->tag());
     set->add(w);
+    //std::clog << " Simul::add(" << w->reference() << ")" << '\n';
 }
 
 
@@ -209,10 +209,7 @@ void Simul::add(ObjectList const& objs)
     for ( Object * obj : objs )
     {
         if ( obj )
-        {
-            //std::clog << "   Simul::add " << obj->reference() << " @ " << obj << "\n";
             add(obj);
-        }
     }
 }
 
