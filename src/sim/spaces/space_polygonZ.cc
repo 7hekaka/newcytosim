@@ -115,7 +115,7 @@ bool SpacePolygonZ::inside(Vector const& W) const
 Vector SpacePolygonZ::project(Vector const& W) const
 {
     real P, Z, R = W.normXY();
-    size_t hit;
+    unsigned hit;
     poly_.project(R, W.z(), P, Z, hit);
     
     real n = P / R;
@@ -135,7 +135,7 @@ void SpacePolygonZ::setConfinement(Vector const& pos, Mecapoint const& mp,
     //Space::setConfinement(pos, mp, meca, stiff); return;
 #if ( DIM > 2 )
     real P, R = pos.normXY();
-    size_t hit;
+    unsigned hit;
     
     Vector prj;
 

@@ -29,11 +29,11 @@ void Polygon::allocate(unsigned s)
 }
 
 
-void Polygon::set(size_t ord, real rad, real ang)
+void Polygon::set(unsigned ord, real rad, real ang)
 {
     allocate(ord);
     real a = 2 * M_PI / (real)ord;
-    for ( size_t i = 0; i < ord; ++i )
+    for ( unsigned i = 0; i < ord; ++i )
     {
         pts_[i].xx = rad * std::cos(ang);
         pts_[i].yy = rad * std::sin(ang);
@@ -43,7 +43,7 @@ void Polygon::set(size_t ord, real rad, real ang)
 }
 
 
-void Polygon::setPoint(size_t i, real x, real y, long c)
+void Polygon::setPoint(unsigned i, real x, real y, long c)
 {
     if ( pts_ && i < npts_ )
     {
@@ -150,7 +150,7 @@ void Polygon::write(std::ostream& os) const
 {
     os.precision(6);
     os << std::fixed;
-    for ( size_t i = 1; i < npts_; ++i )
+    for ( unsigned i = 1; i < npts_; ++i )
     {
         os << std::setw(12) << pts_[i].xx << "  " << std::setw(12) << pts_[i].yy;
         if ( pts_[i].spot )
@@ -165,8 +165,8 @@ void Polygon::write(std::ostream& os) const
  */
 void Polygon::flip()
 {
-    size_t n = 1;
-    size_t p = npts_-1;
+    unsigned n = 1;
+    unsigned p = npts_-1;
     
     while ( n < p )
     {
@@ -182,7 +182,7 @@ void Polygon::flip()
 
 void Polygon::transform(real sx, real sy, real dx, real dy)
 {
-    for ( size_t n = 0; n < npts_; ++n )
+    for ( unsigned n = 0; n < npts_; ++n )
     {
         pts_[n].xx = sx * pts_[n].xx + dx;
         pts_[n].yy = sy * pts_[n].yy + dy;
@@ -209,7 +209,7 @@ void Polygon::inflate(real eps)
     real px = pts_[npts_-1].xx + eps * ty;
     real py = pts_[npts_-1].yy - eps * tx;
 
-    for ( size_t n = 0; n < npts_; ++n )
+    for ( unsigned n = 0; n < npts_; ++n )
     {
         // normal 'N' to current segment
         real nx =  pts_[n].dy;
@@ -261,7 +261,7 @@ void Polygon::find_extremes(real box[4]) const
         box[3] = pts_[0].yy;
     }
     
-    for ( size_t i = 1; i < npts_; ++i )
+    for ( unsigned i = 1; i < npts_; ++i )
     {
         box[0] = std::min(box[0], pts_[i].xx);
         box[1] = std::max(box[1], pts_[i].xx);
@@ -337,7 +337,7 @@ real Polygon::surface() const
         return 0;
     
     real S = pts_[npts_-1].xx * ( pts_[0].yy - pts_[npts_-2].yy );
-    for ( size_t i = 2; i < npts_; ++i )
+    for ( unsigned i = 2; i < npts_; ++i )
         S += pts_[i-1].xx * ( pts_[i].yy - pts_[i-2].yy );
     
     return S * 0.5;
@@ -360,7 +360,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
     int cross = 0;
         
     // check sides of polygon against horizontal line from (xx, yy) to (+inf, yy)
-    for ( size_t i = 0; i < npts_; ++i )
+    for ( unsigned i = 0; i < npts_; ++i )
     {
         const Point2D & p1 = pts_[i]; // not included in edge
         const Point2D & p2 = pts_[i+1];
@@ -434,7 +434,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
  or the segment where the projection landed
 
  */
-int Polygon::project(real xx, real yy, real& pX, real& pY, size_t& hit) const
+int Polygon::project(real xx, real yy, real& pX, real& pY, unsigned& hit) const
 {
     if ( npts_ < 1 )
         throw InvalidParameter("Cannot project on uninitialized polygon");
@@ -447,7 +447,7 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, size_t& hit) const
     
     real dd = square(xx-pX) + square(yy-pY);
     
-    for ( size_t i = 0; i < npts_; ++i )
+    for ( unsigned i = 0; i < npts_; ++i )
     {
         real x = xx - pts_[i].xx;
         real y = yy - pts_[i].yy;
@@ -490,7 +490,7 @@ void Polygon::dump(std::ostream& os) const
 {
     const int W = 10;
     os << "polygon " << npts_ << "\n";
-    for ( size_t n = 0; n < npts_; ++n )
+    for ( unsigned n = 0; n < npts_; ++n )
     {
         os << " " << std::setw(W) << pts_[n].xx << " " << std::setw(W) << pts_[n].yy << " " << pts_[n].spot;
         os << " " << std::setw(W) << pts_[n].dx << " " << std::setw(W) << pts_[n].dy << "\n";
@@ -501,7 +501,7 @@ void Polygon::dump(std::ostream& os) const
 void Polygon::print(FILE * f) const
 {
     fprintf(f, "polygon %u\n", npts_);
-    for ( size_t n = 0; n < npts_; ++n )
+    for ( unsigned n = 0; n < npts_; ++n )
     {
         fprintf(f, "%10.2f %10.2f %4li", pts_[n].xx, pts_[n].yy, pts_[n].spot);
         fprintf(f, "  %10.2f %10.2f\n", pts_[n].dx, pts_[n].dy);

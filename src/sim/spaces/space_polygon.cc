@@ -133,7 +133,7 @@ Vector SpacePolygon::project(Vector const& W) const
     Vector P(W);
 #if ( DIM == 2 )
     
-    size_t hit;
+    unsigned hit;
     poly_.project(W.XX, W.YY, P.XX, P.YY, hit);
     
 #elif ( DIM > 2 )
@@ -149,14 +149,14 @@ Vector SpacePolygon::project(Vector const& W) const
         else
         {
             // outside in Z and XY
-            size_t hit;
+            unsigned hit;
             poly_.project(W.XX, W.YY, P.XX, P.YY, hit);
         }
         P.ZZ = std::copysign(height_, W.ZZ);
     }
     else
     {
-        size_t hit;
+        unsigned hit;
         poly_.project(W.XX, W.YY, P.XX, P.YY, hit);
         if ( poly_.inside(W.XX, W.YY, 1) )
         {
@@ -190,7 +190,7 @@ void SpacePolygon::setConfinement(Vector const& pos, Mecapoint const& mp,
 {    
 #if ( DIM > 1 )
     
-    size_t hit;
+    unsigned hit;
     real pX, pY;
     int edg = poly_.project(pos.XX, pos.YY, pX, pY, hit);
     real nX = -poly_.pts_[hit].dy;

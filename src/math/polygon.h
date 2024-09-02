@@ -65,13 +65,13 @@ public:
     void wrap();
     
     /// set as regular polygon with `ord` sides (4 : square)
-    void set(size_t ord, real radius, real angle = 0);
+    void set(unsigned ord, real radius, real angle = 0);
 
     /// return copy of point at index `inx`
-    Point2D point(size_t inx) { assert_true(inx<npts_); return pts_[inx]; }
+    Point2D point(unsigned inx) { assert_true(inx<npts_); return pts_[inx]; }
 
     /// set coordinates of point at index `inx`:
-    void setPoint(size_t inx, real x, real y, long c = 0);
+    void setPoint(unsigned inx, real x, real y, long c = 0);
     
     /// subfunction
     static size_t read(std::istream&, Point2D *pts, size_t pts_size);
@@ -101,7 +101,7 @@ public:
     int inside(real x, real y, int edge, real threshold = REAL_EPSILON) const;
     
     /// calculate the projection (pX, pY) of the point (x,y) on a polygon
-    int project(real x, real y, real& pX, real& pY, size_t& hit) const;
+    int project(real x, real y, real& pX, real& pY, unsigned& hit) const;
     
     /// calculate the bounding box [xmin, xmax, ymin, ymax] of a polygon
     void find_extremes(real box[4]) const;
