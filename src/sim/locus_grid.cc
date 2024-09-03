@@ -20,7 +20,7 @@ size_t LocusGrid::setGrid(Vector inf, Vector sup, real min_width)
     assert_true( min_width > 0 );
     
     size_t cnt[3] = { 1, 1, 1 };
-    for ( size_t d = 0; d < DIM; ++d )
+    for ( int d = 0; d < DIM; ++d )
     {
         // minimum number of cells in dimension 'd'
         int n = std::floor(( sup[d] - inf[d] ) / min_width);

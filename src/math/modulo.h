@@ -73,16 +73,16 @@ public:
     void disable() { mMode = 0; }
     
     /// enable periodicity in dimension 'd'
-    void enablePeriodic(size_t d, real size);
+    void enablePeriodic(int d, real size);
     
     /// true if at least one direction has periodic boundaries
     bool isPeriodic() const { return mMode; }
 
     /// true if direction `d` has periodic boundaries
-    bool isPeriodic(size_t d) const { return mMode & (1<<d); }
+    bool isPeriodic(int d) const { return mMode & (1<<d); }
     
     /// return the d-th direction of periodicity
-    Vector3 period(size_t d) const;
+    Vector3 period(int d) const;
     
     /// shift `pos` to its canonical image, which is the one closest to the origin
     void fold(Vector& pos) const;

@@ -16,7 +16,7 @@ constexpr int PERIODIC_X   = 1;
 
 
 /// enable periodicity in dimension 'd'
-void Modulo::enablePeriodic(size_t d, real len)
+void Modulo::enablePeriodic(int d, real len)
 {
     if ( d < 3 && len > REAL_EPSILON )
     {
@@ -29,7 +29,7 @@ void Modulo::enablePeriodic(size_t d, real len)
 }
 
 
-Vector3 Modulo::period(size_t d) const
+Vector3 Modulo::period(int d) const
 {
     Vector3 vec(0,0,0);
     if ( d < 3 && ( mMode & 1<<d ))
