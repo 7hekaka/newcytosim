@@ -35,7 +35,7 @@ SpacePolygon::~SpacePolygon()
  */
 void SpacePolygon::resize(Glossary& opt)
 {
-    size_t ord = 6;
+    unsigned ord = 6;
     std::string file;
     
     if ( opt.set(file, "file") )
@@ -45,9 +45,9 @@ void SpacePolygon::resize(Glossary& opt)
     else if ( opt.has_key("points") )
     {
         // specify vertices directly:
-        size_t nbp = opt.num_values("points");
+        unsigned nbp = opt.num_values("points");
         poly_.allocate(nbp);
-        for ( size_t p = 0; p < nbp; ++p )
+        for ( unsigned p = 0; p < nbp; ++p )
         {
             Vector2 vec(0,0);
             if ( ! opt.set(vec, "points", p) )
