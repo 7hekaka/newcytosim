@@ -26,17 +26,19 @@ static int column_width = 10;
 #include "accumulator.h"
 
 /// pad string by adding white-space on the right up to size 'n * column_width - p'
-static std::string ljust(std::string const& str, int n, int p = 0)
+static std::string ljust(std::string const& str, size_t n, size_t p = 0)
 {
-    int s = n * column_width - p - str.size();
-    return str + std::string(std::max(s, 0), ' ');
+    size_t a = n * column_width;
+    size_t s = a - std::min(a, p+str.size());
+    return str + std::string(s, ' ');
 }
 
 /// pad string by adding white-space on the left up to size 'n * column_width - p'
-static std::string rjust(std::string const& str, int n, int p = 1)
+static std::string rjust(std::string const& str, size_t n, size_t p = 1)
 {
-    int s = n * column_width - p - str.size();
-    return std::string(std::max(s, 0), ' ') + str;
+    size_t a = n * column_width;
+    size_t s = a - std::min(a, p+str.size());
+    return std::string(s, ' ') + str;
 }
 
 /// repeat string DIM times with X, Y, Z endings as appropriate
@@ -1600,10 +1602,10 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
         unsigned cnt = 0;
         for ( Fiber const* fox = fibers.nextID(fib); fox; fox = fibers.nextID(fox) )
         {
-            for ( size_t ii = 0; ii < fib->nbSegments(); ++ii )
+            for ( unsigned ii = 0; ii < fib->nbSegments(); ++ii )
             {
                 FiberSegment seg(fib, ii);
-                for ( size_t jj = 0; jj < fox->nbSegments(); ++jj )
+                for ( unsigned jj = 0; jj < fox->nbSegments(); ++jj )
                 {
                     FiberSegment soc(fox, jj);
                     real abs1, abs2;
@@ -2878,7 +2880,7 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
     }
     
     // consider clusters by decreasing size:
-    size_t idx = 0;
+    ObjectFlag idx = 0;
     for ( set_t::value_type const& c : clusters )
     {
         ++idx;
