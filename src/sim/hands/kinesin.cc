@@ -31,9 +31,10 @@ void Kinesin::attach(FiberSite const& s)
 void Kinesin::stepUnloaded()
 {
     assert_true( attached() );
-    
-    nextAct -= prop()->forward_rate_dt / 2;
-    nextBack -= prop()->backward_rate_dt / 1.1;
+    real stride = prop()->stepping_stride;
+
+    nextAct -= prop()->forward_rate_dt * 0.5f;
+    nextBack -= prop()->backward_rate_dt / 1.1f;
 
     while ( std::min(nextAct, nextBack) <= 0 )
     {
@@ -43,7 +44,7 @@ void Kinesin::stepUnloaded()
 
         int dir = ( nextAct <= nextBack ) - ( nextAct > nextBack );
 
-        lati_t s = site() + dir * prop()->stride;
+        lati_t s = site() + dir * stride;
         int out = outsideMP(s);
         
         if ( out )
@@ -65,8 +66,9 @@ void Kinesin::stepUnloaded()
 void Kinesin::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
+    real stride = prop()->stepping_stride;
     
-    real load = dot(force, dirFiber()) * prop()->directionality;
+    real load = dot(force, dirFiber()) * sign_real(stride);
     
     // antagonistic load is negative
     nextAct -= prop()->forward_rate_dt / ( 1 + std::exp(-load*prop()->force_inv) );
@@ -80,7 +82,7 @@ void Kinesin::stepLoaded(Vector const& force)
 
         int dir = ( nextAct <= nextBack ) - ( nextAct > nextBack );
 
-        lati_t s = site() + dir * prop()->stride;
+        lati_t s = site() + dir * stride;
         int out = outsideMP(s);
         
         if ( out )

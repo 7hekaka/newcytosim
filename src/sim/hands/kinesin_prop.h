@@ -24,7 +24,7 @@ public:
      */
     
     /// force parameter expressing the sensitivity of stepping
-    real force;
+    real stepping_force;
 
     /// rate of forward step
     real forward_rate;
@@ -43,17 +43,16 @@ public:
      */
     real unbinding_chance;
     
-    /// directionality ( -1 / +1 )
-    int stride;
+    /// sign indicates directionality; magnitude the number of steps
+    int stepping_stride;
     
     /// @}
     
 private:
     
-    real directionality;
-    real forward_rate_dt;
-    real backward_rate_dt;
-    real force_inv;
+    float forward_rate_dt;
+    float backward_rate_dt;
+    float force_inv;
     
 public:
 

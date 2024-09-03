@@ -21,11 +21,11 @@ void KinesinProp::clear()
         Mechanics of the kinesin step, Carter & Cross, 2005
         http://www.doi.org/10.1038/nature03528
      */
-    force            = 2;
+    stepping_force   = 2;
     forward_rate     = 277;
     backward_rate    = 0.34;
     unbinding_chance = 0.01;
-    stride           = 1;
+    stepping_stride  = 1;
 }
 
 
@@ -33,11 +33,11 @@ void KinesinProp::read(Glossary& glos)
 {
     DigitProp::read(glos);
     
-    glos.set(force,            "force");
+    glos.set(stepping_force,   "stepping_force", "force");
     glos.set(forward_rate,     "forward_rate");
     glos.set(backward_rate,    "backward_rate");
     glos.set(unbinding_chance, "unbinding_chance");
-    glos.set(stride,           "stride");
+    glos.set(stepping_stride,  "stepping_stride", "stride");
 }
 
 
@@ -45,9 +45,9 @@ void KinesinProp::complete(Simul const& sim)
 {
     DigitProp::complete(sim);
    
-    if ( primed(sim) && force <= 0 )
+    if ( primed(sim) && stepping_force <= 0 )
         throw InvalidParameter("kinesin:force must be > 0");
-    force_inv = 1.0 / force;
+    force_inv = 1.0 / stepping_force;
     
     if ( forward_rate < 0 )
         throw InvalidParameter("kinesin:forward_rate must be >= 0");
@@ -56,10 +56,6 @@ void KinesinProp::complete(Simul const& sim)
     if ( backward_rate < 0 )
         throw InvalidParameter("kinesin:backward_rate must be >= 0");
     backward_rate_dt = backward_rate * time_step(sim);
-
-    directionality = sign_real(stride);
-    if ( abs_real(directionality) != 1 )
-        throw InvalidParameter("kinesin:directionality must be +/- 1");
     
     if ( primed(sim) )
     {
@@ -72,10 +68,10 @@ void KinesinProp::complete(Simul const& sim)
 void KinesinProp::write_values(std::ostream& os) const
 {
     DigitProp::write_values(os);
-    write_value(os, "force", force);
+    write_value(os, "stepping_force", stepping_force);
     write_value(os, "forward_rate", forward_rate);
     write_value(os, "backward_rate", backward_rate);
     write_value(os, "unbinding_chance", unbinding_chance);
-    write_value(os, "stride", stride);
+    write_value(os, "stepping_stride", stepping_stride);
 }
 
