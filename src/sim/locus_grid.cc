@@ -907,7 +907,7 @@ inline BitField one_near_bit(vec4f const& xyzr, BigLocus const* src)
 Evaluate `cnt` pos.near(jj->pos_) using SIMD instructions
 @return a bitfield representing the result of all tests
 */
-BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
+BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, size_t cnt)
 {
     BitField res = 0;
     unsigned shift = 0;
@@ -993,12 +993,12 @@ BitField compute_near_bits(vec4f const& xyzr, BigLocus const* start, int cnt)
  Set bitL corresponding to BigLocus in first part of list,
  and bitP corresponding to BigPoints in second part of list
 */
-void compute_near_bits(BitField& bitL, BitField& bitP, vec4f const& xyzr, BigLocusList const& list, int start)
+void compute_near_bits(BitField& bitL, BitField& bitP, vec4f const& xyzr, BigLocusList const& list, size_t start)
 {
-    int cnt = std::min((int)list.size()-start, 64);
+    size_t cnt = std::min(list.size()-start, 64UL);
     BitField bits = compute_near_bits(xyzr, list.begin()+start, cnt);
-    int nloc = list.num_locus();
-    int shift = nloc - std::min(start, nloc);
+    size_t nloc = list.num_locus();
+    size_t shift = nloc - std::min(start, nloc);
     if ( shift < 64 )
     {
         BitField mask = ~0UL << shift;
@@ -1024,9 +1024,9 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
-        for ( int offset = 0; offset < (int)list.size(); offset += 64 )
+        for ( size_t offset = 0; offset < list.size(); offset += 64 )
         {
-            int start = offset + ( ii - list.begin() );
+            size_t start = offset + ( ii - list.begin() );
             compute_near_bits(bitL, bitP, xyzr, list, start);
             //printf(" LL %i : ", __builtin_popcount(bitL));
             BigLocus const* blp = list.begin() + start;
@@ -1060,10 +1060,10 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
-        for ( int offset = 0; offset < (int)list.size(); offset += 64 )
+        for ( size_t offset = 0; offset < list.size(); offset += 64 )
         {
-            int start = offset + ( ii - list.begin() );
-            int cnt = std::min((int)list.size()-start, 64);
+            size_t start = offset + ( ii - list.begin() );
+            size_t cnt = std::min(list.size()-start, 64UL);
             bitP = compute_near_bits(xyzr, list.begin()+start, cnt);
             //printf(" PP ");
             BigLocus const* blp = list.begin() + start;
@@ -1121,16 +1121,16 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
-        for ( int offset = 0; offset < (int)list2.size(); offset += 64 )
+        for ( size_t offset = 0; offset < list2.size(); offset += 64 )
         {
             compute_near_bits(bitL, bitP, xyzr, list2, offset);
             //printf(" LL");
             BigLocus const* blp = list2.begin() + offset;
 #if 0
             // verify all tests:
-            for ( b = 0; b < std::min(64, (int)list2.size()-offset); ++b )
+            for ( size_t b = 0; b < std::min(64UL, list2.size()-offset); ++b )
             {
-                BigVector vec = (jj+b+offset)->pos_;
+                BigVector vec = (ii+b+offset)->pos_;
                 if ( modulo ) modulo->fold_float(vec, pos);
                 bool n = pos.near(vec);
                 bool p = (bitL+bitP) & ( 1UL << b );
@@ -1138,8 +1138,8 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
                 // SIMD and scalar results can differ, near the edges (x+y ~ 0) :
                 if ( n != p )
                 {
-                    printf("%8.2f |  %8.2f %8.2f | ", list2[0].pos_.XX, pos.XX, (jj+b+offset)->pos_.XX);
-                    printf("!near %2i+%2i: %u%u (%f)\n", offset, b, n, p, d);
+                    printf("%8.2f |  %8.2f %8.2f | ", list2[0].pos_.XX, pos.XX, (ii+offset+b)->pos_.XX);
+                    printf("!near %2lu+%2lu: %u%u (%f)\n", offset, b, n, p, d);
                 }
             }
 #endif
@@ -1175,7 +1175,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
-        for ( int offset = 0; offset < (int)list2.size(); offset += 64 )
+        for ( size_t offset = 0; offset < list2.size(); offset += 64 )
         {
             compute_near_bits(bitL, bitP, xyzr, list2, offset);
             //printf(" PL ");
