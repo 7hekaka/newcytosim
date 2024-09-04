@@ -63,7 +63,7 @@ void SpaceLid::resize(Glossary& opt)
 void SpaceLid::update()
 {
     modulo_.reset();
-    for ( unsigned d = 0; d < DIM-1; ++d )
+    for ( int d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
 }
 

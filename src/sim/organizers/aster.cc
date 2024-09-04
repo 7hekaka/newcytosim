@@ -315,7 +315,7 @@ unsigned Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
     size_t ref = ~0U;
     for ( size_t i = 0; i+DIM < sol->nbPoints(); ++i )
     {
-        if ( sol->hasTriad(i) )
+        if ( 0 < sol->hasTriad(i) )
         {
             ref = i;
             break;

@@ -78,7 +78,7 @@ void SpaceStrip::resize(Glossary& opt)
 void SpaceStrip::update()
 {
     modulo_.reset();
-    for ( unsigned d = 0; d < DIM-1; ++d )
+    for ( int d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
     mid_ = ( top_ + bot_ ) * 0.5;
     // option to limit to bottom edge:

@@ -35,7 +35,7 @@ void SpacePeriodic::resize(Glossary& opt)
 void SpacePeriodic::update()
 {
     modulo_.reset();
-    for ( unsigned d = 0; d < DIM; ++d )
+    for ( int d = 0; d < DIM; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
 }
 

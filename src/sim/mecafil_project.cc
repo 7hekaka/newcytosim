@@ -471,10 +471,10 @@ void Mecafil::addProjectionDiff(real* mat) const
     }
     free_real(tmp);
 #endif
-    for ( size_t i = 0; i < nbs; ++i )
+    for ( unsigned i = 0; i < nbs; ++i )
     {
         real w = iJJtJF[i];
-        if ( w ) for ( int d = 0; d < DIM; ++d )
+        if ( w != 0 ) for ( unsigned d = 0; d < DIM; ++d )
         {
             real * yy = mat + (1+bks)*(DIM*i+d);
             yy[0  ] -= w;

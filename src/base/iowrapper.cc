@@ -6,13 +6,13 @@
 
 
 template<typename T> static inline T byteswap16(T& x)
-{ static_assert(sizeof(T)==2, "2 != sizeof()"); return __builtin_bswap16(x); }
+{ static_assert(sizeof(T)==2, "2 != sizeof()"); return static_cast<T>(__builtin_bswap16(x)); }
 
 template<typename T> static inline T byteswap32(T& x)
-{ static_assert(sizeof(T)==4, "4 != sizeof()"); return __builtin_bswap32(x); }
+{ static_assert(sizeof(T)==4, "4 != sizeof()"); return static_cast<T>(__builtin_bswap32(x)); }
 
 template<typename T> static inline T byteswap64(T& x)
-{ static_assert(sizeof(T)==8, "8 != sizeof()"); return __builtin_bswap64(x); }
+{ static_assert(sizeof(T)==8, "8 != sizeof()"); return static_cast<T>(__builtin_bswap64(x)); }
 
 /// check the size of some types that are baked in the code
 static void sanityCheck()

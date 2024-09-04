@@ -34,7 +34,7 @@ size_t FiberGrid::setGrid(Vector inf, Vector sup, real max_step)
     
     size_t cnt[3] = { 1, 1, 1 };
     
-    for ( size_t d = 0; d < DIM; ++d )
+    for ( int d = 0; d < DIM; ++d )
     {
         real n = ( sup[d] - inf[d] ) / max_step;
         

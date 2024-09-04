@@ -257,7 +257,7 @@ void Display::drawTiled(Simul const& sim, int tile)
     int l[3] = { 0 };
     int u[3] = { 0 };
     
-    for ( size_t d = 0; d < DIM; ++d )
+    for ( int d = 0; d < DIM; ++d )
     {
         if ( modulo->isPeriodic(d) )
         {
@@ -2212,7 +2212,7 @@ void Display::drawSolid(Solid const& obj)
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
         {
-            if ( obj.hasTriad(i) )
+            if ( 0 < obj.hasTriad(i) )
             {
                 Vector P = obj.posP(i);
                 gym::transScale(P, rad);

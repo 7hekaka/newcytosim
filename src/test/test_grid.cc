@@ -58,7 +58,7 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
     switch (c)
     {
         case 'p':
-            for ( size_t d = 0; d < DIM; ++d )
+            for ( int d = 0; d < DIM; ++d )
                 grid.setPeriodic(d, !grid.isPeriodic(d));
             break;
             
