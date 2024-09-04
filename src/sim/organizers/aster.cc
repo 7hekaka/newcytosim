@@ -262,7 +262,7 @@ size_t Aster::placeAnchor(const Vector A, const Vector B, unsigned ref)
     link.set(A, B, ref);
     link.len_ *= asRadius;
     //link.print(std::clog);
-    return asLinks.size() - 1;
+    return asLinks.size();
 }
 
 
@@ -271,11 +271,11 @@ void Aster::placeFiber(ObjectList& objs, Simul& sim, const Vector A, const Vecto
                        unsigned ref, std::string const& fiber_type, std::string const& fos)
 {
     size_t i = placeAnchor(A, B, ref);
+    assert_true( i == 1+nbOrganized() );
     FiberProp const* fip = sim.findProperty<FiberProp>("fiber", fiber_type);
     Fiber * F = makeFiber(objs, sim, asRadius*A, B-A, fip, fos);
-    assert_true( i == nbOrganized() );
-    nbOrganized(i+1);
-    grasp(F, i);
+    nbOrganized(i);
+    grasp(F, i-1);
 }
 
 
