@@ -375,7 +375,7 @@ std::string StreamFunc::replace_string(std::string const& src, std::string const
 
 
 /// return `true` if stream contains unread non-space character(s)
-bool StreamFunc::has_trail(std::istream& is)
+size_t StreamFunc::has_trail(std::istream& is)
 {
     if ( is.good() )
     {
@@ -385,9 +385,9 @@ bool StreamFunc::has_trail(std::istream& is)
         if ( c != EOF )
         {
             is.unget();
-            return true;
+            return is.tellg();
         }
     }
-    return false;
+    return 0;
 }
 

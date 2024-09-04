@@ -189,15 +189,6 @@ void Interface::execute_change_all(std::string const& cat, Glossary& def)
 
 using StreamFunc::has_trail;
 
-/// report a warning if some text was ignored
-void warn_trail(std::istream& is)
-{
-    std::string str;
-    std::streampos pos = is.tellg();
-    std::getline(is, str);
-    throw InvalidSyntax("unexpected `"+str+"' in `"+StreamFunc::extract_line(is, pos)+"'");
-}
-
 /**
  Define a placement = ( position, orientation ) from the parameters set in `opt'
  */
@@ -259,7 +250,9 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
     {
         std::istringstream iss(str);
         iso.rot = Cytosim::readOrientation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss);
+        size_t t = has_trail(iss);
+        if ( t )
+            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `"+StreamFunc::extract_line(iss)+"'");
     }
     else
         iso.rot = Rotation::randomRotation();
@@ -273,7 +266,9 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
     {
         std::istringstream iss(str);
         Rotation rot = Cytosim::readOrientation(iss, iso.mov, spc);
-        if ( has_trail(iss) ) warn_trail(iss);
+        size_t t = has_trail(iss);
+        if ( t )
+            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `"+StreamFunc::extract_line(iss)+"'");
         iso.rotate(rot);
     }
     

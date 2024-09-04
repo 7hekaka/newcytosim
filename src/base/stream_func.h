@@ -35,6 +35,9 @@ namespace StreamFunc
     /// extract line containing given `pos`, preserving the current file position
     std::string extract_line(std::istream&, std::streampos pos);
     
+    /// extract current line, preserving the current file position
+    inline std::string extract_line(std::istream& is) { return extract_line(is, is.tellg()); }
+
     /// print line located at `pos`, with a line number
     void print_line(std::ostream&, std::istream&, std::streampos pos);
     
@@ -57,7 +60,7 @@ namespace StreamFunc
     std::string replace_string(std::string const& src, std::string const& fnd, std::string const& rep, size_t& cnt);
 
     /// true if stream has unread material
-    bool has_trail(std::istream& is);
+    size_t has_trail(std::istream& is);
      
 }
 

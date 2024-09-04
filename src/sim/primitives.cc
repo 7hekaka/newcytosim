@@ -652,12 +652,9 @@ Vector Cytosim::readPosition(std::string const& arg, Space const* spc)
 {
     std::istringstream iss(arg);
     Vector vec = Cytosim::readPosition(iss, spc);
-    if ( StreamFunc::has_trail(iss) )
-    {
-        std::string str;
-        std::getline(iss, str);
-        throw InvalidSyntax("unexpected trailing `"+str+"' in position `"+arg+"'");
-    }
+    size_t t = StreamFunc::has_trail(iss);
+    if ( t )
+        throw InvalidSyntax("unexpected trailing `"+arg.substr(t)+"' in position `"+arg+"'");
     return vec;
 }
 
@@ -672,12 +669,9 @@ Vector Cytosim::findPosition(std::string const& arg, Space const* spc)
         Vector vec = Cytosim::readPosition(iss, spc);
         if ( vec.valid() )
         {
-            if ( StreamFunc::has_trail(iss) )
-            {
-                std::string str;
-                std::getline(iss, str);
-                throw InvalidSyntax("unexpected trailing `"+str+"' in position `"+arg+"'");
-            }
+            size_t t = StreamFunc::has_trail(iss);
+            if ( t )
+                throw InvalidSyntax("unexpected trailing `"+arg.substr(t)+"' in position `"+arg+"'");
             return vec;
         }
     }
@@ -992,11 +986,9 @@ Vector Cytosim::readDirection(std::string const& arg, Vector const& pos, Space c
     {
         throw InvalidSyntax("could not determine direction from `"+arg+"'");
     }
-    if ( StreamFunc::has_trail(iss) )
-    {
-        std::string sub = arg.substr(iss.tellg());
-        throw InvalidSyntax("discarded `"+sub+"' in direction");
-    }
+    size_t t = StreamFunc::has_trail(iss);
+    if ( t )
+       throw InvalidSyntax("discarded `"+arg.substr(t)+"' in direction");
     return vec;
 }
 
@@ -1123,11 +1115,9 @@ Rotation Cytosim::readRotation(std::string const& arg)
     {
         throw InvalidSyntax("could not determine rotation from `"+arg+"'");
     }
-    if ( StreamFunc::has_trail(iss) )
-    {
-        std::string sub = arg.substr(iss.tellg());
-        throw InvalidSyntax("discarded `"+sub+"' in rotation");
-    }
+    size_t t = StreamFunc::has_trail(iss);
+    if ( t )
+       throw InvalidSyntax("discarded `"+arg.substr(t)+"' in rotation");
     return rot;
 }
 
