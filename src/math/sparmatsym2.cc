@@ -459,7 +459,7 @@ void SparMatSym2::printColumn(std::ostream& os, const size_t jj)
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
     {
         real v = col[n].val;
-        if ( ! v )
+        if ( v == 0 )
             os << " !";  // this is a waste
         else if ( abs_real(v) < REAL_EPSILON )
             os << " *";  // this element could be removed
@@ -695,7 +695,7 @@ bool SparMatSym2::prepareForMultiply(int dimension)
             assert_true( col[0].inx == jj );
             dia = col[0].val;
             for ( size_t k = 1; k < colsiz_[jj]; ++k )
-            if ( col[k].val )
+            if ( col[k].val != 0 )
             {
                 assert_true( cnt < alcDSS_ );
                 valDSS_[cnt] = col[k].val;

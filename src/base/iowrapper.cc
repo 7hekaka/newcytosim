@@ -6,13 +6,22 @@
 
 
 template<typename T> static inline T byteswap16(T& x)
-{ static_assert(sizeof(T)==2, "2 != sizeof()"); return static_cast<T>(__builtin_bswap16(x)); }
+{
+    static_assert(sizeof(T)==2, "2 != sizeof()");
+    return static_cast<T>(__builtin_bswap16(x));
+}
 
 template<typename T> static inline T byteswap32(T& x)
-{ static_assert(sizeof(T)==4, "4 != sizeof()"); return static_cast<T>(__builtin_bswap32(x)); }
+{
+    static_assert(sizeof(T)==4, "4 != sizeof()");
+    return static_cast<T>(__builtin_bswap32(x));
+}
 
 template<typename T> static inline T byteswap64(T& x)
-{ static_assert(sizeof(T)==8, "8 != sizeof()"); return static_cast<T>(__builtin_bswap64(x)); }
+{
+    static_assert(sizeof(T)==8, "8 != sizeof()");
+    return static_cast<T>(__builtin_bswap64(x));
+}
 
 /// check the size of some types that are baked in the code
 static void sanityCheck()
@@ -663,8 +672,8 @@ void Outputter::writePositiveFixed(const float x)
 {
     if ( binary_ )
     {
-        int32_t i = std::round( x * 65535.f );
-        uint16_t u = std::max(std::min(i, 65535), 0);
+        int32_t i = static_cast<int32_t>(std::round(x * 65535.f));
+        uint16_t u = (uint16_t)std::max(0, std::min(i, 65535));
         if ( u != i )
             fprintf(stderr, "writePositiveFixed(%f) out-of-range\n", x);
         if ( 1 != fwrite(&u, 2, 1, mFile) )
@@ -682,8 +691,8 @@ void Outputter::writeSignedFixed(const float x)
 {
     if ( binary_ )
     {
-        int32_t i = std::round( x * 32767.f );
-        int16_t u = std::max(std::min(i, 32767), -32768);
+        int32_t i = static_cast<int32_t>(std::round(x * 32767.f));
+        int16_t u = (int16_t)std::max(-32768, std::min(i, 32767));
         if ( u != i )
             fprintf(stderr, "writeSignedFixed(%f) out-of-range\n", x);
         if ( 1 != fwrite(&u, 2, 1, mFile) )

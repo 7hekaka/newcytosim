@@ -266,7 +266,7 @@ bool SparMatSym1::notZero() const
     //check for any non-zero sparse term:
     for ( size_t jj = 0; jj < size_; ++jj )
     {
-        if ( diagon_[jj] )
+        if ( diagon_[jj] != 0 )
             return true;
         for ( size_t kk = 0 ; kk < colsiz_[jj] ; ++kk )
         {
@@ -450,7 +450,7 @@ void SparMatSym1::printSparse(std::ostream& os, real inf, size_t start, size_t s
     os << "% SparMatSym1 size " << size_ << ":\n";
     for ( size_t jj = start; jj < stop; ++jj )
     {
-        if ( colsiz_[jj] > 0 || diagon_[jj] )
+        if ( diagon_[jj] != 0 || colsiz_[jj] > 0 )
         {
             os << "% column " << jj << " dia " << diagon_[jj] << "\n";
             for ( size_t n = 0 ; n < colsiz_[jj] ; ++n )
@@ -488,7 +488,7 @@ void SparMatSym1::printColumn(std::ostream& os, const size_t jj)
     for ( size_t n = 0; n < colsiz_[jj]; ++n )
     {
         real v = col[n].val;
-        if ( ! v )
+        if ( v == 0 )
             os << " !";  // this is a waste
         else if ( abs_real(v) < REAL_EPSILON )
             os << " *";  // this element could be removed
@@ -624,7 +624,7 @@ void SparMatSym1::setColumnIndex()
         size_t nxt = size_;
         while ( inx-- > 0 )
         {
-            if ( diagon_[inx] || colsiz_[inx] > 0 )
+            if ( diagon_[inx] != 0 || colsiz_[inx] > 0 )
                 nxt = inx;
             else if ( colsiz_[inx] == 0 )
                 deallocateColumn(inx);
@@ -725,7 +725,7 @@ bool SparMatSym1::prepareForMultiply(int dim)
         for ( size_t k = 0; k < colsiz_[jj]; ++k )
         {
             assert_true( col[k].inx > jj );
-            if ( col[k].val )
+            if ( col[k].val != 0 )
             {
                 // non-zero non-diagonal element
                 assert_true( cnt < nnz );
