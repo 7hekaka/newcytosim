@@ -420,7 +420,7 @@ int DynamicFiber::stepPlusEndStabilized(real factor)
     // force modulates assembly rate exponentially
     if ( growth > 0 )
     {
-        real f = std::max(0.0, forceP);
+        real f = max_real(0.0, forceP);
         // we use tanh(force) which is bounded, scaled to approach exp(-F):
         real e = std::exp(-M_SQRT2 * f * prop()->growing_force_inv[P]);
         real g = 1 + e * ( factor - 1 );
