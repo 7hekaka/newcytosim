@@ -47,7 +47,7 @@ void KinesinProp::complete(Simul const& sim)
    
     if ( primed(sim) && stepping_force <= 0 )
         throw InvalidParameter("kinesin:force must be > 0");
-    force_inv = 1.0 / stepping_force;
+    force_inv = 1.f / stepping_force;
     
     if ( forward_rate < 0 )
         throw InvalidParameter("kinesin:forward_rate must be >= 0");

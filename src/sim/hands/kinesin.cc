@@ -31,7 +31,7 @@ void Kinesin::attach(FiberSite const& s)
 void Kinesin::stepUnloaded()
 {
     assert_true( attached() );
-    real stride = prop()->stepping_stride;
+    int stride = prop()->stepping_stride;
 
     nextAct -= prop()->forward_rate_dt * 0.5f;
     nextBack -= prop()->backward_rate_dt / 1.1f;
@@ -66,7 +66,7 @@ void Kinesin::stepUnloaded()
 void Kinesin::stepLoaded(Vector const& force)
 {
     assert_true( attached() );
-    real stride = prop()->stepping_stride;
+    int stride = prop()->stepping_stride;
     
     real load = dot(force, dirFiber()) * sign_real(stride);
     
