@@ -24,6 +24,7 @@ namespace gle
     
     /// number of circle points stored in buffer
     /** We use multiples of 5 to match circles and the icosahedron */
+    constexpr size_t pi_6half = finesse * 30;
     constexpr size_t pi_5half = finesse * 25;
     constexpr size_t pi_twice = finesse * 20;
     constexpr size_t pi_3half = finesse * 15;
