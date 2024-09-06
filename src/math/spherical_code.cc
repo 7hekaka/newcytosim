@@ -46,9 +46,9 @@ void SphericalCode::putPoint(double* x, double* y, double* z, const size_t i)
 {
     if ( i < num_points_ )
     {
-        *x = coord_[3*i+0];
-        *y = coord_[3*i+1];
-        *z = coord_[3*i+2];
+        *x = static_cast<double>(coord_[3*i+0]);
+        *y = static_cast<double>(coord_[3*i+1]);
+        *z = static_cast<double>(coord_[3*i+2]);
     }
 }
 
@@ -56,9 +56,9 @@ void SphericalCode::putPoint(float* x, float* y, float* z, const size_t i)
 {
     if ( i < num_points_ )
     {
-        *x = coord_[3*i+0];
-        *y = coord_[3*i+1];
-        *z = coord_[3*i+2];
+        *x = static_cast<float>(coord_[3*i+0]);
+        *y = static_cast<float>(coord_[3*i+1]);
+        *z = static_cast<float>(coord_[3*i+2]);
     }
 }
 
