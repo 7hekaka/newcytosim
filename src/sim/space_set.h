@@ -23,9 +23,6 @@ public:
     /// change master
     void setMaster(Space const* s);
     
-    /// name by which given Space can be recovered
-    std::string nameSpace(Space const*) const;
-    
     //--------------------------
     
     /// identifies the property

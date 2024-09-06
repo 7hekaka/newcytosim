@@ -214,7 +214,7 @@ void DynamicFiberProp::complete(Simul const& sim)
 #if NEW_STALL_OUTSIDE
     stall_space = sim.findSpace(stall_label);
     if ( stall_space )
-        stall_label = sim.spaces.nameSpace(stall_space);
+        stall_label = sim.spaces.nameObject(stall_space);
     else if ( primed(sim) && stall_outside != 1 )
         throw InvalidParameter("A space must be specified as stall_outside[1]");
 #endif

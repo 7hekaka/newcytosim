@@ -576,7 +576,7 @@ void FiberProp::complete(Simul const& sim)
     if ( confine_space )
     {
         if ( confine_spec.empty() )
-            confine_spec = sim.spaces.nameSpace(confine_space);
+            confine_spec = sim.spaces.nameObject(confine_space);
     }
     else
     {
@@ -595,7 +595,7 @@ void FiberProp::complete(Simul const& sim)
         if ( confine2_space )
         {
             if ( confine2_spec.empty() )
-                confine2_spec = sim.spaces.nameSpace(confine2_space);
+                confine2_spec = sim.spaces.nameObject(confine2_space);
         }
         else
         {

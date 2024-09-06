@@ -180,6 +180,9 @@ public:
     
     /// check if object's identity match the inventory record (for debugging)
     bool badIdentity(Object const* obj) const { return obj != inventory_.get(obj->identity()); }
+    
+    /// name by which given Space can be recovered
+    std::string nameObject(Object const*) const;
 
     /// return Object corresponding to specifications
     Object * findObject(Property const*, long identity) const;

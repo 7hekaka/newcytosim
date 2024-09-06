@@ -36,23 +36,6 @@ void SpaceSet::setMaster(Space const* spc)
 }
 
 
-/// counting how many objects of the same property have lower identity
-std::string SpaceSet::nameSpace(Space const* spc) const
-{
-    Property const* pp = spc->property();
-    ObjectID end = spc->identity();
-    ObjectID cnt = 1;
-
-    for ( ObjectID id = inventory_.lowest(); id < end; ++id )
-    {
-        Inventoried * i = inventory_[id];
-        if ( i )
-            cnt += ( static_cast<Object*>(i)->property() == pp );
-    }
-    return pp->name() + std::to_string(cnt);
-}
-
-
 //------------------------------------------------------------------------------
 
 Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const
