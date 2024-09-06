@@ -740,19 +740,18 @@ private:
                 reg[0] = calculateOffsets(reg+1, ccc, regMax, ori, positive);
                 //printf("edge %i has region of %i cells\n", e, reg[0]);
             }
-            else if ( 0 )
-            {
-                // compare result for a different cell of the same edge-characteristic
-                int * rig = new int[regMax+1];
-                rig[0] = calculateOffsets(rig+1, ccc, regMax, ori, positive);
-                if ( rig[0] != reg[0] )
-                    ABORT_NOW("inconsistent region size");
-                for ( int s = 1; s < rig[0]+1; ++s )
-                    if ( rig[s] != reg[s] )
-                        ABORT_NOW("inconsistent region offsets");
-                delete[] rig;
-            }
-            regions[indx] = reg;
+#if ( 0 )
+            // compare result for a different cell of the same edge-characteristic
+            int * rig = new int[regMax+1];
+            rig[0] = calculateOffsets(rig+1, ccc, regMax, ori, positive);
+            if ( rig[0] != reg[0] )
+                ABORT_NOW("inconsistent region size");
+            for ( int s = 1; s < rig[0]+1; ++s )
+                if ( rig[s] != reg[s] )
+                    ABORT_NOW("inconsistent region offsets");
+            delete[] rig;
+#endif
+                regions[indx] = reg;
         }
     }
     
