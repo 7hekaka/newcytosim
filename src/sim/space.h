@@ -195,9 +195,6 @@ public:
     /// return associated Property
     Property const * property() const { return prop; }
     
-    /// return the name of the Property, with the identity number, eg. 'cell1'
-    std::string name() const { return prop->name() + std::to_string(identity()); }
-    
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()

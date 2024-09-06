@@ -82,7 +82,7 @@ void SphereProp::complete(Simul const& sim)
         if ( confine_space )
         {
             if ( confine_spec.empty() )
-                confine_spec = confine_space->name();
+                confine_spec = sim.spaces.nameSpace(confine_space);
         }
         else
         {

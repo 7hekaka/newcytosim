@@ -14,14 +14,17 @@ class SpaceSet : public ObjectSet
 
 public:
 
+    /// constructor
+    SpaceSet(Simul& s) : ObjectSet(s), master_(nullptr) {}
+
     /// return master
     Space const* master() const { return master_; }
 
     /// change master
     void setMaster(Space const* s);
-
-    /// constructor
-    SpaceSet(Simul& s) : ObjectSet(s), master_(nullptr) {}
+    
+    /// name by which given Space can be recovered
+    std::string nameSpace(Space const*) const;
     
     //--------------------------
     

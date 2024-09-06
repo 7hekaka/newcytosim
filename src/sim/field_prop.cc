@@ -72,7 +72,7 @@ void FieldProp::complete(Simul const& sim)
     field_space_ptr = sim.findSpace(field_space);
     
     if ( field_space_ptr )
-        field_space = field_space_ptr->name();
+        field_space = sim.spaces.nameSpace(field_space_ptr);
     else if ( primed(sim) )
         throw InvalidParameter("field::space must be created before the field");
 
