@@ -192,7 +192,7 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
 {
     std::istringstream is(arg);
     std::string res = get_symbol(is, false);
-    std::streampos isp = is.tellg();
+    size_t isp = is.tellg();
     int c = is.peek();
     if ( c == ':' )
     {
@@ -203,13 +203,13 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
     else if ( c == '~' )
     {
         is.get();
-        // spliting as symbol:number
+        // spliting as symbol:negative_number
         is >> num;
         num = -num;
     }
     else
     {
-        // spliting as word+number
+        // spliting as word+number, concatenated
         is.clear();
         is.seekg(0);
         get_stuff(is, isalpha);
