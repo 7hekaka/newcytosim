@@ -27,7 +27,7 @@ class FrameReader
 private:
     
     /// special value indicating that no frame is currently loaded
-    const size_t NO_FRAME = -1;
+    const size_t NO_FRAME = ~0UL;
 
     /// accessory class to store a position in a file
     class file_pos 

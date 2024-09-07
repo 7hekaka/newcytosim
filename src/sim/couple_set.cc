@@ -957,7 +957,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
         can.pop();
         addFreeCouple(C);
         // pick randomly with replacement:
-        size_t i = RNG.pint32(nbc);
+        unsigned i = RNG.pint32(nbc);
         C->attach1(loc1[i]);
         C->attach2(loc2[i]);
     }

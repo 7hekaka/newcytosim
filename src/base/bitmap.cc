@@ -81,12 +81,12 @@ static void write_color(FILE * f, uint8_t R, uint8_t G, uint8_t B)
     putc(0, f);
 }
 
-static uint32_t bytes_per_row(unsigned w, uint16_t BitsPerPixel)
+static uint32_t bytes_per_row(uint32_t w, uint16_t BitsPerPixel)
 {
     return 4 * (((w * BitsPerPixel)+31)/32);
 }
 
-void save_bitmap(FILE* f, uint8_t bytes[], unsigned width, unsigned height, uint16_t BitsPerPixel)
+void save_bitmap(FILE* f, uint8_t bytes[], uint32_t width, uint32_t height, uint16_t BitsPerPixel)
 {
     /* in bytes */
     uint32_t FileHeaderSize = 14;
@@ -144,8 +144,8 @@ void save_bitmap(FILE* f, uint8_t bytes[], unsigned width, unsigned height, uint
 template<uint16_t depth>
 class BitMap
 {
-    unsigned width;
-    unsigned height;
+    uint32_t width;
+    uint32_t height;
     uint32_t BPR;
     uint8_t* bytes;
 
@@ -171,7 +171,7 @@ public:
         return ( d == 1 || d == 4 || d == 8 || d == 24 );
     }
     
-    void resize(unsigned W, unsigned H)
+    void resize(uint32_t W, uint32_t H)
     {
         width = W;
         height = H;
@@ -182,7 +182,7 @@ public:
     }
     
     // the matrix is allocated uninitialized
-    BitMap(unsigned W, unsigned H)
+    BitMap(uint32_t W, uint32_t H)
     {
         resize(W, H);
     }

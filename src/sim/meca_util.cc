@@ -776,12 +776,12 @@ void markConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecs)
 
 void Meca::saveConnectivityBitmap() const
 {
-    static size_t cnt = 0;
-    const size_t nbv = mecables.size();
+    static unsigned cnt = 0;
+    const unsigned nbv = mecables.size();
     BitMap<1> bmap(nbv, nbv);
     char str[32] = { 0 };
     
-    snprintf(str, sizeof(str), "net%08lu.bmp", cnt++);
+    snprintf(str, sizeof(str), "net%08u.bmp", cnt++);
     FILE * f = fopen(str, "w");
     if ( f ) {
         if ( !ferror(f) ) {

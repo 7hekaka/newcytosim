@@ -374,7 +374,7 @@ void Meca::readyMecables()
     /*
      Attributes a position in the vector/matrix to each Mecable
      */
-    size_t cnt = 0;
+    unsigned cnt = 0;
     for ( Mecable * mec : mecables )
     {
         mec->setIndex(cnt);
