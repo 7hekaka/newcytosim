@@ -63,12 +63,15 @@ public:
     /// set first Object in list
     void front(Object * o) { frontO = o; }
     
-    /// set first Object in list
+    /// set last Object in list
     void back(Object * o) { backO = o; }
 
     /// Number of objects in the list
     size_t size() const { return nSize; }
     
+    /// change number of objects in the list
+    void size(size_t s) { nSize = s; }
+ 
     /// true if list has zero elements
     bool empty() const { return frontO == nullptr; }
     
@@ -99,6 +102,9 @@ public:
     /// Remove last Object from list
     void pop_back();
     
+    /// remove objects located after `n`, including `n` itself
+    size_t truncate(Object * n);
+
     /// clear the list
     void clear();
     

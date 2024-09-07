@@ -11,7 +11,7 @@
 
 void ObjectPool::push_front(Object * n)
 {
-    //std::clog << "ObjectPool: push_front " << n->reference() << "\n";
+    //std::clog << this << " push_front " << n->reference() << "\n";
     assert_true(n->set_);
     n->prev(nullptr);
     n->next(frontO);
@@ -177,6 +177,30 @@ void ObjectPool::pop(Object * n)
     n->prev(nullptr); // unnecessary?
     n->next(nullptr); // unnecessary?
     --nSize;
+}
+
+
+size_t ObjectPool::truncate(Object * obj)
+{
+    size_t cnt = 0;
+    Object * n = frontO;
+    Object * p = nullptr;
+    while ( n && n != obj )
+    {
+        ++cnt;
+        p = n;
+        n = n->next();
+    }
+    if ( n == obj )
+    {
+        nSize = cnt;
+        backO = p;
+        if ( p )
+            p->next(nullptr);
+        else
+            frontO = nullptr;
+    }
+    return cnt;
 }
 
 
@@ -431,7 +455,10 @@ int ObjectPool::bad() const
     }
     
     if ( cnt != nSize )
+    {
+        std::clog << "ObjectPool believed " << nSize << " true " << cnt << "\n";
         return 4;
+    }
     return 0;
 }
 
