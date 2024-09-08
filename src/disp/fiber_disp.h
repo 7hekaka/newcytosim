@@ -282,7 +282,7 @@ public:
     real tension_scale;
 
     /// ( if != 0 ) display the net forces acting on vertices (known as `force`)
-    real force_style;
+    int force_style;
 
     /**
      if `force_style != 0), a force `F` acting on a vertex is displayed as a

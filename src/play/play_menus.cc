@@ -21,7 +21,7 @@ static void processMenuFiber(int item)
             case 7: FD->end_style[1] = 3*!FD->end_style[1]; break;
             case 8: FD->end_style[0] = 2*!FD->end_style[0]; break;
                 
-            case 9: FD->force_style = FD->force_style; break;
+            case 9: FD->force_style = !FD->force_style; break;
             case 10: FD->visible = !FD->visible; break;
                 
             case 20: FD->coloring = FiberDisp::COLORING_OFF; break;

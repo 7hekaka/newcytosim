@@ -465,7 +465,7 @@ static void changeColoring(FiberDisp* p, int inc)
 
 static void setMask(FiberDisp* p, int val)
 {
-    p->mask = val;
+    p->mask = (unsigned)val;
     p->mask_bitfield = distribute_bits(p->mask, pcg32_state);
     flashText("fiber:mask_bitfield=0x%X (%i bits)", p->mask_bitfield, p->mask);
 }
