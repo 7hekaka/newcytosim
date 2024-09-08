@@ -192,7 +192,10 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
 {
     std::istringstream is(arg);
     std::string res = get_symbol(is, false);
-    size_t isp = is.tellg();
+    if ( ! is.good() )
+        return false;
+    size_t isp = res.size();
+    assert_true( is.tellg() == isp );
     int c = is.peek();
     if ( c == ':' )
     {
@@ -212,12 +215,9 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
         // spliting as word+number, concatenated
         is.clear();
         is.seekg(0);
-        get_stuff(is, isalpha);
-        isp = is.tellg();
+        isp = get_stuff(is, isalpha).size();
         is >> num;
     }
-    if ( is.fail() )
-        return false;
     arg.resize(isp);
     return true;
 }
