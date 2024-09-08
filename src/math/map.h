@@ -60,9 +60,9 @@ and its index is
 For a 4x4 2D grid, the index are like this:
 
     12  13  14  15
-    8    9  10  11
-    4    5   6   7
-    0    1   2   3
+     8   9  10  11
+     4   5   6   7
+     0   1   2   3
 
 \par Neighborhood:
 
@@ -105,6 +105,9 @@ public:
     /// Disabled copy assignment
     Map<ORD>& operator = (Map<ORD> const&);
 
+    /// type for the edge signature of cells
+    typedef unsigned char edge_type;
+    
 protected:
    
     /// Total number of cells in the map; size of cells[]
@@ -234,7 +237,7 @@ public:
     {
         mNbCells = 0;
         eRegion = nullptr;
-        regions = nullptr;
+        region_ = nullptr;
         cVolume = 0;
     }
     
@@ -616,91 +619,115 @@ public:
 private:
     
     /// array of index offset to neighbors, for each edge type
-    int  * eRegion;
+    int * eRegion;
     
-    /// pointers to eRegion[], as a function of cell index
-    int ** regions;
+    /// index into eRegion[], as a function of cell index
+    edge_type * region_;
     
 private:
     
-    /// calculate the edge-characteristic from the size `s`, coordinate `c` and range `r`
-    static size_t edge_signature(const size_t s, const int r, const int c)
+    /// calculate the edge-characteristic from the size `s`, range `r` and coordinate `c`
+    static int edge_signature(const int s, const int r, const int c)
     {
+        /* the characteristic is positive, and given that 0 <= c <= s-1,
+         if will be in [ 0, 2*r+1 ], with 0 far away from any edge.
+         For example with r = 2, we get characteristics as follows:
+         [ 4, 3, 0, 0 ... 0, 1, 2 ]
+         */
         if ( c < r )
-            return (size_t)( r - c );
-        else if ( (size_t)( c + r + 1 ) > s )
-            return (size_t)( 2 * r + c + 1 ) - s;
+            return ( 2 * r - c );
         else
-            return 0;
+            return std::max( 0, r + c + 1 - s );
     }
     
     /// caculate the edge characteristic from the coordinates of a cell and the range vector
-    size_t edgeFromCoordinates(const int coord[ORD], const size_t range[ORD]) const
+    edge_type edgeFromCoordinates(const int coord[ORD], const size_t range[ORD], bool symmetric) const
     {
-        size_t e = 0;
-        for ( int d = ORD; d > 0; --d )
+        int e = 0;
+        if ( symmetric )
         {
-            e *= 2 * range[d-1] + 1;
-            e += edge_signature(mDim[d-1], range[d-1], coord[d-1]);
+            for ( int d = ORD-1; d >= 0; --d )
+            {
+                e *= 2 * range[d] + 1;
+                e += edge_signature(mDim[d], range[d], coord[d]);
+            }
         }
-        return e;
+        else
+        {
+            for ( int d = ORD-1; d >= 0; --d )
+            {
+                e *= range[d] + 1;
+                e += std::max( 0, coord[d] + (int)range[d] + 1 - (int)mDim[d] );
+            }
+        }
+        assert_true(static_cast<edge_type>(e) == e);
+        return static_cast<edge_type>(e);
     }
     
     /// return array of dimensionality ORD, containing indices with reference to the center cell
-    static size_t initRectangularGrid(int * ccc, const size_t range[ORD])
+    static size_t initRectangularGrid(int * ccc, size_t ccc_size, const size_t range[ORD], bool symmetric)
     {
         size_t res = 1;
-        for ( int d = 0; d < ORD; ++d )
+        for ( unsigned d = 0; d < ORD; ++d )
+            ccc[d] = 0;
+        for ( unsigned d = 0; d < ORD; ++d )
         {
             size_t h = res;
-            for ( size_t s = 1; s <= range[d]; ++s )
+            for ( int s = 1; s <= range[d]; ++s )
             {
                 for ( size_t n = 0; n < res; ++n )
                 {
-                    for ( int e = 0; e < d; ++e )
+                    for ( unsigned e = 0; e < d; ++e )
                         ccc[ORD*h+e] = ccc[ORD*n+e];
                     ccc[ORD*h+d] = (int)s;
                     ++h;
-                    for ( int e = 0; e < d; ++e )
-                        ccc[ORD*h+e] = ccc[ORD*n+e];
-                    ccc[ORD*h+d] = -(int)s;
-                    ++h;
+                    if ( symmetric )
+                    {
+                        for ( unsigned e = 0; e < d; ++e )
+                            ccc[ORD*h+e] = ccc[ORD*n+e];
+                        ccc[ORD*h+d] = -(int)s;
+                        ++h;
+                    }
                 }
             }
             res = h;
         }
+        //printf("initRectangularGrid %i has %i neighbors\n", ccc_size, res);
         return res;
     }
     
     
     /// calculate cell index offsets between 'ori' and 'ori+shift'
-    int calculateOffsets(int offsets[], int shift[], size_t cnt, int ori[], bool positive)
+    int calculateOffsets(int offsets[], int shift[], size_t cnt, int ori[], bool symmetric)
     {
         int res = 0;
         int cc[ORD];
         int ori_indx = (int)pack(ori);
         for ( size_t ii = 0; ii < cnt; ++ii )
         {
-            for ( int d = 0; d < ORD; ++d )
+            for ( unsigned d = 0; d < ORD; ++d )
                 cc[d] = ori[d] + shift[ORD*ii+d];
             int off = (int)pack(cc) - ori_indx;
             
-            bool add = ( positive ? off >= 0 : true );
-            if ( isPeriodic() )
+            if ( symmetric || off >= 0 )
             {
-                //check that cell is not already included:
-                for ( int n = 0; n < res; ++n )
-                    if ( offsets[n] == off )
-                    {
-                        add = false;
-                        break;
-                    }
+                bool add = true;
+                if ( isPeriodic() )
+                {
+                    //check that cell is not already included:
+                    for ( int n = 0; n < res; ++n )
+                        if ( offsets[n] == off )
+                        {
+                            add = false;
+                            break;
+                        }
+                }
+                else
+                    add &= inside(cc);
+                
+                if ( add )
+                    offsets[res++] = off;
             }
-            else 
-                add &= inside(cc);
-            
-            if ( add )
-                offsets[res++] = off;
         }
         return res;
     }
@@ -711,39 +738,33 @@ private:
      Note: the range is taken specified in units of cells: 1 = 1 cell
      @todo: specify range in calculateRegion() as real distance!
      */
-    void createRegions(int * ccc, const size_t regMax, const size_t range[ORD], bool positive)
+    void createRegions(int * ccc, const edge_type regMax, const size_t range[ORD], bool symmetric)
     {
-        size_t edgeMax = 0;
-        for ( int d = ORD-1; d >= 0; --d )
-        {
-            edgeMax *= 2 * range[d] + 1;
-            edgeMax += 2 * range[d];
-        }
-        ++edgeMax;
-        
         //allocate and reset arrays:
         deleteRegions();
         
-        regions = new int*[mNbCells]{nullptr};
-        eRegion = new int[edgeMax*(regMax+1)]{0};
+        region_ = new edge_type[mNbCells]{0};
+        eRegion = new int[regMax*(regMax+1)]{0};
         
         int ori[ORD]{0};
-        for ( size_t indx = 0; indx < mNbCells; ++indx )
+        for ( size_t i = 0; i < mNbCells; ++i )
         {
-            setCoordinatesFromIndex(ori, indx);
-            size_t e = edgeFromCoordinates(ori, range);
-            assert_true( e < edgeMax );
-            int * reg = eRegion + e * ( regMax + 1 );
+            setCoordinatesFromIndex(ori, i);
+            edge_type e = edgeFromCoordinates(ori, range, symmetric);
+            assert_true( e < regMax );
+            edge_type off = e * regMax + e;
+            int * reg = eRegion + off;
             if ( reg[0] == 0 )
             {
                 // calculate the region for this new edge-characteristic
-                reg[0] = calculateOffsets(reg+1, ccc, regMax, ori, positive);
-                //printf("edge %i has region of %i cells\n", e, reg[0]);
+                reg[0] = calculateOffsets(reg+1, ccc, regMax, ori, symmetric);
+                //printf("edge type %i has %i neighbors\n", e, reg[0]);
             }
+            region_[i] = off;
 #if ( 0 )
             // compare result for a different cell of the same edge-characteristic
             int * rig = new int[regMax+1];
-            rig[0] = calculateOffsets(rig+1, ccc, regMax, ori, positive);
+            rig[0] = calculateOffsets(rig+1, ccc, regMax, ori, symmetric);
             if ( rig[0] != reg[0] )
                 ABORT_NOW("inconsistent region size");
             for ( int s = 1; s < rig[0]+1; ++s )
@@ -751,7 +772,6 @@ private:
                     ABORT_NOW("inconsistent region offsets");
             delete[] rig;
 #endif
-                regions[indx] = reg;
         }
     }
     
@@ -799,13 +819,13 @@ public:
             cmx *= ( 2 * range[d] + 1 );
         }
         int * ccc = new int[ORD*cmx]{0};
-        initRectangularGrid(ccc, range);
+        initRectangularGrid(ccc, cmx, range, true);
         
         for ( size_t s = cmx; s-- > 0 ; )
             if ( reject_square(ccc+ORD*s, radius) )
                 remove_entry(ccc, s, cmx);
         
-        createRegions(ccc, cmx, range, false);
+        createRegions(ccc, cmx, range, true);
         delete[] ccc;
     }
     
@@ -825,13 +845,13 @@ public:
             cmx *= ( 2 * range[d] + 1 );
         }
         int * ccc = new int[ORD*cmx]{0};
-        initRectangularGrid(ccc, range);
+        initRectangularGrid(ccc, cmx, range, true);
 
         for ( size_t s = cmx; s-- > 0 ; )
             if ( reject_disc(ccc+ORD*s, radius) )
                 remove_entry(ccc, s, cmx);
         
-        createRegions(ccc, cmx, range, false);
+        createRegions(ccc, cmx, range, true);
         delete[] ccc;
     }
 
@@ -843,25 +863,25 @@ public:
 
      Note: the radius is taken specified in units of cells: 1 = 1 cell
      */
-    void createSideRegions(const int num_cells)
+    void createSideRegions(const int num_cells_radius)
     {
         size_t cmx = 1;
         size_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
-            range[d] = num_cells;
-            cmx *= ( 2 * range[d] + 1 );
+            range[d] = num_cells_radius;
+            cmx *= ( range[d] + 1 );
         }
         int * ccc = new int[ORD*cmx]{0};
-        initRectangularGrid(ccc, range);
-        createRegions(ccc, cmx, range, true);
+        initRectangularGrid(ccc, cmx, range, false);
+        createRegions(ccc, cmx, range, false);
         delete[] ccc;
     }
     
     /// true if createRegions() or createRoundRegions() was called
     bool hasRegions() const
     {
-        return ( regions && eRegion );
+        return ( region_ && eRegion );
     }
     
     /// set region array 'offsets' for given cell index
@@ -884,16 +904,17 @@ public:
     int getRegion(int const*& offsets, const size_t indx) const
     {
         assert_true( hasRegions() );
-        offsets = regions[indx]+1;
+        int * R = eRegion + region_[indx];
+        offsets = R + 1;
         assert_true( offsets[0] == 0 );
-        return regions[indx][0];
+        return R[0];
     }
     
     /// free memory claimed by the regions
     void deleteRegions()
     {
-        delete[] regions;
-        regions = nullptr;
+        delete[] region_;
+        region_ = nullptr;
         
         delete[] eRegion;
         eRegion = nullptr;
