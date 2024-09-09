@@ -112,7 +112,7 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
         {
             /* With this option, the steric radius of the fiber may vary,
              as specified by Fiber::silhouette() */
-            for ( size_t i = 0; i < F->nbSegments(); ++i )
+            for ( unsigned i = 0; i < F->nbSegments(); ++i )
             {
                 real rad = F->silhouette(i);
                 real rge = rad + F->prop->steric_range;
@@ -129,7 +129,7 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
             const real sup = rge + 0.5 * F->segmentation();
 
             // include segments, in the cell associated with their center
-            for ( size_t i = 0; i < F->nbSegments(); ++i )
+            for ( unsigned i = 0; i < F->nbSegments(); ++i )
                 grid.add(F, i, rad, rge, sup);
         }
     }
@@ -153,7 +153,7 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
     {
         if ( has_steric(S, grid.nbPanes()) )
         {
-            for ( size_t i = 0; i < S->nbPoints(); ++i )
+            for ( unsigned i = 0; i < S->nbPoints(); ++i )
             {
                 if ( S->radius(i) > REAL_EPSILON )
                     grid.add(S, i, S->radius(i), S->radius(i)+S->prop->steric_range);
@@ -199,7 +199,7 @@ static void distributeStericMecables(LocusGrid& grid, Simul const& sim)
             const real rad = F->prop->steric_radius;
             const real rge = rad + 0.5 * F->segmentation();
             // include segments, in the cell associated with their center
-            for ( size_t i = 0; i < F->nbSegments(); ++i )
+            for ( unsigned i = 0; i < F->nbSegments(); ++i )
                 grid.add(F, i, rad, rge);
         }
     }
@@ -223,7 +223,7 @@ static void distributeStericMecables(LocusGrid& grid, Simul const& sim)
     {
         if ( has_steric(S, grid.nbPanes()) )
         {
-            for ( size_t i = 0; i < S->nbPoints(); ++i )
+            for ( unsigned i = 0; i < S->nbPoints(); ++i )
             {
                 if ( S->radius(i) > REAL_EPSILON )
                     grid.add(S, i, S->radius(i));
@@ -244,7 +244,7 @@ static void distributeStericMecablesModulo(LocusGrid& grid, Simul const& sim)
             const real rad = F->prop->steric_radius;
             const real rge = rad + 0.5 * F->segmentation();
             // include segments, in the cell associated with their center
-            for ( size_t i = 0; i < F->nbSegments(); ++i )
+            for ( unsigned i = 0; i < F->nbSegments(); ++i )
                 grid.add_modulo(F, i, rad, rge);
         }
     }
@@ -268,7 +268,7 @@ static void distributeStericMecablesModulo(LocusGrid& grid, Simul const& sim)
     {
         if ( has_steric(S, grid.nbPanes()) )
         {
-            for ( size_t i = 0; i < S->nbPoints(); ++i )
+            for ( unsigned i = 0; i < S->nbPoints(); ++i )
             {
                 if ( S->radius(i) > REAL_EPSILON )
                     grid.add_modulo(S, i, S->radius(i));

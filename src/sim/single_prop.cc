@@ -103,7 +103,7 @@ void SingleProp::clear()
     diffusion      = 0;
     fast_diffusion = 0;
     fast_reservoir = 0;
-    store_unbound  = ~0;
+    store_unbound  = ~0U;
 #if NEW_MOBILE_SINGLE
     speed.reset();
 #endif
