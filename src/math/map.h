@@ -815,9 +815,13 @@ public:
         for ( int d = 0; d < ORD; ++d )
         {
             assert_true( cWidth[d] > REAL_EPSILON );
-            range[d] = std::ceil( radius / cWidth[d] );
-            cmx *= ( 2 * range[d] + 1 );
+            size_t R = std::ceil( radius / cWidth[d] );
+            cmx *= ( 2 * R + 1 );
+            range[d] = R;
         }
+        if ( cmx != (edge_type)cmx )
+            throw InvalidParameter("Region size exceeds edge_type capacity");
+
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range, true);
         
@@ -841,9 +845,13 @@ public:
         for ( int d = 0; d < ORD; ++d )
         {
             assert_true( cWidth[d] > REAL_EPSILON );
-            range[d] = std::ceil( radius / cWidth[d] );
-            cmx *= ( 2 * range[d] + 1 );
+            size_t R = std::ceil( radius / cWidth[d] );
+            cmx *= ( 2 * R + 1 );
+            range[d] = R;
         }
+        if ( cmx != (edge_type)cmx )
+            throw InvalidParameter("Region size exceeds edge_type capacity");
+
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range, true);
 
@@ -863,20 +871,23 @@ public:
 
      Note: the radius is taken specified in units of cells: 1 = 1 cell
      */
-    void createSideRegions(const int num_cells_radius)
+    void createSideRegions(const unsigned num_cells_radius)
     {
         size_t cmx = 1;
         size_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
+            cmx *= ( num_cells_radius + 1 );
             range[d] = num_cells_radius;
-            cmx *= ( range[d] + 1 );
         }
+        if ( cmx != (edge_type)cmx )
+            throw InvalidParameter("Region size exceeds edge_type capacity");
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range, false);
         createRegions(ccc, cmx, range, false);
         delete[] ccc;
     }
+    
     
     /// true if createRegions() or createRoundRegions() was called
     bool hasRegions() const
