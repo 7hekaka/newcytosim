@@ -138,24 +138,22 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
  */
 std::string Tokenizer::split_symbol(std::string& arg)
 {
-    char const* str = arg.c_str();
-    char const* end = str;
+    size_t i = 0;
+    while ( isspace(arg[i]) )
+        ++i;
+    size_t s = i;
     
-    while ( isspace(*end) )
-        ++end;
-    size_t s = size_t(end-str);
-    
-    while ( valid_symbol(*end) )
-        ++end;
-    size_t e = size_t(end-str);
+    while ( valid_symbol(arg[i]) )
+        ++i;
+    size_t e = i - s;
     
     std::string res = arg.substr(s, e-s);
     
-    while ( isspace(*end) )
-        ++end;
+    while ( isspace(arg[i]) )
+        ++i;
 
     // remove extracted part:
-    arg.erase(0, (size_t)(end-str));
+    arg.erase(0, i);
     return res;
 }
 
@@ -390,18 +388,23 @@ std::vector<std::string> Tokenizer::split(std::string& str, char sep, bool get_e
  */
 bool Tokenizer::split_integer(long& val, std::string& arg)
 {
-    char const* ptr = arg.c_str();
-    char * end = nullptr;
-    errno = 0;
-    long num = strtol(ptr, &end, 10);
-    if ( !errno && (end > ptr) && isspace(*end) )
+    long num;
+    size_t i = 0;
+    try {
+        num = std::stol(arg, &i, 10);
+    }
+    catch (...)
+    {
+        return false;
+    }
+    if ( i > 0 && isspace(arg[i]) )
     {
         val = num;
         // skip any additional space-like characters:
-        while ( isspace(*end) )
-            ++end;
+        while ( isspace(arg[i]) )
+            ++i;
         // remove consumed characters:
-        arg.erase(0, (size_t)(end-ptr));
+        arg.erase(0, i);
         return true;
     }
     return false;
@@ -413,18 +416,23 @@ bool Tokenizer::split_integer(long& val, std::string& arg)
  */
 bool Tokenizer::split_integer(unsigned long& val, std::string& arg)
 {
-    char const* ptr = arg.c_str();
-    char * end = nullptr;
-    errno = 0;
-    unsigned long num = strtoul(ptr, &end, 10);
-    if ( !errno && (end > ptr) && isspace(*end) )
+    unsigned long num;
+    size_t i = 0;
+    try {
+        num = std::stoul(arg, &i, 10);
+    }
+    catch (...)
+    {
+        return false;
+    }
+    if ( i > 0 && isspace(arg[i]) )
     {
         val = num;
         // skip any additional space-like characters:
-        while ( isspace(*end) )
-            ++end;
+        while ( isspace(arg[i]) )
+            ++i;
         // remove consumed characters:
-        arg.erase(0, (size_t)(end-ptr));
+        arg.erase(0, i);
         return true;
     }
     return false;
