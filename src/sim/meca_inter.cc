@@ -2818,7 +2818,8 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     sub_iso_diag(ii3, ww3 * cc3);
     sub_iso(ii3, ii2, ww3 * cc2);
     
-#if ( 0 )
+#if ( 1 )
+    // equivalent shortcut, since cc0+cc1 = -1
     real wd = ww0 * cc1 - we * ee;
     sub_block(ii1, ii0, Matrix22(wd, we, -we, wd));
 #else

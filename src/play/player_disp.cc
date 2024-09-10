@@ -178,6 +178,7 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
         if ( S > 0.1 )
         {
             Vector3 vec(mat);
+            // switch between immediate alignment versus slow by default:
             real damp = ( mode & 16 ? 20 : 0 );
             real flip = std::copysign(1.0, dot(dir, vec));
             // if `damp>0`, time-average the direction vector:
