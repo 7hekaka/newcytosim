@@ -274,16 +274,16 @@ void Simul::solve_auto()
                 char str[256], *ptr = str;
                 char*const end = str+sizeof(str);
                 ptr += snprintf(ptr, end-ptr, " precond selection %lu | method count cpu", N_TESTS);
-                for ( size_t u : methods )
+                for ( unsigned u : methods )
                 {
                     real N = (real)autoCNT[u] / N_TESTS;
                     real T = autoCPU[u] / N_TESTS;
-                    ptr += snprintf(ptr, end-ptr, " | %lu %6.1f %6.0f", u, N, T);
+                    ptr += snprintf(ptr, end-ptr, " | %u %6.1f %6.0f", u, N, T);
                 }
                 snprintf(ptr, end-ptr, " |  -----> %i", autoPrecond);
                 Cytosim::log << str << '\n';
             }
-            for ( size_t u = 0; u < 8; ++u )
+            for ( unsigned u = 0; u < 8; ++u )
             {
                 autoCPU[u] = 0;
                 autoCNT[u] = 0;
