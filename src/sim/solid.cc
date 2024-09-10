@@ -345,7 +345,12 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
     for ( size_t i = 0; i < num; ++i )
     {
         Vector vec(0,0,0);
-        vec = Cytosim::findPosition(spec, nullptr);
+        try {
+            vec = Cytosim::findPosition(spec, nullptr);
+        } catch( InvalidParameter& e ) {
+            //e << " in `" << spec << "'\n";
+            throw;
+        }
         Wrist * w = sip->newWrist(this, ref, vec);
         objs.push_back(w);
     }
