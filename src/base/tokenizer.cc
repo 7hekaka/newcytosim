@@ -132,6 +132,10 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
 }
 
 
+/**
+ This will split 'arg' into 'symbol|stuff'.
+ It will return 'symbol' and truncate arg to 'stuff'.
+ */
 std::string Tokenizer::split_symbol(std::string& arg)
 {
     char const* str = arg.c_str();
@@ -139,12 +143,14 @@ std::string Tokenizer::split_symbol(std::string& arg)
     
     while ( isspace(*end) )
         ++end;
+    size_t s = size_t(end-str);
     
     while ( valid_symbol(*end) )
         ++end;
+    size_t e = size_t(end-str);
     
-    std::string res = arg.substr(0, end-str);
-
+    std::string res = arg.substr(s, e-s);
+    
     while ( isspace(*end) )
         ++end;
 

@@ -340,12 +340,12 @@ void Solid::makeWrist(ObjectList& objs, Glossary& opt, std::string const& var, S
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref, std::string const& str)
+void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref, std::string const& spec)
 {
     for ( size_t i = 0; i < num; ++i )
     {
         Vector vec(0,0,0);
-        vec = Cytosim::findPosition(str, nullptr);
+        vec = Cytosim::findPosition(spec, nullptr);
         Wrist * w = sip->newWrist(this, ref, vec);
         objs.push_back(w);
     }
