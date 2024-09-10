@@ -13,6 +13,27 @@
 #include "space.h"
 
 
+/** Extract some characters from the stream's current position,
+ resetting the state of the stream */
+static std::string peek(std::istream& is)
+{
+    const size_t CNT = 32;
+    char str[CNT]{0};
+    std::streampos isp = is.tellg();
+    is.getline(str, CNT-3);
+    if ( is.fail() )
+    {
+        str[CNT-4] = '.';
+        str[CNT-3] = '.';
+        str[CNT-2] = '.';
+        str[CNT-1] = 0;
+    }
+    is.clear();
+    is.seekg(isp);
+    return std::string(str);
+}
+
+
 /** With C++11, the extracted value is zeroed even upon failure.
 extract(), on the other hand, will preserve the value of 'var' if no read occurs.
 Returns `true` if a value was set. This is used with T=real and T=Vector */
@@ -485,7 +506,8 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
     Vector vec(0,0,0);
     if ( extract(is, vec) )
         return vec;
-    throw InvalidParameter("expected a vector specifying a `position`");
+
+    throw InvalidParameter("cannot extract vector from `"+peek(is)+"`");
 }
 
 
@@ -885,18 +907,17 @@ Vector Cytosim::readDirectionPrimitive(std::istream& is, Vector const& pos, Spac
         throw InvalidParameter("Unknown direction specification `"+tok+"'");
     }
     
+    // accept a Vector:
+    Vector vec(0,0,0);
+    if ( extract(is, vec) )
     {
-        // accept a Vector:
-        Vector vec(0,0,0);
-        if ( extract(is, vec) )
-        {
-            real n = vec.norm();
-            if ( n < REAL_EPSILON )
-                throw InvalidParameter("direction vector appears singular");
-            return vec / n;
-        }
+        real n = vec.norm();
+        if ( n < REAL_EPSILON )
+            throw InvalidParameter("direction vector appears singular");
+        return vec / n;
     }
-    throw InvalidParameter("expected a vector specifying a `direction`");
+
+    throw InvalidParameter("cannot extract direction from `"+peek(is)+"`");
 }
 
 
