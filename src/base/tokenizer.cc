@@ -191,38 +191,41 @@ std::string Tokenizer::get_polysymbol(std::istream& is, bool eat_line)
 /**
  Separates a word and a number, eg. 'cell1' into 'cell' and '1'
  It also splits 'cell:1' into 'cell' and '1'
+ Negative numbers are coded as 'cell~1', splited as 'cell' and '-1'
  */
 bool Tokenizer::split_polysymbol(std::string& arg, long& num)
 {
+    long val = 0;
     std::istringstream is(arg);
     std::string res = get_symbol(is, false);
-    if ( ! is.good() )
-        return false;
-    size_t isp = res.size();
-    assert_true( is.tellg() == isp );
-    int c = is.peek();
+    size_t n = res.size();
+    int c = is.good() ? is.peek() : 0;
     if ( c == ':' )
     {
         is.get();
         // spliting as symbol:number
-        is >> num;
+        is >> val;
     }
     else if ( c == '~' )
     {
         is.get();
         // spliting as symbol:negative_number
-        is >> num;
-        num = -num;
+        is >> val;
+        val = -val;
     }
     else
     {
-        // spliting as word+number, concatenated
+        // spliting as word|number, concatenated
         is.clear();
         is.seekg(0);
-        isp = get_stuff(is, isalpha).size();
-        is >> num;
+        n = get_stuff(is, isalpha).size();
+        is >> val;
     }
-    arg.resize(isp);
+    // check if splitting was successful:
+    if ( is.fail() || val <= 0 )
+        return false;
+    num = val;
+    arg.resize(n);
     return true;
 }
 
