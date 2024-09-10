@@ -150,7 +150,7 @@ inline void Meca::sub_block(size_t i, size_t j, MatrixBlock const& T)
     CHECK_INDICES(i,j,"sub");
 #if USE_MATRIX_BLOCK
     mFUL.block(i, j).sub_full(T);
-    PRINT_BLOCK(i,j,-T);
+    PRINT_BLOCK(i,j,T);
 #elif ( DIM == 1 ) && USE_ISO_MATRIX
     mISO.element(i,j) -= T.value();
 #else
@@ -167,7 +167,7 @@ inline void Meca::sub_block(size_t i, size_t j, real alpha, MatrixBlock const& T
     CHECK_INDICES(i,j,"sub_alpha");
 #if USE_MATRIX_BLOCK
     mFUL.block(i, j).sub_full(alpha, T);
-    PRINT_BLOCK(i,j,-alpha*T);
+    PRINT_BLOCK(i,j,alpha*T);
 #elif ( DIM == 1 ) && USE_ISO_MATRIX
     mISO.element(i,j) -= alpha * T.value();
 #else
@@ -221,7 +221,7 @@ inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
 #if USE_MATRIX_BLOCK
     assert_small(T.asymmetry());
     mFUL.diag_block(i).sub_half(T);
-    PRINT_BLOCK(i,i,-T);
+    PRINT_BLOCK(i,i,T);
 #elif ( DIM == 1 ) && USE_ISO_MATRIX
     mISO.diagonal(i) -= T.value();
 #else

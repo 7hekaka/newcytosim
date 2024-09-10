@@ -939,7 +939,7 @@ public:
         os << arg << " of dim " << ORD << " has " << mNbCells << " cells: ";
         for ( int d = 0; d < ORD; ++d )
         {
-            if ( mPeriodic[d] ) os << 'P';
+            if ( mPeriodic[d] ) os << "P "; else os << " ";
             os << "[" << mInf[d] << ", " << mSup[d];
             os << "]/" << mDim[d] << " = " << cWidth[d];
         }

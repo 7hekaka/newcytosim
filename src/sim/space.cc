@@ -29,8 +29,8 @@ Space::~Space()
 /**
  Provide a uniform random distribution in the volume by Monte-Carlo.
  
- Algorithm: throw a point in the rectangular volume provided by boundaries()
- until inside() returns true.
+ Method: throws a point in the rectangular volume provided by boundaries()
+ until inside() returns true. bailing out after max_trials attempts
 */
 Vector Space::place() const
 {
