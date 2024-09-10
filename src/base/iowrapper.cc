@@ -74,7 +74,7 @@ int Inputter::readInt()
 }
 
 
-int16_t Inputter::readInt16()
+int Inputter::readInt16()
 {
     if ( ! binary_ )
         return readInt();
@@ -88,7 +88,7 @@ int16_t Inputter::readInt16()
 }
 
 
-int32_t Inputter::readInt32()
+int Inputter::readInt32()
 {
     if ( ! binary_ )
         return readInt();
@@ -784,7 +784,7 @@ void Outputter::writeFloatsBinary(const double* a, const size_t n)
     assert_true( binary_ );
     float f[n];
     for ( size_t i = 0; i < n; ++i )
-        f[i] = a[i];
+        f[i] = static_cast<float>(a[i]);
     if ( n != fwrite(f, 4, n, mFile) )
         throw InvalidIO("writeFloat() failed");
 }

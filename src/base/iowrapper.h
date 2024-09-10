@@ -61,9 +61,9 @@ public:
     /// Read ASCII integer
     int readInt();
     /// Read integer on 2 bytes
-    int16_t readInt16();
+    int readInt16();
     /// Read integer on 4 bytes
-    int32_t readInt32();
+    int readInt32();
 
     /// Read ASCII integer
     unsigned readUInt();
