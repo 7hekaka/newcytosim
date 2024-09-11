@@ -25,13 +25,14 @@ void Polygon::allocate(unsigned s)
 {
     delete[] pts_;
     pts_  = new Point2D[s+2];
-    npts_ = s;
+    maxp_ = s;
 }
 
 
 void Polygon::set(unsigned ord, real rad, real ang)
 {
     allocate(ord);
+    npts_ = ord;
     real a = 2 * M_PI / (real)ord;
     for ( unsigned i = 0; i < ord; ++i )
     {
@@ -117,8 +118,12 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
 
 void Polygon::read(std::istream& in)
 {
-    size_t n = read(in, nullptr, 0);
+    size_t s = read(in, nullptr, 0);
+    unsigned n = (unsigned)s;
+    if ( s != n )
+        throw InvalidIO("Error: too many points in polygon coordinate file");
     allocate(n);
+    npts_ = n;
     in.clear();
     in.seekg(0);
     read(in, pts_, npts_);

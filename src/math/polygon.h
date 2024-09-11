@@ -44,6 +44,9 @@ public:
     /// list of points. The array is allocated to hold index = 2+npts_
     Point2D* pts_;
     
+    /// allocated size of arra
+    unsigned maxp_;
+    
     /// number of points
     unsigned npts_;
     
@@ -57,6 +60,9 @@ public:
     
     /// number of points
     unsigned nbPoints() const { return npts_; }
+    
+    /// access to vertex coordinates
+    Point2D const* data() const { return pts_; }
     
     /// set number of points and allocate memory
     void allocate(unsigned s);

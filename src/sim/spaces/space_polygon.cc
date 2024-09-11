@@ -45,7 +45,7 @@ void SpacePolygon::resize(Glossary& opt)
     else if ( opt.has_key("points") )
     {
         // specify vertices directly:
-        unsigned nbp = opt.num_values("points");
+        unsigned nbp = (unsigned)opt.num_values("points");
         poly_.allocate(nbp);
         for ( unsigned p = 0; p < nbp; ++p )
         {
@@ -357,16 +357,14 @@ void SpacePolygon::draw3D() const
 {
     const float H(-height_);
     const unsigned nbp = poly_.nbPoints();
-    Polygon::Point2D const* pts = poly_.pts_;
+    Polygon::Point2D const* pts = poly_.data();
     flute3 * flt = gym::mapBufferV3(2*nbp+2);
-    for ( size_t i = 0; i < nbp; ++i )
+    for ( size_t i = 0; i <= nbp; ++i )
     {
         float X(pts[i].xx), Y(pts[i].yy);
         flt[2*i  ] = { X, Y, -H };
         flt[2*i+1] = { X, Y,  H };
     }
-    flt[2*nbp+2] = flt[2*nbp  ];
-    flt[2*nbp+3] = flt[2*nbp+1];
     gym::unmapBufferV3();
     // display sides
     gym::drawTriangleStrip(0, 2*nbp+2);
