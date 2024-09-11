@@ -180,7 +180,7 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
             Vector3 vec(mat);
             // switch between immediate alignment versus slow by default:
             real damp = ( mode & 16 ? 20 : 0 );
-            real flip = std::copysign(1.0, dot(dir, vec));
+            real flip = std::copysign(1.0, dot(view.firstAxis(), vec));
             // if `damp>0`, time-average the direction vector:
             dir = ( dir * damp + vec * flip ).normalized();
             if ( glApp::mouseS ) // only track if mouse button is up!
