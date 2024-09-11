@@ -202,17 +202,17 @@ public:
     /// multiplication between quaternions
     const Quaternion operator * (const Quaternion & X) const
     {
-        Quaternion result(q[0], q[1], q[2], q[3]);
-        result.rightMult(X);
-        return result;
+        Quaternion R(q[0], q[1], q[2], q[3]);
+        R.rightMult(X);
+        return R;
     }
     
     /// division between quaternions
     const Quaternion operator / (const Quaternion & X) const
     {
-        Quaternion result(q[0], q[1], q[2], q[3]);
-        result.rightMult(X.inverted());
-        return result;
+        Quaternion R(q[0], q[1], q[2], q[3]);
+        R.rightMult(X.inverted());
+        return R;
     }
     
     /// extract the square of the norm, i.e. norm*norm
@@ -560,23 +560,16 @@ public:
         m[3+4*3] = 1.0;
     }
     
-    /// set from polar coordinates (r, phi, theta, psi)
-    void setFromPolar(const REAL v[4])
-    {
-        REAL a = v[0] * std::sin(v[1]);
-        q[0]   = v[0] * std::cos(v[1]);   //r*std::cos(phi)
-        REAL b = a * std::sin(v[2]);
-        q[1]   = a * std::cos(v[2]);      //r*std::sin(phi)*std::cos(theta)
-        q[2]   = b * std::cos(v[3]);      //r*std::sin(phi)*std::sin(theta)*std::cos(psi)
-        q[3]   = b * std::sin(v[3]);      //r*std::sin(phi)*std::sin(theta)*std::sin(psi)
-    }
-    
     /// return new quaternion with polar coordinates (r, phi, theta, psi)
     static const Quaternion newFromPolar(const REAL v[4])
     {
-        Quaternion result;
-        result.setFromPolar(v);
-        return result;
+        REAL tt = v[0] * std::sin(v[1]);
+        REAL q0 = v[0] * std::cos(v[1]); //r*std::cos(phi)
+        REAL bs = tt * std::sin(v[2]);
+        REAL q1 = tt * std::cos(v[2]);   //r*std::sin(phi)*std::cos(theta)
+        REAL q2 = bs * std::cos(v[3]);   //r*std::sin(phi)*std::sin(theta)*std::cos(psi)
+        REAL q3 = bs * std::sin(v[3]);   //r*std::sin(phi)*std::sin(theta)*std::sin(psi)
+        return Quaternion(q0, q1, q2, q3);
     }
     
     /// calculate the polar coordinates (r, phi, theta, psi)
@@ -589,7 +582,6 @@ public:
         v[3] = std::atan2(q[3], q[2]);
     }
     
-    
     /// set as rotation of axis v, angle defined by cosine & sine of HALF-ANGLE
     /** argument `v` should be unitary (norm=1), or S should be divided by the norm */
     void setFromAxis(const REAL v[3], REAL C, REAL S)
@@ -600,12 +592,27 @@ public:
         q[3] = v[2] * S;
     }
 
+    /// set as rotation of axis v, angle defined by cosine & sine of HALF-ANGLE
+    /** argument `v` should be unitary (norm=1), or S should be divided by the norm */
+    static const Quaternion newFromAxis(const REAL v[3], REAL C, REAL S)
+    {
+        return Quaternion(C, v[0] * S, v[1] * S, v[2] * S);
+    }
+
     /// set as rotation of axis v, with angle = v.norm() in radian;
     void setFromAxis(const REAL v[3])
     {
         /** for small angles, we assume here angle ~ v.norm() */
         REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
         setFromAxis(v, std::cos(n*0.5), (n>0)?std::sin(n*0.5)/n:0);
+    }
+
+    /// set as rotation of axis v, with angle = v.norm() in radian;
+    static const Quaternion newFromAxis(const REAL v[3])
+    {
+        /** for small angles, we assume here angle ~ v.norm() */
+        REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+        return newFromAxis(v, std::cos(n*0.5), (n>0)?std::sin(n*0.5)/n:0);
     }
     
     /// set from rotation of axis v, and angle 'angle' in radian around this axis
@@ -618,16 +625,38 @@ public:
         setFromAxis(v, C, S/n);
     }
 
+    /// set from rotation of axis v, and angle 'angle' in radian around this axis
+    /** argument `v` is normalized for more security */
+    static const Quaternion newFromAxis(const REAL v[3], REAL angle)
+    {
+        REAL n = std::sqrt(v[0]*v[0] + v[1]*v[1] + v[2]*v[2]);
+        REAL C = std::cos(angle*0.5);
+        REAL S = std::sin(angle*0.5);
+        return newFromAxis(v, C, S/n);
+    }
+    
     /// set as rotation of angle 'angle' and axis X, Y or Z (axis=0,1,2)
     /** along one of the unit axis specified by `axis`: ( 0: X, 1: Y, 2: Z ) */
     void setFromPrincipalAxis(int axis, REAL angle)
     {
-        REAL a = angle * 0.5;
-        q[0] = std::cos(a);
+        angle *= 0.5;
+        q[0] = std::cos(angle);
         q[1] = 0.0;
         q[2] = 0.0;
         q[3] = 0.0;
-        q[axis+1] = std::sin(a);
+        q[axis+1] = std::sin(angle);
+    }
+
+
+    /// set as rotation of angle 'angle' and axis X, Y or Z (axis=0,1,2)
+    /** along one of the unit axis specified by `axis`: ( 0: X, 1: Y, 2: Z ) */
+    static const Quaternion newFromPrincipalAxis(int axis, REAL angle)
+    {
+        Quaternion R(0,0,0,0);
+        angle *= 0.5;
+        R[0] = std::cos(angle);
+        R[axis+1] = std::sin(angle);
+        return R;
     }
     
     /// set as rotation to transform `dir` into (1, 0, 0), assuming norm(dir)==1
