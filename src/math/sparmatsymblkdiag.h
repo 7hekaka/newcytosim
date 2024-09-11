@@ -179,7 +179,7 @@ public:
     size_t size() const { return rsize_ * SD_BLOCK_SIZE; }
     
     /// change the size of the matrix
-    void resize(size_t s) { rsize_ = s / SD_BLOCK_SIZE; allocate(rsize_); }
+    void resize(size_t s) { rsize_ = ( s + SD_BLOCK_SIZE - 1 ) / SD_BLOCK_SIZE; allocate(rsize_); }
 
     /// base for destructor
     void deallocate();

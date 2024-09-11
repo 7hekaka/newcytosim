@@ -1404,10 +1404,10 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         vec2 mat0 = loadu2(mat);
         vec2 mat2 = loadu2(mat+2);
         vec2 XY = fmadd2(mat0, xx, loadu2(Y+ii));
-        vec2 Z0 = fmadd1(mat2, xx, load1Z(Y+ii+2));
+        vec2 Z0 = fmadd1(unpacklo2(mat2, zero), xx, loadu2(Y+ii+2));
 
         vec2 xyi = loadu2(X+ii);
-        vec2 z0i = load1Z(X+ii+2);
+        vec2 z0i = unpacklo2(load1(X+ii+2), zero);
         s0 = fmadd2(mat0, xyi, s0);
         s0 = fmadd2(mat2, z0i, s0);
 
@@ -1418,13 +1418,12 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
 
         vec2 mat4 = loadu2(mat+4);
         vec2 mat3 = catshift(mat2, mat4);
-        s1 = fmadd2(mat3, xyi, s1);
         XY = fmadd2(mat3, yy, XY);
+        s1 = fmadd2(mat3, xyi, s1);
         vec2 mat6 = loadu2(mat+6);
-        vec2 mat5 = catshift(mat4, mat6);
-        s1 = fmadd2(mat5, z0i, s1);
-        Z0 = fmadd1(mat5, yy, Z0);
-        vec2 mat8 = load1Z(mat+8);
+        Z0 = fmadd1(unpackhi2(mat4, zero), yy, Z0);
+        s1 = fmadd2(catshift(mat4, mat6), z0i, s1);
+        vec2 mat8 = unpacklo2(load1(mat+8), zero);
         s2 = fmadd2(mat6, xyi, s2);
         XY = fmadd2(mat6, zz, XY);
         Z0 = fmadd1(mat8, zz, Z0);
@@ -2041,7 +2040,11 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
         pilar_[j].vecMulAddTriangle2D(X, Y, 2*j);
     
 #else
+    
     zero_real(SD_BLOCK_SIZE*rsize_, Y);
-    vecMulAdd(X, Y, 0, rsize_);
+    //vecMulAdd(X, Y, 0, rsize_);
+    for ( size_t j = 0; j < rsize_; ++j )
+        pilar_[j].vecMulAdd3D_SIMD(X, Y, j*3);
+
 #endif
 }
