@@ -132,6 +132,9 @@ public:
     /// half visible range in X or Y
     float range(int i) const { return 0.5f * viewScale[i] / zoom; }
     
+    /// return first direction of view parallel to display screen
+    Vector3 firstAxis() const;
+
     /// return direction of view that is orthogonal to display screen
     Vector3 depthAxis() const;
     

@@ -753,8 +753,17 @@ void View::setROI(Vector3 a, Vector3 b)
 #pragma mark -
 
 /**
- return axis orthogonal to the display plane, and corresponding to depth axis
- corresponding to the current modelview transformation
+ return first 'X' axis in the display plane, in the current modelview transformation
+ */
+Vector3 View::firstAxis() const
+{
+    const float * ptr = modelview_;
+    return normalize(Vector3(ptr[0], ptr[4], ptr[8]));
+}
+
+/**
+ return axis orthogonal to the display plane, corresponding to depth axis
+ in the current modelview transformation
  */
 Vector3 View::depthAxis() const
 {
