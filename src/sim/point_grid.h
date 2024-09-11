@@ -265,7 +265,7 @@ public:
  - `PointGrid::setSterics()` checks all pairs of Point/Locus that may overlap,
     calculating their distance, and calling Meca::addLink() if they are interacting
  .
- The related class `LocusGrid`, is a simpler, streamline version of this class.
+ The related class `LocusGrid`, is a simpler, streamlined version of this class.
  For periodic boundary conditions, this follows the [Periodic wrapping] method.
  
  Check the [general introduction on Cell Lists](https://en.wikipedia.org/wiki/Cell_lists)

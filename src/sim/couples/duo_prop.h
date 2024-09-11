@@ -57,7 +57,7 @@ public:
     mutable std::string splashed;
 
     /// deactivation_rate * time_step
-    real deactivation_rate_dt;
+    float deactivation_rate_dt;
     
     // Space inside which the Duo is activated
     Space const* activation_space;

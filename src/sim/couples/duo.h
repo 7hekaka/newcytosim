@@ -27,7 +27,7 @@ class Duo : public Couple
 #endif
 
     /// Gillespie countdown timer for deactivation event
-    real countdown_;
+    float nextDeact;
     
     /// switch activity 'off'
     void deactivate();

@@ -14,7 +14,7 @@
 Duo::Duo(DuoProp const* p, Vector const& w)
 : Couple(p, w), active_(0)
 {
-    countdown_ = -1;
+    nextDeact = -1;
     if ( p->fast_diffusion )
         throw InvalidParameter("`fast_diffusion` is incompatible with `activity=duo`");
 }
@@ -28,7 +28,7 @@ Duo::~Duo()
 void Duo::activate()
 {
     active_ = 1;
-    countdown_ = RNG.exponential();
+    nextDeact = RNG.exponential();
 }
 
 void Duo::deactivate()
@@ -58,14 +58,14 @@ void Duo::stepFF()
     // activity
     if ( active_ )
     {
-        assert_true(countdown_ >= 0);
+        assert_true(nextDeact >= 0);
         // spontaneous de-activation:
-        countdown_ -= prop()->deactivation_rate_dt;
-        if ( countdown_ < 0 )
+        nextDeact -= prop()->deactivation_rate_dt;
+        if ( nextDeact < 0 )
         {
             deactivate();
             // test fraction of time when it is inactive:
-            if ( RNG.test(-countdown_/prop()->deactivation_rate_dt) )
+            if ( RNG.test(-nextDeact/prop()->deactivation_rate_dt) )
                 return;
         }
         
@@ -85,8 +85,8 @@ void Duo::stepFF()
  */
 void Duo::tryDeactivate()
 {
-    countdown_ -= prop()->deactivation_rate_dt;
-    if ( countdown_ < 0 )
+    nextDeact -= prop()->deactivation_rate_dt;
+    if ( nextDeact < 0 )
         deactivate();
 }
 
@@ -238,7 +238,7 @@ void Duo::read(Inputter& in, Simul& sim, ObjectTag tag)
     else
         active_ = 1;
     if ( active_ )
-        countdown_ = RNG.exponential();
+        nextDeact = RNG.exponential();
     Couple::read(in, sim, tag);
 }
 
