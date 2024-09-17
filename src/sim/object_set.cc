@@ -214,7 +214,7 @@ void ObjectSet::eraseObjects(ObjectList const& objs)
 /// counting how many objects of the same property have lower identity
 std::string ObjectSet::nameObject(Object const* obj) const
 {
-    Property const* pp = obj->property();
+    Property const* prp = obj->property();
     ObjectID end = obj->identity();
     ObjectID cnt = 1;
 
@@ -222,9 +222,9 @@ std::string ObjectSet::nameObject(Object const* obj) const
     {
         Inventoried * i = inventory_[id];
         if ( i )
-            cnt += ( static_cast<Object*>(i)->property() == pp );
+            cnt += ( static_cast<Object*>(i)->property() == prp );
     }
-    return pp->name() + std::to_string(cnt);
+    return prp->name() + std::to_string(cnt);
 }
 
 

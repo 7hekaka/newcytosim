@@ -380,7 +380,7 @@ bool all_points_inside(ObjectList const& objs, Space const* spc)
 /**
  This would usually create ONE object of type 'pp', placed according to `opt`
  */
-ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& opt)
+ObjectList Interface::new_object(ObjectSet* set, Property const* prp, Glossary& opt)
 {
     ObjectList objs;
     long max_trials = 1024;
@@ -399,7 +399,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
     
     while ( --nb_trials >= 0 )
     {
-        objs = set->newObjects(pp, opt);
+        objs = set->newObjects(prp, opt);
         
 #ifndef NDEBUG
         // check for `nullptr` in list, which should not happen:
@@ -465,7 +465,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* pp, Glossary& o
     
     if ( objs.empty() )
     {
-        std::string name = pp ? pp->name() : "object";
+        std::string name = prp ? prp->name() : "object";
         if ( max_trials > 1 )
             Cytosim::log << "could not place `" << name << "' after " << max_trials << " trials\n";
         return objs;
@@ -522,11 +522,11 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
 {
     ObjectList res;
     ObjectSet * set = nullptr;
-    Property const* pp = sim_->properties.find(name);
+    Property const* prp = sim_->properties.find(name);
     
-    if ( cat.empty() && pp )
+    if ( cat.empty() && prp )
     {
-        set = sim_->findSet(pp->category());
+        set = sim_->findSet(prp->category());
         if ( !set )
             throw InvalidSyntax("could not determine the class of `"+name+"'");
     }
@@ -567,7 +567,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         for ( size_t n = 0; n < cnt; ++n )
         {
             opt.define("position", A + n * dAB);
-            res.append(new_object(set, pp, opt));
+            res.append(new_object(set, prp, opt));
         }
     }
     // syntax sugar: positions specified for multiple objects
@@ -576,13 +576,13 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         for ( size_t n = 0; n < cnt; ++n )
         {
             opt.define("position", opt.least_used_value("positions"));
-            res.append(new_object(set, pp, opt));
+            res.append(new_object(set, prp, opt));
         }
     }
     else if ( set == &sim_->singles && opt.has_key("multi_base") )
     {
         // particular case: distribute Single onto beads (31.01.2023):
-        SingleProp const* sp = static_cast<SingleProp const*>(pp);
+        SingleProp const* sp = static_cast<SingleProp const*>(prp);
         std::string str;
         if ( opt.set(str, "multi_base") )
             sim_->singles.distributeWrists(res, sp, cnt, str);
@@ -602,7 +602,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
         
         // normal pathway:
         for ( size_t n = 0; n < cnt; ++n )
-            res.append(new_object(set, pp, opt));
+            res.append(new_object(set, prp, opt));
     }
     //hold();
     
@@ -642,8 +642,8 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
 ObjectList Interface::execute_new(std::string const& name, size_t cnt, 
                                   Space const* spc, std::string const& position)
 {
-    Property const* pp = sim_->properties.find_or_die(name);
-    ObjectSet * set = sim_->findSet(pp->category());
+    Property const* prp = sim_->properties.find_or_die(name);
+    ObjectSet * set = sim_->findSet(prp->category());
     if ( !set )
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
@@ -652,7 +652,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
     set->reserve(cnt+set->inventory_.highest());
     for ( size_t n = 0; n < cnt; ++n )
     {
-        ObjectList objs = set->newObjects(pp, opt);
+        ObjectList objs = set->newObjects(prp, opt);
         
         if ( objs.empty() )
             throw InvalidSyntax("could not create any `"+name+"'");
