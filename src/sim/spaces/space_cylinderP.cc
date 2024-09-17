@@ -10,9 +10,6 @@
 SpaceCylinderP::SpaceCylinderP(SpaceProp const* p)
 : Space(p)
 {
-#if !ENABLE_PERIODIC_BOUNDARIES
-    throw InvalidParameter("Cytosim was made without PERIODIC BOUNDARIES");
-#endif
     if ( DIM < 3 )
         throw InvalidParameter("cylinderP is only valid in 3D: use strip instead");
     half_ = 0;
@@ -45,8 +42,10 @@ void SpaceCylinderP::resize(Glossary& opt)
 
 void SpaceCylinderP::update()
 {
+#if ENABLE_PERIODIC_BOUNDARIES
     modulo_.reset();
     modulo_.enablePeriodic(0, 2*half_);
+#endif
 }
 
 
@@ -151,7 +150,9 @@ Vector SpaceCylinderP::bounce(Vector const& pos) const
         return bounceOnEdges(pos);
     
     Vector P = pos;
+#if ENABLE_PERIODIC_BOUNDARIES
     P.XX = modulo_.fold_(pos.XX, 0);
+#endif
     return P;
 }
 

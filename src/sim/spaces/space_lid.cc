@@ -13,9 +13,6 @@
 SpaceLid::SpaceLid(SpaceDynamicProp const* p)
 : Space(p)
 {
-#if !ENABLE_PERIODIC_BOUNDARIES
-    throw InvalidParameter("Cytosim was made without PERIODIC BOUNDARIES");
-#endif
     if ( DIM == 1 )
         throw InvalidParameter("lid  is not usable in 1D");
     half_[0] = 0;
@@ -62,9 +59,11 @@ void SpaceLid::resize(Glossary& opt)
 
 void SpaceLid::update()
 {
+#if ENABLE_PERIODIC_BOUNDARIES
     modulo_.reset();
     for ( int d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
+#endif
 }
 
 
@@ -82,6 +81,7 @@ void SpaceLid::boundaries(Vector& inf, Vector& sup) const
 
 Vector SpaceLid::bounce(Vector const& pos) const
 {
+#if ENABLE_PERIODIC_BOUNDARIES
 #if ( DIM >= 3 )
     real X = modulo_.fold_(pos.XX, 0);
     real Y = modulo_.fold_(pos.YY, 1);
@@ -91,6 +91,7 @@ Vector SpaceLid::bounce(Vector const& pos) const
     real X = modulo_.fold_(pos.XX, 0);
     real Y = bounce1(pos.YY, bot_, top_-bot_);
     return Vector(X, Y);
+#endif
 #endif
     return pos;
 }

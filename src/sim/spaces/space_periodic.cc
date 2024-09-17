@@ -9,9 +9,6 @@
 SpacePeriodic::SpacePeriodic(SpaceProp const* p)
 : Space(p)
 {
-#if !ENABLE_PERIODIC_BOUNDARIES
-    throw InvalidParameter("Cytosim was made without PERIODIC BOUNDARIES");
-#endif
     for ( int d = 0; d < 4; ++d )
         half_[d] = 0;
 }
@@ -34,9 +31,11 @@ void SpacePeriodic::resize(Glossary& opt)
 
 void SpacePeriodic::update()
 {
+#if ENABLE_PERIODIC_BOUNDARIES
     modulo_.reset();
     for ( int d = 0; d < DIM; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
+#endif
 }
 
 
@@ -49,6 +48,7 @@ void SpacePeriodic::boundaries(Vector& inf, Vector& sup) const
 
 Vector SpacePeriodic::bounce(Vector const& pos) const
 {
+#if ENABLE_PERIODIC_BOUNDARIES
     real X = modulo_.fold_(pos.XX, 0);
 #if ( DIM == 2 )
     real Y = modulo_.fold_(pos.YY, 1);
@@ -60,6 +60,8 @@ Vector SpacePeriodic::bounce(Vector const& pos) const
     return Vector(X, Y, Z);
 #endif
     return Vector(X, 0, 0);
+#endif
+    return pos;
 }
 
 

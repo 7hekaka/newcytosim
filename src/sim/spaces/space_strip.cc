@@ -12,9 +12,6 @@
 SpaceStrip::SpaceStrip(SpaceProp const* p)
 : Space(p)
 {
-#if !ENABLE_PERIODIC_BOUNDARIES
-    throw InvalidParameter("Cytosim was made without PERIODIC BOUNDARIES");
-#endif
     if ( DIM == 1 )
         throw InvalidParameter("strip is not usable in 1D");
     half_[0] = 0;
@@ -77,9 +74,11 @@ void SpaceStrip::resize(Glossary& opt)
 
 void SpaceStrip::update()
 {
+#if ENABLE_PERIODIC_BOUNDARIES
     modulo_.reset();
     for ( int d = 0; d < DIM-1; ++d )
         modulo_.enablePeriodic(d, 2*half_[d]);
+#endif
     mid_ = ( top_ + bot_ ) * 0.5;
     // option to limit to bottom edge:
     if ( no_top_ )
@@ -104,6 +103,7 @@ void SpaceStrip::boundaries(Vector& inf, Vector& sup) const
 /** bounce within [bot_, top_] in the last dimension, and periodic in the others */
 Vector SpaceStrip::bounce(Vector const& pos) const
 {
+#if ENABLE_PERIODIC_BOUNDARIES
 #if ( DIM >= 3 )
     real X = modulo_.fold_(pos.XX, 0);
     real Y = modulo_.fold_(pos.YY, 1);
@@ -113,6 +113,7 @@ Vector SpaceStrip::bounce(Vector const& pos) const
     real X = modulo_.fold_(pos.XX, 0);
     real Y = bounce1(pos.YY, bot_, top_-bot_);
     return Vector(X, Y);
+#endif
 #endif
     return pos;
 }
