@@ -74,6 +74,8 @@ namespace gym
     inline void rebindBufferV2() { rebind(); setBufferV(2); }
 
     void setBufferVxT2(size_t, size_t);
+    
+    inline void enableTexture(GLuint tex) { glEnable(GL_TEXTURE_2D); glBindTexture(GL_TEXTURE_2D, tex); }
     inline void cleanupTexture() { glDisableClientState(GL_TEXTURE_COORD_ARRAY); glDisable(GL_TEXTURE_2D); }
 
     inline flute4* mapBufferV2T2(size_t n) { return (flute4*)mapFloatBuffer(4*n); }

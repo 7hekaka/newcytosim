@@ -258,8 +258,7 @@ void PointDisp::drawPixelmap(float X, float Y, float Z, size_t inx) const
     float U = 0.25 + T;
     gym::ref_view();
     gym::color(1,1,1,1);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, texture_);
+    gym::enableTexture(texture_);
     flute6* flu = gym::mapBufferV4T2(4);
     flu[0] = { X-S, Y+S, Z, 0, 0, T };
     flu[1] = { X-S, Y-S, Z, 0, 0, U };
