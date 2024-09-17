@@ -487,14 +487,14 @@ void Field::step(FiberSet& fibers)
     // instantaneous transport along Fibers
     if ( prop->transport_strength > 0 )
     {
-        const real spread = 0.5 * cellWidth();
-        const real rate = prop->transport_strength * spread / cellVolume();
+        const real gap = 0.5 * cellWidth();
+        const real rate = prop->transport_strength * gap / cellVolume();
         const real frac = -std::expm1( -rate * tau );
         
         if ( frac >= 0.5 )
             throw InvalidParameter("field:transport_strength is too high");
         
-        fibers.uniFiberSites(loc, spread);
+        fibers.uniFiberSites(loc, gap);
         for ( FiberSite & i : loc )
         {
             // abscissa for exit point of transport:
@@ -517,10 +517,10 @@ void Field::step(FiberSet& fibers)
     if ( prop->cut_fibers )
     {
         LOG_ONCE("!!!! Field severs fibers\n");
-        const real spread = 0.5 / tau;
-        const real fac = spread * tau / cellVolume();
+        const real gap = 0.5 / tau;
+        const real fac = gap * tau / cellVolume();
         
-        fibers.uniFiberSites(loc, spread);
+        fibers.uniFiberSites(loc, gap);
         for ( FiberSite & i : loc )
         {
             real val = field[mGrid.index(i.pos())];

@@ -471,29 +471,29 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
 
 /**
  Set a list of Locations on the fibers, chosen randomly with uniform sampling.
- The number of sites returned on a section of length `L` is  `L / spread`.
- `spread` is thus the average distance between sites.
+ The number of sites returned on a section of length `L` is  `L / gap`.
+ `gap` is thus the average distance between sites.
  
  Because the list of fiber is regularly shuffled, the sites will consider fibers
  in a random order. However, the sites on one fiber will be listed in the order
  of increasing abscissa.
  
- Condition: ( spread > 0 )
+ Condition: ( gap > 0 )
  */
-void FiberSet::uniFiberSites(Array<FiberSite>& res, const real spread) const
+void FiberSet::uniFiberSites(Array<FiberSite>& res, const real gap) const
 {
-    assert_true( spread > 0 );
+    assert_true( gap > 0 );
 
     res.clear();
     Fiber * fib = first();
-    real abs = spread * RNG.exponential();
+    real abs = gap * RNG.exponential();
     while ( fib )
     {
         real len = fib->length();
         while ( abs < len )
         {
             res.emplace(fib, abs+fib->abscissaM());
-            abs += spread * RNG.exponential();
+            abs += gap * RNG.exponential();
         }
         abs -= len;
         fib = fib->next();
@@ -623,20 +623,20 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
 
  This is for the plus end
  */
-void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
+void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real gap) const
 {
-    assert_true( spread > 0 );
+    assert_true( gap > 0 );
     
     res.clear();
     Fiber * fib = first();
-    real abs = spread * RNG.exponential();
+    real abs = gap * RNG.exponential();
     while ( fib )
     {
         real len = fib->freshAssemblyP();
         while ( abs < len )
         {
             res.emplace(fib, fib->abscissaP()-abs);
-            abs += spread * RNG.exponential();
+            abs += gap * RNG.exponential();
         }
         abs -= len;
         fib = fib->next();
@@ -657,20 +657,20 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real spread) const
 
  This is for the minus end
  */
-void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real spread) const
+void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real gap) const
 {
-    assert_true( spread > 0 );
+    assert_true( gap > 0 );
     
     res.clear();
     Fiber * fib = first();
-    real abs = spread * RNG.exponential();
+    real abs = gap * RNG.exponential();
     while ( fib )
     {
         real a = fib->freshAssemblyM();
         while ( abs < a )
         {
             res.emplace(fib, fib->abscissaM()+abs);
-            abs += spread * RNG.exponential();
+            abs += gap * RNG.exponential();
         }
         abs -= a;
         fib = fib->next();

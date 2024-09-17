@@ -1079,15 +1079,15 @@ void Simul::reportFiberPoints(std::ostream& out, Property const* sel) const
  in microcscopy with a low amount of fluorescent-monomers.
  
  The distance between the speckles follows an exponential distribution
- with an average defined by the parameter `spread`.
+ with an average defined by a parameter `gap` or `1/density` defined in `opt`.
  */
 void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
 {
-    real spread = 1;
-    if ( opt.set(spread, "density") )
-        spread = 1.0 / spread;
+    real gap = 1;
+    if ( opt.set(gap, "density") )
+        gap = 1.0 / gap;
     else
-        opt.set(spread, "interval");
+        opt.set(gap, "interval", "gap");
     constexpr real TINY = 0x1p-32;
 
     Fiber const* fib = fibers.first();
@@ -1099,28 +1099,28 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
         if ( fib->abscissaM() < 0 )
         {
             uint64_t Z = pcg32_init(fib->signature());
-            real a = spread * std::log(pcg32(Z)*TINY);
+            real a = gap * std::log(pcg32(Z)*TINY);
             while ( a > fib->abscissaP() )
             {
-                a += spread * std::log(pcg32(Z)*TINY);
+                a += gap * std::log(pcg32(Z)*TINY);
             }
             while ( a >= fib->abscissaM() )
             {
                 out << '\n' << fib->pos(a) << " " << a;
-                a += spread * std::log(pcg32(Z)*TINY);
+                a += gap * std::log(pcg32(Z)*TINY);
             }
         }
         // generate speckles above the origin of abscissa
         if ( fib->abscissaP() > 0 )
         {
             uint64_t Z = pcg32_init(~fib->signature());
-            real a = -spread * std::log(pcg32(Z)*TINY);
+            real a = -gap * std::log(pcg32(Z)*TINY);
             while ( a < fib->abscissaM() )
-                a -= spread * std::log(pcg32(Z)*TINY);
+                a -= gap * std::log(pcg32(Z)*TINY);
             while ( a <= fib->abscissaP() )
             {
                 out << '\n' << fib->pos(a) << " " << a;
-                a -= spread * std::log(pcg32(Z)*TINY);
+                a -= gap * std::log(pcg32(Z)*TINY);
             }
         }
         
@@ -1135,14 +1135,14 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
  */
 void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
 {
-    real spread = 1;
-    if ( opt.set(spread, "density") )
-        spread = 1.0 / spread;
+    real gap = 1;
+    if ( opt.set(gap, "density") )
+        gap = 1.0 / gap;
     else
-        opt.set(spread, "interval");
+        opt.set(gap, "interval", "gap");
     
     Array<FiberSite> loc(1024, 1024);
-    fibers.uniFiberSites(loc, spread);
+    fibers.uniFiberSites(loc, gap);
     
     Fiber const* ofib = nullptr;
     for ( FiberSite & i : loc )
