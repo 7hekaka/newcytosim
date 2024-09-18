@@ -405,7 +405,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* prp, Glossary& 
         // check for `nullptr` in list, which should not happen:
         if ( objs.count(nullptr) )
         {
-            std::clog << "Cytosim void slots in newObjects(" << pp->name() << ")\n";
+            std::clog << "Cytosim void slots in newObjects(" << prp->name() << ")\n";
             objs.remove_pack(nullptr);
         }
 #endif
@@ -509,7 +509,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* prp, Glossary& 
     if ( opt.set(vec, "translation") )
         ObjectSet::translateObjects(objs, vec);
     
-    //std::clog << "new_object " << objs.size() << " " << pp->name() << "\n";
+    //std::clog << "new_object " << objs.size() << " " << prp->name() << "\n";
     return objs;
 }
 
