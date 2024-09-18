@@ -98,7 +98,7 @@ void fgStrokeCharacter(float X, float Y, float scale, int mono, unsigned char ar
 
 
 void fgStrokeString(float X0, float Y, float scale, int mono, const char *string,
-                     float line_width, float point_size, float vshift)
+                    float line_width, float point_size, float vshift)
 {
     const unsigned ONE = 32;
     const unsigned MAX = 16;
