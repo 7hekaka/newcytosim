@@ -1,0 +1,84 @@
+% A contractile actin network with filament turnover
+% Jan 2016 with Julio Belmonte
+
+set simul system
+{
+    time_step = 0.004
+    viscosity = 0.025
+}
+
+set space cell
+{
+    shape = periodic
+}
+
+new space cell
+{
+     length = 10, 10
+}
+
+set fiber actin
+{
+    display = (line_width = 0.5;)
+    rigidity = 0.05
+    segmentation = 0.128
+}
+
+set hand myosin
+{
+    activity = move;
+    binding_range = 0.01;
+    binding_rate = 10;
+    display = ( color = green; )
+    unloaded_speed = 1;
+    stall_force = 5;
+    unbinding_force = 3;
+    unbinding_rate = 0.1;
+}
+
+set hand binder
+{
+    binding_range = 0.01;
+    binding_rate = 10;
+    display = ( color = blue; )
+    unbinding_force = 3;
+    unbinding_rate = 0.01;
+}
+
+set couple motor
+{
+    diffusion = 10;
+    fast_diffusion = 1;
+    hand1 = myosin;
+    hand2 = myosin;
+    stiffness = 256;
+}
+
+set couple crosslinker
+{
+    diffusion = 10;
+    fast_diffusion = 1;
+    hand1 = binder;
+    hand2 = binder;
+    stiffness = 256;
+}
+
+new 768 fiber actin
+{
+    length = 2.56
+}
+
+new 8000 couple motor
+new 4000 couple crosslinker
+
+new event
+{
+    rate = 256
+    code = ( delete 1 fiber actin; new 1 fiber actin { length=2.56; }; )
+}
+
+run 25000 system
+{
+    nb_frames = 200
+}
+
