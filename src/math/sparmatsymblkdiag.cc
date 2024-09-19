@@ -2042,9 +2042,8 @@ void SparMatSymBlkDiag::vecMul(const real* X, real* Y) const
 #else
     
     zero_real(SD_BLOCK_SIZE*rsize_, Y);
-    //vecMulAdd(X, Y, 0, rsize_);
-    for ( size_t j = 0; j < rsize_; ++j )
-        pilar_[j].vecMulAdd3D_SIMD(X, Y, j*3);
+    vecMulAdd(X, Y, 0, rsize_);
+    //for ( size_t j = 0; j < rsize_; ++j ) pilar_[j].vecMulAdd3D_SIMD(X, Y, j*3);
 
 #endif
 }
