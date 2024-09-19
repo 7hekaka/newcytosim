@@ -511,43 +511,10 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
 }
 
 
-//------------------------------------------------------------------------------
 /**
- A position is defined with a SHAPE followed by a number of TRANSFORMATION.
- 
- TRANSFORMATION         | Result                                               |
- -----------------------|-------------------------------------------------------
- `at X Y Z`             | Translate by specified vector (X,Y,Z)
- `add SHAPE`            | Translate by a vector chosen according to SHAPE
- `align VECTOR`         | Rotate to align parallel with specified vector
- `turn ROTATION`        | Apply specified rotation
- `extend B T`           | Extend along the Z axis, between Z=B and Z=T
- `blur REAL`            | Add centered Gaussian noise of variance REAL
- `to X Y Z`             | Interpolate with the previously specified position
- `or POSITION`          | flip randomly between two specified positions
- 
- A vector is set according to SHAPE, and the transformations are applied one after
- the other, in the order in which they were given.\n
-
- Examples:
- 
-   position = 1 0 0
-   position = circle 3 at 1 0
-   position = square 3 align 1 1 0 at 1 1
- 
- */ 
-Vector Cytosim::readPosition(std::istream& is, Space const* spc)
-{
-    Vector pos = readPositionPrimitive(is, spc);
-    assert_true( pos.valid() );
-    is.clear();
-    int c = Tokenizer::skip_space(is, false);
-    if ( isalpha(c) )
-        return modifyPosition(is, spc, pos);
-    return pos;
-}
-
-
+ Modify a vector, according to further instructions from `is`.
+ This applies `at`, `blur`, `if`, `or`...
+*/
 Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
 {
     std::string tok;
@@ -665,6 +632,43 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
             break;
         }
     }
+    return pos;
+}
+
+
+//------------------------------------------------------------------------------
+/**
+ A position is defined with a SHAPE followed by a number of TRANSFORMATION.
+ 
+ TRANSFORMATION         | Result                                               |
+ -----------------------|-------------------------------------------------------
+ `at X Y Z`             | Translate by specified vector (X,Y,Z)
+ `add SHAPE`            | Translate by a vector chosen according to SHAPE
+ `align VECTOR`         | Rotate to align parallel with specified vector
+ `turn ROTATION`        | Apply specified rotation
+ `extend B T`           | Extend along the Z axis, between Z=B and Z=T
+ `blur REAL`            | Add centered Gaussian noise of variance REAL
+ `to X Y Z`             | Interpolate with the previously specified position
+ `or POSITION`          | flip randomly between two specified positions
+ 
+ A vector is set according to SHAPE, and the transformations are applied one after
+ the other, in the order in which they were given.\n
+
+ Examples:
+ 
+   position = 1 0 0
+   position = circle 3 at 1 0
+   position = square 3 align 1 1 0 at 1 1
+ 
+ */
+Vector Cytosim::readPosition(std::istream& is, Space const* spc)
+{
+    Vector pos = readPositionPrimitive(is, spc);
+    assert_true( pos.valid() );
+    is.clear();
+    int c = Tokenizer::skip_space(is, false);
+    if ( isalpha(c) )
+        return modifyPosition(is, spc, pos);
     return pos;
 }
 

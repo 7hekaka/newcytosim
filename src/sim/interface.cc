@@ -638,6 +638,9 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
  
  This is meant to replace execute_new(cat, name, opt, cnt), when no fancy
  option were specified to the command.
+ 
+ By default, this will only try one position for each object, and so it may
+ create fewer objects than 'cnt'. 
  */
 ObjectList Interface::execute_new(std::string const& name, size_t cnt, 
                                   Space const* spc, std::string const& position)
