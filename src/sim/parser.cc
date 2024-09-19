@@ -38,7 +38,7 @@ Parser::Parser(Simul* sim, bool c, bool s, bool n, bool r, bool w)
 }
 
 /// check for unused values in Glossary and issue a warning
-void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t cnt = 1)
+static void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t cnt = 1)
 {
     if ( ! Cytosim::log.is_silent() )
     {
@@ -55,6 +55,20 @@ void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t
     }
 }
 
+
+/*
+ skip matlab-style comments:
+ one line: % ...
+ multiple lines: %{...}
+*/
+static void skip_comments(std::istream& is)
+{
+    is.get();
+    if ( is.get() == '{' )
+        Tokenizer::get_block_text(is, 0, '}');
+    else
+        Tokenizer::get_line(is);
+}
 
 //------------------------------------------------------------------------------
 #pragma mark - Parse
@@ -1166,7 +1180,6 @@ static std::string replace_bracketed_code(std::string const& code, Evaluator con
             std::string C = code.substr(P, Q-P);
             ++Q;
             std::string S = evaluator.eval_as_string(C);
-            //std::clog << "evaluator |" << C << "| -> |" << S << "|\n";
             res.append(S);
             P = code.find('[', Q);
             res.append(code, Q, P-Q);
@@ -1220,12 +1233,19 @@ void Parser::parse_for(std::istream& is)
             throw InvalidSyntax("missing number in command 'for'");
     }
     
+    int c = Tokenizer::skip_space(is, true);
+    if ( c == '%' )
+        skip_comments(is);
+
     std::string code = Tokenizer::get_block(is, '{');
+    code = Tokenizer::trim(code);
     
+    VLOG("--For `" << code << "' " << start << ":" << inc << ":" << end << "\n");
+
     for ( long v = start; v < end; v += inc )
     {
-        //std::clog << "for |" << v << "| <-- |" << var << "|\n";
         std::string str = replace_bracketed_code(code, Evaluator{{var, v}});
+        VLOG("--for " << v << " -> |" << str << "|\n");
         std::istringstream iss(str);
         std::streampos ipos(0);
         try {
@@ -1378,14 +1398,9 @@ void Parser::evaluate(std::istream& is, std::streampos& ipos)
         if ( c == EOF )
             break;
         
-        // skip matlab-style comments: % or %{...}
         if ( c == '%' )
         {
-            is.get();
-            if ( is.get() == '{' )
-                Tokenizer::get_block_text(is, 0, '}');
-            else
-                Tokenizer::get_line(is);
+            skip_comments(is);
             continue;
         }
 #if 0

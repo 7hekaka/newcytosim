@@ -281,7 +281,7 @@ public:
     std::string eval_as_string(std::string const& str) const
     {
         real x = eval(str.c_str());
-        int i = (int) x;
+        long i = (long) x;
         if ( i == x )
             return std::to_string(i);
         return std::to_string(x);
