@@ -176,15 +176,15 @@ public:
     /// set Lagrange multipliers (this is normally not needed)
     virtual void setTensions(const real*) {}
 
-    /// set position of minus end and direction (length and Nb of points are not modified)
+    /// set position of minus end with given direction (length and Nb of points are not modified)
     /** dir does not need to be normalized */
     void setStraight(Vector const& pos, Vector const& dir);
     
-    /// set position of 'ref', direction and length of Fiber
+    /// set position of minus end, direction and length of Fiber
     void setStraight(Vector const& pos, Vector const& dir, real len);
     
-    /// set position of 'ref', direction and length of Fiber
-    void setCurved(Vector dir, real rad, real len);
+    /// set on the surface of a sphere of radius 'rad', in direction 'dir'
+    void setCurved(Vector dir, real rad, real len, real off);
 
     /// translate Fiber to place 'ref' at the position where the CENTER is located
     void placeEnd(FiberEnd ref);

@@ -101,7 +101,8 @@ void Chain::setStraight(Vector const& pos, Vector const& dir, real len)
 }
 
 
-void Chain::setCurved(Vector dir, real rad, real len)
+
+void Chain::setCurved(Vector dir, real rad, real len, real off)
 {
     assert_true( fnSegmentation > REAL_EPSILON );
     assert_true( len > 0 );
@@ -118,8 +119,8 @@ void Chain::setCurved(Vector dir, real rad, real len)
     for ( size_t p = 0 ; p < np; ++p, angle += delta )
     {
         real S = std::sin(angle);
-        real C = std::cos(angle);
-        setPoint(p, Vector(rad*S, 0, 0) + dir*(C-1));
+        real C = std::cos(angle) - off;
+        setPoint(p, Vector(rad*S, 0, 0) + dir*(C-off));
     }
     updateFiber();
 }

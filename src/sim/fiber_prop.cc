@@ -178,35 +178,37 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     }
     else
 #endif
-    if ( opt.value_is("shape", 0, "curved") )
-    {
-        real rad = 1;
-        Vector dir(0, 1, 0);
-        opt.set(rad, "shape", 1);
-        opt.set(dir, "shape", 2);
-        const real len = newFiberLength(opt);
-        fib->setCurved(dir, rad, len);
-    }
-    else
     if ( opt.has_key("shape") )
     {
-        size_t nbp = opt.num_values("shape");
-        
-        if ( nbp < 2 )
-            throw InvalidParameter("fiber:shape must be a list of comma-separated points");
-
-        real* tmp = new_real(DIM*nbp);
-        for ( size_t p = 0; p < nbp; ++p )
+        if ( opt.value_is("shape", 0, "curved") )
         {
-            Vector vec(0,0,0);
-            if ( ! opt.set(vec, "shape", p) )
-                throw InvalidParameter("fiber:shape must be a list of comma-separated points");
-            vec.store(tmp+DIM*p);
+            real rad = 1, off = 0;
+            Vector dir(0, 1, 0);
+            opt.set(rad, "shape", 1);
+            opt.set(dir, "shape", 2);
+            opt.set(off, "shape", 3);
+            const real len = newFiberLength(opt);
+            fib->setCurved(dir, rad, len, off);
         }
-        fib->setShape(tmp, nbp, 0);
-        if ( fib->nbPoints() < 2 )
-            throw InvalidParameter("the vectors specified in fiber:shape must not overlap");
-        free_real(tmp);
+        else
+        {
+            size_t nbp = opt.num_values("shape");
+            if ( nbp < 2 )
+                throw InvalidParameter("fiber:shape must be a list of comma-separated points");
+            
+            real* tmp = new_real(DIM*nbp);
+            for ( size_t p = 0; p < nbp; ++p )
+            {
+                Vector vec(0,0,0);
+                if ( ! opt.set(vec, "shape", p) )
+                    throw InvalidParameter("fiber:shape must be a list of comma-separated points");
+                vec.store(tmp+DIM*p);
+            }
+            fib->setShape(tmp, nbp, 0);
+            if ( fib->nbPoints() < 2 )
+                throw InvalidParameter("the vectors specified in fiber:shape must not overlap");
+            free_real(tmp);
+        }
     }
     else
     {
