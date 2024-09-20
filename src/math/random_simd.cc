@@ -82,25 +82,24 @@ static real * makeGaussiansBM_SIMD(real dst[], size_t cnt, const uint32_t* arg)
     constexpr float tmp(M_PI*0x1p-31);
     constexpr vec4f PI{tmp, tmp, tmp, tmp};
 
+    //vec4f mm{1.f, 1.f, 1.f, 1.f};
     while ( src < end )
     {
         // generate angle in ]-PI, PI[:
-        vec4f t = mul4f(PI, load4if((int32_t*)src));
+        vec4f t = mul4f(PI, load4if((int32_t*)src)); //load 32-bit signed integer as float
         vec4f x, y;
         sincos_approx4f(x, y, t);
 
 #ifdef __ARM_NEON__
-        constexpr vec4f two{2.f, 2.f, 2.f, 2.f};
-        // the multiplication by TWO_POWER_MINUS_32 is handled below:
+        //load 32-bit unsigned integer as float
         vec4f n = minuslog_approx4f32(load4uf(src+4));
 #else
-        constexpr vec4f two{-2.f, -2.f, -2.f, -2.f};
-        constexpr vec4f eps{0x1p-31, 0x1p-31, 0x1p-31, 0x1p-31};
-        // generate norm in ]0, 1]: eps * float(uint32)
-        vec4f n = log_approx4f(mul4f(eps, abs4f(load4if((int32_t*)(src+4)))));
+        //load 32-bit signed integer as float
+        vec4f n = minuslog_approx4f31(abs4f(load4if((int32_t*)(src+4))));
 #endif
-        // transform norm: n = sqrt( -2 * log(n) / n )
-        n = sqrt4f(mul4f(n, two));
+        //mm = min4f(mm, n);
+        // this should be equivalent to: n = sqrt( -2 * log(R) )
+        n = sqrt4f(n);
         x = mul4f(n, x);
         y = mul4f(n, y);
 #if REAL_IS_DOUBLE
@@ -117,6 +116,15 @@ static real * makeGaussiansBM_SIMD(real dst[], size_t cnt, const uint32_t* arg)
         src += 8;
         dst += 8;
     }
+    /*
+    mm = min4f(mm, duphi4f(mm));
+    float m = std::min(mm[0], mm[1]);
+    static float om = 1.0;
+    if ( m < om ) {
+        printf("min: %.12f\n", m);
+        om = m;
+    }
+     */
     return dst;
 }
 

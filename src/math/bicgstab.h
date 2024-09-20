@@ -10,6 +10,16 @@
 #include "monitor.h"
 
 
+static void check_numbers(real const* vec, size_t len, size_t cnt)
+{
+    size_t nan = 0;
+    for ( int i = 0; i < len; ++i )
+        nan += std::isnan(vec[i]);
+    if ( nan )
+        fprintf(stderr, "BCGS %lu : %lu NaNs\n", cnt, nan);
+}
+
+
 /// using BLAS requires functions calls, and more loops are required.
 #define BICGSTAB_USES_BLAS 0
 
@@ -24,7 +34,7 @@ namespace LinearSolvers
 {
     /// Bi-Conjugate Gradient Stabilized without Preconditionning
     /*
-     This solves `mat * x = rhs` with a tolerance specified in 'monitor'
+     This solves `mat * S = rhs` with a tolerance specified in 'monitor'
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >
     void BCGS(const LinearOperator& mat, const real* rhs, real* S,
@@ -74,6 +84,13 @@ namespace LinearSolvers
 #endif
 #endif
         rho = blas::dot(dim, R, R);
+#if 0
+        if ( rho != rho )
+        {
+            fprintf(stderr, "BCGSP called with invalid RHS argument\n");
+            return;
+        }
+#endif
         goto start;
         
         while ( ! monitor.finished(dim, R) )
@@ -163,7 +180,7 @@ namespace LinearSolvers
     
     /// Bi-Conjugate Gradient Stabilized with right-sided Preconditionning
     /*
-     This solves `mat * x = rhs` with a tolerance specified in 'monitor'
+     This solves `mat * S = rhs` with a tolerance specified in 'monitor'
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >
     void BCGSP(const LinearOperator& mat, const real* rhs, real* S,

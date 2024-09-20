@@ -278,8 +278,6 @@ void Random::refill_gaussians()
 #else
     next_gaussian_ = makeGaussians(gaussians_, SFMT_N32, (int32_t*)twister_.state);
 #endif
-    //size_t i = has_nan(next_gaussian_-gaussians_, gaussians_);
-    //printf("refill_gaussians %lu nan %lu\n", next_gaussian_ - gaussians_, i);
     sfmt_gen_rand_all(&twister_);
 }
 
@@ -340,6 +338,10 @@ void Random::gauss_set(real vec[], size_t cnt)
  This is the Box & Muller method.
  A note on the generation of random normal deviates
  Box & Muller, 1958
+    n = sqrt( -2 * log(R) ), where R is random in [0, 1]
+ and with A = random in [-PI, PI]:
+    x = n * cos(A)
+    y = n * sin(A),
  */
 void Random::gauss_boxmuller(real& x, real& y)
 {

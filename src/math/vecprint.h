@@ -37,14 +37,14 @@ namespace VecPrint
         }
     }
 
-    /// print vector to stdout
+    /// print vector to OUT
     template < typename T >
     void print(size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
         print(OUT, len, vec, digits, dim);
     }
     
-    /// print vector to stdout
+    /// print vector to OUT
     template < typename T >
     void print(char const* msg, size_t len, const T* vec, int digits = 2, size_t dim = 0)
     {
