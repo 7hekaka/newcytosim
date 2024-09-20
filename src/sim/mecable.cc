@@ -78,7 +78,7 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
         // add 4 slots to allow for some SIMD instruction burr:
         pBlock = new_real(pBlockAlc);
         //zero_real(pBlockAlc, pBlock);
-        std::clog << reference() << " allocateBlock(" << bks << " " << pivot << " " << alc << ")\n";
+        //std::clog << reference() << " allocateBlock(" << bks << " " << pivot << " " << alc << ")\n";
     }
     // use aligned memory:
     if ( pivot > 0 )

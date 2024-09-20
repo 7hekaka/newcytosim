@@ -209,11 +209,12 @@ public:
     {
         assert_true( nextDetach >= 0 );
         /*
-         Attention: the exponential term can easily become numerically "infinite",
-         which is problematic if 'unbinding_rate==0' and 'unbinding_force' is finite.
-         This issue is handled in HandProp::complete()
+         A bit of math simplification here:
+             unbinding_rate_dt * exp( force / unbinding_force )
+         is equivalent to
+             exp( force * unbinding_force_inv + log(unbinding_rate_dt) )
          */
-        real x = force * prop->unbinding_force_inv;
+        real x = force * prop->unbinding_force_inv[0] + prop->unbinding_force_inv[1];
         //std::clog << prop->name() << " " << x << "   " << std::exp(x) << "\n";
         nextDetach -= std::exp(x);
         
