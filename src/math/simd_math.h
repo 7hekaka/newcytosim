@@ -146,7 +146,7 @@ inline vec4f minuslog_approx4f32(vec4f x)
     /* 112.15146614391825f = ( 32 + 127 ) * log(2) + 1.941064434886946f */
     //const vec4f f = set4f(112.15158843994140625f);
     // we use a slightly larger constant to avoid negative output:
-    const vec4f f = set4f(112.15148162841796875f*2);
+    const vec4f f = set4f(224.3029632568359375f);
     const vec4f g = set4f(-0.693147182464599609375f*2); // -log(2)
     // extract exponent:
     vec4f cst = cvt4if(shiftbitsR4(x, 23));

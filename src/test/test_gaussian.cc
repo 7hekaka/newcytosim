@@ -109,12 +109,14 @@ void check_gaussian(size_t num, REAL* vec)
         else
         {
             ++cnt;
-            avg += vec[i];
-            var += ( vec[i] - off ) * ( vec[i] - off );
+            double v = vec[i] - off;
+            avg += v;
+            var += v * v;
         }
     }
-    avg /= cnt;
-    var = ( var - square( avg - off ) * cnt ) / ( cnt - 1 );
+    avg = avg / cnt;
+    var = ( var - square(avg) * cnt ) / ( cnt - 1 );
+    avg += off;
     // covariance of odd and even numbers:
     double cov = 0;
     for ( size_t i = 1; i < num; i += 2 )
@@ -232,8 +234,9 @@ void scan(size_t chunk, const char str[], REAL* (*FUNC)(REAL*, size_t, const uin
     void * src = nullptr;
     void * dst = nullptr;
 
-    if ( 0 == posix_memalign(&dst, 32, sizeof(REAL)*chunk)
-        && 0 == posix_memalign(&src, 32, 4*chunk) )
+    int e = posix_memalign(&dst, 32, sizeof(REAL)*chunk);
+    int f = posix_memalign(&src, 32, 4*chunk);
+    if ( !e && !f )
     {
         uint32_t * rnd = (uint32_t*)src;
         REAL * vec = (REAL*)dst;
