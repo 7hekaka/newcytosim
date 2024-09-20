@@ -288,16 +288,16 @@ void HandProp::complete(Simul const& sim)
     if ( unbinding_force <= 0 )
         throw InvalidParameter(name()+":unbinding_force must be > 0");
 
-    // this should be zero if 'unbinding_force = inf':
-    unbinding_force_inv = 1.0 / unbinding_force;
-
     /*
-     The exponential term in Kramer's theory can easily become numerically "infinite",
-     and since `zero * infinite` is undefined, we disable here
-     the exponential argument if the unbinding rate is null:
+     A bit of math simplification here:
+         unbinding_rate_dt * exp( force / unbinding_force )
+     is equivalent to
+         exp( force * log(unbinding_rate_dt)/unbinding_force )
      */
-    if ( unbinding_rate == 0 )
+    if ( unbinding_rate <= 0 )
         unbinding_force_inv = 0;
+    else
+        unbinding_force_inv = std::log(unbinding_rate_dt) / unbinding_force;
 
     //std::clog << name() << ":unbinding_force_inv = " << unbinding_force_inv << '\n';
 }
@@ -323,10 +323,10 @@ void HandProp::checkStiffness(real stiff, real len, real, real kT) const
     
     real ap = std::exp( stiff * dis * unbinding_force_inv );
     
-    if ( ap > 10.0 )
+    if ( ap > 1.0 )
     {
         Cytosim::warn << "`" << name() << "' may unbind immediately, "\
-        << "exp(stiffness*binding_range/unbinding_force) = " << ap << "\n";
+        << "time_step * binding_rate * exp(stiffness*binding_range/unbinding_force) = " << ap << "\n";
         //<< PREF << "you could decrease stiffness or binding_range\n";
     }
 }

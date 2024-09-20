@@ -215,7 +215,7 @@ public:
          */
         real x = force * prop->unbinding_force_inv;
         //std::clog << prop->name() << " " << x << "   " << std::exp(x) << "\n";
-        nextDetach -= prop->unbinding_rate_dt * std::exp(x);
+        nextDetach -= std::exp(x);
         
         return ( nextDetach < 0 );
     }

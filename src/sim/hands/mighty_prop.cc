@@ -132,8 +132,8 @@ void MightyProp::checkStiffness(real stiff, real len, real mul, real kT) const
     /*
      Compare detachment rate at stall-force, with detachment rate at rest
      */
-    if ( std::exp( stall_force * unbinding_force_inv ) > 100 )
-        Cytosim::warn << name() << ":exp( stall_force / unbinding_force ) is greater than 100!\n";
+    if ( std::exp( stall_force * unbinding_force_inv ) > 1 )
+        Cytosim::warn << name() << ":exp( stall_force / unbinding_force ) is greater than 1!\n";
 }
 
 
