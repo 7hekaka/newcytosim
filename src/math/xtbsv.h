@@ -1411,7 +1411,7 @@ void alsatian_iso3_xtbsvLTN2K_SIMD(const int N, const double* A, const int lda, 
         vec2 aa = loaddup2(A);
         x4 = mul2(aa, loadu2(X));
         z4 = mul1(aa, load1(X+2));
-        store2(X, x4);
+        storeu2(X, x4);
         store1(X+2, z4);
     }
     if ( N > 1 ) // j = N-2
