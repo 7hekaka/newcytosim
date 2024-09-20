@@ -67,8 +67,8 @@ Set block size to 'bks' and allocate as necessary to hold 'alc' reals, and 'pivo
 void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
 {
     assert_true( bks <= DIM * nPoints );
-    // add enough to cover 'pivot' integers:
-    alc += (( 1 + pivot ) * sizeof(int) ) / sizeof(real);
+    // add enough to cover 'pivot' integers and a bit more:
+    alc += 4 + ( pivot * sizeof(int) ) / sizeof(real);
     
     if ( alc > pBlockAlc )
     {
@@ -76,10 +76,15 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
         pBlockAlc = static_cast<unsigned>(chunk_real(alc));
         assert_true( pBlockAlc == chunk_real(alc) );
         // add 4 slots to allow for some SIMD instruction burr:
-        pBlock = new_real(pBlockAlc+4);
-        //zero_real(pBlockAlc+4, pBlock);
-        //std::clog << reference() << " allocateBlock " << bks << " " << pBlockAlc << "\n";
+        pBlock = new_real(pBlockAlc);
+        //zero_real(pBlockAlc, pBlock);
+        std::clog << reference() << " allocateBlock(" << bks << " " << pivot << " " << alc << ")\n";
     }
+    // use aligned memory:
+    if ( pivot > 0 )
+        pPivot = reinterpret_cast<int*>(pBlock+pBlockAlc) - (( 1 + pivot ) & ~1);
+    else
+        pPivot = nullptr;
 }
 
 

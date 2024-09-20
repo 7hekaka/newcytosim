@@ -63,6 +63,9 @@ private:
     /// Matrix block used for preconditionning in Meca
     real * pBlock;
     
+    /// pointer to allocated memory for pivot indices used in matrix factorization
+    int * pPivot;
+    
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
     unsigned pIndex;
     
@@ -295,7 +298,7 @@ public:
     real * pblock()     const { return pBlock; }
     
     /// Returns address of memory available to store pivoting indices
-    int * pivot() const { return reinterpret_cast<int*>(pBlock+pBlockAlc)-DIM*nPoints; }
+    int * pivot() const { return pPivot; }
     
 #if RECYCLED_PRECONDITIONNER
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom

@@ -328,7 +328,8 @@ void Meca::multiply(const real* X, real* Y) const
 #pragma mark - Solve
 
 
-/// qsort function comparing number of points of Mecables
+/// qsort function comparing number of vertices in Mecables
+[[maybe_unused]]
 static int compareMecables(const void * A, const void * B)
 {
     auto a = (*static_cast<Mecable *const*>(A))->nbPoints();
@@ -412,7 +413,7 @@ void Meca::readyMecables()
         }
 #endif
     }
-    //fprintf(stderr, "Meca::prepare() isnan %lu\n", has_nan(dimension(), vPTS));
+    //fprintf(stderr, "Meca::prepare() %lu NaNs\n", has_nan(dimension(), vPTS));
 }
 
 
@@ -973,6 +974,16 @@ void Meca::apply()
 {
     if ( ready_ )
     {
+#if 0
+        // print vertices of Mecables
+        for ( Mecable * mec : mecables )
+        {
+            const size_t off = DIM * mec->matIndex();
+            const size_t len = DIM * std::min(4U, mec->nbPoints());
+            VecPrint::print(mec->reference().c_str(), len, vSOL+off, 5, DIM);
+        }
+        fprintf(stderr, "\n");
+#endif
         // add calculated displacement to obtain vertices positions:
         blas::xadd(dimension(), vSOL, vPTS);
 
@@ -998,10 +1009,9 @@ void Meca::apply()
                 // check validity of results:
                 size_t a = has_nan(len, vPTS+off);
                 size_t b = has_nan(len, vFOR+off);
-                //fprintf(stderr, "Meca::solve isnan %i %i\n", a, b);
                 if ( a | b )
                 {
-                    fprintf(stderr, "invalid results for %s isnan %lu %lu\n", mec->reference().c_str(), a, b);
+                    fprintf(stderr, "invalid results for %s : %lu %lu NaNs / %lu\n", mec->reference().c_str(), a, b, len);
                     continue;
                 }
             }

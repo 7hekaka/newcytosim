@@ -435,7 +435,6 @@ void Meca::saveMatrix(FILE * fp, real threshold) const
 void Meca::saveSystem() const
 {
     FILE * f = FilePath::open_file("matrix.mtx", "w");
-    MultiplyFuncPtr x = &Meca::multiply;
     saveMatrix<&Meca::multiply>(f, 0);
     fclose(f);
     
@@ -808,6 +807,7 @@ static void markMatrix(BitMap<1>& bmap, size_t sup, MATRIX const& mat)
 }
 
 /// add diagonal elements
+[[maybe_unused]]
 static void markDiagonal(BitMap<1>& bmap, size_t mag, Array<Mecable*> const& mecs)
 {
     for ( Mecable * mec : mecs )

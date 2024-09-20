@@ -260,7 +260,7 @@ LOCAL int32x4_t load4i(int32_t const* a) { return vld1q_s32(a); }
 /// convert integer to float:
 LOCAL vec4f cvt4if(int32x4_t a) { return vcvtq_f32_s32(a); }
 
-/// load integers and convert to float:
+/// load signed/unsigned integers and convert to float:
 LOCAL vec4f load4if(int32_t const* a) { return vcvtq_f32_s32(vld1q_s32(a)); }
 LOCAL vec4f load4uf(uint32_t const* a) { return vcvtq_f32_u32(vld1q_u32(a)); }
 

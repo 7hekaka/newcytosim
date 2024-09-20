@@ -288,6 +288,7 @@ static inline bfloat16 convert_to_bfloat16(float val)
 
 
 /// convert doubles to floats
+[[maybe_unused]]
 static void convert_to_bfloat16s(size_t cnt, double const* src, bfloat16* dst)
 {
     #pragma omp simd
