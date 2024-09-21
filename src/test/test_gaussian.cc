@@ -71,6 +71,7 @@ real * makeGaussians_std(real dst[], size_t cnt, const uint32_t[])
 }
 
 
+/** Using -log(1-R) where R is randomly distributed in [0, 1[ */
 float * makeExponentials_(float dst[], size_t cnt, const uint32_t src[])
 {
     for ( size_t i = 0; i < cnt; ++i )

@@ -129,25 +129,24 @@ static real * makeGaussiansBM_SIMD(real dst[], size_t cnt, const uint32_t* arg)
 }
 
 /// compute approximate exponential derivates
+/** Using -log(1-R) where R is randomly distributed in [0, 1[ */
 static float* makeExponentials_SIMD(float dst[], size_t cnt, const uint32_t* arg)
 {
     const uint32_t * src = arg;
     const uint32_t * end = src + cnt;
     
+    const vec4f half{0.5f, 0.5f, 0.5f, 0.5f};
     while ( src < end )
     {
 #ifdef __ARM_NEON__
-        vec4f z = load4uf(src);
-        // the multiplication by TWO_POWER_MINUS_32 is handled below:
-        vec4f x = minuslog_approx4f32(z);
+        //load 32-bit unsigned integer as float
+        vec4f x = minuslog_approx4f32(load4uf(src));
 #else
-        vec4f z = abs4f(cvt4if(load4i((int32_t*)src)));
-        // off = log(2^31), increased a bit to ensure x >= 0
-        const vec4f off = set4f(21.48757171630859375f);
-        vec4f x = sub4f(off, log_approx4f(z));
+        //load 32-bit signed integer as float
+        vec4f x = minuslog_approx4f31(abs4f(load4if((int32_t*)(src))));
 #endif
+        x = mul4f(x, half);
         src += 4;
-        // store 4 single-precision values
         store4f(dst, x);
         dst += 4;
     }
