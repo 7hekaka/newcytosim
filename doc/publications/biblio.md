@@ -11,6 +11,11 @@
 2024
 
 - [Wave-like oscillations of clamped microtubules driven by collective dynein transport](https://doi.org/10.1016/j.bpj.2024.01.016)
+- [Force Propagation in Active Cytoskeletal Networks](https://arxiv.org/abs/2401.04217)
+- [Rotation-Beating dynamics of a driven flexible filament: role of motor protein properties](https://arxiv.org/abs/2409.12729)
+- [A Role for Cross-linking Proteins in Actin Filament Network Organization and Force Generation](https://www.biorxiv.org/content/10.1101/2024.04.19.590161v1)
+- [Force-transducing molecular ensembles at growing microtubule tips control mitotic spindle size](https://www.biorxiv.org/content/10.1101/2024.02.01.578443v1.abstract)
+- [Contractile to extensile transitions and mechanical adaptability enabled by activity in cytoskeletal structures](https://www.biorxiv.org/content/10.1101/2024.02.22.581411v1.abstract)
 
 2023
 
@@ -70,7 +75,6 @@
 - [Role of External Forcing in Directional Instability of Microtubule Transport](http://dr.iiserpune.ac.in:8080/xmlui/handle/123456789/987)
 - [Entropy production rate is maximized in non-contractile actomyosin](http://dx.doi.org/10.1038/s41467-018-07413-5)
 - [Evolutionary mechanisms of asymmetric spindle positioning in nematode embyos](http://dr.iiserpune.ac.in:8080/xmlui/handle/123456789/1007)
-- [Role of External Forcing in Directional Instability of Microtubule Transport]()
 
 2017
 
