@@ -298,7 +298,7 @@ void HandProp::complete(Simul const& sim)
     unbinding_force_inv[0] = 1.0 / unbinding_force;
     
     if ( unbinding_rate <= 0 )
-        unbinding_force_inv[1] = 0;
+        unbinding_force_inv[1] = -INFINITY;
     else
         unbinding_force_inv[1] = std::log(unbinding_rate_dt);
 
