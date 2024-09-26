@@ -2049,7 +2049,10 @@ void Display::drawFiber(Fiber const& fib)
 
     if ( style && disp->line_width > 0 )
     {
-        //drawFiberBackbone(fib, gym::background_color, 2*disp->line_width);
+        /*
+        if ( style == 1 ) // adding a black outline to filaments
+            drawFiberBackbone(fib, gym::background_color, 2*disp->line_width);
+         */
         drawFiberLines(fib, style, disp->line_width);
     }
     
