@@ -36,7 +36,7 @@ bool match_all(Object const*, void const*)
  */
 bool match_mark(Object const* obj, void const* mrk)
 {
-    return ( obj->mark() == reinterpret_cast<std::uintptr_t>(mrk) );
+    return ( obj->mark() == reinterpret_cast<uintptr_t>(mrk) );
 }
 
 /**

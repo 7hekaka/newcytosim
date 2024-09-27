@@ -623,7 +623,7 @@ void Simul::reportMarkedFiberLengths(std::ostream& out, Property const*) const
     std::streamsize p = out.precision();
     for ( ObjectMark k = 0; k <= sup; ++k )
     {
-        std::uintptr_t val = k;
+        uintptr_t val = k;
         ObjectList objs = fibers.collect(match_mark, reinterpret_cast<void*>(val));
         if ( objs.size() )
         {
@@ -3203,7 +3203,7 @@ void Simul::reportMarkedFiberEnds(std::ostream& out, Glossary& opt) const
     std::streamsize p = out.precision();
     for ( ObjectMark k = 0; k <= sup; ++k )
     {
-        std::uintptr_t val = k;
+        uintptr_t val = k;
         ObjectList objs = fibers.collect(match_mark, reinterpret_cast<void*>(val));
         if ( objs.size() )
         {
