@@ -1099,13 +1099,24 @@ void Fiber::setInteractions(Meca& meca) const
         for ( unsigned i = 0; i < end; ++i )
         {
             Vector P = posP(i);
-            real N = P.normYZ();
-            real U = N / R;
+            real U = P.normYZ() / R;
             real dF = 4 * F / ( R * square(std::exp(-U) + std::exp(U)) );
-            real F0 = -F * std::tanh(U) / N - dF;
+            real F0;
+            if ( U < 0.25 )
+            {
+                // use the Taylor expansion at U = 0: 1 - U^2/3 + U^4*2/15 + O(U^6)
+                real UU = U * U;
+                F0 = -F / R * ( 1 - 0.333333333 * UU * ( 1 - 0.4 * UU ) ) - dF;
+            }
+            else
+            {
+                // this formula is ill-defined for U ~ 0, with a division by zero:
+                F0 = -F * std::tanh(U) / ( R * U ) - dF;
+            }
+            //std::clog << "squeeze " << U << "   " << F0 <<  "  " << dF;
             meca.addLineClampX(Mecapoint(this, i), dF);
             meca.addForce(this, i, Vector(0, F0*P.YY, F0*P.ZZ));
-            //std::clog << -F * std::tanh(U) << "  " << ( F0 + dF ) * N << "\n";
+            //std::clog << "  : " << -F * std::tanh(U) << "  " << (F0+dF)*U*R << "\n";
         }
     }
 #endif
