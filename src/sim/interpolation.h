@@ -44,7 +44,7 @@ private:
 public:
     
     /// reset member variables
-    Interpolation() : mec_(nullptr) { }
+    Interpolation() : mec_(nullptr), pt1_(0), pt2_(0) { }
     
     /// set to interpolate P and P+1 on `m`, with coefficient `c`
     Interpolation(const Mecable * m, real c, unsigned P)

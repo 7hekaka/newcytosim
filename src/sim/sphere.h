@@ -142,8 +142,11 @@ public:
     void projectForces(const real* X, real* Y) const;
     
     /// Number of distance constraints applied to the movements of vertices
-    unsigned nbConstraints() const { return DIM * nbRefPoints - ( DIM + DIM - 1 ) + nPoints - nbRefPoints; }
-
+    /** 1D: 1 dof = 1*1 - 0 : nbRefPoints - 1
+        2D: 3 dof = 2*2 - 1 : nbRefPoints - 1
+        3D: 6 dof = 4*3 - 6 : nbRefPoints + 2 */
+    unsigned nbConstraints() const { return nPoints - 1 + 3 * (DIM==3); }
+  
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()

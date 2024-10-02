@@ -24,8 +24,8 @@ class Tubule : public Object, private Buddy
 private:
     
     /// number of protofilaments
-    static constexpr size_t NFIL = 13;
-    static constexpr size_t FILM = NFIL+3;
+    static constexpr size_t NFIL = 13U;
+    static constexpr size_t FILM = 14U;
 
     /// central backbone if present
     Fiber* bone_;

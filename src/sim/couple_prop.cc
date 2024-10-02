@@ -39,7 +39,7 @@ void CoupleProp::clear()
     diffusion      = 0;
     fast_diffusion = 0;
     fast_reservoir = 0;
-    store_unbound  = ~0;
+    store_unbound  = ~0U;
     trans_activated = 0;
     min_loop       = 1;
     specificity    = BIND_ALWAYS;

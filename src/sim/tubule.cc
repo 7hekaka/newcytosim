@@ -18,6 +18,7 @@ void Tubule::step()
 
 Tubule::Tubule(TubuleProp const* p) : prop(p)
 {
+    assert_true( FILM > NFIL );
     reset();
 }
 

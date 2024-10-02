@@ -403,7 +403,7 @@ void Meca::readyMecables()
         mec->prepareMecable();
 #if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
         real jR = mec->jointRigidity();
-        if ( jR )
+        if ( jR != 0 )
         {
 #   if USE_ISO_MATRIX
             addBendingRigidityMatrix(mISO, mec->matIndex(), mec->nbPoints(), jR);

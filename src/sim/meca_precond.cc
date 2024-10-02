@@ -382,7 +382,7 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t l
 
     const real beta = -tau_ * mec->pointMobility();
     real jR = mec->jointRigidity();
-    if ( jR )
+    if ( jR != 0 )
     {
         if ( ldd != 3 )
             zero_real(ldd*nbp, res);
@@ -432,7 +432,7 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
     real jR = mec->jointRigidity();
-    if ( jR )
+    if ( jR != 0 )
         //addBendingRigidityLower<1>(res, nbp, mec->nbPoints(), jR);
         addBendingRigidity<1>(res, nbp, mec->nbPoints(), jR);
 #endif
@@ -479,7 +479,7 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
     real jR = mec->jointRigidity();
-    if ( jR )
+    if ( jR != 0 )
     {
         setBendingRigidity<DIM>(res, ldd-1, nbp, beta*jR);
         //PRINT_MAT("Rigidity block ", bks, bks, res, bks);
@@ -520,7 +520,7 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
     real jR = mec->jointRigidity();
-    if ( jR )
+    if ( jR != 0 )
     {
         addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), jR);
         //PRINT_MAT("Rigidity block", bks, bks, res, bks);
@@ -566,7 +566,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
 #if SEPARATE_RIGIDITY_TERMS
     // set the Rigidity terms:
     real jR = mec->jointRigidity();
-    if ( jR )
+    if ( jR != 0 )
     {
         addBendingRigidityLower<DIM>(res, bks, mec->nbPoints(), jR);
         //PRINT_MAT("Rigidity block", bks, bks, res, bks);
@@ -622,7 +622,8 @@ void Meca::computePrecondIsoB(Mecable* mec, real* tmp)
      born 15.10.1875 in Montguyon, France
      died 31.08.1918 in Bagneux, following wounds received in battle.
      */
-    int bt, info = 0;
+    int info = 0;
+    unsigned short bt = 0;
     if ( ISOB_LDD <= nbp )
     {
         getIsoBandedBlock(mec, mec->pblock(), ISOB_KD, ISOB_LDD);
@@ -781,7 +782,8 @@ void Meca::computePrecondBand(Mecable* mec, real* tmp)
     real * blk = mec->pblock();
 #endif
 
-    int bt, info = 0;
+    int info = 0;
+    unsigned short bt = 0;
 
     if ( BAND_LDD < bks )
     {
