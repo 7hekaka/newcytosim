@@ -30,7 +30,7 @@ void Fiber::step()
     if ( p )
     {
         LOG_ONCE("SEVER_KINKED_FIBERS\n");
-        objset()->add(severPoint(p));
+        objset()->add(severJoint(p));
     }
 #endif
 #if ( 0 )
@@ -410,7 +410,7 @@ void Fiber::cutP(real len)
  .
  @return zero, if `pti` is not an internal point
  */
-Fiber* Fiber::severPoint(size_t pti)
+Fiber* Fiber::severJoint(size_t pti)
 {
     if ( pti == 0  ||  pti >= lastPoint() )
         return nullptr;
