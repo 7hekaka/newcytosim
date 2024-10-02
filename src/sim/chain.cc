@@ -1174,31 +1174,8 @@ void Chain::growP(const real delta)
     }
     else if ( delta < 0 )
     {
-        real seg = segmentation();
-        //real len = seg + delta / ns; // future segmentation
-#if 1
         for ( size_t p = ns ; p > 0 ; --p )
             movePoint(p, ( a * p ) * diffPoints(p-1));
-#else
-        /**
-         this is a idea from 09.2023, to move points while keeping the length constant.
-         but this turned out to be more complicated: discard?
-         */
-        a = delta;
-        real cosine = 1;
-        Vector dif = diffPoints(ns-1);
-        for ( size_t p = ns ; p > 1 ; --p )
-        {
-            movePoint(p, dif * ( a / seg ));
-            Vector nxt = diffPoints(p-2);
-            cosine = dot(nxt, dif) * ( iCut * iCut );
-            printf(" %8.5f", a);
-            a = -std::sqrt(len*len-square(seg+a)*(1.0-square(cosine))) + (seg+a)*cosine;
-            dif = nxt;
-        }
-        printf(" %8.5f\n", a);
-        movePoint(1, dif * ( a / seg ));
-#endif
 #if 0
         for ( size_t n = 0; n < ns; ++n )
             printf(" %8.5f", diffPoints(n).norm()/len);
