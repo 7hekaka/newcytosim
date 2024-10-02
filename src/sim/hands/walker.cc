@@ -41,14 +41,14 @@ void Walker::stepUnloaded()
 {
     assert_true( attached() );
     
-    real R = prop()->walking_rate_dt;
+    float R = prop()->walking_rate_dt;
 
 #if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
     R += prop()->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
     
-    nextAct -= max_real(0, R);
+    nextAct -= max_float(0, R);
 
     while ( nextAct <= 0 )
     {
@@ -82,14 +82,14 @@ void Walker::stepLoaded(Vector const& force)
     assert_true( attached() );
     
     // evaluate displacement, given the load parallel to filament:
-    real R = prop()->walking_rate_dt + dot(force, dirFiber()) * prop()->var_rate_dt;
+    float R = prop()->walking_rate_dt + dot(force, dirFiber()) * prop()->var_rate_dt;
 
 #if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
     R += prop()->variable_walking_rate_dt * fiber()->meshValue(abscissa());
 #endif
 
-    nextAct -= max_real(0, R);
+    nextAct -= max_float(0, R);
     
     while ( nextAct <= 0 )
     {

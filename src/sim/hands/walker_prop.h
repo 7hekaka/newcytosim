@@ -65,7 +65,7 @@ private:
     real var_rate_dt;
     
     /// derived variable
-    real walking_rate_dt;
+    float walking_rate_dt;
     
     /// number of fiber's step in one 'step'
     mutable int stride;

@@ -224,6 +224,9 @@ inline static real norm_inf(size_t cnt, real const* a, real const* b)
     return s;
 }
 
+/// maximum between `x` and `y`
+inline static float max_float(const float x, const float y) { return std::max(x, y); }
+
 //----------------------------------- DEBUG ------------------------------------
 
 /// count number of Not-A-Number values in `ptr[]` of size `cnt`
