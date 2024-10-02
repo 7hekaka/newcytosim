@@ -61,7 +61,7 @@ private:
     real * fiTMP;
     
     /// allocated size of fiTMP
-    size_t fiTMPSize;
+    size_t fiTMPalc;
     
     /// matrix for diffusion
     SparMatSym1 fiDiffusionMatrix;
@@ -118,7 +118,7 @@ public:
     {
         prop = p;
         fiTMP = nullptr;
-        fiTMPSize = 0;
+        fiTMPalc = 0;
     }
     
     /// destructor

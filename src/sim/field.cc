@@ -96,7 +96,7 @@ void Field::prepare()
     
     free_real(fiTMP);
     fiTMP = new_real(nbc);
-    fiTMPSize = nbc;
+    fiTMPalc = nbc;
 
     if ( prop->slow_diffusion > 0 )
     {
@@ -452,7 +452,7 @@ void Field::step(FiberSet& fibers)
     if ( prop->slow_diffusion > 0 )
     {
         assert_true( fiTMP );
-        assert_true( fiTMPSize == nbc );
+        assert_true( fiTMPalc == nbc );
         assert_true( fiDiffusionMatrix.size() == nbc );
 
         // dup = field:
