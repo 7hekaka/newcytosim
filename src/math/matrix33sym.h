@@ -23,21 +23,16 @@
 /** This class cannot represent rotations and other non-symmatric operations */
 class alignas(2*sizeof(real)) Matrix33sym final
 {
-public:
-    
-    /// unsigned integer type used for indices
-    typedef size_t index;
-
 private:
     
     /// values of the elements
     real val[6];
 
     /// access to modifiable element by index
-    real& operator[](index i)       { return val[i]; }
+    real& operator[](index_t i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](index i) const { return val[i]; }
+    real  operator[](index_t i) const { return val[i]; }
     
 public:
 
@@ -47,7 +42,7 @@ public:
     /// copy constructor
     Matrix33sym(Matrix33sym const& M)
     {
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] = M.val[u];
     }
 
@@ -91,7 +86,7 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] = 0.0;
     }
     
@@ -108,7 +103,7 @@ public:
     
     bool operator != (real zero) const
     {
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -130,30 +125,30 @@ public:
     real const* data() const { return val; }
 
     /// address of element at line i, column j
-    real* addr(const index i, const index j) { return val + ( i+((5-j)*j)/2 ); }
+    real* addr(const index_t i, const index_t j) { return val + ( i+((5-j)*j)/2 ); }
     /// value of element at line i, column j
-    real value(const index i, const index j) const { return val[i+((5-j)*j)/2]; }
+    real value(const index_t i, const index_t j) const { return val[i+((5-j)*j)/2]; }
 
     /// access functions to element by line and column indices
-    real& operator()(const index i, const index j)       { return val[i+((5-j)*j)/2]; }
-    real  operator()(const index i, const index j) const { return val[i+((5-j)*j)/2]; }
+    real& operator()(const index_t i, const index_t j)       { return val[i+((5-j)*j)/2]; }
+    real  operator()(const index_t i, const index_t j) const { return val[i+((5-j)*j)/2]; }
 
     /// set elements from given array
     void load(const real ptr[])
     {
-        for ( index i = 0; i < 6; ++i )
+        for ( index_t i = 0; i < 6; ++i )
             val[i] = ptr[i];
     }
 
     /// copy elements to given array
     void store(real ptr[]) const
     {
-        for ( index i = 0; i < 6; ++i )
+        for ( index_t i = 0; i < 6; ++i )
             ptr[i] = val[i];
     }
 
     /// extract column vector at given index
-    Vector3 column(const index i) const
+    Vector3 column(const index_t i) const
     {
         switch( i )
         {
@@ -164,7 +159,7 @@ public:
     }
     
     /// extract line vector at given index
-    Vector3 line(const index i) const
+    Vector3 line(const index_t i) const
     {
         switch( i )
         {
@@ -201,9 +196,9 @@ public:
     {
         const int w = (int)os.width();
         os << std::setw(1) << "[";
-        for ( index i = 0; i < 3; ++i )
+        for ( index_t i = 0; i < 3; ++i )
         {
-            for ( index j = 0; j < 3; ++j )
+            for ( index_t j = 0; j < 3; ++j )
                 os << " " << std::fixed << std::setw(w) << value(i,j);
             if ( i < 2 )
                 os << ";";
@@ -244,7 +239,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] *= alpha;
     }
 
@@ -258,7 +253,7 @@ public:
     const Matrix33sym operator -() const
     {
         Matrix33sym M;
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -267,7 +262,7 @@ public:
     const Matrix33sym operator *(const real alpha) const
     {
         Matrix33sym res;
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             res.val[u] = val[u] * alpha;
         return res;
     }
@@ -282,7 +277,7 @@ public:
     const Matrix33sym operator +(Matrix33sym const& M) const
     {
         Matrix33sym res;
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -291,7 +286,7 @@ public:
     const Matrix33sym operator -(Matrix33sym const& M) const
     {
         Matrix33sym res;
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -304,7 +299,7 @@ public:
         store2(val+2, add2(load2(val+2), load2(M.val+2)));
         store2(val+4, add2(load2(val+4), load2(M.val+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -317,7 +312,7 @@ public:
         store2(val+2, sub2(load2(val+2), load2(M.val+2)));
         store2(val+4, sub2(load2(val+4), load2(M.val+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -346,7 +341,7 @@ public:
     real norm_inf() const
     {
         real res = abs_real(val[0]);
-        for ( index i = 1; i < 6; ++i )
+        for ( index_t i = 1; i < 6; ++i )
             res = max_real(res, abs_real(val[i]));
         return res;
     }
@@ -589,7 +584,7 @@ public:
         store2(val+2, add2(load2(src+2), load2(val+2)));
         store2(val+4, add2(load2(src+4), load2(val+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] += src[u];
 #endif
     }
@@ -604,7 +599,7 @@ public:
         store2(val+2, fmadd2(a, load2(src+2), load2(val+2)));
         store2(val+4, fmadd2(a, load2(src+4), load2(val+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -618,7 +613,7 @@ public:
         store2(val+2, sub2(load2(val+2), load2(src+2)));
         store2(val+4, sub2(load2(val+4), load2(src+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] -= src[u];
 #endif
     }
@@ -633,7 +628,7 @@ public:
         store2(val+2, fnmadd2(a, load2(src+2), load2(val+2)));
         store2(val+4, fnmadd2(a, load2(src+4), load2(val+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] -= alpha * src[u];
 #endif
     }
@@ -642,7 +637,7 @@ public:
     void sub_trans(Matrix33sym const& M)
     {
         real const* src = M.val;
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] -= src[u];
     }
     
@@ -650,7 +645,7 @@ public:
     void add_trans(Matrix33sym const& M)
     {
         real const* src = M.val;
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] += src[u];
     }
     
@@ -658,7 +653,7 @@ public:
     void add_trans(const real alpha, Matrix33sym const& M)
     {
         real const* src = M.val;
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] += alpha * src[u];
     }
 
@@ -671,7 +666,7 @@ public:
         store2(val+2, add2(load2(src+2), load2(val+2)));
         store2(val+4, add2(load2(src+4), load2(val+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] += src[u];
 #endif
     }
@@ -687,7 +682,7 @@ public:
         store2(val+2, fmadd2(a, load2(src+2), load2(val+2)));
         store2(val+4, fmadd2(a, load2(src+4), load2(val+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -701,7 +696,7 @@ public:
         store2(val+2, sub2(load2(val+2), load2(src+2)));
         store2(val+4, sub2(load2(val+4), load2(src+4)));
 #else
-        for ( index u = 0; u < 6; ++u )
+        for ( index_t u = 0; u < 6; ++u )
             val[u] -= src[u];
 #endif
     }

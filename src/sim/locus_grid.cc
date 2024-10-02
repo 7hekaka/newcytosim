@@ -15,11 +15,11 @@
 
 //------------------------------------------------------------------------------
 
-size_t LocusGrid::setGrid(Vector inf, Vector sup, real min_width)
+index_t LocusGrid::setGrid(Vector inf, Vector sup, real min_width)
 {
     assert_true( min_width > 0 );
     
-    size_t cnt[3] = { 1, 1, 1 };
+    index_t cnt[3] = { 1, 1, 1 };
     for ( int d = 0; d < DIM; ++d )
     {
         // minimum number of cells in dimension 'd'
@@ -65,7 +65,7 @@ void LocusGrid::createCells()
 size_t LocusGrid::capacity() const
 {
     size_t res = 0;
-    for ( size_t i = 0; i < pGrid.nbCells(); ++i )
+    for ( index_t i = 0; i < pGrid.nbCells(); ++i )
         res += pGrid[i].capacity();
     return res;
 }
@@ -1026,7 +1026,7 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
     {
         BigVector pos = ii->pos_;
         /* The radius is negated, such that it gets added by compute_near_bits() */
-        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        vec4f xyzr { pos.xx, pos.yy, pos.zz, -pos.rr };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( size_t offset = 0; offset < list.size(); offset += 64 )
@@ -1062,7 +1062,7 @@ void LocusGrid::setStericsX(BigLocusList const& list) const
     {
         BigVector pos = ii->pos_;
         /* The radius is negated, such that it gets added by compute_near_bits() */
-        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        vec4f xyzr { pos.xx, pos.yy, pos.zz, -pos.rr };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( size_t offset = 0; offset < list.size(); offset += 64 )
@@ -1109,8 +1109,8 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
     assert_true( &list1 != &list2 );
 #if 0
     {
-        size_t l1 = list1.num_locus(), p1 = list1.num_points();
-        size_t l2 = list2.num_locus(), p2 = list2.num_points();
+        index_t l1 = list1.num_locus(), p1 = list1.num_points();
+        index_t l2 = list2.num_locus(), p2 = list2.num_points();
         printf(" stericsX: %2lu+%2lu  :  %2lu+%2lu\n", l1, p1, l2, p2);
     }
 #endif
@@ -1123,7 +1123,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         if ( modulo )
             modulo->fold_float(pos, list2[0].pos_);
         /* The radius is negated, such that it gets added by compute_near_bits() */
-        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        vec4f xyzr { pos.xx, pos.yy, pos.zz, -pos.rr };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( size_t offset = 0; offset < list2.size(); offset += 64 )
@@ -1177,7 +1177,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
         if ( modulo )
             modulo->fold_float(pos, list2[0].pos_);
         /* The radius is negated, such that it gets added by compute_near_bits() */
-        vec4f xyzr { pos.XX, pos.YY, pos.ZZ, -pos.RR };
+        vec4f xyzr { pos.xx, pos.yy, pos.zz, -pos.rr };
         /* In most situations, the list size would be < 64 and one round would
          be sufficient, but in all generality we must handle larger list size */
         for ( size_t offset = 0; offset < list2.size(); offset += 64 )
@@ -1220,7 +1220,7 @@ void LocusGrid::setStericsX(BigLocusList const& list1,
  */
 void LocusGrid::setSterics0() const
 {
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -1238,7 +1238,7 @@ void LocusGrid::setSterics0() const
 /** This calls setStericsT() */
 void LocusGrid::setSterics() const
 {
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -1289,9 +1289,9 @@ void LocusGrid::setStericsT() const
  Scan all cells to examine all object pairs (ii, jj) only once.
  This version can handle periodic boundary conditions
  */
-void LocusGrid::setSterics0(size_t pan) const
+void LocusGrid::setSterics0(index_t pan) const
 {
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -1306,10 +1306,10 @@ void LocusGrid::setSterics0(size_t pan) const
 }
 
 
-void LocusGrid::setStericsT(size_t pan) const
+void LocusGrid::setStericsT(index_t pan) const
 {
     assert_false( pGrid.isPeriodic() );
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
          int const* region;
          int nr = pGrid.getRegion(region, inx);
@@ -1328,10 +1328,10 @@ void LocusGrid::setStericsT(size_t pan) const
  Check interactions between the FatPoints contained in Panes `pan` and `bim`,
  where ( pan1 != pan2 )
  */
-void LocusGrid::setSterics0(size_t pan, size_t bim) const
+void LocusGrid::setSterics0(index_t pan, index_t bim) const
 {
     assert_true(pan != bim);
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -1351,11 +1351,11 @@ void LocusGrid::setSterics0(size_t pan, size_t bim) const
 }
 
 
-void LocusGrid::setStericsT(size_t pan, size_t bim) const
+void LocusGrid::setStericsT(index_t pan, index_t bim) const
 {
     assert_false( pGrid.isPeriodic() );
     assert_true(pan != bim);
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -1375,7 +1375,7 @@ void LocusGrid::setStericsT(size_t pan, size_t bim) const
 }
 
 
-void LocusGrid::setSterics(size_t pan) const
+void LocusGrid::setSterics(index_t pan) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(pan);
@@ -1384,7 +1384,7 @@ void LocusGrid::setSterics(size_t pan) const
 }
 
 
-void LocusGrid::setSterics(size_t pan1, size_t pan2) const
+void LocusGrid::setSterics(index_t pan1, index_t pan2) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(pan1, pan2);

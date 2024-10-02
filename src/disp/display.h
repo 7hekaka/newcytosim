@@ -55,7 +55,7 @@ public:
     zObject() : depth_(0) { }
 
     /// constructor
-    zObject(Mecable const* m, size_t i = 0) : point_(m, i), depth_(0) { }
+    zObject(Mecable const* m, index_t i = 0) : point_(m, i), depth_(0) { }
     
     /// position
     Vector position() const { return point_.pos(); }

@@ -528,12 +528,12 @@ void checkIsoMatrix(MATRIX & mat, real const* x, real const* y, real * z)
         // compute checksum after manually copying to every subspace:
         MATRIX ful;
         ful.resize(SD);
-        for ( size_t j = 0; j < S; ++j )
+        for ( index_t j = 0; j < S; ++j )
         {
             real e = mat.diagonal(j);
             for ( int d = 0; d < DIM; ++d )
                 ful.diagonal(DIM*j+d) = e;
-            for ( size_t i = j+1; i < S; ++i )
+            for ( index_t i = j+1; i < S; ++i )
             {
                 real * p = mat.address(i, j);
                 if ( p )

@@ -132,7 +132,7 @@ public:
     void execute_call(std::string& func, Glossary&);
 
     /// dump system and informations
-    void execute_dump(std::string const& path, int mode);
+    void execute_dump(std::string const& path, unsigned mode);
 };
 
 #endif

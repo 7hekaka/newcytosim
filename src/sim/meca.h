@@ -157,13 +157,13 @@ private:
     real tolerance_;
     
     /// total number of points in the system
-    size_t nPoints_;
+    index_t nPoints_;
     
     /// size of the currently allocated memory
-    size_t allocated_;
+    index_t allocated_;
 
     /// number of preconditionner blocks that could not be factorized
-    size_t bump_;
+    index_t bump_;
     
     /// flag to indicate that result is available
     int ready_;
@@ -259,57 +259,57 @@ public:
 private:
     
     /// add block 'T' to mFUL at position (i, j)
-    void add_block(size_t i, size_t j, MatrixBlock const& T);
+    void add_block(index_t i, index_t j, MatrixBlock const& T);
  
     /// add block 'alpha*T' to mFUL at position (i, j)
-    void add_block(size_t i, size_t j, real alpha, MatrixBlock const& T);
+    void add_block(index_t i, index_t j, real alpha, MatrixBlock const& T);
     
     /// add block '-T' to mFUL at position (i, j)
-    void sub_block(size_t i, size_t j, MatrixBlock const& T);
+    void sub_block(index_t i, index_t j, MatrixBlock const& T);
 
     /// add block '-alpha*T' to mFUL at position (i, j)
-    void sub_block(size_t i, size_t j, real alpha, MatrixBlock const& T);
+    void sub_block(index_t i, index_t j, real alpha, MatrixBlock const& T);
 
     /// add block 'T' to mFUL at position (i, i)
-    void add_block_diag(size_t i, MatrixBlock const& T);
+    void add_block_diag(index_t i, MatrixBlock const& T);
     
     /// add block '-T' to mFUL at position (i, i)
-    void sub_block_diag(size_t i, MatrixBlock const& T);
+    void sub_block_diag(index_t i, MatrixBlock const& T);
     
     /// add block 'alpha*T' to mFUL at position (i, i)
-    void add_block_diag(size_t i, real alpha, MatrixBlock const& T);
+    void add_block_diag(index_t i, real alpha, MatrixBlock const& T);
     
     /// add block 'alpha * (T + dia * Id)' to mFUL at position (i, i)
-    void add_block_diag(size_t i, real alpha, MatrixBlock const& T, real dia);
+    void add_block_diag(index_t i, real alpha, MatrixBlock const& T, real dia);
 
     /// add isotropic stiffness at position (i, j)
-    void add_iso(size_t i, size_t j, real val);
+    void add_iso(index_t i, index_t j, real val);
     
     /// add isotropic stiffness on diagonal at position (i, i)
-    void add_iso_diag(size_t i, real val);
+    void add_iso_diag(index_t i, real val);
 
     /// subtract isotropic stiffness at position (i, j)
-    void sub_iso(size_t i, size_t j, real val);
+    void sub_iso(index_t i, index_t j, real val);
     
     /// subtract isotropic stiffness on diagonal at position (i, i)
-    void sub_iso_diag(size_t i, real val);
+    void sub_iso_diag(index_t i, real val);
 
     /// add vector to vBAS at index `i`
-    void add_base(size_t, Vector const&) const;
+    void add_base(index_t, Vector const&) const;
 
     /// add scaled vector to vBAS at index `i`
-    void add_base(size_t, Vector const&, real) const;
+    void add_base(index_t, Vector const&, real) const;
 
     /// sub vector to vBAS at index `i`
-    void sub_base(size_t, Vector const&) const;
+    void sub_base(index_t, Vector const&) const;
 
     /// sub vector to vBAS at index `i`
-    void sub_base(size_t, Vector const&, real) const;
+    void sub_base(index_t, Vector const&, real) const;
 
 private:
     
     /// allocate memory
-    void allocate(size_t);
+    void allocate(index_t);
     
     /// release memory
     void release();
@@ -330,7 +330,7 @@ private:
     void addAllRigidity(const real* X, real* Y) const;
     
     /// extract the matrix on-diagonal block corresponding to a Mecable
-    void getBandedBlock(const Mecable*, real* mat, size_t ldd, size_t rank) const;
+    void getBandedBlock(const Mecable*, real* mat, index_t ldd, index_t rank) const;
 
     /// extract the matrix on-diagonal block corresponding to a Mecable
     void getHalfBlock(const Mecable*, real* mat) const;
@@ -339,7 +339,7 @@ private:
     void getFullBlock(const Mecable*, real* mat) const;
 
     /// extract the 5-bands symmetric on-diagonal block corresponding to a Mecable
-    void getIsoBandedBlock(const Mecable*, real* mat, size_t kd, size_t ldd) const;
+    void getIsoBandedBlock(const Mecable*, real* mat, index_t kd, index_t ldd) const;
 
     /// extract the istropic projection of the on-diagonal block corresponding to a Mecable
     void getIsoBlock(const Mecable*, real* mat) const;
@@ -355,14 +355,14 @@ private:
     
 #if RECYCLED_PRECONDITIONNER
     /// compute the preconditionner block corresponding to given Mecable
-    void computePrecondAlt(Mecable*, real*, real*, size_t);
+    void computePrecondAlt(Mecable*, real*, real*, index_t);
 
     /// compute all blocks of the preconditionner
     void computePrecondAlt();
 #endif
     
     /// compute the preconditionner block corresponding to given Mecable
-    void renewPreconditionner(Mecable*, int, real*, int*, real*, size_t);
+    void renewPreconditionner(Mecable*, int, real*, int*, real*, index_t);
     
     /// compute the preconditionner block corresponding to given Mecable
     void computePrecondIsoB(Mecable*, real*);
@@ -399,26 +399,26 @@ public:
     /// Add a Mecable to the list of objects to be simulated
     void addMecable(Mecable* p) { mecables.push_back(p); }
     
-    /// Number of Mecable
-    size_t nbMecables() const { return mecables.size(); }
-    
-    /// Number of points in the Mecable that has the most number of points
-    unsigned largestMecable() const;
-    
-    /// Number of points in the Mecable that has the most number of points
-    unsigned smallestMecable() const;
-
-    /// Number of distance constraints applied to the movements of vertices
-    unsigned nbConstraints() const;
-
     /// true if system does not contain any object
     bool empty() const { return nPoints_ == 0; }
+
+    /// Number of points in the Mecable that has the most number of points
+    index_t largestMecable() const;
     
+    /// Number of points in the Mecable that has the least number of points
+    index_t smallestMecable() const;
+
+    /// Number of distance constraints applied to the movements of vertices
+    index_t nbConstraints() const;
+    
+    /// Number of Mecable
+    index_t nbMecables() const { return (index_t)mecables.size(); }
+
     /// number of points in the system
-    size_t nbVertices() const { return nPoints_; }
+    index_t nbVertices() const { return nPoints_; }
     
     /// Implementation of LinearOperator::size()
-    size_t dimension() const { return DIM * nPoints_; }
+    index_t dimension() const { return DIM * nPoints_; }
     
     /// total allocated memory size for preconditionner
     size_t preconditionnerSize() const;
@@ -438,7 +438,7 @@ public:
     void addForce(Mecapoint const&, Vector const& force);
     
     /// Add a constant force on Mecapoint
-    void addForce(Mecable const*, unsigned inx, Vector const& force);
+    void addForce(Mecable const*, index_t inx, Vector const& force);
     
     /// Add a constant force on Interpolated point
     void addForce(Interpolation const&, Vector const& force);
@@ -488,7 +488,7 @@ public:
     void addTorque3Long(Mecapoint const&, Mecapoint const&, Mecapoint const&, MatrixBlock const&, real weight, real len, real weightL);
     
     /// Add a torque on 4 points to align AB with CD
-    void addTorque4(size_t indexA, size_t indexB, size_t indexC, size_t indexD, real weight);
+    void addTorque4(index_t indexA, index_t indexB, index_t indexC, index_t indexD, real weight);
     
     /// Add a torque on 4 points to align AB with CD
     void addTorque4(Mecapoint const&, Mecapoint const&, real weight);
@@ -553,7 +553,7 @@ public:
 
     
     /// Link of stiffness `weight` orthogonal to one of the principal plane and offset by `off`
-    void addPlaneClampXYZ(Mecapoint const& P, size_t xyz, real off, real weight);
+    void addPlaneClampXYZ(Mecapoint const& P, int xyz, real off, real weight);
 
     /// Link of stiffness `weight` with a plane parallel to YZ and offset by `off`
     void addPlaneClampX(Mecapoint const& P, real off, real weight) { addPlaneClampXYZ(P, 0, off, weight); }
@@ -587,26 +587,26 @@ public:
     
     
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink2(Mecapoint const&, const size_t, real, real, real weight);
+    void addLink2(Mecapoint const&, const index_t, real, real, real weight);
     
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink3(Mecapoint const&, const size_t, real, real, real, real weight);
+    void addLink3(Mecapoint const&, const index_t, real, real, real, real weight);
 
     /// Link of stiffness `weight` between vertex and interpolated point
-    void addLink4(Mecapoint const&, const size_t, real, real, real, real, real weight);
+    void addLink4(Mecapoint const&, const index_t, real, real, real, real, real weight);
     
     
     /// Link of stiffness `weight` between Interpolation and vertex
-    void addLink1(Interpolation const&, size_t, real weight);
+    void addLink1(Interpolation const&, index_t, real weight);
 
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink2(Interpolation const&, const size_t, real, real, real weight);
+    void addLink2(Interpolation const&, const index_t, real, real, real weight);
     
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink3(Interpolation const&, const size_t, real, real, real, real weight);
+    void addLink3(Interpolation const&, const index_t, real, real, real, real weight);
 
     /// Link of stiffness `weight` between Interpolation and interpolated point
-    void addLink4(Interpolation const&, const size_t, real, real, real, real, real weight);
+    void addLink4(Interpolation const&, const index_t, real, real, real, real, real weight);
 
     //----------------------- ELEMENTS LINKING POINTS --------------------------
 
@@ -626,7 +626,7 @@ public:
     void addLongLink(Interpolation const&, Interpolation const&, real len, real weight);
     
     /// Link of stiffness `weight` and resting length `len`
-    void addLongLink4(Interpolation const&, const size_t pts, real, real, real, real, real len, real weight);
+    void addLongLink4(Interpolation const&, const index_t pts, real, real, real, real, real len, real weight);
     
 #if ( DIM == 2 )
     /// Link of stiffness `weight`, at distance `arm` on the side of first segment
@@ -751,7 +751,7 @@ public:
     void calculateForces();
     
     /// set connectivity matrix according to mFUL and mISO
-    void setAdjacencyMatrix(int[], size_t) const;
+    void setAdjacencyMatrix(int[], index_t) const;
 
     /// reorder Mecables according to connectivity, to minimize the matrix bandwidth
     void reorderMecables();
@@ -769,7 +769,7 @@ public:
 
     /// Extract matrix defined by template function in a preallocated C-array
     template < MultiplyFuncPtr >
-    void getMatrix(real * mat, size_t lda) const;
+    void getMatrix(real * mat, index_t lda) const;
 
     /// Save matrix defined by template function in binary format
     template < MultiplyFuncPtr >
@@ -799,7 +799,7 @@ public:
 
     /// Save matrix defined by template function in Matrix Market format
     template < MultiplyFuncPtr >
-    void saveMatrix(FILE *, real threshold) const;
+    void saveMatrix(FILE *, size_t dim, real threshold) const;
     
     /// Output vectors and matrices, in a format that can be imported in MATLAB
     void saveSystem() const;
@@ -811,7 +811,7 @@ public:
     void flagClusters() const;
     
     /// export bitmap images to reveal the matrices' sparsity patterns
-    void saveMatrixBitmaps(const char[], size_t inc = 1) const;
+    void saveMatrixBitmaps(const char[], unsigned inc = 1) const;
     
     /// save image of connectivity between Mecables
     void saveConnectivityBitmap() const;

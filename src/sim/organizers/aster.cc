@@ -69,7 +69,7 @@ void Aster::setInteractions(Meca& meca) const
         {
             AsterLink const& link = asLinks[n];
             
-            const size_t off = sol->matIndex() + link.prime_;
+            const index_t off = sol->matIndex() + link.prime_;
 
 #if BACKWARD_COMPATIBILITY < 47
             if ( link.alt_ > 0 )
@@ -312,8 +312,8 @@ unsigned Aster::makeSolid(ObjectList& objs, Simul& sim, Glossary& opt)
         throw InvalidParameter("aster:solid must be specified");
     
     // find local coordinate system:
-    size_t ref = ~0U;
-    for ( size_t i = 0; i+DIM < sol->nbPoints(); ++i )
+    index_t ref = ~0U;
+    for ( index_t i = 0; i+DIM < sol->nbPoints(); ++i )
     {
         if ( 0 < sol->hasTriad(i) )
         {
@@ -629,7 +629,7 @@ void Aster::read(Inputter& in, Simul& sim, ObjectTag tag)
     
     if ( nbf > 0 )
     {
-        const size_t ref = asLinks[0].prime_;
+        const index_t ref = asLinks[0].prime_;
         asRadius = ( sol->posPoint(ref) - sol->posPoint(ref) ).norm();
     }
 }
@@ -684,7 +684,7 @@ Vector Aster::posFiber2(size_t inx) const
  retrieve link between Solid and ends of Fiber
  this is only meaningfull if ( inx < nbFibers() )
  */
-real Aster::getLink1(size_t inx, Vector& pos1, Vector& pos2) const
+real Aster::getLink1(unsigned inx, Vector& pos1, Vector& pos2) const
 {
     pos1 = posSolid1(inx);
     if ( fiber(inx) )
@@ -701,7 +701,7 @@ real Aster::getLink1(size_t inx, Vector& pos1, Vector& pos2) const
  retrieve link between Solid and side of Fiber
  this is only meaningfull if ( inx < nbFibers() )
  */
-real Aster::getLink2(size_t inx, Vector& pos1, Vector& pos2) const
+real Aster::getLink2(unsigned inx, Vector& pos1, Vector& pos2) const
 {
     Fiber const* fib = fiber(inx);
     
@@ -732,7 +732,7 @@ real Aster::getLink2(size_t inx, Vector& pos1, Vector& pos2) const
  This sets 'pos1' and 'pos2' as the ends of the link number `inx`
  or returns zero if the link does not exist
  */
-bool Aster::getLink(size_t inx, Vector& pos1, Vector& pos2) const
+bool Aster::getLink(index_t inx, Vector& pos1, Vector& pos2) const
 {
     if ( inx < 2 * asLinks.size() )
     {

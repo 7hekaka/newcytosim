@@ -131,10 +131,10 @@ protected:
 
     
     /// cut Fiber at point `pti`, return section `[ pti, plus_end ]`
-    virtual Fiber* severJoint(size_t pti);
+    virtual Fiber* severJoint(index_t pti);
     
     /// return index of point where there is a kink with ( std::cos(angle) < max_cos )
-    size_t hasKink(real max_cos) const;
+    index_t hasKink(real max_cos) const;
 
     
     /// viscous drag coefficient for an ellipsoid moving in an infinite volume of fluid
@@ -303,7 +303,7 @@ public:
     size_t nbAttachedHands() const { return fHands.count(); }
     
     /// count attached Hands fitting a given criteria
-    size_t nbAttachedHands(int (*func)(Hand const*)) const { return fHands.count(func); }
+    long nbAttachedHands(int (*func)(Hand const*)) const { return fHands.count(func); }
 
     /// number of Hands attached within a range of abscissa
     size_t nbHandsInRange(real abs_min, real abs_max, FiberEnd ref) const;

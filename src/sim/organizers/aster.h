@@ -32,14 +32,14 @@ private:
      1 = the interpolation corresponds exactly to point 'prime_'
      2 or 3 = link fiber-end with coef1_, fiber-side with coef2_
      */
-    unsigned rank_;
+    index_t rank_;
 
     /// index of first point on the Solid
-    unsigned prime_;
+    index_t prime_;
 
 #if BACKWARD_COMPATIBILITY < 47
     /// index used for backward compatibility
-    unsigned alt_;
+    index_t alt_;
 #endif
     
     /// set coefficients
@@ -54,7 +54,7 @@ private:
         coef2_[0] = 1.0 - coef2_[1] - coef2_[2] - coef2_[3];
         
         rank_ = 1;
-        for ( int i = 1; i <= DIM; ++i )
+        for ( index_t i = 1; i <= DIM; ++i )
         {
             if ( abs_real(coef1_[i]) > 0 )
                 rank_ = i+1;
@@ -252,16 +252,16 @@ public:
     void setInteractions(Meca&) const;
     
     /// number of links to be displayed using getLink()
-    size_t nbLinks() const { return 2 * nbFibers(); }
+    index_t nbLinks() const { return 2 * nbFibers(); }
 
     /// retrieve link between Solid and end of Fiber number `i`, returning stiffness
-    real getLink1(size_t i, Vector&, Vector&) const;
+    real getLink1(index_t i, Vector&, Vector&) const;
     
     /// retrieve link between Solid and side of Fiber number `i`, returning stiffness
-    real getLink2(size_t i, Vector&, Vector&) const;
+    real getLink2(index_t i, Vector&, Vector&) const;
     
     /// retrieve link of type 1 if `i` is even, of type 2 if `i` is odd
-    bool getLink(size_t i, Vector&, Vector&) const;
+    bool getLink(index_t i, Vector&, Vector&) const;
 
     //--------------------------------------------------------------------------
     

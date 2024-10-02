@@ -233,7 +233,7 @@ public:
     real binding_prob;
     
     /// derived variable = unbinding_rate * timestep;
-    real unbinding_rate_dt;
+    float unbinding_rate_dt;
     
     /// flag to indicate that `display` has a new value
     bool display_fresh;

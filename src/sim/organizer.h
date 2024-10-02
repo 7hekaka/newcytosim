@@ -49,7 +49,7 @@ public:
     //--------------------------------------------------------------------------
 
     /// number of objects currently organized
-    size_t nbOrganized() const  { return mObjects.size(); }
+    size_t nbOrganized() const { return mObjects.size(); }
     
     /// set number of objects
     void nbOrganized(size_t n) { mObjects.resize(n, nullptr); }
@@ -81,7 +81,7 @@ public:
     virtual Vector position() const;
 
     /// return the average of all vertices
-    virtual Vector positionP(size_t) const;
+    virtual Vector positionP(index_t) const;
 /*
     /// move all associated objects
     void translate(Vector const& T);
@@ -99,10 +99,10 @@ public:
     real sumDragCoefficient() const;
     
     /// number of links to be displayed using getLink()
-    virtual size_t nbLinks() const { return 0; }
+    virtual index_t nbLinks() const { return 0; }
 
     /// retrieve end positions of link number `inx`, or returns zero if this link does not exist
-    virtual bool getLink(size_t inx, Vector&, Vector&) const { return false; }
+    virtual bool getLink(index_t inx, Vector&, Vector&) const { return false; }
     
     /// object from that gives its display parameters
     virtual Solid * solid() const { return nullptr; }

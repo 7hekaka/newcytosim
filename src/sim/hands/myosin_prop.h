@@ -37,8 +37,8 @@ public:
     
 private:
     
-    real var_rate_dt;
-    real walking_rate_dt;
+    float var_rate_dt;
+    float walking_rate_dt;
     
 public:
 

@@ -55,10 +55,10 @@ public:
 
     
     /// number of links to be displayed using getLink()
-    size_t nbLinks() const { return asterPoints.size(); }
+    index_t nbLinks() const { return (index_t)asterPoints.size(); }
 
     /// retrieve link between Solid and Aster's core
-    bool getLink(size_t, Vector&, Vector&) const;
+    bool getLink(index_t, Vector&, Vector&) const;
     
     /// return unique character identifying the class
     ObjectTag tag() const { return FAKE_TAG; }

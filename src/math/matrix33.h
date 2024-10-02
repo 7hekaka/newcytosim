@@ -38,21 +38,16 @@ class alignas(4*sizeof(real)) Matrix33 final
 class Matrix33 final
 #endif
 {
-public:
-    
-    /// unsigned integer type used for indices
-    typedef size_t index;
-
 private:
     
     /// values of the elements
     real val[BLD*3];
 
     /// access to modifiable element by index
-    real& operator[](index i)       { return val[i]; }
+    real& operator[](index_t i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](index i) const { return val[i]; }
+    real  operator[](index_t i) const { return val[i]; }
     
 public:
     
@@ -72,7 +67,7 @@ public:
     /// copy constructor
     Matrix33(Matrix33 const& M)
     {
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] = M.val[u];
     }
 
@@ -125,22 +120,22 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] = 0.0;
     }
     
     /// set diagonal to 'dia' and other elements to 'off'
     void reset1(real off, real dia)
     {
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] = off;
-        for ( index u = 0; u < 3; ++u )
+        for ( index_t u = 0; u < 3; ++u )
             val[u+BLD*u] = dia;
     }
     
     bool operator != (real zero) const
     {
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -178,38 +173,38 @@ public:
     real const* data() const { return val; }
 
     /// address of element at line i, column j
-    real* addr(const index i, const index j) { return val + ( i + BLD*j ); }
+    real* addr(const index_t i, const index_t j) { return val + ( i + BLD*j ); }
     /// value of element at line i, column j
-    real value(const index i, const index j) const { return val[i+BLD*j]; }
+    real value(const index_t i, const index_t j) const { return val[i+BLD*j]; }
 
     /// access functions to element by line and column indices
-    real& operator()(const index i, const index j)       { return val[i+BLD*j]; }
-    real  operator()(const index i, const index j) const { return val[i+BLD*j]; }
+    real& operator()(const index_t i, const index_t j)       { return val[i+BLD*j]; }
+    real  operator()(const index_t i, const index_t j) const { return val[i+BLD*j]; }
 
     /// set elements from given array
     void load(const real ptr[])
     {
-        for ( index i = 0; i < 3; ++i )
-        for ( index j = 0; j < 3; ++j )
+        for ( index_t i = 0; i < 3; ++i )
+        for ( index_t j = 0; j < 3; ++j )
             val[i+BLD*j] = ptr[i+3*j];
     }
 
     /// copy elements to given array
     void store(real ptr[]) const
     {
-        for ( index i = 0; i < 3; ++i )
-        for ( index j = 0; j < 3; ++j )
+        for ( index_t i = 0; i < 3; ++i )
+        for ( index_t j = 0; j < 3; ++j )
             ptr[i+3*j] = val[i+BLD*j];
     }
 
     /// extract column vector at given index
-    Vector3 column(const index i) const
+    Vector3 column(const index_t i) const
     {
         return Vector3(val+BLD*i);
     }
     
     /// extract line vector at given index
-    Vector3 line(const index i) const
+    Vector3 line(const index_t i) const
     {
         return Vector3(val[i], val[BLD+i], val[BLD*2+i]);
     }
@@ -269,9 +264,9 @@ public:
     {
         const int w = (int)os.width();
         os << std::setw(1) << "[";
-        for ( index i = 0; i < 3; ++i )
+        for ( index_t i = 0; i < 3; ++i )
         {
-            for ( index j = 0; j < 3; ++j )
+            for ( index_t j = 0; j < 3; ++j )
                 os << " " << std::fixed << std::setw(w) << value(i,j);
             if ( i < 2 )
                 os << ";";
@@ -281,7 +276,7 @@ public:
     }
 
     /// value of element at line i, column j
-    std::string format_value(const index i, const index j) const
+    std::string format_value(const index_t i, const index_t j) const
     {
         char tmp[32];
         real x = val[i+BLD*j];
@@ -334,7 +329,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] *= alpha;
     }
 
@@ -348,7 +343,7 @@ public:
     const Matrix33 operator -() const
     {
         Matrix33 M;
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -357,7 +352,7 @@ public:
     const Matrix33 operator *(const real alpha) const
     {
         Matrix33 res;
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] * alpha;
         return res;
     }
@@ -372,7 +367,7 @@ public:
     const Matrix33 operator +(Matrix33 const& M) const
     {
         Matrix33 res;
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -381,7 +376,7 @@ public:
     const Matrix33 operator -(Matrix33 const& M) const
     {
         Matrix33 res;
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -394,7 +389,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(M.val+4)));
         store4(val+8, add4(load4(val+8), load4(M.val+8)));
 #else
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -407,7 +402,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(M.val+4)));
         store4(val+8, sub4(load4(val+8), load4(M.val+8)));
 #else
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -435,8 +430,8 @@ public:
         store4(res.val+4, blend22(z, shuffle4(u, m345, 0b1100)));
         store4(res.val+8, blend22(u, m678));
 #else
-        for ( index x = 0; x < 3; ++x )
-        for ( index y = 0; y < 3; ++y )
+        for ( index_t x = 0; x < 3; ++x )
+        for ( index_t y = 0; y < 3; ++y )
             res[y+BLD*x] = val[x+BLD*y];
 #endif
         return res;
@@ -458,8 +453,8 @@ public:
         store4(res.val+4, blend22(z, shuffle4(u, m345, 0b1100)));
         store4(res.val+8, blend22(u, m678));
 #else
-        for ( index x = 0; x < 3; ++x )
-        for ( index y = 0; y < 3; ++y )
+        for ( index_t x = 0; x < 3; ++x )
+        for ( index_t y = 0; y < 3; ++y )
             res[y+BLD*x] = alpha * val[x+BLD*y];
 #endif
         return res;
@@ -470,7 +465,7 @@ public:
     real norm_inf() const
     {
         real res = abs_real(val[0]);
-        for ( index i = 1; i < 3*BLD; ++i )
+        for ( index_t i = 1; i < 3*BLD; ++i )
             res = max_real(res, abs_real(val[i]));
         return res;
     }
@@ -741,7 +736,7 @@ public:
         storeu4(val+4, add4(loadu4(val+4), loadu4(src+4)));
         store1(val+8, add1(load1(val+8), load1(src+8)));
 #else
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] += src[u];
 #endif
     }
@@ -756,7 +751,7 @@ public:
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] += alpha * src[u];
 #endif
     }
@@ -770,7 +765,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #else
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] -= src[u];
 #endif
     }
@@ -785,7 +780,7 @@ public:
         store4(val+4, fnmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fnmadd4(a, load4(src+8), load4(val+8)));
 #else
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] -= alpha * src[u];
 #endif
     }
@@ -826,7 +821,7 @@ public:
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] += src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -853,7 +848,7 @@ public:
         val[2+BLD] += alpha * src[2+BLD];
         val[2+BLD*2] += alpha * src[2+BLD*2];
 #elif ( 0 )
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] += alpha * src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -893,7 +888,7 @@ public:
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
 #elif ( 1 )
-        for ( index u = 0; u < BLD*3; ++u )
+        for ( index_t u = 0; u < BLD*3; ++u )
             val[u] -= src[u];
 #else
         for ( int x = 0; x < 3; ++x )
@@ -1259,7 +1254,7 @@ public:
     static Matrix33 rotationAroundZ(real angle);
     
     /// a rotation around one the axis: X if `i=0`, Y if `i=1` or Z if `i=2`
-    static Matrix33 rotationAroundPrincipalAxis(index i, real angle);
+    static Matrix33 rotationAroundPrincipalAxis(index_t i, real angle);
 
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix33 rotationToVector(const Vector3&);

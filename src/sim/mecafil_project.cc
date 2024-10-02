@@ -103,7 +103,7 @@ void Mecafil::makeProjection()
     assert_true( nbPoints() >= 2 );
 
     //set the diagonal and off-diagonal of J*J'
-    const size_t nbu = nbPoints() - 2;
+    const index_t nbu = nbPoints() - 2;
 
     for ( size_t jj = 0; jj < nbu; ++jj )
     {
@@ -158,7 +158,7 @@ void Mecafil::makeProjectionAnisotropic()
     assert_true( nbPoints() >= 2 );
 
     //set the diagonal and off-diagonal of J*J'
-    const size_t nbu = nbPoints() - 2;
+    const index_t nbu = nbPoints() - 2;
     real b = 1;
 
     for ( size_t jj = 0; jj < nbu; ++jj )
@@ -370,7 +370,7 @@ void Mecafil::computeTensions(const real* force)
 /** This extracts the matrix underlying the 'Mecafil::projectForces()' */
 void Mecafil::printProjection(FILE * file) const
 {
-    const size_t nbv = DIM * nbPoints();
+    const index_t nbv = DIM * nbPoints();
     real * res = new_real(nbv*nbv);
     real * src = new_real(nbv);
     real * dst = new_real(nbv);
@@ -472,7 +472,7 @@ void Mecafil::addProjectionDiff(real* mat) const
     }
     free_real(tmp);
 #endif
-    for ( unsigned i = 0; i < nbs; ++i )
+    for ( index_t i = 0; i < nbs; ++i )
     {
         real w = iJJtJF[i];
         if ( w != 0 ) for ( unsigned d = 0; d < DIM; ++d )
@@ -501,7 +501,7 @@ void Mecafil::addProjectionDiff(real* mat) const
 void Mecafil::addProjectionDiff(const real* X, real* Y) const
 {
 #if CHECK_PROJECTION_DIFF
-    size_t nbp = DIM * nbPoints();
+    index_t nbp = DIM * nbPoints();
     real * vec = new_real(nbp);
     copy_real(nbp, Y, vec);
     addProjectionDiff_(nbSegments(), iJJtJF, X, vec);

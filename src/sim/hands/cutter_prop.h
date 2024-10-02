@@ -63,7 +63,7 @@ public:
     
 private:
     
-    real cutting_rate_dt;
+    float cutting_rate_dt;
     
 public:
     

@@ -111,13 +111,13 @@ public:
 protected:
    
     /// Total number of cells in the map; size of cells[]
-    size_t mNbCells;
+    index_t mNbCells;
     
     /// The number of cells in each dimension
-    size_t mDim[ORD<4?4:ORD];
+    index_t mDim[ORD<4?4:ORD];
     
     /// Offset between two consecutive cells along each dimension
-    size_t mStride[ORD];
+    index_t mStride[ORD];
     
     /// The position of the inferior (min) edge in each dimension
     real mInf[ORD];
@@ -143,26 +143,26 @@ protected:
 protected:
     
     /// return closest integer to `c` in the segment [ 0, s-1 ]
-    inline size_t image_(int d, long x) const
+    inline index_t image_(int d, int x) const
     {
-        size_t S(mDim[d]);
+        index_t S(mDim[d]);
         ///@todo use remainder() function for branchless code?
         while ( x <  0 ) x += S;
-        size_t u(static_cast<size_t>(x));
+        index_t u(static_cast<index_t>(x));
         while ( u >= S ) u -= S;
         return u;
     }
 
-    inline size_t clamp_(int d, long x) const
+    inline index_t clamp_(int d, int x) const
     {
-        size_t S(mDim[d]-1);
-        size_t u(static_cast<size_t>(std::max(0L, x)));
+        index_t S(mDim[d]-1);
+        index_t u(static_cast<index_t>(std::max(0, x)));
         return std::min(u, S);
         //return c <= 0 ? 0 : ( c >= s ? s-1 : c );
     }
     
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
-    inline size_t ind_(const int d, long x) const
+    inline index_t ind_(const int d, int x) const
     {
 #if ENABLE_PERIODIC_BOUNDARIES
         if ( mPeriodic[d] )
@@ -174,28 +174,28 @@ protected:
 
 
     /// return f modulo s in [ 0, s-1 ]
-    static inline size_t imagef_periodic(size_t s, real f)
+    static inline index_t imagef_periodic(index_t s, real f)
     {
         while ( f <  0 ) f += (real)s;
-        size_t u((size_t)f);
+        index_t u((index_t)f);
         while ( u >= s ) u -= s;
         return u;
     }
 
-    static inline size_t imagef_clamped(size_t s, real f)
+    static inline index_t imagef_clamped(index_t s, real f)
     {
         if ( f > 0 )
         {
-            return std::min(size_t(f), s);
+            return std::min(index_t(f), s);
         }
         return 0;
     }
     
     
     /// returns  ( f - mInf[d] ) / cWidth[d]
-    inline long map_(const int d, real f) const
+    inline int map_(const int d, real f) const
     {
-        return static_cast<long>( f * cDelta[d] - mStart[d] );
+        return static_cast<int>( f * cDelta[d] - mStart[d] );
     }
     
     /// returns  0.5 + ( f - mInf[d] ) / cWidth[d]
@@ -205,7 +205,7 @@ protected:
     }
 
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
-    inline size_t imagef(const int d, real f) const
+    inline index_t imagef(const int d, real f) const
     {
         real x = f * cDelta[d] - mStart[d];
 #if ENABLE_PERIODIC_BOUNDARIES
@@ -217,7 +217,7 @@ protected:
     }
 
     /// return closest integer to `c` in the segment [ 0, mDim[d]-1 ]
-    inline size_t imagef(const int d, real f, real offset) const
+    inline index_t imagef(const int d, real f, real offset) const
     {
         real x = f * cDelta[d] - ( mStart[d] - offset );
 #if ENABLE_PERIODIC_BOUNDARIES
@@ -259,10 +259,10 @@ public:
      the edges of the area are specified in dimension `d` by 'infs[d]' and 'sups[d]',
      and the number of cells by 'nbcells[d]'.
      */
-    void setDimensions(const real infs[ORD], real sups[ORD], const size_t cells[ORD])
+    void setDimensions(const real infs[ORD], real sups[ORD], const index_t cells[ORD])
     {
         cVolume = 1;
-        size_t cnt = 1;
+        index_t cnt = 1;
         bool reshaped = false;
         
         for ( int d = 0; d < ORD; ++d )
@@ -333,13 +333,13 @@ public:
 #pragma mark -
 
     /// total number of cells in the map
-    size_t nbCells()      const { return mNbCells; }
+    index_t nbCells()      const { return mNbCells; }
 
     /// number of cells in dimensionality `d`
-    size_t breadth(int d) const { return mDim[d]; }
+    index_t breadth(int d) const { return mDim[d]; }
     
     /// offset to the next cell in the direction `d`
-    size_t stride(int d)  const { return mStride[d]; }
+    index_t stride(int d)  const { return mStride[d]; }
 
     /// position of the inferior (left/bottom/front) edge
     real inf(int d)   const { return mInf[d]; }
@@ -366,7 +366,7 @@ public:
     real position(int d, real c) const { return mInf[d] + c * cWidth[d]; }
     
     /// index in dimension `d` corresponding to position `w`
-    long index(int d, real w) const { return map_(d, w); }
+    int index(int d, real w) const { return map_(d, w); }
 
     /// half the diagonal length of the unit cell
     real cellRadius() const
@@ -378,7 +378,7 @@ public:
     }
     
     /// the smallest cell width, along dimensions that have more than `min_size` cells
-    real minimumWidth(size_t min_size) const
+    real minimumWidth(index_t min_size) const
     {
         real res = INFINITY;
         for ( int d = 0; d < ORD; ++d )
@@ -409,7 +409,7 @@ public:
     {
         for ( int d = 0; d < ORD; ++d )
         {
-            if ( coord[d] < 0 || (size_t)coord[d] >= mDim[d] )
+            if ( coord[d] < 0 || (index_t)coord[d] >= mDim[d] )
                 return false;
         }
         return true;
@@ -434,7 +434,7 @@ public:
     }
     
     /// conversion from index to coordinates
-    void setCoordinatesFromIndex(int coord[ORD], size_t indx) const
+    void setCoordinatesFromIndex(int coord[ORD], index_t indx) const
     {
         for ( int d = 0; d < ORD; ++d )
         {
@@ -450,7 +450,7 @@ public:
             coord[d] = imagef(d, w[d], offset);
     }
     
-    void setPositionFromIndex(real res[ORD], size_t indx, real offset) const
+    void setPositionFromIndex(real res[ORD], index_t indx, real offset) const
     {
         for ( int d = 0; d < ORD; ++d )
         {
@@ -461,7 +461,7 @@ public:
 
     /// conversion from Index to Position (offset should be in [0,1])
     template < typename REAL >
-    void setPositionFromIndex(REAL res[ORD], size_t indx, real offset) const
+    void setPositionFromIndex(REAL res[ORD], index_t indx, real offset) const
     {
         for ( int d = 0; d < ORD; ++d )
         {
@@ -478,9 +478,9 @@ public:
     }
 
     /// conversion from coordinates to index
-    size_t pack(const int coord[ORD]) const
+    index_t pack(const int coord[ORD]) const
     {
-        size_t inx = ind_(ORD-1, coord[ORD-1]);
+        index_t inx = ind_(ORD-1, coord[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
             inx = mDim[d] * inx + ind_(d, coord[d]);
@@ -490,9 +490,9 @@ public:
     
     
     /// returns the index of the cell whose center is closest to the point w[]
-    size_t index(const real w[ORD]) const
+    index_t index(const real w[ORD]) const
     {
-        size_t inx = imagef(ORD-1, w[ORD-1]);
+        index_t inx = imagef(ORD-1, w[ORD-1]);
         
         for ( int d = ORD-2; d >= 0; --d )
             inx = mDim[d] * inx + imagef(d, w[d]);
@@ -502,9 +502,9 @@ public:
 
     
     /// returns the index of the cell whose center is closest to the point w[]
-    size_t index(const real w[ORD], const real offset) const
+    index_t index(const real w[ORD], const real offset) const
     {
-        size_t inx = imagef(ORD-1, w[ORD-1], offset);
+        index_t inx = imagef(ORD-1, w[ORD-1], offset);
         
         for ( int d = ORD-2; d >= 0; --d )
             inx = mDim[d] * inx + imagef(d, w[d], offset);
@@ -514,9 +514,9 @@ public:
 
     
     /// return cell that is next to `c` in the direction `dim`
-    size_t next(size_t c, int dim) const
+    index_t next(index_t c, int dim) const
     {
-        size_t s[ORD];
+        index_t s[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
             s[d] = c % mDim[d];
@@ -532,81 +532,81 @@ public:
     }
     
     /// convert coordinate to array index, if ORD==1
-    size_t pack1D(const int x) const
+    index_t pack1D(const int x) const
     {
         return ind_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==2
-    size_t pack2D(const int x, const int y) const
+    index_t pack2D(const int x, const int y) const
     {
         return ind_(1, y) * mDim[0] + ind_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==3
-    size_t pack3D(const int x, const int y, const int z) const
+    index_t pack3D(const int x, const int y, const int z) const
     {
         return ( ind_(2, z) * mDim[1] + ind_(1, y) ) * mDim[0] + ind_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==1
-    size_t pack1D_clamped(const int x) const
+    index_t pack1D_clamped(const int x) const
     {
         return clamp_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==2
-    size_t pack2D_clamped(const int x, const int y) const
+    index_t pack2D_clamped(const int x, const int y) const
     {
         return clamp_(1, y) * mDim[0] + clamp_(0, x);
     }
     
     /// convert coordinate to array index, if ORD==3
-    size_t pack3D_clamped(const int x, const int y, const int z) const
+    index_t pack3D_clamped(const int x, const int y, const int z) const
     {
         return ( clamp_(2, z) * mDim[1] + clamp_(1, y) ) * mDim[0] + clamp_(0, x);
     }
 
     
     /// return index of cell corresponding to position (x), if ORD==1
-    size_t index1D(const real x) const
+    index_t index1D(const real x) const
     {
         return ind_(0, map_(0, x));
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
-    size_t index2D(const real x, const real y) const
+    index_t index2D(const real x, const real y) const
     {
-        size_t X = ind_(0, map_(0, x));
-        size_t Y = ind_(1, map_(1, y));
+        index_t X = ind_(0, map_(0, x));
+        index_t Y = ind_(1, map_(1, y));
         return  Y * mDim[0] + X;
     }
     
     /// return index of cell corresponding to position (x, y, z), if ORD==3
-    size_t index3D(const real x, const real y, const real z) const
+    index_t index3D(const real x, const real y, const real z) const
     {
-        size_t X = ind_(0, map_(0, x));
-        size_t Y = ind_(1, map_(1, y));
-        size_t Z = ind_(2, map_(2, z));
+        index_t X = ind_(0, map_(0, x));
+        index_t Y = ind_(1, map_(1, y));
+        index_t Z = ind_(2, map_(2, z));
         return ( Z * mDim[1] + Y ) * mDim[0] + X;
     }
     
     /// return index of cell corresponding to position (x, y), if ORD==2
-    size_t direct_index2D(const real x, const real y) const
+    index_t direct_index2D(const real x, const real y) const
     {
-        size_t X = static_cast<size_t>(map_(0, x)); assert_true( X < mDim[0] );
+        index_t X = static_cast<index_t>(map_(0, x)); assert_true( X < mDim[0] );
         // with semi-periodic conditions, Y may not be inside, and clamping is necessary:
-        size_t Y = static_cast<size_t>(clamp_(1, map_(1, y))); assert_true( Y < mDim[1] );
+        index_t Y = static_cast<index_t>(clamp_(1, map_(1, y))); assert_true( Y < mDim[1] );
         return Y * mDim[0] + X;
     }
 
     /// return index of cell corresponding to position (x, y, z), if ORD==3
-    size_t direct_index3D(const real x, const real y, const real z) const
+    index_t direct_index3D(const real x, const real y, const real z) const
     {
-        size_t X = static_cast<size_t>(map_(0, x)); assert_true( X < mDim[0] );
+        index_t X = static_cast<index_t>(map_(0, x)); assert_true( X < mDim[0] );
         // with semi-periodic conditions, Y may not be inside, and clamping is necessary:
-        size_t Y = static_cast<size_t>(clamp_(1, map_(1, y))); assert_true( Y < mDim[1] );
-        size_t Z = static_cast<size_t>(clamp_(2, map_(2, z))); assert_true( Z < mDim[2] );
+        index_t Y = static_cast<index_t>(clamp_(1, map_(1, y))); assert_true( Y < mDim[1] );
+        index_t Z = static_cast<index_t>(clamp_(2, map_(2, z))); assert_true( Z < mDim[2] );
         return ( Z * mDim[1] + Y ) * mDim[0] + X;
     }
 
@@ -643,7 +643,7 @@ private:
     }
     
     /// caculate the edge characteristic from the coordinates of a cell and the range vector
-    edge_type edgeFromCoordinates(const int coord[ORD], const size_t range[ORD], bool symmetric) const
+    edge_type edgeFromCoordinates(const int coord[ORD], const index_t range[ORD], bool symmetric) const
     {
         int e = 0;
         if ( symmetric )
@@ -667,17 +667,17 @@ private:
     }
     
     /// return array of dimensionality ORD, containing indices with reference to the center cell
-    static size_t initRectangularGrid(int * ccc, size_t ccc_size, const size_t range[ORD], bool symmetric)
+    static index_t initRectangularGrid(int * ccc, index_t ccc_size, const index_t range[ORD], bool symmetric)
     {
-        size_t res = 1;
+        index_t res = 1;
         for ( unsigned d = 0; d < ORD; ++d )
             ccc[d] = 0;
         for ( unsigned d = 0; d < ORD; ++d )
         {
-            size_t h = res;
+            index_t h = res;
             for ( int s = 1; s <= range[d]; ++s )
             {
-                for ( size_t n = 0; n < res; ++n )
+                for ( index_t n = 0; n < res; ++n )
                 {
                     for ( unsigned e = 0; e < d; ++e )
                         ccc[ORD*h+e] = ccc[ORD*n+e];
@@ -700,12 +700,12 @@ private:
     
     
     /// calculate cell index offsets between 'ori' and 'ori+shift'
-    int calculateOffsets(int offsets[], int shift[], size_t cnt, int ori[], bool symmetric)
+    int calculateOffsets(int offsets[], int shift[], index_t cnt, int ori[], bool symmetric)
     {
         int res = 0;
         int cc[ORD];
         int ori_indx = (int)pack(ori);
-        for ( size_t ii = 0; ii < cnt; ++ii )
+        for ( index_t ii = 0; ii < cnt; ++ii )
         {
             for ( unsigned d = 0; d < ORD; ++d )
                 cc[d] = ori[d] + shift[ORD*ii+d];
@@ -740,7 +740,7 @@ private:
      Note: the range is taken specified in units of cells: 1 = 1 cell
      @todo: specify range in calculateRegion() as real distance!
      */
-    void createRegions(int * ccc, const edge_type regMax, const size_t range[ORD], bool symmetric)
+    void createRegions(int * ccc, const edge_type regMax, const index_t range[ORD], bool symmetric)
     {
         //allocate and reset arrays:
         deleteRegions();
@@ -749,7 +749,7 @@ private:
         eRegion = new int[regMax*(regMax+1)]{0};
         
         int ori[ORD]{0};
-        for ( size_t i = 0; i < mNbCells; ++i )
+        for ( index_t i = 0; i < mNbCells; ++i )
         {
             setCoordinatesFromIndex(ori, i);
             edge_type e = edgeFromCoordinates(ori, range, symmetric);
@@ -796,10 +796,10 @@ private:
     }
     
     /// used to remove ORD coordinates in array `ccc`
-    void remove_entry(int * ccc, const size_t s, size_t& cmx)
+    void remove_entry(int * ccc, const index_t s, index_t& cmx)
     {
         --cmx;
-        for ( size_t x = ORD*s; x < ORD*cmx; ++x )
+        for ( index_t x = ORD*s; x < ORD*cmx; ++x )
             ccc[x] = ccc[x+ORD];
     }
     
@@ -812,12 +812,12 @@ public:
      */
     void createSquareRegions(const real radius)
     {
-        size_t cmx = 1;
-        size_t range[ORD];
+        index_t cmx = 1;
+        index_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
             assert_true( cWidth[d] > REAL_EPSILON );
-            size_t R = std::ceil( radius / cWidth[d] );
+            index_t R = std::ceil( radius / cWidth[d] );
             cmx *= ( 2 * R + 1 );
             range[d] = R;
         }
@@ -827,7 +827,7 @@ public:
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range, true);
         
-        for ( size_t s = cmx; s-- > 0 ; )
+        for ( index_t s = cmx; s-- > 0 ; )
             if ( reject_square(ccc+ORD*s, radius) )
                 remove_entry(ccc, s, cmx);
         
@@ -842,12 +842,12 @@ public:
      */
     void createRoundRegions(const real radius)
     {
-        size_t cmx = 1;
-        size_t range[ORD];
+        index_t cmx = 1;
+        index_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
             assert_true( cWidth[d] > REAL_EPSILON );
-            size_t R = std::ceil( radius / cWidth[d] );
+            index_t R = std::ceil( radius / cWidth[d] );
             cmx *= ( 2 * R + 1 );
             range[d] = R;
         }
@@ -857,7 +857,7 @@ public:
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range, true);
 
-        for ( size_t s = cmx; s-- > 0 ; )
+        for ( index_t s = cmx; s-- > 0 ; )
             if ( reject_disc(ccc+ORD*s, radius) )
                 remove_entry(ccc, s, cmx);
         
@@ -873,10 +873,10 @@ public:
 
      Note: the radius is taken specified in units of cells: 1 = 1 cell
      */
-    void createSideRegions(const unsigned num_cells_radius)
+    void createSideRegions(const index_t num_cells_radius)
     {
-        size_t cmx = 1;
-        size_t range[ORD];
+        index_t cmx = 1;
+        index_t range[ORD];
         for ( int d = 0; d < ORD; ++d )
         {
             cmx *= ( num_cells_radius + 1 );
@@ -914,7 +914,7 @@ public:
      
      Note: createRegions() must be called first
     */
-    int getRegion(int const*& offsets, const size_t indx) const
+    int getRegion(int const*& offsets, const index_t indx) const
     {
         assert_true( hasRegions() );
         int * R = eRegion + region_[indx];

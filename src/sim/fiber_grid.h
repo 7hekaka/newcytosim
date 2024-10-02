@@ -97,7 +97,7 @@ public:
     FiberGrid() : modulo_(nullptr) { }
 
     /// set a grid to cover the specified Volume with cells of width `max_step` at most
-    size_t setGrid(Vector inf, Vector sup, real max_step);
+    index_t setGrid(Vector inf, Vector sup, real max_step);
     
     /// true if the grid was initialized by setGrid(); return allocated size
     size_t hasGrid() const;
@@ -106,7 +106,7 @@ public:
     void createCells();
     
     /// number of cells in grid
-    size_t nbCells() const;
+    index_t nbCells() const;
 
     /// distribute the Fiber segments over the grid cells
     void paintGrid(const Fiber * first, const Fiber * last, real range);
@@ -124,13 +124,13 @@ public:
     FiberSegment closestSegment(Vector const&) const;
     
     /// total number of segments in grid
-    size_t nbTargets() const;
+    index_t nbTargets() const;
 
     /// return segment list associated with cell containing 'pos'
     SegmentList& cellTargets(Vector const& pos) const
     {
         // get the cell index from the position in space:
-        const size_t indx = fGrid.index(pos, 0.5);
+        const index_t indx = fGrid.index(pos, 0.5);
         // get the list of rods associated with this cell:
         return fGrid.icell(indx);
     }

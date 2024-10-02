@@ -178,7 +178,7 @@ void SpaceSquare::setConfinement(const real pos[], Mecapoint const& mp,
 {
     bool in = true;
     
-    for ( size_t d = 0; d < DIM; ++d )
+    for ( int d = 0; d < DIM; ++d )
     {
         if ( abs_real(pos[d]) > dim[d] )
         {
@@ -190,7 +190,7 @@ void SpaceSquare::setConfinement(const real pos[], Mecapoint const& mp,
     if ( in ) 
     {
         // find the dimensionality 'dip' corresponding to the closest face
-        size_t dip = 0;
+        int dip = 0;
         
         real l = dim[0] - abs_real(pos[0]);
 #if ( DIM > 1 )

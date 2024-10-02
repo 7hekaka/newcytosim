@@ -122,7 +122,7 @@ void free_vector(real *& ptr)
     ptr = nullptr;
 }
 
-void Meca::allocate(size_t alc)
+void Meca::allocate(index_t alc)
 {
     if ( alc > allocated_ )
     {
@@ -153,25 +153,25 @@ void Meca::release()
 }
 
 
-unsigned Meca::largestMecable() const
+index_t Meca::largestMecable() const
 {
-    unsigned res = 0;
+    index_t res = 0;
     for ( Mecable * mec : mecables )
         res = std::max(res, mec->nbPoints());
     return res;
 }
 
-unsigned Meca::smallestMecable() const
+index_t Meca::smallestMecable() const
 {
-    unsigned res = ~0;
+    index_t res = ~0U;
     for ( Mecable * mec : mecables )
         res = std::min(res, mec->nbPoints());
     return res;
 }
 
-unsigned Meca::nbConstraints() const
+index_t Meca::nbConstraints() const
 {
-    unsigned res = 0;
+    index_t res = 0;
     for ( Mecable * mec : mecables )
         res += mec->nbConstraints();
     return res;
@@ -375,7 +375,7 @@ void Meca::readyMecables()
     /*
      Attributes a position in the vector/matrix to each Mecable
      */
-    unsigned cnt = 0;
+    index_t cnt = 0;
     for ( Mecable * mec : mecables )
     {
         mec->setIndex(cnt);
@@ -669,7 +669,7 @@ real Meca::residualNorm() const
  */
 unsigned Meca::solve()
 {
-    const size_t dim = dimension();
+    const index_t dim = dimension();
     assert_true(ready_==0);
 
     prepareMatrices();
@@ -732,7 +732,7 @@ unsigned Meca::solve()
     if ( uniform_flow_dt_.norm() > REAL_EPSILON )
     {
         LOG_ONCE("NEW_CYTOPLASMIC_FLOW code enabled\n");
-        for ( size_t p = 0; p < nbVertices(); ++p )
+        for ( index_t p = 0; p < nbVertices(); ++p )
             uniform_flow_dt_.add_to(vRHS+DIM*p);
     }
 #endif
@@ -791,7 +791,7 @@ unsigned Meca::solve()
      iteration involving 2 matrix-vector multiplications.
      Here we set the limit to the theoretical maximum:
      */
-    size_t max_iter = 2 * dim;
+    index_t max_iter = 2 * dim;
     LinearSolvers::Monitor monitor(max_iter, tolerance_);
 
     //fprintf(stderr, "\nSystem size %6lu  limit %6lu  tolerance %f\n", dim, max_iter, tolerance_);
@@ -912,8 +912,8 @@ unsigned Meca::solve()
     Mecable * mac = nullptr;
     for ( Mecable * mec : mecables )
     {
-        const size_t off = DIM * mec->matIndex();
-        const size_t nbc = DIM * mec->nbPoints();
+        const index_t off = DIM * mec->matIndex();
+        const index_t nbc = DIM * mec->nbPoints();
         real d = blas::nrm2(nbc, vSOL+off);
         if ( d > dis )
         {
@@ -1005,15 +1005,15 @@ void Meca::apply()
         #pragma omp parallel for num_threads(NUM_THREADS)
         for ( Mecable * mec : mecables )
         {
-            const size_t off = DIM * mec->matIndex();
-            const size_t len = DIM * mec->nbPoints();
+            const index_t off = DIM * mec->matIndex();
+            const index_t len = DIM * mec->nbPoints();
 #ifndef __FAST_MATH__
             // check validity of results:
             size_t a = has_nan(len, vPTS+off);
             size_t b = has_nan(len, vFOR+off);
             if ( a | b )
             {
-                fprintf(stderr, "invalid results for %s : %lu %lu NaNs / %lu\n", mec->reference().c_str(), a, b, len);
+                fprintf(stderr, "invalid results for %s : %lu %lu NaNs / %u\n", mec->reference().c_str(), a, b, len);
                 continue;
             }
 #endif

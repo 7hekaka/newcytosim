@@ -18,12 +18,12 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real     val;  ///< The value of the element
-        unsigned inx;  ///< The index of the line
+        real    val;  ///< The value of the element
+        index_t inx;  ///< The index of the line
         
-        void reset(size_t i)
+        void reset(index_t i)
         {
-            inx = static_cast<unsigned>(i);
+            inx = i;
             val = 0;
         }
     };
@@ -31,30 +31,30 @@ public:
 private:
     
     /// size of matrix
-    size_t size_;
+    index_t size_;
     
     /// amount of memory allocated
-    size_t alloc_;
+    index_t alloc_;
     
     /// array column_[c][] holds Elements of column 'c'
     Element ** column_;
     
     /// colsiz_[c] is the number of Elements in column 'c'
-    unsigned * colsiz_;
+    index_t * colsiz_;
     
     /// colmax_[c] is the number of Elements allocated in column 'c'
-    unsigned * colmax_;
+    index_t * colmax_;
     
     /// allocate column to hold specified number of values
-    void allocateColumn(size_t col, size_t nb);
+    void allocateColumn(index_t col, index_t nb);
     
 public:
     
     /// return the size of the matrix
-    size_t size() const { return size_; }
+    index_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; }
+    void resize(index_t s) { allocate(s); size_=s; }
 
     /// base for destructor
     void deallocate();
@@ -69,19 +69,19 @@ public:
     void reset();
     
     /// allocate the matrix to hold ( sz * sz )
-    void allocate(size_t sz);
+    void allocate(index_t sz);
     
     /// returns the address of element at (x, y), no allocation is done
-    real* address(size_t x, size_t y) const;
+    real* address(index_t x, index_t y) const;
     
     /// returns a modifiable reference to the diagonal term at given index
-    real& diagonal(size_t i);
+    real& diagonal(index_t i);
     
     /// returns the element at (i, j), allocating if necessary
-    real& element(size_t i, size_t j);
+    real& element(index_t i, index_t j);
     
     /// returns the element at (i, j), allocating if necessary
-    real& operator()(size_t i, size_t j)
+    real& operator()(index_t i, index_t j)
     {
         return element(std::max(i, j), std::min(i, j));
     }
@@ -90,7 +90,7 @@ public:
     void scale(real);
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul) const;
+    void addDiagonalBlock(real* mat, index_t ldd, index_t start, index_t cnt, index_t mul) const;
     
     /// prepare matrix for multiplications by a vector (must be called)
     bool prepareForMultiply(int dim);
@@ -111,7 +111,7 @@ public:
     bool notZero() const;
     
     /// number of elements in columns [start, stop[
-    size_t nbElements(size_t start, size_t stop) const;
+    size_t nbElements(index_t start, index_t stop) const;
     
     /// number of elements in matrix
     size_t nbElements() const { return nbElements(0, size_); }
@@ -120,16 +120,16 @@ public:
     std::string what() const;
     
     /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
-    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
+    void printSparse(std::ostream&, real inf, index_t start, index_t stop) const;
     
     /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
     void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
 
     /// print content of one column
-    void printColumn(std::ostream&, size_t);
+    void printColumn(std::ostream&, index_t);
     
     /// print content of one column
-    void printSummary(std::ostream&, size_t start, size_t stop);
+    void printSummary(std::ostream&, index_t start, index_t stop);
 
     /// debug function
     int bad() const;

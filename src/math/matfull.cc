@@ -35,12 +35,12 @@ void MatrixFull::deallocate()
 }
 
 
-void MatrixFull::allocate(size_t alc)
+void MatrixFull::allocate(index_t alc)
 {
     assert_true( alc > 0 );
     if ( alc > allo_ )
     {
-        constexpr size_t chunk = 4;
+        constexpr index_t chunk = 4;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
         
         //printf("new block-matrix sz %i\n", nbblock );
@@ -66,7 +66,7 @@ void MatrixFull::allocate(size_t alc)
 #pragma mark - Access
 
 
-real* MatrixFull::address(size_t i, size_t j) const
+real* MatrixFull::address(index_t i, index_t j) const
 {
     assert_true( i < size_ );
     assert_true( j < size_ );
@@ -79,48 +79,48 @@ real* MatrixFull::address(size_t i, size_t j) const
 
 void MatrixFull::reset(real dia, real off)
 {
-    for ( size_t i = 0; i < allo_*allo_ ; ++i )
+    for ( index_t i = 0; i < allo_*allo_ ; ++i )
         mat_[i] = off;
-    for ( size_t i = 0; i < size_ ; ++i )
+    for ( index_t i = 0; i < size_ ; ++i )
         *address(i,i) = dia;
 }
 
 
-void MatrixFull::truncate(size_t kl, size_t ku)
+void MatrixFull::truncate(index_t kl, index_t ku)
 {
-    for ( size_t j = 0; j < size_; ++j )
+    for ( index_t j = 0; j < size_; ++j )
     {
         //zero out terms above the diagonal:
-        for ( size_t i = 0; i+ku < j; ++i )
+        for ( index_t i = 0; i+ku < j; ++i )
             *address(i,j) = 0;
         
         //zero out terms below the diagonal:
-        for ( size_t i = j+kl+1; i < size_; ++i )
+        for ( index_t i = j+kl+1; i < size_; ++i )
             *address(i,j) = 0;
     }
 }
 
 
-void MatrixFull::importMatrix(size_t size, real const* ptr, size_t lld)
+void MatrixFull::importMatrix(index_t size, real const* ptr, index_t lld)
 {
     resize(size);
-    for ( size_t i = 0; i < size; ++i )
-    for ( size_t j = 0; j < size; ++j )
+    for ( index_t i = 0; i < size; ++i )
+    for ( index_t j = 0; j < size; ++j )
         *address(i,j) = ptr[i+lld*j];
 }
 
 
 void MatrixFull::scale(const real a)
 {
-    for ( size_t i = 0; i < allo_*allo_ ; ++i )
+    for ( index_t i = 0; i < allo_*allo_ ; ++i )
         mat_[i] *= a;
 }
 
 
 void MatrixFull::transpose()
 {
-    for ( size_t i = 0; i < size_; ++i )
-    for ( size_t j = i; j < size_; ++j )
+    for ( index_t i = 0; i < size_; ++i )
+    for ( index_t j = i; j < size_; ++j )
     {
         real tmp = value(i,j);
         *address(i,j) = *address(j,i);
@@ -134,10 +134,10 @@ void MatrixFull::transpose()
 
 void MatrixFull::vecMulAdd(const real* X, real* Y)  const
 {
-    for ( size_t i = 0; i < size_; ++i )
+    for ( index_t i = 0; i < size_; ++i )
     {
         real val = 0;
-        for ( size_t j = 0; j < size_; ++j )
+        for ( index_t j = 0; j < size_; ++j )
             val += value(i,j) * X[j];
         Y[i] += val;
     }
@@ -145,10 +145,10 @@ void MatrixFull::vecMulAdd(const real* X, real* Y)  const
 
 void MatrixFull::vecMul0(const real* X, real* Y)  const
 {
-    for ( size_t i = 0; i < size_; ++i )
+    for ( index_t i = 0; i < size_; ++i )
     {
         real val = 0;
-        for ( size_t j = 0; j < size_; ++j )
+        for ( index_t j = 0; j < size_; ++j )
             val += value(i,j) * X[j];
         Y[i] = val;
     }
@@ -158,22 +158,22 @@ void MatrixFull::vecMul0(const real* X, real* Y)  const
 
 void MatrixFull::vecMul(const real* X, real* Y)  const
 {
-    for ( size_t i = 0; i < size_; i += 4 )
+    for ( index_t i = 0; i < size_; i += 4 )
     {
-        size_t end = ~3 & size_; // last multiple of 4 <= size_
+        index_t end = ~3 & size_; // last multiple of 4 <= size_
         __m256i msk = makemask(size_-end);
         vec4 y0 = setzero4();
         vec4 y1 = setzero4();
         vec4 y2 = setzero4();
         vec4 y3 = setzero4();
         real const* ptr = mat_ + SB * block(i, 0);
-        const size_t last = ~7 & size_; // last multiple of 8 <= size_
+        const index_t last = ~7 & size_; // last multiple of 8 <= size_
         {
             vec4 s0 = setzero4();
             vec4 s1 = setzero4();
             vec4 s2 = setzero4();
             vec4 s3 = setzero4();
-            for ( size_t j = 0; j < last; j += 8 )
+            for ( index_t j = 0; j < last; j += 8 )
             {
                 vec4 xx = loadu4(X+j);
                 vec4 yy = loadu4(X+j+4);
@@ -192,7 +192,7 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
             y2 = add4(y2, s2);
             y3 = add4(y3, s3);
         }
-        for ( size_t j = last; j < end; j += 4 )
+        for ( index_t j = last; j < end; j += 4 )
         {
             vec4 xx = loadu4(X+j);
             y0 = fmadd4(streamload4(ptr   ), xx, y0);
@@ -221,9 +221,9 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
 void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
 {
     // as we accumulate in Y[], the columns cannot be process independently
-    for ( size_t i = 0; i < size_; i += 4 )
+    for ( index_t i = 0; i < size_; i += 4 )
     {
-        size_t end = ~3 & size_; // last multiple of 4 <= size_
+        index_t end = ~3 & size_; // last multiple of 4 <= size_
         vec4 x0, x1, x2, x3;
         {
             x0 = maskload4(X+i, makemask(size_-i));
@@ -235,7 +235,7 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
             x3 = duphi4(x3); // = broadcast1(xxx+3);
         }
         real const* ptr = mat_ + SB * block(i, 0);
-        for ( size_t j = 0; j < end; j += 4 )
+        for ( index_t j = 0; j < end; j += 4 )
         {
             vec4 s = fmadd4(streamload4(ptr), x0, load4(Y+j));
             s = fmadd4(streamload4(ptr+ 4), x1, s);
@@ -260,10 +260,10 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
 
 void MatrixFull::vecMul(const real* X, real* Y)  const
 {
-    for ( size_t i = 0; i < size_; ++i )
+    for ( index_t i = 0; i < size_; ++i )
     {
         real val = 0;
-        for ( size_t j = 0; j < size_; ++j )
+        for ( index_t j = 0; j < size_; ++j )
             val += value(i,j) * X[j];
         Y[i] = val;
     }
@@ -271,10 +271,10 @@ void MatrixFull::vecMul(const real* X, real* Y)  const
 
 void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
 {
-    for ( size_t i = 0; i < size_; ++i )
+    for ( index_t i = 0; i < size_; ++i )
     {
         real val = 0;
-        for ( size_t j = 0; j < size_; ++j )
+        for ( index_t j = 0; j < size_; ++j )
             val += value(j,i) * X[j];
         Y[i] += val;
     }
@@ -289,13 +289,13 @@ void MatrixFull::transVecMulAdd(const real* X, real* Y)  const
 real MatrixFull::norm_inf() const
 {
     real res = 0;
-    for ( size_t i = 0; i < size_*allo_; ++i )
+    for ( index_t i = 0; i < size_*allo_; ++i )
         res = max_real(res, abs_real(mat_[i]));
     return res;
 }
 
 
-void MatrixFull::print(std::ostream& os, size_t imin, size_t imax, size_t jmin, size_t jmax) const
+void MatrixFull::print(std::ostream& os, index_t imin, index_t imax, index_t jmin, index_t jmax) const
 {
     imax = std::min(imax, size_);
     jmax = std::min(jmax, size_);
@@ -305,10 +305,10 @@ void MatrixFull::print(std::ostream& os, size_t imin, size_t imax, size_t jmin, 
     snprintf(fmt, sizeof(fmt), " %%%i.%if", digits+5, digits);
 
     os << "MatrixFull " << size_ << " (" << nblk_ << ") [";
-    for ( size_t i = imin; i < imax; ++i )
+    for ( index_t i = imin; i < imax; ++i )
     {
         os << "\n" << std::setw(2) << i;
-        for ( size_t j = jmin; j < jmax; ++j )
+        for ( index_t j = jmin; j < jmax; ++j )
         {
             snprintf(str, sizeof(str), fmt, value(i, j));
             os << str;

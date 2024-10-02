@@ -22,17 +22,17 @@
 
 
 // defined in "mecafil_project.cc"
-//extern void projectForcesD_(size_t, const real*, const real*, const real*, real*);
+//extern void projectForcesD_(index_t, const real*, const real*, const real*, real*);
 
 
 /**
  This returns N+1, where N is the integer that minimizes
      abs_real( length / N - segmentation ),
  */
-size_t Chain::bestNumberOfPoints(const real ratio)
+index_t Chain::bestNumberOfPoints(const real ratio)
 {
     real n = 1 + std::floor(ratio);
-    return (size_t)( n + ( ratio*(n-0.5) >= n*(n-1) ));
+    return (index_t)( n + ( ratio*(n-0.5) >= n*(n-1) ));
 }
 
 
@@ -40,7 +40,7 @@ real Chain::contourLength(const real pts[], size_t n_pts)
 {
     real len = 0;
     Vector a(pts), b;
-    for ( size_t n = 1; n < n_pts; ++n )
+    for ( index_t n = 1; n < n_pts; ++n )
     {
         b.load(pts+DIM*n);
         len += (b-a).norm();
@@ -84,7 +84,7 @@ void Chain::setStraight(Vector const& pos, Vector const& dir)
     // 'dir' is normalized for safety:
     Vector delta = dir * ( fnCut / dir.norm() );
     //
-    for ( size_t p = 0 ; p < nPoints; ++p )
+    for ( index_t p = 0 ; p < nPoints; ++p )
         setPoint(p, pos + p * delta);
 }
 
@@ -93,7 +93,7 @@ void Chain::setStraight(Vector const& pos, Vector const& dir, real len)
 {
     assert_true( fnSegmentation > REAL_EPSILON );
     assert_true( len > 0 );
-    size_t np = bestNumberOfPoints(len/fnSegmentation);
+    index_t np = bestNumberOfPoints(len/fnSegmentation);
     setNbPoints(np);
     setSegmentation(len/(np-1));
     fnAbscissaP = fnAbscissaM + len;
@@ -109,14 +109,14 @@ void Chain::setCurved(Vector dir, real rad, real len, real off)
     // ensure that `dir` is orthogonal to X:
     dir.XX = 0;
     dir.normalize();
-    size_t np = bestNumberOfPoints(len/fnSegmentation);
+    index_t np = bestNumberOfPoints(len/fnSegmentation);
     setNbPoints(np);
     real S = len / ( np - 1 );
     setSegmentation(S);
     fnAbscissaP = fnAbscissaM + len;
     real delta = 2 * std::asin(0.5*S/rad);
     real angle = -0.5 * delta * np;
-    for ( size_t p = 0 ; p < np; ++p, angle += delta )
+    for ( index_t p = 0 ; p < np; ++p, angle += delta )
     {
         real S = rad * std::sin(angle);
         real C = rad * std::cos(angle) - off;
@@ -134,7 +134,7 @@ void Chain::setCurved(Vector dir, real rad, real len, real off)
  */
 void Chain::setEquilibrated(real len, real persistence_length)
 {
-    size_t np = bestNumberOfPoints(len/fnSegmentation);
+    index_t np = bestNumberOfPoints(len/fnSegmentation);
     assert_true( np > 1 );
     
     setNbPoints(np);
@@ -147,7 +147,7 @@ void Chain::setEquilibrated(real len, real persistence_length)
     Vector dir(1,0,0);
     setPoint(0, pos);
     
-    for ( size_t p = 1 ; p < np; ++p )
+    for ( index_t p = 1 ; p < np; ++p )
     {
         pos += fnCut * dir;
         setPoint(p, pos);
@@ -205,7 +205,7 @@ void Chain::placeEnd(const FiberEnd ref)
  and the segments will be approximately equal to each other.
  Thus reshape() is called eventually to equalize the segments.
  */
-void Chain::setShape(const real pts[], size_t n_pts, size_t np)
+void Chain::setShape(const real pts[], size_t n_pts, index_t np)
 {
     assert_true(n_pts > 1);
     Vector a(pts), b;
@@ -228,10 +228,10 @@ void Chain::setShape(const real pts[], size_t n_pts, size_t np)
     
     len = (b-a).norm();
     real h = 0;
-    size_t p = 1;
+    index_t p = 1;
     --np;
     
-    for ( size_t n = 1; n < np; ++n )
+    for ( index_t n = 1; n < np; ++n )
     {
         h += fnCut;
 
@@ -275,8 +275,8 @@ Vector3 Chain::adjustedNormal(Vector3 const& d) const
 #pragma mark - UNUSED OLDER RESHAPE CODE
 
 /// old version (2018)
-int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
-                                 real* mem, size_t chk)
+int Chain::reshape_calculate_old(const index_t ns, real target, const real* dif,
+                                 real* mem, index_t chk)
 {
     real * sca = mem;
     real * val = mem+chk;
@@ -292,7 +292,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
      The system is symmetric, and we can use a faster factorization
      */
     real err0 = 0;
-    for ( size_t i = 0; i < ns; ++i )
+    for ( index_t i = 0; i < ns; ++i )
     {
         Vector difA(dif+DIM*i), difB(dif+DIM*(i+1));
         real n = difA.normSqr();
@@ -313,7 +313,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
     //printf("\n ----err %20.16f", err0);
     //printf("\n     sca "); VecPrint::print(ns, sca, 3);
 
-    size_t cnt = 0;
+    index_t cnt = 0;
     while ( ++cnt < 16 )
     {
         {
@@ -325,7 +325,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
             upe[0] = dot(vec, dif1);
         }
         real err = abs_real(val[0]);
-        for ( size_t i = 1; i+1 < ns; ++i )
+        for ( index_t i = 1; i+1 < ns; ++i )
         {
             Vector difA(dif+DIM*(i-1)), difB(dif+DIM*i), difC(dif+DIM*(i+1));
             Vector vec = sca[i-1]*difA + (1-2*sca[i])*difB + sca[i+1]*difC;
@@ -361,7 +361,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
-        for ( size_t i = 0; i < ns-1; ++i )
+        for ( index_t i = 0; i < ns-1; ++i )
         {
             sup = std::max(sup, abs_real(low[i+1]+upe[i]));
             asy += abs_real(low[i+1]-upe[i]);
@@ -376,7 +376,7 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
         }
 
         // update result following Newton's iteration
-        for ( size_t u = 0; u < ns; ++u )
+        for ( index_t u = 0; u < ns; ++u )
             sca[u] = std::min(0.5, sca[u] - 0.5 * val[u]);
 
         //printf("\n   ->sca "); VecPrint::print(ns, sca, 3);
@@ -390,8 +390,8 @@ int Chain::reshape_calculate_old(const size_t ns, real target, const real* dif,
  old version 22.02.2015
  externally provided memory `mem[]` should be allocated to hold `5*chk` reals
  */
-int Chain::reshape_calculate_alt(const size_t ns, real target,
-                                 const real* dif, real* mem, size_t chk)
+int Chain::reshape_calculate_alt(const index_t ns, real target,
+                                 const real* dif, real* mem, index_t chk)
 {
     real * sca = mem;
     real * val = mem+chk;
@@ -402,7 +402,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
     zero_real(ns, sca);
 
     real err0 = INFINITY;
-    size_t cnt = 0;
+    index_t cnt = 0;
     while ( ++cnt < 16 )
     {
         //printf("\n   %i sca  ", cnt); VecPrint::print(ns, sca, 3);
@@ -415,7 +415,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
             upe[0] = dot(vec, dif1);
         }
         real err = abs_real(val[0]);
-        for ( size_t i = 1; i+1 < ns; ++i )
+        for ( index_t i = 1; i+1 < ns; ++i )
         {
             Vector difA(dif+DIM*(i-1)), difB(dif+DIM*i), difC(dif+DIM*(i+1));
             Vector vec = sca[i-1]*difA + (1-2*sca[i])*difB + sca[i+1]*difC;
@@ -458,7 +458,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
         }
         
         // update result following Newton's iteration
-        for ( size_t u = 0; u < ns; ++u )
+        for ( index_t u = 0; u < ns; ++u )
             sca[u] -= 0.5 * val[u];
     }
 #if ( 0 )
@@ -473,7 +473,7 @@ int Chain::reshape_calculate_alt(const size_t ns, real target,
 /**
  Apply correction (old version)
  */
-void Chain::reshape_apply_alt(const size_t nbs, const real* src,
+void Chain::reshape_apply_alt(const index_t nbs, const real* src,
                               const real* mul, real* dst)
 {
     assert_true( nbs > 1 );
@@ -482,9 +482,9 @@ void Chain::reshape_apply_alt(const size_t nbs, const real* src,
     for ( int d = 0; d < DIM; ++d )
         nxt[d] = src[d];
     
-    for ( size_t i = 0; i < nbs; ++i )
+    for ( index_t i = 0; i < nbs; ++i )
     {
-        for ( int d = 0; d < DIM; ++d )
+        for ( index_t d = 0; d < DIM; ++d )
         {
             real x = mul[i] * ( src[DIM+DIM*i+d] - src[DIM*i+d] );
             dst[DIM*i+d] = nxt[d] + x;
@@ -492,7 +492,7 @@ void Chain::reshape_apply_alt(const size_t nbs, const real* src,
         }
     }
     
-    for ( int d = 0; d < DIM; ++d )
+    for ( index_t d = 0; d < DIM; ++d )
         dst[DIM*nbs+d] = nxt[d];
 }
 
@@ -583,7 +583,7 @@ void Chain::reshape_two(const real* src, real* dst, real cut)
  FJN, Strasbourg, 22.02.2015 & Cambridge, 10.05.2019 -- 13.05.2019
  */
 
-int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
+int Chain::reshape_calculate(const index_t ns, real target, index_t max_iter,
                              real const* mag, real const* pri, real const* sec,
                              real* mem, size_t chk)
 {
@@ -601,7 +601,7 @@ int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
      The system is symmetric definite positive, and we can use a faster factorization
      The matrix is multiplied by -2, to yield a -0.5 in the update: mul[] -= 0.5 * rhs[]
      */
-    for ( size_t i = 0; i < ns; ++i )
+    for ( index_t i = 0; i < ns; ++i )
     {
         mul[i] = mag[i] - target;
         dia[i] = mag[i] * 4;
@@ -618,7 +618,7 @@ int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
     lapack::xptts2(ns, 1, dia, low, mul, ns);
     if ( err0 < tol )
         return 0;
-    size_t cnt = 0;
+    index_t cnt = 0;
     //fprintf(stderr, "\n %3lu err %20.16f norm(rhs) %8.5e\n", cnt, err0, blas::nrm2(ns, mul));
 
     while ( ++cnt <= max_iter )
@@ -635,7 +635,7 @@ int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
             upe[0] = U;
         }
         err = abs_real(rhs[0]);
-        for( size_t i = 1; i+1 < ns; ++i )
+        for( index_t i = 1; i+1 < ns; ++i )
         {
             real a = mul[i-1];
             real b = mul[i] * 2 - 1;
@@ -690,7 +690,7 @@ int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
 #endif
 #if ( 0 )
         real asy = 0, sup = 0;
-        for ( size_t i = 0; i < ns-1; ++i )
+        for ( index_t i = 0; i < ns-1; ++i )
         {
             sup = std::max(sup, abs_real(low[i+1]+upe[i]));
             asy += abs_real(low[i+1]-upe[i]);
@@ -706,7 +706,7 @@ int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
         
         // update result following Newton's iteration
         //blas::xaxpy(ns, -0.5, rhs, 1, mul, 1);
-        for ( size_t u = 0; u < ns; ++u )
+        for ( index_t u = 0; u < ns; ++u )
             mul[u] -= 0.5 * rhs[u];
     }
     //printf("\n   >> err %20.16f", err);
@@ -728,14 +728,14 @@ int Chain::reshape_calculate(const size_t ns, real target, size_t max_iter,
  
  Note that if 'src == dst', the result are still correct
  */
-void Chain::reshape_apply(const size_t nbs, const real* src,
+void Chain::reshape_apply(const index_t nbs, const real* src,
                           const real * mul, real* dst)
 {
     assert_true( nbs > 1 );
     Vector A(src);
     Vector B = A;
 
-    for ( size_t i = 0; i < nbs; ++i )
+    for ( index_t i = 0; i < nbs; ++i )
     {
         Vector C(src+DIM*(i+1));
         Vector add = mul[i] * ( C - B );
@@ -755,8 +755,8 @@ void Chain::reshape_apply(const size_t nbs, const real* src,
  here ns = nbSegments() and mem_size >= ns
  `mem` should be allocated to hold 8 * mem_size
  */
-int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
-                         real cut, size_t max_iter, real* mem, size_t mem_size)
+int Chain::reshape_local(const index_t nbs, const real* src, real* dst,
+                         real cut, index_t max_iter, real* mem, size_t mem_size)
 {
     assert_true( nbs > 1 );
 
@@ -774,7 +774,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     mag[0] = alpha * A.normSqr();
     mag[1] = alpha * B.normSqr();
     pri[0] = alpha * dot(A, B);
-    for ( size_t i = 2; i < nbs; ++i )
+    for ( index_t i = 2; i < nbs; ++i )
     {
         C.load_diff(src+DIM*i);
         mag[i] = alpha * C.normSqr();
@@ -798,9 +798,9 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
     const real beta = 1.0 / cut;
     real * dif = new_real(mem_size*DIM);
     // calculate differences
-    for ( size_t p = 0; p < DIM*nbs; ++p )
+    for ( index_t p = 0; p < DIM*nbs; ++p )
         dif[p] = ( src[p+DIM] - src[p] ) * beta;
-    for ( size_t p = 0; p < DIM; ++p )
+    for ( index_t p = 0; p < DIM; ++p )
         dif[DIM*nbs+p] = 0;
 
     // checking against older code
@@ -823,7 +823,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
         // checking against older code
         reshape_apply_alt(nbs, src, sec, mag);
         //projectForcesD_(nbs, dif, src, mem, mag);  // similar calculation!
-        size_t nbv = DIM*nbs+DIM;
+        index_t nbv = DIM*nbs+DIM;
         real DIF = blas::difference(nbv, mag, dst);
         //printf("\n Chain:reshape errors %6lu %20.16f %20.16f", nbs, ERR, DIF);
         if ( abs_real(DIF) > 1e-8 )
@@ -857,7 +857,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
  vertical portion of the fiber, irrespective of the length of this section.
  */
 
-void Chain::reshape_global(const size_t ns, const real* src, real* dst, const real cut)
+void Chain::reshape_global(const index_t ns, const real* src, real* dst, const real cut)
 {
     Vector inc(0,0,0), sum(0,0,0), seg;
     seg.load_diff(src);
@@ -869,7 +869,7 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, const re
     
     Vector(src).store(dst);
 
-    for ( size_t i = 1; i < ns; ++i )
+    for ( index_t i = 1; i < ns; ++i )
     {
         seg.load_diff(src+DIM*i);
         dis = seg.norm();
@@ -891,7 +891,7 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, const re
     sum = ( sum + inc ) / ( ns + 1 );
     
     // translate entire fiber uniformly:
-    for ( size_t i = 0; i <= ns; ++i )
+    for ( index_t i = 0; i <= ns; ++i )
         sum.sub_to(dst+DIM*i);
 }
 
@@ -904,26 +904,26 @@ void Chain::reshape_global(const size_t ns, const real* src, real* dst, const re
  This is operation does not change the center of gravity of the fiber.
  */
 
-void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut)
+void Chain::reshape_global(const index_t ns, const real* src, real* dst, real cut)
 {
     Vector off, sum(0,0,0);
 
     copy_real(DIM*(ns+1), src, dst);
-    for ( size_t pp = 1; pp <= ns; ++pp )
+    for ( index_t pp = 1; pp <= ns; ++pp )
     {
         off.load_diff(dst+DIM*(pp-1));
         real dis = off.norm();
         if ( dis > REAL_EPSILON )
         {
             off  *= ( cut/dis - 1.0 );
-            for ( size_t qq = pp; qq <= ns; ++qq )
+            for ( index_t qq = pp; qq <= ns; ++qq )
                 off.add_to(dst+DIM*qq);
             sum += ( 1 + ns - pp ) * off;
         }
     }
     
     sum /= ns + 1;
-    for ( size_t i = 0; i <= ns; ++i )
+    for ( index_t i = 0; i <= ns; ++i )
         sum.sub_to(dst+DIM*i);
 }
 
@@ -940,7 +940,7 @@ void Chain::getPoints(real const* ptr)
     if ( unconstrainLength )
         return copy_real(DIM*nPoints, ptr, pPos);
 #endif
-    constexpr size_t NVEC = 8;
+    constexpr index_t NVEC = 8U;
 #if 0
     // using static memory
     // Attention: this only works if using a single thread
@@ -1018,11 +1018,11 @@ void Chain::growM(const real delta)
 {
     assert_true( length() + delta > REAL_EPSILON );
     real a = -delta / length();
-    const size_t ns = nbSegments();
+    const index_t ns = nbSegments();
     
     if ( delta > 0 )
     {
-        size_t p = 0, n = ns;
+        index_t p = 0, n = ns;
         Vector dp0 = diffPoints(0), dp1;
         movePoint(p, ( a * n ) * dp0);
         ++p;
@@ -1051,7 +1051,7 @@ void Chain::growM(const real delta)
     }
     else if ( delta < 0 )
     {
-        for ( size_t p = 0, n = ns; n > 0; ++p, --n )
+        for ( index_t p = 0, n = ns; n > 0; ++p, --n )
             movePoint(p, ( a * n ) * diffPoints(p));
     }
     
@@ -1067,7 +1067,7 @@ void Chain::growM(const real delta)
  */
 void Chain::addSegmentM()
 {
-    size_t pp = 1+nPoints;
+    index_t pp = 1+nPoints;
     setNbPoints(pp);
     
     pp *= DIM;
@@ -1092,13 +1092,13 @@ void Chain::addSegmentM()
 void Chain::cutM(const real delta)
 {
     real len = length();
-    const size_t ns = bestNumberOfPoints((len-delta)/fnSegmentation) - 1;
+    const index_t ns = bestNumberOfPoints((len-delta)/fnSegmentation) - 1;
     const real cut = (len-delta) / ns;
     assert_true( cut > 0 );
     real* tmp = new_real(DIM*(ns+1));
 
     // calculate intermediate points:
-    for ( size_t i=0; i < ns; ++i )
+    for ( index_t i=0; i < ns; ++i )
     {
         Vector w = interpolateM(delta+i*cut).pos();
         w.store(tmp+DIM*i);
@@ -1116,7 +1116,7 @@ void Chain::cutM(const real delta)
 }
 
 
-void Chain::truncateM(size_t p)
+void Chain::truncateM(index_t p)
 {
     Mecable::truncateM(p);
     fnAbscissaM = abscissaPoint(p);
@@ -1140,13 +1140,13 @@ void Chain::growP(const real delta)
 {
     assert_true( length() + delta > REAL_EPSILON );
     real a = delta / length();
-    const size_t ns = nbSegments();
+    const index_t ns = nbSegments();
     
     if ( delta > 0 )
     {
         Vector dp0 = diffPoints(ns-1), dp1;
         movePoint(ns, ( a * ns ) * dp0);
-        size_t p = ns-1;
+        index_t p = ns-1;
         
         if ( p > 0  &&  ( p & 1 ) )
         {
@@ -1171,10 +1171,10 @@ void Chain::growP(const real delta)
     }
     else if ( delta < 0 )
     {
-        for ( size_t p = ns ; p > 0 ; --p )
+        for ( index_t p = ns ; p > 0 ; --p )
             movePoint(p, ( a * p ) * diffPoints(p-1));
 #if 0
-        for ( size_t n = 0; n < ns; ++n )
+        for ( index_t n = 0; n < ns; ++n )
             printf(" %8.5f", diffPoints(n).norm()/len);
         printf(" - \n");
 #endif
@@ -1192,11 +1192,11 @@ void Chain::growP(const real delta)
  */
 void Chain::addSegmentP()
 {
-    size_t pp = nPoints;
+    index_t pp = nPoints;
     setNbPoints(pp+1);
     
     real * psp = pPos + DIM * pp;
-    for ( size_t dd = 0; dd < DIM; ++dd )
+    for ( index_t dd = 0; dd < DIM; ++dd )
         psp[dd] = 2 * psp[dd-DIM] - psp[dd-2*DIM];
     
     fnAbscissaP += fnCut;
@@ -1214,7 +1214,7 @@ void Chain::addSegmentP()
 void Chain::cutP(const real delta)
 {
     real len = length();
-    const size_t np = bestNumberOfPoints((len-delta)/fnSegmentation);
+    const index_t np = bestNumberOfPoints((len-delta)/fnSegmentation);
     const real cut = (len-delta) / (np-1);
     assert_true( cut > 0 );
     real* tmp = new_real(DIM*np);
@@ -1223,7 +1223,7 @@ void Chain::cutP(const real delta)
     copy_real(DIM, pPos, tmp);
 
     // calculate intermediate points:
-    for ( size_t i = 1; i < np; ++i )
+    for ( index_t i = 1; i < np; ++i )
     {
         Vector w = interpolateM(i*cut).pos();
         w.store(tmp+DIM*i);
@@ -1238,7 +1238,7 @@ void Chain::cutP(const real delta)
 }
 
 
-void Chain::truncateP(size_t p)
+void Chain::truncateP(index_t p)
 {
     Mecable::truncateP(p);
     fnAbscissaP = abscissaPoint(p);
@@ -1302,13 +1302,13 @@ void Chain::join(Chain const* fib)
 {
     const real len = length();
     const real lenT = len + fib->length();
-    const size_t ns = bestNumberOfPoints(lenT/fnSegmentation) - 1;
+    const index_t ns = bestNumberOfPoints(lenT/fnSegmentation) - 1;
     const real cut = lenT / real(ns);
     
     real* tmp = new_real(DIM*(ns+1));
 
     // calculate new points into tmp[]:
-    for ( size_t i = 1; i < ns; ++i )
+    for ( index_t i = 1; i < ns; ++i )
     {
         Vector w;
         if ( i*cut < len )
@@ -1336,8 +1336,8 @@ void Chain::join(Chain const* fib)
 */
 void Chain::flipChainPolarity()
 {
-    size_t ii = 0;
-    size_t jj = lastPoint();
+    index_t ii = 0;
+    index_t jj = lastPoint();
     
     while ( ii < jj )
     {
@@ -1364,12 +1364,12 @@ static real lengthSegmentSqr(const real a[])
 /**
  Returns the minimum and maximum distance between consecutive points, for 'cnt' segments
  */
-void Chain::computeMinMax(size_t cnt, real const* ptr, real& in, real& ax)
+void Chain::computeMinMax(index_t cnt, real const* ptr, real& in, real& ax)
 {
     real x = lengthSegmentSqr(ptr);
     in = x;
     ax = x;
-    for ( unsigned i = 1; i < cnt; ++i )
+    for ( index_t i = 1; i < cnt; ++i )
     {
         x = lengthSegmentSqr(ptr+DIM*i);
         in = std::min(in, x);
@@ -1382,11 +1382,11 @@ void Chain::computeMinMax(size_t cnt, real const* ptr, real& in, real& ax)
 /**
  Returns the average and variances of segment length
  */
-void Chain::computeMeanVar(size_t cnt, real const* ptr, real off, real& mean, real& variance)
+void Chain::computeMeanVar(index_t cnt, real const* ptr, real off, real& mean, real& variance)
 {
     Vector vec;
     double avg = 0, var = 0;
-    for ( size_t n = 0; n < cnt; ++n )
+    for ( index_t n = 0; n < cnt; ++n )
     {
         vec.load_diff(ptr+DIM*n);
         real r = vec.norm() - off;
@@ -1409,6 +1409,7 @@ void Chain::computeMeanVar(size_t cnt, real const* ptr, real off, real& mean, re
  
  curvature is ZERO if A, B and C are aligned
  */
+[[ maybe_unused ]]
 static real curvature3(Vector const& A, Vector const& B, Vector const& C)
 {
     // cross-product = 2 * surface; hence S = 16 * surface^2
@@ -1426,6 +1427,7 @@ static real curvature3(Vector const& A, Vector const& B, Vector const& C)
  
  Thank you, Serge to point this out!
  */
+[[ maybe_unused ]]
 static real curvature3(Vector const& A, Vector const& B, Vector const& C, real seg)
 {
     real H = norm( A + C - 2 * B );  // 2 * height_of_triangle
@@ -1435,7 +1437,7 @@ static real curvature3(Vector const& A, Vector const& B, Vector const& C, real s
 /**
  This returns the curvature estimated at point `p`
  */
-real Chain::curvature(size_t p) const
+real Chain::curvature(index_t p) const
 {
     if (( 0 < p ) & ( p < lastPoint() ))
         return curvature3(posP(p-1), posP(p), posP(p+1), fnCut);
@@ -1469,10 +1471,10 @@ real Chain::curvature(size_t p) const
 real Chain::bendingEnergy0() const
 {
     real e = 0;
-    const size_t lsp = nPoints - 2;
+    const index_t lsp = nPoints - 2;
     if ( lsp > 0 )
     {
-        for ( size_t p = 0; p < lsp ; ++p )
+        for ( index_t p = 0; p < lsp ; ++p )
         {
             Vector A = posP(p);
             Vector B = posP(p+1);
@@ -1497,7 +1499,7 @@ real Chain::minCosine() const
     real res;
     Vector dir1, dir2;
     
-    size_t ps = nbSegments() % 2;
+    index_t ps = nbSegments() % 2;
     if ( ps )
     {
         dir1 = diffPoints(0);
@@ -1525,13 +1527,13 @@ real Chain::minCosine() const
 /**
  Returns the minimum and maximum distance between consecutive points
  */
-size_t Chain::nbKinks(real threshold) const
+index_t Chain::nbKinks(real threshold) const
 {
-    size_t res = 0;
+    index_t res = 0;
     threshold *= fnCut * fnCut;
     Vector d = diffPoints(0);
     
-    for ( size_t n = 1; n < lastPoint(); ++n )
+    for ( index_t n = 1; n < lastPoint(); ++n )
     {
         Vector r = diffPoints(n);
         if ( dot(d, r) < threshold )
@@ -1556,7 +1558,7 @@ size_t Chain::nbKinks(real threshold) const
  The position of the cut is `posPoint(s, a)`
  */
 
-real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
+real Chain::planarIntersect(index_t s, Vector const& n, const real a) const
 {
     assert_true( s < nbSegments() );
     
@@ -1591,7 +1593,7 @@ real Chain::planarIntersect(size_t s, Vector const& n, const real a) const
  new interpolation will not exactly match `segmentation()`, but this calls
  getPoints() here which calls reshape().
  */
-void Chain::resegment(size_t ns)
+void Chain::resegment(index_t ns)
 {
     //std::clog << reference() << " resegment(" << ns << ")\n";
     assert_true( ns > 0 );
@@ -1602,11 +1604,11 @@ void Chain::resegment(size_t ns)
     Vector a = posP(0), b = posP(1);
     
     real h = 0;
-    size_t p = 1;
+    index_t p = 1;
     real* tmp = new_real(DIM*(ns+2));
     
     a.store(tmp);
-    for ( size_t n = 1; n < ns; ++n )
+    for ( index_t n = 1; n < ns; ++n )
     {
         h += cut;
         
@@ -1664,7 +1666,7 @@ void Chain::adjustSegmentation()
 {
     LOG_ONCE("adjustSegmentation() is using the fiber curvature\n");
     const real upLimit = 8.0 * fnSegmentation;
-    const size_t nbs = nbSegments();
+    const index_t nbs = nbSegments();
     real len = length();
     
     assert_true( fnSegmentation > REAL_EPSILON );
@@ -1747,7 +1749,7 @@ void Chain::adjustSegmentation()
 {
     assert_true( fnSegmentation > REAL_EPSILON );
     
-    size_t best = bestNumberOfPoints(nbSegments()*fnCut/fnSegmentation);
+    index_t best = bestNumberOfPoints(nbSegments()*fnCut/fnSegmentation);
     
     if ( best != nPoints )
     {
@@ -1950,7 +1952,7 @@ Interpolation Chain::interpolateEnd(const FiberEnd end) const
 
 Interpolation Chain::interpolateCenter() const
 {
-    size_t n = lastPoint() / 2;
+    index_t n = lastPoint() / 2;
     return Interpolation(this, real(0.5)*(lastPoint()-2*n), n);
 }
 
@@ -1969,7 +1971,8 @@ Interpolation Chain::interpolateCenter() const
 Interpolation Chain::interpolateM(const real ab) const
 {
     real a = max_real(ab*iCut, 0);
-    unsigned i = std::min((unsigned)a, (unsigned)nPoints-2);
+    index_t i(nbPoints()-2);
+    i = std::min(i, (index_t)a);
     return Interpolation(this, std::min(a-i, real(1)), i);
 }
 
@@ -2015,7 +2018,7 @@ Vector Chain::posM(const real ab) const
         return posP(0);
     
     real a = ab / fnCut;
-    size_t s = (size_t)a;
+    index_t s = static_cast<index_t>(a);
     
     // check if plus end is reached:
     if ( s+1 < nPoints )
@@ -2030,9 +2033,9 @@ Vector Chain::dirM(const real ab) const
     if ( ab <= 0 )
         return dirSegment(0);
     
-    real a = ab / fnCut;
-    size_t s = std::min((size_t)a, (size_t)nPoints-2);
-    return dirSegment(s);
+    index_t a = static_cast<index_t>( ab / fnCut );
+    index_t t(nbPoints()-2);
+    return dirSegment(std::min(t, a));
 }
 #endif
 
@@ -2254,7 +2257,7 @@ void Chain::writeAngles(Outputter& out) const
     // first point:
     out.writeFloatsBinary(pPos, DIM);
     // angles:
-    for ( size_t i = DIM; i < DIM*nPoints; i += DIM )
+    for ( index_t i = DIM; i < DIM*nPoints; i += DIM )
     {
         // in 2D, there is only one angle:
         real x = pPos[i  ] - pPos[i-DIM  ];
@@ -2293,7 +2296,7 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
 
     fnAbscissaM = in.readFloatBinary();
     fnAbscissaP = fnAbscissaM + len;
-    size_t cnt = in.readUInt16();
+    index_t cnt = in.readUInt16();
     
     if ( cnt < 1 )
         throw InvalidIO("invalid fiber with no segment?");
@@ -2309,26 +2312,26 @@ void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
     if ( in.vectorSize() > 2 )
     {
         // 3D data with two angles per segment
-        for ( size_t i = 1; i <= cnt; ++i )
+        for ( index_t i = 1; i <= cnt; ++i )
         {
             float a, b;
             in.readEulerAngles(a, b);
             pos[0] += L * cosf(a) * sinf(b);
             pos[1] += L * sinf(a) * sinf(b);
             pos[2] += L * cosf(b);
-            for ( int d = 0; d < DIM; ++d )
+            for ( index_t d = 0; d < DIM; ++d )
                 pPos[DIM*i+d] = pos[d];
         }
     }
     else
     {
         // 2D case, one angle per segment
-        for ( size_t i = 1; i <= cnt; ++i )
+        for ( index_t i = 1; i <= cnt; ++i )
         {
             float a = in.readAngle();
             pos[0] += L * cosf(a);
             pos[1] += L * sinf(a);
-            for ( int d = 0; d < DIM; ++d )
+            for ( index_t d = 0; d < DIM; ++d )
                 pPos[DIM*i+d] = pos[d];
         }
     }

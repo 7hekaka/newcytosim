@@ -11,7 +11,7 @@
 FiberGrid::SegmentList allSegments;
 
 
-size_t FiberGrid::setGrid(Vector, Vector, real)
+index_t FiberGrid::setGrid(Vector, Vector, real)
 {
     LOG_ONCE("Cytosim is using a crude method to localize fibers!\n");
     return 1;
@@ -23,7 +23,7 @@ void FiberGrid::createCells()
 }
 
 
-size_t FiberGrid::nbCells() const
+index_t FiberGrid::nbCells() const
 {
     return 1;
 }
@@ -35,7 +35,7 @@ size_t FiberGrid::hasGrid() const
 }
 
 
-size_t FiberGrid::nbTargets() const
+index_t FiberGrid::nbTargets() const
 {
     return allSegments.size();
 }
@@ -49,7 +49,7 @@ void FiberGrid::paintGrid(const Fiber * first, const Fiber * last, real)
     // add all segments
     for ( const Fiber * f = first ; f != last ; f=f->next() )
     {
-        for ( size_t s = 0; s < f->nbSegments(); ++s )
+        for ( index_t s = 0; s < f->nbSegments(); ++s )
             allSegments.emplace(f, s);
     }
 }

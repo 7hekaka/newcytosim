@@ -115,12 +115,12 @@ void writeFibers(FILE* file, bool binary, FiberSet const& fibers)
             fprintf(stderr, "Warning: Sweet20 data format overflow\n");
         if ( binary )
         {
-            for ( size_t i = 0; i < fib->nbPoints(); ++i )
+            for ( index_t i = 0; i < fib->nbPoints(); ++i )
                 writeBinary(file, a, b, c, fib->posPoint(i));
         }
         else
         {
-            for ( size_t i = 0; i < fib->nbPoints(); ++i )
+            for ( index_t i = 0; i < fib->nbPoints(); ++i )
                 writeText(file, a, b, c, fib->posPoint(i));
         }
     }

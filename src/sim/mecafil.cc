@@ -53,10 +53,10 @@ Mecafil& Mecafil::operator = (Mecafil const&)
 
 
 //------------------------------------------------------------------------------
-void Mecafil::allocateMecable(const size_t nbp)
+void Mecafil::allocateMecable(const index_t nbp)
 {
-    size_t add = ADD_PROJECTION_DIFF ? 3 : 2;
-    size_t top = NEW_ANISOTROPIC_FIBER_DRAG ? 3*DIM+1 : DIM+2;
+    index_t add = ADD_PROJECTION_DIFF ? 3 : 2;
+    index_t top = NEW_ANISOTROPIC_FIBER_DRAG ? 3*DIM+1 : DIM+2;
     real * ptr = Mecable::allocateMemory(nbp, add+top);
     /*
      if Mecable::allocateMecable() allocated memory, it will return a
@@ -424,7 +424,7 @@ void Mecafil::addRigidity(const real* X, real* Y) const
              Link fiber end points in the same way as consecutive points triplets,
              making the fiber mechanically homogeneous for bending elasticity
              */
-            const size_t L = nbPoints() - 2;
+            const index_t L = nbPoints() - 2;
             add_rigidity(L+1, 0, 1, X, iRigidity, Y);
             add_rigidity(L, L+1, 0, X, iRigidity, Y);
         }

@@ -26,30 +26,30 @@ class FatVector
 {
 public:
 
-    float XX, YY, ZZ;
-    float RR;
+    float xx, yy, zz;
+    float rr;
     
-    FatVector() { XX = 0; YY = 0; ZZ = 0; RR = 0; }
+    FatVector() { xx = 0; yy = 0; zz = 0; rr = 0; }
 
-    FatVector(Vector1 v, real r) { XX = v.XX; YY = 0; ZZ = 0; RR = r; }
-    FatVector(Vector2 v, real r) { XX = v.XX; YY = v.YY; ZZ = 0; RR = r; }
-    FatVector(Vector3 v, real r) { XX = v.XX; YY = v.YY; ZZ = v.ZZ; RR = r; }
+    FatVector(Vector1 v, real r) { xx = float(v.XX); yy = 0; zz = 0; rr = float(r); }
+    FatVector(Vector2 v, real r) { xx = float(v.XX); yy = float(v.YY); zz = 0; rr = float(r); }
+    FatVector(Vector3 v, real r) { xx = float(v.XX); yy = float(v.YY); zz = float(v.ZZ); rr = float(r); }
 
     /// @return result of test `distance(this, arg) < sum_of_ranges`
     bool near(FatVector const& arg) const
     {
-        float x = XX - arg.XX;
+        float x = xx - arg.xx;
 #if ( DIM == 1 )
-        float r = RR + arg.RR;
+        float r = rr + arg.rr;
         return ( std::fabs(x) <= r );
 #elif ( DIM == 2 )
-        float y = YY - arg.YY;
-        float r = RR + arg.RR;
+        float y = yy - arg.yy;
+        float r = rr + arg.rr;
         return ( x*x + y*y <= r*r );
 #else
-        float y = YY - arg.YY;
-        float z = ZZ - arg.ZZ;
-        float r = RR + arg.RR;
+        float y = yy - arg.yy;
+        float z = zz - arg.zz;
+        float r = rr + arg.rr;
         return ( z*z + x*x <= r*r - y*y );
 #endif
     }
@@ -223,20 +223,20 @@ public:
     /// clear all panes
     void clear()
     {
-        for ( size_t p = 1; p <= NUM_STERIC_PANES; ++p )
+        for ( index_t p = 1; p <= NUM_STERIC_PANES; ++p )
         {
             point_panes[p].clear();
             locus_panes[p].clear();
         }
     }
     
-    FatPointList& point_list(size_t p)
+    FatPointList& point_list(index_t p)
     {
         assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return point_panes[p];
     }
     
-    FatLocusList& locus_list(size_t p)
+    FatLocusList& locus_list(index_t p)
     {
         assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return locus_panes[p];
@@ -332,13 +332,13 @@ private:
     }
     
     /// cell corresponding to index `w`
-    FatPointList& point_list(const size_t w) const
+    FatPointList& point_list(const index_t w) const
     {
         return pGrid.icell(w).point_pane;
     }
     
     /// cell corresponding to index `w`
-    FatLocusList& locus_list(const size_t w) const
+    FatLocusList& locus_list(const index_t w) const
     {
         return pGrid.icell(w).locus_pane;
     }
@@ -352,44 +352,44 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    FatPointList& point_list(Vector const& w, const size_t p) const
+    FatPointList& point_list(Vector const& w, const index_t p) const
     {
         assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.cell(w).point_panes[p];
     }
     
     /// cell corresponding to position `w`, and pane `p`
-    FatLocusList& locus_list(Vector const& w, const size_t p) const
+    FatLocusList& locus_list(Vector const& w, const index_t p) const
     {
         assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.cell(w).locus_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatPointList& point_list(const size_t c, const size_t p) const
+    FatPointList& point_list(const index_t c, const index_t p) const
     {
         assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.icell(c).point_panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    FatLocusList& locus_list(const size_t c, const size_t p) const
+    FatLocusList& locus_list(const index_t c, const index_t p) const
     {
         assert_true( 0 < p && p <= NUM_STERIC_PANES );
         return pGrid.icell(c).locus_panes[p];
     }
     
     /// enter interactions into Meca in one pane
-    void setSterics0(size_t pan) const;
+    void setSterics0(index_t pan) const;
     
     /// enter interactions into Meca in one pane
-    void setStericsT(size_t pan) const;
+    void setStericsT(index_t pan) const;
     
     /// enter interactions into Meca between two panes
-    void setSterics0(size_t pan1, size_t pan2) const;
+    void setSterics0(index_t pan1, index_t pan2) const;
     
     /// enter interactions into Meca between two panes
-    void setStericsT(size_t pan1, size_t pan2) const;
+    void setStericsT(index_t pan1, index_t pan2) const;
 
 #endif
     
@@ -405,7 +405,7 @@ public:
     void stiffness(real h, real l) { push_ = h; pull_ = l; }
 
     /// define grid covering specified Space, given a minimal cell size requirement
-    size_t setGrid(Vector inf, Vector sup, real min_width);
+    index_t setGrid(Vector inf, Vector sup, real min_width);
     
     /// allocate memory for grid
     void createCells();
@@ -449,10 +449,10 @@ public:
 #if ( NUM_STERIC_PANES > 1 )
     
     /// enter interactions into Meca in one pane
-    void setSterics(size_t pan) const;
+    void setSterics(index_t pan) const;
     
     /// enter interactions into Meca between two panes
-    void setSterics(size_t pan1, size_t pan2) const;
+    void setSterics(index_t pan1, index_t pan2) const;
     
 #endif
     

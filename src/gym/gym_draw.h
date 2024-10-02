@@ -9,7 +9,8 @@
 
 namespace gym
 {
-    inline void drawPoints(float size, int off, int cnt)
+    template < typename INTEGER >
+    inline void drawPoints(float size, int off, INTEGER cnt)
     {
         if ( size > 0 )
         {
@@ -18,7 +19,8 @@ namespace gym
         }
     }
     
-    inline void drawSquarePoints(float size, int off, int cnt)
+    template < typename INTEGER >
+    inline void drawSquarePoints(float size, int off, INTEGER cnt)
     {
         if ( size > 0 )
         {
@@ -29,7 +31,8 @@ namespace gym
         }
     }
     
-    inline void drawLines(float width, int off, int cnt)
+    template < typename INTEGER >
+    inline void drawLines(float width, int off, INTEGER cnt)
     {
         if ( width > 0 )
         {
@@ -38,7 +41,8 @@ namespace gym
         }
     }
     
-    inline void drawLineStrip(float width, int off, int cnt)
+    template < typename INTEGER >
+    inline void drawLineStrip(float width, int off, INTEGER cnt)
     {
         if ( width > 0 )
         {
@@ -47,22 +51,26 @@ namespace gym
         }
     }
     
-    inline void drawLineStrip(int off, int cnt)
+    template < typename INTEGER >
+    inline void drawLineStrip(int off, INTEGER cnt)
     {
         glDrawArrays(GL_LINE_STRIP, off, cnt);
     }
 
-    inline void drawTriangles(int off, int cnt)
+    template < typename INTEGER >
+    inline void drawTriangles(int off, INTEGER cnt)
     {
         glDrawArrays(GL_TRIANGLES, off, cnt);
     }
 
-    inline void drawTriangleStrip(int off, int cnt)
+    template < typename INTEGER >
+    inline void drawTriangleStrip(int off, INTEGER cnt)
     {
         glDrawArrays(GL_TRIANGLE_STRIP, off, cnt);
     }
     
-    inline void drawArrays(GLenum mode, int first, int cnt)
+    template < typename INTEGER >
+    inline void drawArrays(GLenum mode, int first, INTEGER cnt)
     {
         glDrawArrays(mode, first, cnt);
     }

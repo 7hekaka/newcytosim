@@ -20,14 +20,14 @@ void Mecafil::initProjection()
 }
 
 
-void Mecafil::allocateProjection(const size_t ms, real*)
+void Mecafil::allocateProjection(const index_t ms, real*)
 {
     //std::clog << reference() << "allocateProjection(" << ms << ")\n";
     free_real(iProj);
     free_real(iDProj);
     free_real(iJJtiJ);
     free_real(iTMP);
-    const size_t N = DIM * ms;
+    const index_t N = DIM * ms;
     iProj  = new_real(N*N);
     iDProj = new_real(N*N);
     iJJtiJ = new_real(N*ms);
@@ -71,8 +71,8 @@ void Mecafil::destroyProjection()
  */
 void Mecafil::makeProjection()
 {
-    const size_t nbc = nbSegments();      // number of constraints
-    const size_t nbv = DIM * nbPoints();  // number of variables
+    const index_t nbc = nbSegments();      // number of constraints
+    const index_t nbv = DIM * nbPoints();  // number of variables
     assert_true( nbc > 0 );
     
     //----- allocate temp space:
@@ -87,14 +87,14 @@ void Mecafil::makeProjection()
     //set up the Jacobian matrix J and the diagonals of J * Jt
     w  = posP(0);
     dw.set(0,0,0);
-    for ( size_t jj = 0; jj < nbc ; ++jj )
+    for ( index_t jj = 0; jj < nbc ; ++jj )
     {
         //set J:
         v = w;
         w = posP(jj+1);
         dv = -dw;
         dw = w - v;
-        for ( size_t d = 0; d < DIM ; ++d )
+        for ( index_t d = 0; d < DIM ; ++d )
         {
             J[jj+nbc*(DIM*jj+d)    ] = -dw[d];
             J[jj+nbc*(DIM*jj+DIM+d)] =  dw[d];
@@ -118,7 +118,7 @@ void Mecafil::makeProjection()
     blas::xgemm('T', 'N', nbv, nbv, nbc, -1.0, J, nbc, iJJtiJ, nbc, 0., iProj, nbv );
     
     // iProj <- iProj + I
-    for ( size_t j = 0; j < nbv*nbv; j += nbv+1 )
+    for ( index_t j = 0; j < nbv*nbv; j += nbv+1 )
         iProj[j] += 1.0;
     
     free_real(J);
@@ -131,7 +131,7 @@ void Mecafil::makeProjection()
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
-    const size_t nbv = DIM * nbPoints();
+    const index_t nbv = DIM * nbPoints();
     if ( X == Y )
     {
         // the BLAS::dsymv will fail if the input and output vectors are identical
@@ -149,7 +149,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
 
 void Mecafil::printProjection(FILE * file) const
 {
-    const size_t nbv = DIM * nbPoints();
+    const index_t nbv = DIM * nbPoints();
     os << reference() << '\n';
     VecPrint::full(file, nbv, nbv, iProj, nbv);
 }
@@ -157,8 +157,8 @@ void Mecafil::printProjection(FILE * file) const
 
 void Mecafil::computeTensions(const real* force)
 {
-    const size_t nbs = nbSegments();
-    const size_t nbv = DIM * nbPoints();
+    const index_t nbs = nbSegments();
+    const index_t nbv = DIM * nbPoints();
     
     // calculate the lagrangian multipliers:
     blas::xgemv('N', nbs, nbv, 1., iJJtiJ, nbs, force, 1, 0., iLag, 1);
@@ -172,8 +172,8 @@ void Mecafil::computeTensions(const real* force)
 
 void Mecafil::makeProjectionDiff(const real* force)
 {
-    const size_t nbs = nbSegments();             //number of constraints
-    const size_t nbv = DIM * nbPoints();         //number of variables
+    const index_t nbs = nbSegments();             //number of constraints
+    const index_t nbv = DIM * nbPoints();         //number of variables
     
     // calculate the lagrangian coefficients:
     if ( force )
@@ -183,7 +183,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     
     // select expensive forces ( lagrangian > 0 )
     useProjectionDiff = false;
-    for ( size_t ii = 0; ii < nbs; ++ii )
+    for ( index_t ii = 0; ii < nbs; ++ii )
     {
         if ( iLag[ii] > 0 )
         {
@@ -198,7 +198,7 @@ void Mecafil::makeProjectionDiff(const real* force)
     
     //set up the first term in the derivative of J with respect to variable x[ii]
     //set up term  P * (dJ)t * inverse(J*Jt) * J * force:
-    for ( size_t jj = 0; jj < nbv; ++jj )
+    for ( index_t jj = 0; jj < nbv; ++jj )
     {
         real* col = iDProj + nbv * jj;
         zero_real(nbv, col);
@@ -225,14 +225,14 @@ void Mecafil::makeProjectionDiff(const real* force)
 
 void Mecafil::addProjectionDiff( const real* X, real* Y ) const
 {
-    size_t nbv = DIM * nbPoints();
+    index_t nbv = DIM * nbPoints();
     blas::xsymv('U', nbv, 1.0, iDProj, nbv, X, 1, 1.0, Y, 1);
 }
 
 /// Add projection-diff matrix
 void Mecafil::addProjectionDiff(real* mat) const
 {
-    size_t nbv = DIM * nbPoints();
+    index_t nbv = DIM * nbPoints();
     blas::xadd(nbv*nbv, iDProj, mat);
 }
 

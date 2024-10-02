@@ -401,7 +401,7 @@ public:
     static const char TRAJECTORY[];
 
     /// current file format (check history in `simul_file.cc`)
-    static constexpr unsigned currentFormatID = 60;
+    static constexpr unsigned currentFormatID = 60U;
     
     /// read objects from file, and add them to the simulation state
     int readMetaData(Inputter&, std::string& section, ObjectSet*& objset, ObjectSet* subset);

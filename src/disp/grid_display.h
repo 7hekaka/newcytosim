@@ -21,7 +21,7 @@ void drawBoundaries(Map<2> const&, float);
 void drawBoundaries(Map<3> const&, float);
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - paint cells, with a color-scale defined by an external function
 
 
 /// display the values stored in the cells of a 1D grid using OpenGL
@@ -39,7 +39,7 @@ void drawValues(Grid<CELL, 1> const& grid,
 
     flute6 * flu = gym::mapBufferC4V2(4*grid.breadth(0)+4);
     flute6 * ptr = flu;
-    for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
+    for ( index_t ix = 0; ix < grid.breadth(0); ++ix )
     {
         float x = grid.position(0, ix);
         gym_color col = color(arg, grid.icell1D(ix), Vector1(x+cx));
@@ -69,11 +69,11 @@ void drawValues(Grid<CELL, 2> const& grid,
     float dx = grid.cellWidth(0), cx = 0.5f * dx;
     float dy = grid.cellWidth(1), cy = 0.5f * dy;
  
-    for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
+    for ( index_t iy = 0; iy < grid.breadth(1); ++iy )
     {
         flute6 * flu = gym::mapBufferC4V2(4*grid.breadth(0)+4);
         flute6 * ptr = flu;
-        for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
+        for ( index_t ix = 0; ix < grid.breadth(0); ++ix )
         {
             float x = grid.position(0, ix);
             float y = grid.position(1, iy);
@@ -108,12 +108,12 @@ void drawValues(Grid<CELL, 3> const& grid,
     float dy = grid.cellWidth(1), cy = 0.5f * dy;
     float z = (float)zzz;
     
-    size_t iz = grid.index(2, zzz);
-    for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
+    index_t iz = grid.index(2, zzz);
+    for ( index_t iy = 0; iy < grid.breadth(1); ++iy )
     {
         flute8 * flu = gym::mapBufferC4V4(4*grid.breadth(0)+4);
         flute8 * ptr = flu;
-        for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
+        for ( index_t ix = 0; ix < grid.breadth(0); ++ix )
         {
             float x = grid.position(0, ix);
             float y = grid.position(1, iy);
@@ -148,12 +148,12 @@ void drawValuesXZ(Grid<CELL, 3> const& grid,
     float dz = grid.cellWidth(1), cz = 0.5f * dz;
     float y = (float)yyy;
 
-    size_t iy = grid.index(1, yyy);
-    for ( size_t iz = 0; iz < grid.breadth(2); ++iz )
+    index_t iy = grid.index(1, yyy);
+    for ( index_t iz = 0; iz < grid.breadth(2); ++iz )
     {
         flute8 * flu = gym::mapBufferC4V4(4*grid.breadth(0)+4);
         flute8 * ptr = flu;
-        for ( size_t ix = 0; ix < grid.breadth(0); ++ix )
+        for ( index_t ix = 0; ix < grid.breadth(0); ++ix )
         {
             float x = grid.position(0, ix);
             float z = grid.position(2, iz);
@@ -187,12 +187,12 @@ void drawValuesYZ(Grid<CELL, 3> const& grid,
     float dz = grid.cellWidth(1), cz = 0.5f * dz;
     float x = (float)xxx;
 
-    size_t ix = grid.index(0, xxx);
-    for ( size_t iz = 0; iz < grid.breadth(2); ++iz )
+    index_t ix = grid.index(0, xxx);
+    for ( index_t iz = 0; iz < grid.breadth(2); ++iz )
     {
         flute8 * flu = gym::mapBufferC4V4(4*grid.breadth(1)+4);
         flute8 * ptr = flu;
-        for ( size_t iy = 0; iy < grid.breadth(1); ++iy )
+        for ( index_t iy = 0; iy < grid.breadth(1); ++iy )
         {
             float y = grid.position(1, iy);
             float z = grid.position(2, iz);

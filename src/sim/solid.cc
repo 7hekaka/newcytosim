@@ -52,9 +52,9 @@ void Solid::setInteractions(Meca& meca) const
 #if NEW_SOLID_HAS_TWIN
     if ( soTwin && soTwin != this )
     {
-        const size_t off = DIM+1; // index of point to be linked
-        const size_t sup = std::min(nPoints-off, off+1); // last point to be linked
-        for ( size_t POLE = 0; POLE <= sup; POLE += off+1 )
+        const index_t off = DIM+1; // index of point to be linked
+        const index_t sup = std::min(nPoints-off, off+1); // last point to be linked
+        for ( index_t POLE = 0; POLE <= sup; POLE += off+1 )
         {
             const real stiff = prop->twin_stiffness;
             if ( stiff > 0 )
@@ -65,8 +65,8 @@ void Solid::setInteractions(Meca& meca) const
             const real torque = prop->twin_torque_stiffness;
             if ( torque > 0 )
             {
-                size_t ii = POLE + matIndex();
-                size_t jj = POLE + soTwin->matIndex();
+                index_t ii = POLE + matIndex();
+                index_t jj = POLE + soTwin->matIndex();
                 meca.addTorque4(ii, ii+off, jj+off, jj, torque);
             }
         }
@@ -78,7 +78,7 @@ void Solid::setInteractions(Meca& meca) const
         switch ( prop->confine )
         {
             case CONFINE_INSIDE:
-                for ( size_t i = 0; i < nPoints; ++i )
+                for ( index_t i = 0; i < nPoints; ++i )
                 {
                     // confine all massive points:
                     if ( radius(i) > 0 )
@@ -91,7 +91,7 @@ void Solid::setInteractions(Meca& meca) const
                 break;
                 
             case CONFINE_OUTSIDE:
-                for ( size_t i = 0; i < nPoints; ++i )
+                for ( index_t i = 0; i < nPoints; ++i )
                 {
                     // confine all massive points:
                     if ( radius(i) > 0 )
@@ -104,7 +104,7 @@ void Solid::setInteractions(Meca& meca) const
                 break;
                 
             case CONFINE_ALL_INSIDE:
-                for ( size_t i = 0; i < nPoints; ++i )
+                for ( index_t i = 0; i < nPoints; ++i )
                 {
                     const real rad = radius(i);
                     // confine all massive points:
@@ -118,7 +118,7 @@ void Solid::setInteractions(Meca& meca) const
                 break;
                 
             case CONFINE_ON:
-                for ( size_t i = 0; i < nPoints; ++i )
+                for ( index_t i = 0; i < nPoints; ++i )
                 {
                     // only confine massive points:
                     if ( radius(i) > 0 )
@@ -185,7 +185,7 @@ Solid::Solid(const Solid & o)
     reset();
     prop = o.prop;
     allocateMecable(o.nPoints);
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
         soRadius[p] = o.soRadius[p];
     fixShape();
 }
@@ -197,7 +197,7 @@ Solid & Solid::operator = (const Solid & o)
     prop = o.prop;
     allocateMecable(o.nPoints);
     Mecable::operator = (o);
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
         soRadius[p] = o.soRadius[p];
     fixShape();
     return *this;
@@ -216,12 +216,12 @@ Solid::~Solid()
 /**
  This extends Mecable::allocateMecable().
  */
-void Solid::allocateMecable(const size_t nbp)
+void Solid::allocateMecable(const index_t nbp)
 {
     real * ptr = Mecable::allocateMemory(nbp, 1+DIM);
     if ( ptr )
     {
-        size_t all = allocated();
+        index_t all = allocated();
         //std::clog << "Solid::allocateMecable " << all << '\n';
         soRadius = ptr;
         soShape = ptr + all;
@@ -241,11 +241,11 @@ void Solid::release()
 #pragma mark - Build
 
 
-size_t Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+index_t Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
-    size_t inx = 0;
-    size_t nbp = 1;
+    index_t inx = 0;
+    unsigned nbp = 1;
     // optionally specify a number of points
     if ( opt.set_positive_integer(nbp, var) )
         ++inx;
@@ -256,10 +256,10 @@ size_t Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var,
         real rad = 0;
         opt.set(rad, var, inx+1);
         
-        size_t fip = nPoints;
+        index_t fip = nPoints;
         str = opt.value(var, inx);
         // add 'nbp' points:
-        for ( size_t n = 0; n < nbp; ++n )
+        for ( index_t n = 0; n < nbp; ++n )
         {
             Vector vec = Cytosim::findPosition(str, nullptr);
             addSphere(vec, rad);
@@ -276,9 +276,9 @@ size_t Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var,
 
 void Solid::makeWrist(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
-    size_t num = 1;
+    index_t num = 1;
     std::string str;
-    size_t a = 0, b = 0;
+    index_t a = 0, b = 0;
     real c = 0.0;
     
     opt.set(str, var, 0);
@@ -300,7 +300,7 @@ void Solid::makeWrist(ObjectList& objs, Glossary& opt, std::string const& var, S
             throw InvalidParameter("interpolation coefficient must be in [0, 1]");
     }
     
-    for ( size_t i = 0; i < num; ++i )
+    for ( index_t i = 0; i < num; ++i )
     {
         // add a Wrist anchored between 'a' and 'b':
         Wrist * w = sip->newWrist(this, a);
@@ -315,9 +315,9 @@ void Solid::makeWrist(ObjectList& objs, Glossary& opt, std::string const& var, S
  add Wrists anchored on the local coordinate system of a sphere at index 'ref':
  using unit vectors here since the Triad is build already with a scale 'rad'
  */
-void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_t ref, std::string const& spec)
+void Solid::addWrists(ObjectList& objs, index_t num, SingleProp const* sip, index_t ref, std::string const& spec)
 {
-    for ( size_t i = 0; i < num; ++i )
+    for ( index_t i = 0; i < num; ++i )
     {
         Vector vec(0,0,0);
         try {
@@ -332,7 +332,7 @@ void Solid::addWrists(ObjectList& objs, size_t num, SingleProp const* sip, size_
 }
 
 
-size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+index_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
     // get sphere radius:
@@ -353,7 +353,7 @@ size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, 
     // get position of center:
     Vector cen = Cytosim::findPosition(opt.value(var, 0), nullptr);
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, rad);
+    index_t ref = addSphere(cen, rad);
     addTriad(rad);
     rad = abs_real(rad);
 
@@ -362,17 +362,17 @@ size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, 
     if ( opt.set(sep, "separation") )
     {
         // count number of singles to be attached:
-        size_t nbs = 0;
-        size_t inx = 2;
+        index_t nbs = 0;
+        index_t inx = 2;
         while ( opt.peek(str, var, inx++) )
         {
-            size_t num = 1;
+            index_t num = 1;
             Tokenizer::split_integer(num, str);
             nbs += num;
         }
         std::vector<Vector> pts(nbs, Vector(0,0,0));
         real sup = 2 * std::pow(M_PI/(3*M_SQRT2*nbs), 1.0/3);
-        size_t nbp = tossPointsBall(pts, std::min(sep/rad, sup), 128);
+        index_t nbp = tossPointsBall(pts, std::min(sep/rad, sup), 128);
         if ( nbp < nbs )
         {
             Cytosim::warn << " Could only fit " << nbp << "/" << nbs << " points in Sphere at separation " << sep << "\n";
@@ -382,10 +382,10 @@ size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, 
         inx = 2;
         while ( opt.set(str, var, inx++) )
         {
-            size_t num = 1;
+            index_t num = 1;
             Tokenizer::split_integer(num, str);
             SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
-            for ( size_t u = 0; u < num; ++u )
+            for ( index_t u = 0; u < num; ++u )
             {
                 Wrist * w = sip->newWrist(this, ref, pts[nbs]);
                 nbs = ( nbs + 1 ) % nbp;
@@ -396,10 +396,10 @@ size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, 
     else
 #endif
     {
-        size_t inx = 2;
+        index_t inx = 2;
         while ( opt.set(str, var, inx++) )
         {
-            size_t num = 1;
+            index_t num = 1;
             Tokenizer::split_integer(num, str);
             std::string nam = Tokenizer::split_symbol(str);
             if ( nam.empty() )
@@ -409,7 +409,7 @@ size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, 
                 addWrists(objs, num, sip, ref, str);
             else
             {
-                for ( size_t i = 0; i < num; ++i )
+                for ( index_t i = 0; i < num; ++i )
                 {
                     Wrist * w = sip->newWrist(this, ref, Vector::randB());
                     objs.push_back(w);
@@ -421,7 +421,7 @@ size_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var, 
 }
 
 
-size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
+index_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     std::string str;
     real rad = 0;
@@ -439,7 +439,7 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
     // get position of center:
     Vector cen = Cytosim::findPosition(opt.value(var, 0), nullptr);
     // add a bead with a local coordinate system
-    size_t ref = addSphere(cen, rad);
+    index_t ref = addSphere(cen, rad);
     addTriad(rad);
     rad = abs_real(rad);
 
@@ -450,17 +450,17 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
         if ( dev > rad )
             throw InvalidParameter("solid:deviation should be <= radius");
         // attach Single on the surface of this sphere:
-        size_t nbs = opt.num_values(var) - 2;
+        index_t nbs = opt.num_values(var) - 2;
         std::vector<Vector> pts(nbs, Vector(0,0,0));
         distributePointsSphere(pts, sep/rad, 128);
-        size_t inx = 2;
+        index_t inx = 2;
         while ( opt.set(str, var, inx++) )
         {
             // get a number and the name of a class:
-            size_t num = 1;
+            index_t num = 1;
             Tokenizer::split_integer(num, str);
             SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
-            for ( size_t u = 0; u < num; ++u )
+            for ( index_t u = 0; u < num; ++u )
             {
                 Vector pos = pts[inx-3];
                 Vector vec = normalize(pos+pos.randOrthoB(dev/rad));
@@ -472,11 +472,11 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
     else if ( opt.set(sep, "separation") )
     {
         // count number of singles to be attached:
-        size_t nbs = 0;
-        size_t inx = 2;
+        index_t nbs = 0;
+        index_t inx = 2;
         while ( opt.peek(str, var, inx++) )
         {
-            size_t num = 1;
+            index_t num = 1;
             Tokenizer::split_integer(num, str);
             nbs += num;
         }
@@ -487,10 +487,10 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
         inx = 2;
         while ( opt.set(str, var, inx++) )
         {
-            size_t num = 1;
+            index_t num = 1;
             Tokenizer::split_integer(num, str);
             SingleProp const* sip = sim.findProperty<SingleProp>("single", str);
-            for ( size_t u = 0; u < num; ++u )
+            for ( index_t u = 0; u < num; ++u )
             {
                 Wrist * w = sip->newWrist(this, ref, pts[nbs++]);
                 objs.push_back(w);
@@ -500,10 +500,10 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
     else
 #endif
     {
-        size_t inx = 2;
+        index_t inx = 2;
         while ( opt.set(str, var, inx++) )
         {
-            size_t num = 1;
+            index_t num = 1;
             Tokenizer::split_integer(num, str);
             std::string nam = Tokenizer::split_symbol(str);
             //std::clog << num << " [" << nam << "] |" << str << "|\n";
@@ -517,8 +517,8 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
                 real cap = 0.18;
                 // distribute points randomly over a portion of the unit sphere:
                 std::vector<Vector> pts(num, Vector(0,0,0));
-                size_t cnt = tossPointsCap(pts, cap, 1024);
-                for ( size_t i = 0; i < cnt; ++i )
+                index_t cnt = tossPointsCap(pts, cap, 1024);
+                for ( index_t i = 0; i < cnt; ++i )
                 {
                     Wrist * w = sip->newWrist(this, ref, -rot.trans_vecmul(pts[i]));
                     objs.push_back(w);
@@ -530,7 +530,7 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
                 addWrists(objs, num, sip, ref, str);
             else
             {
-                for ( size_t i = 0; i < num; ++i )
+                for ( index_t i = 0; i < num; ++i )
                 {
                     Wrist * w = sip->newWrist(this, ref, Vector::randU());
                     objs.push_back(w);
@@ -544,7 +544,7 @@ size_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& var
 
 Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
-    size_t ref = 0;
+    index_t ref = 0;
     const real rad = radius(ref);
     Vector A, B;
     std::string str;
@@ -766,14 +766,14 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     
     bool more = true;
     std::string var = "";
-    for ( size_t inp = 1; more; ++inp)
+    for ( index_t inp = 1; more; ++inp)
     {
         more = false;
         // parameter 'sphere###' will add a sphere, with Singles on their surface
         var = "sphere" + std::to_string(inp);
         if ( opt.has_key(var) )
         {
-            size_t ref = makeSphere(objs, opt, var, sim);
+            index_t ref = makeSphere(objs, opt, var, sim);
             if ( opt.has_key("twin") )
                 rotateTriad(ref, Rotation::align111());
             more = true;
@@ -851,21 +851,21 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
 //------------------------------------------------------------------------------
 #pragma mark - Shape
 
-size_t Solid::addSphere(Vector const& vec, real rad)
+index_t Solid::addSphere(Vector const& vec, real rad)
 {
-    size_t inx = addPoint(vec);
+    index_t inx = addPoint(vec);
     soRadius[inx] = rad;
     //std::clog << "addSphere(" << vec << ", " << rad << ") for " << reference() << " index " << inx << "\n";
     return inx;
 }
 
 // the coordinate system can be inverted by specifying negative 'arm'
-size_t Solid::addTriad(real arm)
+index_t Solid::addTriad(real arm)
 {
     if ( nPoints < 1 )
         throw InvalidParameter("cannot add Triad to a Solid with no point");
     
-    size_t inx = lastPoint();
+    index_t inx = lastPoint();
     real ARM = abs_real(arm);
     
     //std::clog << "Solid::addTriad(" << arm << ") at index " << inx << "\n";
@@ -879,13 +879,13 @@ size_t Solid::addTriad(real arm)
 }
 
 
-void Solid::rotateTriad(size_t ref, Rotation const& rot)
+void Solid::rotateTriad(index_t ref, Rotation const& rot)
 {
     if ( nPoints < ref + DIM )
         throw InvalidParameter("cannot identify Triad at this index");
 
     Vector vec = posP(ref);
-    for ( size_t i = 1; i <= DIM; ++i )
+    for ( index_t i = 1; i <= DIM; ++i )
     {
         Vector off = posPoint(ref+i) - vec;
         setPoint(ref+i, vec + rot*off);
@@ -894,7 +894,7 @@ void Solid::rotateTriad(size_t ref, Rotation const& rot)
 
 
 /** will return the size of the base vector, negated if triad is indirect */
-real Solid::hasTriad(size_t inx, real epsilon) const
+real Solid::hasTriad(index_t inx, real epsilon) const
 {
     if ( inx + DIM >= nbPoints() )
         return 0;
@@ -923,7 +923,7 @@ real Solid::hasTriad(size_t inx, real epsilon) const
 }
 
 
-void Solid::setRadius(const size_t indx, const real rad)
+void Solid::setRadius(const index_t indx, const real rad)
 {
     assert_true( indx < nPoints );
     if ( rad < 0 )
@@ -936,7 +936,7 @@ real Solid::sumRadius() const
 {
     real res = 0;
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
         res += radius(i);
     
     return res;
@@ -948,10 +948,10 @@ real Solid::sumRadius() const
  The result should be independent of the actual position, since the shape
  of a Solid is fixed, and it could be precalculated
  */
-size_t Solid::closestSpheres(const size_t inx, size_t& i1, size_t& i2, size_t& i3) const
+index_t Solid::closestSpheres(const index_t inx, index_t& i1, index_t& i2, index_t& i3) const
 {
     assert_true( inx < nbPoints() );
-    const size_t sup = nbPoints();
+    const index_t sup = nbPoints();
     Vector X = posP(inx);
     i1 = sup;
     i2 = sup;
@@ -959,7 +959,7 @@ size_t Solid::closestSpheres(const size_t inx, size_t& i1, size_t& i2, size_t& i
     real d1 = INFINITY;
     real d2 = INFINITY;
     real d3 = INFINITY;
-    for ( size_t i = 0; i < sup; ++i )
+    for ( index_t i = 0; i < sup; ++i )
     {
         if ( i != inx && radius(i) > 0 )
         {
@@ -1001,7 +1001,7 @@ Vector Solid::centroid() const
     
     real sum = 0;
     Vector res(0,0,0);
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         real R = radius(i);
         if ( R > 0 )
@@ -1026,7 +1026,7 @@ Vector Solid::orientation() const
 {
     real S = 0, M[9] = { 0 };
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         const real w = radius(i);
         Vector p = posP(i);
@@ -1053,7 +1053,7 @@ Vector Solid::orientation() const
     if ( S > REAL_EPSILON )
     {
         // rescale matrix:
-        for ( size_t d = 0; d < 9; ++d )
+        for ( index_t d = 0; d < 9; ++d )
             M[d] = M[d] / S;
         
         real val[3] = { 0 };
@@ -1096,10 +1096,10 @@ void Solid::fixShape()
     // store the current points:
     soAmount = nPoints;
     // set reference to current shape translated to be centered:
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
     {
         ( Vector(pPos+DIM*p) - avg ).store(soShape+DIM*p);
-        //for ( size_t d = 0; d < DIM; ++d )
+        //for ( index_t d = 0; d < DIM; ++d )
         //    soShape[DIM*p+d] = pPos[DIM*p+d] - avg[d];
     }
 }
@@ -1115,9 +1115,9 @@ void Solid::scaleShape(const real mag[DIM])
     //recalculate the momentum needed in rescale():
     soVariance = 0;
     // scale the specified dimension
-    for ( size_t p = 0; p < soAmount; ++p )
+    for ( index_t p = 0; p < soAmount; ++p )
     {
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( index_t d = 0; d < DIM; ++d )
         {
             soShape[DIM*p+d] *= mag[d];
             soVariance += square(soShape[DIM*p+d]);
@@ -1145,11 +1145,11 @@ void Solid::rescale()
         real mag = std::sqrt( soVariance / M );
     
         // scale the shape around the center of gravity:
-        for ( size_t p = 0; p < nPoints; ++p )
+        for ( index_t p = 0; p < nPoints; ++p )
         {
             real * ptr = pPos + DIM * p;
             (avg+mag*(Vector(ptr)-avg)).store(ptr);
-            //for ( size_t d = 0; d < DIM; ++d )
+            //for ( index_t d = 0; d < DIM; ++d )
             //    ptr[d] = mag * ( ptr[d] - avg[d] ) + avg[d];
         }
     }
@@ -1174,7 +1174,7 @@ void Solid::reshape1D(real const* shap)
     assert_true( soAmount == nPoints );
          
     real X = 0, C = 0;
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         C += pPos[i] * shap[i];
         X += pPos[i];
@@ -1183,7 +1183,7 @@ void Solid::reshape1D(real const* shap)
     X /= real( nPoints );
     C /= abs_real(C);
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
         pPos[i] = C * shap[i] + X;
 }
 
@@ -1200,7 +1200,7 @@ void Solid::reshape2D(real const* shap)
     real X = 0, Y = 0;
     real C = 0, S = 0;
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         X += pPos[0+DIM*i];
         Y += pPos[1+DIM*i];
@@ -1223,7 +1223,7 @@ void Solid::reshape2D(real const* shap)
     //printf(" n %8.3f, c %8.3f, s %8.3f norm = %8.3f\n", n, C, S, C*S + S*S);
     
     // apply transformation = rotation + translation:
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         pPos[DIM*i  ] = C * shap[DIM*i] - S * shap[DIM*i+1] + X;
         pPos[DIM*i+1] = S * shap[DIM*i] + C * shap[DIM*i+1] + Y;
@@ -1243,7 +1243,7 @@ void Solid::reshape3D(real const* shap)
     Vector3 avg(Mecable::position());
     
     Matrix33 S(0,0);
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
         S.addOuterProduct(shap+DIM*i, pPos+DIM*i);
     
     // rescale matrix to keep its magnitude in range
@@ -1296,20 +1296,20 @@ void Solid::reshape3D(real const* shap)
         {
             // measure remaining error:
             real dev = 0;
-            for ( size_t i = 0; i < nPoints; ++i )
+            for ( index_t i = 0; i < nPoints; ++i )
                 dev += distanceSqr(avg+S*Vector3(shap+DIM*i), pPos+DIM*i);
             printf("%s error %6.4f :", reference().c_str(), dev);
             printf(" eigenvalue %6.2f ", val[0]); quat.println();
         }
 
         // apply rotation + translation:
-        for ( size_t i = 0; i < nPoints; ++i )
+        for ( index_t i = 0; i < nPoints; ++i )
             (avg+S*Vector3(shap+DIM*i)).store(pPos+DIM*i);
     }
     else
     {
         // apply translation:
-        for ( size_t i = 0; i < nPoints; ++i )
+        for ( index_t i = 0; i < nPoints; ++i )
             (avg+Vector3(shap+DIM*i)).store(pPos+DIM*i);
         
         printf("Solid::reshape(): lapack::xsyevx() failed with code %i\n", info);
@@ -1368,7 +1368,7 @@ void Solid::setDragCoefficient()
     real roti = 0;     //in 2D, the total rotational inertia
 #endif
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         real R = radius(i);
         if ( R > 0 )
@@ -1426,7 +1426,7 @@ real Solid::addBrownianForces(real const* fce, real alpha, real* rhs) const
     const real b = std::sqrt( alpha * drag / (real)nPoints );
 
     // noise is equally distributed over all points:
-    for ( size_t j = 0; j < DIM*nPoints; ++j )
+    for ( index_t j = 0; j < DIM*nPoints; ++j )
         rhs[j] = b * rhs[j] + fce[j];
     
     //std::clog << reference() << " drag " << b << " " << drag << "   " << std::sqrt(nPoints)*b/drag << "\n";
@@ -1452,12 +1452,12 @@ void Solid::makeProjection()
 void Solid::projectForces(const real* X, real* Y) const
 {
     real T = 0;
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
         T += X[p];
     
     T /= prop->viscosity * soDrag;
     
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
         Y[p] = T;
 }
 
@@ -1482,7 +1482,7 @@ void Solid::makeProjection()
     real sumR = 0;
     real sumR3 = 0;
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         real R = radius(i);
         if ( R > 0 )
@@ -1506,7 +1506,7 @@ void Solid::projectForces(const real* X, real* Y) const
     Vector T(0.0,0.0);  // Translation
     real R = 0;         // Infinitesimal Rotation (a vector in Z)
     
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
     {
         real const* pos = pPos + DIM * p;
         real const* xxx = X + DIM * p;
@@ -1523,7 +1523,7 @@ void Solid::projectForces(const real* X, real* Y) const
     R = A * ( R + cross(T,soCenter) );
     T = B * T + cross(soCenter,R);
     
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
     {
         real const* pos = pPos + DIM * p;
         real * yyy = Y + DIM * p;
@@ -1546,11 +1546,11 @@ void Solid::makeProjection()
     ///\todo: from reshape, we know the rotation matrix from the stored shape
     //to the current shape. We could use it to transform the inertia matrix
     real sum = 0;
-    size_t cnt = 0;
+    index_t cnt = 0;
     real cX = 0, cY = 0, cZ = 0;
     real XX=0, XY=0, XZ=0, YY=0, YZ=0, ZZ=0;
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         const real R = radius(i);
         if ( R > 0 )
@@ -1625,7 +1625,7 @@ void Solid::projectForces0(const real* X, real* Y) const
     Vector T(0,0,0);    //Translation
     Vector R(0,0,0);    //Rotation
     
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
     {
         real * pos = pPos + DIM * p;
         real const* xxx = X + DIM * p;
@@ -1648,7 +1648,7 @@ void Solid::projectForces0(const real* X, real* Y) const
     // reduce Torque to center of mobility:
     T = cross(soCenter, R) + T / ( visc * soDrag );
 
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
     {
         real const* pos = pPos + DIM * p;
         real * yyy = Y + DIM * p;
@@ -1665,7 +1665,7 @@ void Solid::projectForces(const real* X, real* Y) const
     Vector T(0,0,0);   //Translation
     Vector R(0,0,0);   //Rotation
     
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
     {
         Vector F(X+DIM*p);
         T += F;
@@ -1679,7 +1679,7 @@ void Solid::projectForces(const real* X, real* Y) const
     // reduce Torque to center of mobility:
     T = cross(soCenter, R) + T / ( visc * soDrag );
     
-    for ( size_t p = 0; p < nPoints; ++p )
+    for ( index_t p = 0; p < nPoints; ++p )
     {
         // Y <- T + cross(R, X)
         (T+cross(R, Vector(pPos+DIM*p))).store(Y+DIM*p);
@@ -1696,7 +1696,7 @@ void Solid::write(Outputter& out) const
 {
     writeMarker(out, TAG);
     out.writeUInt16(nPoints);
-    for ( size_t p = 0; p < nPoints ; ++p )
+    for ( index_t p = 0; p < nPoints ; ++p )
     {
         out.writeFloats(pPos + DIM * p, DIM, '\n');
         out.writeSoftSpace();
@@ -1728,9 +1728,9 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         try
         {
-            size_t nbp = in.readUInt16();
+            index_t nbp = in.readUInt16();
             setNbPoints(nbp);
-            for ( size_t i = 0; i < nbp ; ++i )
+            for ( index_t i = 0; i < nbp ; ++i )
             {
                 in.readFloats(pPos+DIM*i, DIM);
                 soRadius[i] = in.readFloat();
@@ -1780,7 +1780,7 @@ void Solid::print(std::ostream& os, bool write_shape) const
     os << "new solid " << reference() << '\n';
     os << "{\n";
     os << " nb_points = " << nPoints << '\n';
-    for ( size_t n = 0; n < nPoints ; ++n )
+    for ( index_t n = 0; n < nPoints ; ++n )
     {
         os << " point" << n+1 << " = ";
         if ( write_shape )

@@ -43,7 +43,7 @@ Vector Interpolation4::normal() const
 /**
 Set a point of index 'P' on Mecable
 */
-void Interpolation4::set(Mecable const* m, unsigned p)
+void Interpolation4::set(Mecable const* m, index_t p)
 {
     assert_true( !m || p < m->nbPoints() );
     
@@ -58,7 +58,7 @@ Coefficient 'c' determines the position between 'P' and 'Q':
 - with ( c == 1 ) the point is equal to P
 .
 */
-void Interpolation4::set(Mecable const* m, unsigned p, unsigned q, real c)
+void Interpolation4::set(Mecable const* m, index_t p, index_t q, real c)
 {
     assert_true(m);
     assert_true(q < m->nbPoints());
@@ -86,7 +86,7 @@ This is used when the four vertices [P ... P+3] define a orthonormal reference,
 as the components of 'vec' are then simply the coordinates of the position of the
 interpolation in this reference frame.
 */
-void Interpolation4::set(Mecable const* m, unsigned p, Vector const& vec)
+void Interpolation4::set(Mecable const* m, index_t p, Vector const& vec)
 {
     assert_true(m);
     
@@ -105,7 +105,7 @@ void Interpolation4::set(Mecable const* m, unsigned p, Vector const& vec)
 
 void Interpolation4::addLink(Meca& meca, Mecapoint const& arg, const real weight) const
 {
-    size_t off = mec_->matIndex() + prime_;
+    index_t off = mec_->matIndex() + prime_;
     
     switch ( rank_ )
     {
@@ -130,7 +130,7 @@ void Interpolation4::addLink(Meca& meca, Mecapoint const& arg, const real weight
 void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real weight) const
 {
     assert_true(mec_);
-    size_t off = mec_->matIndex() + prime_;
+    index_t off = mec_->matIndex() + prime_;
     
     switch ( rank_ )
     {
@@ -160,7 +160,7 @@ void Interpolation4::addLink(Meca& meca, Interpolation const& arg, const real we
 void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, const real weight) const
 {
     assert_true(mec_);
-    size_t off = mec_->matIndex() + prime_;
+    index_t off = mec_->matIndex() + prime_;
     // coefficients to extract ( surface_point - center )
     real alp[4] = { coef_[0] - real(1), coef_[1], coef_[2], coef_[3] };
     //printf("offsetLink %9.3f %9.3f %9.3f\n", alp[1], alp[2], alp[3]);
@@ -200,7 +200,7 @@ void Interpolation4::addOffsetLink(Meca& meca, real len, Mecapoint const& arg, c
 void Interpolation4::addAlignedOffsetLink(Meca& meca, real len, Mecapoint const& arg, const real weight) const
 {
     assert_true(mec_);
-    size_t off = mec_->matIndex() + prime_;
+    index_t off = mec_->matIndex() + prime_;
     // coefficients to calculate the radius of the bead:
     real alp[2] = { real(-1), real(1) };
     // extract distance in current configuration:

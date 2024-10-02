@@ -67,10 +67,10 @@ private:
     int * pPivot;
     
     /// Index that Object coordinates occupy in the matrices and vectors of Meca
-    unsigned pIndex;
+    index_t pIndex;
     
     /// Allocated size of pBlock[], capable of size^2
-    unsigned pBlockAlc;
+    index_t pBlockAlc;
 
 protected:
 
@@ -110,28 +110,28 @@ public:
     //--------------------------------------------------------------------------
     
     /// Set the number of points of the object
-    void setNbPoints(const size_t n);
+    void setNbPoints(const index_t n);
     
     /// Returns number of points
-    unsigned nbPoints()  const { return nPoints; }
+    index_t nbPoints() const { return nPoints; }
     
     /// Index of the last point = nbPoints() - 1
-    unsigned lastPoint() const { return nPoints - 1; }
+    index_t lastPoint() const { return nPoints - 1; }
     
     /// size currently allocated
-    unsigned allocated() const { return pAllocated; }
+    index_t allocated() const { return pAllocated; }
     
     /// Number of distance constraints applied to the movements of vertices
-    virtual unsigned nbConstraints() const { return 0; }
+    virtual index_t nbConstraints() const { return 0; }
 
     //--------------------------------------------------------------------------
     
     /// Position of vertex number 'p' (indices starting at zero)
-    Vector posPoint(size_t p) const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
+    Vector posPoint(index_t p) const { assert_true(pPos && p<nPoints); return Vector(pPos+DIM*p); }
     
     /// Position of point 'p' of the object
     /** this is identical to posPoint(), it exists for historical reasons*/
-    Vector posP(size_t p)     const { return Vector(pPos+DIM*p); }
+    Vector posP(index_t p)     const { return Vector(pPos+DIM*p); }
     
     /// modifiable address of coordinate array
     real * addrPoints() { return pPos; }
@@ -140,43 +140,43 @@ public:
     const real * addrPoints() const { return pPos; }
 
     /// Address of point `p`
-    const real * addrPoint(size_t p) const { assert_true(p<nPoints); return pPos + DIM*p; }
+    const real * addrPoint(index_t p) const { assert_true(p<nPoints); return pPos + DIM*p; }
 
     /// Set position of point `i` to `x`
-    void setPoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
+    void setPoint(index_t i, Vector const& x) { assert_true(i<nPoints); x.store(pPos+DIM*i); }
     
     /// Shift point at index `i` by `x`
-    void movePoint(size_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
+    void movePoint(index_t i, Vector const& x) { assert_true(i<nPoints); x.add_to(pPos+DIM*i); }
     
     /// replace current coordinates by values from the given array
     virtual void getPoints(real const*);
     
     /// Set to `n_pts` points copied from `pts[]`
-    void setPoints(const real pts[], size_t n_pts);
+    void setPoints(const real pts[], index_t n_pts);
     
     /// copy current vertex coordinates to given array, assuming it is suitably allocated
     void putPoints(real*) const;
 
-    /// Copy current vertex coordinates to `ptr[]`, already allocated to hold `cnt` scalars
-    int putPoints(float ptr[], size_t cnt) const;
+    /// Copy current vertex coordinates to `ptr[]`, already allocated to hold `sup` scalars
+    void putPoints(float ptr[], index_t sup) const;
 
     /// Add a point and expand the object, returning the array index that was used
-    size_t addPoint(Vector const& w);
+    index_t addPoint(Vector const& w);
     
     /// Remove `nbp` points starting from index `inx`
-    void removePoints(size_t inx, size_t nbp);
+    void removePoints(index_t inx, index_t nbp);
     
     /// Remove all points
     void clearPoints() { nPoints = 0; }
     
     /// Shift `nbp` points starting from index `inx`
-    void shiftPoints(size_t inx, size_t nbp);
+    void shiftPoints(index_t inx, index_t nbp);
     
     /// Remove all points with indices [ 0, p-1 ], keep [ p, nbPoints() ]
-    virtual void truncateM(size_t p);
+    virtual void truncateM(index_t p);
     
     /// Keep points [ 0, p ], remove other points
-    virtual void truncateP(size_t p);
+    virtual void truncateP(index_t p);
     
     /// Set all coordinates to zero (nicer for debug/testing)
     void resetPoints();
@@ -190,7 +190,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Difference of two consecutive points: (P+1) - (P)
-    Vector diffPoints(const size_t P) const
+    Vector diffPoints(const index_t P) const
     {
         assert_true( P+1 < nPoints );
         Vector vec;
@@ -199,7 +199,7 @@ public:
     }
     
     /// Difference of two points = Q - P = vector PQ
-    Vector diffPoints(const size_t P, const size_t Q) const
+    Vector diffPoints(const index_t P, const index_t Q) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
@@ -210,7 +210,7 @@ public:
     
     /// intermediate position between P and Q=P+1 : P + A * ( Q - P )
     /** returns P if A=0; returns P+1 if A=1, and returns middle of segment if A = 0.5*/
-    Vector midPoint(const size_t P, const real A) const
+    Vector midPoint(const index_t P, const real A) const
     {
         assert_true( P < nPoints );
         assert_true( A == 0 || P+1 < nPoints );
@@ -219,14 +219,14 @@ public:
     }
     
     /// middle position between P and P+1 = 0.5 * ( P + Q )
-    Vector midPoint(const size_t P) const
+    Vector midPoint(const index_t P) const
     {
         assert_true( P+1 < nPoints );
         return 0.5 * ( Vector(pPos+DIM*P) + Vector(pPos+DIM*P+DIM) );
     }
 
     /// Calculate intermediate position = P + a * ( Q - P )
-    Vector interpolatePoints(const size_t P, const size_t Q, const real A) const
+    Vector interpolatePoints(const index_t P, const index_t Q, const real A) const
     {
         assert_true( P < nPoints );
         assert_true( Q < nPoints );
@@ -235,15 +235,15 @@ public:
     }
     
     /// interpolate 'rank' points starting from 'ref' with coefficients
-    Vector interpolatePoints(size_t ref, const real coef[], size_t rank) const;
+    Vector interpolatePoints(index_t ref, const real coef[], index_t rank) const;
 
     //--------------------------------------------------------------------------
 
     /// Allocate memory to store given number of vertices and extra vectors
-    real * allocateMemory(size_t, size_t);
+    real * allocateMemory(index_t, index_t);
 
     /// Allocate memory to store given number of vertices
-    virtual void allocateMecable(size_t n) { allocateMemory(n, 0); }
+    virtual void allocateMecable(index_t n) { allocateMemory(n, 0); }
     
     /// free allocated memory
     void release();
@@ -276,7 +276,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// Store the index where coordinates are located in Meca
-    void setIndex(unsigned i) { pIndex = i; }
+    void setIndex(index_t i) { pIndex = i; }
     
     /// Index of the first vertex in the isotropic matrix (Meca::mISO)
     /**
@@ -286,13 +286,13 @@ public:
      The index can be used directly to address the isotropic matrix (Meca::mISO)
      and should be multiplied by DIM to address the general matrix (Meca::mFUL)
      */
-    unsigned matIndex() const { return pIndex; }
+    index_t matIndex() const { return pIndex; }
     
     /// set size of preconditionner block, allocating memory for 'alc' scalars
-    void blockSize(size_t, size_t alc, size_t pivot);
+    void blockSize(index_t, index_t alc, index_t pivot);
     
     /// Returns allocated size of preconditionner block
-    size_t blockLimit() const { return pBlockAlc; }
+    index_t blockLimit() const { return pBlockAlc; }
 
     /// True if preconditionner block is 'in use'
     SIZE_T blockType()  const { return pBlockType; }
@@ -325,7 +325,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// returns the force on point `p` calculated at the previous Meca's solve
-    Vector netForce(const size_t p) const;
+    Vector netForce(const index_t p) const;
     
     /// replace current forces by the ones provided as argument
     virtual void getForces(const real* ptr) { pForce = ptr; }
@@ -415,7 +415,7 @@ public:
     void print(std::ostream&, real const*) const;
     
     /// return (validated) index encoded in `str`
-    size_t point_index(std::string const& str) const;
+    index_t point_index(std::string const& str) const;
 
     /// check for NaNs in the position vector
     int invalid() const;

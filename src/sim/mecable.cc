@@ -31,7 +31,7 @@ Mecable::Mecable()
 }
 
 
-void Mecable::setNbPoints(size_t n)
+void Mecable::setNbPoints(index_t n)
 {
     if ( n != nPoints )
     {
@@ -64,7 +64,7 @@ Mecable& Mecable::operator = (const Mecable& o)
 /**
 Set block size to 'bks' and allocate as necessary to hold 'alc' reals, and 'pivot' integers
  */
-void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
+void Mecable::blockSize(index_t bks, index_t alc, index_t pivot)
 {
     assert_true( bks <= DIM * nPoints );
     // add enough to cover 'pivot' integers and a bit more:
@@ -73,7 +73,7 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
     if ( alc > pBlockAlc )
     {
         free_real(pBlock);
-        pBlockAlc = static_cast<unsigned>(chunk_real(alc));
+        pBlockAlc = chunk_real(alc);
         assert_true( pBlockAlc == chunk_real(alc) );
         // add 4 slots to allow for some SIMD instruction burr:
         pBlock = new_real(pBlockAlc);
@@ -93,12 +93,12 @@ void Mecable::blockSize(size_t bks, size_t alc, size_t pivot)
  @returns pointer to new memory allocated, or nullptr if no allocation was necessary
  some extra space is allowed in 3D to allow for AVX overspill
  */
-real* Mecable::allocateMemory(const size_t nbp, size_t add)
+real* Mecable::allocateMemory(const index_t nbp, index_t add)
 {
     if ( nbp + (DIM==3) > pAllocated )
     {
         // in 3D, we want one extra vector for SIMD burr
-        size_t all = chunk_real(nbp+(DIM==3));
+        index_t all = chunk_real(nbp+(DIM==3));
         // std::clog << "mecable(" << reference() << ") allocates " << all << '\n';
         
         // allocate memory for vertices + requested extra:
@@ -142,34 +142,34 @@ void Mecable::release()
 //------------------------------------------------------------------------------
 #pragma mark - Modifying points
 
-size_t Mecable::addPoint(Vector const& vec)
+index_t Mecable::addPoint(Vector const& vec)
 {
     allocateMecable(nPoints+1);
-    size_t i = nPoints++;
+    index_t i = nPoints++;
     //std::clog << "mecable " << reference() << " point" << i+1 << " = " << vec << "\n";
     vec.store(pPos+DIM*i);
     return i;
 }
 
 
-void Mecable::removePoints(const size_t inx, const size_t nbp)
+void Mecable::removePoints(const index_t inx, const index_t nbp)
 {
     assert_true( inx + nbp <= nPoints );
     
     nPoints -= nbp;
     
     //move part of the array down, to erase 'nbp' points from index 'inx'
-    for ( size_t i = DIM*inx; i < DIM*nPoints; ++i )
+    for ( index_t i = DIM*inx; i < DIM*nPoints; ++i )
         pPos[i] = pPos[i+DIM*nbp];
 }
 
 
-void Mecable::shiftPoints(const size_t inx, const size_t nbp)
+void Mecable::shiftPoints(const index_t inx, const index_t nbp)
 {
     allocateMecable(nPoints+nbp);
     
     //move part of the array up, making space for 'nbp' points from index 'inx'
-    for ( size_t i = DIM*inx; i < DIM*nPoints; ++i )
+    for ( index_t i = DIM*inx; i < DIM*nPoints; ++i )
         pPos[i+DIM*nbp] = pPos[i];
     
     nPoints += nbp;
@@ -179,13 +179,13 @@ void Mecable::shiftPoints(const size_t inx, const size_t nbp)
 /**
  shifts array to keep only points within [p, last]
  */
-void Mecable::truncateM(const size_t p)
+void Mecable::truncateM(const index_t p)
 {
     assert_true( p < nPoints - 1 );
     
-    size_t np = nPoints - p;
+    index_t np = nPoints - p;
     
-    for ( size_t i = 0; i < DIM*np; ++i )
+    for ( index_t i = 0; i < DIM*np; ++i )
         pPos[i] = pPos[i+DIM*p];
     
     nPoints = np;
@@ -194,7 +194,7 @@ void Mecable::truncateM(const size_t p)
 /**
  erase higher indices of array to keep [0, p]
  */
-void Mecable::truncateP(const size_t p)
+void Mecable::truncateP(const index_t p)
 {
     assert_true( p < nPoints );
     assert_true( p > 0 );
@@ -206,28 +206,28 @@ void Mecable::truncateP(const size_t p)
 
 void Mecable::resetPoints()
 {
-    for ( size_t i = 0; i < DIM*pAllocated; ++i )
+    for ( index_t i = 0; i < DIM*pAllocated; ++i )
         pPos[i] = 0;
 }
 
 
 void Mecable::addNoise(const real mag)
 {
-    for ( size_t i = 0; i < DIM*nPoints; ++i )
+    for ( index_t i = 0; i < DIM*nPoints; ++i )
         pPos[i] += mag * RNG.sreal();
 }
 
 
 void Mecable::translate(Vector const& T)
 {
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
         T.add_to(pPos+DIM*i);
 }
 
 
 void Mecable::rotate(Rotation const& T)
 {
-    for ( size_t i = 0; i < nPoints; ++i)
+    for ( index_t i = 0; i < nPoints; ++i)
         T.vecmul(pPos+DIM*i).store(pPos+DIM*i);
 }
 
@@ -249,7 +249,7 @@ void Mecable::getPoints(const real * pts)
 }
 
 
-void Mecable::setPoints(const real pts[], const size_t nbp)
+void Mecable::setPoints(const real pts[], const index_t nbp)
 {
     setNbPoints(nbp);
     copy_real(DIM*nbp, pts, pPos);
@@ -257,34 +257,19 @@ void Mecable::setPoints(const real pts[], const size_t nbp)
 
 
 /**
-Copy the coordinates of the points of Object to array `ptr[]`, which has been
-allocated to hold `cnt` coordinates. Thus in 3D, `cnt` should be >= 3*Object::nbPoints()
-Exactly 3*Object::nbPoints() values are set at most. The Z component is set to zero in 2D mode.
-The data is converted to single precision.
-
-@return error code: 0 = no error, 1 = insufficient allocation
+Copy vertex coordinates to given array, converting to single precision.
 */
-int Mecable::putPoints(float ptr[], size_t cnt) const
+void Mecable::putPoints(float ptr[], index_t sup) const
 {
-#if ( DIM == 2 )
-    size_t sup = std::min(DIM*(size_t)nPoints, cnt);
-    for ( size_t i = 0; i < sup; ++sup )
+    index_t end = DIM * nbPoints();
+    if ( sup < end )
+        sup = end;
+    for ( index_t i = 0; i < sup; ++i )
         ptr[i] = pPos[i];
-#else
-    size_t sup = std::min((size_t)nPoints, cnt/3);
-    for ( size_t i = 0; i < sup; ++sup )
-    {
-        for ( size_t d = 0; d < DIM; ++d )
-            ptr[3*i+d] = pPos[3*i+d];
-        for ( size_t d = DIM; d < 3; ++d )
-            ptr[3*i+d] = 0;
-    }
-#endif
-    return ( cnt < 3*nPoints );
 }
 
 
-Vector Mecable::netForce(const size_t p) const
+Vector Mecable::netForce(const index_t p) const
 {
     if ( pForce )
         return Vector(pForce+DIM*p);
@@ -299,19 +284,21 @@ Vector Mecable::netForce(const size_t p) const
 Vector Mecable::position() const
 {
     Vector sum = posP(0);
-    for ( size_t i = 1; i < nPoints; ++i )
+    for ( index_t i = 1; i < nPoints; ++i )
         sum += posP(i);
     return sum / real(nPoints);
 }
 
 
-Vector Mecable::interpolatePoints(size_t ref, real const coef[], size_t rank) const
+Vector Mecable::interpolatePoints(index_t ref, real const coef[], index_t rank) const
 {
     assert_true( rank > 0 );
     assert_true( ref < nPoints );
-    size_t top = std::min(rank, nPoints-ref);
+    index_t end = nbPoints() - ref;
+    if ( rank < end )
+        end = rank;
     Vector res = coef[0] * posP(ref);
-    for ( size_t i = 1; i < top; ++i )
+    for ( index_t i = 1; i < end; ++i )
         res += coef[i] * posP(ref+i);
     return res;
 }
@@ -328,7 +315,7 @@ void Mecable::calculateMomentum(Vector& avg, Vector& dev)
     avg.reset();
     dev.reset();
     
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         Vector x = posPoint(i);
         avg += x;
@@ -355,7 +342,7 @@ void Mecable::foldPosition(Modulo const* m)
 
 bool Mecable::allPointsInside(Space const* spc) const
 {
-    for ( size_t i = 0; i < nPoints; ++i )
+    for ( index_t i = 0; i < nPoints; ++i )
     {
         if ( spc->outside(posP(i)) )
             return false;
@@ -371,19 +358,19 @@ bool Mecable::allPointsInside(Space const* spc) const
 void Mecable::write(Outputter& out) const
 {
     out.writeUInt16(nPoints);
-    for ( size_t i = 0; i < nPoints ; ++i )
+    for ( index_t i = 0; i < nPoints ; ++i )
         out.writeFloats(pPos+DIM*i, DIM, '\n');
 }
 
 
 void Mecable::read(Inputter& in, Simul&, ObjectTag)
 {
-    size_t nb = in.readUInt16();
+    index_t nb = in.readUInt16();
     setNbPoints(nb);
 #if !REAL_IS_DOUBLE
     in.readFloats(nb, pPos, DIM);
 #else
-    for ( size_t i = 0; i < nb ; ++i )
+    for ( index_t i = 0; i < nb ; ++i )
         in.readFloats(pPos+DIM*i, DIM);
 #endif
 }
@@ -393,7 +380,7 @@ void Mecable::print(std::ostream& os, real const* ptr) const
 {
     os << "new mecable " << reference() << "\n{\n";
     os << " nb_points = " << nPoints << '\n';
-    for ( size_t i = 0; i < nPoints ; ++i )
+    for ( index_t i = 0; i < nPoints ; ++i )
     {
         os << " point" << i+1 << " = " << Vector(ptr+DIM*i) << '\n';
     }
@@ -408,9 +395,9 @@ std::ostream& operator << (std::ostream& os, Mecable const& arg)
 }
 
 
-size_t Mecable::point_index(std::string const& str) const
+index_t Mecable::point_index(std::string const& str) const
 {
-    const size_t sup = nbPoints();
+    const index_t sup = nbPoints();
     if ( str.size() > 5  &&  str.compare(0,5,"point") == 0 )
     {
         unsigned long i = 0;
@@ -422,7 +409,7 @@ size_t Mecable::point_index(std::string const& str) const
         }
         if ( i < 1 ) throw InvalidParameter("a point index must must be >= 1");
         if ( i > sup ) throw InvalidParameter("point index is out of range");
-        return i - 1;
+        return (index_t)(i - 1);
     }
     throw InvalidParameter("expected a point specification eg. `point1'");
     return 0;
@@ -431,7 +418,7 @@ size_t Mecable::point_index(std::string const& str) const
 
 int Mecable::invalid() const
 {
-    for ( size_t i = 0; i < DIM * nPoints ; ++i )
+    for ( index_t i = 0; i < DIM * nPoints ; ++i )
         if ( pPos[i] != pPos[i] )
             return 1;
     return 0;

@@ -24,7 +24,7 @@
  */
 class Meca1D
 {
-    size_t allocated_;           ///< allocated size of vectors
+    index_t allocated_;          ///< allocated size of vectors
 
     real * vSOL;                 ///< position of the points
     real * vBAS;                 ///< base points of forces and intermediate of calculus
@@ -96,7 +96,7 @@ public:
         for(Fiber * fib = sim.fibers.first(); fib; fib=fib->next())
             mecables.push_back(fib);
         
-        size_t dim = mecables.size();
+        index_t dim = mecables.size();
         
         allocate(dim);
         matX.resize(dim);
@@ -105,7 +105,7 @@ public:
         zero_real(dim, vBAS);
         zero_real(dim, vRHS);
 
-        size_t inx = 0;
+        index_t inx = 0;
         for ( Mecable * mec : mecables )
         {
             mec->setIndex(inx);
@@ -118,14 +118,14 @@ public:
     }
     
     /// clamp point at index 'i' to position 'pos' with weight w
-    void addClamp(size_t i, real w, real pos)
+    void addClamp(index_t i, real w, real pos)
     {
         matX(i, i) -= w;
         vBAS[i] += w * pos;
     }
     
     /// link points 'i' and 'j' with a position offset 'delta' and weight w
-    void addLink(size_t i, size_t j, real w, real delta)
+    void addLink(index_t i, index_t j, real w, real delta)
     {
         matX(i, i) -= w;
         matX(i, j) += w;
@@ -174,7 +174,7 @@ public:
          vSOL = newPOS - oldPOS
 
      */
-    size_t solve(real tol)
+    index_t solve(real tol)
     {
         assert_true(ready_==0);
         matX.prepareForMultiply(1);

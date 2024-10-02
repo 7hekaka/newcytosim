@@ -8,9 +8,9 @@
  */
 void drawBoundaries(Map<1> const& map, float width)
 {
-    size_t sup = 1 + map.breadth(0);
+    index_t sup = 1 + map.breadth(0);
     flute2 * flt = gym::mapBufferV2(2*sup);
-    for ( size_t n = 0; n < sup; ++n )
+    for ( index_t n = 0; n < sup; ++n )
     {
         float x = map.position(0, n);
         flt[2*n  ] = { x, -0.5f };
@@ -26,13 +26,13 @@ void drawBoundaries(Map<1> const& map, float width)
  */
 void drawBoundaries(Map<2> const& map, float width)
 {
-    const size_t supX = 1 + map.breadth(0);
-    const size_t supY = 1 + map.breadth(1);
+    const index_t supX = 1 + map.breadth(0);
+    const index_t supY = 1 + map.breadth(1);
     flute2 * flt = gym::mapBufferV2(2*supY);
 
     float i = map.inf(0);
     float s = map.sup(0);
-    for ( size_t n = 0; n < supY; ++n )
+    for ( index_t n = 0; n < supY; ++n )
     {
         float y = map.position(1, n);
         flt[2*n  ] = { i, y };
@@ -44,7 +44,7 @@ void drawBoundaries(Map<2> const& map, float width)
 
     i = map.inf(1);
     s = map.sup(1);
-    for ( size_t n = 0; n < supX; ++n )
+    for ( index_t n = 0; n < supX; ++n )
     {
         float x = map.position(0, n);
         flt[2*n  ] = { x, i };
@@ -60,17 +60,17 @@ void drawBoundaries(Map<2> const& map, float width)
  */
 void drawBoundaries(Map<3> const& map, float width)
 {
-    const size_t supX = 1 + map.breadth(0);
-    const size_t supY = 1 + map.breadth(1);
-    const size_t supZ = 1 + map.breadth(2);
+    const index_t supX = 1 + map.breadth(0);
+    const index_t supY = 1 + map.breadth(1);
+    const index_t supZ = 1 + map.breadth(2);
 
     float i = map.inf(0);
     float s = map.sup(0);
-    for ( size_t iz = 0; iz < supZ; ++iz )
+    for ( index_t iz = 0; iz < supZ; ++iz )
     {
         float z = map.position(2, iz);
         flute3 * flt = gym::mapBufferV3(2*supY);
-        for ( size_t n = 0; n < supY; ++n )
+        for ( index_t n = 0; n < supY; ++n )
         {
             float y = map.position(1, n);
             flt[2*n  ] = { i, y, z };
@@ -82,11 +82,11 @@ void drawBoundaries(Map<3> const& map, float width)
     
     i = map.inf(1);
     s = map.sup(1);
-    for ( size_t iz = 0; iz < supZ; ++iz )
+    for ( index_t iz = 0; iz < supZ; ++iz )
     {
         float z = map.position(2, iz);
         flute3 * flt = gym::mapBufferV3(2*supX);
-        for ( size_t n = 0; n < supX; ++n )
+        for ( index_t n = 0; n < supX; ++n )
         {
             float x = map.position(0, n);
             flt[2*n  ] = { x, i, z };
@@ -98,11 +98,11 @@ void drawBoundaries(Map<3> const& map, float width)
 
     i = map.inf(2);
     s = map.sup(2);
-    for ( size_t ix = 0; ix < supX; ++ix )
+    for ( index_t ix = 0; ix < supX; ++ix )
     {
         float x = map.position(0, ix);
         flute3 * flt = gym::mapBufferV3(2*supY);
-        for ( size_t n = 0; n < supY; ++n )
+        for ( index_t n = 0; n < supY; ++n )
         {
             float y = map.position(1, n);
             flt[2*n  ] = { x, y, i };

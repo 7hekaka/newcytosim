@@ -2,7 +2,7 @@
 // Started FJN on January 2008
 
 #ifndef DIM
-#  define DIM 2
+#  define DIM 3
 #endif
 
 #include "vector.h"
@@ -24,12 +24,12 @@
 const int range = 3;
 real inf[] = {-range,-range, 0 };
 real sup[] = { range, range, 1 };
-size_t num[] = { 7*range, 5*range, 3 };
+index_t num[] = { 7*range, 5*range, 3 };
 
 
 Grid<real, DIM> grid;
 
-size_t cell_indx;
+index_t cell_indx;
 int coord[4] = { 0 };
 Vector3 mouse(0,0,0);
 Vector3 node(0,0,0);
@@ -124,12 +124,12 @@ void processMouseClick(int, int, const Vector3 & a, int)
     if ( grid.hasRegions() )
     {
         real val = grid.sumValuesInRegion(cell_indx);
-        snprintf(str, sizeof(str), "cell %lu : coord %i %i : %.0f marbles",
+        snprintf(str, sizeof(str), "cell %u : coord %i %i : %.0f marbles",
                  cell_indx, coord[0], coord[1], val);
     } 
     else
     {
-        snprintf(str, sizeof(str), "cell %lu : coord %i %i", cell_indx, coord[0], coord[1]);
+        snprintf(str, sizeof(str), "cell %u : coord %i %i", cell_indx, coord[0], coord[1]);
     }
     
     glApp::setMessage(str);
@@ -183,7 +183,7 @@ int display(View& view)
     flute4D * flu = gym::mapBufferC4VD(16*grid.nbCells()+2);
     flute4D * ptr = flu;
 
-    for ( size_t c = 0 ; c < grid.nbCells(); ++c )
+    for ( index_t c = 0 ; c < grid.nbCells(); ++c )
     {
         int cnt = grid.icell(c);
         // use Fibonacci's spiral:
@@ -225,7 +225,7 @@ int display(View& view)
     {
         char str[16];
         real val = grid.interpolate(mouse);
-        snprintf(str, sizeof(str), "cell %lu %f", cell_indx, val);
+        snprintf(str, sizeof(str), "cell %u %f", cell_indx, val);
         glApp::setMessage(str);
     }
     view.closeDisplay();
@@ -239,7 +239,7 @@ void speedTest()
 
     real L[] = { 0, 0, 0};
     real R[] = { 1, 1, 1};
-    size_t S[] = { 10, 10, 10};
+    index_t S[] = { 10, 10, 10};
 
     Grid<float, 3> tmp;
     tmp.setDimensions(L, R, S);
@@ -276,7 +276,7 @@ void testInterpolate(unsigned CNT)
 {
     real L[] = { 0.0, 0.0, 0.0 };
     real R[] = { 1.0, 1.0, 1.0 };
-    size_t S[] = { 100, 100, 100 };
+    index_t S[] = { 100, 100, 100 };
     
     const unsigned MAX = 1 << 14;
     real  rand[MAX+3] = { 0 };

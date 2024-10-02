@@ -69,16 +69,16 @@ public:
         friend class SparMatBlk;
         friend class Meca;
 
-        Block *blk_;    ///< block elements
-        Block *sbk_;    ///< pointer for consolidated elements
-        unsigned *inx_; ///< column index for each element
-        size_t rlen_;   ///< number of elements in row
-        size_t allo_;   ///< allocated size
+        Block *blk_;   ///< block elements
+        Block *sbk_;   ///< pointer for consolidated elements
+        index_t *inx_; ///< column index for each element
+        index_t rlen_; ///< number of elements in row
+        index_t allo_; ///< allocated size
 
     public:
         
         /// constructor
-        Line() { rlen_=0; allo_=0; inx_=nullptr; blk_=nullptr; sbk_=nullptr; }
+        Line() : blk_(nullptr), sbk_(nullptr), inx_(nullptr), rlen_(0), allo_(0) { }
         
         /// the assignment operator will transfer memory
         void operator = (Line&);
@@ -87,7 +87,7 @@ public:
         ~Line() { deallocate(); }
         
         /// allocate to hold 'nb' elements
-        void allocate(size_t nb);
+        void allocate(index_t nb);
         
         /// deallocate memory
         void deallocate();
@@ -96,22 +96,22 @@ public:
         void reset();
         
         /// sort element by increasing indices, using given temporary array
-        void sortElements(Element[], size_t);
+        void sortElements(Element[], index_t);
         
         /// print
         void printBlocks(std::ostream&) const;
         
         /// true if column is empty
-        bool notEmpty() const { return ( rlen_ > 0 ); }
+        bool notEmpty() const { return ( rlen_ > 0U ); }
         
         /// return n-th block (not necessarily, located at line inx_[n]
-        Block& operator[](size_t n) const { return blk_[n]; }
+        Block& operator[](index_t n) const { return blk_[n]; }
 
         /// return block corresponding to index
-        Block* find_block(size_t j) const;
+        Block* find_block(index_t j) const;
 
         /// return block located at column 'j', allocating if necessary
-        Block& block(size_t j);
+        Block& block(index_t j);
         
         /// multiplication of a vector: L * X
         void vecMulLine(const real* X, real* Y) const;
@@ -143,7 +143,7 @@ public:
 private:
 
     /// create Elements
-    static size_t newElements(Element*& ptr, size_t);
+    static index_t newElements(Element*& ptr, index_t);
     
     /// sort matrix block in increasing index order
     void sortElements();
@@ -160,10 +160,10 @@ private:
 private:
     
     /// number of lines in the matrix, divided by block size
-    size_t rsize_;
+    index_t rsize_;
     
     /// amount of memory which has been allocated
-    size_t alloc_;
+    index_t alloc_;
     
     /// array row_[c][] holds Elements of line 'c'
     Line * row_;
@@ -177,10 +177,10 @@ private:
 public:
     
     /// return the size of the matrix
-    size_t size() const { return rsize_ * BLOCK_SIZE; }
+    index_t size() const { return rsize_ * BLOCK_SIZE; }
     
     /// change the size of the matrix
-    void resize(size_t s) { rsize_ = s / BLOCK_SIZE; allocate(rsize_); }
+    void resize(index_t s) { rsize_ = s / BLOCK_SIZE; allocate(rsize_); }
 
     /// base for destructor
     void deallocate();
@@ -195,19 +195,19 @@ public:
     void reset();
     
     /// allocate the matrix to hold ( sz * sz )
-    void allocate(size_t alc);
+    void allocate(index_t alc);
     
     /// number of columns
-    size_t num_columns() const { return rsize_; }
+    index_t num_columns() const { return rsize_; }
 
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { assert_true(j<rsize_); return row_[j].rlen_; }
+    index_t column_size(index_t j) const { assert_true(j<rsize_); return row_[j].rlen_; }
     
     /// reduced line index of n-th element in j-th column (not multiplied by BLOCK_SIZE)
-    size_t column_index(size_t j, size_t n) const { assert_true(j<rsize_); return row_[j].inx_[n]; }
+    index_t column_index(index_t j, index_t n) const { assert_true(j<rsize_); return row_[j].inx_[n]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
-    Block& block(const size_t ii, const size_t jj)
+    Block& block(const index_t ii, const index_t jj)
     {
         assert_true( ii >= jj );
         assert_true( ii < rsize_ );
@@ -217,7 +217,7 @@ public:
     }
     
     /// returns element stored at line ii and column jj, if ( ii > jj )
-    Block& diag_block(const size_t ii)
+    Block& diag_block(const index_t ii)
     {
         assert_true( ii < rsize_ );
         assert_false( is_symmetric );
@@ -225,51 +225,51 @@ public:
     }
 
     /// returns the address of element at line i, column j, no allocation is done
-    real* address(size_t i, size_t j) const;
+    real* address(index_t i, index_t j) const;
     
     /// returns the address of element at line i, column j, allocating if necessary
-    real& element(size_t i, size_t j);
+    real& element(index_t i, index_t j);
 
     /// returns the address of element at line i, column j, allocating if necessary
-    real& operator()(size_t i, size_t j) { return element(i,j); }
+    real& operator()(index_t i, index_t j) { return element(i,j); }
     
     /// scale the matrix by a scalar factor
     void scale(real);
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul) const;
+    void addDiagonalBlock(real* mat, index_t ldd, index_t start, index_t cnt, index_t mul) const;
     
     /// add scaled terms with `i` in [start, start+cnt[ if ( j > i ) and ( j <= i + rank ) to `mat`
-    void addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank) const;
+    void addLowerBand(real alpha, real* mat, index_t ldd, index_t start, index_t cnt, index_t mul, index_t rank) const;
 
     /// add `alpha*trace()` for blocks within [start, start+cnt[ if ( j <= i + rank ) to `mat`
-    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank, bool sym) const;
+    void addDiagonalTrace(real alpha, real* mat, index_t ldd, index_t start, index_t cnt, index_t mul, index_t rank, bool sym) const;
 
     
     /// prepare matrix for multiplications by a vector (must be called)
     bool prepareForMultiply(int);
 
     /// multiplication of a vector, for columns within [start, stop[
-    void vecMulAdd(const real*, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd2D(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd2D(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd3D(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd3D(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const;
 
     
     /// multiplication of a vector, for columns within [start, stop[
-    void vecMul(const real*, real* Y, size_t start, size_t stop) const;
+    void vecMul(const real*, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMul2D(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMul2D(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMul3D(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMul3D(const real* X, real* Y, index_t start, index_t stop) const;
 
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
@@ -291,7 +291,7 @@ public:
     bool notZero() const;
     
     /// number of blocks in columns [start, stop[. Set allocated size
-    size_t nbElements(size_t start, size_t stop, size_t& alc) const;
+    size_t nbElements(index_t start, index_t stop, size_t& alc) const;
     
     /// total number of blocks currently in use
     size_t nbElements() const { size_t alc=0; return nbElements(0, rsize_, alc); }
@@ -300,7 +300,7 @@ public:
     std::string what() const;
     
     /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
-    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
+    void printSparse(std::ostream&, real inf, index_t start, index_t stop) const;
     
     /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
     void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, rsize_); }

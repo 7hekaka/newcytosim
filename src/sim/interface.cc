@@ -1422,7 +1422,7 @@ void Interface::execute_call(std::string& str, Glossary& opt)
 }
 
 
-void Interface::execute_dump(std::string const& path, int mode)
+void Interface::execute_dump(std::string const& path, unsigned mode)
 {
     sim_->sMeca.doNotify = 1;
     sim_->solve_half();

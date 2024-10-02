@@ -109,7 +109,7 @@ public:
 
 private:
     
-    real nucleation_rate_dt;
+    float nucleation_rate_dt;
     
 public:
     

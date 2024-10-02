@@ -59,7 +59,7 @@ Solid* SolidSet::insideSphere(Vector const& pos, real range, size_t& inx, SolidP
     for ( Solid* S = first(); S; S = S->next() )
         if ( S->prop == sel )
         {
-            for ( size_t p = 0; p < S->nbPoints(); ++p )
+            for ( index_t p = 0; p < S->nbPoints(); ++p )
             {
                 const real rad = S->radius(p);
                 if ( rad > 0 )

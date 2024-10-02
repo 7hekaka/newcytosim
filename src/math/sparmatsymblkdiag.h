@@ -63,8 +63,8 @@ public:
         Block   dia_;   ///< diagonal block
         unsigned* inx_; ///< line index for each element
         Block * blk_;   ///< off-diagonal blocks
-        size_t allo_;   ///< allocated size of array
-        size_t noff_;   ///< number of blocks in column
+        unsigned allo_; ///< allocated size of array
+        unsigned noff_; ///< number of blocks in column
 
     public:
         
@@ -78,7 +78,7 @@ public:
         ~Pilar() { deallocate(); }
         
         /// allocate to hold 'nb' elements
-        void allocate(size_t nb);
+        void allocate(index_t nb);
         
         /// deallocate memory
         void deallocate();
@@ -87,7 +87,7 @@ public:
         void reset();
         
         /// sort element by increasing indices, using given temporary array
-        void sortElements(Element[], size_t);
+        void sortElements(Element[], index_t);
         
         /// print
         void printBlocks(std::ostream&) const;
@@ -99,62 +99,62 @@ public:
         Block& diag_block() { return dia_; }
         
         /// return n-th block (not necessarily, located at line inx_[n]
-        Block& operator[](size_t n) const { return blk_[n]; }
+        Block& operator[](index_t n) const { return blk_[n]; }
 
         /// return block corresponding to index
-        Block* find_block(size_t j) const;
+        Block* find_block(index_t j) const;
 
         /// return block located at line 'i' and column 'j'
-        Block& block(size_t i);
+        Block& block(index_t i);
 
         /// multiplication of a vector: Y <- Y + M * X, block_size = 1
-        void vecMulAdd1D(const real* X, real* Y, size_t j) const;
+        void vecMulAdd1D(const real* X, real* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X, block_size = 2
-        void vecMulAdd2D(const real* X, real* Y, size_t j) const;
+        void vecMulAdd2D(const real* X, real* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X, block_size = 3
-        void vecMulAdd3D(const real* X, real* Y, size_t j) const;
+        void vecMulAdd3D(const real* X, real* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X, block_size = 4
-        void vecMulAdd4D(const real* X, real* Y, size_t j) const;
+        void vecMulAdd4D(const real* X, real* Y, index_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAddTriangle1D(const real* X, real* Y, size_t j) const;
+        void vecMulAddTriangle1D(const real* X, real* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAddTriangle2D(const real* X, real* Y, size_t j) const;
+        void vecMulAddTriangle2D(const real* X, real* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAddTriangle3D(const real* X, real* Y, size_t j) const;
+        void vecMulAddTriangle3D(const real* X, real* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAddTriangle4D(const real* X, real* Y, size_t j) const;
+        void vecMulAddTriangle4D(const real* X, real* Y, index_t j) const;
 
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_SSE(const double* X, double* Y, size_t j) const;
+        void vecMulAdd2D_SSE(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVX(const double* X, double* Y, size_t j) const;
+        void vecMulAdd2D_AVX(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVXU(const double* X, double* Y, size_t j) const;
+        void vecMulAdd2D_AVXU(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd2D_AVXUU(const double* X, double* Y, size_t j) const;
+        void vecMulAdd2D_AVXUU(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 2
-        void vecMulAdd3D_SIMD(const double* X, double* Y, size_t j) const;
+        void vecMulAdd3D_SIMD(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_SSE(const float* X, float* Y, size_t j) const;
+        void vecMulAdd3D_SSE(const float* X, float* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_SSEU(const float* X, float* Y, size_t j) const;
+        void vecMulAdd3D_SSEU(const float* X, float* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAddTriangle3D_SSE(const float* X, float* Y, size_t j) const;
+        void vecMulAddTriangle3D_SSE(const float* X, float* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_AVX(const double* X, double* Y, size_t j) const;
+        void vecMulAdd3D_AVX(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAddTriangle3D_AVX(const double* X, double* Y, size_t j) const;
+        void vecMulAddTriangle3D_AVX(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 3
-        void vecMulAdd3D_AVXU(const double* X, double* Y, size_t j) const;
+        void vecMulAdd3D_AVXU(const double* X, double* Y, index_t j) const;
         /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M), block_size = 4
-        void vecMulAdd4D_AVX(const double* X, double* Y, size_t j) const;
+        void vecMulAdd4D_AVX(const double* X, double* Y, index_t j) const;
     };
 
 private:
 
     /// create Elements
-    static size_t newElements(Element*& ptr, size_t);
+    static index_t newElements(Element*& ptr, index_t);
     
     /// sort matrix block in increasing index order
     void sortElements();
@@ -162,10 +162,10 @@ private:
 private:
     
     /// size of matrix
-    size_t rsize_;
+    index_t rsize_;
     
     /// amount of memory which has been allocated
-    size_t alloc_;
+    index_t alloc_;
 
     /// array col_[c][] holds Elements of column 'c'
     Pilar * pilar_;
@@ -176,10 +176,10 @@ private:
 public:
     
     /// return the size of the matrix
-    size_t size() const { return rsize_ * SD_BLOCK_SIZE; }
+    index_t size() const { return rsize_ * SD_BLOCK_SIZE; }
     
     /// change the size of the matrix
-    void resize(size_t s) { rsize_ = ( s + SD_BLOCK_SIZE - 1 ) / SD_BLOCK_SIZE; allocate(rsize_); }
+    void resize(index_t s) { rsize_ = ( s + SD_BLOCK_SIZE - 1 ) / SD_BLOCK_SIZE; allocate(rsize_); }
 
     /// base for destructor
     void deallocate();
@@ -194,19 +194,19 @@ public:
     void reset();
     
     /// allocate the matrix to hold ( sz * sz )
-    void allocate(size_t alc);
+    void allocate(index_t alc);
     
     /// number of columns
-    size_t num_columns() const { return rsize_; }
+    index_t num_columns() const { return rsize_; }
 
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { assert_true(j<rsize_); return pilar_[j].noff_; }
+    index_t column_size(index_t j) const { assert_true(j<rsize_); return pilar_[j].noff_; }
     
     /// line index of n-th element in j-th column (not multiplied by BLOCK_SIZE)
-    size_t column_index(size_t j, size_t n) const { assert_true(j<rsize_); return pilar_[j].inx_[n]; }
+    index_t column_index(index_t j, index_t n) const { assert_true(j<rsize_); return pilar_[j].inx_[n]; }
 
     /// returns element stored at line ii and column jj, if ( ii > jj )
-    Block& block(const size_t ii, const size_t jj)
+    Block& block(const index_t ii, const index_t jj)
     {
         assert_true( ii < rsize_ );
 #if ( 1 )
@@ -219,40 +219,40 @@ public:
     }
     
     /// returns element at (i, i)
-    Block& diag_block(size_t i) { return pilar_[i].diag_block(); }
+    Block& diag_block(index_t i) { return pilar_[i].diag_block(); }
     
     /// returns the address of element at line i, column j, no allocation is done
-    real* address(size_t i, size_t j) const;
+    real* address(index_t i, index_t j) const;
 
     /// returns the address of element at line i, column j, allocating if necessary
-    real& element(size_t i, size_t j);
+    real& element(index_t i, index_t j);
 
     /// returns the address of element at line i, column j, allocating if necessary
-    real& operator()(size_t i, size_t j) { return element(i,j); }
+    real& operator()(index_t i, index_t j) { return element(i,j); }
     
     /// scale the matrix by a scalar factor
     void scale(real);
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul) const;
+    void addDiagonalBlock(real* mat, index_t ldd, index_t start, index_t cnt, index_t mul) const;
     
     /// add scaled terms with `i` in [start, start+cnt[ if ( j > i ) and ( j <= i + rank ) to `mat`
-    void addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank) const;
+    void addLowerBand(real alpha, real* mat, index_t ldd, index_t start, index_t cnt, index_t mul, index_t rank) const;
 
     /// add `alpha*trace()` for blocks within [start, start+cnt[ if ( j <= i + rank ) to `mat`
-    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank, bool sym) const;
+    void addDiagonalTrace(real alpha, real* mat, index_t ldd, index_t start, index_t cnt, index_t mul, index_t rank, bool sym) const;
     
     
     /// prepare matrix for multiplications by a vector (must be called)
     bool prepareForMultiply(int);
 
     /// multiplication of a vector, for columns within [start, stop[
-    void vecMulAdd(const real*, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd(const real*, real* Y, index_t start, index_t stop) const;
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd(const real* X, real* Y) const { vecMulAdd(X, Y, 0, rsize_); }
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const;
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(Y) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y) const { vecMulAdd_ALT(X, Y, 0, rsize_); };
 
@@ -280,10 +280,10 @@ public:
     void vecMulDiagonal3D_SSE(const float* X, float* Y) const;
 
     // process only off-diagonal elements with columns [start, stop[
-    void vecMulAddTriangle(const real* X, real* Y, size_t start, size_t stop) const
+    void vecMulAddTriangle(const real* X, real* Y, index_t start, index_t stop) const
     {
         stop = std::min(stop, rsize_);
-        for ( size_t j = colix_[start]; j < stop; j = colix_[j+1] )
+        for ( index_t j = colix_[start]; j < stop; j = colix_[j+1] )
             pilar_[j].vecMulAddTriangle3D(X, Y, 3*j);
     }
 
@@ -294,7 +294,7 @@ public:
     bool notZero() const;
     
     /// number of blocks in columns [start, stop[. Set allocated size
-    size_t nbElements(size_t start, size_t stop, size_t& alc) const;
+    size_t nbElements(index_t start, index_t stop, size_t& alc) const;
     
     /// total number of blocks currently in use
     size_t nbElements() const { size_t alc=0; return nbElements(0, rsize_, alc); }
@@ -303,13 +303,13 @@ public:
     std::string what() const;
     
     /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
-    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
+    void printSparse(std::ostream&, real inf, index_t start, index_t stop) const;
     
     /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
     void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, rsize_); }
 
     /// print size of columns
-    void printSummary(std::ostream&, size_t start, size_t stop);
+    void printSummary(std::ostream&, index_t start, index_t stop);
     
     /// print
     void printBlocks(std::ostream&) const;

@@ -359,11 +359,11 @@ void FiberSet::allIntersections0(FiberSiteList& res1, FiberSiteList& res2,
 
     for ( Fiber * fib1 = first(); fib1; fib1 = fib1->next() )
     {
-        for ( unsigned s1 = 0; s1 < fib1->nbSegments(); ++s1 )
+        for ( index_t s1 = 0; s1 < fib1->nbSegments(); ++s1 )
         {
             FiberSegment seg(fib1, s1);
             // check against other segments of this fiber
-            for ( unsigned s2 = s1+2; s2 < fib1->nbSegments(); ++s2 )
+            for ( index_t s2 = s1+2; s2 < fib1->nbSegments(); ++s2 )
             {
                 FiberSegment soc(fib1, s2);
                 real abs1, abs2;
@@ -377,7 +377,7 @@ void FiberSet::allIntersections0(FiberSiteList& res1, FiberSiteList& res2,
             // check against other fibers:
             for ( Fiber * fib2 = fib1->next(); fib2; fib2 = fib2->next() )
             {
-                for ( unsigned s2 = 0; s2 < fib2->nbSegments(); ++s2 )
+                for ( index_t s2 = 0; s2 < fib2->nbSegments(); ++s2 )
                 {
                     FiberSegment soc(fib2, s2);
                     real abs1, abs2;
@@ -437,7 +437,7 @@ void FiberSet::allIntersections(FiberSiteList& res1, FiberSiteList& res2,
     for ( Fiber const* fib = first(); fib; fib = fib->next() )
     {
         //std::clog << fib->reference() << ":\n";
-        for ( unsigned s = 0; s < fib->nbSegments(); ++s )
+        for ( index_t s = 0; s < fib->nbSegments(); ++s )
         {
             FiberSegment seg(fib, s);
             list = grid.cellTargets(seg.middle());
@@ -450,7 +450,7 @@ void FiberSet::allIntersections(FiberSiteList& res1, FiberSiteList& res2,
                     //std::clog << "   " << can;
                     real abs1, abs2;
                     real dis2 = seg.shortestDistanceSqr(soc, abs1, abs2);
-                    if ((dis2 < sup) & seg.within(abs1) & soc.within(abs2))
+                    if ((dis2 < sup) && seg.within(abs1) && soc.within(abs2))
                     {
                         res1.emplace(fib, abs1+fib->abscissaPoint(s));
                         res2.emplace(bif, abs2+bif->abscissaPoint(soc.point()));
@@ -921,7 +921,7 @@ real FiberSet::infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector
             P += w * fib->posEndP();
  
             Vector G1 = 0.5 * ( fib->posEndM() + fib->posEndP() );
-            for ( size_t n = 1; n < fib->nbSegments(); ++n )
+            for ( index_t n = 1; n < fib->nbSegments(); ++n )
                 G1 += fib->posP(n);
             G += G1 * ( w / fib->nbSegments() );
         }
@@ -942,7 +942,7 @@ static real computeNematicEigenvectors(real res[9], real sum, real M[9])
     // rescale matrix, to ensure eigenvalue = 1 in perfect order
     const real beta = ( DIM >= 3 ) ? 0.5 : 1.0;
     sum = beta * DIM / sum;
-    for ( size_t d = 0; d < 9; ++d )
+    for ( int d = 0; d < 9; ++d )
         M[d] = sum * M[d];
     //std::clog << "trace = " << M[0] + M[4] + M[8] << " (should be DIM/2)\n";
     // subtract trace:
@@ -1019,10 +1019,10 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
         Fiber * fib = Fiber::toFiber(i);
         if ( fib )
         {
-            const size_t cnt = fib->nbPoints();
+            const index_t cnt = fib->nbPoints();
             real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
             Vector Q = fib->posP(0);
-            for ( size_t n = 1; n < cnt; ++n )
+            for ( index_t n = 1; n < cnt; ++n )
             {
                 Vector P = fib->posP(n);
                 Vector d = P - Q;
@@ -1073,9 +1073,9 @@ real FiberSet::infoOrthoNematic(ObjectList const& objs, real res[9], Space const
         Fiber * fib = Fiber::toFiber(i);
         if ( fib )
         {
-            const size_t cnt = fib->nbSegments();
+            const index_t cnt = fib->nbSegments();
             real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
-            for ( size_t n = 0; n < cnt; ++n )
+            for ( index_t n = 0; n < cnt; ++n )
             {
                 Vector pos = fib->posPoint(n);
                 Vector dir = fib->dirSegment(n);
@@ -1148,7 +1148,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
         if ( fib )
         {
             const real w = fib->length() / fib->nbPoints();
-            for ( size_t n = 0; n < fib->nbPoints(); ++n )
+            for ( index_t n = 0; n < fib->nbPoints(); ++n )
             {
                 Vector p = fib->posP(n);
                 avg[0] += w * p.XX;
@@ -1254,7 +1254,7 @@ void FiberSet::infoPlane(int& np, int& na, Vector const& n, real a) const
     na = 0;
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
-        for ( size_t s = 0; s < fib->nbSegments(); ++s )
+        for ( index_t s = 0; s < fib->nbSegments(); ++s )
         {
             real abs = fib->planarIntersect(s, n, a);
             if (( 0 <= abs ) & ( abs < 1 ))
@@ -1384,7 +1384,7 @@ void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup, Vector 
     Vector dir = normalize(n);
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
-        for ( size_t s = 0; s < fib->nbSegments(); ++s )
+        for ( index_t s = 0; s < fib->nbSegments(); ++s )
         {
             real abs = fib->planarIntersect(s, n, a);
             if (( 0 <= abs ) & ( abs < 1 ))
@@ -1417,7 +1417,7 @@ void FiberSet::infoTension(size_t& cnt, real& sum, real& inf, real& sup) const
 
     for ( Fiber const* fib=first(); fib; fib=fib->next() )
     {
-        for ( size_t s = 0; s < fib->nbSegments(); ++s )
+        for ( index_t s = 0; s < fib->nbSegments(); ++s )
         {
             real h = fib->tension(s);
             sum += h;
@@ -1436,7 +1436,7 @@ void FiberSet::infoRadius(size_t& cnt, real& rad) const
     
     for ( Fiber const* f=first(); f; f=f->next() )
     {
-        for ( size_t p = 0; p < f->nbPoints() ; ++p )
+        for ( index_t p = 0; p < f->nbPoints() ; ++p )
         {
             r += f->posP(p).norm();
             ++cnt;

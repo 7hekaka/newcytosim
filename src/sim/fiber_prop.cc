@@ -164,9 +164,9 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     // specify the vertices directly:
     if ( opt.has_key("points") )
     {
-        size_t nbp = opt.num_values("points");
+        index_t nbp = opt.num_values("points");
         fib->setNbPoints(nbp);
-        for ( size_t p = 0; p < nbp; ++p )
+        for ( index_t p = 0; p < nbp; ++p )
         {
             Vector vec(0,0,0);
             if ( ! opt.set(vec, "points", p) )

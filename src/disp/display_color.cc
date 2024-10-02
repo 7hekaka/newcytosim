@@ -1,10 +1,10 @@
 // Cytosim was created by Francois Nedelec. Copyright 2020 Cambridge University
 
 // hide definitions in anonymous namespace
-namespace {
-    
+namespace
+{
     // colors that vary with the direction of a vector:
-    gym_color radial_color(const Vector3& d, gym_color::COLOF a = 1.f)
+    static gym_color radial_color(const Vector3& d, gym_color::COLOF a = 1.f)
     { return gym_color::radial_color((gym_color::COLOF)d.XX, (gym_color::COLOF)d.YY, (gym_color::COLOF)d.ZZ, a); }
     
     gym_color radial_color(const Vector2& d, gym_color::COLOF a = 1.f)
@@ -33,12 +33,12 @@ namespace {
         return 1;
     }
     
-    gym_color color_fiber(Fiber const& fib, size_t)
+    gym_color color_fiber(Fiber const& fib, index_t)
     {
         return fib.disp->color;
     }
     
-    gym_color color_alternate(Fiber const& fib, size_t seg)
+    gym_color color_alternate(Fiber const& fib, index_t seg)
     {
         if ( seg & 1 )
             return fib.disp->color.darken(0.75);
@@ -46,13 +46,13 @@ namespace {
             return fib.disp->color;
     }
     
-    gym_color color_by_tension(Fiber const& fib, size_t seg)
+    gym_color color_by_tension(Fiber const& fib, index_t seg)
     {
         real x = fib.disp->color_scale * fib.tension(seg);
         return fib.disp->color.alpha(x);
     }
     
-    gym_color color_by_tension_jet(Fiber const& fib, size_t seg)
+    gym_color color_by_tension_jet(Fiber const& fib, index_t seg)
     {
         real x = fib.disp->color_scale * fib.tension(seg);
         // use jet coloring, where Lagrange multipliers are negative under compression
@@ -60,20 +60,20 @@ namespace {
         //return fib.disp->color.alpha(x-1);
     }
     
-    gym_color color_by_curvature(Fiber const& fib, size_t pti)
+    gym_color color_by_curvature(Fiber const& fib, index_t pti)
     {
         const real beta = fib.disp->color_scale;
         return gym_color::jet_color(beta*fib.curvature(pti));
     }
     
-    gym_color color_seg_curvature(Fiber const& fib, size_t seg)
+    gym_color color_seg_curvature(Fiber const& fib, index_t seg)
     {
         const real beta = fib.disp->color_scale;
         real c = 0.5 * (fib.curvature(seg) + fib.curvature(seg+1));
         return gym_color::jet_color(beta*c);
     }
     
-    gym_color color_by_direction(Fiber const& fib, size_t seg)
+    gym_color color_by_direction(Fiber const& fib, index_t seg)
     {
         return radial_color(fib.dirSegment(seg));
     }
@@ -96,7 +96,7 @@ namespace {
     }
     
     /// using distance from the plus end to the end of segment `seg`
-    gym_color color_by_abscissaM(Fiber const& fib, size_t seg)
+    gym_color color_by_abscissaM(Fiber const& fib, index_t seg)
     {
         const real beta = fib.disp->color_scale;
         real x = min_real(seg*beta, 32);
@@ -104,7 +104,7 @@ namespace {
     }
     
     /// using distance from the plus end to the end of segment `seg`
-    gym_color color_by_abscissaP(Fiber const& fib, size_t seg)
+    gym_color color_by_abscissaP(Fiber const& fib, index_t seg)
     {
         const real beta = fib.disp->color_scale;
         real x = min_real((fib.lastSegment()-seg)*beta, 32);
@@ -112,7 +112,7 @@ namespace {
     }
     
     /// color set according to distance to the confining Space
-    gym_color color_by_height(Fiber const& fib, size_t pti)
+    gym_color color_by_height(Fiber const& fib, index_t pti)
     {
         const real beta = fib.disp->color_scale;
         real Z = 0;
@@ -128,11 +128,11 @@ namespace {
     
     
     /// color set according to some Map
-    gym_color color_by_grid(Fiber const& fib, size_t seg)
+    gym_color color_by_grid(Fiber const& fib, index_t seg)
     {
         Map<DIM> const& map = fib.simul().visibleMap();
         Vector w = fib.midPoint(seg);
-        size_t i = map.index(w);
+        index_t i = map.index(w);
         return gym::alt_color(i);
     }
     
@@ -140,7 +140,7 @@ namespace {
     //------------------------------------------------------------------------------
 #pragma mark - Color schemes for Fiber Lattice
     
-    gym_color color_alternate(Fiber const& fib, long ix, real)
+    gym_color color_alternate(Fiber const& fib, int ix, real)
     {
         if ( ix & 1 )
             return fib.disp->color.darken(0.75);
@@ -148,17 +148,17 @@ namespace {
             return fib.disp->color;
     }
     
-    gym_color color_by_lattice(Fiber const& fib, long ix, real beta)
+    gym_color color_by_lattice(Fiber const& fib, int ix, real beta)
     {
         return fib.disp->color.darken(beta*fib.visibleLattice()->data(ix));
     }
     
-    gym_color color_by_lattice_jet(Fiber const& fib, long ix, real beta)
+    gym_color color_by_lattice_jet(Fiber const& fib, int ix, real beta)
     {
         return gym_color::jet_color(beta*fib.visibleLattice()->data(ix));
     }
     
-    gym_color color_by_lattice_white(Fiber const& fib, long ix, real beta)
+    gym_color color_by_lattice_white(Fiber const& fib, int ix, real beta)
     {
         real x = beta * fib.visibleLattice()->data(ix);
         return gym_color(x, x, x);
@@ -208,7 +208,7 @@ namespace {
         PointDisp const* dis = obj.prop->disp;
         if ( dis->coloring )
         {
-            size_t i = ( dis->coloring == 2 ? obj.mark() : obj.signature());
+            index_t i = ( dis->coloring == 2 ? obj.mark() : obj.signature());
             gym_color col = gym::bright_color(i);
             gym::color_load(col);
             gym::color_back(col.darken(0.5));

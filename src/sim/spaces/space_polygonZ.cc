@@ -177,7 +177,7 @@ void SpacePolygonZ::setInteractions(Meca& meca, Simul const&) const
     
     for (Fiber * fib=fibers.first(); fib; fib=fib->next() )
     {
-        for ( size_t s = 0; s < fib->nbSegments() ; ++s )
+        for ( index_t s = 0; s < fib->nbSegments() ; ++s )
         {
             //project on point on segment
             if ( 0 <= abs  &&  abs < 1 )

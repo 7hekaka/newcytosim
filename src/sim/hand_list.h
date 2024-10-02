@@ -53,7 +53,7 @@ public:
     size_t count(Hand const*) const;
 
     /// a function to count Hands using a custom criteria
-    size_t count(int (*func)(Hand const*)) const;
+    long count(int (*func)(Hand const*)) const;
     
     /// count Couple attached to another Fiber
     size_t countLinks(Fiber const*) const;

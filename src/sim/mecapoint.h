@@ -18,7 +18,7 @@ private:
     Mecable const* mec_;
     
     /// Index of the point-of-interest in the Mecable
-    unsigned pti_;
+    index_t pti_;
     
 public:
         
@@ -29,10 +29,10 @@ public:
     Mecapoint() : mec_(nullptr), pti_(0) { }
 
     /// Build to refer to point p in ps
-    Mecapoint(const Mecable * m, unsigned p) : mec_(m), pti_(p) { assert_true(p < m->nbPoints() ); }
+    Mecapoint(const Mecable * m, index_t p) : mec_(m), pti_(p) { assert_true(p < m->nbPoints() ); }
     
     /// Set to refer to point p in ps
-    void set(const Mecable * m, unsigned p) { mec_ = m; pti_ = p; assert_true(p < m->nbPoints() ); }
+    void set(const Mecable * m, index_t p) { mec_ = m; pti_ = p; assert_true(p < m->nbPoints() ); }
     
     /// Constant pointer to the Mecable 
     Mecable const* mecable() const { return mec_; }
@@ -41,13 +41,13 @@ public:
     bool valid() const { return (mec_!=nullptr) & (pti_<mec_->nbPoints()); }
     
     /// Index of point in object
-    unsigned point() const { return pti_; }
+    index_t point() const { return pti_; }
         
     /// Position of the point-of-interest in space
     Vector pos() const { return mec_->posPoint(pti_); }
     
     /// Index of the point-of-interest in the isotropic matrix (Meca::mISO)
-    size_t matIndex0() const { return mec_->matIndex() + (size_t)pti_; }
+    index_t matIndex0() const { return mec_->matIndex() + pti_; }
     
     /// Write to file
     void write(Outputter&) const;

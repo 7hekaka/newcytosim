@@ -126,7 +126,7 @@ public:
     //------------------------------- Mecable ----------------------------------
 
     /// allocate memory
-    void allocateMecable(size_t);
+    void allocateMecable(index_t);
     
     /// free allocated memory
     void release();

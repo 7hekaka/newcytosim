@@ -155,6 +155,7 @@ void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
     assert_false( attached() );
     FiberProp const* fip = prop()->fiber_class;
     
+    // factor to limit the number of fibers nucleated
     float damp = 1.f - float(fip->nbFibers()) * prop()->nucleation_limit;
 
     float R = prop()->nucleation_rate_dt * max_float(0, damp);

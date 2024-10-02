@@ -25,10 +25,10 @@ public:
     real coef_[4];
 
     /// index of first interpolated point
-    unsigned prime_;
+    index_t prime_;
     
     /// number of interpolated points (order), expected to be DIM+1 at most
-    unsigned rank_;
+    index_t rank_;
     
     /// set coefficients
     void set_coef(real a, real b, real c) { coef_[1]=a; coef_[2]=b; coef_[3]=c; polish(); }
@@ -42,16 +42,16 @@ public:
     void clear();
     
     /// constructor
-    Interpolation4() { clear(); }
+    Interpolation4() : mec_(nullptr), prime_(0), rank_(0) { set_coef(0, 0, 0); }
 
     /// set as pointing to vertex `p` of `mec`
-    void set(Mecable const* mec, unsigned p);
+    void set(Mecable const* mec, index_t p);
     
     /// set as interpolated between vertices `p` and `q` of `mec`
-    void set(Mecable const* mec, unsigned p, unsigned q, real coef);
+    void set(Mecable const* mec, index_t p, index_t q, real coef);
 
     /// set as interpolated over 4 vertices, defined by position 'vec'
-    void set(Mecable const*, unsigned, Vector const& vec);
+    void set(Mecable const*, index_t, Vector const& vec);
 
     /// attachment mecable
     Mecable const* mecable() const { return mec_; }
@@ -63,7 +63,7 @@ public:
     Vector normal() const;
 
     /// number of points beeing interpolated
-    size_t rank() const { return rank_; }
+    index_t rank() const { return rank_; }
 
     /// first attachement point
     Mecapoint vertex0() const { return Mecapoint(mec_, prime_); }

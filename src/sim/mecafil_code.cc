@@ -320,7 +320,7 @@ void projectForcesD__(size_t nbs, const real* dir,
 /**
  Perform first calculation needed by projectForces:
  */
-void projectForcesU_PTR(size_t nbs, const real* dir, const real* src, real* mul)
+void projectForcesU_PTR(index_t nbs, const real* dir, const real* src, real* mul)
 {
     real x3, x0 = src[0];
     real x4, x1 = src[1];
@@ -354,7 +354,7 @@ void projectForcesU_PTR(size_t nbs, const real* dir, const real* src, real* mul)
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD_PTR(size_t nbs, const real* dir,
+void projectForcesD_PTR(index_t nbs, const real* dir,
                         const real* X, const real* mul, real* Y)
 {
     real a0 = X[0];
@@ -405,7 +405,7 @@ void projectForcesD_PTR(size_t nbs, const real* dir,
 /**
  Perform first calculation needed by projectForces:
  */
-void projectForcesU2D_SSE(size_t nbs, const double* dir, const double* src, double* mul)
+void projectForcesU2D_SSE(index_t nbs, const double* dir, const double* src, double* mul)
 {
     real const*const end = mul - 1 + nbs;
 
@@ -433,7 +433,7 @@ void projectForcesU2D_SSE(size_t nbs, const double* dir, const double* src, doub
 /**
  Perform second calculation needed by projectForces:
  */
-void projectForcesD2D_SSE(size_t nbs, const double* dir,
+void projectForcesD2D_SSE(index_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
 {
     vec2 cc = load2(src);
@@ -461,7 +461,7 @@ void projectForcesD2D_SSE(size_t nbs, const double* dir,
 
  F. Nedelec, 9.12.2016, 6.9.2018
  */
-void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, double* mul)
+void projectForcesU2D_AVX(index_t nbs, const double* dir, const double* src, double* mul)
 {
     real const*const end = mul - 3 + nbs;
 
@@ -502,7 +502,7 @@ void projectForcesU2D_AVX(size_t nbs, const double* dir, const double* src, doub
  an array containing contiguous coordinates
  F. Nedelec, 9.12.2016, 23.03.2018
  */
-void projectForcesD2D_AVX(size_t nbs, const double* dir,
+void projectForcesD2D_AVX(index_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
 {
     vec4 cc = setzero4();
@@ -565,7 +565,7 @@ void projectForcesD2D_AVX(size_t nbs, const double* dir,
  and the second sweep of DPTTS2 with projectForcesD(),
  it reduces the number of sweeps to 2
  */
-void projectForces(size_t nbs, const real* dir, const real* src,
+void projectForces(index_t nbs, const real* dir, const real* src,
                    real* mul, const real* D, const real* DE, real* dst)
 {
     assert_true( nbs > 0 );
@@ -658,7 +658,7 @@ void projectForces(size_t nbs, const real* dir, const real* src,
 
 
 #if REAL_IS_DOUBLE && USE_SIMD
-void projectForcesU3D_SSE1(size_t nbs, const double* dir, const double* src, double* mul)
+void projectForcesU3D_SSE1(index_t nbs, const double* dir, const double* src, double* mul)
 {
     const double *const end = mul + nbs;
 
@@ -679,7 +679,7 @@ void projectForcesU3D_SSE1(size_t nbs, const double* dir, const double* src, dou
 }
 
 
-void projectForcesD3D_SSE1(size_t nbs, const double* dir,
+void projectForcesD3D_SSE1(index_t nbs, const double* dir,
                            const double* src, const double* mul, double* dst)
 {
     double const*const start = mul;
@@ -714,7 +714,7 @@ void projectForcesD3D_SSE1(size_t nbs, const double* dir,
  In this version, the up and down stages of projectForces are merged
  with the up and down stages of the tridiagonal solve (DPTTS2)
  */
-void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
+void projectForces3D_SSE(index_t nbs, const double* dir, const double* src,
                          double* mul, double const* D, double const* DE, double* dst)
 {
     assert_true( nbs > 0 );
@@ -845,7 +845,7 @@ void projectForces3D_SSE(size_t nbs, const double* dir, const double* src,
  with the up and down stages of the tridiagonal solve (DPTTS2).
  This code is directly derived from the 3D version
  */
-void projectForces2D_SSE(size_t nbs, const double* dir, const double* src,
+void projectForces2D_SSE(index_t nbs, const double* dir, const double* src,
                          double* mul, double const* D, double const* DE, double* dst)
 {
     assert_true( nbs > 0 );
@@ -911,7 +911,7 @@ void projectForces2D_SSE(size_t nbs, const double* dir, const double* src,
 
 #if REAL_IS_DOUBLE && USE_SIMD
 
-void projectForcesU3D_SSE(size_t nbs, const double* dir, const double* src, double* mul)
+void projectForcesU3D_SSE(index_t nbs, const double* dir, const double* src, double* mul)
 {
     const double *const end = mul + nbs - 1;
 #if 1
@@ -995,7 +995,7 @@ void projectForcesU3D_SSE(size_t nbs, const double* dir, const double* src, doub
      Y[4] = dir[4] * mul[1] + X[4] - dir[1] * mul[0];
      Y[5] = dir[5] * mul[1] + X[5] - dir[2] * mul[0];
  */
-void projectForcesD3D_SSE(size_t nbs, const double* dir,
+void projectForcesD3D_SSE(index_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
 {
     double const*const end = mul + nbs - 1;
@@ -1121,7 +1121,7 @@ void projectForcesD3D_SSE(size_t nbs, const double* dir,
 #if defined(__AVX__) && REAL_IS_DOUBLE
 
 /// FJN @ Strasbourg, 17 and 18.04.2020
-void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, double* mul)
+void projectForcesU3D_AVX(index_t nbs, const double* dir, const double* src, double* mul)
 {
     const double *const end = mul - 3 + nbs;
     while ( mul < end )
@@ -1184,7 +1184,7 @@ void projectForcesU3D_AVX(size_t nbs, const double* dir, const double* src, doub
  Ugly piece of code to harvest AVX power...
  FJN @ Strasbourg, 18 and 19.04.2020, improved 22.08.2021
  */
-void projectForcesD3D_AVX(size_t nbs, const double* dir,
+void projectForcesD3D_AVX(index_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
 {
     // we can assume nbs > 0
@@ -1307,7 +1307,7 @@ void projectForcesD3D_AVX(size_t nbs, const double* dir,
  Ugly piece of code to harvest SSE power for single precision
  FJN @ Strasbourg, 23.08.2021
  */
-void projectForcesD3D_SSE(size_t nbs, const float* dir,
+void projectForcesD3D_SSE(index_t nbs, const float* dir,
                           const float* src, const float* mul, float* dst)
 {
     // we can assume nbs > 0
@@ -1430,7 +1430,7 @@ void projectForcesD3D_SSE(size_t nbs, const float* dir,
 
 
 ///expanded implementation:
-void addProjectionDiff_R(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_R(const index_t nbs, const real* mul, const real* X, real* Y)
 {
     // this loop cannot be unrolled as there is an OUTPUT dependency in Y
     for ( size_t jj = 0; jj < nbs; ++jj )
@@ -1453,7 +1453,7 @@ void addProjectionDiff_R(const size_t nbs, const real* mul, const real* X, real*
 
 
 /// scalar implementation
-void addProjectionDiff_F(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_F(const index_t nbs, const real* mul, const real* X, real* Y)
 {
     real px0 = X[0];
     real px1 = X[1];
@@ -1502,7 +1502,7 @@ void addProjectionDiff_F(const size_t nbs, const real* mul, const real* X, real*
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && USE_SIMD
 
-void addProjectionDiff2D_SSE(const size_t nbs, const double* mul, const double* src, double* dst)
+void addProjectionDiff2D_SSE(const index_t nbs, const double* mul, const double* src, double* dst)
 {
     vec2 p = load2(src);
     vec2 n = load2(dst);
@@ -1528,7 +1528,7 @@ void addProjectionDiff2D_SSE(const size_t nbs, const double* mul, const double* 
 
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
 
-void addProjectionDiff_AVX(const size_t nbs, const double* mul, const double* X, double* Y)
+void addProjectionDiff_AVX(const index_t nbs, const double* mul, const double* X, double* Y)
 {
     double * pY = Y;
     double const* pX = X;
@@ -1573,7 +1573,7 @@ void addProjectionDiff_AVX(const size_t nbs, const double* mul, const double* X,
     Y[d+DIM*i    ] += w;
     Y[d+DIM*i+DIM] -= w;
  */
-void addProjectionDiff3D_SSE(const size_t nbs, const double* mul, const double* src, double* dst)
+void addProjectionDiff3D_SSE(const index_t nbs, const double* mul, const double* src, double* dst)
 {
     // there should be at least 2 3D vectors, and these loads are safe:
     vec2 p0 = loadu2(src);

@@ -37,7 +37,7 @@ class Sphere : public Mecable
 public:
     
     /// number of reference points, including center: 1, 2, 4 for DIM = 1, 2 and 3
-    static constexpr size_t nbRefPoints = DIM+(DIM==3);
+    static constexpr index_t nbRefPoints = DIM+(DIM==3);
 
 private:
     
@@ -77,7 +77,7 @@ public:
     //-------------------------------- info ------------------------------------
 
     /// allocate memory
-    void allocateMecable(size_t);
+    void allocateMecable(index_t);
     
     /// free allocated memory
     void release();
@@ -119,16 +119,16 @@ public:
     
     
     /// move the reference points such as to restore a orthogonal reference
-    void orthogonalize(size_t i);
+    void orthogonalize(index_t i);
 
     /// set position
     void getPoints(real const*);
 
     /// normalize point and add center
-    size_t addSurfacePoint(Vector const&);
+    index_t addSurfacePoint(Vector const&);
     
     /// number of points on the surface
-    size_t nbSurfacePoints() const { return nPoints - nbRefPoints; }
+    index_t nbSurfacePoints() const { return nPoints - nbRefPoints; }
     
     /// initialize according to options given in Glossary
     ObjectList build(Glossary&, Simul&);
@@ -145,8 +145,8 @@ public:
     /** 1D: 1 dof = 1*1 - 0 : nbRefPoints - 1
         2D: 3 dof = 2*2 - 1 : nbRefPoints - 1
         3D: 6 dof = 4*3 - 6 : nbRefPoints + 2 */
-    unsigned nbConstraints() const { return nPoints - 1 + 3 * (DIM==3); }
-  
+    index_t nbConstraints() const { return nPoints - 1 + 3 * (DIM==3); }
+
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()

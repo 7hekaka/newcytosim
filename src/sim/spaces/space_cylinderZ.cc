@@ -12,6 +12,7 @@
 
 
 /// surface of a cylinder of given radius, length
+[[ maybe_unused ]]
 static real surface_cylinder(real rad, real len)
 {
     // surface elements divided by 2 * M_PI:

@@ -38,7 +38,7 @@ Bead::~Bead()
 }
 
 
-void Bead::allocateMecable(const size_t nbp)
+void Bead::allocateMecable(const index_t nbp)
 {
     assert_true( nbp == 1 );
     //Mecable::allocateMemory(nbp, 0);

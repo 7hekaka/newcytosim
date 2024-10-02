@@ -87,7 +87,7 @@ Sphere::~Sphere()
  here 'cp' is the vector from the center to the point to be added,
  in other words, the position of the point in the local reference frame.
  */
-size_t Sphere::addSurfacePoint(Vector const& cp)
+index_t Sphere::addSurfacePoint(Vector const& cp)
 {
     return addPoint(posP(0)+cp.normalized(spRadius));
 }
@@ -144,7 +144,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
 {
     ObjectList objs(this);
     std::string str;
-    size_t inp = 1, inx = 0, nbp = 1;
+    index_t inp = 1, inx = 0, nbp = 1;
 
     if ( opt.has_key("point0") )
         throw InvalidParameter("point indices start at 1 (use `point1`, `point2`, etc.)");
@@ -160,7 +160,7 @@ ObjectList Sphere::build(Glossary & opt, Simul& sim)
         
         if ( nbp > 0 )
         {
-            size_t fip = nPoints;
+            index_t fip = nPoints;
             str = opt.value(var, inx);
             // add 'nbp' points:
             for ( size_t n = 0; n < nbp; ++n )
@@ -291,7 +291,7 @@ void Sphere::setDragCoefficient()
 //------------------------------------------------------------------------------
 #pragma mark - Mecable
 
-void Sphere::allocateMecable(size_t nbp)
+void Sphere::allocateMecable(index_t nbp)
 {
     real * ptr = Mecable::allocateMemory(nbp, DIM);
     if ( ptr )
@@ -440,12 +440,12 @@ real Sphere::addBrownianForces(real const* fce, real alpha, real* rhs) const
  Here we start from the i-th Vector and make the other ones orthogonal.
  There must be a better way to do this...
  */
-void Sphere::orthogonalize(size_t i)
+void Sphere::orthogonalize(index_t i)
 {
 #if ( DIM >= 3 )
-    const size_t ix = 1 + i;
-    const size_t iy = 1 + (i+1)%3;
-    const size_t iz = 1 + (i+2)%3;
+    const index_t ix = 1 + i;
+    const index_t iy = 1 + (i+1)%3;
+    const index_t iz = 1 + (i+2)%3;
     
     Vector cen(pPos);
     assert_true( nPoints >= nbRefPoints );
@@ -480,7 +480,7 @@ void Sphere::reshape()
     assert_true( spRadius > 0 );
     Vector cen(pPos);
     
-    for ( size_t i = 1; i < nPoints; ++i )
+    for ( index_t i = 1; i < nPoints; ++i )
     {
         Vector off = ( posP(i) - cen ).normalized(spRadius);
         setPoint(i, cen + off);
@@ -501,7 +501,7 @@ void Sphere::getPoints(real const* arg)
     Vector cen(arg);
     copy_real(DIM, arg, pPos);
     
-    for ( size_t i = 1; i < nPoints; ++i )
+    for ( index_t i = 1; i < nPoints; ++i )
     {
         Vector off = ( Vector(arg+DIM*i) - cen ).normalized(spRadius);
         setPoint(i, cen + off);
@@ -658,7 +658,7 @@ void Sphere::print(std::ostream& os) const
     os << "new sphere " << reference() << '\n';
     os << "{\n";
     os << " nb_points = " << nbPoints() << '\n';
-    for ( size_t i = 0; i < nbPoints() ; ++i )
+    for ( index_t i = 0; i < nbPoints() ; ++i )
         os << " point" << i+1 << " = " << posP(i) << '\n';
     os << "}" << '\n';
 }

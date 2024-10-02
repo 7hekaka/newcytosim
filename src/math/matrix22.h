@@ -26,11 +26,6 @@
 /// 2x2 matrix class with 4 'real' elements stored in column order
 class alignas(4*sizeof(real)) Matrix22 final
 {
-public:
-    
-    /// unsigned integer type used for indices
-    typedef size_t index;
-    
 private:
     
     union {
@@ -41,10 +36,10 @@ private:
     };
 
     /// access to modifiable element by index
-    real& operator[](index i)       { return val[i]; }
+    real& operator[](index_t i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](index i) const { return val[i]; }
+    real  operator[](index_t i) const { return val[i]; }
 
 public:
     
@@ -56,7 +51,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = M.mat;
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] = M.val[u];
 #endif
     }
@@ -67,7 +62,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = mul4(M.mat, set4(alpha));
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] = alpha * M.val[u];
 #endif
     }
@@ -130,7 +125,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = setzero4();
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] = 0.;
 #endif
     }
@@ -151,7 +146,7 @@ public:
     /// true if any element is different than 'zero'
     bool operator != (real zero) const
     {
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -179,36 +174,36 @@ public:
     real const* data() const { return val; }
 
     /// address of element at line i, column j
-    real* addr(const index i, const index j) { return val + ( i + 2*j ); }
+    real* addr(const index_t i, const index_t j) { return val + ( i + 2*j ); }
     /// value of element at line i, column j
-    real value(const index i, const index j) const { return val[i+2*j]; }
+    real value(const index_t i, const index_t j) const { return val[i+2*j]; }
 
     /// access functions to element by line and column indices
-    real& operator()(const index i, const index j)       { return val[i+2*j]; }
-    real  operator()(const index i, const index j) const { return val[i+2*j]; }
+    real& operator()(const index_t i, const index_t j)       { return val[i+2*j]; }
+    real  operator()(const index_t i, const index_t j) const { return val[i+2*j]; }
     
     /// set elements from given array
     void load(const real ptr[])
     {
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] = ptr[u];
     }
 
     /// copy elements to given array
     void store(real ptr[]) const
     {
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             ptr[u] = val[u];
     }
 
     /// extract column vector at given index
-    Vector2 column(const index i) const
+    Vector2 column(const index_t i) const
     {
         return Vector2(val+2*i);
     }
     
     /// extract line vector at given index
-    Vector2 line(const index i) const
+    Vector2 line(const index_t i) const
     {
         return Vector2(val[i], val[2+i]);
     }
@@ -266,7 +261,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = mul4(mat, set4(alpha));
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] *= alpha;
 #endif
     }
@@ -281,7 +276,7 @@ public:
     const Matrix22 operator -() const
     {
         Matrix22 M;
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -293,7 +288,7 @@ public:
         return Matrix22(mul4(mat, set4(alpha)));
 #else
         Matrix22 M;
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             M.val[u] = val[u] * alpha;
         return M;
 #endif
@@ -312,7 +307,7 @@ public:
         return Matrix22(add4(mat, M.mat));
 #else
         Matrix22 res;
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
 #endif
@@ -325,7 +320,7 @@ public:
         return Matrix22(sub4(mat, M.mat));
 #else
         Matrix22 res;
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
 #endif
@@ -337,7 +332,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = add4(mat, M.mat);
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -348,7 +343,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = sub4(mat, M.mat);
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -619,7 +614,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = add4(mat, M.mat);
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -630,7 +625,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = fmadd4(set4(alpha), M.mat, mat);
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] += alpha * M.val[u];
 #endif
     }
@@ -641,7 +636,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = sub4(mat, M.mat);
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -652,7 +647,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = fnmadd4(set4(alpha), M.mat, mat);
 #else
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] -= alpha * M.val[u];
 #endif
     }
@@ -690,7 +685,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = add4(mat, M.mat);
 #elif ( 1 )
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] += M.val[u];
 #else
         val[0] += M.val[0];
@@ -705,7 +700,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = fmadd4(set4(alpha), M.mat, mat);
 #elif ( 1 )
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] += alpha * M.val[u];
 #else
         val[0] += alpha * M.val[0];
@@ -728,7 +723,7 @@ public:
 #if MATRIX22_USES_AVX
         mat = sub4(mat, M.mat);
 #elif ( 1 )
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u] -= M.val[u];
 #else
         val[0] -= M.val[0];

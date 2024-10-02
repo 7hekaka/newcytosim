@@ -29,11 +29,11 @@ public:
     /// An element of the sparse matrix
     struct Element
     {
-        real     val;  ///< The value of the element
-        unsigned inx;  ///< The index of the line
-        void reset(size_t i)
+        real    val;  ///< The value of the element
+        index_t inx;  ///< The index of the line
+        void reset(index_t i)
         {
-            inx = static_cast<unsigned>(i);
+            inx = i;
             val = 0;
         }
     };
@@ -41,33 +41,33 @@ public:
 private:
     
     /// size of matrix
-    size_t size_;
+    index_t size_;
     
-    /// amount of memory allocated
-    size_t alloc_;
+    /// number of columns allocated
+    index_t alloc_;
     
     /// array column_[c][] holds Elements of column 'c'
     Element ** column_;
     
     /// colsiz_[c] is the number of Elements in column 'c'
-    unsigned * colsiz_;
+    index_t * colsiz_;
     
     /// colmax_[c] is the number of Elements allocated in column 'c'
-    unsigned * colmax_;
+    index_t * colmax_;
 
     /// diagonal elements
     real * diagon_;
     
 #if SPARMAT1_USES_COLNEXT
     /// colidx_[i] is the index of the first non-empty column of index >= i
-    unsigned * colidx_;
+    index_t * colidx_;
 #endif
 
     /// allocate column to hold specified number of values
-    void allocateColumn(size_t jj, unsigned nb);
+    void allocateColumn(index_t jj, index_t nb);
     
     /// allocate column to hold specified number of values
-    void deallocateColumn(size_t jj);
+    void deallocateColumn(index_t jj);
 
     /// update colidx_[], a pointer to the next non-empty column
     void setColumnIndex();
@@ -75,51 +75,51 @@ private:
 #if SPARMAT1_COMPACTED
 
     /// allocated size of compact sparse storage arrays
-    size_t nmax_;
+    index_t nmax_;
     /// index to ija_[] and elm_[] where each column starts
-    unsigned * off_;
+    index_t * off_;
     /// compact sparse storage indices
-    unsigned * ija_;
+    index_t * ija_;
     /// compact sparse storage values
     real * elm_;
 
 #endif
     
     /// One column multiplication of a vector
-    static void vecMulAddCol(const real* X, real* Y, size_t jj, real dia, Element col[], size_t cnt);
+    static void vecMulAddCol(const real* X, real* Y, index_t jj, real dia, Element col[], index_t cnt);
     
     /// One column multiplication of a vector, isotropic 2D version
-    static void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real dia, Element col[], size_t cnt);
+    static void vecMulAddColIso2D(const real* X, real* Y, index_t jj, real dia, Element col[], index_t cnt);
     
     /// One column multiplication of a vector, isotropic 3D version
-    static void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real dia, Element col[], size_t cnt);
+    static void vecMulAddColIso3D(const real* X, real* Y, index_t jj, real dia, Element col[], index_t cnt);
 
 
     /// One column multiplication of a vector
-    void vecMulAddCol(const real* X, real* Y, size_t jj, real dia, size_t start, size_t stop) const;
+    void vecMulAddCol(const real* X, real* Y, index_t jj, real dia, index_t start, index_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D(const real* X, real* Y, size_t jj, real dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D(const real* X, real* Y, index_t jj, real dia, index_t start, index_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddColIso3D(const real* X, real* Y, size_t jj, real dia, size_t start, size_t stop) const;
+    void vecMulAddColIso3D(const real* X, real* Y, index_t jj, real dia, index_t start, index_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSE(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSE(const double* X, double* Y, index_t jj, const double* dia, index_t start, index_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_SSEU(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_SSEU(const double* X, double* Y, index_t jj, const double* dia, index_t start, index_t stop) const;
 
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVX(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVX(const double* X, double* Y, index_t jj, const double* dia, index_t start, index_t stop) const;
     
     /// One column 2D isotropic multiplication of a vector
-    void vecMulAddColIso2D_AVXU(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso2D_AVXU(const double* X, double* Y, index_t jj, const double* dia, index_t start, index_t stop) const;
     
     /// One column 3D isotropic multiplication of a vector
-    void vecMulAddColIso3D_AVX(const double* X, double* Y, size_t jj, const double* dia, size_t start, size_t stop) const;
+    void vecMulAddColIso3D_AVX(const double* X, double* Y, index_t jj, const double* dia, index_t start, index_t stop) const;
 
 public:
     
@@ -130,16 +130,16 @@ public:
     ~SparMatSym1()  { deallocate(); }
 
     /// return the size of the matrix
-    size_t size() const { return size_; }
+    index_t size() const { return size_; }
     
     /// change the size of the matrix
-    void resize(size_t s) { allocate(s); size_=s; }
+    void resize(index_t s) { allocate(s); size_=s; }
     
     /// allocate the matrix to hold ( sz * sz )
-    void allocate(size_t sz);
+    void allocate(index_t sz);
     
     /// return total allocated memory
-    size_t allocated() const;
+    index_t allocated() const;
 
     /// release memory
     void deallocate();
@@ -148,28 +148,28 @@ public:
     void reset();
     
     /// number of columns
-    size_t num_columns() const { return size_; }
+    index_t num_columns() const { return size_; }
     
     /// return column at index j
-    Element const* column(size_t j) const { assert_true(j<size_); return column_[j]; }
+    Element const* column(index_t j) const { assert_true(j<size_); return column_[j]; }
     
     /// number of elements in j-th column
-    size_t column_size(size_t j) const { assert_true(j<size_); return colsiz_[j]; }
+    index_t column_size(index_t j) const { assert_true(j<size_); return colsiz_[j]; }
     
     /// line index of n-th element in j-th column
-    size_t column_index(size_t j, size_t n) const { assert_true(j<size_); return column_[j][n].inx; }
+    index_t column_index(index_t j, index_t n) const { assert_true(j<size_); return column_[j][n].inx; }
 
     /// returns the address of element at (x, y), no allocation is done
-    real* address(size_t x, size_t y) const;
+    real* address(index_t x, index_t y) const;
 
     /// returns a modifiable diagonal element
-    real& diagonal(size_t i) { return diagon_[i]; }
+    real& diagonal(index_t i) { return diagon_[i]; }
     
     /// returns the element at (i, j), allocating if necessary
-    real& element(size_t i, size_t j);
+    real& element(index_t i, index_t j);
     
     /// returns the element at (i, j), allocating if necessary
-    real& operator()(size_t i, size_t j)
+    real& operator()(index_t i, index_t j)
     {
         if ( i == j )
             return diagon_[i];
@@ -180,29 +180,29 @@ public:
     void scale(real);
     
     /// add terms with `i` and `j` in [start, start+cnt[ to `mat`
-    void addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt, size_t mul) const;
+    void addDiagonalBlock(real* mat, index_t ldd, index_t start, index_t cnt, index_t mul) const;
     
     /// add scaled terms with `i` in [start, start+cnt[ if ( j > i ) and ( j <= i + rank ) to `mat`
-    void addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank) const;
+    void addLowerBand(real alpha, real* mat, index_t ldd, index_t start, index_t cnt, index_t mul, index_t rank) const;
     
     /// add `alpha*trace()` for blocks within [start, start+cnt[ if ( j <= i + rank ) to `mat`
-    void addDiagonalTrace(real alpha, real* mat, size_t ldd, size_t start, size_t cnt, size_t mul, size_t rank, bool sym) const;
+    void addDiagonalTrace(real alpha, real* mat, index_t ldd, index_t start, index_t cnt, index_t mul, index_t rank, bool sym) const;
 
     /// create compressed storage from column-based data
     bool prepareForMultiply(int);
 
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
-    void vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// 2D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 2 * dim(M)
-    void vecMulAddIso2D(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAddIso2D(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// 3D isotropic multiplication of a vector: Y <- Y + M * X with dim(X) = 3 * dim(M)
-    void vecMulAddIso3D(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAddIso3D(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector, for columns within [start, stop[
-    void vecMul(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMul(const real* X, real* Y, index_t start, index_t stop) const;
 
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMulAdd(const real* X, real* Y)      const { vecMulAdd(X, Y, 0, size_); }
@@ -217,7 +217,7 @@ public:
     void vecMul(const real* X, real* Y)         const { vecMul(X, Y, 0, size_); }
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
-    void vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const;
+    void vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const;
     
     /// multiplication of a vector: Y <- Y + M * X with dim(X) = dim(M)
     void vecMulAdd_ALT(const real* X, real* Y)  const { vecMulAdd_ALT(X, Y, 0, size_); }
@@ -226,10 +226,10 @@ public:
     bool notZero() const;
     
     /// number of elements in columns [start, stop[
-    size_t nbElements(size_t start, size_t stop, size_t& alc) const;
+    size_t nbElements(index_t start, index_t stop, size_t& alc) const;
     
     /// number of diagonal elements in columns [start, stop[
-    size_t nbDiagonalElements(size_t start, size_t stop) const;
+    size_t nbDiagonalElements(index_t start, index_t stop) const;
 
     /// number of elements in matrix
     size_t nbElements() const { size_t alc; return nbElements(0, size_, alc); }
@@ -238,16 +238,16 @@ public:
     std::string what() const;
     
     /// print matrix columns in sparse mode: ( i, j : value ) if |value| >= inf
-    void printSparse(std::ostream&, real inf, size_t start, size_t stop) const;
+    void printSparse(std::ostream&, real inf, index_t start, index_t stop) const;
     
     /// print matrix in sparse mode: ( i, j : value ) if |value| >= inf
     void printSparse(std::ostream& os, real inf) const { printSparse(os, inf, 0, size_); }
 
     /// print content of one column
-    void printColumn(std::ostream&, size_t);
+    void printColumn(std::ostream&, index_t);
     
     /// print content of one column
-    void printSummary(std::ostream&, size_t start, size_t stop);
+    void printSummary(std::ostream&, index_t start, index_t stop);
 
     /// printf debug function in sparse mode: i, j : value
     void printSparseArray(std::ostream&) const;

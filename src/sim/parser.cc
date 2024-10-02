@@ -1329,8 +1329,8 @@ void Parser::parse_dump(std::istream& is)
 
     if ( do_write && do_run )
     {
+        unsigned mode = 1;
         Glossary opt(blok);
-        int mode = 1;
         opt.set(mode, "mode");
         execute_dump(str, mode);
     }

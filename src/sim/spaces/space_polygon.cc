@@ -252,7 +252,7 @@ void SpacePolygon::setInteractions(Meca& meca, Simul const&) const
     for ( Fiber * fib=fibers.first(); fib; fib=fib->next() )
     {
         real ls = fib->segmentation();
-        for ( size_t seg = 0; seg < fib->nbSegments() ; ++seg )
+        for ( index_t seg = 0; seg < fib->nbSegments() ; ++seg )
         {
             FiberSegment loc(fib, seg);
             for ( int i = 0; i < n_pik; ++i )
@@ -313,10 +313,10 @@ void SpacePolygon::read(Inputter& in, Simul&, ObjectTag)
 
 void SpacePolygon::drawPolygon(float lines, float points) const
 {
-    const unsigned nbp = poly_.nbPoints();
+    const index_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     flute2 * flt = gym::mapBufferV2(nbp+1);
-    for ( size_t n = 0; n <= nbp; ++n )
+    for ( index_t n = 0; n <= nbp; ++n )
         flt[n].set(pts[n].xx, pts[n].yy);
     gym::unmapBufferV2();
     
@@ -340,7 +340,7 @@ void SpacePolygon::drawPolygon(float lines, float points) const
 /*
 void SpacePolygon::drawPolygonPoints() const
 {
-    const unsigned nbp = poly_.nbPoints();
+    const index_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     // indicate index of each point:
     char tmp[32];
@@ -356,10 +356,10 @@ void SpacePolygon::drawPolygonPoints() const
 void SpacePolygon::draw3D() const
 {
     const float H(-height_);
-    const unsigned nbp = poly_.nbPoints();
+    const index_t nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.data();
     flute3 * flt = gym::mapBufferV3(2*nbp+2);
-    for ( size_t i = 0; i <= nbp; ++i )
+    for ( index_t i = 0; i <= nbp; ++i )
     {
         float X(pts[i].xx), Y(pts[i].yy);
         flt[2*i  ] = { X, Y, -H };

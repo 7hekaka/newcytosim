@@ -40,10 +40,10 @@ private:
     real ilen_;
     
     /// index of vertex 1 in mec_
-    unsigned pt1_;
+    index_t pt1_;
 
     /// index of vertex 2 in mec_
-    unsigned pt2_;
+    index_t pt2_;
     
 public:
     
@@ -51,18 +51,18 @@ public:
     Interpolation() : mec_(nullptr), coef_(0), ilen_(0), pt1_(0), pt2_(0) { }
     
     /// set to interpolate P and P+1 on `m`, with coefficient `c`
-    Interpolation(const Chain * m, real c, unsigned P)
+    Interpolation(const Chain * m, real c, index_t P)
     : mec_(m), coef_(c), ilen_(m->segmentationInv()), pt1_(P), pt2_(P+1) { assert_true(P+1 < m->nbPoints() ); }
     
     /// set to interpolate P and Q on `m`, with coefficient `c`
-    Interpolation(const Mecable * m, real c, unsigned P, unsigned Q)
+    Interpolation(const Mecable * m, real c, index_t P, index_t Q)
     : mec_(m), coef_(c), ilen_(0), pt1_(P), pt2_(Q) { assert_true(Q < m->nbPoints() ); }
 
     /// disabled old-style constructor
-    Interpolation(const Mecable*, unsigned, unsigned, real) = delete;
+    //Interpolation(const Mecable*, unsigned, unsigned, real) = delete;
 
     /// disabled constructor avoid conversions from int to real
-    Interpolation(const Mecable*, unsigned, real) = delete;
+    //Interpolation(const Mecable*, unsigned, real) = delete;
 
     /// set to interpolate given fiber segment, at abscissa `abs` in [0,1]
     Interpolation(FiberSegment const&, real abs);
@@ -81,10 +81,10 @@ public:
     }
     
     /// Index of point 1 in the matrix of dynamics (Meca::mISO)
-    size_t matIndex1() const { return mec_->matIndex() + (size_t)pt1_; }
+    index_t matIndex1() const { return mec_->matIndex() + pt1_; }
     
     /// Index of point 2 in the matrix of dynamics (Meca::mISO)
-    size_t matIndex2() const { return mec_->matIndex() + (size_t)pt2_; }
+    index_t matIndex2() const { return mec_->matIndex() + pt2_; }
     
     /// true if the pointer seems to be valid.
     bool valid() const { return (mec_!=nullptr) && (pt1_<mec_->nbPoints()) && (pt2_<mec_->nbPoints()); }
@@ -99,13 +99,13 @@ public:
     Mecapoint vertex2() const { return Mecapoint(mec_, pt2_); }
     
     /// Index of point 1 in object
-    unsigned point1() const { return pt1_; }
+    index_t point1() const { return pt1_; }
   
     /// Index of point 2 in object
-    unsigned point2() const { return pt2_; }
+    index_t point2() const { return pt2_; }
     
     /// Index of point with the smallest weight (ie. point1 or point2)
-    unsigned lightest_point() const { return ( coef_ > 0.5 ) ? pt1_ : pt2_; }
+    index_t lightest_point() const { return ( coef_ > 0.5 ) ? pt1_ : pt2_; }
 
     /// interpolation coefficient on first point
     real coef0() const { return 1 - coef_; }

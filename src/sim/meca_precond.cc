@@ -36,22 +36,22 @@ static inline unsigned long machine_time()
 #define SAUERKRAUT 7
 
 /// leading dimension of the banded matrix used for iso symmetric blocks
-constexpr unsigned ISOB_KD = 2;
-constexpr unsigned ISOB_LDD = 3;
+constexpr index_t ISOB_KD = 2;
+constexpr index_t ISOB_LDD = 3;
 
 /*
  number of off-diagonals and leading dimension for the non-isotropic banded matrix
  We use a band preconditionner with 2*DIM off-diagonals to include the near-
  diagonal terms from the blocks that are offset by 2 from the matrix diagonal
  */
-constexpr unsigned BAND_NUD = 6;
+constexpr index_t BAND_NUD = 6;
 
 // should allocate to also hold the true diagonal: BAND_LDD > BAND_NUD
-constexpr unsigned BAND_LDD = BAND_NUD+2;
+constexpr index_t BAND_LDD = BAND_NUD+2;
 
 
 template < typename REAL >
-static void PRINT_MAT(std::string const& msg, size_t lin, size_t col, const REAL* mat, size_t ldd, int digits=0)
+static void PRINT_MAT(std::string const& msg, index_t lin, index_t col, const REAL* mat, index_t ldd, int digits=0)
 {
     VecPrint::full(msg, lin, col, mat, ldd, digits);
 }
@@ -211,7 +211,7 @@ void Meca::precondition(const real* X, real* Y) const
     #pragma omp parallel for num_threads(NUM_THREADS)
     for ( Mecable const* mec : mecables )
     {
-        const size_t inx = DIM * mec->matIndex();
+        const index_t inx = DIM * mec->matIndex();
 #if RECYCLED_PRECONDITIONNER
         if ( mec->blockType() == 7 )
             mec->blockMultiply(X+inx, Y+inx);
@@ -237,20 +237,20 @@ size_t Meca::preconditionnerSize() const
 #pragma mark - Debug Preconditionner
 
 [[maybe_unused]]
-static void printPreconditionnerBlock(Mecable* mec, unsigned sup)
+static void printPreconditionnerBlock(Mecable* mec, index_t sup)
 {
-    const unsigned bks = DIM * mec->nbPoints();
-    size_t S = std::min(bks, sup);
+    const index_t bks = DIM * mec->nbPoints();
+    index_t S = std::min(bks, sup);
     real * blk = mec->pblock();
 
     PRINT_MAT("Diagonal block"+std::to_string(bks), S, S, mec->pblock(), bks);
     
     std::clog << "S ";
     char str[32];
-    for ( size_t i = 0; i < S; ++i )
+    for ( index_t i = 0; i < S; ++i )
     {
         real sum = 0;
-        for ( size_t j = 0; j < bks; ++j )
+        for ( index_t j = 0; j < bks; ++j )
             sum += blk[j+bks*i];
         snprintf(str, sizeof(str), " %8.3f", sum);
         std::clog << str;
@@ -268,9 +268,9 @@ static void printPreconditionnerBlock(Mecable* mec, unsigned sup)
 */
 void Meca::extractBlock(const Mecable* mec, real* res) const
 {
-    const size_t dim = dimension();
-    const unsigned bks = DIM * mec->nbPoints();
-    const unsigned off = DIM * mec->matIndex();
+    const index_t dim = dimension();
+    const index_t bks = DIM * mec->nbPoints();
+    const index_t off = DIM * mec->matIndex();
     
     assert_true( off+bks <= dim );
     real * vec = new_real(dim);
@@ -280,7 +280,7 @@ void Meca::extractBlock(const Mecable* mec, real* res) const
     //zero_real(bks*bks, res);
     
     // proceed column by column:
-    for ( size_t jj = 0; jj < bks; ++jj )
+    for ( index_t jj = 0; jj < bks; ++jj )
     {
         vec[jj+off] = 1;
         multiply(vec, tmp);
@@ -298,7 +298,7 @@ void Meca::extractBlock(const Mecable* mec, real* res) const
  */
 void Meca::verifyBlock(const Mecable * mec, const real* blk)
 {
-    const unsigned bks = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
     real * wrk = new_real(bks*bks);
     
     extractBlock(mec, wrk);
@@ -329,7 +329,7 @@ void Meca::verifyBlock(const Mecable * mec, const real* blk)
  */
 void Meca::checkBlock(const Mecable * mec, const real* blk)
 {
-    const unsigned bks = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
     
     if ( 0 == mec->blockType() )
         return;
@@ -344,7 +344,7 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
     extractBlock(mec, wrk);   // wrk <- MEC_BLOCK
    
     copy_real(bks*bks, wrk, mat);  // mat <- wrk
-    for ( size_t i = 0; i < bks; ++i )
+    for ( index_t i = 0; i < bks; ++i )
     {
         applyPreconditionner(mec, mat+bks*i);
         mat[i+bks*i] -= 1;
@@ -387,9 +387,9 @@ void Meca::checkBlock(const Mecable * mec, const real* blk)
  This block is square, symmetric, definite positive and well-behaved
  Banded storage is used and, mat(i, j) is stored in blk[i-j+ldd*j]
  */
-void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t ldd) const
+void Meca::getIsoBandedBlock(const Mecable * mec, real* res, index_t kd, index_t ldd) const
 {
-    const unsigned nbp = mec->nbPoints();
+    const index_t nbp = mec->nbPoints();
 
     const real beta = -tau_ * mec->pointMobility();
     real jR = mec->jointRigidity();
@@ -420,7 +420,7 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t l
     }
     
     // add Identity matrix to band storage:
-    for ( size_t i = 0; i < nbp; ++i )
+    for ( index_t i = 0; i < nbp; ++i )
         res[ldd*i] += 1;
 }
 
@@ -436,7 +436,7 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, size_t kd, size_t l
  */
 void Meca::getIsoBlock(const Mecable * mec, real* res) const
 {
-    const unsigned nbp = mec->nbPoints();
+    const index_t nbp = mec->nbPoints();
     
     zero_real(nbp*nbp, res);
     
@@ -459,11 +459,11 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
     const real beta = -tau_ * mec->pointMobility();
 
     //blas::xscal(bs*bs, beta, res, 1);
-    for ( size_t n = 0; n < nbp*nbp; ++n )
+    for ( index_t n = 0; n < nbp*nbp; ++n )
         res[n] = beta * res[n];
     
     // add Identity matrix:
-    for ( size_t i = 0; i < nbp*nbp; i += nbp+1 )
+    for ( index_t i = 0; i < nbp*nbp; i += nbp+1 )
         res[i] += 1;
 }
 
@@ -477,10 +477,10 @@ void Meca::getIsoBlock(const Mecable * mec, real* res) const
  multiplied by the vertex mobility, but projection is not applied.
  This block is banded and symmetric, and can be factorized by Cholesky's method!
  */
-void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t rank) const
+void Meca::getBandedBlock(const Mecable * mec, real* res, index_t ldd, index_t rank) const
 {
-    const unsigned nbp = mec->nbPoints();
-    const unsigned bks = DIM * nbp;
+    const index_t nbp = mec->nbPoints();
+    const index_t bks = DIM * nbp;
 
     zero_real(ldd*bks, res);
 
@@ -508,7 +508,7 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
         mFUL.addLowerBand(beta, res, ldd-1, mec->matIndex(), nbp, DIM, rank);
     
     // add Identity matrix to band storage:
-    for ( size_t i = 0; i < bks; ++i )
+    for ( index_t i = 0; i < bks; ++i )
         res[ldd*i] += 1;
 }
 
@@ -523,8 +523,8 @@ void Meca::getBandedBlock(const Mecable * mec, real* res, size_t ldd, size_t ran
  */
 void Meca::getHalfBlock(const Mecable * mec, real* res) const
 {
-    const unsigned nbp = mec->nbPoints();
-    const unsigned bks = DIM * nbp;
+    const index_t nbp = mec->nbPoints();
+    const index_t bks = DIM * nbp;
     
     zero_real(bks*bks, res);
     
@@ -550,11 +550,11 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
     const real beta = -tau_ * mec->pointMobility();
     
     //blas::xscal(bs*bs, beta, res, 1);
-    for ( size_t n = 0; n < bks*bks; ++n )
+    for ( index_t n = 0; n < bks*bks; ++n )
         res[n] = beta * res[n];
     
     // add Identity matrix:
-    for ( size_t i = 0; i < bks*bks; i += bks+1 )
+    for ( index_t i = 0; i < bks*bks; i += bks+1 )
         res[i] += 1;
 }
 
@@ -569,8 +569,8 @@ void Meca::getHalfBlock(const Mecable * mec, real* res) const
  */
 void Meca::getFullBlock(const Mecable * mec, real* res) const
 {
-    const unsigned nbp = mec->nbPoints();
-    const unsigned bks = DIM * nbp;
+    const index_t nbp = mec->nbPoints();
+    const index_t bks = DIM * nbp;
     
     zero_real(bks*bks, res);
     
@@ -601,17 +601,17 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
 
     // include the projection, by applying it to each column vector:
     /* This could be vectorized */
-    for ( size_t i = 0; i < bks; ++i )
+    for ( index_t i = 0; i < bks; ++i )
         mec->projectForces(res+bks*i, res+bks*i);
 
     // scale
     const real beta = -tau_ * mec->leftoverMobility();
     //blas::xscal(bs*bs, beta, res, 1);
-    for ( size_t n = 0; n < bks*bks; ++n )
+    for ( index_t n = 0; n < bks*bks; ++n )
         res[n] = beta * res[n];
     
     // add Identity matrix:
-    for ( size_t i = 0; i < bks*bks; i += bks+1 )
+    for ( index_t i = 0; i < bks*bks; i += bks+1 )
         res[i] += 1;
 }
 
@@ -625,7 +625,7 @@ void Meca::getFullBlock(const Mecable * mec, real* res) const
  */
 void Meca::computePrecondIsoB(Mecable* mec, real* tmp)
 {
-    const unsigned nbp = mec->nbPoints();
+    const index_t nbp = mec->nbPoints();
     mec->blockSize(DIM*nbp, ISOB_LDD*nbp, 0);
     
     /**
@@ -693,9 +693,9 @@ void Meca::computePrecondIsoB(Mecable* mec, real* tmp)
  */
 void Meca::computePrecondIsoS(Mecable* mec)
 {
-    const unsigned nbp = mec->nbPoints();
+    const index_t nbp = mec->nbPoints();
 #if 0
-    const unsigned bks = DIM * nbp;
+    const index_t bks = DIM * nbp;
     mec->blockSize(bks, bks*bks, bks);
     getFullBlock(mec, mec->pblock());
     project_matrix<DIM>(nbp, mec->pblock(), bks, mec->pblock(), nbp);
@@ -739,10 +739,10 @@ Compute a preconditionner block corresponding to 'mec':
  */
 void Meca::computePrecondIsoP(Mecable* mec, real* tmp)
 {
-    const unsigned nbp = mec->nbPoints();
+    const index_t nbp = mec->nbPoints();
     int info = 0;
 
-    const unsigned bks = DIM * nbp;
+    const index_t bks = DIM * nbp;
     mec->blockSize(nbp, nbp*nbp, bks);
     real * blk = mec->pblock();
 
@@ -782,8 +782,8 @@ void Meca::computePrecondIsoP(Mecable* mec, real* tmp)
 void Meca::computePrecondBand(Mecable* mec, real* tmp)
 {
     assert_true(BAND_NUD < BAND_LDD);
-    const unsigned bks = DIM * mec->nbPoints();
-    const unsigned lin = std::min(BAND_LDD, bks);
+    const index_t bks = DIM * mec->nbPoints();
+    const index_t lin = std::min(BAND_LDD, bks);
 #if SAUERKRAUT && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*lin/2, 0);
     // use temporary memory to build matrix block:
@@ -853,7 +853,7 @@ void Meca::computePrecondBand(Mecable* mec, real* tmp)
  */
 void Meca::computePrecondHalf(Mecable* mec, real* tmp)
 {
-    const unsigned bks = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
 #if SAUERKRAUT && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*bks/2, bks);
     // use temporary memory to build matrix block:
@@ -896,7 +896,7 @@ Compute preconditionner block corresponding to 'mec'
  */
 void Meca::computePrecondFull(Mecable* mec, real* tmp)
 {
-    const unsigned bks = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
     
 #if CHOUCROUTE && REAL_IS_DOUBLE
     mec->blockSize(bks, 4+bks*bks/2, bks);
@@ -946,7 +946,7 @@ void Meca::computePrecondFull(Mecable* mec, real* tmp)
 void Meca::computePreconditionner()
 {
     bump_ = 0;
-    size_t sup = ( 1 + DIM * largestMecable() ) & ~1;
+    index_t sup = ( 1 + DIM * largestMecable() ) & ~1;
     real * tmp = new_real(4+sup*sup);
 
     switch( precond_ )
@@ -1019,9 +1019,9 @@ void Meca::computePreconditionner()
  Method 2 attempts to keep the existing block, and evaluates it fitness
  by iterations to identify the largest eigenvalue, which may or may not perform well
  */
-void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
+void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, index_t wrksize)
 {
-    const unsigned bks = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
     assert_true( bks*bks <= wrksize );
 
     bool may_keep = false;
@@ -1095,8 +1095,8 @@ void Meca::computePrecondAlt(Mecable* mec, real* tmp, real* wrk, size_t wrksize)
  */
 void Meca::computePrecondAlt()
 {
-    const size_t vecsize = DIM * largestMecable();
-    const size_t wrksize = vecsize * vecsize;
+    const index_t vecsize = DIM * largestMecable();
+    const index_t wrksize = vecsize * vecsize;
  
     // allocate memory:
     real * tmp = new_real(wrksize);
@@ -1116,7 +1116,7 @@ void Meca::computePrecondAlt()
  */
 static void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
 {
-    const unsigned bks = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
     // create Identity matrix:
     init_matrix(bks, wrk, 1, 0);
     int info = 0;
@@ -1137,9 +1137,9 @@ static void convertPreconditionner(Mecable* mec, real* blk, int* piv, real* wrk)
 /**
 renew preconditionner block corresponding to 'mec'
  */
-void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, real* wrk, size_t wrksize)
+void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, real* wrk, index_t wrksize)
 {
-    const unsigned bks = DIM * mec->nbPoints();
+    const index_t bks = DIM * mec->nbPoints();
     const int age = mec->blockAge();
 
     if (( mec->blockType() != 7 ) | ( age >= span ))
@@ -1163,8 +1163,8 @@ void Meca::renewPreconditionner(Mecable* mec, int span, real* blk, int* piv, rea
 // Compute sequentially all the blocks of the preconditionner
 void Meca::renewPreconditionner(int span)
 {
-    const size_t vecsize = DIM * largestMecable();
-    const size_t wrksize = vecsize * vecsize;
+    const index_t vecsize = DIM * largestMecable();
+    const index_t wrksize = vecsize * vecsize;
  
     // allocate memory:
     real * tmp = new_real(wrksize);

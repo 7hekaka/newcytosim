@@ -1062,7 +1062,7 @@ void Simul::reportFiberPoints(std::ostream& out, std::ostream& com, Property con
             continue;
         com << COM << "fiber " << fib->reference() << "  " << fib->segmentation();
         
-        for ( size_t p = 0; p < fib->nbPoints(); ++p )
+        for ( index_t p = 0; p < fib->nbPoints(); ++p )
         {
             out << LIN << fib->identity();
             out << SEP << fib->posPoint(p);
@@ -1233,7 +1233,7 @@ void Simul::reportFiberDirections(std::ostream& out, std::ostream& com, Property
     {
         if ( sel && sel != fib->prop )
             continue;
-        for ( size_t p = 0; p < fib->nbSegments(); ++p )
+        for ( index_t p = 0; p < fib->nbSegments(); ++p )
         {
             Vector pos = fib->midPoint(p);
             Vector dir = fib->dirSegment(p);
@@ -1299,7 +1299,7 @@ void Simul::reportFiberMoments(std::ostream& out, std::ostream& com) const
             {
                 const real w = fib->segmentation();
                 acc.add(0.5*w, fib->posEndM());
-                for ( size_t n = 1; n < fib->lastPoint(); ++n )
+                for ( index_t n = 1; n < fib->lastPoint(); ++n )
                     acc.add(w, fib->posPoint(n));
                 acc.add(0.5*w, fib->posEndP());
             }
@@ -1323,7 +1323,7 @@ void Simul::reportNetworkSize(std::ostream& out, std::ostream& com) const
     {
         const real w = fib->segmentation();
         acc.add(0.5*w, fib->posEndM());
-        for ( size_t n = 1; n < fib->lastPoint(); ++n )
+        for ( index_t n = 1; n < fib->lastPoint(); ++n )
             acc.add(w, fib->posPoint(n));
         acc.add(0.5*w, fib->posEndP());
     }
@@ -1349,7 +1349,7 @@ void Simul::reportFiberForces(std::ostream& out, std::ostream& com) const
     {
         com << COM << "fiber " << fib->reference();
         
-        for ( size_t p = 0; p < fib->nbPoints(); ++p )
+        for ( index_t p = 0; p < fib->nbPoints(); ++p )
         {
             out << LIN << fib->identity();
             out << SEP << fib->posPoint(p);
@@ -1472,7 +1472,7 @@ void Simul::reportFiberConfineForce(std::ostream& out, std::ostream& com) const
          const real stiff = fib->prop->confine_stiff[0];
          const Confinement mode = fib->prop->confine;
 
-         for ( size_t p = 0; p < fib->nbPoints(); ++p )
+         for ( index_t p = 0; p < fib->nbPoints(); ++p )
          {
              Vector w, pos = fib->posPoint(p);
              if ( vertexIsConfined(mode, fib, p) && confinementApplies(mode, spc, pos) )
@@ -1508,7 +1508,7 @@ real Simul::reportFiberConfinement(std::ostream& out, std::ostream& com) const
         if ( !isSymmetricAroundAxisZ(spc->prop->shape) )
             throw InvalidParameter("reportFiberConfinement() cannot handle non symmetric Space");
         
-        for ( size_t p = 0; p < fib->nbPoints(); ++p )
+        for ( index_t p = 0; p < fib->nbPoints(); ++p )
         {
             Vector w, pos = fib->posPoint(p);
             if ( vertexIsConfined(mode, fib, p) && confinementApplies(mode, spc, pos) )
@@ -1602,12 +1602,12 @@ void Simul::reportFiberIntersections(std::ostream& out, std::ostream& com, Gloss
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         unsigned cnt = 0;
-        for ( unsigned ii = 0; ii < fib->nbSegments(); ++ii )
+        for ( index_t ii = 0; ii < fib->nbSegments(); ++ii )
         {
             FiberSegment seg(fib, ii);
             for ( Fiber const* fox = fibers.nextID(fib); fox; fox = fibers.nextID(fox) )
             {
-                for ( unsigned jj = 0; jj < fox->nbSegments(); ++jj )
+                for ( index_t jj = 0; jj < fox->nbSegments(); ++jj )
                 {
                     FiberSegment soc(fox, jj);
                     real abs1, abs2;
@@ -1892,7 +1892,7 @@ static void reportSet(std::ostream& out, SET& set, PropertyList const& propertie
     for ( Property const* i : properties.find_all(set.title()) )
     {
         ObjectID id = 0;
-        unsigned points = 0, sup = 0;
+        index_t points = 0, sup = 0;
         ObjectList objs = set.collect(i);
         for ( Object * o : objs )
         {
@@ -2956,7 +2956,7 @@ size_t Simul::flagRing() const
         list_t sec;
         for ( Fiber const* fib=fibers.first(); fib; fib=fib->next() )
         {
-            for ( size_t s = 0; s < fib->nbSegments(); ++s )
+            for ( index_t s = 0; s < fib->nbSegments(); ++s )
             {
                 // check that fiber intersect with plane:
                 real abs = fib->planarIntersect(s, nor, 0);
@@ -3037,7 +3037,7 @@ void Simul::analyzeRing(ObjectFlag flg, real& length, real& radius) const
             // only consider fiber that are part of the ring:
             if ( fib->flag() == flg )
             {
-                for ( size_t s = 0; s < fib->nbSegments(); ++s )
+                for ( index_t s = 0; s < fib->nbSegments(); ++s )
                 {
                     // check that fiber intersect with plane:
                     real abs = fib->planarIntersect(s, nor, 0);

@@ -10,28 +10,27 @@
 
 #define SPARMAT_OPTIMIZED_MULTIPLY 1
 
-const size_t AVAILABLE_CELL = ~0U >> 1;
-const size_t LAST_IN_COLUMN = ~0U;
+constexpr index_t FREE_CELL = ~0U >> 1;
+constexpr index_t COLUMN_END = ~0U;
 
 
 SparMat::SparMat()
+: size_(0), alloc_(0)
 {
-    size_  = 0;
-    alloc_ = 0;
     mxCol  = nullptr;
     mxRow  = nullptr;
 }
 
 
-void SparMat::allocate(size_t sz)
+void SparMat::allocate(index_t sz)
 {
     size_ = sz;
     if ( size_ > alloc_ )
     {
-        real   ** mxCol_new = new real*[size_];
-        size_t ** mxRow_new = new size_t*[size_];
+        real    ** mxCol_new = new real*[size_];
+        index_t ** mxRow_new = new index_t*[size_];
         
-        size_t ii = 0;
+        index_t ii = 0;
         if ( mxCol )
         {
             for ( ; ii < alloc_; ++ii )
@@ -60,7 +59,7 @@ void SparMat::deallocate()
 {
     if ( mxCol )
     {
-        for ( size_t ii = 0; ii < alloc_; ++ii )
+        for ( index_t ii = 0; ii < alloc_; ++ii )
             if ( mxCol[ii] )
             {
                 delete[] mxCol[ii];
@@ -75,22 +74,22 @@ void SparMat::deallocate()
 }
 
 
-void SparMat::allocateColumn( const size_t jj, size_t sz )
+void SparMat::allocateColumn( const index_t jj, index_t sz )
 {
     assert_true( jj < size_ );
     assert_true( sz > 0 );
     //printf("new S-COL %i %i\n", jj, sz );
     
-    constexpr size_t chunk = 16;
+    constexpr index_t chunk = 16;
     sz = ( sz + chunk - 1 ) & ~( chunk -1 );
 
-    real  * mxCol_new = new real[sz];
-    size_t* mxRow_new = new size_t[sz];
+    real   * mxCol_new = new real[sz];
+    index_t* mxRow_new = new index_t[sz];
     
-    size_t ii = 0;
+    index_t ii = 0;
     if ( mxCol[jj] )
     {
-        for ( ; mxRow[jj][ii] != LAST_IN_COLUMN ; ++ii )
+        for ( ; mxRow[jj][ii] != COLUMN_END ; ++ii )
         {
             mxCol_new[ii] =  mxCol[jj][ii];
             mxRow_new[ii] =  mxRow[jj][ii];
@@ -100,8 +99,8 @@ void SparMat::allocateColumn( const size_t jj, size_t sz )
         delete[] mxRow[jj];
     }
     for ( ; ii < sz-1 ; ++ii )
-        mxRow_new[ii] = AVAILABLE_CELL;
-    mxRow_new[sz-1] = LAST_IN_COLUMN;
+        mxRow_new[ii] = FREE_CELL;
+    mxRow_new[sz-1] = COLUMN_END;
     
     mxCol[jj]  = mxCol_new;
     mxRow[jj]  = mxRow_new;
@@ -109,21 +108,21 @@ void SparMat::allocateColumn( const size_t jj, size_t sz )
 
 
 //allocate the position if necessary:
-real& SparMat::operator()( size_t x, size_t y )
+real& SparMat::operator()(index_t x, index_t y)
 {
     assert_true( x < size_ );
     assert_true( y < size_ );
     
     if ( mxRow[y] )
     {
-        size_t ii = 0;
-        for ( ; mxRow[y][ii] != LAST_IN_COLUMN; ++ii )
+        index_t ii = 0;
+        for ( ; mxRow[y][ii] != COLUMN_END; ++ii )
             if ( mxRow[y][ii] == x )
                 return mxCol[y][ii];
         
-        if ( mxRow[y][ii] == LAST_IN_COLUMN )
+        if ( mxRow[y][ii] == COLUMN_END )
             allocateColumn( y, ii + 1 );
-        assert_true( mxRow[y][ii] == AVAILABLE_CELL );
+        assert_true( mxRow[y][ii] == FREE_CELL );
         mxRow[y][ii] = x;
         mxCol[y][ii] = 0;
         //printf("allo. %3i %3i\n", x, y );
@@ -132,7 +131,7 @@ real& SparMat::operator()( size_t x, size_t y )
     
     allocateColumn( y, 1 );
     //printf("allo. %3i %3i\n", nx, ny );
-    assert_true( mxRow[y][0] == AVAILABLE_CELL );
+    assert_true( mxRow[y][0] == FREE_CELL );
     
     //put the diagonal term first:
     mxRow[y][0] = y;
@@ -147,12 +146,12 @@ real& SparMat::operator()( size_t x, size_t y )
 
 
 //does not allocate the position:
-real* SparMat::address( size_t x, size_t y) const
+real* SparMat::address(index_t x, index_t y) const
 {
-    size_t * row = mxRow[y];
+    index_t * row = mxRow[y];
     if ( row )
     {
-        for ( ; *row != LAST_IN_COLUMN; ++row )
+        for ( ; *row != COLUMN_END; ++row )
             if ( *row == x )
                 return & mxCol[y][ row - mxRow[y] ];
     }
@@ -162,39 +161,39 @@ real* SparMat::address( size_t x, size_t y) const
 
 void SparMat::reset()
 {
-    for ( size_t ii = 0; ii < size_; ++ii )
+    for ( index_t ii = 0; ii < size_; ++ii )
         if ( mxRow[ii] )
-            for ( int jj = 0; mxRow[ii][jj] != LAST_IN_COLUMN; ++jj )
-                mxRow[ii][jj] = AVAILABLE_CELL;
+            for ( index_t jj = 0; mxRow[ii][jj] != COLUMN_END; ++jj )
+                mxRow[ii][jj] = FREE_CELL;
 }
 
 
 void SparMat::scale( real a )
 {
-    for ( size_t ii = 0; ii < size_; ++ii )
+    for ( index_t ii = 0; ii < size_; ++ii )
         if ( mxRow[ii] )
-            for ( int jj = 0; mxRow[ii][jj] != LAST_IN_COLUMN; ++jj )
+            for ( index_t jj = 0; mxRow[ii][jj] != COLUMN_END; ++jj )
                 mxCol[ii][jj] *= a;
 }
 
 
-void SparMat::addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt,
-                               const size_t mul) const
+void SparMat::addDiagonalBlock(real* mat, index_t ldd, index_t start, index_t cnt,
+                               const index_t mul) const
 {
     assert_true( start + cnt <= size_ );
-    size_t end = start + cnt;
+    index_t end = start + cnt;
 
-    for ( size_t jj = start; jj < end; ++jj )
+    for ( index_t jj = start; jj < end; ++jj )
     {
-        size_t* row = mxRow[jj];
+        index_t* row = mxRow[jj];
         if ( row != nullptr )
         {
             real* col = mxCol[jj];
-            for ( ; *row != LAST_IN_COLUMN; ++row, ++col )
+            for ( ; *row != COLUMN_END; ++row, ++col )
             {
                 if ( *row > start )
                 {
-                    size_t ii = *row;
+                    index_t ii = *row;
                     if ( start <= ii && ii < end )
                     {
                         mat[mul*(ii+ldd*jj)] += *col;
@@ -212,10 +211,10 @@ void SparMat::addDiagonalBlock(real* mat, size_t ldd, size_t start, size_t cnt,
 int SparMat::bad() const
 {
     if ( size_ <= 0 ) return 1;
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( index_t jj = 0; jj < size_; ++jj )
     {
         if ( mxRow[jj] )
-            for ( int ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )
+            for ( index_t ii = 0; mxRow[jj][ii] != COLUMN_END; ++ii )
             {
                 if ( mxRow[jj][ii] <  0     ) return 2;
                 if ( mxRow[jj][ii] >= size_ ) return 3;
@@ -225,15 +224,15 @@ int SparMat::bad() const
 }
 
 
-void SparMat::printSparse(std::ostream& os, real, size_t start, size_t stop) const
+void SparMat::printSparse(std::ostream& os, real, index_t start, index_t stop) const
 {
     stop = std::min(stop, size_);
     std::streamsize p = os.precision(8);
     os << "% SparMat size " << size_ << ":\n";
-    for ( size_t jj = start; jj < stop; ++jj )
+    for ( index_t jj = start; jj < stop; ++jj )
     {
         if ( mxRow[jj] )
-            for ( int ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )
+            for ( index_t ii = 0; mxRow[jj][ii] != COLUMN_END; ++ii )
             {
                 os << mxRow[jj][ii] << " " << jj << " ";
                 os << std::setw(16) << mxCol[jj][ii] << '\n';
@@ -246,24 +245,24 @@ void SparMat::printSparse(std::ostream& os, real, size_t start, size_t stop) con
 
 bool SparMat::notZero() const
 {
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( index_t jj = 0; jj < size_; ++jj )
         if ( mxRow[jj] )
-            for ( int ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )
+            for ( index_t ii = 0; mxRow[jj][ii] != COLUMN_END; ++ii )
                 if ( mxCol[jj][ii] != 0 )
                     return true;
     return false;
 }
 
 
-size_t SparMat::nbElements(size_t start, size_t stop) const
+size_t SparMat::nbElements(index_t start, index_t stop) const
 {
     assert_true( start <= stop );
     stop = std::min(stop, size_);
     //all allocated elements are counted, even if the value is zero
     size_t cnt = 0;
-    for ( size_t jj = start; jj < stop; ++jj )
+    for ( index_t jj = start; jj < stop; ++jj )
         if ( mxRow[jj] )
-            for ( size_t ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )
+            for ( index_t ii = 0; mxRow[jj][ii] != COLUMN_END; ++ii )
                 ++cnt;
     return cnt;
 }
@@ -283,15 +282,16 @@ std::string SparMat::what() const
 
 void SparMat::vecMulAdd( const real* X, real* Y ) const
 {
-    size_t kk;
-    
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( index_t jj = 0; jj < size_; ++jj )
     {
         if ( mxRow[jj] )
-            for ( size_t ii = 0; ( kk = mxRow[jj][ii] ) != LAST_IN_COLUMN; ++ii )
+        {
+            index_t kk;
+            for ( index_t ii = 0; ( kk = mxRow[jj][ii] ) != COLUMN_END; ++ii )
             {
                 Y[kk] += mxCol[jj][ii] * X[jj];
             }
+        }
     }
 }
 
@@ -301,12 +301,12 @@ void SparMat::vecMulAdd( const real* X, real* Y ) const
 
 void SparMat::vecMulAddIso2D( const real* X, real* Y ) const
 {
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( index_t jj = 0; jj < size_; ++jj )
     {
         if ( mxRow[jj] )
-            for ( size_t ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )
+            for ( index_t ii = 0; mxRow[jj][ii] != COLUMN_END; ++ii )
             {
-                const size_t kk = 2 * mxRow[jj][ii];
+                const index_t kk = 2 * mxRow[jj][ii];
                 const real a = mxCol[jj][ii];
                 Y[kk  ] += a * X[kk  ];
                 Y[kk+1] += a * X[kk+1];
@@ -317,12 +317,12 @@ void SparMat::vecMulAddIso2D( const real* X, real* Y ) const
 
 void SparMat::vecMulAddIso3D( const real* X, real* Y ) const
 {
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( index_t jj = 0; jj < size_; ++jj )
     {
         if ( mxRow[jj] )
-            for ( size_t ii = 0; mxRow[jj][ii] != LAST_IN_COLUMN; ++ii )
+            for ( index_t ii = 0; mxRow[jj][ii] != COLUMN_END; ++ii )
             {
-                const size_t kk = 3 * mxRow[jj][ii];
+                const index_t kk = 3 * mxRow[jj][ii];
                 const real a = mxCol[jj][ii];
                 Y[kk  ] += a * X[kk  ];
                 Y[kk+1] += a * X[kk+1];
@@ -337,20 +337,20 @@ void SparMat::vecMulAddIso3D( const real* X, real* Y ) const
 
 void SparMat::vecMulAddIso2D( const real* X, real* Y ) const
 {
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( index_t jj = 0; jj < size_; ++jj )
     {
-        size_t* row = mxRow[jj];
+        index_t* row = mxRow[jj];
         if ( row != nullptr )
         {
             real* col = mxCol[jj];
-            size_t ll = 2 * jj;
+            index_t ll = 2 * jj;
             
             real X1 = X[ll  ];
             real X2 = X[ll+1];
             
-            while ( *row != LAST_IN_COLUMN )
+            while ( *row != COLUMN_END )
             {
-                size_t kk = 2 * ( *row );
+                index_t kk = 2 * ( *row );
                 Y[kk  ] += (*col) * X1;
                 Y[kk+1] += (*col) * X2;
                 
@@ -364,21 +364,21 @@ void SparMat::vecMulAddIso2D( const real* X, real* Y ) const
 
 void SparMat::vecMulAddIso3D( const real* X, real* Y ) const
 {
-    for ( size_t jj = 0; jj < size_; ++jj )
+    for ( index_t jj = 0; jj < size_; ++jj )
     {
-        size_t* row = mxRow[jj];
+        index_t* row = mxRow[jj];
         if ( row != nullptr )
         {
             real* col = mxCol[jj];
-            size_t ll = 3 * jj;
+            index_t ll = 3 * jj;
             
             real X1 = X[ll  ];
             real X2 = X[ll+1];
             real X3 = X[ll+2];
             
-            while ( *row != LAST_IN_COLUMN )
+            while ( *row != COLUMN_END )
             {
-                size_t kk = 3 * ( *row );
+                index_t kk = 3 * ( *row );
                 Y[kk  ] += (*col) * X1;
                 Y[kk+1] += (*col) * X2;
                 Y[kk+2] += (*col) * X3;

@@ -25,15 +25,13 @@
 
 
 SparMatSymBlk::SparMatSymBlk()
+: rsize_(0), alloc_(0), column_(nullptr)
 {
-    rsize_ = 0;
-    alloc_ = 0;
-    column_ = nullptr;
     colidx_ = new unsigned[2]();
 }
 
 
-void SparMatSymBlk::allocate(size_t alc)
+void SparMatSymBlk::allocate(index_t alc)
 {
     if ( alc > alloc_ )
     {
@@ -41,7 +39,7 @@ void SparMatSymBlk::allocate(size_t alc)
          'chunk' can be increased to gain performance:
           more memory will be used, but reallocation will be less frequent
         */
-        constexpr size_t chunk = 32;
+        constexpr index_t chunk = 32;
         alc = ( alc + chunk - 1 ) & ~( chunk -1 );
 
         //fprintf(stderr, "SMSB allocates %u\n", alc);
@@ -49,7 +47,7 @@ void SparMatSymBlk::allocate(size_t alc)
        
         if ( column_ )
         {
-            for (size_t n = 0; n < alloc_; ++n )
+            for (index_t n = 0; n < alloc_; ++n )
                 ptr[n] = column_[n];
             delete[] column_;
         }
@@ -89,7 +87,7 @@ SparMatSymBlk::Column::Column()
 /*
  This may require some smart allocation scheme.
  */
-void SparMatSymBlk::Column::allocate(size_t alc)
+void SparMatSymBlk::Column::allocate(index_t alc)
 {
     if ( alc > alo_ )
     {
@@ -99,7 +97,7 @@ void SparMatSymBlk::Column::allocate(size_t alc)
          'chunk' can be increased, to possibly gain performance:
          more memory will be used, but reallocation will be less frequent
          */
-        constexpr size_t chunk = 8;
+        constexpr index_t chunk = 8;
         alc = ( alc + chunk - 1 ) & ~( chunk - 1 );
         
         // use aligned memory:
@@ -112,14 +110,14 @@ void SparMatSymBlk::Column::allocate(size_t alc)
 
         if ( inx_ )
         {
-            for ( size_t n = 0; n < nbb_; ++n )
+            for ( index_t n = 0; n < nbb_; ++n )
                 inx_new[n] = inx_[n];
             free(inx_);
         }
 
         if ( blk_ )
         {
-            for ( size_t n = 0; n < nbb_; ++n )
+            for ( index_t n = 0; n < nbb_; ++n )
                 blk_new[n] = blk_[n];
             free_real(blk_);
         }
@@ -166,9 +164,9 @@ void SparMatSymBlk::Column::operator = (SparMatSymBlk::Column & col)
 
 
 /* This is a silly search that could be optimized */
-SparMatSymBlk::Block* SparMatSymBlk::Column::find_block(size_t ii) const
+SparMatSymBlk::Block* SparMatSymBlk::Column::find_block(index_t ii) const
 {
-    for ( size_t n = 0; n < nbb_; ++n )
+    for ( index_t n = 0; n < nbb_; ++n )
         if ( inx_[n] == ii )
             return blk_ + n;
     return nullptr;
@@ -177,7 +175,7 @@ SparMatSymBlk::Block* SparMatSymBlk::Column::find_block(size_t ii) const
 /**
  This allocates to be able to hold the matrix element if necessary
  */
-SparMatSymBlk::Block& SparMatSymBlk::Column::block(size_t ii, size_t jj)
+SparMatSymBlk::Block& SparMatSymBlk::Column::block(index_t ii, index_t jj)
 {
     assert_true( ii >= jj );
     SparMatSymBlk::Block * B = find_block(ii);
@@ -210,7 +208,7 @@ void SparMatSymBlk::Column::reset()
     nbb_ = 0;
 }
 
-SparMatSymBlk::Block& SparMatSymBlk::diag_block(size_t ii)
+SparMatSymBlk::Block& SparMatSymBlk::diag_block(index_t ii)
 {
     assert_true( ii < rsize_ );
     Column & col = column_[ii];
@@ -228,31 +226,31 @@ SparMatSymBlk::Block& SparMatSymBlk::diag_block(size_t ii)
 }
 
 
-real& SparMatSymBlk::element(size_t iii, size_t jjj)
+real& SparMatSymBlk::element(index_t iii, index_t jjj)
 {
     // branchless code to address lower triangle
-    size_t ii = std::max(iii, jjj);
-    size_t jj = std::min(iii, jjj);
+    index_t ii = std::max(iii, jjj);
+    index_t jj = std::min(iii, jjj);
 #if ( S_BLOCK_SIZE == 1 )
     return column_[jj].block(ii, jj).value();
 #else
-    size_t i = ii / S_BLOCK_SIZE;
-    size_t j = jj / S_BLOCK_SIZE;
+    index_t i = ii / S_BLOCK_SIZE;
+    index_t j = jj / S_BLOCK_SIZE;
     return column_[j].block(i, j)(ii%S_BLOCK_SIZE, jj%S_BLOCK_SIZE);
 #endif
 }
 
 
-real* SparMatSymBlk::address(size_t iii, size_t jjj) const
+real* SparMatSymBlk::address(index_t iii, index_t jjj) const
 {
     // branchless code to address lower triangle
-    size_t ii = std::max(iii, jjj);
-    size_t jj = std::min(iii, jjj);
+    index_t ii = std::max(iii, jjj);
+    index_t jj = std::min(iii, jjj);
 #if ( S_BLOCK_SIZE == 1 )
     return column_[jj].block(ii, jj).data();
 #else
-    size_t i = ii / S_BLOCK_SIZE;
-    size_t j = jj / S_BLOCK_SIZE;
+    index_t i = ii / S_BLOCK_SIZE;
+    index_t j = jj / S_BLOCK_SIZE;
     Block * B = column_[j].find_block(i);
     if ( B )
         return B->addr(ii%S_BLOCK_SIZE, jj%S_BLOCK_SIZE);
@@ -266,7 +264,7 @@ real* SparMatSymBlk::address(size_t iii, size_t jjj) const
 
 void SparMatSymBlk::reset()
 {
-    for ( size_t n = 0; n < rsize_; ++n )
+    for ( index_t n = 0; n < rsize_; ++n )
         column_[n].reset();
 }
 
@@ -274,10 +272,10 @@ void SparMatSymBlk::reset()
 bool SparMatSymBlk::notZero() const
 {
     //check for any non-zero sparse term:
-    for ( size_t jj = 0; jj < rsize_; ++jj )
+    for ( index_t jj = 0; jj < rsize_; ++jj )
     {
         Column & col = column_[jj];
-        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
+        for ( index_t n = 0 ; n < col.nbb_ ; ++n )
             if ( col[n] != 0.0 )
                 return true;
     }
@@ -288,21 +286,21 @@ bool SparMatSymBlk::notZero() const
 
 void SparMatSymBlk::scale(const real alpha)
 {
-    for ( size_t jj = 0; jj < rsize_; ++jj )
+    for ( index_t jj = 0; jj < rsize_; ++jj )
     {
         Column & col = column_[jj];
-        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
+        for ( index_t n = 0 ; n < col.nbb_ ; ++n )
             col[n].scale(alpha);
     }
 }
 
 
-void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, const size_t cnt, size_t mul) const
+void SparMatSymBlk::addDiagonalBlock(real* mat, index_t ldd, const index_t start, const index_t cnt, index_t mul) const
 {
     assert_true( mul == S_BLOCK_SIZE );
     assert_true( start + cnt <= rsize_ );
     
-    for ( size_t jj = 0; jj < cnt; ++jj )
+    for ( index_t jj = 0; jj < cnt; ++jj )
     {
         Column & col = column_[jj+start];
         if ( col.nbb_ > 0 )
@@ -310,7 +308,7 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, 
             assert_true(col.inx_[0] == jj + start);
             real * dst = mat + ( jj + ldd * jj ) * S_BLOCK_SIZE;
             col[0].addto_symm(dst, ldd);
-            for ( size_t n = 1; n < col.nbb_; ++n )
+            for ( index_t n = 1; n < col.nbb_; ++n )
             {
                 // assuming lower triangle is stored:
                 assert_true( col.inx_[n] > jj + start );
@@ -327,22 +325,22 @@ void SparMatSymBlk::addDiagonalBlock(real* mat, size_t ldd, const size_t start, 
 }
 
 
-void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start, size_t cnt,
-                                 const size_t mul, const size_t rank) const
+void SparMatSymBlk::addLowerBand(real alpha, real* mat, index_t ldd, index_t start, index_t cnt,
+                                 const index_t mul, const index_t rank) const
 {
     assert_true( mul == S_BLOCK_SIZE );
     assert_true( start + cnt <= rsize_ );
 
-    for ( size_t jj = 0; jj < cnt; ++jj )
+    for ( index_t jj = 0; jj < cnt; ++jj )
     {
         Column & col = column_[jj+start];
         if ( col.nbb_ > 0 )
         {
             assert_true(col.inx_[0] == jj + start);
-            size_t sup = std::min(cnt-jj, rank+1);
+            index_t sup = std::min(cnt-jj, rank+1);
             real * dst = mat + ( jj + ldd * jj ) * S_BLOCK_SIZE;
             col[0].addto_lower(dst, ldd, alpha);
-            for ( size_t n = 1; n < col.nbb_; ++n )
+            for ( index_t n = 1; n < col.nbb_; ++n )
             {
                 // assuming lower triangle is stored:
                 assert_true(col.inx_[n] > jj + start);
@@ -359,24 +357,24 @@ void SparMatSymBlk::addLowerBand(real alpha, real* mat, size_t ldd, size_t start
 }
 
 
-void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
-                                     const size_t start, const size_t cnt,
-                                     const size_t mul, const size_t rank, const bool sym) const
+void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, index_t ldd,
+                                     const index_t start, const index_t cnt,
+                                     const index_t mul, const index_t rank, const bool sym) const
 {
     assert_true( mul == S_BLOCK_SIZE );
     assert_true( start + cnt <= rsize_ );
 
-    for ( size_t jj = 0; jj < cnt; ++jj )
+    for ( index_t jj = 0; jj < cnt; ++jj )
     {
         Column & col = column_[jj+start];
         if ( col.nbb_ > 0 )
         {
             assert_true(col.inx_[0] == jj + start);
-            size_t sup = std::min(cnt-jj, rank+1);
+            index_t sup = std::min(cnt-jj, rank+1);
             // with banded storage, mat(i, j) is stored in mat[i-j+ldd*j]
             real * dst = mat + ( jj + ldd * jj );
             dst[0] += alpha * col[0].trace();  // diagonal term
-            for ( size_t n = 1; n < col.nbb_; ++n )
+            for ( index_t n = 1; n < col.nbb_; ++n )
             {
                 // assuming lower triangle is stored:
                 assert_true(col.inx_[n] > jj + start);
@@ -398,10 +396,10 @@ void SparMatSymBlk::addDiagonalTrace(real alpha, real* mat, size_t ldd,
 int SparMatSymBlk::bad() const
 {
     if ( rsize_ <= 0 ) return 1;
-    for ( size_t jj = 0; jj < rsize_; ++jj )
+    for ( index_t jj = 0; jj < rsize_; ++jj )
     {
         Column & col = column_[jj];
-        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
+        for ( index_t n = 0 ; n < col.nbb_ ; ++n )
         {
             if ( col.inx_[n] >= rsize_ ) return 2;
             if ( col.inx_[n] <= jj )    return 3;
@@ -412,13 +410,13 @@ int SparMatSymBlk::bad() const
 
 
 /** all allocated elements are counted, even if zero */
-size_t SparMatSymBlk::nbElements(size_t start, size_t stop, size_t& alc) const
+size_t SparMatSymBlk::nbElements(index_t start, index_t stop, size_t& alc) const
 {
     assert_true( start <= stop );
     stop = std::min(stop, rsize_);
     alc = 0;
-    size_t cnt = 0;
-    for ( size_t i = start; i < stop; ++i )
+    index_t cnt = 0;
+    for ( index_t i = start; i < stop; ++i )
     {
         cnt += column_[i].nbb_;
         alc += column_[i].alo_;
@@ -450,10 +448,11 @@ std::string SparMatSymBlk::what() const
 }
 
 
-static void printSparseBlock(std::ostream& os, real epsilon, SparMatSymBlk::Block const& B, size_t ii, size_t jj)
+static void printSparseBlock(std::ostream& os, real epsilon, SparMatSymBlk::Block const& B, index_t ii, index_t jj)
 {
-    for ( size_t x = 0; x < B.dimension(); ++x )
-    for ( size_t y = (ii==jj?x:0); y < B.dimension(); ++y )
+    index_t d = ( ii == jj );
+    for ( index_t x = 0; x < B.dimension(); ++x )
+    for ( index_t y = d*x; y < B.dimension(); ++y )
     {
         real v = B(y, x);
         if ( abs_real(v) > epsilon )
@@ -462,30 +461,30 @@ static void printSparseBlock(std::ostream& os, real epsilon, SparMatSymBlk::Bloc
 }
 
 
-void SparMatSymBlk::printSparse(std::ostream& os, real epsilon, size_t start, size_t stop) const
+void SparMatSymBlk::printSparse(std::ostream& os, real epsilon, index_t start, index_t stop) const
 {
     os << "% SparMatSymBlk size " << rsize_ << ":\n";
     stop = std::min(stop, rsize_);
     std::streamsize p = os.precision(8);
     if ( ! column_ )
         return;
-    for ( size_t jj = start; jj < stop; ++jj )
+    for ( index_t jj = start; jj < stop; ++jj )
     {
         Column & col = column_[jj];
         if ( col.notEmpty() )
             os << "% column " << jj << "\n";
-        for ( size_t n = 0 ; n < col.nbb_ ; ++n )
+        for ( index_t n = 0 ; n < col.nbb_ ; ++n )
             printSparseBlock(os, epsilon, col.blk_[n], col.inx_[n], jj);
     }
     os.precision(p);
 }
 
 
-void SparMatSymBlk::printSummary(std::ostream& os, size_t start, size_t stop)
+void SparMatSymBlk::printSummary(std::ostream& os, index_t start, index_t stop)
 {
     stop = std::min(stop, rsize_);
     os << "SMSB size " << rsize_ << ":";
-    for ( size_t j = start; j < stop; ++j )
+    for ( index_t j = start; j < stop; ++j )
         if ( column_[j].notEmpty() )
         {
             os << "\n   " << j << "   " << column_[j].nbb_;
@@ -497,14 +496,14 @@ void SparMatSymBlk::printSummary(std::ostream& os, size_t start, size_t stop)
 
 void SparMatSymBlk::Column::printBlocks(std::ostream& os) const
 {
-    for ( size_t n = 0; n < nbb_; ++n )
+    for ( index_t n = 0; n < nbb_; ++n )
         os << " " << inx_[n] << " " << blk_[n];
 }
 
 
 void SparMatSymBlk::printBlocks(std::ostream& os) const
 {
-    for ( size_t j = 0; j < rsize_; ++j )
+    for ( index_t j = 0; j < rsize_; ++j )
     {
         os << "\nSMSB  col " << j;
         column_[j].printBlocks(os);
@@ -525,15 +524,15 @@ public:
     real blk[S_BLOCK_SIZE*S_BLOCK_SIZE];
 
     /// index
-    size_t inx;
+    index_t inx;
 };
 
 
 /// qsort function comparing line indices
 static int compareSMSBElement(const void * A, const void * B)
 {
-    size_t a = static_cast<SparMatSymBlk::Element const*>(A)->inx;
-    size_t b = static_cast<SparMatSymBlk::Element const*>(B)->inx;
+    index_t a = static_cast<SparMatSymBlk::Element const*>(A)->inx;
+    index_t b = static_cast<SparMatSymBlk::Element const*>(B)->inx;
     
     return ( a > b ) - ( b > a );
 }
@@ -541,10 +540,10 @@ static int compareSMSBElement(const void * A, const void * B)
 /**
  This copies the data to the provided temporary array
  */
-void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
+void SparMatSymBlk::Column::sortElements(Element tmp[], index_t tmp_size)
 {
     assert_true( nbb_ <= tmp_size );
-    for ( size_t i = 1; i < nbb_; ++i )
+    for ( index_t i = 1; i < nbb_; ++i )
     {
         blk_[i].store(tmp[i].blk);
         tmp[i].inx = inx_[i];
@@ -553,7 +552,7 @@ void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
     //std::clog << "sizeof(SparMatSymBlk::Element) " << sizeof(Element) << "\n";
     qsort(tmp+1, nbb_-1, sizeof(Element), &compareSMSBElement);
     
-    for ( size_t i = 1; i < nbb_; ++i )
+    for ( index_t i = 1; i < nbb_; ++i )
     {
         blk_[i].load(tmp[i].blk);
         inx_[i] = tmp[i].inx;
@@ -561,10 +560,10 @@ void SparMatSymBlk::Column::sortElements(Element tmp[], size_t tmp_size)
 }
 
 
-size_t SparMatSymBlk::newElements(Element*& ptr, size_t cnt)
+index_t SparMatSymBlk::newElements(Element*& ptr, index_t cnt)
 {
-    constexpr size_t chunk = 16;
-    size_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
+    constexpr index_t chunk = 16;
+    index_t all = ( cnt + chunk - 1 ) & ~( chunk - 1 );
     free(ptr);  // Element has no destructor
     void* tmp = nullptr;
     if ( posix_memalign(&tmp, 32, all*sizeof(Element)) )
@@ -576,11 +575,11 @@ size_t SparMatSymBlk::newElements(Element*& ptr, size_t cnt)
 
 void SparMatSymBlk::sortElements()
 {
-    //size_t cnt = 0;
-    size_t tmp_size = 0;
+    //index_t cnt = 0;
+    index_t tmp_size = 0;
     Element * tmp = nullptr;
     
-    for ( size_t j = colidx_[0]; j < rsize_; j = colidx_[j+1] )
+    for ( index_t j = colidx_[0]; j < rsize_; j = colidx_[j+1] )
     {
         assert_true( j < rsize_ );
         Column & col = column_[j];
@@ -601,9 +600,9 @@ void SparMatSymBlk::sortElements()
         assert_true( col.inx_[0] == j );
         col.blk_[0].copy_lower();
 #ifndef NDEBUG
-        for ( size_t n = 1 ; n < col.nbb_ ; ++n )
+        for ( index_t n = 1 ; n < col.nbb_ ; ++n )
         {
-            const size_t i = col.inx_[n];
+            const index_t i = col.inx_[n];
             assert_true( i < rsize_ );
             assert_true( i > j );
         }
@@ -620,8 +619,8 @@ bool SparMatSymBlk::prepareForMultiply(int)
     colidx_[rsize_] = rsize_;
     if ( rsize_ > 0 )
     {
-        size_t inx = rsize_;
-        size_t nxt = rsize_;
+        index_t inx = rsize_;
+        index_t nxt = rsize_;
         while ( inx-- > 0 )
         {
             if ( column_[inx].notEmpty() )
@@ -647,16 +646,16 @@ bool SparMatSymBlk::prepareForMultiply(int)
 
 
 #if ( S_BLOCK_SIZE == 1 )
-void SparMatSymBlk::Column::vecMulAdd1D(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd1D(const real* X, real* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     const real X0 = X[jj];
     real D = blk_[0].value();
     real Y0 = Y[jj] + D * X0;
     assert_true(inx_[0]==jj);
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = inx_[n];
+        const index_t ii = inx_[n];
         const real M = blk_[n].value();
         Y[ii] += M * X0;
         Y0 += M * X[ii];
@@ -667,16 +666,16 @@ void SparMatSymBlk::Column::vecMulAdd1D(const real* X, real* Y, size_t jj) const
 
 
 #if ( S_BLOCK_SIZE == 2 )
-void SparMatSymBlk::Column::vecMulAdd2D(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D(const real* X, real* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     const Vector2 xx(X+jj);
     assert_true(2*inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
     Vector2 yy = blk_[0].vecmul(xx);
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = 2 * inx_[n];
+        const index_t ii = 2 * inx_[n];
         Block const& M = blk_[n];
         M.vecmul(xx).add_to(Y+ii);
         yy += M.trans_vecmul(X+ii);
@@ -686,16 +685,16 @@ void SparMatSymBlk::Column::vecMulAdd2D(const real* X, real* Y, size_t jj) const
 #endif
 
 #if ( S_BLOCK_SIZE == 3 )
-void SparMatSymBlk::Column::vecMulAdd3D(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D(const real* X, real* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     const Vector3 xxx(X+jj);
     assert_true(3*inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
     Vector3 yyy = blk_[0].vecmul(xxx);
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = 3 * inx_[n];
+        const index_t ii = 3 * inx_[n];
         Block const& M = blk_[n];
         M.vecmul(xxx).add_to(Y+ii);
         yyy += M.trans_vecmul(X+ii);
@@ -706,16 +705,16 @@ void SparMatSymBlk::Column::vecMulAdd3D(const real* X, real* Y, size_t jj) const
 
 
 #if ( S_BLOCK_SIZE == 4 )
-void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     const Vector4 xxxx(X+jj);
     assert_true(4*inx_[0]==jj);
     assert_small(blk_[0].asymmetry());
     Vector4 yyyy = blk_[0].vecmul(xxxx);
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = 4 * inx_[n];
+        const index_t ii = 4 * inx_[n];
         Block const& M = blk_[n];
         M.vecmul(xxxx).add_to(Y+ii);
         yyyy += M.trans_vecmul4_(X+ii);
@@ -729,7 +728,7 @@ void SparMatSymBlk::Column::vecMulAdd4D(const real* X, real* Y, size_t jj) const
 #pragma mark - Single precision Optimized Vector Multiplication
 
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_SSE && !REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(3*inx_[0] == jj);
@@ -751,9 +750,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
 
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = 3 * inx_[n];
+        const index_t ii = 3 * inx_[n];
         const vec4f m012 = blk_[n].data0();
         const vec4f m345 = blk_[n].data1();
         const vec4f m678 = blk_[n].data2();
@@ -793,7 +792,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
 
 
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_SSE && !REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(3*inx_[0] == jj);
@@ -817,18 +816,18 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
         const vec4f x1 = clear4th(broadcastYf(xxx));
         const vec4f x2 = clear4th(broadcastZf(xxx));
 
-        size_t n = 1;
+        index_t n = 1;
         {
-            const size_t end = 1 + ( nbb_ & ~1 );
+            const index_t end = 1 + ( nbb_ & ~1 );
             // process 2 by 2
             #pragma nounroll
             for ( ; n < end; n += 2 )
             {
-                const size_t ii = 3 * inx_[n];
+                const index_t ii = 3 * inx_[n];
                 const vec4f m012 = blk_[n].data0();
                 const vec4f m345 = blk_[n].data1();
                 const vec4f m678 = blk_[n].data2();
-                const size_t kk = 3 * inx_[n+1];
+                const index_t kk = 3 * inx_[n+1];
                 const vec4f p012 = blk_[n+1].data0();
                 const vec4f p345 = blk_[n+1].data1();
                 const vec4f p678 = blk_[n+1].data2();
@@ -859,7 +858,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
 #pragma nounroll
         for ( ; n < nbb_; ++n )
         {
-            const size_t ii = 3 * inx_[n];
+            const index_t ii = 3 * inx_[n];
             const vec4f m012 = blk_[n].data0();
             const vec4f m345 = blk_[n].data1();
             const vec4f m678 = blk_[n].data2();
@@ -903,7 +902,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSEU(const float* X, float* Y, size_t jj
 #pragma mark - Double precision Optimized Vector Multiplication
 
 #if ( S_BLOCK_SIZE == 2 ) && REAL_IS_DOUBLE && SMSB_USES_SSE
-void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     vec2 s1 = load2(X+jj);
@@ -985,7 +984,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_SSE(const double* X, double* Y, size_t j
 #endif
 
 #if ( S_BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(2*inx_[0] == jj);
@@ -1005,9 +1004,9 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
     const vec4 xxyy = duplohi4(xy);
 
     // while x0 and x1 are constant, there is a dependency in the loop for 'yy'.
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = 2 * inx_[n];
+        const index_t ii = 2 * inx_[n];
         vec4 mat = blk_[n].data0();     // load 2x2 matrix
         vec4 yy = load2Z(Y+ii);         // yy = { Y0 Y1 0 0 }
         vec4 xx = broadcast2(X+ii);     // xx = { X0 X1 X0 X1 }
@@ -1034,7 +1033,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVX(const double* X, double* Y, size_t j
 
 
 #if ( S_BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-static inline void multiply2D(double const* X, double* Y, size_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
+static inline void multiply2D(double const* X, double* Y, index_t ii, vec4 const& mat, vec4 const& xxxx, vec4& ss)
 {
     vec4 xx = broadcast2(X+ii);
     vec4 u = fmadd4(mat, xxxx, load2Z(Y+ii));
@@ -1045,7 +1044,7 @@ static inline void multiply2D(double const* X, double* Y, size_t ii, vec4 const&
 
 
 #if ( S_BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(2*inx_[0] == jj);
@@ -1103,7 +1102,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXU(const double* X, double* Y, size_t 
 
 
 #if ( S_BLOCK_SIZE == 2 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(2*inx_[0] == jj);
@@ -1177,7 +1176,7 @@ void SparMatSymBlk::Column::vecMulAdd2D_AVXUU(const double* X, double* Y, size_t
 
 
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(3*inx_[0] == jj);
@@ -1216,9 +1215,9 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = 3 * inx_[n];
+        const index_t ii = 3 * inx_[n];
         const vec4 m012 = blk_[n].data0();
         const vec4 m345 = blk_[n].data1();
         const vec4 m678 = blk_[n].data2();
@@ -1261,7 +1260,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
 
 
 #if ( S_BLOCK_SIZE == 3 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(3*inx_[0] == jj);
@@ -1301,8 +1300,8 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
     #pragma nounroll
     for ( ; blk < end; blk += 2, inx += 2 )
     {
-        const size_t ii = 3 * inx[0];
-        const size_t kk = 3 * inx[1];
+        const index_t ii = 3 * inx[0];
+        const index_t kk = 3 * inx[1];
         assert_true( ii < kk );
         //printf("--- %4i %4i\n", ii, kk);
         vec4 M0 = blk[0].data0();
@@ -1348,7 +1347,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
     #pragma nounroll
     for ( end = blk_ + nbb_; blk < end; ++blk )
     {
-        const size_t ii = 3 * inx[0];
+        const index_t ii = 3 * inx[0];
         ++inx;
         //printf("--- %4i\n", ii);
         vec4 ma = blk->data0();
@@ -1380,7 +1379,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVXU(const double* X, double* Y, size_t 
 
 
 #if ( S_BLOCK_SIZE == 4 ) && SMSB_USES_AVX && REAL_IS_DOUBLE
-void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t jj) const
+void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, index_t jj) const
 {
     assert_true(nbb_ > 0);
     assert_true(3*inx_[0] == jj);
@@ -1413,9 +1412,9 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
     ++blk;
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     #pragma nounroll
-    for ( size_t n = 1; n < nbb_; ++n )
+    for ( index_t n = 1; n < nbb_; ++n )
     {
-        const size_t ii = 4 * inx_[n];
+        const index_t ii = 4 * inx_[n];
         const vec4 yy = load4(Y+ii);
         const vec4 xx = load4(X+ii);  // xx = { X0 X1 X2 X3 }
         const vec4 m0 = blk->data0();
@@ -1449,11 +1448,11 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
 
 
 // multiplication of a vector: Y = Y + M * X
-void SparMatSymBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t stop) const
+void SparMatSymBlk::vecMulAdd_ALT(const real* X, real* Y, index_t start, index_t stop) const
 {
     assert_true( start <= stop );
     stop = std::min(stop, rsize_);
-    for ( size_t j = start; j < stop; ++j )
+    for ( index_t j = start; j < stop; ++j )
     if ( column_[j].notEmpty() )
     {
         //std::clog << "SparMatSymBlk column " << j << "  " << rsize_ << " \n";
@@ -1490,11 +1489,11 @@ void SparMatSymBlk::vecMulAdd_ALT(const real* X, real* Y, size_t start, size_t s
 
 
 // multiplication of a vector: Y = Y + M * X
-void SparMatSymBlk::vecMulAdd(const real* X, real* Y, size_t start, size_t stop) const
+void SparMatSymBlk::vecMulAdd(const real* X, real* Y, index_t start, index_t stop) const
 {
     assert_true( start <= stop );
     stop = std::min(stop, rsize_);
-    for ( size_t j = colidx_[start]; j < stop; j = colidx_[j+1] )
+    for ( index_t j = colidx_[start]; j < stop; j = colidx_[j+1] )
     {
         //std::clog << "SparMatSymBlk column " << j << "  " << rsize_ << " \n";
 #if ( S_BLOCK_SIZE == 1 )

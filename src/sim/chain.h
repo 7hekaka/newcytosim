@@ -69,7 +69,7 @@ class Chain : public Mecable
 public:
     
     /// the ideal number of points for ratio = length / segmentation
-    static size_t bestNumberOfPoints(real ratio);
+    static index_t bestNumberOfPoints(real ratio);
 
     /// calculate length of given string of points
     static real contourLength(const real pts[], size_t n_pts);
@@ -130,25 +130,25 @@ protected:
     static void reshape_two(const real*, real*, real cut);
 
     /// oldest method to restore the distance between successive vertices
-    static void reshape_global(size_t, const real*, real*, real cut);
+    static void reshape_global(index_t, const real*, real*, real cut);
 
     /// (old) apply the forces movements needed to the distance between two points
-    static void reshape_apply_alt(size_t, const real*, const real*, real*);
+    static void reshape_apply_alt(index_t, const real*, const real*, real*);
 
     /// (old) iterative method to restore the distance between successive vertices
-    static int reshape_calculate_alt(size_t, real, const real*, real*, size_t);
+    static int reshape_calculate_alt(index_t, real, const real*, real*, index_t);
     
     /// (old) iterative method to restore the distance between successive vertices
-    static int reshape_calculate_old(size_t, real, const real*, real*, size_t);
+    static int reshape_calculate_old(index_t, real, const real*, real*, index_t);
 
     /// apply the forces movements needed to the distance between two points
-    static void reshape_apply(size_t, const real*, const real*, real*);
+    static void reshape_apply(index_t, const real*, const real*, real*);
 
     /// iterative method to restore the distance between successive vertices
-    static int reshape_calculate(size_t, real, size_t max_iter, real const*, real const*, real const*, real*, size_t);
+    static int reshape_calculate(index_t, real, index_t max_iter, real const*, real const*, real const*, real*, size_t);
 
     /// iterative method to restore the distance between successive vertices
-    static int reshape_local(size_t, const real*, real*, real cut, size_t max_iter, real* tmp, size_t);
+    static int reshape_local(index_t, const real*, real*, real cut, index_t max_iter, real* tmp, size_t);
 
     /// change segmentation
     void setSegmentation(real c) { fnCut = std::max(c, REAL_EPSILON); iCut = real(1) / fnCut; }
@@ -162,14 +162,14 @@ public:
     ~Chain() {}
     
     /// Number of segments = nbPoints() - 1
-    unsigned nbSegments()  const { return nPoints - 1; }
+    index_t nbSegments()  const { return nPoints - 1; }
     
     /// Index of the last segment = nbPoints() - 2
-    unsigned lastSegment() const { return nPoints - 2; }
+    index_t lastSegment() const { return nPoints - 2; }
     
     /// return P where segment [ P, P+1 [ contains point at distance `a` from the minus end
     /** returns 0 if `a < 0` and last point index if `a > lastSegment()` */
-    unsigned indexSegmentM(const real a) const { return std::min(unsigned(std::max(a,(real)0)/fnCut), lastSegment()); }
+    index_t indexSegmentM(const real a) const { return std::min(index_t(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
 
@@ -187,7 +187,7 @@ public:
     void placeEnd(FiberEnd ref);
     
     /// set shape with `np` points from the given array of size DIM*n_pts
-    void setShape(const real pts[], size_t n_pts, size_t np);
+    void setShape(const real pts[], size_t n_pts, index_t np);
 
     /// set shape as a random walk with given parameters
     void setEquilibrated(real length, real persistence_length);
@@ -199,12 +199,12 @@ public:
     void constrainLength(bool s) { unconstrainLength = !s; }
 
     /// Number of distance constraints applied to the movements of vertices
-    unsigned nbConstraints() const { return unconstrainLength ? 0 : nPoints - 1; }
+    index_t nbConstraints() const { return unconstrainLength ? 0 : nPoints - 1; }
 #else
     void constrainLength(bool s) { if (!s) ABORT_NOW("NEW_UNCONSTRAINED_LENGTH is off"); }
     
     /// Number of distance constraints applied to the movements of vertices
-    unsigned nbConstraints() const { return nPoints - 1; }
+    index_t nbConstraints() const { return nPoints - 1; }
 #endif
     
     /// change Lagrange multipliers (do not use: this is done by computeTensions)
@@ -343,10 +343,10 @@ public:
 #if ( 1 )
     /// unit tangent vector to the fiber within segment [p, p+1]
     /** Using iCut, expected to be the inverse of the distance between vertices */
-    Vector dirSegment(size_t p)  const { return diffPoints(p) * iCut; }
+    Vector dirSegment(index_t p) const { return diffPoints(p) * iCut; }
 #else
     /// normalized tangent vector to the fiber within segment [p, p+1]
-    Vector dirSegment(size_t p)  const { return normalize(diffPoints(p)); }
+    Vector dirSegment(index_t p) const { return normalize(diffPoints(p)); }
 #endif
 #if ( DIM == 1 )
     /// direction at distance `ab` from the minus end
@@ -400,7 +400,7 @@ public:
     real segmentationInv() const { return iCut; }
     
     /// reinterpolate vertices and adjust fiber to have `ns` segments
-    void resegment(size_t ns);
+    void resegment(index_t ns);
     
     /// automatically select the number of points if needed, and resegment the fiber
     void adjustSegmentation();
@@ -417,16 +417,16 @@ public:
     //--------------------- Info
     
     /// calculate average and variance of the segment length
-    static void computeMeanVar(size_t cnt, real const* ptr, real, real&, real&);
+    static void computeMeanVar(index_t cnt, real const* ptr, real, real&, real&);
 
     /// calculate the minimum and maximum segment length, for `cnt` segments
-    static void computeMinMax(size_t cnt, real const* ptr, real&, real&);
+    static void computeMinMax(index_t cnt, real const* ptr, real&, real&);
     
     /// calculate the minimum and maximum segment length
     void segmentMinMax(real& n, real& x) const { computeMinMax(nbSegments(), pPos, n, x); }
 
     /// curvature calculated at joint `p`, where `0 < p < nbPoints()-1`
-    real curvature(size_t p) const;
+    real curvature(index_t p) const;
     
     /// normalized energy associated with bending
     real bendingEnergy0() const;
@@ -435,10 +435,10 @@ public:
     real minCosine() const;
     
     /// number of joints at which ( cosine(angle) < threshold )
-    size_t nbKinks(real threshold = 0) const;
+    index_t nbKinks(real threshold = 0) const;
     
     /// calculate intersection between segment `s` and the plane defined by <em> n.pos + a = 0 </em>
-    real planarIntersect(size_t s, Vector const& n, const real a) const;
+    real planarIntersect(index_t s, Vector const& n, const real a) const;
 
     //--------------------- Growing/Shrinking
 
@@ -458,9 +458,9 @@ public:
     void cutP(real delta);
 
     /// Discard vertices in [ 0, P-1 ] and keep [ P, end ]
-    virtual void truncateM(size_t P);
+    virtual void truncateM(index_t P);
     /// Keep vertices [ 0, P ] and discard the others
-    virtual void truncateP(size_t P);
+    virtual void truncateP(index_t P);
 
     /// length of polymer made in last timestep, at the minus end (negative for shrinking)
     real freshAssemblyM() const { return cDeltaM; }

@@ -11,11 +11,11 @@
 
 //------------------------------------------------------------------------------
 
-size_t PointGrid::setGrid(Vector inf, Vector sup, real min_width)
+index_t PointGrid::setGrid(Vector inf, Vector sup, real min_width)
 {
     assert_true( min_width > 0 );
     
-    size_t cnt[3] = { 1, 1, 1 };
+    index_t cnt[3] = { 1, 1, 1 };
     for ( int d = 0; d < DIM; ++d )
     {
         // minimum number of cells in dimension 'd'
@@ -61,7 +61,7 @@ void PointGrid::createCells()
 size_t PointGrid::capacity() const
 {
     size_t res = 0;
-    for ( size_t i = 0; i < pGrid.nbCells(); ++i )
+    for ( index_t i = 0; i < pGrid.nbCells(); ++i )
         res += pGrid[i].capacity();
     return res;
 }
@@ -535,7 +535,7 @@ void PointGrid::setStericsT(FatPointList & pots1, FatLocusList & locs1,
 void PointGrid::setSterics0() const
 {
     // scan all cells to examine each pair of particles:
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -560,7 +560,7 @@ void PointGrid::setStericsT() const
     assert_false( pGrid.isPeriodic() );
     
     // scan all cells to examine each pair of particles:
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -595,10 +595,10 @@ void PointGrid::setSterics() const
 /**
  Check interactions between the FatPoints contained in Pane `pan`.
  */
-void PointGrid::setSterics0(const size_t pan) const
+void PointGrid::setSterics0(const index_t pan) const
 {
     // scan all cells to examine each pair of particles:
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -619,11 +619,11 @@ void PointGrid::setSterics0(const size_t pan) const
 }
 
 
-void PointGrid::setStericsT(const size_t pan) const
+void PointGrid::setStericsT(const index_t pan) const
 {
     assert_false( pGrid.isPeriodic() );
     // scan all cells to examine each pair of particles:
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -648,12 +648,12 @@ void PointGrid::setStericsT(const size_t pan) const
  Check interactions between the FatPoints contained in Panes `pan1` and `pan2`,
  where ( pan1 != pan2 )
  */
-void PointGrid::setSterics0(const size_t pan1, const size_t pan2) const
+void PointGrid::setSterics0(const index_t pan1, const index_t pan2) const
 {
     assert_true(pan1 != pan2);
     
     // scan all cells to examine each pair of particles:
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -681,13 +681,13 @@ void PointGrid::setSterics0(const size_t pan1, const size_t pan2) const
     }
 }
 
-void PointGrid::setStericsT(const size_t pan1, const size_t pan2) const
+void PointGrid::setStericsT(const index_t pan1, const index_t pan2) const
 {
     assert_false( pGrid.isPeriodic() );
     assert_true(pan1 != pan2);
     
     // scan all cells to examine each pair of particles:
-    for ( size_t inx = 0; inx < pGrid.nbCells(); ++inx )
+    for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
         int nr = pGrid.getRegion(region, inx);
@@ -716,7 +716,7 @@ void PointGrid::setStericsT(const size_t pan1, const size_t pan2) const
 }
 
 
-void PointGrid::setSterics(size_t pan) const
+void PointGrid::setSterics(index_t pan) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(pan);
@@ -725,7 +725,7 @@ void PointGrid::setSterics(size_t pan) const
 }
 
 
-void PointGrid::setSterics(size_t pan1, size_t pan2) const
+void PointGrid::setSterics(index_t pan1, index_t pan2) const
 {
     if ( pGrid.isPeriodic() )
         setSterics0(pan1, pan2);

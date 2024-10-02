@@ -27,12 +27,12 @@
      -if `max_step` is too large, tryToAttach() will be slow.
  A compromise is to adjust `max_step` to the length of the segments.
  */
-size_t FiberGrid::setGrid(Vector inf, Vector sup, real max_step)
+index_t FiberGrid::setGrid(Vector inf, Vector sup, real max_step)
 {
     assert_true(max_step > 0);
     modulo_ = modulo;
     
-    size_t cnt[3] = { 1, 1, 1 };
+    index_t cnt[3] = { 1, 1, 1 };
     
     for ( int d = 0; d < DIM; ++d )
     {
@@ -44,13 +44,13 @@ size_t FiberGrid::setGrid(Vector inf, Vector sup, real max_step)
         if ( modulo_ && modulo_->isPeriodic(d) )
         {
             //adjust the grid to match the edges exactly
-            cnt[d] = std::max((size_t)1, (size_t)std::ceil(n));
+            cnt[d] = std::max((index_t)1, (index_t)std::ceil(n));
             fGrid.setPeriodic(d, true);
         }
         else
         {
             //extend the grid by one cell on each side
-            cnt[d]  = (size_t)std::ceil(n) + 2;
+            cnt[d]  = (index_t)std::ceil(n) + 2;
             inf[d] -= max_step;
             sup[d] += max_step;
         }
@@ -68,7 +68,7 @@ void FiberGrid::createCells()
 }
 
 
-size_t FiberGrid::nbCells() const
+index_t FiberGrid::nbCells() const
 {
     return fGrid.nbCells();
 }
@@ -80,9 +80,9 @@ size_t FiberGrid::hasGrid() const
 }
 
 
-size_t FiberGrid::nbTargets() const
+index_t FiberGrid::nbTargets() const
 {
-    size_t res = 0;
+    index_t res = 0;
     SegmentList * ptr = fGrid.data();
     const SegmentList * end = ptr + fGrid.nbCells();
     
@@ -491,7 +491,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
     //check all the segments to find those close enough from pos:
     for ( Fiber const* fib=set.first(); fib; fib=fib->next() )
     {
-        for ( unsigned p = 0; p < fib->nbSegments(); ++p )
+        for ( index_t p = 0; p < fib->nbSegments(); ++p )
         {
             FiberSegment seg(fib, p);
             real dis = INFINITY;

@@ -108,10 +108,10 @@ public:
     void deleteWrists(Object const*);
 
     /// create Wrists anchored on given Mecable
-    void makeWrists(ObjectList&, Mecable const*, size_t, size_t, std::string const&);
+    void makeWrists(ObjectList&, Mecable const*, index_t, index_t, std::string const&);
 
     /// create Single attached to the beads
-    void distributeWrists(ObjectList&, SingleProp const*, size_t cnt, std::string const&) const;
+    void distributeWrists(ObjectList&, SingleProp const*, index_t cnt, std::string const&) const;
     
     /// return the first free Single
     Single * firstF() const { return static_cast<Single*>(fList.front()); }

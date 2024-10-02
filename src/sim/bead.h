@@ -92,7 +92,7 @@ public:
     //--------------------------------------------------------------------------
     
     /// allocate memory
-    void allocateMecable(size_t);
+    void allocateMecable(index_t);
 
     /// sets the mobility
     void setDragCoefficient();

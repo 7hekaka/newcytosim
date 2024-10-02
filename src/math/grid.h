@@ -131,7 +131,7 @@ public:
     }
     
     /// return cell at index 'inx'
-    CELL& icell(const size_t inx) const
+    CELL& icell(const index_t inx) const
     {
         assert_true( inx < MAP::mNbCells );
         return gCell[ inx ];
@@ -140,7 +140,7 @@ public:
     /// reference to CELL whose center is closest to w[]
     CELL& cell(const real w[ORD]) const
     {
-        size_t inx = MAP::index(w);
+        index_t inx = MAP::index(w);
         assert_true( inx < MAP::mNbCells );
         return gCell[ inx ];
     }
@@ -153,7 +153,7 @@ public:
     }
    
     /// operator access to a cell by index
-    CELL& operator[](const size_t inx) const
+    CELL& operator[](const index_t inx) const
     {
         assert_true( inx <= MAP::mNbCells );
         return gCell[ inx ];
@@ -178,7 +178,7 @@ public:
 #pragma mark -
     
     /// create a 1D-map
-    void create1D(real i, real s, size_t d)
+    void create1D(real i, real s, index_t d)
     {
         assert_true( ORD == 1 );
         MAP::setDimensions(&i, &s, &d);
@@ -206,7 +206,7 @@ public:
     /// access to cell for ORD==1
     CELL& icell1D_clamped(const int x) const
     {
-        size_t inx = MAP::pack1D_clamped(x);
+        index_t inx = MAP::pack1D_clamped(x);
         assert_true( inx < MAP::mNbCells );
         return gCell[inx];
     }
@@ -214,7 +214,7 @@ public:
     /// access to cell for ORD==2
     CELL& icell2D_clamped(const int x, const int y) const
     {
-        size_t inx = MAP::pack2D_clamped(x,y);
+        index_t inx = MAP::pack2D_clamped(x,y);
         assert_true( inx < MAP::mNbCells );
         return gCell[inx];
     }
@@ -222,7 +222,7 @@ public:
     /// access to cell for ORD==3
     CELL& icell3D_clamped(const int x, const int y, const int z) const
     {
-        size_t inx = MAP::pack3D_clamped(x,y,z);
+        index_t inx = MAP::pack3D_clamped(x,y,z);
         assert_true( inx < MAP::mNbCells );
         return gCell[inx];
     }
@@ -235,7 +235,7 @@ public:
     {
         //we have 2^ORD corner cells
         const int sz = 1 << ORD;
-        size_t inx[sz];   //incides of the corner cells
+        index_t inx[sz];   //incides of the corner cells
         real    alp[sz];   //coefficients of interpolation
         
         int nb = 0;
@@ -293,8 +293,8 @@ public:
         
         ax -= ix;
         
-        size_t lx = MAP::ind_(0, ix-1);
-        size_t ux = MAP::ind_(0, ix  );
+        index_t lx = MAP::ind_(0, ix-1);
+        index_t ux = MAP::ind_(0, ix  );
         
         return gCell[lx] + ax * ( gCell[ux] - gCell[lx] );
     }
@@ -319,11 +319,11 @@ public:
         ax -= ix;
         ay -= iy;
         
-        size_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
-        size_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
+        index_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
+        index_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
 
-        size_t lx = MAP::ind_(0, ix-1);
-        size_t ux = MAP::ind_(0, ix  );
+        index_t lx = MAP::ind_(0, ix-1);
+        index_t ux = MAP::ind_(0, ix  );
         
         //sum weighted cells to get interpolation
         CELL  rl = gCell[lx+ly] + ay * ( gCell[lx+uy] - gCell[lx+ly] );
@@ -356,14 +356,14 @@ public:
         ay -= iy;
         az -= iz;
         
-        size_t lz = MAP::ind_(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
-        size_t uz = MAP::ind_(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
+        index_t lz = MAP::ind_(2, iz-1) * MAP::breadth(1) * MAP::breadth(0);
+        index_t uz = MAP::ind_(2, iz  ) * MAP::breadth(1) * MAP::breadth(0);
         
-        size_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
-        size_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
+        index_t ly = MAP::ind_(1, iy-1) * MAP::breadth(0);
+        index_t uy = MAP::ind_(1, iy  ) * MAP::breadth(0);
 
-        size_t lx = MAP::ind_(0, ix-1);
-        size_t ux = MAP::ind_(0, ix  );
+        index_t lx = MAP::ind_(0, ix-1);
+        index_t ux = MAP::ind_(0, ix  );
 
         CELL * cul = gCell + (ux+ly), rul = cul[lz] + ( cul[uz] - cul[lz] ) * az;
         CELL * cuu = gCell + (ux+uy), ruu = cuu[lz] + ( cuu[uz] - cuu[lz] ) * az;
@@ -384,7 +384,7 @@ public:
     void setValues(const CELL val)
     {
         assert_true( MAP::mNbCells <= gAllocated );
-        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+        for ( index_t i = 0; i < MAP::mNbCells; ++i )
             gCell[i] = val;
     }
     
@@ -392,7 +392,7 @@ public:
     void scaleValues(const CELL val)
     {
         assert_true ( MAP::mNbCells <= gAllocated );
-        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+        for ( index_t i = 0; i < MAP::mNbCells; ++i )
             gCell[i] *= val;
     }
     
@@ -403,7 +403,7 @@ public:
         sum = 0;
         mn = gCell[0];
         mx = gCell[0];
-        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+        for ( index_t i = 0; i < MAP::mNbCells; ++i )
         {
             //mn = std::min(mn, gCell[i]);
             //mx = std::max(mx, gCell[i]);
@@ -417,7 +417,7 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL result = 0;
-        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+        for ( index_t i = 0; i < MAP::mNbCells; ++i )
             result += gCell[i];
         return result;
     }
@@ -427,7 +427,7 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL res = gCell[0];
-        for ( size_t i = 1; i < MAP::mNbCells; ++i )
+        for ( index_t i = 1; i < MAP::mNbCells; ++i )
             res.e_min(gCell[i]);
         return res;
     }
@@ -437,7 +437,7 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL res = gCell[0];
-        for ( size_t i = 1; i < MAP::mNbCells; ++i )
+        for ( index_t i = 1; i < MAP::mNbCells; ++i )
             res.e_max(gCell[i]);
         return res;
     }
@@ -446,7 +446,7 @@ public:
     bool hasNegativeValue() const
     {
         assert_true( MAP::mNbCells <= gAllocated );
-        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+        for ( index_t i = 0; i < MAP::mNbCells; ++i )
             if ( gCell[i].negative() )
                 return true;
         return false;
@@ -455,7 +455,7 @@ public:
 #pragma mark -
     
     /// the sum of the values in the region around cell referred by 'inx'
-    CELL sumValuesInRegion(const size_t inx) const
+    CELL sumValuesInRegion(const index_t inx) const
     {
         CELL result = 0;
         int const* offsets = nullptr;
@@ -467,7 +467,7 @@ public:
     }
     
     /// the sum of the values in the region around cell referred by 'inx'
-    CELL avgValueInRegion(const size_t inx) const
+    CELL avgValueInRegion(const index_t inx) const
     {
         CELL result = 0;
         int const* offsets = nullptr;
@@ -479,7 +479,7 @@ public:
     }
     
     /// the maximum of the values in the region around cell referred by 'inx'
-    CELL maxValueInRegion(const size_t inx) const
+    CELL maxValueInRegion(const index_t inx) const
     {
         assert_true( MAP::mNbCells <= gAllocated );
         CELL result = gCell[inx];
@@ -499,7 +499,7 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         real w[ORD];
-        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+        for ( index_t i = 0; i < MAP::mNbCells; ++i )
         {
             MAP::setPositionFromIndex(w, i, offset);
             for ( int d=0; d < ORD; ++d )
@@ -513,7 +513,7 @@ public:
     {
         assert_true( MAP::mNbCells <= gAllocated );
         real l[ORD], r[ORD];
-        for ( size_t i = 0; i < MAP::mNbCells; ++i )
+        for ( index_t i = 0; i < MAP::mNbCells; ++i )
         {
             MAP::setPositionFromIndex(l, i, 0.0);
             MAP::setPositionFromIndex(r, i, 1.0);

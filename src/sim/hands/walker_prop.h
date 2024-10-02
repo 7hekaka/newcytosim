@@ -55,14 +55,14 @@ public:
     
 #if NEW_VARIABLE_WALK
     /// portion of the speed that depends on position
-    real variable_walking_rate_dt;
+    float variable_walking_rate_dt;
 #endif
     
     
 private:
     
     /// derived variable
-    real var_rate_dt;
+    float var_rate_dt;
     
     /// derived variable
     float walking_rate_dt;

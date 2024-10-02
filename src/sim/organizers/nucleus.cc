@@ -24,7 +24,7 @@ void Nucleus::setInteractions(Meca& meca) const
     
     if ( sph )
     {
-        for ( size_t i = Sphere::nbRefPoints; i < nuSphere->nbPoints(); ++i )
+        for ( index_t i = Sphere::nbRefPoints; i < nuSphere->nbPoints(); ++i )
         {
             Fiber const* fib = fiber(i-Sphere::nbRefPoints);
             if ( fib )
@@ -159,9 +159,9 @@ void Nucleus::read(Inputter& in, Simul& sim, ObjectTag tag)
  This sets the ends of the link number `inx`
  or returns zero if the link does not exist
  */
-bool Nucleus::getLink(size_t inx, Vector& pos1, Vector& pos2) const
+bool Nucleus::getLink(index_t inx, Vector& pos1, Vector& pos2) const
 {
-    size_t i = inx + Sphere::nbRefPoints;
+    index_t i = inx + Sphere::nbRefPoints;
     if ( sphere() && i < sphere()->nbPoints() )
     {
         pos1 = sphere()->posP(i);

@@ -166,7 +166,7 @@ void Fake::read(Inputter& in, Simul& sim, ObjectTag tag)
  This sets the ends of the link number `inx`
  or returns zero if the link does not exist
  */
-bool Fake::getLink(size_t inx, Vector& pos1, Vector& pos2) const
+bool Fake::getLink(index_t inx, Vector& pos1, Vector& pos2) const
 {
     if ( inx < asterPoints.size() )
     {

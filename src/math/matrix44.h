@@ -25,15 +25,12 @@
 class alignas(4*sizeof(real)) Matrix44
 {
 public:
-    
-    /// unsigned integer type used for indices
-    typedef size_t index;
 
     /// access to modifiable element by index
-    real& operator[](index i)       { return val[i]; }
+    real& operator[](index_t i)       { return val[i]; }
     
     /// access element value by index
-    real  operator[](index i) const { return val[i]; }
+    real  operator[](index_t i) const { return val[i]; }
 
 public:
 
@@ -45,7 +42,7 @@ public:
     /// copy constructor
     Matrix44(Matrix44 const& M)
     {
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] = M.val[u];
     }
     
@@ -107,23 +104,23 @@ public:
     /// set all elements to zero
     void reset()
     {
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] = 0.0;
     }
     
     /// set diagonal to 'dia' and other elements to 'off'
     void reset1(real off, real dia)
     {
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] = off;
-        for ( index u = 0; u < 4; ++u )
+        for ( index_t u = 0; u < 4; ++u )
             val[u*5] = dia;
     }
 
     /// true if any value is different from 'zero'
     bool operator != (real zero) const
     {
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             if ( val[u] != zero )
                 return true;
         return false;
@@ -151,36 +148,36 @@ public:
     real const* data() const { return val; }
 
     /// address of element at line i, column j
-    real* addr(const index i, const index j) { return val + ( i + 4*j ); }
+    real* addr(const index_t i, const index_t j) { return val + ( i + 4*j ); }
     /// value of element at line i, column j
-    real value(const index i, const index j) const { return val[i+4*j]; }
+    real value(const index_t i, const index_t j) const { return val[i+4*j]; }
 
     /// access functions to element by line and column indices
-    real& operator()(const index i, const index j)       { return val[i+4*j]; }
-    real  operator()(const index i, const index j) const { return val[i+4*j]; }
+    real& operator()(const index_t i, const index_t j)       { return val[i+4*j]; }
+    real  operator()(const index_t i, const index_t j) const { return val[i+4*j]; }
     
     /// set elements from given array
     void load(const real ptr[])
     {
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] = ptr[u];
     }
 
     /// copy elements to given array
     void store(real ptr[]) const
     {
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             ptr[u] = val[u];
     }
 
     /// extract column vector at given index
-    Vector4 column(const index i) const
+    Vector4 column(const index_t i) const
     {
         return Vector4(val+4*i);
     }
     
     /// extract line vector at given index
-    Vector4 line(const index i) const
+    Vector4 line(const index_t i) const
     {
         return Vector4(val[i], val[4+i], val[8+i], val[12+i]);
     }
@@ -211,9 +208,9 @@ public:
     {
         const int w = (int)os.width();
         os << std::setw(1) << "[";
-        for ( index i = 0; i < 4; ++i )
+        for ( index_t i = 0; i < 4; ++i )
         {
-            for ( index j = 0; j < 4; ++j )
+            for ( index_t j = 0; j < 4; ++j )
                 os << " " << std::fixed << std::setw(w) << value(i,j);
             if ( i < 3 )
                 os << ";";
@@ -235,7 +232,7 @@ public:
     /// scale all elements
     void scale(const real alpha)
     {
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] *= alpha;
     }
     
@@ -249,7 +246,7 @@ public:
     const Matrix44 operator -() const
     {
         Matrix44 M;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             M.val[u] = -val[u];
         return M;
     }
@@ -258,7 +255,7 @@ public:
     const Matrix44 operator *(const real alpha) const
     {
         Matrix44 M;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             M.val[u] = val[u] * alpha;
         return M;
     }
@@ -273,7 +270,7 @@ public:
     const Matrix44 operator +(Matrix44 const& M) const
     {
         Matrix44 res;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             res.val[u] = val[u] + M.val[u];
         return res;
     }
@@ -282,7 +279,7 @@ public:
     const Matrix44 operator -(Matrix44 const& M) const
     {
         Matrix44 res;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             res.val[u] = val[u] - M.val[u];
         return res;
     }
@@ -296,7 +293,7 @@ public:
         store4(val+8 , add4(load4(val+8 ), load4(M.val+8 )));
         store4(val+12, add4(load4(val+12), load4(M.val+12)));
 #else
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] += M.val[u];
 #endif
     }
@@ -310,7 +307,7 @@ public:
         store4(val+8 , sub4(load4(val+8 ), load4(M.val+8 )));
         store4(val+12, sub4(load4(val+12), load4(M.val+12)));
 #else
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] -= M.val[u];
 #endif
     }
@@ -346,8 +343,8 @@ public:
         store4(res.val+8 , blend22(v2, v0));
         store4(res.val+12, blend22(v3, v1));
 #else
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = 0; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = 0; y < 4; ++y )
             res.val[y+4*x] = val[x+4*y];
 #endif
         return res;
@@ -374,8 +371,8 @@ public:
         store4(res.val+8 , blend22(v2, v0));
         store4(res.val+12, blend22(v3, v1));
 #else
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = 0; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = 0; y < 4; ++y )
             res.val[y+4*x] = alpha * val[x+4*y];
 #endif
         return res;
@@ -385,7 +382,7 @@ public:
     real norm_inf() const
     {
         real res = abs_real(val[0]);
-        for ( index i = 1; i < 16; ++i )
+        for ( index_t i = 1; i < 16; ++i )
             res = max_real(res, abs_real(val[i]));
         return res;
     }
@@ -676,7 +673,7 @@ public:
     void add_full(Matrix44 const& M)
     {
         real const* src = M.val;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] += src[u];
     }
     
@@ -684,7 +681,7 @@ public:
     void add_full(const real alpha, Matrix44 const& M)
     {
         real const* src = M.val;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] += alpha * src[u];
     }
     
@@ -692,7 +689,7 @@ public:
     void sub_full(Matrix44 const& M)
     {
         real const* src = M.val;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] -= src[u];
     }
     
@@ -700,7 +697,7 @@ public:
     void sub_full(const real alpha, Matrix44 const& M)
     {
         real const* src = M.val;
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] -= alpha * src[u];
     }
 
@@ -709,11 +706,11 @@ public:
     {
         real const* src = M.val;
 #if ( 1 )
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] += src[u];
 #else
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = x; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = x; y < 4; ++y )
             val[y+4*x] += src[y+4*x];
 #endif
     }
@@ -723,11 +720,11 @@ public:
     {
         real const* src = M.val;
 #if ( 1 )
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] += alpha * src[u];
 #else
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = x; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = x; y < 4; ++y )
             val[y+4*x] += alpha * src[y+4*x];
 #endif
     }
@@ -769,11 +766,11 @@ public:
     {
         real const* src = M.val;
 #if ( 1 )
-        for ( index u = 0; u < 16; ++u )
+        for ( index_t u = 0; u < 16; ++u )
             val[u] -= src[u];
 #else
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = x; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = x; y < 4; ++y )
             val[y+4*x] -= src[y+4*x];
 #endif
     }
@@ -782,50 +779,50 @@ public:
     /// add all elements of block 'S' to array 'M'
     void addto(real * M, size_t ldd) const
     {
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = 0; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = 0; y < 4; ++y )
             M[y+ldd*x] = val[y+4*x];
     }
     
     /// add scaled elements of block 'S' to array 'M'
     void addto(real * M, size_t ldd, real alpha) const
     {
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = 0; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = 0; y < 4; ++y )
             M[y+ldd*x] = alpha * val[y+4*x];
     }
 
     /// add lower elements of this block to lower triangle of 'M'
     void addto_lower(real * M, size_t ldd) const
     {
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = x; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = x; y < 4; ++y )
             M[y+ldd*x] = val[y+4*x];
     }
     
     /// add scaled lower elements of this block to lower triangle of 'M'
     void addto_lower(real * M, size_t ldd, real alpha) const
     {
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = x; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = x; y < 4; ++y )
             M[y+ldd*x] = alpha * val[y+4*x];
     }
 
     /// add all elements of this block to 'M', with transposition
     void addto_trans(real * M, size_t ldd) const
     {
-        for ( index x = 0; x < 4; ++x )
-        for ( index y = 0; y < 4; ++y )
+        for ( index_t x = 0; x < 4; ++x )
+        for ( index_t y = 0; y < 4; ++y )
             M[x+ldd*y] = val[y+4*x];
     }
     
     /// add lower elements of this block to both upper and lower triangles of 'M'
     void addto_symm(real * M, size_t ldd) const
     {
-        for ( index x = 0; x < 4; ++x )
+        for ( index_t x = 0; x < 4; ++x )
         {
             M[x+ldd*x] = val[x+4*x];
-            for ( index y = x+1; y < 4; ++y )
+            for ( index_t y = x+1; y < 4; ++y )
             {
                 M[y+ldd*x] = val[y+4*x];
                 M[x+ldd*y] = val[y+4*x];

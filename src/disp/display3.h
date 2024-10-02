@@ -33,22 +33,22 @@ private:
     
     /// draw Fiber model segments
     void drawFiberSegmentsClip(Fiber const&, float rad,
-                               gym_color (*set_color)(Fiber const&, size_t)) const;
+                               gym_color (*set_color)(Fiber const&, unsigned)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
-    void drawFiberSectionsClip(Fiber const&, float rad, long inx, long last, real abs, real inc,
-                               gym_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+    void drawFiberSectionsClip(Fiber const&, float rad, int inx, int last, real abs, real inc,
+                               gym_color (*set_color)(Fiber const&, int, real), real fac, real facM, real facP) const;
     
     /// draw Fiber model segments
     void drawFiberSegmentsJoin(Fiber const&, float rad,
-                               gym_color (*set_color)(Fiber const&, size_t)) const;
+                               gym_color (*set_color)(Fiber const&, unsigned)) const;
     
     /// draw Fiber segments not necessarily aligned with the vertices
-    void drawFiberSectionsJoin(Fiber const&, float rad, long inx, long last, real abs, real inc,
-                               gym_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
+    void drawFiberSectionsJoin(Fiber const&, float rad, int inx, int last, real abs, real inc,
+                               gym_color (*set_color)(Fiber const&, int, real), real fac, real facM, real facP) const;
 
     /// display lattice substance using specified color function
-    void drawFiberLattice(Fiber const&, VisibleLattice const&, float rad, gym_color (*set_color)(Fiber const&, long, real)) const;
+    void drawFiberLattice(Fiber const&, VisibleLattice const&, float rad, gym_color (*set_color)(Fiber const&, int, real)) const;
 
 public:
         

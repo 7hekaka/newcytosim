@@ -86,7 +86,7 @@ void WristLong::setInteractions(Meca& meca) const
         meca.addLongLink(base_.vertex0(), itp, prop->length, prop->stiffness);
     else
     {
-        const size_t off = base_.vertex0().matIndex0();
+        const index_t off = base_.vertex0().matIndex0();
         real const* coef = base_.coef();
         meca.addLongLink4(itp, off, coef[0], coef[1], coef[2], coef[3], prop->length, prop->stiffness);
     }

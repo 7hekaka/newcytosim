@@ -26,12 +26,12 @@ private:
     Fiber const * fib_;
     
     /// index of segment's first point
-    unsigned sgi_;
+    index_t sgi_;
     
 public:
     
     /// construct without initialization
-    FiberSegment() {}
+    FiberSegment() : sgi_(0) {}
     
     /// constructor
     FiberSegment(Fiber const* f, unsigned p) : fib_(f), sgi_(p) {}
@@ -46,13 +46,13 @@ public:
     ObjectID identity() const { if ( fib_ ) return fib_->identity(); return 0; }
     
     /// index of segment
-    unsigned point() const { return sgi_; }
+    index_t point() const { return sgi_; }
     
     /// set segment index
     void point(unsigned p) { sgi_ = p; }
 
     /// Index of segment's first vertex in the isotropic matrix (Meca::mISO)
-    size_t matIndex0()  const { return fib_->matIndex() + sgi_; }
+    index_t matIndex0()  const { return fib_->matIndex() + sgi_; }
 
     /// abscissa at start of segment (i.e. corresponding to point())
     real abscissa1()    const { return fib_->abscissaPoint(sgi_); }
@@ -94,16 +94,16 @@ public:
     Mecapoint vertex2() const { return Mecapoint(fib_, sgi_+1); }
     
     /// true if the segment is the first of the Fiber
-    bool isFirst()     const { return ( sgi_ == 0 ); }
+    bool isFirst()  const { return ( sgi_ == 0U ); }
 
     /// true if the segment is not the first of the Fiber
-    bool notFirst()    const { return ( sgi_ > 0 ); }
+    bool notFirst() const { return ( sgi_ > 0U ); }
     
     /// true if the segment is the last of the fiber
-    bool isLast()      const { return ( sgi_+2 == fib_->nbPoints() ); }
+    bool isLast()   const { return ( sgi_+2U == fib_->nbPoints() ); }
     
     /// true if the segment is not the last of the fiber
-    bool notLast()     const { return ( sgi_+2 < fib_->nbPoints() ); }
+    bool notLast()  const { return ( sgi_+2U < fib_->nbPoints() ); }
 
     
     /// return abscissa of the projection of `w` on the line supporting the segment, and set distance

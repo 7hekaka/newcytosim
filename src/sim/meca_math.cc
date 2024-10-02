@@ -273,6 +273,7 @@ static void convert_to_floats(size_t cnt, double const* src, float* dst)
         dst[i] = (float)src[i];
 }
 
+#if 0
 typedef uint16_t bfloat16;
 
 static inline bfloat16 convert_to_bfloat16(float val)
@@ -295,7 +296,7 @@ static void convert_to_bfloat16s(size_t cnt, double const* src, bfloat16* dst)
     for ( size_t i = 0; i < cnt; ++i )
         dst[i] = convert_to_bfloat16(src[i]);
 }
-
+#endif
 
 /// set 'mat' of order `siz` with `diag` on the diagonal and 'off' elsewhere
 [[maybe_unused]]

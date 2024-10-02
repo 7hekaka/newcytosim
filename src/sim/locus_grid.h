@@ -30,34 +30,34 @@ class BigVector
 {
 public:
 
-    float XX, YY, ZZ;
-    float RR;
+    float xx, yy, zz;
+    float rr;
     
-    BigVector() { XX = 0; YY = 0; ZZ = 0; RR = 0; }
+    BigVector() { xx = 0; yy = 0; zz = 0; rr = 0; }
 
-    BigVector(Vector1 v, real r) { XX = v.XX; YY = 0; ZZ = 0; RR = r; }
-    BigVector(Vector2 v, real r) { XX = v.XX; YY = v.YY; ZZ = 0; RR = r; }
-    BigVector(Vector3 v, real r) { XX = v.XX; YY = v.YY; ZZ = v.ZZ; RR = r; }
+    BigVector(Vector1 v, real r) { xx = float(v.XX); yy = 0; zz = 0; rr = float(r); }
+    BigVector(Vector2 v, real r) { xx = float(v.XX); yy = float(v.YY); zz = 0; rr = float(r); }
+    BigVector(Vector3 v, real r) { xx = float(v.XX); yy = float(v.YY); zz = float(v.ZZ); rr = float(r); }
 
     //float const* data() const { return &XX; }
-    operator float*() { return &XX; }
-    operator const float*() const { return &XX; }
+    operator float*() { return &xx; }
+    operator const float*() const { return &xx; }
 
     /// @return result of test `distance(this, arg) < sum_of_ranges`
     bool near(BigVector const& arg) const
     {
-        float x = XX - arg.XX;
+        float x = xx - arg.xx;
 #if ( DIM == 1 )
-        float r = RR + arg.RR;
+        float r = rr + arg.rr;
         return ( std::fabs(x) <= r );
 #elif ( DIM == 2 )
-        float y = YY - arg.YY;
-        float r = RR + arg.RR;
+        float y = yy - arg.yy;
+        float r = rr + arg.rr;
         return ( x*x + y*y <= r*r );
 #else
-        float y = YY - arg.YY;
-        float z = ZZ - arg.ZZ;
-        float r = RR + arg.RR;
+        float y = yy - arg.yy;
+        float z = zz - arg.zz;
+        float r = rr + arg.rr;
         return ( x*x + y*y < r*r - z*z );
 #endif
     }
@@ -78,21 +78,18 @@ public:
     Mecable const* obj_;
     
     /// equilibrium radius of the interaction (distance where force is zero)
-    float    rad_;
+    float   rad_;
 
     /// index of segment's first point
-    unsigned vix_;
+    index_t vix_;
     
 public:
     
-    BigLocus() {}
+    BigLocus() : obj_(nullptr), vix_(0) {}
     
-    BigLocus(Mecable const* f, size_t i, real r, real e, Vector const& w)
-    : pos_(w, e)
+    BigLocus(Mecable const* f, index_t i, real r, real e, Vector const& w)
+    : pos_(w, e), obj_(f), rad_(float(r)), vix_(i)
     {
-        obj_ = f;
-        rad_ = r;
-        vix_ = static_cast<unsigned>(i);
         assert_true( i == vix_ );
     }
     
@@ -198,7 +195,7 @@ public:
     BigLocus const* end() const { return pane.end(); }
     
     /// reference to Object at index ii (val_[ii])
-    BigLocus const& operator[](const size_t i) const { return pane.at(i); }
+    BigLocus const& operator[](const index_t i) const { return pane.at(i); }
 
     /// allocated size
     size_t capacity() const { return pane.capacity(); }
@@ -229,11 +226,11 @@ public:
     /// clear all panes
     void clear()
     {
-        for ( size_t p = 1; p <= MAX_STERIC_PANES; ++p )
+        for ( index_t p = 1; p <= MAX_STERIC_PANES; ++p )
             panes[p].clear();
     }
     
-    BigLocusList& cell_list(size_t p)
+    BigLocusList& cell_list(index_t p)
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return panes[p];
@@ -328,7 +325,7 @@ private:
     void setStericsX(BigLocusList const&, BigLocusList const&) const;
 
     /// used for steric with periodic boundary conditions
-    inline size_t direct_index(Vector const& w)
+    inline index_t direct_index(Vector const& w)
     {
 #if ( DIM == 3 )
         return pGrid.direct_index3D(w.XX, w.YY, w.ZZ);
@@ -348,13 +345,13 @@ private:
     }
     
     /// cell corresponding to index `w`
-    BigLocusList& cell_pane(const size_t c) const
+    BigLocusList& cell_pane(const index_t c) const
     {
         return pGrid.icell(c);
     }
     
     /// cell corresponding to index `w`
-    BigLocusList& cell_list(const size_t w) const
+    BigLocusList& cell_list(const index_t w) const
     {
         return pGrid.icell(w);
     }
@@ -368,37 +365,37 @@ private:
 #else
     
     /// cell corresponding to position `w`, and pane `p`
-    BigLocusList& cell_pane(Vector const& w, const size_t p) const
+    BigLocusList& cell_pane(Vector const& w, const index_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.cell(w).panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    BigLocusList& cell_pane(const size_t c, const size_t p) const
+    BigLocusList& cell_pane(const index_t c, const index_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.icell(c).panes[p];
     }
     
     /// cell corresponding to index `c`, and pane `p`
-    BigLocusList& cell_list(const size_t c, const size_t p) const
+    BigLocusList& cell_list(const index_t c, const index_t p) const
     {
         assert_true( 0 < p && p <= MAX_STERIC_PANES );
         return pGrid.icell(c).panes[p];
     }
     
     /// enter interactions into Meca in one pane
-    void setSterics0(size_t pan) const;
+    void setSterics0(index_t pan) const;
     
     /// enter interactions into Meca in one pane
-    void setStericsT(size_t pan) const;
+    void setStericsT(index_t pan) const;
     
     /// enter interactions into Meca between two panes
-    void setSterics0(size_t pan1, size_t pan2) const;
+    void setSterics0(index_t pan1, index_t pan2) const;
     
     /// enter interactions into Meca between two panes
-    void setStericsT(size_t pan1, size_t pan2) const;
+    void setStericsT(index_t pan1, index_t pan2) const;
     
 #endif
     
@@ -414,7 +411,7 @@ public:
     void stiffness(real s) { push_ = s; }
                
     /// define grid covering specified volume, given a minimal cell size requirement
-    size_t setGrid(Vector inf, Vector sup, real min_width);
+    index_t setGrid(Vector inf, Vector sup, real min_width);
     
     /// allocate memory for grid
     void createCells();
@@ -460,7 +457,7 @@ public:
     {
         Vector w = fib->midPoint(inx);
         modulo->fold(w);
-        size_t c = direct_index(w);
+        index_t c = direct_index(w);
         //assert_true( c == pGrid.index(w) );
 #if ( MAX_STERIC_PANES <= 1 )
         BigLocusList& bll = cell_pane(c);
@@ -477,7 +474,7 @@ public:
     {
         Vector w = mec->posPoint(inx);
         modulo->fold(w);
-        size_t c = direct_index(w);
+        index_t c = direct_index(w);
         //assert_true( c == pGrid.index(w) );
 #if ( MAX_STERIC_PANES <= 1 )
         BigLocusList& bll = cell_pane(c);
@@ -494,10 +491,10 @@ public:
 #if ( MAX_STERIC_PANES > 1 )
 
     /// enter interactions into Meca in one pane
-    void setSterics(size_t pan) const;
+    void setSterics(index_t pan) const;
     
     /// enter interactions into Meca between two panes
-    void setSterics(size_t pan1, size_t pan2) const;
+    void setSterics(index_t pan1, index_t pan2) const;
     
 #endif
 

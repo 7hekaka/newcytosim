@@ -56,14 +56,14 @@ public:
     Sphere * sphere()   const { return nuSphere; }
     
     /// i-th fiber attached to the nucleus
-    Fiber * fiber(size_t i) const { return static_cast<Fiber*>(organized(i)); }
+    Fiber * fiber(index_t i) const { return static_cast<Fiber*>(organized(i)); }
     
     
     /// number of links to be displayed using getLink()
-    size_t nbLinks() const { return nuSphere->nbPoints(); }
+    index_t nbLinks() const { return nuSphere->nbPoints(); }
 
     /// retrieve link between Sphere and ends of Fiber
-    bool getLink(size_t, Vector&, Vector&) const;
+    bool getLink(index_t, Vector&, Vector&) const;
 
     //------------------------------ read/write --------------------------------
     

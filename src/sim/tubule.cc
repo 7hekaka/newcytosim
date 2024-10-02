@@ -32,7 +32,7 @@ Tubule::~Tubule()
 void Tubule::reset()
 {
     bone_ = nullptr;
-    for ( size_t i = 0; i < FILM; ++i )
+    for ( index_t i = 0; i < FILM; ++i )
     {
         fil_[i] = nullptr;
         // set as left-handed 3-start helix: 3 * 4 nm offset in one turn
@@ -67,7 +67,7 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
     }
 
     // all constitutive fibers should have the same length!
-    for ( size_t i = 0; i < NFIL; ++i )
+    for ( index_t i = 0; i < NFIL; ++i )
     {
         Fiber * fib = fp->newFiber();
         fib->constrainLength(false);
@@ -88,7 +88,7 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
     else
     {
         // find average direction
-        for ( size_t i = 0; i < NFIL; ++i )
+        for ( index_t i = 0; i < NFIL; ++i )
             dir += fil_[i]->diffPoints(0);
         dir.normalize();
     }
@@ -103,7 +103,7 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
      */
     real a = 0; //M_PI * RNG.sreal();
     real da = 2 * M_PI / NFIL;
-    for ( size_t i = 0; i < NFIL; ++i )
+    for ( index_t i = 0; i < NFIL; ++i )
     {
         fil_[i]->translate(std::cos(a)*E+std::sin(a)*F);
         a += da;
@@ -118,7 +118,7 @@ ObjectList Tubule::build(real rad, Glossary& opt, Simul& sim)
 Vector Tubule::posCenterlineM(real dis)
 {
     Vector vec(0, 0, 0);
-    for ( size_t i = 0; i < NFIL; ++i )
+    for ( index_t i = 0; i < NFIL; ++i )
         vec += fil_[i]->posM(dis);
     return vec / NFIL;
 }
@@ -131,11 +131,11 @@ Vector Tubule::posCenterlineM(real dis)
 void Tubule::setFamily(Fiber const* fam)
 {
     // wrap array values for convenience
-    for ( size_t i = NFIL; i < FILM; ++i )
+    for ( index_t i = NFIL; i < FILM; ++i )
         fil_[i] = fil_[i-NFIL];
 
 #if FIBER_HAS_FAMILY
-    for ( size_t i = 0; i < NFIL; ++i )
+    for ( index_t i = 0; i < NFIL; ++i )
     {
         if ( fil_[i] )
         {
@@ -163,7 +163,7 @@ void Tubule::salute(Buddy const* guy)
             // copy the growth exhibited from `bone_`
             real aP = bone_->abscissaP();
             real aM = bone_->abscissaM();
-            for ( size_t i = 0; i < NFIL; ++i )
+            for ( index_t i = 0; i < NFIL; ++i )
             {
                 fil_[i]->growP(aP-offset_[i]-fil_[i]->abscissaP());
                 fil_[i]->growM(fil_[i]->abscissaM()-aM+offset_[i]);
@@ -181,7 +181,7 @@ void Tubule::goodbye(Buddy const* b)
     std::cerr << "ERROR: Tubule's filaments cannot be deleted\n";
     if ( b )
     {
-        for ( size_t i = 0; i < NFIL+2; ++i )
+        for ( index_t i = 0; i < NFIL+2; ++i )
             if ( fil_[i] == b )
             {
                 fil_[i] = nullptr;
@@ -207,26 +207,26 @@ void Tubule::setInteractionsA(Meca& meca) const
     const real C = std::cos(ang), S = std::sin(ang);
     
     assert_true(fil_[0]);
-    const size_t e = fil_[0]->nbSegments();
+    const index_t e = fil_[0]->nbSegments();
     
     Rotation mat(0,1);
 
-    for ( size_t i = 0; i < e; ++i )
+    for ( index_t i = 0; i < e; ++i )
     {
         // compute centerline
         Vector cen(0,0,0);
-        for ( size_t n = 0; n < NFIL; ++n )
+        for ( index_t n = 0; n < NFIL; ++n )
             cen += fil_[n]->posPoint(i);
         cen /= NFIL;
         
         // get average direction of the Tubule at this location:
         Vector dir(0,0,0);
-        for ( size_t n = 0; n < NFIL; ++n )
+        for ( index_t n = 0; n < NFIL; ++n )
             dir += fil_[n]->diffPoints(i);
         dir.normalize();
         mat = Rotation::rotationAroundAxis(dir, C, S);
         
-        for ( size_t n = 0; n < NFIL; ++n )
+        for ( index_t n = 0; n < NFIL; ++n )
         {
             real alpha = len * fil_[n]->segmentationInv();
             Vector leg = mat.vecmul(( cen - fil_[n]->posPoint(i) ).normalized(alpha));
@@ -236,11 +236,11 @@ void Tubule::setInteractionsA(Meca& meca) const
 
     // get centerline
     Vector cen(0,0,0);
-    for ( size_t n = 0; n < NFIL; ++n )
+    for ( index_t n = 0; n < NFIL; ++n )
         cen += fil_[n]->posPoint(e);
     cen /= NFIL;
     
-    for ( size_t n = 0; n < NFIL; ++n )
+    for ( index_t n = 0; n < NFIL; ++n )
     {
         real alpha = len * fil_[n]->segmentationInv();
         Vector leg = mat.vecmul(( cen - fil_[n]->posPoint(e) ).normalized(alpha));
@@ -266,10 +266,10 @@ void Tubule::setInteractions(Meca& meca) const
     const real len = 2 * prop->radius * std::sin(ang);  // distance between protofilaments
     const real C = std::cos(ang), S = std::sin(ang);
     
-    const size_t e = bone_->nbSegments();
+    const index_t e = bone_->nbSegments();
     
     // check all filament length:
-    for ( size_t n = 0; n < NFIL; ++n )
+    for ( index_t n = 0; n < NFIL; ++n )
     {
         if ( fil_[n]->nbSegments() != e )
         {
@@ -282,14 +282,14 @@ void Tubule::setInteractions(Meca& meca) const
     real beta = prop->radius / len;
     Vector cen, dir;
     
-    for ( size_t i = 0; i < e; ++i )
+    for ( index_t i = 0; i < e; ++i )
     {
         // get centerline
         cen = bone_->posPoint(i);
         dir = bone_->dirSegment(i);
         mat = Rotation::rotationAroundAxis(dir, C, S);
         
-        for ( size_t n = 0; n < NFIL; ++n )
+        for ( index_t n = 0; n < NFIL; ++n )
         {
             real alpha = len * fil_[n]->segmentationInv();
             Vector leg = ( cen - fil_[n]->posPoint(i) ).normalized(alpha);
@@ -304,7 +304,7 @@ void Tubule::setInteractions(Meca& meca) const
 
     // link last point:
     cen = bone_->posPoint(e);
-    for ( size_t n = 0; n < NFIL; ++n )
+    for ( index_t n = 0; n < NFIL; ++n )
     {
         real alpha = len * fil_[n]->segmentationInv();
         Vector leg = ( cen - fil_[n]->posPoint(e) ).normalized(alpha);
@@ -330,27 +330,27 @@ void Tubule::setInteractionsC(Meca& meca) const
     Vector2 ang(std::cos(theta), std::sin(theta));
     
     assert_true(fil_[0]);
-    const size_t e = fil_[0]->nbSegments();
+    const index_t e = fil_[0]->nbSegments();
     
     MatrixBlock mat;
-    for ( size_t i = 0; i < e; ++i )
+    for ( index_t i = 0; i < e; ++i )
     {
         // get centerline
         Vector cen(0,0,0);
-        for ( size_t n = 0; n < NFIL; ++n )
+        for ( index_t n = 0; n < NFIL; ++n )
             cen += fil_[n]->posPoint(i);
         cen /= NFIL;
         
         // get average direction of the Tubule at this location:
         Vector dir(0,0,0);
-        for ( size_t n = 0; n < NFIL; ++n )
+        for ( index_t n = 0; n < NFIL; ++n )
             dir += fil_[n]->diffPoints(i);
         dir.normalize();
         
         // create rotation matrix for torque:
         mat = Meca::torqueMatrix(stiffA, dir, ang);
         
-        for ( size_t n = 0; n < NFIL; ++n )
+        for ( index_t n = 0; n < NFIL; ++n )
         {
             real alpha = len * fil_[n]->segmentationInv();
             Vector leg = ( 2*cen - fil_[n]->posPoint(i) - fil_[n+1]->posPoint(i)).normalized(alpha);
@@ -362,11 +362,11 @@ void Tubule::setInteractionsC(Meca& meca) const
     
     // last segment:
     Vector cen(0,0,0);
-    for ( size_t n = 0; n < NFIL; ++n )
+    for ( index_t n = 0; n < NFIL; ++n )
         cen += fil_[n]->posPoint(e);
     cen /= NFIL;
 
-    for ( size_t n = 0; n < NFIL; ++n )
+    for ( index_t n = 0; n < NFIL; ++n )
     {
         real alpha = len * fil_[n]->segmentationInv();
         Vector leg = (2*cen - fil_[n]->posPoint(e) - fil_[n+1]->posPoint(e)).normalized(alpha);
@@ -389,10 +389,10 @@ void Tubule::setInteractionsD(Meca& meca) const
     const real C = std::sin(ang), S = std::cos(ang); // rotation of angle PI/2 - ang
     Rotation mat(0, 1);
 
-    for ( size_t n = 0; n < NFIL; ++n )
+    for ( index_t n = 0; n < NFIL; ++n )
     {
         Fiber * fib = fil_[n+1];
-        const size_t e = fil_[n]->nbSegments();
+        const index_t e = fil_[n]->nbSegments();
         const real alpha = len * fib->segmentationInv();
 
         if ( fib->nbSegments() != e )
@@ -401,7 +401,7 @@ void Tubule::setInteractionsD(Meca& meca) const
             return;
         }
         
-        for ( size_t i = 0; i < e; ++i )
+        for ( index_t i = 0; i < e; ++i )
         {
             mat = Rotation::rotationAroundAxis(fib->dirSegment(i), C, S);
             // rotate direction of previous protofilament pair:
@@ -430,7 +430,7 @@ void Tubule::write(Outputter& out) const
     writeMarker(out, TAG);
     out.writeUInt16(NFIL+1);
     Object::writeReference(out, bone_);
-    for ( size_t i = 0; i < NFIL; ++i )
+    for ( index_t i = 0; i < NFIL; ++i )
     {
         Object::writeReference(out, fil_[i]);
     }
@@ -440,10 +440,10 @@ void Tubule::write(Outputter& out) const
 void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
     ObjectTag g;
-    size_t n = in.readUInt16()-1;
+    index_t n = in.readUInt16()-1;
     Object * w = sim.readReference(in, g);
     bone_ = Fiber::toFiber(w);
-    size_t i = 0;
+    index_t i = 0;
     for (; i < n && i < NFIL; ++i )
     {
         w = sim.readReference(in, g);
@@ -458,7 +458,7 @@ void Tubule::read(Inputter& in, Simul& sim, ObjectTag tag)
 void Tubule::report(std::ostream& os) const
 {
     os << reference() << " " << bone_->segmentation() << " " << bone_->nbPoints() << " " << bone_->length() << "\n";
-    for ( size_t i = 0; i < NFIL; ++i )
+    for ( index_t i = 0; i < NFIL; ++i )
     {
         Fiber const* F = fil_[i];
         if ( F )

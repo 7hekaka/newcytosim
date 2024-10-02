@@ -102,13 +102,13 @@ private:
     void reshape3D(real const*);
     
     /// part of build()
-    size_t makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
+    index_t makePoint(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    size_t makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
+    index_t makeSphere(ObjectList&, Glossary&, std::string const&, Simul&);
     
     /// part of build()
-    size_t makeBall(ObjectList&, Glossary&, std::string const&, Simul&);
+    index_t makeBall(ObjectList&, Glossary&, std::string const&, Simul&);
 
     /// part of build()
     void makeWrist(ObjectList&, Glossary&, std::string const&, Simul&);
@@ -117,7 +117,7 @@ private:
     Fiber* makeFiber(ObjectList&, Glossary&, std::string const&, Simul&);
 
     /// part of build()
-    void addWrists(ObjectList&, size_t num, SingleProp const*, size_t ref, std::string const&);
+    void addWrists(ObjectList&, index_t num, SingleProp const*, index_t ref, std::string const&);
 
     /// part of build()
     void buildTwin(ObjectList&, Glossary&, std::string const&, Simul&);
@@ -148,7 +148,7 @@ public:
     //------------------------------- Mecable ----------------------------------
     
     /// allocate memory
-    void allocateMecable(size_t);
+    void allocateMecable(index_t);
     
     /// free allocated memory
     void release();
@@ -166,7 +166,7 @@ public:
     real pointMobility() const { return nbPoints() / dragCoefficient(); }
     
     /// Number of distance constraints applied to the movements of vertices
-    unsigned nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
+    index_t nbConstraints() const { return DIM * nPoints - ( DIM + (DIM-1) * (nPoints>1) ); }
 
     /// add the interactions due to confinement
     void setInteractions(Meca&) const;
@@ -201,30 +201,30 @@ public:
     void getPoints(real const*);
 
     /// add a new point with a sphere (extends Mecable::addPoint)
-    size_t addSphere(Vector const&, real radius);
+    index_t addSphere(Vector const&, real radius);
     
     /// change radius of the sphere around point `i`
-    void setRadius(size_t i, real val);
+    void setRadius(index_t i, real val);
 
     /// add DIM points separated by `len`, to make a coordinate system around the last point
-    size_t addTriad(real len);
+    index_t addTriad(real len);
 
     /// rotate the 3 points to align the diagonal with the X-axis
-    void rotateTriad(size_t, Rotation const&);
+    void rotateTriad(index_t, Rotation const&);
 
     /// check if a coordinate system already exist at given index
-    real hasTriad(size_t, real epsilon = 0.001) const;
+    real hasTriad(index_t, real epsilon = 0.001) const;
     
     //--------------------------------------------------------------------------
     
     /// radius of the sphere around point `i`
-    real radius(const size_t i) const { return abs_real(soRadius[i]); }
+    real radius(const index_t i) const { return abs_real(soRadius[i]); }
     
     /// sum of all sphere's radius
     real sumRadius() const;
 
     /// set index of Spheres that are nearest neighbors to `inx`; return number of values set
-    size_t closestSpheres(size_t inx, size_t&, size_t&, size_t&) const;
+    index_t closestSpheres(index_t inx, index_t&, index_t&, index_t&) const;
 
     /// mean of all spheres weighted with their drag coefficients (or equivalently radius)
     Vector centroid() const;
@@ -258,7 +258,7 @@ public:
     /// sum distance squared of links between twins
     real twinTensionSqr() const
     {
-        size_t i = 1+DIM;
+        index_t i = 1+DIM;
         if ( soTwin && soTwin != this )
             return distanceSqr(posPoint(i), soTwin->posPoint(i));
         return 0;

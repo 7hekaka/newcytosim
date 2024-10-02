@@ -62,7 +62,7 @@ real Simul::minimumStericRange() const
     {
         if ( S->prop->steric_key )
         {
-            for ( size_t p = 0; p < S->nbPoints(); ++p )
+            for ( index_t p = 0; p < S->nbPoints(); ++p )
                 ran = max_real(ran, 2 * S->radius(p) + S->prop->steric_range);
         }
     }
@@ -165,7 +165,7 @@ void Simul::setAllInteractions(Meca& meca) const
 
         for ( Fiber const* F = fibers.first(); F; F = F->next() )
         {
-            for ( size_t n = 0; n < F->nbSegments(); ++n )
+            for ( index_t n = 0; n < F->nbSegments(); ++n )
             {
                 FiberSegment seg(F, n);
                 real dis = INFINITY;
@@ -268,9 +268,9 @@ void Simul::solve_auto()
     std::initializer_list<unsigned> methods { 0, 1, 6 };
     
     // how many timestep accumulated for each method:
-    constexpr size_t N_TESTS = 8;
+    constexpr index_t N_TESTS = 8;
     // number of timestep for next trial series:
-    constexpr size_t PERIOD = 32;
+    constexpr index_t PERIOD = 32;
     
     //automatically select the preconditionning mode:
     //by trying each methods N_STEP steps, adding CPU time and use fastest.
@@ -301,7 +301,7 @@ void Simul::solve_auto()
             {
                 char str[256], *ptr = str;
                 char*const end = str+sizeof(str);
-                ptr += snprintf(ptr, end-ptr, " precond selection %lu | method count cpu", N_TESTS);
+                ptr += snprintf(ptr, end-ptr, " precond selection %u | method count cpu", N_TESTS);
                 for ( unsigned u : methods )
                 {
                     real N = (real)autoCNT[u] / N_TESTS;
@@ -421,8 +421,8 @@ void Simul::solve_uniaxial()
         Hand const* h1 = c->hand1();
         Hand const* h2 = c->hand2();
         
-        const size_t i1 = h1->fiber()->matIndex();
-        const size_t i2 = h2->fiber()->matIndex();
+        const index_t i1 = h1->fiber()->matIndex();
+        const index_t i2 = h2->fiber()->matIndex();
         assert_true( i1 != i2 );
         
         pMeca1D->addLink(i1, i2, c->prop->stiffness, h2->pos().XX - h1->pos().XX);
@@ -431,7 +431,7 @@ void Simul::solve_uniaxial()
     for ( Single * s = singles.firstA(); s ; s=s->next() )
     {
         Hand const* h = s->hand();
-        const size_t i = h->fiber()->matIndex();
+        const index_t i = h->fiber()->matIndex();
         
         pMeca1D->addClamp(i, s->prop->stiffness, s->position().XX - h->pos().XX);
     }
@@ -504,9 +504,9 @@ static void join(Object ** table, ObjectFlag f, ObjectFlag g)
 
 
 /// number of points in list starting at 'ptr' and defined by 'next()'
-static size_t depth(Object * ptr)
+static index_t depth(Object * ptr)
 {
-    size_t cnt = 0;
+    index_t cnt = 0;
     while ( ptr )
     {
         cnt += static_cast<Mecable*>(ptr)->nbPoints();
@@ -542,14 +542,14 @@ ObjectFlag Simul::orderClustersCouple(Object ** table, ObjectFlag sup)
     }
 #if 1
     // pool smaller clusters together to reach 'target'
-    const size_t target = 256;
+    const index_t target = 256;
     ObjectFlag s = 1;
-    size_t cnt = depth(table[s]);
+    index_t cnt = depth(table[s]);
     for ( ObjectFlag f = s+1; f <= sup; ++f )
     {
         if ( table[f] )
         {
-            size_t d = depth(table[f]);
+            index_t d = depth(table[f]);
             if ( cnt + d < target )
             {
                 join(table, s, f);

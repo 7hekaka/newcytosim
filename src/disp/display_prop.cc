@@ -27,7 +27,7 @@ void DisplayProp::clear()
 void DisplayProp::read(Glossary& glos)
 {
     gym_color col;
-    for ( size_t i = 0; glos.set(col, "colors", i); ++i )
+    for ( unsigned i = 0; glos.set(col, "colors", i); ++i )
         gym::set_color(i, col);
 
     glos.set(style, "style", {{"fast", 1}, {"detailed", 2}, {"nice", 3}});

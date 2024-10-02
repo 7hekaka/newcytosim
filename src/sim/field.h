@@ -73,11 +73,11 @@ private:
         // we add a safety border (in micro-meters)
         const real extra = tight ? 0 : 1;
         
-        size_t n_cell[3] = { 0, 0, 0 };
+        index_t n_cell[3] = { 0, 0, 0 };
         // we use square cells:
         for ( int d = 0; d < DIM; ++d )
         {
-            n_cell[d] = (size_t)std::ceil( (sup[d]-inf[d]+extra) / step );
+            n_cell[d] = (index_t)std::ceil( (sup[d]-inf[d]+extra) / step );
             real mid = 0.5 * ( inf[d] + sup[d] );
             inf[d] = mid - 0.5 * step * n_cell[d];
             sup[d] = mid + 0.5 * step * n_cell[d];
@@ -171,7 +171,7 @@ public:
     FieldCell& cell(const real w[]) const { return mGrid.cell(w); }
     
     /// access to data
-    size_t nbCells() const { return mGrid.nbCells(); }
+    index_t nbCells() const { return mGrid.nbCells(); }
 
     /// info
     void infoValues(FieldCell& s, FieldCell& a, FieldCell& n, FieldCell& x) const { return mGrid.infoValues(s, a, n, x); }
@@ -186,7 +186,7 @@ public:
         mGrid.setValues( mGrid.cellVolume() * conc );
 #else
         FieldCell val = conc * mGrid.cellVolume();
-        for ( size_t i = 0; i < mGrid.nbCells(); ++i )
+        for ( index_t i = 0; i < mGrid.nbCells(); ++i )
             mGrid[i] = val * RNG.exponential();
 #endif
     }
@@ -198,7 +198,7 @@ public:
         FieldCell i = val_in * mGrid.cellVolume();
         FieldCell o = val_out * mGrid.cellVolume();
         
-        for ( size_t c = 0; c < mGrid.nbCells(); ++c )
+        for ( index_t c = 0; c < mGrid.nbCells(); ++c )
         {
             Vector w;
             mGrid.setPositionFromIndex(w, c, 0.5);
@@ -276,7 +276,7 @@ public:
                 o.writeFloat(mGrid.sup(d));
             }
             o.writeUInt32(mGrid.nbCells(), ' ');
-            for ( size_t c = 0; c < mGrid.nbCells(); ++c )
+            for ( index_t c = 0; c < mGrid.nbCells(); ++c )
                 mGrid.icell(c).write(o);
             o.writeSoftNewline();
         }
@@ -292,15 +292,15 @@ public:
     /// read Field from file using VAL::read()
     void readData(Inputter& in, Simul&)
     {
-        size_t size[DIM] = { 0 };
+        index_t size[DIM] = { 0 };
         real minB[DIM] = { 0 };
         real maxB[DIM] = { 0 };
         
-        size_t dim = in.readUInt16();
+        index_t dim = in.readUInt16();
         if ( dim != DIM )
             throw InvalidIO("cannot read field due to dimensionality mismatch");
         
-        for ( size_t d = 0; d < dim; ++d )
+        for ( index_t d = 0; d < dim; ++d )
         {
             size[d] = in.readUInt32();
             minB[d] = in.readFloat();
@@ -310,7 +310,7 @@ public:
         mGrid.setDimensions(minB, maxB, size);
         createCells();
         
-        size_t nbc = in.readUInt32();
+        index_t nbc = in.readUInt32();
         if ( nbc != mGrid.nbCells() )
         {
             std::cerr << "file: " << nbc << " field: " << mGrid.nbCells() << "\n";
@@ -318,7 +318,7 @@ public:
         }
         //std::clog << "readData() num_cells=" << nbc << '\n';
         
-        for ( size_t c = 0; c < nbc; ++c )
+        for ( index_t c = 0; c < nbc; ++c )
             mGrid.icell(c).read(in);
     }
     

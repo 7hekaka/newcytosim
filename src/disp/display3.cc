@@ -190,9 +190,9 @@ inline void Display3::drawHandF(Vector const& pos, PointDisp const* dis) const
 This draws the model-segments, using function `select_color` to set display colors
 */
 void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
-                                     gym_color (*select_color)(Fiber const&, size_t)) const
+                                     gym_color (*select_color)(Fiber const&, index_t)) const
 {
-    const size_t last = fib.lastSegment();
+    const index_t last = fib.lastSegment();
     Vector old = fib.posPoint(0);
     Vector pos = fib.posPoint(1);
     Vector nxt, dir;
@@ -213,7 +213,7 @@ void Display3::drawFiberSegmentsClip(Fiber const& fib, float rad,
         
         // draw inner segments
         gym::enableClipPlane(5);
-        for ( size_t i = 1; i < last; ++i )
+        for ( index_t i = 1; i < last; ++i )
         {
             old = pos;
             pos = nxt;
@@ -256,9 +256,9 @@ used to model the Fiber. All abscissa is relative to the minus end.
 The function `select_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
-                                     long inx, const long last,
+                                     int inx, const int last,
                                      real abs, const real inc,
-                                     gym_color (*select_color)(Fiber const&, long, real),
+                                     gym_color (*select_color)(Fiber const&, int, real),
                                      real fac, real facM, real facP) const
 {
     Vector old = fib.displayPosM(abs);
@@ -331,9 +331,9 @@ void Display3::drawFiberSectionsClip(Fiber const& fib, float rad,
 This draws the model-segments, using function `select_color` to set display colors
 */
 void Display3::drawFiberSegmentsJoin(Fiber const& fib, float rad,
-                                     gym_color (*select_color)(Fiber const&, size_t)) const
+                                     gym_color (*select_color)(Fiber const&, index_t)) const
 {
-    const size_t last = fib.lastSegment();
+    const index_t last = fib.lastSegment();
     Vector pos = fib.posPoint(0);
     Vector nxt = fib.posPoint(1);
     
@@ -349,7 +349,7 @@ void Display3::drawFiberSegmentsJoin(Fiber const& fib, float rad,
     }
     gle::tubeS();
 
-    for ( size_t i = 1; i < last; ++i )
+    for ( index_t i = 1; i < last; ++i )
     {
         pos = nxt;
         nxt = fib.posPoint(i+1);
@@ -372,9 +372,9 @@ used to model the Fiber. All abscissa is relative to the minus end.
 The function `select_color` is called to set the color of the segments.
 */
 void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
-                                     long inx, const long last,
+                                     int inx, const int last,
                                      real abs, const real inc,
-                                     gym_color (*select_color)(Fiber const&, long, real),
+                                     gym_color (*select_color)(Fiber const&, int, real),
                                      real fac, real facM, real facP) const
 {
     Vector pos = fib.displayPosM(abs);
@@ -619,7 +619,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
 
 
 void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, float rad,
-                                gym_color (*select_color)(Fiber const&, long, real)) const
+                                gym_color (*select_color)(Fiber const&, int, real)) const
 {
     FiberDisp const*const dis = fib.prop->disp;
 
@@ -877,7 +877,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
         gym::color_front(col);
         const float wid = pixscale(dis->width);
 
-        for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
+        for ( index_t i = 0; obj.getLink(i, P, Q); ++i )
         {
             drawPoint(P, dis);
             if ( modulo ) modulo->fold(Q, P);
@@ -902,7 +902,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             gle::dualPassBarrel();
 #else
             const float wid = pixscale(dis->width);
-            for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
+            for ( index_t i = 0; i < sol->nbPoints(); i+=2 )
             {
                 gym::stretchAlignZ(sol->posPoint(i), sol->posPoint(i+1), wid);
                 gle::hexTube();

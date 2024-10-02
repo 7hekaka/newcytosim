@@ -7,17 +7,17 @@
 
 
 template < typename MATRIX >
-static void setAdjacency(int mat[], const size_t lld, unsigned table[], MATRIX const& MAT)
+static void setAdjacency(int mat[], const index_t lld, index_t table[], MATRIX const& MAT)
 {
     // process all matrix columns:
-    for ( size_t j = 0; j < MAT.num_columns(); ++j )
+    for ( index_t j = 0; j < MAT.num_columns(); ++j )
     {
-        unsigned a = table[j];
+        index_t a = table[j];
         // consider all blocks in column
-        for ( size_t n = 0; n < MAT.column_size(j); ++n )
+        for ( index_t n = 0; n < MAT.column_size(j); ++n )
         {
             size_t i = MAT.column_index(j, n);
-            unsigned b = table[i];
+            index_t b = table[i];
             mat[b+lld*a] = 1;
         }
     }
@@ -28,18 +28,18 @@ static void setAdjacency(int mat[], const size_t lld, unsigned table[], MATRIX c
  mat[i+lld*j] is set to 1 if i-th and j-th Mecables interact, ie. if some
  element of the matrices is not null at the mecable's indices.
  */
-void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
+void Meca::setAdjacencyMatrix(int mat[], const index_t lld) const
 {
-    const size_t sup = nbMecables();
-    const size_t nbv = nbVertices();
+    const index_t sup = nbMecables();
+    const index_t nbv = nbVertices();
     assert_true(nbv > 0);
     // maps matrix index to Mecable
-    unsigned * table = new unsigned[nbv]{0};
+    index_t * table = new index_t[nbv]{0};
     
-    unsigned u = 0, f = 0;
+    index_t u = 0, f = 0;
     for ( Mecable * mec : mecables )
     {
-        unsigned e = u + mec->nbPoints();
+        index_t e = u + mec->nbPoints();
         while ( u < e )
             table[u++] = f;
         ++f;
@@ -68,14 +68,14 @@ void Meca::setAdjacencyMatrix(int mat[], const size_t lld) const
 class IndexOrder
 {
 public:
-    unsigned inx;  ///< index
-    unsigned ord;  ///< order
+    index_t inx;  ///< index
+    index_t ord;  ///< order
     
     /// constructor, set to zero
     IndexOrder() { inx=0; ord=0; }
 
     /// constructor
-    IndexOrder(unsigned i, unsigned o) { inx=i; ord=o; }
+    IndexOrder(index_t i, index_t o) { inx=i; ord=o; }
     
     /// ordering function used by std::set
     bool operator < (IndexOrder const&b) const { return ord < b.ord; }
@@ -85,8 +85,8 @@ public:
 /// compare function for qsort()
 static int compareOrder(const void * A, const void * B)
 {
-    unsigned a = static_cast<IndexOrder const*>(A)->ord;
-    unsigned b = static_cast<IndexOrder const*>(B)->ord;
+    auto a = static_cast<IndexOrder const*>(A)->ord;
+    auto b = static_cast<IndexOrder const*>(B)->ord;
     return ( a > b ) - ( a < b );
 }
 
@@ -95,15 +95,15 @@ static int compareOrder(const void * A, const void * B)
  Calculate the order of each node, and place lowest order first.
  Used by the Reverse CutHill McKee algorithm
  */
-static void calculateOrder(IndexOrder res[], const unsigned sup, int mat[])
+static void calculateOrder(IndexOrder res[], const index_t sup, int mat[])
 {
-    unsigned inx = 0, val = sup;
-    for ( unsigned f = 0; f < sup; ++f )
+    index_t inx = 0, val = sup;
+    for ( index_t f = 0; f < sup; ++f )
     {
         unsigned u = 0;
-        for ( unsigned i = 0; i < f; ++i )
+        for ( index_t i = 0; i < f; ++i )
             u += mat[f+i*sup];
-        for ( unsigned i = f+1; i < sup; ++i )
+        for ( index_t i = f+1; i < sup; ++i )
             u += mat[i+f*sup];
         res[f] = IndexOrder(f, u);
         // get index of lowest order:
@@ -124,7 +124,7 @@ static void calculateOrder(IndexOrder res[], const unsigned sup, int mat[])
  https://en.wikipedia.org/wiki/Cuthill%E2%80%93McKee_algorithm
  FJN, La Foret Fouesnant, 29.7.2022
  */
-static void reverseCuthillMcKee(Mecable* order[], const unsigned sup, int mat[], Mecable* mecables[])
+static void reverseCuthillMcKee(Mecable* order[], const index_t sup, int mat[], Mecable* mecables[])
 {
     IndexOrder *obj = new IndexOrder[sup];
     calculateOrder(obj, sup, mat);
@@ -165,7 +165,7 @@ static void reverseCuthillMcKee(Mecable* order[], const unsigned sup, int mat[],
 
 void Meca::reorderMecables()
 {
-    const unsigned sup = nbMecables();
+    const index_t sup = nbMecables();
     Mecable ** order = new Mecable*[sup]{nullptr};
     
     int * mat = new int[sup*sup]{0};
@@ -173,8 +173,8 @@ void Meca::reorderMecables()
     reverseCuthillMcKee(order, sup, mat, mecables.data());
     delete[] mat;
 
-    unsigned cnt = 0;
-    for ( unsigned i = 0; i < sup; ++i )
+    index_t cnt = 0;
+    for ( index_t i = 0; i < sup; ++i )
     {
         Mecable * mec = order[i];
         mecables[i] = mec;
@@ -205,14 +205,14 @@ void Meca::reorderMecables()
 
 /// equalize flags for any existing matrix element between Mecables
 template < typename MATRIX >
-static void flagConnectedMecables(Array<Mecable*> const mecables, const size_t sup,
+static void flagConnectedMecables(Array<Mecable*> const mecables, const index_t sup,
                                   Mecable** table, MATRIX const& MAT)
 {
     // process all matrix columns:
-    for ( size_t j = 0; j < sup; ++j )
+    for ( index_t j = 0; j < sup; ++j )
     {
         Mecable const* A = table[j];
-        for ( size_t n = 0; n < MAT.column_size(j); ++n )
+        for ( index_t n = 0; n < MAT.column_size(j); ++n )
         {
             /* we do not check the value of the elements here, but just
              the fact of having a block at these indices */
@@ -238,13 +238,13 @@ static void flagConnectedMecables(Array<Mecable*> const mecables, const size_t s
 /** Assuming that Mecable::flag() have been set already */
 void Meca::flagClusters() const
 {
-    const size_t MAX = nbVertices();
+    const index_t MAX = nbVertices();
     Mecable ** table = new Mecable*[MAX]{nullptr};
     
     for ( Mecable * mec : mecables )
     {
-        const size_t inx = mec->matIndex();
-        const size_t end = mec->nbPoints() + inx;
+        const index_t inx = mec->matIndex();
+        const index_t end = mec->nbPoints() + inx;
         assert_true( end <= MAX );
         for ( size_t i = inx; i < end; ++i )
             table[i] = mec;
@@ -326,7 +326,7 @@ void Meca::multiplyElasticity(const real* X, real* Y) const
  dimension of the array.
  */
 template < Meca::MultiplyFuncPtr MULTIPLY >
-void Meca::getMatrix(real * mat, size_t lda) const
+void Meca::getMatrix(real * mat, index_t lda) const
 {
     size_t dim = dimension();
     if ( lda < dim )
@@ -364,8 +364,8 @@ void Meca::saveObjectID(FILE * fp) const
     int i = 1;
     for ( Mecable const* mec : mecables )
     {
-        const size_t nbp = DIM * mec->nbPoints();
-        for ( size_t p = 0; p < nbp; ++p )
+        const index_t nbp = DIM * mec->nbPoints();
+        for ( index_t p = 0; p < nbp; ++p )
             fprintf(fp, "%if\n", i);
         ++i;
     }
@@ -375,9 +375,9 @@ void Meca::saveMobility(FILE * fp) const
 {
     for ( Mecable const* mec : mecables )
     {
-        const size_t nbp = mec->nbPoints();
+        const index_t nbp = mec->nbPoints();
         const real val = mec->pointMobility();
-        for ( size_t p = 0; p < DIM * nbp; ++p )
+        for ( index_t p = 0; p < DIM * nbp; ++p )
             fprintf(fp, "%f\n", val);
     }
 }
@@ -388,14 +388,13 @@ void Meca::saveMobility(FILE * fp) const
  This is a Sparse text format
  */
 template < Meca::MultiplyFuncPtr MULTIPLY >
-void Meca::saveMatrix(FILE * fp, real threshold) const
+void Meca::saveMatrix(FILE * fp, const size_t dim, real threshold) const
 {
     fprintf(fp, "%%%%MatrixMarket matrix coordinate real general\n");
     fprintf(fp, "%% This is a matrix produced by Cytosim\n");
     fprintf(fp, "%% author: Francois J. Nedelec\n");
     fprintf(fp, "%% kind: biological cell simulation (cytoskeleton)\n");
 
-    const size_t dim = dimension();
     real * src = new_real(dim);
     real * dst = new_real(dim);
     zero_real(dim, src);
@@ -434,17 +433,28 @@ void Meca::saveMatrix(FILE * fp, real threshold) const
  */
 void Meca::saveSystem() const
 {
+    size_t dim = dimension();
+    
     FILE * f = FilePath::open_file("matrix.mtx", "w");
-    saveMatrix<&Meca::multiply>(f, 0);
-    fclose(f);
+    if ( f )
+    {
+        saveMatrix<&Meca::multiply>(f, dim, 0);
+        fclose(f);
+    }
     
     f = FilePath::open_file("elasticity.mtx", "w");
-    saveMatrix<&Meca::multiplyElasticity>(f, 0);
-    fclose(f);
+    if ( f )
+    {
+        saveMatrix<&Meca::multiplyElasticity>(f, dim, 0);
+        fclose(f);
+    }
 
     f = FilePath::open_file("vector.mtx", "w");
-    saveVector(f, dimension(), vRHS);
-    fclose(f);
+    if ( f )
+    {
+        saveVector(f, dim, vRHS);
+        fclose(f);
+    }
 }
 
 
@@ -457,7 +467,7 @@ void Meca::exportSystem() const
     std::clog << "incorrect dump since SEPARATE_RIGIDITY_TERMS is defined\n";
 #endif
     FILE * f = FilePath::open_file("ord.txt", "w");
-    fprintf(f, "%lu %i %lu\n", dimension(), DIM, sizeof(real));
+    fprintf(f, "%u %u %lu\n", dimension(), DIM, sizeof(real));
     fclose(f);
     
     f = FilePath::open_file("stp.txt", "w");
@@ -490,7 +500,7 @@ void Meca::exportSystem() const
     os.close();
 #endif
         
-    unsigned alc = 0;
+    index_t alc = 0;
     for ( Mecable const* mec : mecables )
         alc = std::max(alc, mec->nbPoints());
 
@@ -501,7 +511,7 @@ void Meca::exportSystem() const
     
     for ( Mecable * mec : mecables )
     {
-        const unsigned bks = DIM * mec->nbPoints();
+        const index_t bks = DIM * mec->nbPoints();
         extractBlock(mec, tmp2);
         VecPrint::sparse_off(f, bks, bks, tmp2, bks, DIM*mec->matIndex());
     }
@@ -549,8 +559,8 @@ void Meca::dumpObjectID(FILE * fp) const
     uint32_t i = 1;
     for ( Mecable const* mec : mecables )
     {
-        const size_t nbp = mec->nbPoints();
-        for ( size_t p = 0; p < nbp; ++p )
+        const index_t nbp = mec->nbPoints();
+        for ( index_t p = 0; p < nbp; ++p )
             vec[p] = i;
         for ( int d = 0; d < DIM; ++d )
             fwrite(vec, sizeof(uint32_t), nbp, fp);
@@ -567,9 +577,9 @@ void Meca::dumpMobility(FILE * fp, bool nat) const
     
     for ( Mecable const* mec : mecables )
     {
-        const size_t nbp = mec->nbPoints();
+        const index_t nbp = mec->nbPoints();
         const real val = mec->pointMobility();
-        for ( size_t p=0; p < nbp; ++p )
+        for ( index_t p=0; p < nbp; ++p )
             vec[p] = val;
         for ( int d = 0; d < DIM; ++ d )
             dumpVector(fp, nbp, vec, nat);
@@ -690,7 +700,7 @@ void Meca::dumpPreconditionner(FILE * fp, bool nat) const
 void Meca::dumpSystem(bool nat) const
 {
     FILE * f = FilePath::open_file("ord.txt", "w");
-    fprintf(f, "%lu %i %lu\n", dimension(), DIM, sizeof(real));
+    fprintf(f, "%u %u %lu\n", dimension(), DIM, sizeof(real));
     fclose(f);
     
     f = FilePath::open_file("stp.txt", "w");
@@ -776,7 +786,7 @@ void markConnectivity(BitMap<1>& bmap, Array<Mecable*> const& mecs)
 void Meca::saveConnectivityBitmap() const
 {
     static unsigned cnt = 0;
-    const unsigned nbv = mecables.size();
+    const index_t nbv = mecables.size();
     BitMap<1> bmap(nbv, nbv);
     char str[32] = { 0 };
     
@@ -793,13 +803,13 @@ void Meca::saveConnectivityBitmap() const
 
 
 template < typename MATRIX >
-static void markMatrix(BitMap<1>& bmap, size_t sup, MATRIX const& mat)
+static void markMatrix(BitMap<1>& bmap, index_t sup, MATRIX const& mat)
 {
-    for ( size_t j = 0; j < sup; ++j )
+    for ( index_t j = 0; j < sup; ++j )
     {
-        for ( size_t n = 0; n < mat.column_size(j); ++n )
+        for ( index_t n = 0; n < mat.column_size(j); ++n )
         {
-            size_t i = mat.column_index(j, n);
+            index_t i = mat.column_index(j, n);
             if ( i < sup )
                 bmap.set(i, j, 1);
         }
@@ -808,30 +818,30 @@ static void markMatrix(BitMap<1>& bmap, size_t sup, MATRIX const& mat)
 
 /// add diagonal elements
 [[maybe_unused]]
-static void markDiagonal(BitMap<1>& bmap, size_t mag, Array<Mecable*> const& mecs)
+static void markDiagonal(BitMap<1>& bmap, index_t mag, Array<Mecable*> const& mecs)
 {
     for ( Mecable * mec : mecs )
     {
-        size_t i = mag * mec->matIndex();
-        size_t k = mag * mec->nbPoints();
-        for ( size_t j = 0; j < k; ++j )
+        index_t i = mag * mec->matIndex();
+        index_t k = mag * mec->nbPoints();
+        for ( index_t j = 0; j < k; ++j )
             bmap.set_if(i+j, i+j, 1);
     }
 }
 
 /// add vertical and horizontal lines to indicate mecables indices
-static void markMecables(BitMap<1>& bmap, size_t mag, Array<Mecable*> const& mecs)
+static void markMecables(BitMap<1>& bmap, index_t mag, Array<Mecable*> const& mecs)
 {
     for ( Mecable * mec : mecs )
     {
-        size_t i = mag * mec->matIndex();
-        for ( size_t j = 1; j < 6; ++j )
+        index_t i = mag * mec->matIndex();
+        for ( index_t j = 1; j < 6; ++j )
             bmap.set_if(i-j-1, i+j, 1);
     }
 }
 
 template < typename MATRIX >
-static void saveMatrixBitmap(MATRIX& mat, Array<Mecable*> mecs, size_t nbv, const char str[])
+static void saveMatrixBitmap(MATRIX& mat, Array<Mecable*> mecs, index_t nbv, const char str[])
 {
     BitMap<1> bmap(nbv, nbv);
     FILE * f = fopen(str, "w");
@@ -839,7 +849,7 @@ static void saveMatrixBitmap(MATRIX& mat, Array<Mecable*> mecs, size_t nbv, cons
         if ( !ferror(f) ) {
             bmap.clear();
             markMatrix(bmap, nbv, mat);
-            size_t mag = DIM*nbv/mat.size();
+            index_t mag = DIM*nbv/mat.size();
             //markDiagonal(bmap, mag, mecs);
             markMecables(bmap, mag, mecs);
             bmap.save(f);
@@ -848,16 +858,16 @@ static void saveMatrixBitmap(MATRIX& mat, Array<Mecable*> mecs, size_t nbv, cons
     }
 }
 
-void Meca::saveMatrixBitmaps(const char prefix[], size_t inc) const
+void Meca::saveMatrixBitmaps(const char prefix[], unsigned inc) const
 {
-    static size_t cnt = 0;
+    static unsigned cnt = 0;
     char str[64] = { 0 };
     
 #if USE_ISO_MATRIX
-    snprintf(str, sizeof(str), "%siso%08lu.bmp", prefix, cnt);
+    snprintf(str, sizeof(str), "%siso%08u.bmp", prefix, cnt);
     saveMatrixBitmap(mISO, mecables, mISO.num_columns(), str);
 #endif
-    snprintf(str, sizeof(str), "%sful%08lu.bmp", prefix, cnt);
+    snprintf(str, sizeof(str), "%sful%08u.bmp", prefix, cnt);
     saveMatrixBitmap(mFUL, mecables, mFUL.num_columns(), str);
     cnt += inc;
 }

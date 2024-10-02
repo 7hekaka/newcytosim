@@ -48,7 +48,7 @@ protected:
     mutable real inter_;
 
     /// index of segment where site is located: Vertex1 = hFiber::Vertex(segix_)
-    mutable unsigned segix_;
+    mutable index_t segix_;
 
 #if FIBER_HAS_LATTICE
     /// index in the Fiber's Lattice (a signed integer)

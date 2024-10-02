@@ -129,7 +129,7 @@ inline void drawMonomer(Vector3 const& pos, float rad)
     gle::sphere2();
 }
 
-static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color bak, bool flip)
+static void drawFootball(Solid const& obj, index_t inx, gym_color col, gym_color bak, bool flip)
 {
     assert_true(inx+DIM < obj.nbPoints());
     Vector X = obj.posP(inx);
@@ -516,7 +516,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
 {
     if ( numLineDisp < fibers.size() )
     {
-        constexpr size_t chunk = 32;
+        constexpr index_t chunk = 32;
         numLineDisp = ( fibers.size() + chunk ) & ~ ( chunk - 1 );
         delete[] allLineDisp;
         allLineDisp = new LineDisp[numLineDisp];
@@ -526,7 +526,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
         std::clog << " new allLineDisp(" << numLineDisp << ")\n";
 #endif
     }
-    size_t i = 0;
+    index_t i = 0;
     for ( Fiber * fib = fibers.first(); fib; fib = fib->next() )
     {
         fib->disp = &allLineDisp[i++];
@@ -547,7 +547,7 @@ void Display::attributeLineDisp(FiberSet const& fibers)
 void Display::prepareDrawing(Simul const& sim, PropertyList& fiberDisp, PropertyList& alldisp)
 {
     // counter to give different colors to the objects
-    size_t idx = 0;
+    unsigned idx = 0;
 
     PropertyList plist = sim.properties.find_all("fiber");
     
@@ -909,7 +909,7 @@ void Display::drawFiberLines(Fiber const& fib, const int style, float width) con
 {
     if ( style == 8 && fib.endStateP() != STATE_GREEN )
         return;
-    size_t cnt = 2 * fib.nbSegments();
+    index_t cnt = 2 * fib.nbSegments();
     flute4D* flu = gym::mapBufferC4VD(cnt+4);
     flute4D* ptr = flu;
     bool strip = 1;
@@ -918,13 +918,13 @@ void Display::drawFiberLines(Fiber const& fib, const int style, float width) con
     {
         case 1: { // display plain lines:
             gym_color c = fib.disp->color;
-            for ( size_t i = 0; i < fib.nbPoints(); ++i )
+            for ( index_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {c, fib.posP(i)};
             ptr = flu + fib.nbPoints();
         } break;
         case 2: // display segments with color indicating internal tension
             strip = 0;
-            for ( size_t n = 0; n < fib.nbSegments(); ++n )
+            for ( index_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gym_color c = color_by_tension(fib, n);
                 ptr[0] = {c, fib.posP(n)};
@@ -934,7 +934,7 @@ void Display::drawFiberLines(Fiber const& fib, const int style, float width) con
             break;
         case 3: // display segments with color indicating internal tension
             strip = 0;
-            for ( size_t n = 0; n < fib.nbSegments(); ++n )
+            for ( index_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gym_color c = color_by_tension_jet(fib, n);
                 ptr[0] = {c, fib.posP(n)};
@@ -944,7 +944,7 @@ void Display::drawFiberLines(Fiber const& fib, const int style, float width) con
             break;
         case 4: // color according to the angle with respect to the XY-plane:
             strip = 0;
-            for ( size_t n = 0; n < fib.nbSegments(); ++n )
+            for ( index_t n = 0; n < fib.nbSegments(); ++n )
             {
                 gym_color c = color_by_direction(fib, n);
                 ptr[0] = {c, fib.posP(n)};
@@ -953,7 +953,7 @@ void Display::drawFiberLines(Fiber const& fib, const int style, float width) con
             }
             break;
         case 5: // display segments with color indicating the curvature
-            for ( size_t i = 0; i < fib.nbPoints(); ++i )
+            for ( index_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {color_by_curvature(fib, i), fib.posP(i)};
             ptr = flu + fib.nbPoints();
             break;
@@ -961,19 +961,19 @@ void Display::drawFiberLines(Fiber const& fib, const int style, float width) con
             *ptr++ = {color_by_distanceM(fib, 0), fib.posP(0)};
             for ( real a = 0.0625; a < 0.6; a *= 2 )
                 *ptr++ = {color_by_distanceM(fib, a), fib.midPoint(0, a)};
-            for ( size_t n = 1; n < fib.nbPoints(); ++n )
+            for ( index_t n = 1; n < fib.nbPoints(); ++n )
                 *ptr++ = {color_by_distanceM(fib, n), fib.posP(n)};
             break;
         case 7: case 8: { // color according to the distance from the plus end
-            const size_t last = fib.lastPoint();
-            for ( size_t n = 0; n < last; ++n )
+            const index_t last = fib.lastPoint();
+            for ( index_t n = 0; n < last; ++n )
                 *ptr++ = {color_by_distanceP(fib, n), fib.posP(n)};
             for ( real a = 0.5; a > 0.06; a /= 2 )
                 *ptr++ = {color_by_distanceP(fib, last-a), fib.midPoint(last-1, 1-a)};
             *ptr++ = {color_by_distanceP(fib, last), fib.posP(last)};
         } break;
         case 9: // color according to distance to the confining Space
-            for ( size_t i = 0; i < fib.nbPoints(); ++i )
+            for ( index_t i = 0; i < fib.nbPoints(); ++i )
                 flu[i] = {color_by_height(fib, i), fib.posP(i)};
             ptr = flu + fib.nbPoints();
             break;
@@ -996,7 +996,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
     const int style = dis->line_style;
     if ( style == 8 && fib.endStateP() != STATE_GREEN )
         return;
-    size_t cnt = 8;
+    index_t cnt = 8;
     flute4D* flu = gym::mapBufferC4VD(cnt);
     flute4D* ptr = flu;
     
@@ -1050,7 +1050,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
     FiberDisp const*const dis = fib.prop->disp;
     const real gap = dis->speckle_gap;
 
-    size_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/gap);
+    index_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/gap);
     fluteD* pts = gym::mapBufferVD(cnt);
 
     // display random speckles:
@@ -1138,7 +1138,7 @@ void Display::drawFiberPoints(Fiber const& fib) const
         const real gap = dis->point_gap;
         const real rad = pixscale(dis->point_size);
         real beta = fib.segmentationInv() * rad;
-        size_t cnt = 4 * fib.length() / gap + 8;
+        index_t cnt = 4 * fib.length() / gap + 8;
         fluteD* flu = gym::mapBufferVD(cnt);
         fluteD* ptr = flu;
         real a = std::ceil(fib.abscissaM()/gap) * gap - fib.abscissaM();
@@ -1188,7 +1188,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
     FiberDisp const*const dis = fib.prop->disp;
     gym_color c, col = dis->color;
     const real fac = 1 / dis->lattice_scale;
-    size_t cnt = 2 * ( sup - inf );
+    index_t cnt = 2 * ( sup - inf );
     flute4D* flu = gym::mapBufferC4VD(cnt+4);
     flute4D* ptr = flu;
     
@@ -1255,7 +1255,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
     FiberDisp const*const dis = fib.prop->disp;
     gym_color c, col = dis->color;
     const real fac = 1 / dis->lattice_scale;
-    size_t cnt = 2 + 2 * ( sup - inf );
+    index_t cnt = 2 + 2 * ( sup - inf );
     flute4D* flu = gym::mapBufferC4VD(cnt);
     flute4D* ptr = flu;
     
@@ -1326,7 +1326,7 @@ void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat,
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
     
-    size_t cnt = sup - inf + 4;
+    index_t cnt = sup - inf + 4;
     fluteD* flu = gym::mapBufferVD(cnt);
     fluteD* ptr = flu;
     real abs = (inf+1) * uni - fib.abscissaM();
@@ -1398,9 +1398,9 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
     {
         // draw fiber identity and vertex indices
         int C = snprintf(str, sizeof(str), " %u:", fib.identity());
-        for ( size_t i = 0; i < fib.nbPoints(); ++i )
+        for ( index_t i = 0; i < fib.nbPoints(); ++i )
         {
-            snprintf(str+C, sizeof(str)-C, "%lu", i);
+            snprintf(str+C, sizeof(str)-C, "%u", i);
             strokeText(fib.posP(i), str, pixelSize);
         }
     } 
@@ -1408,7 +1408,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
     {
         // draw fiber identity and abscissa value at vertices
         int C = snprintf(str, sizeof(str), " %u:", fib.identity());
-        for ( size_t i = 0; i < fib.nbPoints(); ++i )
+        for ( index_t i = 0; i < fib.nbPoints(); ++i )
         {
             snprintf(str+C, sizeof(str)-C, "%.3f", fib.abscissaPoint(i));
             strokeText(fib.posP(i), str, pixelSize);
@@ -1435,7 +1435,7 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
     {
         // indicate tension values in the segments
         Vector a = fib.posEndM();
-        for ( size_t i = 1; i < fib.nbPoints(); ++i )
+        for ( index_t i = 1; i < fib.nbPoints(); ++i )
         {
             Vector b = fib.posP(i);
             snprintf(str, sizeof(str), "%+4.1f", fib.tension(i-1));
@@ -1453,7 +1453,7 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
     gym_color lor = col.alpha_scaled(0.5f);
     unsigned cnt = 2 * fib.nbPoints();
     flute4D* flu = gym::mapBufferC4VD(cnt);
-    for ( size_t i = 0; i < fib.nbPoints(); ++i )
+    for ( index_t i = 0; i < fib.nbPoints(); ++i )
     {
         Vector P = fib.posP(i);
         Vector F = mag * fib.netForce(i);
@@ -1485,7 +1485,7 @@ void Display::drawFiberWide(Fiber const& fib, float rad) const
     ptr += 2;
     
     Vector old;
-    for ( size_t i = 1; i < fib.nbSegments(); ++i )
+    for ( index_t i = 1; i < fib.nbSegments(); ++i )
     {
         old = pos;
         pos = nxt;
@@ -1517,7 +1517,7 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     // abs in [0, uni] is now relative to minus end
     real abs = inc * cnt - fib.abscissaM();
     // draw segments
-    size_t top = 10 * std::floor(sup/inc) + 14;
+    index_t top = 10 * std::floor(sup/inc) + 14;
     flute4D* flu = gym::mapBufferC4VD(top);
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
@@ -1590,7 +1590,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     }
     gym_color clr = col;
     // draw segments
-    size_t top = 8 * fib.length() / uni + 8;
+    index_t top = 8 * fib.length() / uni + 8;
     flute4D* flu = gym::mapBufferC4VD(top);
     flute4D* ptr = flu;
     Vector pos = fib.posEndM();
@@ -2024,14 +2024,14 @@ void Display::drawFiber(Fiber const& fib)
      */
     if (( style==1 && fib.disp->color.transparent()) || ( style==2 || style==3 ))
     {
-        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+        for ( index_t i = 0; i < fib.lastPoint(); ++i )
             zObjects.emplace(&fib, i);
         style = 0;
     }
     else if ( style == 6 )
     {
         // color according to the distance from the minus end
-        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+        for ( index_t i = 0; i < fib.lastPoint(); ++i )
             if ( color_by_distanceM(fib, i).visible() )
                 zObjects.emplace(&fib, i);
         style = 0;
@@ -2039,7 +2039,7 @@ void Display::drawFiber(Fiber const& fib)
     else if ( style == 7 || ( style == 8 && fib.endStateP() == STATE_GREEN ))
     {
         // color according to the distance from the plus end
-        for ( size_t i = 0; i < fib.lastPoint(); ++i )
+        for ( index_t i = 0; i < fib.lastPoint(); ++i )
             if ( color_by_distanceP(fib, i+1).visible() )
                 zObjects.emplace(&fib, i);
         style = 0;
@@ -2212,7 +2212,7 @@ void Display::drawSolid(Solid const& obj)
         const float rad = pixscale(dis->size);
         gym::color_both(col);
         gym::enableLighting();
-        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+        for ( index_t i = 0; i < obj.nbPoints(); ++i )
         {
             if ( 0 < obj.hasTriad(i) )
             {
@@ -2251,9 +2251,9 @@ void Display::drawSolid(Solid const& obj)
         gym::ref_view();
         gym::enableLighting();
         gym::disableCullFace();
-        const unsigned off = DIM+1; // index of point to be linked
-        const unsigned sup = std::min(obj.lastPoint(), 2*off+1); // last point to be linked
-        for ( unsigned inx = off; inx <= sup; inx += off+1 )
+        const index_t off = DIM+1; // index of point to be linked
+        const index_t sup = std::min(obj.lastPoint(), index_t(2*off+1)); // last to be linked
+        for ( index_t inx = off; inx <= sup; inx += off+1 )
         {
             gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), rad);
             gym::color_back(lor.darken(0.5));
@@ -2264,7 +2264,7 @@ void Display::drawSolid(Solid const& obj)
     }
 #endif
 
-#if OLD_SOLID_HAS_TWIN
+#ifdef OLD_SOLID_HAS_TWIN
     // display links between twin solids
     if ( obj.elder_twin() && ( dis->style & 6 ) && dis->perceptible )
     {
@@ -2272,7 +2272,7 @@ void Display::drawSolid(Solid const& obj)
         gym_color lor = bodyColorF(*twi);
         // draw links between 'obj' and its Twin
         real rad = M_SQRT2 * pixscale(dis->size);
-        const size_t inx = 0;
+        const index_t inx = 0;
         // three points are expected:
         if ( obj.radius(inx) > 0 && obj.nbPoints() > inx+4 )
         {
@@ -2340,7 +2340,7 @@ void Display::drawSolid(Solid const& obj)
         gym::color(col);
 #if ( DIM == 2 )
         gym::disableLighting();
-        for ( size_t i = 0; i < obj.nbPoints(); ++i )
+        for ( index_t i = 0; i < obj.nbPoints(); ++i )
         {
             if ( obj.radius(i) > pixelSize )
             {
@@ -2368,9 +2368,9 @@ void Display::drawSolid(Solid const& obj)
         gym::color(col);
         snprintf(tmp, sizeof(tmp), "0:%u", obj.identity());
         strokeText(obj.posP(0), tmp, pixelSize);
-        for ( size_t i = 1; i < obj.nbPoints(); ++i )
+        for ( index_t i = 1; i < obj.nbPoints(); ++i )
         {
-            snprintf(tmp, sizeof(tmp), "%lu", i);
+            snprintf(tmp, sizeof(tmp), "%u", i);
             strokeText(obj.posP(i), tmp, pixelSize);
         }
     }
@@ -2394,13 +2394,13 @@ void Display::drawSolidT(Solid const& obj, unsigned inx) const
 {
     Vector X = obj.posP(inx);
     // using clipping planes to cleanup overlapping Spheres
-    size_t near[3];
-    size_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
+    index_t near[4];
+    index_t num = obj.closestSpheres(inx, near[0], near[1], near[2]);
     //printf("nearest Spheres to %lu / %lu are %lu %lu %lu\n", inx, obj.nbPoints(), near[0], near[1], near[2]);
     // set clipping planes with nearest Spheres
-    for ( size_t i = 0; i < num; ++i )
+    for ( index_t i = 0; i < num; ++i )
     {
-        size_t J = near[i];
+        index_t J = near[i];
         Vector P = obj.posP(J);
         real A = ( square(obj.radius(inx)) - square(obj.radius(J)) ) / distanceSqr(X, P);
         gym::enableClipPlane(5-i);
@@ -2419,7 +2419,7 @@ void Display::drawSolidT(Solid const& obj, unsigned inx) const
     gym::color(col);
     drawDiscT(X, obj.radius(inx));
 #endif
-    for ( size_t i = 0; i < num; ++i )
+    for ( index_t i = 0; i < num; ++i )
         gym::disableClipPlane(5-i);
 }
 
@@ -2435,7 +2435,7 @@ void Display::drawSolids(SolidSet const& set)
             if ( dis->style & 1 )
             {
                 // draw Solid's balls which can be transparent or not
-                size_t sup = obj->nbPoints();
+                index_t sup = obj->nbPoints();
                 if ( dis->style & 4 ) sup = 1;
 #if ( DIM >= 3 )
 #if NEW_SOLID_HAS_TWIN
@@ -2443,7 +2443,7 @@ void Display::drawSolids(SolidSet const& set)
                 if ( twi )
                 {
                     if ( twi != obj ) // only select elder twin
-                    for ( size_t inx = 0; inx+DIM < obj->nbPoints(); inx += DIM+2 )
+                    for ( index_t inx = 0; inx+DIM < obj->nbPoints(); inx += DIM+2 )
                     {
                         gym::enableLighting();
                         gym_color black(0,0,0,1);
@@ -2456,14 +2456,14 @@ void Display::drawSolids(SolidSet const& set)
 #endif
                 if ( dis->color.transparent() )
                 {
-                    for ( size_t i = 0; i < sup; ++i )
+                    for ( index_t i = 0; i < sup; ++i )
                         if ( obj->radius(i) > 0 )
                             zObjects.emplace(obj, i);
                 }
                 else
 #endif
                 {
-                    for ( size_t i = 0; i < sup; ++i )
+                    for ( index_t i = 0; i < sup; ++i )
                         if ( obj->radius(i) > 0 )
                             drawSolidT(*obj, i);
                 }
@@ -2586,7 +2586,7 @@ void Display::drawSphere(Sphere const& obj)
         if ( dis->style & 2 )
         {
             bodyColor(obj);
-            for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
+            for ( index_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
                 drawObject(obj.posP(i), rad, gle::sphere1);
         }
         
@@ -2595,7 +2595,7 @@ void Display::drawSphere(Sphere const& obj)
         {
             bodyColor(obj);
             drawObject(obj.posP(0), rad, gle::star);
-            for ( size_t i = 0; i < obj.nbRefPoints; ++i )
+            for ( index_t i = 0; i < obj.nbRefPoints; ++i )
                 drawObject(obj.posP(i), rad, gle::cube);
         }
     }
@@ -2673,12 +2673,11 @@ void Display::drawOrganizer(Organizer const& obj) const
     if ( sol ) col = bodyColorF(*sol).match_a(dis->color);
     if ( sph ) col = bodyColorF(*sph).match_a(dis->color);
 
-    size_t i = 0, cnt = obj.nbLinks();
-
     if ( dis->style & 2 )
     {
         // draw links between Solid/Sphere and Mecables
         Vector P, Q;
+        index_t cnt = obj.nbLinks(), i = 0;
         fluteD* flu = gym::mapBufferVD(2*cnt);
         while ( obj.getLink(i, P, Q) )
         {

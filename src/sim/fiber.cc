@@ -306,7 +306,7 @@ real Fiber::projectPoint(Vector const& w, real & dis) const
     real abs = 0, len = segmentation();
     
     // try all segments
-    for ( size_t s = 0; s < nbSegments(); ++s )
+    for ( index_t s = 0; s < nbSegments(); ++s )
     {
         //project on the segment:
         real d = INFINITY;
@@ -410,7 +410,7 @@ void Fiber::cutP(real len)
  .
  @return zero, if `pti` is not an internal point
  */
-Fiber* Fiber::severJoint(size_t pti)
+Fiber* Fiber::severJoint(index_t pti)
 {
     if ( pti == 0  ||  pti >= lastPoint() )
         return nullptr;
@@ -666,10 +666,10 @@ void Fiber::severNow()
 /**
  returns index of first point for which `std::cos(angle) < max_cosine`  or zero
  */
-size_t Fiber::hasKink(const real max_cosine) const
+index_t Fiber::hasKink(const real max_cosine) const
 {
-    size_t end = nPoints - 2;
-    for ( size_t p = 0; p < end; ++p )
+    index_t end = nPoints - 2;
+    for ( index_t p = 0; p < end; ++p )
     {
         if ( dot(diffPoints(p), diffPoints(p+1)) < max_cosine )
             return p+1;
@@ -691,7 +691,7 @@ void Fiber::planarCut(Vector const& n, const real a,
      The cuts should be processed in order of decreasing abscissa,
      hence we consider the segments downwards from plus end to minus end
     */
-    for ( size_t s = nbSegments(); s-- > 0 ; )
+    for ( index_t s = nbSegments(); s-- > 0 ; )
     {
         real abs = planarIntersect(s, n, a);
         if ( 0 <= abs  &&  abs < 1 )
@@ -1006,7 +1006,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
     switch ( mode )
     {
         case CONFINE_INSIDE:
-            for ( unsigned i = 0; i < nPoints; ++i )
+            for ( index_t i = 0; i < nPoints; ++i )
             {
                 Vector pos = posP(i);
                 if ( spc->outside(pos) )
@@ -1015,7 +1015,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             break;
             
         case CONFINE_OUTSIDE:
-            for ( unsigned i = 0; i < nPoints; ++i )
+            for ( index_t i = 0; i < nPoints; ++i )
             {
                 Vector pos = posP(i);
                 if ( spc->inside(pos) )
@@ -1024,12 +1024,12 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             break;
             
         case CONFINE_ON:
-            for ( unsigned i = 0; i < nPoints; ++i )
+            for ( index_t i = 0; i < nPoints; ++i )
                 spc->setConfinement(posP(i), Mecapoint(this, i), meca, stiff);
             break;
         
         case CONFINE_IN_OUT:
-            for ( unsigned i = 0; i < nPoints; ++i )
+            for ( index_t i = 0; i < nPoints; ++i )
             {
                 Vector pos = posP(i);
                 real S = ( spc->inside(pos) ? stiff : stiff2 );
@@ -1043,13 +1043,13 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             
         case CONFINE_PLUS_END:
         {
-            const unsigned L = lastPoint();
+            const index_t L = lastPoint();
             spc->setConfinement(posP(L), Mecapoint(this, L), meca, stiff);
         } break;
             
         case CONFINE_BOTH_ENDS:
         {
-            const unsigned L = lastPoint();
+            const index_t L = lastPoint();
             spc->setConfinement(posP(0), Mecapoint(this, 0), meca, stiff);
             spc->setConfinement(posP(L), Mecapoint(this, L), meca, stiff);
         } break;
@@ -1063,7 +1063,7 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
 
         case CONFINE_PLUS_OUT:
         {
-            const unsigned L = lastPoint();
+            const index_t L = lastPoint();
             Vector pos = posP(L);
             if ( spc->inside(pos) )
                 spc->setConfinement(pos, Mecapoint(this, L), meca, stiff);
@@ -1777,7 +1777,7 @@ void Fiber::setGlue3(Single* glue, Space const* spc)
             return;
         
         // find a vertex that is on the other side of the Space edge:
-        for ( size_t i = 1; i < nPoints; ++i )
+        for ( index_t i = 1; i < nPoints; ++i )
         {
             if ( spc->inside(posP(i)) != in )
             {

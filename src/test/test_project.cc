@@ -23,15 +23,12 @@
 #include "../sim/mecafil_code.cc"
 
 
-/// type used for indexing
-typedef size_t UINT;
-
 /// number of segments:
-const UINT NSEG = 117;
+const index_t NSEG = 117;
 /// number of vertex coordinates
-const UINT NVAL = DIM * ( NSEG + 1 );
-const UINT ALOC = NVAL + 8;
-const UINT SUB = 64;
+const index_t NVAL = DIM * ( NSEG + 1 );
+const index_t ALOC = NVAL + 8;
+const index_t SUB = 64;
 
 /// vectors for one filament
 real *pos_=nullptr, *dir_=nullptr, *ani_=nullptr;
@@ -41,15 +38,15 @@ real *diag_=nullptr, *upper_=nullptr;
 //
 
 /// fill vector with signalling NANs
-void nan_fill(UINT cnt, real * ptr)
+void nan_fill(index_t cnt, real * ptr)
 {
     real n = std::numeric_limits<real>::signaling_NaN();
-    for ( UINT u = 0; u < cnt; ++u )
+    for ( index_t u = 0; u < cnt; ++u )
         ptr[u] = n;
 }
 
 
-void new_nans(UINT cnt, real*& ptr)
+void new_nans(index_t cnt, real*& ptr)
 {
     free_real(ptr);
     ptr = new_real(cnt);
@@ -57,16 +54,16 @@ void new_nans(UINT cnt, real*& ptr)
     //printf("%p = new_nans(%lu)\n", ptr, cnt);
 }
 
-void new_nans(UINT cnt, real*& x, real*& y, real*& z)
+void new_nans(index_t cnt, real*& x, real*& y, real*& z)
 {
     new_nans(cnt, x);
     new_nans(cnt, y);
     new_nans(cnt, z);
 }
 
-void randomize(UINT cnt, real*& x, real*& y, real*& z, real mag)
+void randomize(index_t cnt, real*& x, real*& y, real*& z, real mag)
 {
-    for ( UINT i = 0; i < cnt; ++i )
+    for ( index_t i = 0; i < cnt; ++i )
     {
         x[i] = mag * RNG.sreal();
         y[i] = mag * RNG.sreal();
@@ -95,10 +92,10 @@ void free_reals(real*& x, real*& y, real*& z, real*& t)
 //------------------------------------------------------------------------------
 
 /// reference implementation
-void projectForcesU_(UINT nbs, const real* dir, const real* src, real* mul)
+void projectForcesU_(index_t nbs, const real* dir, const real* src, real* mul)
 {
     #pragma omp simd
-    for ( UINT i = 0; i < nbs; ++i )
+    for ( index_t i = 0; i < nbs; ++i )
     {
         const real * X = src + DIM * i;
         const real * d = dir + DIM * i;
@@ -111,23 +108,23 @@ void projectForcesU_(UINT nbs, const real* dir, const real* src, real* mul)
     }
 }
 
-inline void DPTTRF(UINT nbs)
+inline void DPTTRF(index_t nbs)
 {
     int info = 0;
     alsatian_xpttrf(nbs, diag_, upper_, &info);
 }
 
-inline void DPTTS2(UINT nbs, real* Y)
+inline void DPTTS2(index_t nbs, real* Y)
 {
     alsatian_xptts2(nbs, 1, diag_, upper_, Y, 0);
 }
 
 //------------------------------------------------------------------------------
 
-void setFilament(UINT nbs, real seg, real persistence_length, real mag)
+void setFilament(index_t nbs, real seg, real persistence_length, real mag)
 {
     nbs = std::min(nbs, NSEG);
-    UINT nbv = DIM * ( nbs + 1 );
+    index_t nbv = DIM * ( nbs + 1 );
     new_nans(nbv, pos_);
     new_nans(nbv, dir_);
     new_nans(nbv, lag_);
@@ -140,7 +137,7 @@ void setFilament(UINT nbs, real seg, real persistence_length, real mag)
     
     pos.store(pos_);
     dir.store(dir_);
-    for ( UINT p = 1 ; p < nbs; ++p )
+    for ( index_t p = 1 ; p < nbs; ++p )
     {
         pos += seg * dir;
         pos.store(pos_+DIM*p);
@@ -152,19 +149,19 @@ void setFilament(UINT nbs, real seg, real persistence_length, real mag)
     pos.store(pos_+DIM*nbs);
     print_floating_point_exceptions("setFilament");
 
-    for ( UINT i = 0 ; i < nbv; ++i )
+    for ( index_t i = 0 ; i < nbv; ++i )
         force_[i] = mag * RNG.sreal();
     
     print_floating_point_exceptions("setForce");
 }
 
 
-void setProjection(UINT nbs)
+void setProjection(index_t nbs)
 {
     new_nans(nbs, diag_);
     new_nans(nbs, upper_);
     
-    UINT j = 0;
+    index_t j = 0;
     for ( ; j < nbs-1; ++j )
     {
         const real* X = dir_ + DIM * j;
@@ -194,20 +191,20 @@ void setProjection(UINT nbs)
 }
 
 
-void setAnisotropy(UINT nbs)
+void setAnisotropy(index_t nbs)
 {
-    const UINT sup = DIM * nbs;
+    const index_t sup = DIM * nbs;
     new_nans(sup+DIM, ani_);
     new_nans(sup+DIM, tmp_);
 
     // for the extremities, the direction of the nearby segment is used.
-    for ( UINT d = 0; d < DIM; ++d )
+    for ( index_t d = 0; d < DIM; ++d )
     {
         ani_[d]     = dir_[d];
         ani_[d+sup] = dir_[d+sup-DIM];
     }
     // for intermediate points, the directions of the flanking segments are averaged
-    for ( UINT p = DIM ; p < sup; ++p )
+    for ( index_t p = DIM ; p < sup; ++p )
         ani_[p] = 0.5 * ( dir_[p-DIM] + dir_[p] );
     
     print_floating_point_exceptions("setAnisotropy");
@@ -216,7 +213,7 @@ void setAnisotropy(UINT nbs)
 
 void setRandom(int np, real * vec, real mag)
 {
-    for ( UINT p = 0 ; p < ALOC; ++p )
+    for ( index_t p = 0 ; p < ALOC; ++p )
         vec[p] = mag * RNG.sreal();
 }
 
@@ -226,7 +223,7 @@ void setRandom(int np, real * vec, real mag)
 /**
  Perform first calculation needed by projectForces:
  */
-inline void projectForcesU_TWO(UINT nbs, const real* dir, const real* src, real* mul)
+inline void projectForcesU_TWO(index_t nbs, const real* dir, const real* src, real* mul)
 {
     real x3, x0 = src[0];
     real x4, x1 = src[1];
@@ -291,7 +288,7 @@ inline void projectForcesU_TWO(UINT nbs, const real* dir, const real* src, real*
  nbs-th point of tmp, which should be allocated accordingly.
  F. Nedelec, 11.01.2018
  */
-void projectForcesU2D_AVY(UINT nbs, const real* dir, const real* src, real* mul)
+void projectForcesU2D_AVY(index_t nbs, const real* dir, const real* src, real* mul)
 {
     real *const end = mul - 3 + nbs;
     
@@ -319,17 +316,17 @@ void projectForcesU2D_AVY(UINT nbs, const real* dir, const real* src, real* mul)
  Perform second calculation needed by projectForces:
  Y <- X + Jt * tmp
  */
-void projectForcesD_(const UINT nbs, const real* dir, const real* X, const real* mul, real* Y)
+void projectForcesD_(const index_t nbs, const real* dir, const real* X, const real* mul, real* Y)
 {
-    for ( UINT d = 0; d < DIM; ++d )
+    for ( index_t d = 0; d < DIM; ++d )
         Y[d] = X[d] + dir[d] * mul[0];
 
-    for ( UINT e = DIM*nbs; e < DIM*(nbs+1); ++e )
+    for ( index_t e = DIM*nbs; e < DIM*(nbs+1); ++e )
         Y[e] = X[e] - dir[e-DIM] * mul[nbs-1];
 
-    for ( UINT j = 1; j < nbs; ++j )
+    for ( index_t j = 1; j < nbs; ++j )
     {
-        const UINT kk = DIM * j;
+        const index_t kk = DIM * j;
         Y[kk  ] = X[kk  ] + dir[kk  ] * mul[j] - dir[kk-DIM  ] * mul[j-1];
         Y[kk+1] = X[kk+1] + dir[kk+1] * mul[j] - dir[kk-DIM+1] * mul[j-1];
 #if ( DIM > 2 )
@@ -342,7 +339,7 @@ void projectForcesD_(const UINT nbs, const real* dir, const real* X, const real*
 /**
  1xMUL 2xADD
  */
-void projectForcesD_ADD(UINT nbs, const real* dir, const real* X, const real* mul, real* Y)
+void projectForcesD_ADD(index_t nbs, const real* dir, const real* X, const real* mul, real* Y)
 {
     real a0 = X[0];
     real a1 = X[1];
@@ -350,7 +347,7 @@ void projectForcesD_ADD(UINT nbs, const real* dir, const real* X, const real* mu
     real a2 = X[2];
 #endif
     
-    for ( UINT jj = 0; jj < nbs; ++jj )
+    for ( index_t jj = 0; jj < nbs; ++jj )
     {
         real b0 = dir[DIM*jj  ] * mul[jj];
         real b1 = dir[DIM*jj+1] * mul[jj];
@@ -369,7 +366,7 @@ void projectForcesD_ADD(UINT nbs, const real* dir, const real* X, const real* mu
 #endif
     }
     
-    const UINT ee = DIM * nbs;
+    const index_t ee = DIM * nbs;
     Y[ee  ] = a0;
     Y[ee+1] = a1;
 #if ( DIM > 2 )
@@ -379,7 +376,7 @@ void projectForcesD_ADD(UINT nbs, const real* dir, const real* X, const real* mu
 
 
 /// proceeding downward, this could be fused with downward part of DPTTS2
-void projectForcesD_REV(UINT nbs, const real* dir, const real* X, const real* mul, real* Y)
+void projectForcesD_REV(index_t nbs, const real* dir, const real* X, const real* mul, real* Y)
 {
     const real * E = X + DIM * nbs;
     real a0 = E[0];
@@ -388,7 +385,7 @@ void projectForcesD_REV(UINT nbs, const real* dir, const real* X, const real* mu
     real a2 = E[2];
 #endif
     
-    for ( UINT i = nbs; i-- > 0; )
+    for ( index_t i = nbs; i-- > 0; )
     {
         real m0 = dir[DIM*i  ] * mul[i];
         real m1 = dir[DIM*i+1] * mul[i];
@@ -416,7 +413,7 @@ void projectForcesD_REV(UINT nbs, const real* dir, const real* X, const real* mu
 
 
 /// proceeding downward with pointers, this could be fused with downward part of DPTTS2
-void projectForcesD_RIV(UINT nbs, const real* dir, const real* X, const real* mul, real* Y)
+void projectForcesD_RIV(index_t nbs, const real* dir, const real* X, const real* mul, real* Y)
 {
     const real * E = X + DIM * nbs;
     real a0 = E[0];
@@ -465,7 +462,7 @@ void projectForcesD_RIV(UINT nbs, const real* dir, const real* X, const real* mu
 /**
  2xFMA
  */
-void projectForcesD_FMA(UINT nbs, const real* dir, const real* X, const real* mul, real* Y)
+void projectForcesD_FMA(index_t nbs, const real* dir, const real* X, const real* mul, real* Y)
 {
     real a0 = X[0];
     real a1 = X[1];
@@ -473,7 +470,7 @@ void projectForcesD_FMA(UINT nbs, const real* dir, const real* X, const real* mu
     real a2 = X[2];
 #endif
     
-    for ( UINT jj = 0; jj < nbs; ++jj )
+    for ( index_t jj = 0; jj < nbs; ++jj )
     {
         real m = mul[jj];
         real d0 = dir[DIM*jj  ];
@@ -493,7 +490,7 @@ void projectForcesD_FMA(UINT nbs, const real* dir, const real* X, const real* mu
 #endif
     }
     
-    const UINT ee = DIM * nbs;
+    const index_t ee = DIM * nbs;
     Y[ee  ] = a0;
     Y[ee+1] = a1;
 #if ( DIM > 2 )
@@ -523,7 +520,7 @@ void projectForcesD_FMA(UINT nbs, const real* dir, const real* X, const real* mu
 
 #if ( DIM == 3 ) && USE_SIMD
 // SSE version using FMA
-void projectForcesD3D_sse(size_t nbs, const double* dir,
+void projectForcesD3D_sse(index_t nbs, const double* dir,
                           const double* src, const double* mul, double* dst)
 {
     double const*const end = mul + nbs - 1;
@@ -676,9 +673,9 @@ void projectForcesD3D_sse(size_t nbs, const double* dir,
 //------------------------------------------------------------------------------
 #pragma mark - Fiber::scaleTangentially()
 
-void scaleTANGENTIALLY(size_t nbp, const real* src, const real* dir, real* dst)
+void scaleTANGENTIALLY(index_t nbp, const real* src, const real* dir, real* dst)
 {
-    for ( size_t i = 0; i < nbp; ++i )
+    for ( index_t i = 0; i < nbp; ++i )
     {
         real const* xxx = src + DIM * i;
         real const* ddd = dir + DIM * i;
@@ -697,7 +694,7 @@ void scaleTANGENTIALLY(size_t nbp, const real* src, const real* dir, real* dst)
     }
 }
 
-void scaleTangentially(UINT nbp, const real* src, const real* dir, real* dst)
+void scaleTangentially(index_t nbp, const real* src, const real* dir, real* dst)
 {
     const real* const end = src + DIM * nbp;
     while ( src < end )
@@ -719,11 +716,11 @@ void scaleTangentially(UINT nbp, const real* src, const real* dir, real* dst)
 }
 
 
-void addProjectionDiff_(const size_t nbs, const real* mul, const real* X, real* Y)
+void addProjectionDiff_(const index_t nbs, const real* mul, const real* X, real* Y)
 {
-    for ( size_t i = 0; i < nbs; ++i )
+    for ( index_t i = 0; i < nbs; ++i )
     {
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( index_t d = 0; d < DIM; ++d )
         {
             const real w = mul[i] * ( X[DIM*i+DIM+d] - X[DIM*i+d] );
             Y[DIM*i+(    d)] += w;
@@ -736,7 +733,7 @@ void addProjectionDiff_(const size_t nbs, const real* mul, const real* X, real* 
 #pragma mark - Comparison against reference implementation
 
 
-void projectForces(UINT nbs, const real* X, real* Y)
+void projectForces(index_t nbs, const real* X, real* Y)
 {
     projectForcesU_(nbs, dir_, X, lag_);
     DPTTS2(nbs, lag_);
@@ -745,7 +742,7 @@ void projectForces(UINT nbs, const real* X, real* Y)
 
 
 #if REAL_IS_DOUBLE && USE_SIMD
-void projectForces_SSE(UINT nbs, const double* X, real* Y)
+void projectForces_SSE(index_t nbs, const double* X, real* Y)
 {
 #if ( DIM == 2 )
     projectForcesU2D_SSE(nbs, dir_, X, lag_);
@@ -760,7 +757,7 @@ void projectForces_SSE(UINT nbs, const double* X, real* Y)
 #endif
 }
 #elif defined(__SSE3__)
-void projectForces_SSE(UINT nbs, const float* X, real* Y)
+void projectForces_SSE(index_t nbs, const float* X, real* Y)
 {
     projectForcesU3D_SSE(nbs, dir_, X, lag_);
     DPTTS2(nbs, lag_);
@@ -769,7 +766,7 @@ void projectForces_SSE(UINT nbs, const float* X, real* Y)
 #endif
 
 #if REAL_IS_DOUBLE && USE_SIMD
-void projectForcesFused_SSE(UINT nbs, const double* X, real* Y)
+void projectForcesFused_SSE(index_t nbs, const double* X, real* Y)
 {
 #if ( DIM == 3 )
     projectForces3D_SSE(nbs, dir_, X, lag_, diag_, upper_, Y);
@@ -780,14 +777,14 @@ void projectForcesFused_SSE(UINT nbs, const double* X, real* Y)
 #endif
 
 #if REAL_IS_DOUBLE
-void projectForcesFused(UINT nbs, const double* X, real* Y)
+void projectForcesFused(index_t nbs, const double* X, real* Y)
 {
     projectForces(nbs, dir_, X, lag_, diag_, upper_, Y);
 }
 #endif
 
 #if REAL_IS_DOUBLE && defined(__AVX__)
-void projectForces_AVX(UINT nbs, const double* X, real* Y)
+void projectForces_AVX(index_t nbs, const double* X, real* Y)
 {
 #if ( DIM == 2 )
     projectForcesU2D_AVX(nbs, dir_, X, lag_);
@@ -804,18 +801,18 @@ void projectForces_AVX(UINT nbs, const double* X, real* Y)
 #endif
 
 
-template < void (*FUNC)(UINT, const real*, real*) >
-void checkProject(UINT nbs, const char msg[])
+template < void (*FUNC)(index_t, const real*, real*) >
+void checkProject(index_t nbs, const char msg[])
 {
-    printf("%s projectForces %2lu ", msg, nbs);
+    printf("%s projectForces %2u ", msg, nbs);
     real *x = nullptr, *y = nullptr, *z = nullptr;
-    UINT nbv = DIM * ( nbs + 1 );
+    index_t nbv = DIM * ( nbs + 1 );
     new_nans(nbv+4, x, y, z);
     setFilament(nbs, 0.1, 20.0, 1.0);
     setProjection(nbs);
     std::feclearexcept(FE_ALL_EXCEPT);
     
-    for ( UINT i = 0; i < nbv; ++i )
+    for ( index_t i = 0; i < nbv; ++i )
         x[i] = RNG.sreal();
     
     nan_fill(nbs, lag_);
@@ -842,24 +839,24 @@ void checkProject(UINT nbs, const char msg[])
 //------------------------------------------------------------------------------
 #pragma mark - Adaptors
 
-void onlyDPTTS(UINT nbs, const real* X, real* Y)
+void onlyDPTTS(index_t nbs, const real* X, real* Y)
 {
     alsatian_xptts2(nbs, 1, diag_, upper_, Y, NSEG);
 }
 
-void onlyScale(UINT nbs, const real* X, real* Y)
+void onlyScale(index_t nbs, const real* X, real* Y)
 {
     scaleTangentially(nbs+1, X, ani_, Y);
     scaleTangentially(nbs+1, Y, ani_, Y);
 }
 
-void onlySCALE(UINT nbs, const real* X, real* Y)
+void onlySCALE(index_t nbs, const real* X, real* Y)
 {
     scaleTANGENTIALLY(nbs+1, X, ani_, Y);
     scaleTANGENTIALLY(nbs+1, Y, ani_, Y);
 }
 
-void anisoProject(UINT nbs, const real* X, real* Y)
+void anisoProject(index_t nbs, const real* X, real* Y)
 {
     scaleTangentially(nbs+1, X, ani_, tmp_);
     projectForcesU_(nbs, dir_, tmp_, lag_);
@@ -870,23 +867,23 @@ void anisoProject(UINT nbs, const real* X, real* Y)
     scaleTangentially(nbs+1, Y, ani_, Y);
 }
 
-void projectDiff_(UINT nbs, const real* X, real* Y)
+void projectDiff_(index_t nbs, const real* X, real* Y)
 {
     addProjectionDiff_(nbs, lag_, X, Y);
 }
 
-void projectDiff_R(UINT nbs, const real* X, real* Y)
+void projectDiff_R(index_t nbs, const real* X, real* Y)
 {
     addProjectionDiff_R(nbs, lag_, X, Y);
 }
 
-void projectDiff_F(UINT nbs, const real* X, real* Y)
+void projectDiff_F(index_t nbs, const real* X, real* Y)
 {
     addProjectionDiff_F(nbs, lag_, X, Y);
 }
 
 #if USE_SIMD
-void projectDiff_SSE(UINT nbs, const real* X, real* Y)
+void projectDiff_SSE(index_t nbs, const real* X, real* Y)
 {
 #if ( DIM == 2 )
     addProjectionDiff2D_SSE(nbs, lag_, X, Y);
@@ -896,7 +893,7 @@ void projectDiff_SSE(UINT nbs, const real* X, real* Y)
 }
 #endif
 #if ( DIM == 2 ) && REAL_IS_DOUBLE && defined(__AVX__)
-void projectDiff_AVX(UINT nbs, const real* X, real* Y)
+void projectDiff_AVX(index_t nbs, const real* X, real* Y)
 {
     addProjectionDiff_AVX(nbs, lag_, X, Y);
 }
@@ -906,8 +903,8 @@ void projectDiff_AVX(UINT nbs, const real* X, real* Y)
 //------------------------------------------------------------------------------
 #pragma mark - Test UP & Down
 
-template <void (*FUNC)(UINT, const real*, const real*, real*)>
-void testU(UINT cnt, char const* str)
+template <void (*FUNC)(index_t, const real*, const real*, real*)>
+void testU(index_t cnt, char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_nans(ALOC, x, y, z);
@@ -919,10 +916,10 @@ void testU(UINT cnt, char const* str)
     print_floating_point_exceptions("");
     
     tick();
-    for ( UINT i=0; i<cnt; ++i )
+    for ( index_t i=0; i<cnt; ++i )
     {
         randomize(NVAL, x, y, z, 1.0);
-        for ( UINT j=0; j<SUB; ++j )
+        for ( index_t j=0; j<SUB; ++j )
         {
             FUNC(NSEG, dir_, y, z);
             FUNC(NSEG, dir_, x, y);
@@ -936,8 +933,8 @@ void testU(UINT cnt, char const* str)
 }
 
 
-template < void (*FUNC)(UINT, const real*, const real*, const real*, real*) >
-void testD(UINT cnt, char const* str)
+template < void (*FUNC)(index_t, const real*, const real*, const real*, real*) >
+void testD(index_t cnt, char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_nans(ALOC, x, y, z);
@@ -949,10 +946,10 @@ void testD(UINT cnt, char const* str)
     print_floating_point_exceptions("");
     
     tick();
-    for ( UINT i=0; i<cnt; ++i )
+    for ( index_t i=0; i<cnt; ++i )
     {
         randomize(NVAL, x, y, z, 1.0);
-        for ( UINT j=0; j<SUB; ++j )
+        for ( index_t j=0; j<SUB; ++j )
         {
             FUNC(NSEG, dir_, x, lag_, z);
             FUNC(NSEG, dir_, y, lag_, x);
@@ -966,8 +963,8 @@ void testD(UINT cnt, char const* str)
 }
 
 
-template < void (*FUNC)(UINT, const real*, real*) >
-void timeProject(UINT cnt, char const* str)
+template < void (*FUNC)(index_t, const real*, real*) >
+void timeProject(index_t cnt, char const* str)
 {
     real *x = nullptr, *y = nullptr, *z = nullptr;
     new_nans(ALOC, x, y, z);
@@ -978,10 +975,10 @@ void timeProject(UINT cnt, char const* str)
     print_floating_point_exceptions("");
 
     tick();
-    for ( UINT i=0; i<cnt; ++i )
+    for ( index_t i=0; i<cnt; ++i )
     {
         randomize(NVAL, x, y, z, 1.0);
-        for ( UINT j=0; j<SUB; ++j )
+        for ( index_t j=0; j<SUB; ++j )
         {
             FUNC(NSEG, x, y);
             FUNC(NSEG, y, z);
@@ -997,7 +994,7 @@ void timeProject(UINT cnt, char const* str)
 //------------------------------------------------------------------------------
 #pragma mark - Speed tests
 
-void testProjectionU(UINT cnt)
+void testProjectionU(index_t cnt)
 {
     std::cout << DIM << "D testProjection UP -- " << NSEG << " segments\n";
     testU<projectForcesU_>(cnt,    "U_   ");
@@ -1019,7 +1016,7 @@ void testProjectionU(UINT cnt)
 #endif
 }
 
-void testProjectionD(UINT cnt)
+void testProjectionD(index_t cnt)
 {
     std::cout << DIM << "D testProjection DOWN -- " << NSEG << " segments\n";
     projectForcesU_(NSEG, dir_, force_, lag_);
@@ -1051,7 +1048,7 @@ void testProjectionD(UINT cnt)
 #endif
 }
 
-void testProjection(UINT cnt)
+void testProjection(index_t cnt)
 {
     std::cout << DIM << "D projectForces -- " << NSEG << " segments\n";
     setProjection(NSEG);
@@ -1075,7 +1072,7 @@ void testProjection(UINT cnt)
     timeProject<anisoProject>(cnt, "*aniso");
 }
 
-void testProjectionDiff(UINT cnt)
+void testProjectionDiff(index_t cnt)
 {
     setFilament(NSEG, 0.2, 20.0, 1.0);
     setProjection(NSEG);
@@ -1096,7 +1093,7 @@ void testProjectionDiff(UINT cnt)
 
 int main(int argc, char* argv[])
 {
-    const UINT REP = 4096;
+    const index_t REP = 4096;
     RNG.seed();
     std::cout << "DIM=" << DIM << "  real " << sizeof(real) << " bytes   " << __VERSION__ << "\n";
     //enable_floating_point_exceptions();
@@ -1104,13 +1101,13 @@ int main(int argc, char* argv[])
     {
 #if REAL_IS_DOUBLE
 #  if defined(__AVX__)
-        for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
+        for ( index_t nbs = std::min(NSEG,(index_t)11); nbs > 0; --nbs )
             checkProject<projectForcesFused>(nbs, "Fus");
-        for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
+        for ( index_t nbs = std::min(NSEG,(index_t)11); nbs > 0; --nbs )
             checkProject<projectForces_AVX>(nbs, "AVX");
 #  endif
 #  if USE_SIMD
-        for ( UINT nbs = std::min(NSEG,(UINT)11); nbs > 0; --nbs )
+        for ( index_t nbs = std::min(NSEG,(index_t)11); nbs > 0; --nbs )
             checkProject<projectForces_SSE>(nbs, "SSE");
 #  endif
 #endif

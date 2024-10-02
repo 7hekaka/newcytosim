@@ -15,20 +15,15 @@
  */
 class Matrix11 final
 {
-public:
-    
-    /// unsigned integer type used for indices
-    typedef size_t index;
-
 private:
     
     real val_;
     
     /// access to modifiable element by index
-    real& operator[](index i)       { return val_; }
+    real& operator[](index_t i)       { return val_; }
     
     /// access element value by index
-    real  operator[](index i) const { return val_; }
+    real  operator[](index_t i) const { return val_; }
 
 public:
     
@@ -93,13 +88,13 @@ public:
     real const* data() const { return &val_; }
 
     /// address of element at line i, column j
-    real* addr(const index i, const index j) { return &val_; }
+    real* addr(const index_t i, const index_t j) { return &val_; }
     /// value of element at line i, column j
-    real value(const index i, const index j) const { return val_; }
+    real value(const index_t i, const index_t j) const { return val_; }
 
     /// access functions to element by line and column indices
-    real& operator()(const index i, const index j)       { return val_; }
-    real  operator()(const index i, const index j) const { return val_; }
+    real& operator()(const index_t i, const index_t j)       { return val_; }
+    real  operator()(const index_t i, const index_t j) const { return val_; }
     
     /// set elements from given array
     void load(const real ptr[])
@@ -114,13 +109,13 @@ public:
     }
 
     /// extract column vector at given index
-    Vector1 column(const index) const
+    Vector1 column(const index_t) const
     {
         return Vector1(val_);
     }
     
     /// extract line vector at given index
-    Vector1 line(const index) const
+    Vector1 line(const index_t) const
     {
         return Vector1(val_);
     }

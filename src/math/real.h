@@ -42,6 +42,10 @@
 #endif
 
 
+/// unsigned integer type used for indexing into matrices
+typedef unsigned index_t;
+
+
 //----------------------------ALLOCATION----------------------------------------
 
 /// add consistency checks to new_real() and free_real()

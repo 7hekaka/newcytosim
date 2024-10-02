@@ -258,7 +258,7 @@ namespace Cymath
 
     /// return the usual base-10 representation of a number
     template <typename T>
-    std::string repr(T const& x, unsigned width, unsigned precision)
+    std::string repr(T const& x, int width, unsigned precision)
     {
         std::ostringstream oss;
         oss.precision(precision);

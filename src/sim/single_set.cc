@@ -233,7 +233,7 @@ ObjectList SingleSet::newObjects(Property const* p, Glossary& opt)
         if ( !mec )
             throw InvalidParameter("could not find Mecable specified in single:base `"+str+"'");
         // get index of point in second argument
-        size_t ip = 0;
+        index_t ip = 0;
         if ( opt.set(str, "base", 1) )
             ip = mec->point_index(str);
          
@@ -593,7 +593,7 @@ int SingleSet::bad() const
 
 /** Create Wrists anchored, and distributed to beads `name` */
 void SingleSet::distributeWrists(ObjectList& objs, SingleProp const* sp,
-                                 size_t cnt, std::string const& name) const
+                                 index_t cnt, std::string const& name) const
 {
     BeadProp * bip = simul_.findProperty<BeadProp>("bead", name);
     if ( !bip )
@@ -623,7 +623,7 @@ void SingleSet::distributeWrists(ObjectList& objs, SingleProp const* sp,
  
  This is used to attach Single to Bead, Solid and Sphere
  */
-void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, size_t fip, size_t nbp, std::string const& arg)
+void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, index_t fip, index_t nbp, std::string const& arg)
 {
     size_t num = 1;
     std::istringstream iss(arg);
@@ -643,15 +643,15 @@ void SingleSet::makeWrists(ObjectList& objs, Mecable const* mec, size_t fip, siz
 
     if ( mod == "each" )
     {
-        for ( size_t u = 0; u < num; ++u )
+        for ( index_t u = 0; u < num; ++u )
         {
-            for ( size_t i = 0; i < nbp; ++i )
+            for ( index_t i = 0; i < nbp; ++i )
                 objs.push_back(sip->newWrist(mec, fip+i));
         }
     }
     else
     {
-        for ( size_t u = 0; u < num; ++u )
+        for ( index_t u = 0; u < num; ++u )
             objs.push_back(sip->newWrist(mec, fip+RNG.pint32(nbp)));
     }
 }
