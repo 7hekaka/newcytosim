@@ -137,13 +137,12 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
 void Nucleator::stepUnattached(Simul& sim, Vector const& pos)
 {
     assert_false( attached() );
-    FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop()->fiber_type);
+    FiberProp const* fip = prop()->fiber_class;
     
-    real damp = 1.0 - real(fip->nbFibers()) * prop()->nucleation_limit;
-    if ( damp < 0 )
-        return;
-    real rate = prop()->nucleation_rate_dt * damp;
-    nextAct -= rate;
+    float damp = 1.f - float(fip->nbFibers()) * prop()->nucleation_limit;
+
+    float R = prop()->nucleation_rate_dt * max_float(0, damp);
+    nextAct -= R;
     
     if ( nextAct < 0 )
     {
@@ -179,7 +178,7 @@ void Nucleator::stepUnloaded()
     else if ( prop()->track_end == PLUS_END )
         relocateP();
     
-    if ( prop()->stabilize )
+    if ( prop()->stabilize != 0 )
     {
         Fiber * fib = modifiableFiber();
         fib->stabilize(nearestEnd(), prop()->stabilize);
@@ -197,7 +196,7 @@ void Nucleator::stepLoaded(Vector const& force)
     else if ( prop()->track_end == PLUS_END )
         relocateP();
     
-    if ( prop()->stabilize )
+    if ( prop()->stabilize != 0 )
     {
         Fiber * fib = modifiableFiber();
         fib->stabilize(nearestEnd(), prop()->stabilize);

@@ -22,6 +22,7 @@ void NucleatorProp::clear()
     nucleation_rate = 1;
     fiber_type = "";
     fiber_spec = "";
+    fiber_class = nullptr;
     track_end  = NO_END;
     hold_end   = MINUS_END;
     addictive  = false;
@@ -90,7 +91,7 @@ void NucleatorProp::complete(Simul const& sim)
     if ( fiber_type.empty() )
         throw InvalidParameter(name()+":nucleate[1] (=fiber_type) must be specified if activity=nucleate");
 
-    sim.properties.find_or_die("fiber", fiber_type);
+    fiber_class = sim.findProperty<FiberProp>("fiber", fiber_type);
     
     if ( nucleation_rate < 0 )
         throw InvalidParameter(name()+":nucleate (=rate) must be positive");

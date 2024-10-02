@@ -38,7 +38,7 @@ public:
     /// rate for nucleation (also known as `nucleate[0]`)
     real nucleation_rate;
 
-    /// type of fiber that is nucleated (also known as `nucleate[1]`)
+    /// name of fiber that is nucleated (also known as `nucleate[1]`)
     std::string fiber_type;
     
     /// specifications of a new fiber (also known as `nucleate[2]`)
@@ -54,8 +54,8 @@ public:
     /// if true, new fiber is nucleated in the surface of the Space
     bool nucleate_in_plane;
     
-    ///
-    real nucleation_limit;
+    /// factor to limit the number of fibers nucleated in total
+    float nucleation_limit;
     
     /// specificity of nucleation
     int specificity;
@@ -98,6 +98,9 @@ public:
     real stabilize;
     
     /// @}
+    
+    /// type of fiber to be nucleated
+    FiberProp const* fiber_class;
     
 private:
     
