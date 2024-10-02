@@ -49,7 +49,7 @@ public:
 /**
  Example of type that can be used in Field
  */
-template < size_t N >
+template < int N >
 class FieldVector
 {
     /// vector of values
@@ -61,59 +61,59 @@ public:
     static const int dimension_ = N;
     
     /// constructor
-    FieldVector<N>() { for (size_t i=0; i<N; ++i) val[i] = 0; }
+    FieldVector<N>() { for (int i=0; i<N; ++i) val[i] = 0; }
 
     /// constructor
-    FieldVector<N>(real x) { for (size_t i=0; i<N; ++i) val[i] = x; }
+    FieldVector<N>(real x) { for (int i=0; i<N; ++i) val[i] = x; }
 
     /// set to zero
-    void clear() { for (size_t i=0; i<N; ++i) val[i] = 0; }
+    void clear() { for (int i=0; i<N; ++i) val[i] = 0; }
 
     /// access to the vector components
-    real const& operator[](size_t i) const { assert_true(i<N); return val[i]; }
+    real const& operator[](int i) const { assert_true(i<N); return val[i]; }
 
     /// access to modifiable vector components
-    real& operator[](size_t i)        { assert_true(i<N); return val[i]; }
+    real& operator[](int i)        { assert_true(i<N); return val[i]; }
 
     /// multiplication
-    FieldVector<N> operator * (real x) const { FieldVector R; for (size_t i=0; i<N; ++i) R[i] = val[i] * x; return R; }
+    FieldVector<N> operator * (real x) const { FieldVector R; for (int i=0; i<N; ++i) R[i] = val[i] * x; return R; }
     
     /// addition
-    FieldVector<N> operator + (FieldVector<N> const& X) { FieldVector R; for (size_t i=0; i<N; ++i) R[i] = val[i] + X[i]; return R; }
+    FieldVector<N> operator + (FieldVector<N> const& X) { FieldVector R; for (int i=0; i<N; ++i) R[i] = val[i] + X[i]; return R; }
     
     /// substractions
-    FieldVector<N> operator - (FieldVector<N> const& X) { FieldVector R; for (size_t i=0; i<N; ++i) R[i] = val[i] - X[i]; return R; }
+    FieldVector<N> operator - (FieldVector<N> const& X) { FieldVector R; for (int i=0; i<N; ++i) R[i] = val[i] - X[i]; return R; }
 
     /// comparison
-    bool negative() const { for (size_t i=1; i<N; ++i) if ( val[i] < 0 ) return true; return false; }
+    bool negative() const { for (int i=1; i<N; ++i) if ( val[i] < 0 ) return true; return false; }
 
     /// assignment
-    void operator = (real x) { for (size_t i=0; i<N; ++i) val[i] = x; }
+    void operator = (real x) { for (int i=0; i<N; ++i) val[i] = x; }
     
     /// accumulation
-    void operator += (FieldVector<N> const& X) { for (size_t i=0; i<N; ++i) val[i] += X[i]; }
+    void operator += (FieldVector<N> const& X) { for (int i=0; i<N; ++i) val[i] += X[i]; }
     
 
     /// minimization
-    void e_min(FieldVector<N> const& X) { for (size_t i=0; i<N; ++i) val[i] = std::min(val[i], X[i]); }
+    void e_min(FieldVector<N> const& X) { for (int i=0; i<N; ++i) val[i] = std::min(val[i], X[i]); }
     
     /// maximization
-    void e_max(FieldVector<N> const& X) { for (size_t i=0; i<N; ++i) val[i] = std::max(val[i], X[i]); }
+    void e_max(FieldVector<N> const& X) { for (int i=0; i<N; ++i) val[i] = std::max(val[i], X[i]); }
 
     /// read
-    void read(Inputter& in)          { for (size_t i=0; i<N; ++i) val[i] = in.readFloat(); }
+    void read(Inputter& in)          { for (int i=0; i<N; ++i) val[i] = in.readFloat(); }
     
     /// write
-    void write(Outputter& out) const { for (size_t i=0; i<N; ++i) out.writeFloat(val[i]); }
+    void write(Outputter& out) const { for (int i=0; i<N; ++i) out.writeFloat(val[i]); }
 
 };
 
 /// output
-template < size_t N >
+template < int N >
 std::ostream& operator << (std::ostream& os, FieldVector<N> const& FV) { for (size_t i=0; i<N; ++i) os << " " << FV[i]; return os; }
 
 /// input
-template < size_t N >
+template < int N >
 std::istream& operator >> (std::istream& is, FieldVector<N>& FV) { for (size_t i=0; i<N; ++i) is >> FV[i]; return is; }
 
 

@@ -116,8 +116,8 @@ public:
     /// constructor
     Field(FieldProp const* p)
     {
-        prop      = p;
-        fiTMP     = nullptr;
+        prop = p;
+        fiTMP = nullptr;
         fiTMPSize = 0;
     }
     
@@ -293,7 +293,8 @@ public:
     void readData(Inputter& in, Simul&)
     {
         size_t size[DIM] = { 0 };
-        real   minB[DIM] = { 0 }, maxB[DIM] = { 0 };
+        real minB[DIM] = { 0 };
+        real maxB[DIM] = { 0 };
         
         size_t dim = in.readUInt16();
         if ( dim != DIM )
@@ -312,7 +313,7 @@ public:
         size_t nbc = in.readUInt32();
         if ( nbc != mGrid.nbCells() )
         {
-            printf("file: %lu field:%lu\n", nbc, mGrid.nbCells());
+            std::cerr << "file: " << nbc << " field: " << mGrid.nbCells() << "\n";
             throw InvalidIO("mismatch in Field::size");
         }
         //std::clog << "readData() num_cells=" << nbc << '\n';

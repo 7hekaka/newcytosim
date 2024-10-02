@@ -581,14 +581,14 @@ static gym_color field_color(FieldDisplayParameters fdp, FieldScalar const& cell
 
 
 /// set color for Vector field
-template < size_t N >
+template < int N >
 static gym_color field_color(FieldDisplayParameters fdp, FieldVector<N> const& cell, Vector const& pos)
 {
     if ( fdp.spc && ! fdp.spc->inside(pos) )
         return gym_color(0, 0, 0);
     //this maps val[0] to the red channel, val[1] to green and val[2] to blue
     gym_color::COLOF rgb[3] = { 0, 0, 0 };
-    const int sup = std::min(3UL, N);
+    const int sup = std::min(3, N);
     for ( int c = 0; c < sup; ++c )
         rgb[c] = fdp.amp * cell[c];
     return gym_color(rgb[0], rgb[1], rgb[2]);
