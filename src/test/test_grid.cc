@@ -23,7 +23,7 @@
 // grid definitions:
 const int range = 3;
 real inf[] = {-range,-range, 0 };
-real sup[] = { range, range, 0.5 };
+real sup[] = { range, range, 1 };
 size_t num[] = { 7*range, 5*range, 3 };
 
 
@@ -47,8 +47,8 @@ void throwMarbles(int cnt)
     {
         w[0] = range * RNG.sreal();
         w[1] = range * RNG.sreal();
-        w[2] = range * RNG.sreal();
-        ++grid(w);
+        w[2] = RNG.preal();
+        grid(w) += RNG.pint32(4);
     }
 }
 
@@ -237,14 +237,14 @@ void speedTest()
 {
     printf("Speed test...");
 
-    real   L[] = { 0, 0, 0};
-    real   R[] = { 1, 1, 1};
+    real L[] = { 0, 0, 0};
+    real R[] = { 1, 1, 1};
     size_t S[] = { 10, 10, 10};
 
-    Grid<float, 3> map;
-    map.setDimensions(L, R, S);
-    map.createCells();
-    map.setValues(0);
+    Grid<float, 3> tmp;
+    tmp.setDimensions(L, R, S);
+    tmp.createCells();
+    tmp.setValues(0);
 
     real w[3], A = 0.5;
     for ( int cc=0; cc<10000; ++cc )
@@ -254,19 +254,19 @@ void speedTest()
         w[2] = RNG.preal();
         for ( int x = 0; x < 1024; ++x )
         {
-            ++map(w);
-            ++map(w+Vector(A,0,0));
-            ++map(w+Vector(0,A,0));
-            ++map(w+Vector(A,A,0));
-            ++map(w+Vector(0,0,A));
-            ++map(w+Vector(A,0,A));
-            ++map(w+Vector(0,A,A));
-            ++map(w+Vector(A,A,A));
+            ++tmp(w);
+            ++tmp(w+Vector(A,0,0));
+            ++tmp(w+Vector(0,A,0));
+            ++tmp(w+Vector(A,A,0));
+            ++tmp(w+Vector(0,0,A));
+            ++tmp(w+Vector(A,0,A));
+            ++tmp(w+Vector(0,A,A));
+            ++tmp(w+Vector(A,A,A));
         }
     }
 
     FILE* test = fopen("testgrid.out","w");
-    map.printValues(test, 0);
+    tmp.printValues(test, 0);
     fclose(test);
     printf("wrote file testgrid.out\n");
 }
@@ -274,8 +274,8 @@ void speedTest()
 
 void testInterpolate(unsigned CNT)
 {
-    real   L[] = { 0.0, 0.0, 0.0 };
-    real   R[] = { 1.0, 1.0, 1.0 };
+    real L[] = { 0.0, 0.0, 0.0 };
+    real R[] = { 1.0, 1.0, 1.0 };
     size_t S[] = { 100, 100, 100 };
     
     const unsigned MAX = 1 << 14;
