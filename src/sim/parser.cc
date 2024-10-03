@@ -1179,7 +1179,7 @@ static std::string replace_bracketed_code(std::string const& code, Evaluator con
         {
             std::string C = code.substr(P, Q-P);
             ++Q;
-            std::string S = evaluator.eval_as_string(C);
+            std::string S = evaluator.eval_(C);
             res.append(S);
             P = code.find('[', Q);
             res.append(code, Q, P-Q);

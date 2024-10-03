@@ -11,7 +11,9 @@
 #include <errno.h>
 #include <string>
 #include <vector>
+
 #include "exceptions.h"
+#include "random.h"
 
 /// a minimal math expression evaluator
 /**
@@ -63,6 +65,8 @@ private:
         if ( arg == "round" ) return 33;
         if ( arg == "trunc" ) return 34;
         if ( arg == "frac" ) return 35;
+        if ( arg == "prand" ) return 40;
+        if ( arg == "srand" ) return 41;
         return 0;
     }
     
@@ -89,6 +93,8 @@ private:
             case 33: return round(x);
             case 34: return trunc(x);
             case 35: return x-trunc(x);
+            case 40: return RNG.preal();
+            case 41: return RNG.sreal();
         }
         return x;
     }
@@ -278,7 +284,7 @@ public:
     }
     
     /// return string-representation of evaluated expression
-    std::string eval_as_string(std::string const& str) const
+    std::string eval_(std::string const& str) const
     {
         real x = eval(str.c_str());
         long i = (long) x;
