@@ -568,7 +568,7 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
             pos += Vector::randG(blur);
         }
         // extend along one of the main axis
-        if ( tok.compare(0, 6, "extend") == 0 )
+        else if ( tok.compare(0, 6, "extend") == 0 )
         {
             real B = 0, T = 0;
             extract(is, B);
