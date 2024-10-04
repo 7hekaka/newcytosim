@@ -180,10 +180,10 @@ public:
     static void drawObject(Vector const& pos, Vector const& dir, float rad, void (*obj)());
 
     
-    /// draw a scalar field
+    /// draw all scalar fields
     void drawFields(FieldSet const&);
     
-    /// draw a Space
+    /// draw one Space
     void drawSpace3D(Space const*, bool back);
 
     /// draw all Spaces (in 3D the back side)
@@ -196,22 +196,22 @@ public:
     /// draw thin lines joining the Fiber vertices
     void drawFiberBackbone(Fiber const&, gym_color col, float width) const;
 
-    /// draw Fiber minus end
+    /// draw minus end of one fiber
     virtual void drawFiberEndMinus(Fiber const&, int style, float size) const;
     
-    /// draw Fiber plus end
+    /// draw plus end of one fiber
     virtual void drawFiberEndPlus(Fiber const&, int style, float size) const;
     
     /// draw fresh assembly near the plus ends, using white stripes
     void drawFiberGrowth(Fiber const&, float size) const;
 
-    /// draw Fiber linear features
+    /// draw linear features of one fiber
     virtual void drawFiberLines(Fiber const&, int style, float width) const;
     
-    /// draw one segment of a Fiber (used to display transparent fibers)
+    /// draw one segment of one fiber (used to display transparent fibers)
     virtual void drawFiberSegmentT(Fiber const&, unsigned) const;
     
-    /// Using triangles to draw a broken line with thickness `2*rad`
+    /// Using triangles to draw a broken line with width `2*rad`
     void drawFiberWide(Fiber const& fib, float rad) const;
 
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
@@ -235,10 +235,10 @@ public:
     /// microtubule-like rendering using a sphere to represent each monomer
     void drawMicrotubule(Fiber const& fib, gym_color, gym_color, gym_color) const;
     
-    /// draw Fiber point-like features
+    /// draw Fiber point-like features, eg. vertices
     virtual void drawFiberPoints(Fiber const&) const;
     
-    /// draw Fiber Speckles
+    /// draw fiduciary marks on all fibers
     virtual void drawFiberSpeckles(Fiber const&) const;
    
     /// display lattice subtance using color
@@ -259,25 +259,25 @@ public:
     /// display lattice cell edges
     virtual void drawFiberLatticeBits(Fiber const&, FiberLattice const&) const;
 
-    /// display Labels for a Fiber
+    /// display labels for a Fiber
     void drawFiberLabels(Fiber const&, int style) const;
     
     /// display forces acting on the fiber vertices
     void drawFiberForces(Fiber const&, real scale, float width) const;
     
-    /// draw all features of Fiber
+    /// draw all features of one Fiber
     void drawFiber(Fiber const&);
     
-    /// draw Fibers
+    /// draw all Fibers
     void drawFibers(FiberSet const&);
     
-    /// draw Fibers
+    /// draw text associated with Fibers
     void drawFiberTexts(FiberSet const&);
 
-    /// draw the average fiber for the pool defined by func(obj, val) == true
+    /// draw some average taken over fibers provided in list
     void drawAverageFiber(ObjectList const&, gym_color) const;
     
-    /// draw the averaged fiber
+    /// draw some arrows computed by averaging over fibers
     void drawAverageFiber1(FiberSet const&, Property const* ) const;
     
     /// draw the average for left-pointing and right-pointing fibers
@@ -290,7 +290,7 @@ public:
     /// draw translucent elements of a Bead
     void drawBeadT(Bead const&) const;
     
-    /// draw the Beads
+    /// draw all Beads
     void drawBeads(BeadSet const&);
 
     
@@ -300,42 +300,42 @@ public:
     /// draw translucent elements of a Solid
     void drawSolidT(Solid const&, unsigned) const;
 
-    /// draw the Solids
+    /// draw all Solids
     void drawSolids(SolidSet const&);
     
     
-    /// draw the Sphere
+    /// draw one Sphere
     void drawSphere(Sphere const&);
 
     /// draw translucent elements of a Sphere
     void drawSphereT(Sphere const&) const;
     
-    /// draw the Spheres
+    /// draw all Spheres
     void drawSpheres(SphereSet const&);
     
     
-    /// draw the free Singles
+    /// draw all free Singles
     virtual void drawSinglesF(SingleSet const&) const = 0;
     
-    /// draw the attached Singles
+    /// draw all attached Singles
     virtual void drawSinglesA(SingleSet const&) const = 0;
     
-    /// draw the free Couples, showing Hand1
+    /// draw all free Couples, showing Hand1
     virtual void drawCouplesF(CoupleSet const&) const = 0;
 
-    /// draw the attached Couples
+    /// draw all attached Couples
     virtual void drawCouplesA(CoupleSet const&) const = 0;
     
     /// draw one bridging Couple
     virtual void drawCoupleB(Couple const*) const { }
 
-    /// draw the bridging Couples
+    /// draw all bridging Couples
     void drawCouplesB(CoupleSet const&) const;
 
-    /// draw Organizer
+    /// draw one Organizer
     virtual void drawOrganizer(Organizer const&) const;
     
-    /// draw the Organizers
+    /// draw all Organizers
     void drawOrganizers(OrganizerSet const&);
 
     

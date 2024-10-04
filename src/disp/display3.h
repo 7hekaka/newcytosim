@@ -122,7 +122,7 @@ public:
     void drawCoupleBcrude(Couple const*) const;
     
     /// draw one bridging Couple made of two identical hands
-    void drawCoupleBhomo(Couple const*) const;
+    void drawCoupleBhomo(Couple const*, PointDisp const*) const;
     
     /// draw one bridging Couple
     void drawCoupleBori(Couple const*) const;
@@ -133,7 +133,7 @@ public:
     /// draw one bridging Couple
     void drawCoupleBalt(Couple const*) const;
 
-    /// draw an Organizer
+    /// draw one Organizer
     void drawOrganizer(Organizer const&) const;
 };
 

@@ -1141,14 +1141,8 @@ void Display3::drawCoupleBcrude(Couple const* cx) const
 }
 
 
-void Display3::drawCoupleBhomo(Couple const* cx) const
+void Display3::drawCoupleBhomo(Couple const* cx, PointDisp const* dis) const
 {
-    assert_true( cx->disp1() == cx->disp2() );
-    PointDisp const* dis = cx->disp1();
-    
-    if ( ! dis->visible )
-        return;
-    
     Vector p1 = cx->posHand1();
     Vector p2 = cx->posHand2();
 
@@ -1353,7 +1347,10 @@ void Display3::drawCoupleB(Couple const* cx) const
     PointDisp const* pd2 = cx->disp2();
     
     if ( pd1 == pd2 )
-        drawCoupleBhomo(cx);
+    {
+        if ( pd1->visible )
+            drawCoupleBhomo(cx, pd1);
+    }
     else
     {
         Vector p1 = cx->posHand1();
