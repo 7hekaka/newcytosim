@@ -124,6 +124,9 @@ public:
     /// draw one bridging Couple made of two identical hands
     void drawCoupleBhomo(Couple const*, PointDisp const*) const;
     
+    /// draw one bridging Couple using 2 feet per hand
+    void drawCoupleBwalk(Couple const*) const;
+
     /// draw one bridging Couple
     void drawCoupleBori(Couple const*) const;
 

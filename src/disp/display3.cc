@@ -1141,6 +1141,76 @@ void Display3::drawCoupleBcrude(Couple const* cx) const
 }
 
 
+/** each hand is represented by two feet and the position of these feet
+ are set as a function of hand's abscissa, to immitate a walk:
+ one foot is on the surface of the fiber, and the other one away from it.
+ */
+void Display3::drawCoupleBwalk(Couple const* cx) const
+{
+    PointDisp const* pd1 = cx->disp1();
+    PointDisp const* pd2 = cx->disp2();
+    
+    Vector p1 = cx->posHand1();
+    Vector p2 = cx->posHand2();
+    
+    Vector dif = p2 - p1;
+    real dns = dif.normSqr();
+    
+    if ( dns > 1e-6 )
+    {
+        // moving the 'hands' to the surface of the fiber:
+        dns = 1.0 / std::sqrt(dns);
+        // position the heads at the surface of the filaments:
+        const real R1 = pixscale(cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size);
+        const real R2 = pixscale(cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size);
+        // move points orthogonal to the fiber's axis
+        Vector t1 = cx->dirFiber1();
+        Vector t2 = cx->dirFiber2();
+        Vector d1 = ( dif - dot(dif,t1) * t1 ) * min_real(0.45, R1*dns);
+        Vector d2 = ( dot(dif,t2) * t2 - dif ) * min_real(0.45, R2*dns);
+        
+        gym::color_both(pd2->color.mix(pd1->color));
+        gym::stretchAlignZ(p1+d1, p2+d2, pixscale(pd1->width));
+        gle::hexTube();
+
+        // grounded foot is at position 'b' and uplifted one at (x, y):
+        const real R = 0.008;
+        Fiber const* fib = cx->fiber1();
+        real a = cx->hand1()->abscissa();
+        real i = std::round(a/R);
+        real b = i * R;
+        real x = 2 * a - b;
+        real y = std::sqrt((R*R - square(x-b))) * ( dns * 0.4 );
+        
+        float S = pixscale(0.5*pd1->size);
+        gym_color col = pd1->color;
+        gym_color lor = pd1->color;
+        if ( int(i) & 1 ) col = col.darken(0.75); else lor = lor.darken(0.75);
+        gym::color_both(col);
+        drawObject(d1+fib->pos(b), S, gle::blob);
+        gym::color_both(lor);
+        drawObject(d1+fib->pos(x)+y*dif, S, gle::blob);
+        
+        // grounded foot is at position 'b' and uplifted one at (x, y):
+        fib = cx->fiber2();
+        a = cx->hand2()->abscissa();
+        i = std::round(a/R);
+        b = i * R;
+        x = 2 * a - b;
+        y = std::sqrt((R*R - square(x-b))) * ( dns * 0.4 );
+        
+        S = pixscale(0.5*pd2->size);
+        col = pd2->color;
+        lor = pd2->color;
+        if ( int(i) & 1 ) col = col.darken(0.75); else lor = lor.darken(0.75);
+        gym::color_both(col);
+        drawObject(d2+fib->pos(b), S, gle::blob);
+        gym::color_both(lor);
+        drawObject(d2+fib->pos(x)-y*dif, S, gle::blob);
+    }
+}
+
+
 void Display3::drawCoupleBhomo(Couple const* cx, PointDisp const* dis) const
 {
     Vector p1 = cx->posHand1();
@@ -1152,18 +1222,18 @@ void Display3::drawCoupleBhomo(Couple const* cx, PointDisp const* dis) const
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:
-        dns = sizeScale / std::sqrt(dns);
+        dns = 1.0 / std::sqrt(dns);
         // position the heads at the surface of the filaments:
-        const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * dis->size;
-        const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * dis->size;
+        const real R1 = pixscale(cx->fiber1()->prop->disp->line_width + 0.4 * dis->size);
+        const real R2 = pixscale(cx->fiber2()->prop->disp->line_width + 0.4 * dis->size);
         // move points along the link
-        //p1 += dif * min_real(0.45, rad1*dns);
-        //p2 -= dif * min_real(0.45, rad2*dns);
+        //p1 += dif * min_real(0.45, R1*dns);
+        //p2 -= dif * min_real(0.45, R2*dns);
         // move points orthogonal to the fiber's axis
-        Vector dir1 = cx->dirFiber1();
-        Vector dir2 = cx->dirFiber2();
-        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
-        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
+        Vector t1 = cx->dirFiber1();
+        Vector t2 = cx->dirFiber2();
+        p1 += ( dif - dot(dif,t1) * t1 ) * min_real(0.45, R1*dns);
+        p2 -= ( dif - dot(dif,t2) * t2 ) * min_real(0.45, R2*dns);
     }
 #endif
     float R = pixscale(dis->size);
@@ -1251,18 +1321,18 @@ void Display3::drawCoupleBori(Couple const* cx) const
     {
 #if !FIBER_HAS_FAMILY
         // moving the 'hands' to the surface of the fiber:
-        dns = sizeScale / std::sqrt(dns);
+        dns = 1.0 / std::sqrt(dns);
         // position the heads at the surface of the filaments:
-        const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
-        const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
+        const real R1 = pixscale(cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size);
+        const real R2 = pixscale(cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size);
         // move points along the link
-        //p1 += dif * min_real(0.45, rad1*dns);
-        //p2 -= dif * min_real(0.45, rad2*dns);
+        //p1 += dif * min_real(0.45, R1*dns);
+        //p2 -= dif * min_real(0.45, R2*dns);
         // move points orthogonal to the fiber's axis
         Vector dir1 = cx->dirFiber1();
         Vector dir2 = cx->dirFiber2();
-        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
-        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
+        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, R1*dns);
+        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, R2*dns);
         dif = p2 - p1;
 #endif
         if ( pd1->visible )
@@ -1305,18 +1375,18 @@ void Display3::drawCoupleBalt(Couple const* cx) const
     if ( dns > 1e-6 )
     {
         // moving the 'hands' to the surface of the fiber:
-        dns = sizeScale / std::sqrt(dns);
+        dns = 1.0 / std::sqrt(dns);
         // position the heads at the surface of the filaments:
-        const real rad1 = cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size;
-        const real rad2 = cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size;
+        const real R1 = pixscale(cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size);
+        const real R2 = pixscale(cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size);
         // move points along the link
-        //p1 += dif * min_real(0.45, rad1*dns);
-        //p2 -= dif * min_real(0.45, rad2*dns);
+        //p1 += dif * min_real(0.45, R1*dns);
+        //p2 -= dif * min_real(0.45, R2*dns);
         // move points orthogonal to the fiber's axis
         Vector dir1 = cx->dirFiber1();
         Vector dir2 = cx->dirFiber2();
-        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, rad1*dns);
-        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, rad2*dns);
+        p1 += ( dif - dot(dif,dir1) * dir1 ) * min_real(0.45, R1*dns);
+        p2 -= ( dif - dot(dif,dir2) * dir2 ) * min_real(0.45, R2*dns);
     }
 #endif
     
@@ -1349,7 +1419,7 @@ void Display3::drawCoupleB(Couple const* cx) const
     if ( pd1 == pd2 )
     {
         if ( pd1->visible )
-            drawCoupleBhomo(cx, pd1);
+            drawCoupleBwalk(cx);
     }
     else
     {
