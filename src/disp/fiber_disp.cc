@@ -71,7 +71,8 @@ void FiberDisp::clear()
 
 void FiberDisp::read(Glossary& glos)
 {
-    glos.set(style, "style", {{"line", 0}, {"backbone", 1}, {"stripe", 2}, {"filament", 3}, {"actin", 4}, {"microtubule", 5}});
+    glos.set(style, "style", {{"line", 0}, {"backbone", 1}, {"stripe", 2},
+        {"striped", 2}, {"filament", 3}, {"actin", 4}, {"microtubule", 5}});
     glos.set(visible, "visible");
     if ( glos.set(color, "color") )
         back_color = color.darken(0.625);
