@@ -12,7 +12,6 @@ set simul system
 
 set system display
 {
-    style = 2;
     label = (Gliding spiral -);
     delay = 5;
     period = 4;

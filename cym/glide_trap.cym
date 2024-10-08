@@ -17,7 +17,6 @@ set simul system
     time_step = 0.0025
     precondition = 0
     display = (
-        style = 2;
         delay = 10;
         point_size = 10
         period = 4

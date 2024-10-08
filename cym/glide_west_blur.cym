@@ -10,7 +10,6 @@ set simul system
     display = (
         tile = 1, 1;
         zoom = 0.5;
-        style = 2;
         delay = 10;
         point_size = 6
         window_size=1000,600

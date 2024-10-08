@@ -84,7 +84,6 @@ set system display
     label = (Motor stripes -)
     delay = 10
     tile  = 1, 1
-    style = 2
 }
 
 run system

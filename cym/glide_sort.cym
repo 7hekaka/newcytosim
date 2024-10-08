@@ -9,7 +9,6 @@ set simul system
 %    random_seed = 87 
     display = (
         tile = 1, 1;
-        style = 2;
         delay = 5;
         point_size = 6
     )

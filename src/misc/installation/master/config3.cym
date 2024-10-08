@@ -13,7 +13,6 @@ set system display
 {
     delay = 20;
     period = 2;
-    style = 2;
     point_size = 8; 
     window_size = 1024, 512; 
 }

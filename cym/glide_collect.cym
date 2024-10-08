@@ -6,7 +6,6 @@ set simul system
     viscosity = 0.01
     time_step = 0.0025
     display = (
-        style = 2;
         delay = 10;
         point_size = 8;
         )
