@@ -988,10 +988,10 @@ void Chain::getPoints(real const* ptr)
         //VecPrint::print("/ ", DIM*nPoints, pPos, 2);
         //VecPrint::print("L ", DIM*nPoints, ptr, 2);
         std::string doc = document(ptr);
-        real mov = std::sqrt(sumSquaredDistances(ptr));
+        real mov = std::sqrt(sum_square(DIM*nPoints, pPos, ptr));
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        std::cerr << " wild motion for " << doc << " " << mov << '\n';
+        std::cerr << " wild motion for " << doc << " dis " << mov << '\n';
         //copy_real(DIM*nPoints, ptr, pPos);
 #endif
     }

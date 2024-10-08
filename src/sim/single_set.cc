@@ -347,16 +347,8 @@ void SingleSet::link(Object * obj)
 void SingleSet::unlink(Object * obj)
 {
     Single * s = static_cast<Single*>(obj);
-
-    if ( s->attached() )
-    {
-        aList.pop(obj);
-        s->detach();
-    }
-    else
-    {
-        fList.pop(obj);
-    }
+    if ( s->attached() ) s->detach();
+    fList.pop(obj);
 }
 
 //------------------------------------------------------------------------------

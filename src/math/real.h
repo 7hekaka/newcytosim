@@ -224,6 +224,15 @@ inline static real norm_inf(size_t cnt, real const* a, real const* b)
     return s;
 }
 
+/// return sum of `( a[i] - b[i] )^2` for i in [0, cnt]
+inline static real sum_square(size_t cnt, real const* a, real const* b)
+{
+    double s = 0;
+    for ( size_t u = 0; u < cnt; ++u )
+        s += square( a[u] - b[u] );
+    return s;
+}
+
 /// maximum between `x` and `y`
 inline static float max_float(const float x, const float y) { return std::max(x, y); }
 

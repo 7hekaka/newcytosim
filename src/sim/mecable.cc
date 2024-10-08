@@ -364,15 +364,6 @@ bool Mecable::allPointsInside(Space const* spc) const
 }
 
 
-real Mecable::sumSquaredDistances(const real pts[]) const
-{
-    real res = 0;
-    for ( size_t i = 0; i < DIM * nPoints; ++i )
-        res += square(pPos[i] - pts[i]);
-    return res;
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark - Read/write
 

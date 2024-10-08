@@ -399,9 +399,6 @@ public:
     
     /// true if all points are inside Space
     bool allPointsInside(Space const*) const;
-    
-    /// sum of the square distances between vertices and `pts[]`
-    real sumSquaredDistances(const real pts[]) const;
 
     //--------------------------------------------------------------------------
     
