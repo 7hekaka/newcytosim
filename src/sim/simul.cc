@@ -207,10 +207,7 @@ void Simul::add(ObjectList const& objs)
 {
     //std::clog << " Simul::add("<< objs.size() <<" objects):" << '\n';
     for ( Object * obj : objs )
-    {
-        if ( obj )
-            add(obj);
-    }
+        add(obj);
 }
 
 
@@ -225,8 +222,7 @@ void Simul::remove(ObjectList const& objs)
 {
     //std::clog << " Simul::remove("<< objs.size() <<" objects):" << '\n';
     for ( Object * obj : objs )
-        if ( obj )
-            remove(obj);
+        remove(obj);
 }
 
 
@@ -243,12 +239,9 @@ void Simul::eraseObjects(ObjectList const& objs)
     //std::clog << " Simul::eraseObjects(" << objs.size() << " objects):\n";
     for ( Object * obj : objs )
     {
-        if ( obj )
-        {
-            //std::clog << " Simul::erase(" << obj << ")\n";
-            remove(obj);
-            delete(obj);
-        }
+        //std::clog << " Simul::erase(" << obj << ")\n";
+        remove(obj);
+        delete(obj);
     }
 }
 

@@ -448,7 +448,7 @@ int ObjectPool::bad() const
         else
         {
             if ( q->prev() != p )
-                return 3;
+                return 4;
         }
         p = q;
         ++cnt;
@@ -457,7 +457,7 @@ int ObjectPool::bad() const
     if ( cnt != nSize )
     {
         std::clog << "ObjectPool believed " << nSize << " true " << cnt << "\n";
-        return 4;
+        return 8;
     }
     return 0;
 }

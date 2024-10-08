@@ -194,11 +194,11 @@ public:
     /// a unique character identifying the class
     static const ObjectTag TAG = 's';
    
-    /// a unique character identifying the Wrist derived class
+    /// a unique character identifying the derived class Wrist
     static const ObjectTag WRIST_TAG = 'w';
 
     /// return unique character identifying the class
-    ObjectTag tag() const { return TAG; }
+    virtual ObjectTag tag() const { return TAG; }
     
     /// return associated Property
     Property const* property() const { return prop; }

@@ -200,13 +200,12 @@ void ObjectSet::eraseObjects(ObjectList const& objs)
     //std::clog << " ObjectSet::erase(" << objs.size() << " objects):\n";
     for ( Object * obj : objs )
     {
-        if ( obj )
-        {
-            assert_true( obj->objset() == this );
-            inventory_.unassign(obj);
-            unlink(obj);
-            delete(obj);
-        }
+        assert_true( obj );
+        //std::clog << "   erase " << obj->reference() << '\n';
+        assert_true( obj->objset() == this );
+        inventory_.unassign(obj);
+        unlink(obj);
+        delete(obj);
     }
 }
 
@@ -605,9 +604,13 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
      information that is associated to an already constructed object.
      LATTICE_TAG = 'l' for backward compatibility with format 56 (before 23/06/2021)
      */
-    bool update = ( islower(tag) && tag != 'l' );
-
-    if ( obj && update )
+#if BACKWARD_COMPATIBILITY <= 56
+    bool primary = ( islower(tag) && tag != 'l' );
+#else
+    bool primary = islower(tag);
+#endif
+    
+    if ( obj && primary )
     {
         assert_true(obj->property());
         /* check that property index has not changed: this can happen however, if
@@ -634,7 +637,7 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
     {
         if ( id == 0 )
             throw InvalidIO("Invalid ObjectID referenced in file");
-        assert_true(update);
+        assert_true(primary);
         assert_true(isprint(tag));
         //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
         // create new object of required class, identified by property-id
@@ -661,11 +664,11 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
     if ( obj->invalid() )
     {
         inventory_.unassign(obj);
-        if ( !update )
+        if ( !primary )
             unlink(obj);
         delete(obj);
     }
-    else if ( update )
+    else if ( primary )
     {
         link(obj);
         if ( mk ) obj->mark(mk);
