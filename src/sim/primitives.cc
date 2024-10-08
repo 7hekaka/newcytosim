@@ -1169,11 +1169,7 @@ Rotation Cytosim::readOrientation(std::istream& is, Vector const& pos, Space con
     if ( isalpha(c) )
     {
         try {
-            Rotation rot = readRotation(is);
-            // can combine a second rotation:
-            if ( is.good() )
-                return Cytosim::readRotation(is) * rot;
-            return rot;
+            return readRotation(is);
         }
         catch ( Exception& e )
         {
