@@ -137,7 +137,6 @@ void View::openDisplay() const
 {
     adjust();
     loadView();
-    gym::openDepthMask();
     gym::clearPixels(back_color);
     setFog(fog_type, fog_param, fog_color);
     setLights();
@@ -145,17 +144,20 @@ void View::openDisplay() const
     
     if ( floor_radius > 1 )
     {
-        gym::disableDepthTest();
         gym::disableLighting();
-        gym::closeDepthMask();
         gym::color(floor_color);
         gym::drawTiledFloor(floor_radius, floor_tile, floor_height);
-        gym::openDepthMask();
-        gym::restoreDepthTest();
     }
     
+    gym::openDepthMask();
+
     if ( axes )
+    {
+        gym::enableLighting();
+        gym::enableCullFace(GL_BACK);
         gle::drawAxes(axes_size, axes);
+        gym::disableCullFace();
+    }
 }
 
 

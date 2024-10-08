@@ -1284,7 +1284,7 @@ namespace gle
 
     inline size_t nbTrianglesCylinder(size_t inc, int top = 0)
     {
-        return 2 + 2 * (( pi_6half + top*pi_once ) /inc );
+        return 2 + 2 * (( pi_6half + top*pi_once ) / inc );
     }
 
     /// set triangle strip for a tube of radius 1 at Z=B, and R at Z=T, closed at Z=B
@@ -1299,44 +1299,44 @@ namespace gle
         size_t i = 0;
         size_t p = pi_once;
         // bottom disc, from PI to 0:
-        flu[i++] = { -1, 0, B, 0, 0, -Z };
+        flu[i++] = { 1, 0, B, 0, 0, -Z };
         while ( p > inc )
         {
             p -= inc;
-            float C = cos_(p), S = sin_(p);
-            flu[i++] = { C, S, B, 0, 0, -Z };
+            float C = -cos_(p), S = sin_(p);
             flu[i++] = { C,-S, B, 0, 0, -Z };
+            flu[i++] = { C, S, B, 0, 0, -Z };
         }
         assert_true( p == inc );
-        flu[i++] = { 1, 0, B, 0, 0, -Z };
+        flu[i++] = { -1, 0, B, 0, 0, -Z };
         // repeat point to adjust normal:
-        flu[i++] = { 1, 0, B, X, 0, Y };
-        flu[i++] = { R, 0, T, X, 0, Y };
+        flu[i++] = { -1, 0, B, X, 0, Y };
+        flu[i++] = { -R, 0, T, X, 0, Y };
         // sides, from 0 to 2*PI:
         while ( p < pi_twice )
         {
-            float C = cos_(p), S = -sin_(p);
+            float C = -cos_(p), S = sin_(p);
             flu[i++] = { C,   S,   B, X*C, X*S, Y };
             flu[i++] = { C*R, S*R, T, X*C, X*S, Y };
             p += inc;
         }
-        flu[i++] = { 1, 0, B, X, 0, Y };
-        flu[i++] = { R, 0, T, X, 0, Y };
+        flu[i++] = { -1, 0, B, X, 0, Y };
+        flu[i++] = { -R, 0, T, X, 0, Y };
         assert_true( p == pi_twice );
         if ( top )
         {
             // repeat point to adjust normal:
-            flu[i++] = { R, 0, T, 0, 0, Z };
+            flu[i++] = { -R, 0, T, 0, 0, Z };
             // top disc, from 2*PI to PI:
             while ( p > pi_once + inc )
             {
                 p -= inc;
-                float C = cos_(p), S = sin_(p);
-                flu[i++] = { C*R,-S*R, T, 0, 0, Z };
+                float C = -cos_(p), S = sin_(p);
                 flu[i++] = { C*R, S*R, T, 0, 0, Z };
+                flu[i++] = { C*R,-S*R, T, 0, 0, Z };
             }
             assert_true( p == pi_once + inc );
-            flu[i++] = { -R, 0, T, 0, 0, Z };
+            flu[i++] = { R, 0, T, 0, 0, Z };
         }
         size_t j = nbTrianglesCylinder(inc, top);
         //std::clog << top << "   " << i << " " << j << "\n";
@@ -1489,18 +1489,18 @@ namespace gle
         tubes_[5] = i+s; i += setTube(ptr+i, 4,-E, 1+E); // tubeM
         tubes_[6] = i+s; i += setTube(ptr+i, 4,-E, 1);   // tubeE
         
-        tubes_[7] = i+s; i += setTube(ptr+i, 1, B, T);
-        tubes_[8] = i+s; i += setTube(ptr+i, 2, B, T);
-        tubes_[9] = i+s; i += setTube(ptr+i, 4, B, T);
+        tubes_[7] = i+s; i += setTube(ptr+i, 1, B, T); // longTube1
+        tubes_[8] = i+s; i += setTube(ptr+i, 2, B, T); // longTube2
+        tubes_[9] = i+s; i += setTube(ptr+i, 4, B, T); // longTube4
         
-        tubes_[10] = i+s; i += setTube(ptr+i, 1, 0, T);
-        tubes_[11] = i+s; i += setTube(ptr+i, 2, 0, T);
-        tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T);
+        tubes_[10] = i+s; i += setTube(ptr+i, 1, 0, T); // halfTube1
+        tubes_[11] = i+s; i += setTube(ptr+i, 2, 0, T); // halfTube2
+        tubes_[12] = i+s; i += setTube(ptr+i, 4, 0, T); // halfTube4
         
-        tubes_[15] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 1); //shutTube2
-        tubes_[16] = i+s; i += setCylinder(ptr+i, 2, 0, T, 1); //shutLongTube2
-        tubes_[13] = i+s; i += setCylinder(ptr+i, 1, 0, 1, 1, 1);
-        tubes_[14] = i+s; i += setCylinder(ptr+i, 1, -1, 1, 1, 1);
+        tubes_[13] = i+s; i += setCylinder(ptr+i, 1, 0, 1, 1, 1); //cylinder1
+        tubes_[14] = i+s; i += setCylinder(ptr+i, 1, -1, 1, 1, 1); //cylinderC
+        tubes_[15] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 1, 0); //shutTube2
+        tubes_[16] = i+s; i += setCylinder(ptr+i, 2, 0, T, 1, 0); //shutLongTube2
 
         tubes_[17] = i+s; i += setCylinder(ptr+i, 1, 0, 1, 0); // cone1
         tubes_[18] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 0); // cone2
@@ -1561,8 +1561,8 @@ namespace gle
     
     void cylinder1()     { doTubeStrip(13, nbTrianglesCylinder(1, 1)); }
     void cylinderC()     { doTubeStrip(14, nbTrianglesCylinder(1, 1)); }
-    void shutTube2()     { doTubeStrip(15, nbTrianglesCylinder(2)); }
-    void shutLongTube2() { doTubeStrip(16, nbTrianglesCylinder(2)); }
+    void shutTube2()     { doTubeStrip(15, nbTrianglesCylinder(2, 0)); }
+    void shutLongTube2() { doTubeStrip(16, nbTrianglesCylinder(2, 0)); }
 
     void cone1()         { doTubeStrip(17, nbTrianglesCylinder(1)); }
     void cone2()         { doTubeStrip(18, nbTrianglesCylinder(2)); }
@@ -2380,9 +2380,6 @@ namespace gle
     void drawAxes(const float L, int dim)
     {
         const float R(L*0.1f);
-        gym::openDepthMask();
-        gym::enableLighting();
-        gym::enableCullFace(GL_BACK);
         // display a white ball at the origin
         gym::color_front(1, 1, 1);
         gym::pull_ref();
@@ -2414,8 +2411,7 @@ namespace gle
             gym::scale(0.26, 0.26, 2.4);
             tube1();
         }
-        gym::restoreCullFace();
-        gym::restoreLighting();
+        gym::load_ref();
     }
     
     /// draw two rectangles parallel with the XY plane
