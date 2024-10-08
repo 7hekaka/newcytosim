@@ -205,12 +205,16 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
         is.get();
         // spliting as symbol:number
         is >> val;
+        if ( val <= 0 )
+            return false;
     }
     else if ( c == '~' )
     {
         is.get();
         // spliting as symbol:negative_number
         is >> val;
+        if ( val <= 0 )
+            return false;
         val = -val;
     }
     else
@@ -222,7 +226,7 @@ bool Tokenizer::split_polysymbol(std::string& arg, long& num)
         is >> val;
     }
     // check if splitting was successful:
-    if ( is.fail() || val <= 0 )
+    if ( is.fail() )
         return false;
     num = val;
     arg.resize(n);
