@@ -121,6 +121,7 @@ void Simul::writeObjects(std::string const& name, bool append, int binary) const
 {
     if ( prop.clear_system_file && name==prop.system_file )
     {
+        VLOG("delete ---> " << name <<"\n");
         std::remove(prop.system_file.c_str());
         prop.clear_system_file = false;
     }
@@ -130,7 +131,7 @@ void Simul::writeObjects(std::string const& name, bool append, int binary) const
     if ( ! out.good() )
         throw InvalidIO("could not open output file `"+name+"' for writing");
     
-    //std::clog << name << " <--- frame @ " << time() << " " << prop.end_time << "\n";
+    VLOG(name << (append?"":"<--- clear") << " <--- frame @ " << time() << "\n");
     
     try
     {
@@ -862,7 +863,7 @@ void Simul::writeProperties(bool prune) const
         //this should be equivalent to: writeProperties(os, prune);
         ofs << "% " << TimeDate::date_string() << '\n';
         ofs << properties_saved << '\n';
-        //std::clog << "Saved properties at " << time() << "s\n";
+        VLOG(name << " <--- properties @ " << time() << "\n");
     }
 }
 

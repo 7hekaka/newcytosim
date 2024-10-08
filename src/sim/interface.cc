@@ -1149,7 +1149,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     {
         // write initial state:
         sim_->writeProperties(prune);
-        sim_->writeObjects(sim_->prop.system_file, false, binary);
+        sim_->writeObjects(sim_->prop.system_file, true, binary);
     }
     
     VLOG("+RUN START +" << sec);
