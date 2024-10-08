@@ -595,7 +595,8 @@ public:
     size_t direct_index2D(const real x, const real y) const
     {
         size_t X = static_cast<size_t>(map_(0, x)); assert_true( X < mDim[0] );
-        size_t Y = static_cast<size_t>(map_(1, y)); assert_true( Y < mDim[1] );
+        // with semi-periodic conditions, Y may not be inside, and clamping is necessary:
+        size_t Y = static_cast<size_t>(clamp_(1, map_(1, y))); assert_true( Y < mDim[1] );
         return Y * mDim[0] + X;
     }
 
@@ -603,8 +604,9 @@ public:
     size_t direct_index3D(const real x, const real y, const real z) const
     {
         size_t X = static_cast<size_t>(map_(0, x)); assert_true( X < mDim[0] );
-        size_t Y = static_cast<size_t>(map_(1, y)); assert_true( Y < mDim[1] );
-        size_t Z = static_cast<size_t>(map_(2, z)); assert_true( Z < mDim[2] );
+        // with semi-periodic conditions, Y may not be inside, and clamping is necessary:
+        size_t Y = static_cast<size_t>(clamp_(1, map_(1, y))); assert_true( Y < mDim[1] );
+        size_t Z = static_cast<size_t>(clamp_(2, map_(2, z))); assert_true( Z < mDim[2] );
         return ( Z * mDim[1] + Y ) * mDim[0] + X;
     }
 
