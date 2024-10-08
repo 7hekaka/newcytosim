@@ -161,7 +161,7 @@ public:
     /// attach at the specified end of given Fiber
     void attachEnd(Fiber const* f, FiberEnd end) { do_attach(f, f->abscissaEnd(end)); }
 
-    /// detach, without updating Monitor
+    /// detach, without updating the Monitor
     void detachHand();
 
     /// attach at abscissa of given Fiber (this calls attach(FiberSite))
@@ -173,7 +173,67 @@ public:
     /// attach at the given end of Fiber (this calls attach(FiberSite))
     void attachToEnd(Fiber const* f, FiberEnd end) { attach(FiberSite(f, f->abscissaEnd(end))); }
     
+
+#if FIBER_HAS_LATTICE > 0
     
+    /// true if none of the Lattice's site bits matches the footprint
+    bool vacantLattice(lati_t s) const { return 0 == (hLattice->data(s) & prop->footprint); }
+
+    /// flip footprint bits on current site
+    void incLattice() const { assert_true(vacantLattice(hSite)); hLattice->data(hSite) ^= prop->footprint; }
+
+    /// flip footprint bits on current site
+    void decLattice() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacantLattice(hSite)); }
+
+    /// set FiberSite at index `s` with an abscissa `off` within the site
+    void hopLattice(lati_t s)
+    {
+        assert_true(attached());
+        assert_true(hLattice);
+        //std::clog << this << ":hop " << hSite << " ---> " << s << "\n";
+        decLattice();
+        hSite = s;
+        incLattice();
+        hAbs = s * hLattice->unit() + prop->site_shift;
+    }
+
+#elif FIBER_HAS_LATTICE < 0
+
+    /// true if given Lattice's site is zero
+    bool vacantLattice(lati_t s) const { return hLattice->data(s) == 0.0; }
+
+    /// add 1.0 to Lattice's site
+    void incLattice() const { hLattice->data(hSite) += prop->footprint; }
+
+    /// subtract 1.0 to Lattice's site
+    void decLattice() const { hLattice->data(hSite) -= prop->footprint; }
+    
+    /// set FiberSite at index `s` with an abscissa `off` within the site
+    void hopLattice(lati_t s)
+    {
+        assert_true(attached());
+        assert_true(hLattice);
+        //std::clog << this << ":hop " << hSite << " ---> " << s << "\n";
+        decLattice();
+        hSite = s;
+        incLattice();
+        hAbs = s * hLattice->unit() + prop->site_shift;
+    }
+
+#else
+
+    bool vacantLattice(lati_t) const { return true; }
+    void incLattice() const {}
+    void decLattice() const {}
+    
+    /// set FiberSite at index `s` with an abscissa `off` within the site
+    void hopLattice(lati_t s)
+    {
+        hAbs = s * prop->step_size + prop->site_shift;
+    }
+
+#endif
+
     /// return position of other Hand, if part of a Couple, or position of Single
     Vector linkFoot() const;
     

@@ -38,8 +38,8 @@ void Dynein::stepUnloaded()
         lati_t s = site() - 1;
         if ( outsideMP(s) ) //immediately detach at the end of the Fiber:
             return detach();
-        if ( vacant(s) )
-            hop(s);
+        if ( vacantLattice(s) )
+            hopLattice(s);
         nextAct += RNG.exponential();
     }
 }
@@ -65,8 +65,8 @@ void Dynein::stepLoaded(Vector const& force)
         lati_t s = site() - 1;
         if ( outsideMP(s) )  //immediately detach at the end of the Fiber:
             return detach();
-        if ( vacant(s) )
-            hop(s);
+        if ( vacantLattice(s) )
+            hopLattice(s);
         nextAct += RNG.exponential();
     }
 }

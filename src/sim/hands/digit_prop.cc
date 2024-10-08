@@ -19,10 +19,6 @@ Hand * DigitProp::newHand(HandMonitor* m) const
 void DigitProp::clear()
 {
     HandProp::clear();
-
-    step_size = 0;
-    footprint = 1;
-    site_shift = 0;
 }
 
 

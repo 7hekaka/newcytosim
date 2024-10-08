@@ -6,6 +6,7 @@
 #include "cymdef.h"
 #include "real.h"
 #include "property.h"
+#include "fiber.h" // for FiberLattice
 
 
 /// enables "binding_limits" to restrict binding of Hands to Fibers
@@ -204,6 +205,23 @@ public:
     /// display parameters (see @ref PointDispPar)
     std::string display;
     
+    
+    /// size of one step
+    real step_size;
+    
+    /// specifies the position of binding within the Lattice cell
+    /**
+     `site_shift` should be in [0, step_size]:
+     - at `0.0`, the attachment position is at the start of the site
+     - at `step_size`, the attachment position is at the end of the site
+     - at `step_size/2`, the attachment is midway
+     [default = step_size/2]
+     */
+    real site_shift;
+    
+    /// list of cell's bits covered upon binding to the lattice
+    FiberLattice::cell_t footprint;
+
     /** @} */
 
 public:

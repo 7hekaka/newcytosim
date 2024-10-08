@@ -18,14 +18,15 @@ Digit::Digit(DigitProp const* p, HandMonitor* h)
 
 
 /**
- This sets 'sit.site()' which is thus modified in a meaningful way!
+ Digit::attachmentAllowed modifies its argument 'sit' in a meaningful way:
+ It adjusts in particular the 'site' index as a function of abscissa,
  */
 bool Digit::attachmentAllowed(FiberSite& sit) const
 {
     if ( Hand::attachmentAllowed(sit) )
     {
 #if FIBER_HAS_LATTICE
-        FiberLattice * lat = const_cast<FiberLattice*>(sit.lattice());
+        FiberLattice const* lat = sit.lattice();
         
         if ( !lat->ready() )
             throw InvalidParameter("a lattice was not defined for `"+sit.fiber()->prop->name()+"'");
@@ -47,10 +48,14 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
             else
                 return false;
         }
-
-        if ( sit.occupied(s, prop()->footprint) )
-            return false;
         
+#if FIBER_HAS_LATTICE > 0
+        if ( lat->data(s) & prop()->footprint )
+            return false;
+#elif FIBER_HAS_LATTICE < 0
+        if ( lat->data(s) != 0.0 )
+            return false;
+#endif
         // adjust to match selected lattice site:
         sit.engageLattice(s, prop()->site_shift);
 #endif
@@ -72,35 +77,18 @@ void Digit::attach(FiberSite const& sit)
     hLattice = sit.lattice();
     //std::clog << "offset " << sit.abscissa() - hLattice->unit()*hSite - prop()->site_shift << "\n";
 #endif
-    inc();
+    incLattice();
 }
 
 
 void Digit::detach()
 {
-    dec();
+    decLattice();
     Hand::detach();
 }
 
 //------------------------------------------------------------------------------
 #pragma mark -
-
-void Digit::hop(lati_t s)
-{
-    assert_true(attached());
-#if FIBER_HAS_LATTICE
-    assert_true(hLattice);
-    //std::clog << this << ":hop " << hSite << " ---> " << s << "\n";
-    dec();
-    hSite = s;
-    inc();
-    hAbs = s * lattice()->unit() + prop()->site_shift;
-#else
-    hAbs = s * prop()->step_size + prop()->site_shift;
-#endif
-}
-
-//------------------------------------------------------------------------------
 
 /**
  Try to move `n` sites towards the plus end, stopping before any already occupied site.
@@ -112,13 +100,13 @@ void Digit::crawlP(const int n)
     
     while ( s < e )
     {
-        if ( vacant(s+1) )
+        if ( vacantLattice(s+1) )
             ++s;
         else
             break;
     }
     if ( s != site() )
-        hop(s);
+        hopLattice(s);
 }
 
 
@@ -132,13 +120,13 @@ void Digit::crawlM(const int n)
     
     while ( s > e )
     {
-        if ( vacant(s-1) )
+        if ( vacantLattice(s-1) )
             --s;
         else
             break;
     }
     if ( s != site() )
-        hop(s);
+        hopLattice(s);
 }
 
 //------------------------------------------------------------------------------
@@ -213,7 +201,7 @@ void Digit::promote()
         {
             hLattice = sit.lattice();
             hSite = sit.site();
-            static_cast<Digit*>(this)->inc();
+            static_cast<Digit*>(this)->incLattice();
         }
         else
             detachHand();
@@ -249,9 +237,9 @@ bool Fiber::resetLattice(bool lazy)
         {
             Digit* i = static_cast<Digit*>(h);
             FiberSite::lati_t s = i->site();
-            if ( i->vacant(s) )
+            if ( i->vacantLattice(s) )
             {
-                i->inc();
+                i->incLattice();
                 i->setAbscissa(uni * s + i->prop()->site_shift);
             }
             else

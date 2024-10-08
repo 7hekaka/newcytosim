@@ -65,35 +65,6 @@ public:
     bool aboveP(lati_t s) const { return hFiber->aboveP(abscissa_(s)); }
 
 #endif
-#if FIBER_HAS_LATTICE > 0
-
-    /// true if none of the Lattice's site bits matches the footprint
-    bool vacant(lati_t s) const { return 0 == (hLattice->data(s) & prop()->footprint); }
-
-    /// flip footprint bits on current site
-    void inc() const { assert_true(vacant(hSite)); hLattice->data(hSite) ^= prop()->footprint; }
-
-    /// flip footprint bits on current site
-    void dec() const { hLattice->data(hSite) ^= prop()->footprint; assert_true(vacant(hSite)); }
-    
-#elif FIBER_HAS_LATTICE < 0
-
-    /// true if given Lattice's site is zero
-    bool vacant(lati_t s) const { return hLattice->data(s) == 0.0; }
-
-    /// add 1.0 to Lattice's site
-    void inc() const { hLattice->data(hSite) += 1.0; }
-
-    /// subtract 1.0 to Lattice's site
-    void dec() const { hLattice->data(hSite) -= 1.0; }
-    
-#else
-
-    bool vacant(lati_t) const { return true; }
-    void inc() const {}
-    void dec() const {}
-    
-#endif
 
     /// check if attachement is possible according to properties
     bool attachmentAllowed(FiberSite&) const;
@@ -104,12 +75,9 @@ public:
     /// detach
     void detach();
 
-    
-    /// transfer to given site
-    void hop(lati_t);
 
     /// transfer to given site if it is vacant
-    void jumpTo(lati_t p) { if ( vacant(p) ) hop(p); }
+    void jumpTo(lati_t p) { if ( vacantLattice(p) ) hopLattice(p); }
     
     /// relocate without checking intermediate sites
     void jumpToEndM() { jumpTo(lattice()->entry()); }

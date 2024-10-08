@@ -171,6 +171,11 @@ void HandProp::clear()
     activity = "bind";
     display  = "";
     display_fresh = false;
+    
+    // parameters used for Digit:
+    step_size = 0;
+    footprint = 1;
+    site_shift = 0;
 }
 
 

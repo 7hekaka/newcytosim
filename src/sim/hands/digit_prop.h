@@ -23,22 +23,6 @@ public:
      @{
      */
     
-    /// size of one step
-    real step_size;
-    
-    /// list of cell's bits covered upon binding on the lattice
-    FiberLattice::cell_t footprint;
-    
-    /// specifies the position of binding within the Lattice cell
-    /**
-     `site_shift` should be in [0, step_size]:
-     - at `0.0`, the attachment position is at the start of the site
-     - at `step_size`, the attachment position is at the end of the site
-     - at `step_size/2`, the attachment is midway
-     [default = step_size/2]
-     */
-    real site_shift;
-    
     /// @}
     
 public:

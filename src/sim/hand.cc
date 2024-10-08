@@ -258,7 +258,10 @@ void Hand::detachHand()
     hFiber->removeHand(this);
     hFiber = nullptr;
 #if FIBER_HAS_LATTICE
-    hLattice = nullptr;
+    if ( hLattice ) {
+        decLattice();
+        hLattice = nullptr;
+    }
 #endif
 }
 
@@ -266,11 +269,14 @@ void Hand::detachHand()
 void Hand::detach()
 {
     assert_true( attached() );
-    hFiber->removeHand(this);
     hMonitor->beforeDetachment(this);
+    hFiber->removeHand(this);
     hFiber = nullptr;
 #if FIBER_HAS_LATTICE
-    hLattice = nullptr;
+    if ( hLattice ) {
+        decLattice();
+        hLattice = nullptr;
+    }
 #endif
 }
 
