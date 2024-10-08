@@ -30,7 +30,7 @@ public:
     Base() { x = 0; printf("Base()\n"); }
     ~Base() { printf("~Base\n"); }
     virtual int val() { return x; }
-    virtual void func() { --x; printf("Base::dec()\n"); }
+    virtual void func() { --x; printf("Base::dec\n"); }
 };
 
 class Obj: public Base
@@ -38,7 +38,7 @@ class Obj: public Base
 public:
     Obj() { printf("Obj()\n"); }
     ~Obj() { printf("~Obj\n"); }
-    virtual void func() { ++x; printf("Obj::inc()\n");  }
+    virtual void func() { ++x; printf("Obj::inc\n");  }
 };
 
 
