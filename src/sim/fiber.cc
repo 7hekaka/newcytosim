@@ -1098,8 +1098,8 @@ void Fiber::setInteractions(Meca& meca) const
         const unsigned end = ( prop->squeeze_mode > 1 ) ? 1 : nPoints;
         for ( unsigned i = 0; i < end; ++i )
         {
-            Vector P = posP(i);
-            real U = P.normYZ() / R;
+            Vector YZ = posP(i); YZ.XX = 0;
+            real U = YZ.normYZ() / R;
             real dF = 4 * F / ( R * square(std::exp(-U) + std::exp(U)) );
             real F0;
             if ( U < 0.25 )
@@ -1115,7 +1115,7 @@ void Fiber::setInteractions(Meca& meca) const
             }
             //std::clog << "squeeze " << U << "   " << F0 <<  "  " << dF;
             meca.addLineClampX(Mecapoint(this, i), dF);
-            meca.addForce(this, i, Vector(0, F0*P.YY, F0*P.ZZ));
+            meca.addForce(this, i, F0*YZ);
             //std::clog << "  : " << -F * std::tanh(U) << "  " << (F0+dF)*U*R << "\n";
         }
     }
