@@ -48,7 +48,7 @@ static void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos,
             size_t L;
             Cytosim::log << war << " in `" << StreamFunc::extract_line(is, ipos, L) << "' (line " << L << ")\n";
             // also report to standard error:
-            print_yellow(std::cerr, war);
+            print_yellow(stderr, war);
             std::cerr << '\n';
             StreamFunc::print_lines(std::cerr, is, ipos, is.tellg(), true);
         }
@@ -1561,7 +1561,7 @@ size_t Parser::read_input(int fd)
                     Parser::evaluate(buf);
                 }
                 catch ( Exception & e ) {
-                    print_green(std::cerr, e.brief());
+                    print_green(stderr, e.brief());
                     std::cerr << " in: " << buf << "\n";
                 }
                 // move remaining data at the start of 'buf':

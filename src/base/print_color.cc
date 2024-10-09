@@ -1,21 +1,20 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-// Created by Francois Nedelec on 03/09/2014.
+// Cytosim was created by Francois Nedelec. Copyright Cambridge University 2024
+// Created by Francois Nedelec on 03/09/2014; +ncurses 08/10/2024.
 
 
 #include "print_color.h"
 #include <cstdio>
 #include <cstdlib>
+#include <curses.h>
+#include <unistd.h>
 
 
 #ifndef PRINT_IN_COLOR
-#define PRINT_IN_COLOR 1
+#   define PRINT_IN_COLOR 1
 #endif
 
 
-#if PRINT_IN_COLOR
-
-// using ANSI escape sequence for UNIX-based systems
-
+// these are ANSI escape sequence for UNIX-based systems
 #define KNRM  "\x1B[0m"
 #define KBLD  "\x1B[1m"
 #define KUND  "\x1B[4m"
@@ -38,125 +37,108 @@
 #define KBLDCYN  "\x1B[1m\x1B[36m"
 #define KBLDWHT  "\x1B[1m\x1B[37m"
 
+// using a macro to concatenate strings:
+#define FORMAT_STRING(COLOR) COLOR "%s" KNRM
 
-/* Check the number of colors supported by the terminal */
-bool print_has_colors()
+
+/* Returns the number of colors supported by the terminal */
+int num_colors(int fd)
 {
-    static long n_colors = 0;
-    if ( n_colors == 0 )
+    int res = 0;
+    if ( !isatty(fd) )
     {
-        long n = 1;
-        FILE * fp = popen("tput cols 2> /dev/null", "r");
-        if ( fp ) {
-            char str[32] = { 0 };
-            if ( fgets(str, sizeof(str), fp) )
-                n = strtol(str, nullptr, 10);
-            pclose(fp);
-            //printf("terminal has %li colors: %s", n, str);
-        }
-        n_colors = n;
+        //printf("[FILE %i is not a TTY]", fd);
+        return 0;
     }
-    return n_colors > 7;
+    stdscr = initscr();
+    if ( stdscr != nullptr )
+    {
+        start_color();
+        if ( has_colors() )
+            res = COLOR_PAIRS;
+    }
+    refresh();
+    endwin();
+    //printf("[FILE %i has %i colors]", fd, res);
+    return res;
+ }
+
+
+/* Check if terminal supports color printing */
+inline static bool terminal_has_colors(FILE * file)
+{
+    return num_colors(fileno(file)) > 7;
 }
 
 
-void print_red(std::ostream& os, std::string const& str)
+void print_red(FILE * file, std::string const& str)
 {
-    if ( print_has_colors() )
-        os << KBLDRED << str << KNRM;
+#if PRINT_IN_COLOR
+    if ( terminal_has_colors(file) )
+        fprintf(file, FORMAT_STRING(KBLDRED), str.c_str());
     else
-        os << str;
-}
-
-void print_green(std::ostream& os, std::string const& str)
-{
-    if ( print_has_colors() )
-        os << KBLDGRN << str << KNRM;
-    else
-        os << str;
-}
-
-void print_yellow(std::ostream& os, std::string const& str)
-{
-    if ( print_has_colors() )
-        os << KBLDYEL << str << KNRM;
-    else
-        os << str;
-}
-
-void print_blue(std::ostream& os, std::string const& str)
-{
-    if ( print_has_colors() )
-        os << KBLDBLU << str << KNRM;
-    else
-        os << str;
-}
-
-void print_magenta(std::ostream& os, std::string const& str)
-{
-    if ( print_has_colors() )
-        os << KBLDMAG << str << KNRM;
-    else
-        os << str;
-}
-
-void print_cyan(std::ostream& os, std::string const& str)
-{
-    if ( print_has_colors() )
-        os << KBLDCYN << str << KNRM;
-    else
-        os << str;
-}
-
-void print_bold(std::ostream& os, std::string const& str)
-{
-    if ( print_has_colors() )
-        os << KBLD << str << KNRM;
-    else
-        os << str;
-}
-
-#else
-
-bool print_has_colors()
-{
-    return false;
-}
-
-void print_red(std::ostream& os, std::string const& str)
-{
-    os << str;
-}
-
-void print_green(std::ostream& os, std::string const& str)
-{
-    os << str;
-}
-
-void print_yellow(std::ostream& os, std::string const& str)
-{
-    os << str;
-}
-
-void print_blue(std::ostream& os, std::string const& str)
-{
-    os << str;
-}
-
-void print_magenta(std::ostream& os, std::string const& str)
-{
-    os << str;
-}
-
-void print_cyan(std::ostream& os, std::string const& str)
-{
-    os << str;
-}
-
-void print_bold(std::ostream& os, std::string const& str)
-{
-    os << str;
-}
-
 #endif
+        fputs(str.c_str(), file);
+}
+
+void print_green(FILE * file, std::string const& str)
+{
+#if PRINT_IN_COLOR
+    if ( terminal_has_colors(file) )
+        fprintf(file, FORMAT_STRING(KBLDGRN), str.c_str());
+    else
+#endif
+        fputs(str.c_str(), file);
+}
+
+void print_yellow(FILE * file, std::string const& str)
+{
+#if PRINT_IN_COLOR
+    if ( terminal_has_colors(file) )
+        fprintf(file, FORMAT_STRING(KBLDYEL), str.c_str());
+    else
+#endif
+        fputs(str.c_str(), file);
+}
+
+void print_blue(FILE * file, std::string const& str)
+{
+#if PRINT_IN_COLOR
+    if ( terminal_has_colors(file) )
+        fprintf(file, FORMAT_STRING(KBLDBLU), str.c_str());
+    else
+#endif
+        fputs(str.c_str(), file);
+}
+
+void print_magenta(FILE * file, std::string const& str)
+{
+#if PRINT_IN_COLOR
+    if ( terminal_has_colors(file) )
+        fprintf(file, FORMAT_STRING(KBLDMAG), str.c_str());
+    else
+#endif
+        fputs(str.c_str(), file);
+}
+
+void print_cyan(FILE * file, std::string const& str)
+{
+#if PRINT_IN_COLOR
+    if ( terminal_has_colors(file) )
+        fprintf(file, FORMAT_STRING(KBLDCYN), str.c_str());
+    else
+#endif
+        fputs(str.c_str(), file);
+}
+
+void print_bold(FILE * file, std::string const& str)
+{
+#if PRINT_IN_COLOR
+    if ( terminal_has_colors(file) )
+        fprintf(file, FORMAT_STRING(KBLD), str.c_str());
+    else
+#endif
+        fputs(str.c_str(), file);
+}
+
 

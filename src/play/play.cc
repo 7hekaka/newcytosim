@@ -165,7 +165,7 @@ void help(std::ostream& os)
 
 void print_error(Exception const& e)
 {
-    print_magenta(std::cerr, e.brief());
+    print_magenta(stderr, e.brief());
     std::cerr << e.info() << '\n';
 }
 
@@ -375,7 +375,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
-        arg.print_warnings(std::cerr, 1, "\n");
+        arg.print_warnings(stderr, 1, "\n");
         print_error(e);
         return 4;
     }
@@ -442,12 +442,12 @@ int main(int argc, char* argv[])
             } while ( arg.set(frm, "frame", ++inx) );
         }
         if ( simul.prop.verbose ) printf("\n");
-        arg.print_warnings(std::cerr, 1, "\n");
+        arg.print_warnings(stderr, 1, "\n");
         OffScreen::closeContext();
         return 0;
     }
     
-    arg.print_warnings(std::cerr, 1, "\n");
+    arg.print_warnings(stderr, 1, "\n");
 
     //--------- initialize Window system and create Window
 #if ( HEADLESS_PLAYER )

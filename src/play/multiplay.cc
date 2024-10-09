@@ -370,7 +370,7 @@ int main(int argc, char *argv[])
         view.read(arg);
         disp.read(arg);
         arg.set(period, "period");
-        arg.print_warnings(std::cerr, 1, "\n");
+        arg.print_warnings(stderr, 1, "\n");
     }
     
     GLFWwindow* win = initWindow(bugW*tileX, bugH*tileY);

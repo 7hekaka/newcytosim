@@ -186,7 +186,7 @@ int main(int argc, char* argv[])
     
     glApp::initialize();
     glApp::views[0].read(arg);
-    arg.print_warnings(std::cerr, 1, "\n");
+    arg.print_warnings(stderr, 1, "\n");
 
     glutInit(&argc, argv);
     glApp::setDimensionality(3);

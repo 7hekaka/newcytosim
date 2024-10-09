@@ -123,7 +123,7 @@ ObjectList Nucleator::makeFiber(Simul& sim, Vector pos, FiberProp const* fip, Gl
     real a = std::acos(dot(fib->dirEndM(), dir));
     std::clog << "nucleated with angle " << std::setw(8) << a << " along " << fib->dirEndM() << "\n";
 #endif
-    opt.print_warnings(std::cerr, 1, " in nucleator:spec\n");
+    opt.print_warnings(stderr, 1, " in nucleator:spec\n");
     assert_false(fib->invalid());
     return objs;
 }

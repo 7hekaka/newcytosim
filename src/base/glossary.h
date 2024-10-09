@@ -307,7 +307,7 @@ public:
     int has_warning(std::string&, size_t threshold = 1) const;
     
     /// print message about unused values and values used multiple times
-    void print_warnings(std::ostream&, size_t threshold, std::string const&) const;
+    void print_warnings(FILE*, size_t threshold, std::string const&) const;
 
     //-------------------------------------------------------------------------------
     #pragma mark -

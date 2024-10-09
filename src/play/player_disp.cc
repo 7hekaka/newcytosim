@@ -291,7 +291,7 @@ void Player::prepareDisplay(View& view)
     }
     catch(Exception & e)
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << '\n';
     }
 }
@@ -327,7 +327,7 @@ void Player::drawCytosim()
     }
     catch(Exception & e)
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << " (display)\n";
     }
 }
@@ -345,7 +345,7 @@ void Player::readDisplayString(View& view, std::string const& str)
     }
     catch( Exception & e )
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << " (simul:display)\n";
     }
 }

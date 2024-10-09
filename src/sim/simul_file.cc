@@ -142,7 +142,7 @@ void Simul::writeObjects(std::string const& name, bool append, int binary) const
     catch( InvalidIO & e )
     {
         out.unlock();
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << ", writing trajectory at t=" << time() << '\n';
     }
 }
@@ -804,7 +804,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
         }
         catch( Exception & e )
         {
-            print_blue(std::cerr, e.brief());
+            print_blue(stderr, e.brief());
             if ( objset )
             {
                 in.skip_until("#section ");

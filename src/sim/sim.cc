@@ -58,19 +58,14 @@ void handle_interrupt(int sig)
 
 //------------------------------------------------------------------------------
 
-/// for normal output:
-using std::cout;
-/// where errors are printed:
-using std::cerr;
-
 int main(int argc, char* argv[])
 {
     register_signal_handlers();
     // register callback to catch interrupting signals:
     if ( signal(SIGINT, handle_interrupt) )
-        cerr << "Could not register SIGINT handler\n";
+        std::cerr << "Could not register SIGINT handler\n";
     if ( signal(SIGTERM, handle_interrupt) )
-        cerr << "Could not register SIGTERM handler\n";
+        std::cerr << "Could not register SIGTERM handler\n";
     // catch division by zero and Nan
     //feenableexcept(FE_INVALID|FE_DIVBYZERO|FE_OVERFLOW);
 
@@ -81,15 +76,15 @@ int main(int argc, char* argv[])
 
     if ( arg.use_key("help") || arg.use_key("--help") )
     {
-        splash(cout);
-        help(cout);
+        splash(std::cout);
+        help(std::cout);
         return 0;
     }
 
     if ( arg.use_key("info") || arg.use_key("--version")  )
     {
-        splash(cout);
-        print_version(cout);
+        splash(std::cout);
+        print_version(std::cout);
         return 0;
     }
     
@@ -124,7 +119,7 @@ int main(int argc, char* argv[])
     Simul simul;
     try {
         simul.prop.read(arg);
-        arg.print_warnings(cerr, 1, " on command line\n");
+        arg.print_warnings(stderr, 1, " on command line\n");
         simul.initCytosim();
         time_t sec = TimeDate::seconds_since_1970();
         // read and execute default config file:
@@ -134,12 +129,12 @@ int main(int argc, char* argv[])
         Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";
     }
     catch( Exception & e ) {
-        print_magenta(cerr, e.brief());
-        cerr << e.info() << '\n';
+        print_magenta(stderr, e.brief());
+        std::cerr << e.info() << '\n';
         return 4;
     }
     catch(...) {
-        print_red(cerr, "Error: an exception occurred\n");
+        print_red(stderr, "Error: an exception occurred\n");
         return 5;
     }
     

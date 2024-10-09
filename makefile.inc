@@ -84,6 +84,9 @@ endif
 #------------------------  Compiler Specifications  ----------------------------
 #-------------------------------------------------------------------------------
 
+# Libraries needed by almost all objects
+LIBRARIES := -lpthread -lncurses
+
 # common options for all C++ objects: use '-fopenmp' to enable OpenMP
 CXXFLG := -std=c++17 -fno-rtti -Wredeclared-class-member -Wno-deprecated-declarations
 CXXFLG := -std=c++17 -fno-rtti $(OpenMP) #-g -fno-inline
@@ -169,7 +172,7 @@ ifeq ($(MACHINE),mac)
     FlagsP := -O2 -fno-devirtualize $(ALIGN) -fno-inline
     FlagsF := $(FAST) $(ALIGN)
 
-    LINK   := -framework Accelerate $(OMPLIB)
+    LINK   := -framework Accelerate $(OMPLIB) $(LIBRARIES)
 
     GRAFIX := -framework GLUT -framework OpenGL -framework AGL
     # Using brew's freeGLUT:
@@ -217,12 +220,12 @@ ifeq ($(MACHINE),cluster)
     ### 64bit Linux distribution, 2011 (distribution on LSF EMBL cluster)
     # ln -sf /usr/lib64/liblapack.so.3 /usr/lib64/liblapack.so
     # ln -sf /usr/lib64/libblas.so.3 /usr/lib64/libblas.so
-    #LINK  := /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3 -L/usr/lib64 -lpthread
+    #LINK  := /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3 -L/usr/lib64 $(LIBRARIES)
     
     ### Automatic
-    LINK := -llapack -lopenblas -lgfortran -lpthread
+    LINK := -llapack -lopenblas -lgfortran $(LIBRARIES)
     ### Self-compiled LAPACK/BLAS (2022)
-    LINK := ~/lib/liblapack.a ~/lib/libblas.a -lgfortran -lpthread
+    LINK := ~/lib/liblapack.a ~/lib/libblas.a -lgfortran $(LIBRARIES)
 
     # linkage options for programs using graphics:
     GRAFIX :=-L/usr/lib -lglut -lGL -lGLEW -lXt -lX11
@@ -264,9 +267,9 @@ ifeq ($(MACHINE),linux)
     endif
 
     #### For dynamic linking:
-    LINK := -L$(BLASDIR) -llapack -lblas -lpthread
+    LINK := -L$(BLASDIR) -llapack -lblas $(LIBRARIES)
     #### For static linking specify the objects directly:
-    #LINK := -L$(BLASDIR) $(BLASDIR)/liblapack.so $(BLASDIR)/libblas.so -lpthread
+    #LINK := -L$(BLASDIR) $(BLASDIR)/liblapack.so $(BLASDIR)/libblas.so $(LIBRARIES)
 
     ########### Install libraries needed for graphics ############
     # Centos freglut: yum install freeglut-devel
@@ -303,7 +306,7 @@ ifeq ($(MACHINE),cygwin)
     ### Needs
     # blas:   yum install blas-devel
     # lapack: yum install lapack-devel
-    LINK := -L/usr/lib -L/bin -llapack -lblas -lpthread
+    LINK := -L/usr/lib -L/bin -llapack -lblas $(LIBRARIES)
 
     ### linkage options for programs using graphics:
     ### Needs
@@ -362,7 +365,7 @@ ifeq ($(HAS_MKL),1)
     #MKLLIB := -lmkl_intel_lp64 -lmkl_intel_thread -lmkl_core -liomp5
 
     # modify the linking command:
-    LINK := -L$(MKLDIR) $(MKLLIB) -lpthread
+    LINK := -L$(MKLDIR) $(MKLLIB) $(LIBRARIES)
 
 endif
 
@@ -376,13 +379,13 @@ ifeq ($(HAS_MKL),2)
     #MKLLIB := $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a
     
     # sequential for linux
-    MKLLIB := -Wl,--start-group $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a -Wl,--end-group -lpthread -lm -ldl
+    MKLLIB := -Wl,--start-group $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_sequential.a $(MKLDIR)/libmkl_core.a -Wl,--end-group  $(LIBRARIES) -lm -ldl
 
     # threaded static linking:
     #MKLLIB := $(MKLDIR)/libmkl_intel_lp64.a $(MKLDIR)/libmkl_thread.a $(MKLDIR)/libmkl_core.a /opt/intel/lib/libiomp5.a
 
     # modify the linking command:
-    LINK := $(MKLLIB) -lpthread -lm -ldl
+    LINK := $(MKLLIB) $(LIBRARIES) -lm -ldl
 
 endif
 

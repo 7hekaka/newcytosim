@@ -157,7 +157,7 @@ bool Glossary::use_key(key_type const& k)
                 iss >> var;
                 if ( iss.fail() )
                 {
-                    print_magenta(std::cerr, "warning: unexpected value `"+val.value_+"' specified for `"+w->first+"'\n");
+                    print_magenta(stderr, "warning: unexpected value `"+val.value_+"' specified for `"+w->first+"'\n");
                     var = false;
                 }
             }
@@ -772,7 +772,7 @@ int Glossary::read_strings(int argc, char* argv[], int no_overwrite)
         }
         catch( Exception & e )
         {
-            print_magenta(std::cerr, e.brief());
+            print_magenta(stderr, e.brief());
             std::cerr << e.info() << '\n';
             res = 1;
         }
@@ -852,13 +852,13 @@ int Glossary::has_warning(std::string& msg, size_t threshold) const
 }
 
 
-void Glossary::print_warnings(std::ostream& os, size_t threshold, std::string const& msg) const
+void Glossary::print_warnings(FILE * file, size_t threshold, std::string const& msg) const
 {
     std::string war;
     if ( has_warning(war, threshold) )
     {
-        print_yellow(os, war);
-        os << msg;
+        print_yellow(file, war);
+        fputs(msg.c_str(), file);
     }
 }
 

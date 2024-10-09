@@ -238,7 +238,7 @@ int main(int argc, char* argv[])
     
     PAM.read(arg);
     glApp::currentView().read(arg);
-    arg.print_warnings(std::cerr, 1, "\n");
+    arg.print_warnings(stderr, 1, "\n");
     glApp::newWindow(display);
     glApp::attachMenu();
     glApp::setScale(10);

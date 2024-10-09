@@ -295,7 +295,7 @@ int SimThread::loadFrame(size_t f)
     }
     catch( Exception & e )
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << " (loading frame " << f << ")\n";
     }
     unlock();
@@ -320,7 +320,7 @@ int SimThread::loadNextFrame()
     }
     catch( Exception & e )
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << " (loading next frame)\n";
     }
     unlock();
@@ -336,7 +336,7 @@ int SimThread::loadLastFrame()
     }
     catch( Exception & e )
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << " (loading last frame)\n";
     }
     unlock();
@@ -534,7 +534,7 @@ void SimThread::exportObjects(const int binary)
     }
     catch( Exception & e )
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << " (export objects)\n";
     }
     unlock();
@@ -549,7 +549,7 @@ void SimThread::writeProperties(std::ostream& os, bool prune)
     }
     catch( Exception & e )
     {
-        print_blue(std::cerr, e.brief());
+        print_blue(stderr, e.brief());
         std::cerr << e.info() << " (write properties)\n";
     }
     unlock();

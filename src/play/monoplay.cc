@@ -288,7 +288,7 @@ int main(int argc, char *argv[])
         arg.set(P, "period");
         worker.period(P);
         arg.set(winW, "size") && ( arg.set(winH, "size", 1) || ( winH = winW ));
-        arg.print_warnings(std::cerr, 1, "\n");
+        arg.print_warnings(stderr, 1, "\n");
     }
 
     GLFWwindow* win = initWindow(winW, winH);
