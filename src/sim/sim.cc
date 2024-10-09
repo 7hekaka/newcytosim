@@ -130,7 +130,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e ) {
         print_magenta(stderr, e.brief());
-        std::cerr << e.info() << '\n';
+        fputs(e.info().c_str(), stderr);
         return 4;
     }
     catch(...) {

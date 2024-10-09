@@ -1562,7 +1562,7 @@ size_t Parser::read_input(int fd)
                 }
                 catch ( Exception & e ) {
                     print_green(stderr, e.brief());
-                    std::cerr << " in: " << buf << "\n";
+                    fprintf(stderr, " in: %s\n", buf);
                 }
                 // move remaining data at the start of 'buf':
                 memmove(buf, ptr, nxt-ptr);

@@ -166,7 +166,7 @@ void help(std::ostream& os)
 void print_error(Exception const& e)
 {
     print_magenta(stderr, e.brief());
-    std::cerr << e.info() << '\n';
+    fputs(e.info().c_str(), stderr);
 }
 
 

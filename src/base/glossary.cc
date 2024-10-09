@@ -773,7 +773,7 @@ int Glossary::read_strings(int argc, char* argv[], int no_overwrite)
         catch( Exception & e )
         {
             print_magenta(stderr, e.brief());
-            std::cerr << e.info() << '\n';
+            fputs(e.info().c_str(), stderr);
             res = 1;
         }
     }
