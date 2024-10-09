@@ -851,7 +851,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 
 /**
  Move the vertices relative to each other, such that when this is done,
- all segments have the same distance `fnCut` ( =segmentation() ).
+ all segments have the same distance `cut` (ie. parameter `segmentation`).
  This is operation does not change the center of gravity of the fiber.
 
  
@@ -860,7 +860,7 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
  likely, the Brownian motion will push the points apart soon.
  */
 
-void Chain::reshape_global(const size_t ns, const real* src, real* dst, real cut)
+void Chain::reshape_global(const size_t ns, const real* src, real* dst, const real cut)
 {
     Vector inc(0,0,0), sum(0,0,0), seg;
     seg.load_diff(src);
@@ -988,10 +988,10 @@ void Chain::getPoints(real const* ptr)
         //VecPrint::print("/ ", DIM*nPoints, pPos, 2);
         //VecPrint::print("L ", DIM*nPoints, ptr, 2);
         std::string doc = document(ptr);
-        real mov = std::sqrt(sum_square(DIM*nPoints, pPos, ptr));
+        real mov = std::sqrt(sum_square(DIM*nPoints, pPos, ptr)) / nPoints;
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        std::cerr << " wild motion for " << doc << " dis " << mov << '\n';
+        std::cerr << " wild motion for " << doc << " disp. " << mov << '\n';
         //copy_real(DIM*nPoints, ptr, pPos);
 #endif
     }
