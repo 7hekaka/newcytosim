@@ -7,7 +7,7 @@ set simul system
     viscosity = 0.2
 }
 
-set system display { point_size=5; }
+set system display { point_size=2; zoom=2; }
 
 set space cell
 {
@@ -22,8 +22,8 @@ new cell
 set fiber filament
 {
     rigidity = 0.5
-    segmentation = 0.25
-    display = ( line=0.5, 1; color=gray; )
+    segmentation = 0.128
+    display = ( color=gray; lines=1, 3, 1; tension_scale=4; )
 }
 
 set hand motor

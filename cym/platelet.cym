@@ -4,7 +4,7 @@
 set simul system
 {
     steric = 1, 500
-    time_step = 0.005
+    time_step = 0.0025
     binding_grid_step = 0.1
     viscosity = 1.0
     precondition = 1
@@ -21,7 +21,7 @@ set system display
     back_color   = black
     %back_color   = 0xFFFFFFFF;
     %front_color  = 0x000000FF;
-    fog          = 2, 0.5, 0x000000FF;
+    fog          = 2, 2, 0x000000FF;
     style        = 3;
     point_value  = 0.01;
     point_size   = 2;
@@ -65,7 +65,7 @@ set fiber filament
     growing_force = inf
     total_polymer = 80.0
     
-    display = ( color=light_blue; line=2.5; lattice=3, 1; )
+    display = ( color=light_blue; line=2.5; lattice=3, 1; style=stripe; )
 }
 
 %----------------------------------
@@ -124,8 +124,9 @@ set couple gamma
 
 new cell { diameter = 1.7, 1.7, 0.42; }
 new 8 gamma
-new 1523 complex
+new 1000 complex
 new envelope { diameter = 1.84, 1.84, 0.54; }
+new filament { length=0.016; }
 
 run 1000000 system 
 {
