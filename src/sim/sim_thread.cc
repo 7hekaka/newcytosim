@@ -359,7 +359,7 @@ SingleProp * SimThread::makeHandleProperty(real range)
     // Create a Hand that attaches fast and never detach:
     HandProp * hap = new HandProp("live_hand");
     hap->binding_range   = range;
-    hap->binding_rate    = 1 / time_step(*sim_);
+    hap->binding_rate    = 1.0 / sim_->time_step();
     hap->unbinding_rate  = 0;
     hap->unbinding_force = INFINITY;
     hap->complete(*sim_);

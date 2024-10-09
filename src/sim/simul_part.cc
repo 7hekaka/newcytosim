@@ -2,12 +2,14 @@
 
 #include "simul.h"
 
+/// time in the simulated world
+real time(Simul const& sim) { return sim.prop.time; }
 
-/// time_step
+/// time step of the simulation engine
 real time_step(Simul const& sim) { return sim.prop.time_step; }
 
-/// Boltzmann constant * temperature
+/// kT = Boltzmann constant * temperature
 real boltzmann(Simul const& sim) { return sim.prop.kT; }
 
-/// ready to simulate
+/// flag indicating readiness to simulate
 int primed(Simul const& sim) { return sim.primed(); }
