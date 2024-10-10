@@ -1083,7 +1083,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd2D_AVXUU(const double* X, double* Y, siz
 #if ( SD_BLOCK_SIZE == 3 ) && !REAL_IS_DOUBLE && SMSBD_USES_SSE
 void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj) const
 {
-    //multiply with the symmetrized block, assuming it has been symmetrized:
+    //multiply with the diagonal block, assuming it is symmetric:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
     // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
@@ -1369,28 +1369,27 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
     vec2 zero = setzero2();
     /* vec4 s0, s1, s2 accumulate lines of the transposed-matrix multiplied by 'xyz' */
     vec2 s0, s1, s2;
+    vec2 t0, t2;
     vec2 xx, yy, zz;
     {
         vec2 xy = loadu2(X+jj);
-        zz = load1Z(X+jj+2);
-        //multiply with the symmetrized block, assuming it has been symmetrized:
+        zz = loaddup2(X+jj+2);
+        //multiply with the diagonal block, assuming it is symmetric:
         // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
         // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
         // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
-        auto const& mat = dia_.data();
+        auto const& D = dia_.data();
         yy = loadu2(Y+jj);
-        s0 = fmadd2(loadu2(mat  ), xy, unpacklo2(yy, zero));
-        s1 = fmadd2(loadu2(mat+3), xy, unpackhi2(yy, zero));
-        vec2 mat6 = loadu2(mat+6);
-        s2 = fmadd2(mat6, xy, load1Z(Y+jj+2));
+        s0 = fmadd2(loadu2(D  ), xy, unpacklo2(yy, zero));
+        s1 = fmadd2(loadu2(D+3), xy, unpackhi2(yy, zero));
+        vec2 mat6 = loadu2(D+6);
+        s2 = fmadd2(mat6, xy, unpacklo2(load1(Y+jj+2), zero));
         // prepare broadcasted vectors:
         xx = duplo2(xy);
         yy = duphi2(xy);
-        // add last column, keeping the upper value from s0, s1, s2:
-        s0 = fmadd2(unpacklo2(mat6, zero), zz, s0);
-        s1 = fmadd2(unpackhi2(mat6, zero), zz, s1);
-        s2 = fmadd2(load1Z(mat+8), zz, s2);
-        zz = duplo2(zz);
+        // multiply last column into t0 = { X, Y } and t2 = { Z }:
+        t0 = mul2(mat6, zz);
+        t2 = mul1(load1(D+8), zz); // upper is garbage
     }
     // There is a dependency in the loop for 's0', 's1' and 's2'.
     for ( size_t n = 0; n < noff_; ++n )
@@ -1404,33 +1403,35 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         vec2 mat0 = loadu2(mat);
         vec2 mat2 = loadu2(mat+2);
         vec2 XY = fmadd2(mat0, xx, loadu2(Y+ii));
-        vec2 Z0 = fmadd1(unpacklo2(mat2, zero), xx, loadu2(Y+ii+2));
+        vec2 Z0 = fmadd1(mat2, xx, load1(Y+ii+2));  // upper not used
 
         vec2 xyi = loadu2(X+ii);
-        vec2 z0i = unpacklo2(load1(X+ii+2), zero);
+        vec2 zzi = loaddup2(X+ii+2);
         s0 = fmadd2(mat0, xyi, s0);
-        s0 = fmadd2(mat2, z0i, s0);
-
         // multiply with the transposed block in lines { s0, s1, s2 }:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
 
         vec2 mat4 = loadu2(mat+4);
+        Z0 = fmadd1(unpackhi2(mat4, zero), yy, Z0);
         vec2 mat3 = catshift(mat2, mat4);
         XY = fmadd2(mat3, yy, XY);
         s1 = fmadd2(mat3, xyi, s1);
         vec2 mat6 = loadu2(mat+6);
-        Z0 = fmadd1(unpackhi2(mat4, zero), yy, Z0);
-        s1 = fmadd2(catshift(mat4, mat6), z0i, s1);
-        vec2 mat8 = unpacklo2(load1(mat+8), zero);
-        s2 = fmadd2(mat6, xyi, s2);
+        t0 = fmadd2(blend11(mat2, mat4), zzi, t0);
+
+        vec2 mat8 = load1(mat+8);   // upper is garbage
         XY = fmadd2(mat6, zz, XY);
-        Z0 = fmadd1(mat8, zz, Z0);
-        s2 = fmadd2(mat8, z0i, s2);
+        Z0 = fmadd1(mat8, zz, Z0);  // upper is garbage
+        s2 = fmadd2(mat6, xyi, s2);
+        t2 = fmadd1(mat8, zzi, t2); // upper is garbage
         storeu2(Y+ii, XY);
         store1(Y+ii+2, Z0);
     }
+    s0 = add2(s0, unpacklo2(t0, zero));
+    s1 = add2(s1, unpackhi2(t0, zero));
+    s2 = add2(s2, unpacklo2(t2, zero));
     // finally sum s0 = { Y0 Y0 }, s1 = { Y1 Y1 }, s2 = { Y2 Y2 }
     s0 = add2(unpacklo2(s0, s1), unpackhi2(s0, s1));
     s2 = add2(unpacklo2(s2, s2), unpackhi2(s2, s2));
@@ -1447,7 +1448,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_AVX(const double* X, double* Y, size_
     vec4 x0, x1, x2;
     {
         vec4 xxx = load3Z(X+jj);
-        //multiply with the symmetrized block, assuming it has been symmetrized:
+        //multiply with the diagonal block, assuming it is symmetric:
         // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
         // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
         // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
@@ -1756,7 +1757,7 @@ void SparMatSymBlkDiag::Pilar::vecMulAddTriangle3D_AVX(const double* X, double* 
 #if ( SD_BLOCK_SIZE == 4 ) && REAL_IS_DOUBLE && SMSBD_USES_AVX
 void SparMatSymBlkDiag::Pilar::vecMulAdd4D_AVX(const double* X, double* Y, size_t jj) const
 {
-    //multiply with the symmetrized block, assuming it has been symmetrized:
+    //multiply with the diagonal block, assuming it is symmetric:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     vec4 s0, s1, s2, s3;
     vec4 x0, x1, x2, x3;

@@ -736,7 +736,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_SSE(const float* X, float* Y, size_t jj)
     // load 3x3 matrix diagonal element into 3 vectors:
     Block const& D = blk_[0];
     
-    //multiply with the symmetrized block, assuming it has been symmetrized:
+    //multiply with the diagonal block, assuming it is symmetric:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
     // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
@@ -1184,7 +1184,7 @@ void SparMatSymBlk::Column::vecMulAdd3D_AVX(const double* X, double* Y, size_t j
     // load 3x3 matrix diagonal element into 3 vectors:
     Block const& D = blk_[0];
     
-    //multiply with the symmetrized block, assuming it has been symmetrized:
+    //multiply with the diagonal block, assuming it is symmetric:
     // Y0 = Y[jj  ] + M[0] * X0 + M[1] * X1 + M[2] * X2;
     // Y1 = Y[jj+1] + M[1] * X0 + M[4] * X1 + M[5] * X2;
     // Y2 = Y[jj+2] + M[2] * X0 + M[5] * X1 + M[8] * X2;
@@ -1385,7 +1385,7 @@ void SparMatSymBlk::Column::vecMulAdd4D_AVX(const double* X, double* Y, size_t j
     assert_true(nbb_ > 0);
     assert_true(3*inx_[0] == jj);
     Block const* blk = blk_;
-    //multiply with the symmetrized block, assuming it has been symmetrized:
+    //multiply with the diagonal block, assuming it is symmetric:
     /* vec4 s0, s1, s2 add lines of the transposed-matrix multiplied by 'xyz' */
     vec4 s0, s1, s2, s3;
     vec4 x0, x1, x2, x3;

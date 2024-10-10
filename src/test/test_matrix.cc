@@ -265,11 +265,11 @@ real checkMatrix(MATRIX & mat, real const* x, real const* y, real * z, size_t NP
     real n = std::max(abs_real(sum1-sum2), abs_real(sum2-sum3));
     if ( NP > 0 )
     {
+        printf(" check %+16.6f %+16.6f %+16.6f ", sum1, sum2, sum3);
         if ( n > 1e-6 )
             printf(" FAILED");
         else
-            printf("  check");
-        printf(" %+16.6f %+16.6f %+16.6f ", sum1, sum2, sum3);
+            printf(" : pass");
     }
     return n;
 }
@@ -621,7 +621,7 @@ void testMatricesMulti(const unsigned S, const size_t F, const size_t rep)
     setVectors(DIM*S, x, y, z);
     
     MATRIX mat;
-    printf("------ %i x %i  multi-test %s:", DIM, S, mat.what().c_str());
+    printf("------ %i x %i  multi-test %s:\n", DIM, S, mat.what().c_str());
     mat.resize(DIM*S);
     real err = 0;
     for ( size_t i = 0; i < rep; ++i )
@@ -633,12 +633,13 @@ void testMatricesMulti(const unsigned S, const size_t F, const size_t rep)
         err = checkMatrix(mat, x, y, z, 0);
         if ( err > REAL_EPSILON ) break;
     }
-    printf(" error %e\n", err);
-    checkMatrix(mat, x, y, z, 16*(err>1e-6));
+    checkMatrix(mat, x, y, z, 1+15*(err>1e-6));
+    printf(" ---> error %e\n", err);
     //mat.printSparse(std::cout, 0, 0, 1000);
     setIndices(0, 0);
     setVectors(0, x, y, z);
 }
+
 
 void testMatrices(const unsigned S, const size_t F)
 {
