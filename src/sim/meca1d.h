@@ -33,10 +33,11 @@ class Meca1D
     
     Array<Mecable *> mecables;   ///< list of mobile objects
 
-    SparMatSym1 mat;             ///< matrix containing the elasticity coefficients
+    SparMatSym1 matX;            ///< matrix containing the elasticity coefficients
 
     LinearSolvers::Allocator allocator_;  ///< working memory allocator
     
+    int verbose_;
     int ready_;                  ///< true if the solution is contained in 'vSOL'
 
 public:
@@ -44,6 +45,7 @@ public:
     Meca1D()
     {
         allocated_ = 0;
+        verbose_ = 1;
         ready_ = -1;
         vSOL = nullptr;
         vBAS = nullptr;
@@ -97,8 +99,8 @@ public:
         size_t dim = mecables.size();
         
         allocate(dim);
-        mat.resize(dim);
-        mat.reset();
+        matX.resize(dim);
+        matX.reset();
 
         zero_real(dim, vBAS);
         zero_real(dim, vRHS);
@@ -118,16 +120,16 @@ public:
     /// clamp point at index 'i' to position 'pos' with weight w
     void addClamp(size_t i, real w, real pos)
     {
-        mat(i, i) -= w;
+        matX(i, i) -= w;
         vBAS[i] += w * pos;
     }
     
     /// link points 'i' and 'j' with a position offset 'delta' and weight w
     void addLink(size_t i, size_t j, real w, real delta)
     {
-        mat(i, i) -= w;
-        mat(i, j) += w;
-        mat(j, j) -= w;
+        matX(i, i) -= w;
+        matX(i, j) += w;
+        matX(j, j) -= w;
         vBAS[i] += w * delta;
         vBAS[j] -= w * delta;
     }
@@ -140,8 +142,7 @@ public:
         {
             real b = std::sqrt( 2 * kT * vMOB[i] );
             vRHS[i] = vMOB[i] * vBAS[i] + b * RNG.gauss();
-            if ( b < res )
-                res = b;
+            res = std::min(res, b);
         }
         return res;
     }
@@ -173,14 +174,25 @@ public:
          vSOL = newPOS - oldPOS
 
      */
-    size_t solve(real precision)
+    size_t solve(real tol)
     {
         assert_true(ready_==0);
-        mat.prepareForMultiply(1);
-        LinearSolvers::Monitor monitor(dimension(), precision);
-        // solve system using Bi-Conjugate Gradient Stabilized Method:
+        matX.prepareForMultiply(1);
+        LinearSolvers::Monitor monitor(2*dimension(), tol);
+        // Solve linear system using Bi-Conjugate Gradient Stabilized Method:
         LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         ready_ = monitor.converged();
+        if ( verbose_ )
+        {
+            std::stringstream oss;
+            oss << "\tuniaxial size " << dimension();
+            oss << " " << matX.what();
+            oss << " count " << std::setw(4) << monitor.count();
+            oss << " residual " << std::setw(11) << std::left << monitor.residual();
+            if ( !ready_ ) oss << " FAILED!";
+            Cytosim::out << oss.str() << std::endl;
+            //std::clog << oss.str() << std::endl;
+        }
         return monitor.count();
     }
     
@@ -208,7 +220,7 @@ public:
         assert_true( X != Y  &&  X != vBAS  &&  Y != vBAS );
         
         zero_real(mecables.size(), vBAS);
-        mat.vecMulAdd(X, vBAS);
+        matX.vecMulAdd(X, vBAS);
         
         for( size_t i = 0; i < mecables.size(); ++i )
             Y[i] = X[i] - vMOB[i] * vBAS[i];
