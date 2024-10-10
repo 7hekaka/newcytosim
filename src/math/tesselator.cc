@@ -1014,7 +1014,7 @@ static void projectDice(REAL* X, const REAL len[4])
     n += ( X[0] - px ) * ( X[0] - px );
     n += ( X[1] - py ) * ( X[1] - py );
     n += ( X[2] - pz ) * ( X[2] - pz );
-    n = len[3] / sqrt(n);
+    n = len[3] / std::sqrt(n);
     X[0] = px + n * ( X[0] - px );
     X[1] = py + n * ( X[1] - py );
     X[2] = pz + n * ( X[2] - pz );

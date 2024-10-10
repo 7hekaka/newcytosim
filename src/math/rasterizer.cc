@@ -509,9 +509,9 @@ void Rasterizer::paintCuboid(void (*paint)(int, int, int, int, void*), void * ar
      D (  0,  2*a ) = -A
      E ( -b,    a ) = -B
      F ( -b,   -a ) = -C
- with b = std::sqrt(3) * a
+ with b = sqrt(3) * a:
      b = 1
-     a = 1 / std::sqrt(3)
+     a = 1 / sqrt(3)
  */
 void Rasterizer::paintHexagonalPrism(void (*paint)(int, int, int, int, void*), void * arg,
                                      Vector3 P, Vector3 Q, const real iPQ,

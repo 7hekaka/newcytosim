@@ -70,7 +70,8 @@ void DuoProp::splash(std::ostream& os) const
 {
     std::ostringstream oss;
     real L = std::sqrt(diffusion/deactivation_rate);
-    oss << std::setw(10) << name() << ": deactivation_rate " << deactivation_rate;
+    oss << std::setw(10) << name();
+    oss << ": deactivation_rate " << deactivation_rate;
     oss << "  traveled_distance " << L << "\n";
     if ( oss.str() != splashed )
     {

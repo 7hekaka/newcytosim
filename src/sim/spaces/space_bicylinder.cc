@@ -162,7 +162,7 @@ void SpaceBicylinder::setConfinement(Vector const& W, Mecapoint const& mp, Meca&
             X *= M_SQRT1_2;
             E.set(X, X, Y);
             // X = -M_SQRT2 * Y; Y = M_SQRT1_2 * X
-            real s = 1.0 / sqrt(2*square(Y) + square(X));
+            real s = 1.0 / std::sqrt(2*square(Y) + square(X));
             T.set(s*Y, s*Y, -s*X);
         }
         else
@@ -171,7 +171,7 @@ void SpaceBicylinder::setConfinement(Vector const& W, Mecapoint const& mp, Meca&
             projectEllipse(X, Y, M_SQRT1_2*(W.XX-W.YY), W.ZZ, M_SQRT2*rad, rad);
             X *= M_SQRT1_2;
             E.set(X, -X, Y);
-            real s = 1.0 / sqrt(2*square(Y) + square(X));
+            real s = 1.0 / std::sqrt(2*square(Y) + square(X));
             T.set(-s*Y, s*Y, s*X);
         }
         meca.addLineClamp(mp, E, T, stiff);

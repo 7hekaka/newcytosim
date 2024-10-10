@@ -134,19 +134,6 @@ public:
     real kT;
     
     
-    /// 32-bits seed for random number generator
-    /**
-     The simulation uses SFMT, a fast Mersenne Twister to generate pseudo-random numbers
-     http://en.wikipedia.org/wiki/Mersenne_twister
-     
-     The generator is initialized from `random_seed` specified in the config file,
-     but if `random_seed == 0`, it is set automatically during initialization.
-    
-     <em>default value = 0</em>
-     */
-    unsigned random_seed;
-    
-    
     /// Desired precision in the motion of the objects
     /**
      The motion of the objects is solved with a residual error that is lower than `tolerance * B`, 
@@ -159,6 +146,19 @@ public:
     */
     real tolerance;
     
+    
+    /// 32-bits seed for random number generator
+    /**
+     The simulation uses SFMT, a fast Mersenne Twister to generate pseudo-random numbers
+     http://en.wikipedia.org/wiki/Mersenne_twister
+     
+     The generator is initialized from `random_seed` specified in the config file,
+     but if `random_seed == 0`, it is set automatically during initialization.
+    
+     <em>default value = 0</em>
+     */
+    unsigned random_seed;
+
     
     /// Precision threshold for stochastic events
     /** 

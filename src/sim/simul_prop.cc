@@ -24,9 +24,9 @@ void SimulProp::clear()
 #if OLD_SPINDLE_FLUX
     flux_speed = 0;
 #endif
-    kT           = 0.0042;
-    random_seed  = 0;
-    tolerance    = 0.05;
+    kT = 0.0042;
+    tolerance = 0.05;
+    random_seed = 0;
     acceptable_prob = 0.5;
     precondition = 0;
     precond_span = 2;
