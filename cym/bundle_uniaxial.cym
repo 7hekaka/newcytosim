@@ -1,0 +1,110 @@
+% A bundle of microtubules with Kinesin dimers
+% FJN, Strasbourg 10.10.2024
+
+set simul system
+{
+    viscosity = 100
+    time_step = 0.001
+    steric = 1, 333, 11
+    precondition = 1
+    verbose = 7
+}
+
+set system display
+{
+    size=1280, 512;
+    point_value=0.01;
+    point_size=0.5;
+    line_width=1;
+    style=3;
+    back_color = black
+}
+
+set space cell
+{
+    shape = sphere
+    display = ( color=0xFFFFFF04; visible=1 )
+}
+
+new cell
+{
+    radius = 1.5
+}
+
+% ---------------------- MICROTUBULES ------------------------
+
+set fiber microtubule
+{
+    rigidity = 20
+    segmentation = 0.25
+    steric = 1, 0.025, 0.025
+    squeeze = 1, 1, 1
+    
+    activity = none
+    min_length = 0.024
+    growing_speed = 0.210
+    shrinking_speed = -0.42
+    hydrolysis_rate = 1.0
+    display = ( color=white; line_width=2.5; style=2; coloring=2; )
+}
+
+% ---------------------- KINESIN-5 ------------------------
+
+set hand para_kinesin
+{
+    binding = 16, 0.070
+    unbinding = 1, 6
+    
+    activity = mighty
+    unloaded_speed = 0.060
+    stall_force = 3
+    display = ( color=blue; size=1.5; )
+}
+
+set couple parakin
+{
+    specificity = parallel
+    hand1 = para_kinesin
+    hand2 = para_kinesin
+    stiffness = 400
+    length = 0.055
+    diffusion = 5
+}
+
+set hand anti_kinesin
+{
+    binding = 16, 0.070
+    unbinding = 0.5, 6
+    
+    activity = mighty
+    unloaded_speed = 0.060
+    stall_force = 3
+    %rescue_chance = 0.0125
+    display = ( color=orange; size=1.5; )
+}
+
+set couple antikin
+{
+    specificity = antiparallel
+    hand1 = anti_kinesin
+    hand2 = anti_kinesin
+    stiffness = 400
+    length = 0.055
+    diffusion = 5
+}
+
+% ---------------------- SYSTEM! ------------------------
+
+new 0 parakin
+new 100 antikin
+
+new microtubule { position=0 0.050; length=1.0; direction=-1; plus_end=grow;}
+new microtubule { position=0 0; length=1.5; direction=1; plus_end=grow;}
+new microtubule { position=0 -0.050; length=0.5; direction=-1; plus_end=grow;}
+
+run 500000 system
+{
+    solve = uniaxial
+    nb_frames = 200
+}
+

@@ -1144,16 +1144,18 @@ void Display3::drawCoupleBcrude(Couple const* cx) const
 /** each hand is represented by two feet and the position of these feet
  are set as a function of hand's abscissa, to immitate a walk:
  one foot is on the surface of the fiber, and the other one away from it.
+ In ICE back from Bad Honnef, 4.10.2024
  */
 void Display3::drawCoupleBwalk(Couple const* cx) const
 {
+    const float DK = 0.625; // factor by which one hand is darkened
     PointDisp const* pd1 = cx->disp1();
     PointDisp const* pd2 = cx->disp2();
     
-    Vector p1 = cx->posHand1();
-    Vector p2 = cx->posHand2();
+    Vector P1 = cx->posHand1();
+    Vector P2 = cx->posHand2();
     
-    Vector dif = p2 - p1;
+    Vector dif = P2 - P1;
     real dns = dif.normSqr();
     
     if ( dns > 1e-6 )
@@ -1161,18 +1163,23 @@ void Display3::drawCoupleBwalk(Couple const* cx) const
         // moving the 'hands' to the surface of the fiber:
         dns = 1.0 / std::sqrt(dns);
         // position the heads at the surface of the filaments:
-        const real R1 = pixscale(cx->fiber1()->prop->disp->line_width + 0.4 * pd1->size);
-        const real R2 = pixscale(cx->fiber2()->prop->disp->line_width + 0.4 * pd2->size);
+        const real R1 = pixscale(cx->fiber1()->prop->disp->line_width + 0.25 * pd1->size);
+        const real R2 = pixscale(cx->fiber2()->prop->disp->line_width + 0.25 * pd2->size);
         // move points orthogonal to the fiber's axis
-        Vector t1 = cx->dirFiber1();
-        Vector t2 = cx->dirFiber2();
-        Vector d1 = ( dif - dot(dif,t1) * t1 ) * min_real(0.45, R1*dns);
-        Vector d2 = ( dot(dif,t2) * t2 - dif ) * min_real(0.45, R2*dns);
+        Vector T1 = cx->dirFiber1();
+        Vector T2 = cx->dirFiber2();
+        Vector h1 = ( dif - dot(dif,T1) * T1 ) * min_real(0.45, R1*dns);
+        Vector h2 = ( dot(dif,T2) * T2 - dif ) * min_real(0.45, R2*dns);
         
         gym::color_both(pd2->color.mix(pd1->color));
-        gym::stretchAlignZ(p1+d1, p2+d2, pixscale(pd1->width));
+        gym::stretchAlignZ(P1+h1, P2+h2, pixscale(pd1->width));
         gle::hexTube();
 
+#if ( DIM > 2 )
+        // the axes around which uplifted hands revolve are tilted w/r dif
+        T1 = dif + cross(dif, T1);
+        T2 = cross(T2, dif) - dif;
+#endif
         // grounded foot is at position 'b' and uplifted one at (x, y):
         const real R = 0.008;
         Fiber const* fib = cx->fiber1();
@@ -1185,11 +1192,11 @@ void Display3::drawCoupleBwalk(Couple const* cx) const
         float S = pixscale(0.5*pd1->size);
         gym_color col = pd1->color;
         gym_color lor = pd1->color;
-        if ( int(i) & 1 ) col = col.darken(0.75); else lor = lor.darken(0.75);
+        if ( int(i) & 1 ) col = col.darken(DK); else lor = lor.darken(DK);
         gym::color_both(col);
-        drawObject(d1+fib->pos(b), S, gle::blob);
+        drawObject(h1+fib->pos(b), S, gle::blob);
         gym::color_both(lor);
-        drawObject(d1+fib->pos(x)+y*dif, S, gle::blob);
+        drawObject(h1+fib->pos(x)+y*T1, S, gle::blob);
         
         // grounded foot is at position 'b' and uplifted one at (x, y):
         fib = cx->fiber2();
@@ -1202,11 +1209,11 @@ void Display3::drawCoupleBwalk(Couple const* cx) const
         S = pixscale(0.5*pd2->size);
         col = pd2->color;
         lor = pd2->color;
-        if ( int(i) & 1 ) col = col.darken(0.75); else lor = lor.darken(0.75);
+        if ( int(i) & 1 ) col = col.darken(DK); else lor = lor.darken(DK);
         gym::color_both(col);
-        drawObject(d2+fib->pos(b), S, gle::blob);
+        drawObject(h2+fib->pos(b), S, gle::blob);
         gym::color_both(lor);
-        drawObject(d2+fib->pos(x)-y*dif, S, gle::blob);
+        drawObject(h2+fib->pos(x)+y*T2, S, gle::blob);
     }
 }
 
