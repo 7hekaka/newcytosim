@@ -16,7 +16,6 @@
 #include "space.h"
 #include "singles/wrist.h"
 #include "lapack.h"
-#include "print_color.h"
 #include "quaternion.h"
 #include "matrix33.h"
 

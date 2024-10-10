@@ -194,6 +194,21 @@
 		BB31698924A0F3F5008DFDB3 /* operator_new.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6E174B223E5B2F00AF850D /* operator_new.cc */; };
 		BB31698A24A0F3F5008DFDB3 /* operator_new.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6E174B223E5B2F00AF850D /* operator_new.cc */; };
 		BB31698C24A0F407008DFDB3 /* operator_new.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB6E174B223E5B2F00AF850D /* operator_new.cc */; };
+		BB3174542CB7F0EF00AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174552CB7F11200AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174562CB7F13500AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174572CB7F13A00AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174582CB7F15300AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174592CB7F16300AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB31745A2CB7F17800AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB31745B2CB7F18B00AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB31745C2CB7F33900AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB31745D2CB7F5FE00AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB31745E2CB7F65700AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB31745F2CB7F67600AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174602CB7F68D00AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174612CB7F69E00AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
+		BB3174622CB7F6AE00AA9399 /* libncurses.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = BB3174532CB7F0EF00AA9399 /* libncurses.tbd */; };
 		BB3417660C3294B40016CF18 /* filewrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB20484A0AF203A0004EDA21 /* filewrapper.cc */; };
 		BB39EC26153806070047768E /* duo_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB39EC24153806070047768E /* duo_long.cc */; };
 		BB39EC27153806070047768E /* duo_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB39EC25153806070047768E /* duo_long.h */; };
@@ -1772,6 +1787,7 @@
 		BB30391F16FB42C700CDF586 /* reportF.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = reportF.cc; sourceTree = "<group>"; };
 		BB3092282164BAC300C6DEE4 /* grid_display.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = grid_display.h; sourceTree = "<group>"; };
 		BB3092292164BAC300C6DEE4 /* grid_display.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = grid_display.cc; sourceTree = "<group>"; };
+		BB3174532CB7F0EF00AA9399 /* libncurses.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libncurses.tbd; path = usr/lib/libncurses.tbd; sourceTree = SDKROOT; };
 		BB318E260EE688610050C945 /* vector.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = vector.h; path = src/math/vector.h; sourceTree = SOURCE_ROOT; };
 		BB3205EF220DB5930098C439 /* evaluator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = evaluator.h; path = src/math/evaluator.h; sourceTree = SOURCE_ROOT; };
 		BB351EFF2535DFD800007B88 /* meca_inter_draw.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_inter_draw.cc; sourceTree = "<group>"; };
@@ -2329,6 +2345,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB31745A2CB7F17800AA9399 /* libncurses.tbd in Frameworks */,
 				BB0A754D282650E00062EDC5 /* libcytodisp.a in Frameworks */,
 				BB0A754E282650E00062EDC5 /* OpenGL.framework in Frameworks */,
 				BB0A754F282650E00062EDC5 /* libcytobase.a in Frameworks */,
@@ -2370,6 +2387,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174622CB7F6AE00AA9399 /* libncurses.tbd in Frameworks */,
 				BB2B25E0284CB48D003A5864 /* libcytodisp.a in Frameworks */,
 				BB2B25E1284CB48D003A5864 /* OpenGL.framework in Frameworks */,
 				BB2B25E2284CB48D003A5864 /* libcytobase.a in Frameworks */,
@@ -2390,6 +2408,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB31745D2CB7F5FE00AA9399 /* libncurses.tbd in Frameworks */,
 				BB805D492419637700B62699 /* libcytodisp.a in Frameworks */,
 				BB805D4A2419639500B62699 /* OpenGL.framework in Frameworks */,
 				BB55C0E30A2613D5003333C9 /* libcytobase.a in Frameworks */,
@@ -2409,6 +2428,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB31745F2CB7F67600AA9399 /* libncurses.tbd in Frameworks */,
 				BBD49F2A2781C57300F31EB2 /* libcytodisp.a in Frameworks */,
 				BB97B7D720DE3B7E004D659C /* GLUT.framework in Frameworks */,
 				BB55C0A90A260F19003333C9 /* OpenGL.framework in Frameworks */,
@@ -2426,6 +2446,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174562CB7F13500AA9399 /* libncurses.tbd in Frameworks */,
 				BB5CD2E828D8C94E004F34D5 /* libcytosimG.a in Frameworks */,
 				BB5CD2E928D8C94E004F34D5 /* libcytospaceG.a in Frameworks */,
 				BB5CD2EA28D8C94E004F34D5 /* libcytodisp.a in Frameworks */,
@@ -2444,6 +2465,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174592CB7F16300AA9399 /* libncurses.tbd in Frameworks */,
 				BB786B1C0AF62D28005AF9A2 /* libcytospace.a in Frameworks */,
 				BB6403F705FBC2F400DF7BFF /* libcytosim.a in Frameworks */,
 				BBD59C972498C738002A2E7B /* Accelerate.framework in Frameworks */,
@@ -2456,6 +2478,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174602CB7F68D00AA9399 /* libncurses.tbd in Frameworks */,
 				BB46A4CA24A48E1900E89FE2 /* libcytospaceG.a in Frameworks */,
 				BB55C0F00A26147A003333C9 /* libcytobase.a in Frameworks */,
 				BB805D482419635D00B62699 /* libcytodisp.a in Frameworks */,
@@ -2486,6 +2509,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB31745E2CB7F65700AA9399 /* libncurses.tbd in Frameworks */,
 				BB805D4C241963CB00B62699 /* libcytodisp.a in Frameworks */,
 				BB882AF80EE82C8B00E29E5C /* libcytobase.a in Frameworks */,
 				BBAEC50B0EF1D22B00955B64 /* libcytomath.a in Frameworks */,
@@ -2498,6 +2522,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174612CB7F69E00AA9399 /* libncurses.tbd in Frameworks */,
 				BBB22114267B25E200B7DE26 /* libcytodisp.a in Frameworks */,
 				BB8EE1E82542DE7400E15C40 /* OpenGL.framework in Frameworks */,
 				BB8EE1E62542DE6D00E15C40 /* GLUT.framework in Frameworks */,
@@ -2515,6 +2540,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174542CB7F0EF00AA9399 /* libncurses.tbd in Frameworks */,
 				BBA5790905FA6259009AE66E /* libcytosim.a in Frameworks */,
 				BB55C13B0A261795003333C9 /* libcytospace.a in Frameworks */,
 				BBA5790C05FA625D009AE66E /* libcytobase.a in Frameworks */,
@@ -2527,6 +2553,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174552CB7F11200AA9399 /* libncurses.tbd in Frameworks */,
 				BB692223233D366F00F528D2 /* libcytosimG.a in Frameworks */,
 				BBE82A65233D163C00BE44DF /* libcytospaceG.a in Frameworks */,
 				BB4DB5A50C69D625001E5E4F /* libcytodisp.a in Frameworks */,
@@ -2551,6 +2578,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB31745B2CB7F18B00AA9399 /* libncurses.tbd in Frameworks */,
 				BBA758B1139CFD3F0098FBAF /* libcytomath.a in Frameworks */,
 				BBA758B2139CFD430098FBAF /* libcytobase.a in Frameworks */,
 				BBB1C6DE0CB2CAA300679ADC /* OpenGL.framework in Frameworks */,
@@ -2561,6 +2589,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174582CB7F15300AA9399 /* libncurses.tbd in Frameworks */,
 				BBC422F52472D0C2007EA070 /* Accelerate.framework in Frameworks */,
 				BB786AF30AF62C90005AF9A2 /* libcytosim.a in Frameworks */,
 				BB786AF20AF62C8B005AF9A2 /* libcytospace.a in Frameworks */,
@@ -2573,6 +2602,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB3174572CB7F13A00AA9399 /* libncurses.tbd in Frameworks */,
 				BBCE25FE281EAAE1004F6955 /* libcytosimG.a in Frameworks */,
 				BBCE25FF281EAAE1004F6955 /* libcytospaceG.a in Frameworks */,
 				BBCE2600281EAAE1004F6955 /* libcytodisp.a in Frameworks */,
@@ -2591,6 +2621,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB31745C2CB7F33900AA9399 /* libncurses.tbd in Frameworks */,
 				BB227D4E2568156600A42E98 /* Accelerate.framework in Frameworks */,
 				BB227D4C2568152D00A42E98 /* libcytomath.a in Frameworks */,
 				BB227D4A2568150600A42E98 /* libcytospace.a in Frameworks */,
@@ -3727,6 +3758,7 @@
 		BBB7ED3A06933C7700E2B49B /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				BB3174532CB7F0EF00AA9399 /* libncurses.tbd */,
 				BBCE261B281EAFC8004F6955 /* IOKit.framework */,
 				BBCE2619281EAFC1004F6955 /* Cocoa.framework */,
 				BB8EE1E72542DE7400E15C40 /* OpenGL.framework */,

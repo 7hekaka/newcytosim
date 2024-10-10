@@ -5,7 +5,6 @@
 #include "print_color.h"
 #include <cstdio>
 #include <cstdlib>
-#include <curses.h>
 #include <unistd.h>
 
 
@@ -13,6 +12,9 @@
 #   define PRINT_IN_COLOR 1
 #endif
 
+#if PRINT_IN_COLOR
+#   include <curses.h>
+#endif
 
 // these are ANSI escape sequence for UNIX-based systems
 #define KNRM  "\x1B[0m"
@@ -45,6 +47,7 @@
 int num_colors(int fd)
 {
     int res = 0;
+#if PRINT_IN_COLOR
     if ( !isatty(fd) )
     {
         //printf("[FILE %i is not a TTY]", fd);
@@ -60,6 +63,7 @@ int num_colors(int fd)
     refresh();
     endwin();
     //printf("[FILE %i has %i colors]", fd, res);
+#endif
     return res;
  }
 
