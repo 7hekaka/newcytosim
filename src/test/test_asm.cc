@@ -1,63 +1,49 @@
 
 
-typedef double real;
-#define DIM 2
+#include <cstddef>
+#include <cstdio>
 
-/*
-void copy(real * restrict dst, real * restrict src, int n)
-{
-    for (size_t i = 0; i < n; ++i)
-        dst[i] = src[i];
-}
-*/
-/*
-void projectForcesU(unsigned nbs, const real* dif, const real* X, real* mul)
-{
-    for ( size_t jj = 0; jj < nbs; ++jj )
-    {
-        mul[jj] = dif[DIM*jj  ] * ( X[DIM*jj+DIM  ] - X[DIM*jj  ] )
-                + dif[DIM*jj+1] * ( X[DIM*jj+DIM+1] - X[DIM*jj+1] )
-#if ( DIM > 2 )
-                + dif[DIM*jj+2] * ( X[DIM*jj+DIM+2] - X[DIM*jj+2] )
-#endif
-        ;
-    }
-}
-*/
+const size_t SIZE = 8;
 
 
-//void projectForcesV(unsigned nbs, const real restrict* dif, const real restrict* vec, real restrict* mul)
-void projectForcesV(size_t nbs, const real* dif, const real* vec, real* mul)
+void *ntbread(void *dst, const void *src, size_t bs)
 {
-    #pragma omp simd
-    for ( size_t jj = 0; jj < nbs; ++jj )
-    {
-        const real * X = vec + DIM * jj;
-        const real * d = dif + DIM * jj;
-        mul[jj] = d[0] * ( X[DIM  ] - X[0] )
-                + d[1] * ( X[DIM+1] - X[1] )
-#if ( DIM > 2 )
-                + d[2] * ( X[DIM+2] - X[2] )
-#endif
-        ;
-    }
+    __asm__ __volatile__ (
+        "BREAD1_%=:\n"
+        "ldnp   q0, q1, [%0]\n"
+        "ldnp   q2, q3, [%0, #0x20]\n"
+        "add    %0, %0, #0x40\n"
+        "subs   %1, %1, #0x40\n"
+        "b.hi   BREAD1_%=\n"
+        : "=r"(src) /* %0 */, "=r"(bs) /* %1 */ /* output */
+        : "0"(src) /* %0 */, "1"(bs) /* %1 */ /* input */
+        : "v0", "v1", "v2", "v3" /* clobbered */
+    );
+    return dst;
 }
 
 
-void projectForcesSOA(size_t nbs, const real*restrict dif, const real*restrict vec, real* mul)
+void test()
 {
-    size_t S = nbs, T = nbs + nbs;
-    const real * X = vec, * Y = vec + S, * Z = vec + T;
-    const real *dX = dif, *dY = dif + S, *dZ = dif + T;
+    int src[SIZE] = { 0 };
+    int dst[SIZE] = { 0 };
     
-    for ( size_t jj = 0; jj < nbs; ++jj )
-    {
-        mul[jj] = dX[jj] * ( X[jj+1] - X[jj] )
-                + dY[jj] * ( Y[jj+1] - Y[jj] )
-#if ( DIM > 2 )
-                + dZ[jj] * ( Z[jj+1] - Z[jj] )
-#endif
-        ;
-    }
+    for ( int i = 0; i < SIZE; ++i )
+        src[i] = i;
+    
+    ntbread(dst, src, SIZE*sizeof(int));
+    
+    for ( int i = 0; i < SIZE; ++i )
+        printf("%i ", src[i]);
+    printf("\n");
+    
+    for ( int i = 0; i < SIZE; ++i )
+        printf("%i ", dst[i]);
+    printf("\n");
 }
 
+
+int main(int argc, char* argv[])
+{
+    test();
+}

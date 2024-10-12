@@ -1406,16 +1406,16 @@ void SparMatSymBlkDiag::Pilar::vecMulAdd3D_SIMD(const double* X, double* Y, size
         vec2 Z0 = fmadd1(mat2, xx, load1(Y+ii+2));  // upper not used
 
         vec2 xyi = loadu2(X+ii);
-        vec2 zzi = loaddup2(X+ii+2);
+        vec2 mat4 = loadu2(mat+4);
         s0 = fmadd2(mat0, xyi, s0);
         // multiply with the transposed block in lines { s0, s1, s2 }:
         //Y0 += M[0] * X[ii] + M[1] * X[ii+1] + M[2] * X[ii+2];
         //Y1 += M[3] * X[ii] + M[4] * X[ii+1] + M[5] * X[ii+2];
         //Y2 += M[6] * X[ii] + M[7] * X[ii+1] + M[8] * X[ii+2];
 
-        vec2 mat4 = loadu2(mat+4);
-        Z0 = fmadd1(unpackhi2(mat4, zero), yy, Z0);
+        vec2 zzi = loaddup2(X+ii+2);
         vec2 mat3 = catshift(mat2, mat4);
+        Z0 = fmadd1(unpackhi2(mat4, zero), yy, Z0);
         XY = fmadd2(mat3, yy, XY);
         s1 = fmadd2(mat3, xyi, s1);
         vec2 mat6 = loadu2(mat+6);
