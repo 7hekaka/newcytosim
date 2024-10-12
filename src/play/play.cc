@@ -339,6 +339,10 @@ int main(int argc, char* argv[])
             // get the name of 'simul' and simul:display from config file
             Parser(&simul, 1, 0, 0, 0, 0).readConfig();
         }
+        
+        // read Simul parameters from command line
+        simul.prop.read(arg);
+        std::cerr << simul.prop << "\n";
     }
     catch( Exception & e )
     {

@@ -163,7 +163,7 @@ void SimulProp::complete(Simul const& sim)
         if ( kT < 0 )
             throw InvalidParameter("simul:kT must be > 0");
         
-        if ( kT == 0 && tolerance > 0.1 )
+        if ( kT == 0 && tolerance > 0.01 )
             throw InvalidParameter("if simul:kT==0, simul:tolerance must be defined and small");
         
         if ( steric_stiff_push[0] < 0 )

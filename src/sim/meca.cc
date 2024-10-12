@@ -777,9 +777,12 @@ unsigned Meca::solve()
         tolerance_ *= noiseLevel;
     else
     {
-        // tolerance will be understood as an absolute quantity
         if ( alpha_ > 0 )
+        {
+            // this is likely an error, since kT > 0:
             Cytosim::log << "Warning: all Brownian terms are zero?\n";
+        }
+        // if kT==0, the tolerance will be understood as an absolute quantity
     }
     
     /*
