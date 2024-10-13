@@ -212,7 +212,7 @@ std::string FilePath::full_name(std::string const& dir, std::string const& file)
  size is the amount to which buf was allocated using malloc(), and it can be zero
  If more memory is required, the value of buf[] and size will be updated accordingly
  As `buf` is allocated with 'malloc', it should be eventually released by `free(buf)`
- @returns null pointer in case file cannot be openned.
+ @returns nullptr in case the file cannot be opened.
  */
 char* FilePath::read_file(const char filename[], char*& buf, size_t& size)
 {

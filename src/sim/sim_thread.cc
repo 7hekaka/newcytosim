@@ -123,9 +123,9 @@ void SimThread::run()
         std::string filename = simulProp().config_file;
         if ( config_code )
         {
-            // with code provided, we save opening/reading a file
-            std::stringstream is(config_code);
-            readConfig(is, filename);
+            // with code provided as string, we do not open/read a file
+            std::stringstream iss(config_code);
+            readConfig(iss, filename);
         }
         else
         {

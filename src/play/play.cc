@@ -233,8 +233,7 @@ int main(int argc, char* argv[])
 
     if ( arg.use_key("live") || arg.has_key(".cym") )
     {
-        if ( arg.set(name, ".cym") )
-            simul.prop.config_file = name;
+        arg.peek(simul.prop.config_file, ".cym");
         player.goLive = true;
     }
     
@@ -336,13 +335,12 @@ int main(int argc, char* argv[])
         }
         else
         {
-            // get the name of 'simul' and simul:display from config file
+            // get the name of 'simul' object and 'simul:display' from the config file
             Parser(&simul, 1, 0, 0, 0, 0).readConfig();
         }
-        
+
         // read Simul parameters from command line
         simul.prop.read(arg);
-        std::cerr << simul.prop << "\n";
     }
     catch( Exception & e )
     {

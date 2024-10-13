@@ -104,7 +104,7 @@ test_variablerate: test_variablerate.cc $(TEST_OBJ) | bin
 	$(DONE)
 
 test_asm: test_asm.cc | bin
-	$(COMPILE) -restrict -S -c -m64 $^ -o build/test_asm.s
+	$(COMPILE) $^ -o bin/$@
 	$(DONE)
 
 test_dot: test_dot.cc $(TEST_OBJ) | bin
