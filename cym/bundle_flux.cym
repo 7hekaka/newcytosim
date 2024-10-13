@@ -1,5 +1,5 @@
-% A bundle of microtubules fluxing by Kinesin-5
-% FJN, Physikzentrum inm Bad Honnef 30.09.2024
+% A bundle of microtubules with Kinesin dimers
+% FJN, Strasbourg 10.10.2024
 
 set simul system
 {
@@ -7,15 +7,18 @@ set simul system
     time_step = 0.001
     steric = 1, 333, 11
     precondition = 1
+    verbose = 7
+    tolerance = 0.00001
+    kT = 0
 }
 
 set system display
 {
-    size=1280, 512;
-    point_value=0.01;
-    point_size=0.5;
-    line_width=1;
-    style=3;
+    size = 1536, 512;
+    point_value = 0.01;
+    point_size = 0.5;
+    line_width = 1;
+    style = 3;
     back_color = black
 }
 
@@ -37,9 +40,8 @@ set fiber microtubule
     rigidity = 20
     segmentation = 0.25
     steric = 1, 0.025, 0.025
-    squeeze = 1, 1, 1
     
-    activity = dynamic
+    activity = none
     min_length = 0.024
     growing_speed = 0.210
     shrinking_speed = -0.42
@@ -65,10 +67,9 @@ set couple parakin
     specificity = parallel
     hand1 = para_kinesin
     hand2 = para_kinesin
-    stiffness = 400
+    stiffness = 500
     length = 0.055
     diffusion = 5
-    fast_diffusion = 1
 }
 
 set hand anti_kinesin
@@ -88,30 +89,23 @@ set couple antikin
     specificity = antiparallel
     hand1 = anti_kinesin
     hand2 = anti_kinesin
-    stiffness = 400
+    stiffness = 500
     length = 0.055
     diffusion = 5
-    fast_diffusion = 1
 }
 
 % ---------------------- SYSTEM! ------------------------
 
-new [10 * volume] parakin
-new [10 * volume] antikin
-new 0 augmin
+new 200 parakin
+new 100 antikin
 
-new microtubule { position=center; length=0.5; direction=X; plus_end=grow;}
-new microtubule { position=center; length=1.0; direction=X; plus_end=grow;}
-new microtubule { position=center; length=1.5; direction=X; plus_end=grow;}
-
-new event
-{
-    rate = 0.5
-    code = ( new microtubule { position=center; length=0.050; direction=X; plus_end=grow;})
-}
+new microtubule { position=0 0; length=1.024; direction=1; plus_end=grow; }
+new microtubule { position=0 0.050; length=0.512; direction=1; plus_end=grow; }
+new microtubule { position=0 -0.050; length=1.536; direction=-1; plus_end=grow; }
 
 run 500000 system
 {
+    solve = 1
     nb_frames = 200
 }
 
