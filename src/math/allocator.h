@@ -84,68 +84,7 @@ namespace LinearSolvers
             return ptr;
         }
     };
-    
-    
-    /// minimalistic non-square matrix class used in GMRES
-    class Matrix
-    {
-    private:
-    
-        /// number of lines and columns
-        size_t lin_, col_;
-        
-        /// leading dimension of array, allocated size
-        size_t ldd_, alc_;
-        
-        /// pointer to data
-        real * val_;
-        
-    public:
-    
-        Matrix()
-        {
-            val_ = nullptr;
-            alc_ = 0;
-            lin_ = 0;
-            col_ = 0;
-        }
-        
-        ~Matrix()
-        {
-            free_real(val_);
-            val_ = nullptr;
-        }
-        
-        void resize(size_t l, size_t c)
-        {
-            lin_ = l;
-            col_ = c;
-            ldd_ = chunk_real(l);
-            if ( alc_ < c * ldd_ )
-            {
-                free_real(val_);
-                alc_ = c * ldd_;
-                val_ = new_real(alc_);
-            }
-        }
-        
-        void reset()
-        {
-            zero_real(ldd_*col_, val_);
-        }
-        
-        real& operator()(size_t i, size_t j)
-        {
-            assert_true( i < lin_ && j < col_ );
-            return val_[i+ldd_*j];
-        }
-        
-        real* column(size_t k)
-        {
-            assert_true( k < col_ );
-            return val_ + ldd_*k;
-        }
-    };
+
 }
 
 #endif

@@ -104,7 +104,6 @@
 		BB0A754F282650E00062EDC5 /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB0A7550282650E00062EDC5 /* GLUT.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB69D0B8209C666100445716 /* GLUT.framework */; };
 		BB0A7551282650E00062EDC5 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
-		BB0CB11B20C170C10016D73D /* qmr.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0CB11A20C170C10016D73D /* qmr.h */; };
 		BB0DF4810D93F11F006CB71A /* lattice.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB1749A407D798E600BC7BDC /* lattice.cc */; };
 		BB0E4BD81002698100A96B34 /* random_vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB0E4BD61002698100A96B34 /* random_vector.h */; };
 		BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E4BD71002698100A96B34 /* random_vector.cc */; };
@@ -338,7 +337,6 @@
 		BB6485EC2057FD1B005F2CD1 /* allocator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6485EB2057FD1B005F2CD1 /* allocator.h */; };
 		BB6485EE2057FD30005F2CD1 /* linear_operator.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6485ED2057FD30005F2CD1 /* linear_operator.h */; };
 		BB6485F02057FDD5005F2CD1 /* monitor.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6485EF2057FDD5005F2CD1 /* monitor.h */; };
-		BB6485F2205803BB005F2CD1 /* gmres.h in Headers */ = {isa = PBXBuildFile; fileRef = BB6485F1205803BB005F2CD1 /* gmres.h */; };
 		BB650A9A182E475900A7998B /* growing_fiber_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB650A96182E475900A7998B /* growing_fiber_prop.cc */; };
 		BB650A9B182E475900A7998B /* growing_fiber_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BB650A97182E475900A7998B /* growing_fiber_prop.h */; };
 		BB650A9C182E475900A7998B /* growing_fiber.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB650A98182E475900A7998B /* growing_fiber.cc */; };
@@ -612,7 +610,6 @@
 		BB7191700EF1CD9900CED9E2 /* dim.h in Headers */ = {isa = PBXBuildFile; fileRef = BB55BF300A25FB13003333C9 /* dim.h */; };
 		BB7191760EF1CD9900CED9E2 /* rasterizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589F05B98DA3006956D5 /* rasterizer.h */; };
 		BB7191770EF1CD9900CED9E2 /* spherical_code.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* spherical_code.h */; };
-		BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587205B98DA3006956D5 /* conjgradient.h */; };
 		BB71917A0EF1CD9900CED9E2 /* cymath.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358A505B98DA3006956D5 /* cymath.h */; };
 		BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588405B98DA3006956D5 /* matfull.h */; };
 		BB71917F0EF1CD9900CED9E2 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589D05B98DA3006956D5 /* random.h */; };
@@ -622,13 +619,11 @@
 		BB7191850EF1CD9900CED9E2 /* matsym.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589005B98DA3006956D5 /* matsym.h */; };
 		BB7191860EF1CD9900CED9E2 /* isometry.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8CE30705DFF9140031D3B4 /* isometry.h */; };
 		BB7191870EF1CD9900CED9E2 /* matrix.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588505B98DA3006956D5 /* matrix.h */; };
-		BB7191890EF1CD9900CED9E2 /* linear_solvers.h in Headers */ = {isa = PBXBuildFile; fileRef = BB21854D0B40836900B75436 /* linear_solvers.h */; };
 		BB71918A0EF1CD9900CED9E2 /* sparmatsymblk.h in Headers */ = {isa = PBXBuildFile; fileRef = BBDF72AE0B5C2327007CAD2A /* sparmatsymblk.h */; };
 		BB71918B0EF1CD9900CED9E2 /* vector1.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB89ED40BE3DED10054838A /* vector1.h */; };
 		BB71918C0EF1CD9900CED9E2 /* vector2.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB89ED60BE3DED10054838A /* vector2.h */; };
 		BB71918D0EF1CD9900CED9E2 /* vector3.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB89ED80BE3DED10054838A /* vector3.h */; };
 		BB7191960EF1CD9900CED9E2 /* vector.h in Headers */ = {isa = PBXBuildFile; fileRef = BB318E260EE688610050C945 /* vector.h */; };
-		BB71919E0EF1CD9900CED9E2 /* conjgradient.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587105B98DA3006956D5 /* conjgradient.cc */; };
 		BB7191A00EF1CD9900CED9E2 /* sparmat.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73588905B98DA3006956D5 /* sparmat.cc */; };
 		BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E505E1440E00BC9B7A /* matrix.cc */; };
 		BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB0E75E805E14D9C00BC9B7A /* matfull.cc */; };
@@ -1714,7 +1709,6 @@
 		BB0BD2DC2A58BE0300FC76A9 /* freezer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = freezer.h; path = ../sim/freezer.h; sourceTree = "<group>"; };
 		BB0C409E069A043600CF45A8 /* sparmatsym.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = sparmatsym.cc; path = src/math/sparmatsym.cc; sourceTree = SOURCE_ROOT; };
 		BB0C409F069A043600CF45A8 /* sparmatsym.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = sparmatsym.h; path = src/math/sparmatsym.h; sourceTree = SOURCE_ROOT; };
-		BB0CB11A20C170C10016D73D /* qmr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = qmr.h; path = src/math/qmr.h; sourceTree = SOURCE_ROOT; };
 		BB0E4BD61002698100A96B34 /* random_vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = random_vector.h; path = src/math/random_vector.h; sourceTree = SOURCE_ROOT; };
 		BB0E4BD71002698100A96B34 /* random_vector.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = random_vector.cc; path = src/math/random_vector.cc; sourceTree = SOURCE_ROOT; };
 		BB0E75E505E1440E00BC9B7A /* matrix.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = matrix.cc; path = src/math/matrix.cc; sourceTree = SOURCE_ROOT; };
@@ -1755,8 +1749,6 @@
 		BB201E1E24ABDCD900A8CA82 /* test_xtbsv */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = test_xtbsv; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB20484A0AF203A0004EDA21 /* filewrapper.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = filewrapper.cc; path = src/base/filewrapper.cc; sourceTree = SOURCE_ROOT; };
 		BB20484B0AF203A0004EDA21 /* filewrapper.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = filewrapper.h; path = src/base/filewrapper.h; sourceTree = SOURCE_ROOT; };
-		BB21854D0B40836900B75436 /* linear_solvers.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 4; name = linear_solvers.h; path = src/math/linear_solvers.h; sourceTree = SOURCE_ROOT; };
-		BB2185620B4084CC00B75436 /* linear_solvers.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = linear_solvers.cc; path = src/math/linear_solvers.cc; sourceTree = SOURCE_ROOT; };
 		BB29615728C71FFA00525067 /* monoplay.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = monoplay.cc; sourceTree = "<group>"; };
 		BB2A470114F3D4AD008434C6 /* bead_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bead_prop.h; sourceTree = "<group>"; };
 		BB2A470214F3D4AD008434C6 /* bead_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bead_prop.cc; sourceTree = "<group>"; };
@@ -1875,7 +1867,6 @@
 		BB6485EB2057FD1B005F2CD1 /* allocator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = allocator.h; path = src/math/allocator.h; sourceTree = SOURCE_ROOT; };
 		BB6485ED2057FD30005F2CD1 /* linear_operator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = linear_operator.h; path = src/math/linear_operator.h; sourceTree = SOURCE_ROOT; };
 		BB6485EF2057FDD5005F2CD1 /* monitor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = monitor.h; path = src/math/monitor.h; sourceTree = SOURCE_ROOT; };
-		BB6485F1205803BB005F2CD1 /* gmres.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gmres.h; path = src/math/gmres.h; sourceTree = SOURCE_ROOT; };
 		BB64CD940869C129004DD8FE /* makefile */ = {isa = PBXFileReference; explicitFileType = sourcecode.make; fileEncoding = 30; path = makefile; sourceTree = SOURCE_ROOT; };
 		BB650A96182E475900A7998B /* growing_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = growing_fiber_prop.cc; path = fibers/growing_fiber_prop.cc; sourceTree = "<group>"; };
 		BB650A97182E475900A7998B /* growing_fiber_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = growing_fiber_prop.h; path = fibers/growing_fiber_prop.h; sourceTree = "<group>"; };
@@ -1929,8 +1920,6 @@
 		BB72EA6B26622B0100FF7352 /* CMakeLists.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = CMakeLists.txt; path = src/CMakeLists.txt; sourceTree = "<group>"; };
 		BB73586D05B98DA3006956D5 /* array.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = array.h; path = src/base/array.h; sourceTree = SOURCE_ROOT; };
 		BB73586E05B98DA3006956D5 /* assert_macro.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = assert_macro.h; path = src/base/assert_macro.h; sourceTree = SOURCE_ROOT; };
-		BB73587105B98DA3006956D5 /* conjgradient.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = conjgradient.cc; path = src/math/conjgradient.cc; sourceTree = SOURCE_ROOT; };
-		BB73587205B98DA3006956D5 /* conjgradient.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = conjgradient.h; path = src/math/conjgradient.h; sourceTree = SOURCE_ROOT; };
 		BB73587505B98DA3006956D5 /* exceptions.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = exceptions.h; path = src/base/exceptions.h; sourceTree = SOURCE_ROOT; };
 		BB73587905B98DA3006956D5 /* messages.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = messages.cc; path = src/base/messages.cc; sourceTree = SOURCE_ROOT; };
 		BB73587A05B98DA3006956D5 /* messages.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = messages.h; path = src/base/messages.h; sourceTree = SOURCE_ROOT; };
@@ -3059,16 +3048,10 @@
 		BB614D9E05BE8FDB0048FA70 /* solvers */ = {
 			isa = PBXGroup;
 			children = (
-				BB0CB11A20C170C10016D73D /* qmr.h */,
-				BB21854D0B40836900B75436 /* linear_solvers.h */,
-				BB2185620B4084CC00B75436 /* linear_solvers.cc */,
 				BB8CB8551523147900505E89 /* bicgstab.h */,
-				BB6485F1205803BB005F2CD1 /* gmres.h */,
 				BB6485EF2057FDD5005F2CD1 /* monitor.h */,
 				BB6485EB2057FD1B005F2CD1 /* allocator.h */,
 				BB6485ED2057FD30005F2CD1 /* linear_operator.h */,
-				BB73587205B98DA3006956D5 /* conjgradient.h */,
-				BB73587105B98DA3006956D5 /* conjgradient.cc */,
 			);
 			name = solvers;
 			sourceTree = "<group>";
@@ -4338,11 +4321,9 @@
 				BB7191770EF1CD9900CED9E2 /* spherical_code.h in Headers */,
 				BBA27AEB211EC31600A7E184 /* vector4.h in Headers */,
 				BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */,
-				BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */,
 				BB71917A0EF1CD9900CED9E2 /* cymath.h in Headers */,
 				BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */,
 				BB6CD588254ED31A00FB7547 /* real_print.h in Headers */,
-				BB0CB11B20C170C10016D73D /* qmr.h in Headers */,
 				BB9EC395209235CC00EF00E7 /* SFMT-params19937.h in Headers */,
 				BB9EC399209235CC00EF00E7 /* SFMT.h in Headers */,
 				BB158A8628A65244008AFB22 /* simd_sse.h in Headers */,
@@ -4357,11 +4338,9 @@
 				BB7191850EF1CD9900CED9E2 /* matsym.h in Headers */,
 				BB158A8428A65244008AFB22 /* simd_neon.h in Headers */,
 				BB7191860EF1CD9900CED9E2 /* isometry.h in Headers */,
-				BB6485F2205803BB005F2CD1 /* gmres.h in Headers */,
 				BB7191870EF1CD9900CED9E2 /* matrix.h in Headers */,
 				BB151D64270C85F2003ECD4E /* space_dynamic_disc.h in Headers */,
 				BB3DA1DF254C8F0300226B81 /* object_pool.h in Headers */,
-				BB7191890EF1CD9900CED9E2 /* linear_solvers.h in Headers */,
 				BB71918A0EF1CD9900CED9E2 /* sparmatsymblk.h in Headers */,
 				BB71918B0EF1CD9900CED9E2 /* vector1.h in Headers */,
 				BB71918C0EF1CD9900CED9E2 /* vector2.h in Headers */,
@@ -5691,7 +5670,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB71919E0EF1CD9900CED9E2 /* conjgradient.cc in Sources */,
 				BB7191A00EF1CD9900CED9E2 /* sparmat.cc in Sources */,
 				BB7191A20EF1CD9900CED9E2 /* matrix.cc in Sources */,
 				BB7191A30EF1CD9900CED9E2 /* matfull.cc in Sources */,

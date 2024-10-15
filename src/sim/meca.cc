@@ -27,7 +27,6 @@
 #include "vecprint.h"
 #include "filepath.h"
 #include "bicgstab.h"
-#include "gmres.h"
 #include "simul.h"
 
 /**
@@ -775,36 +774,12 @@ unsigned Meca::solve()
     {
         LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
         //fprintf(stderr, "    BCGS     count %4u  residual %.3e\n", monitor.count(), monitor.residual());
-        //LinearSolvers::GMRES(*this, vRHS, vSOL, 32, monitor, allocator_, mH, mV, temporary_);
     }
     else
     {
         LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
-        //LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
     }
     
-    /*
-     GMRES may converge faster than BCGGS, but has overheads and uses more memory
-     hence for very large systems, BCGGS is often advantageous.
-     */
-#if ( 0 )
-    // enable this to compare with GMRES using different restart parameters
-    for ( int RS : {8, 16, 32} )
-    {
-        monitor.reset();
-        zero_real(dim, vSOL);
-        LinearSolvers::GMRES(*this, vRHS, vSOL, RS, monitor, allocator_, mH, mV, temporary_);
-        fprintf(stderr, "    GMRES-%i  count %4i  residual %.3e\n", RS, monitor.count(), monitor.residual());
-    }
-#endif
-#if ( 0 )
-    // enable this to compare BCGS and GMRES
-    fprintf(stderr, "    BCGS     count %4i  residual %.3e\n", monitor.count(), monitor.residual());
-    monitor.reset();
-    zero_real(dim, vSOL);
-    LinearSolvers::GMRES(*this, vRHS, vSOL, 64, monitor, allocator_, mH, mV, temporary_);
-    fprintf(stderr, "    GMRES-64 count %4i  residual %.3e\n", monitor.count(), monitor.residual());
-#endif
 #if ( 0 )
     // enable this to compare with another implementation of biconjugate gradient stabilized
     monitor.reset();

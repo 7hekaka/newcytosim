@@ -190,11 +190,8 @@ private:
     
     //--------------------------------------------------------------------------
 
-    /// working memory allocator for BCGS and GMRES
+    /// working memory allocator for BCGS
     LinearSolvers::Allocator allocator_;
-    
-    /// secondary memory allocator for GMRES
-    //LinearSolvers::Allocator temporary_;
     
     /// grid used for steric interaction between Fiber/Solid/Bead/Sphere
     PointGrid pointGrid;

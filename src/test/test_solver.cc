@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 /*
- A test for linear iterative solver (BCGS, GMRES, etc):
+ A test for linear iterative solver (BCGS, etc):
  Read 'A' from "matrix.mtx" and 'b' from "vector.mtx" and solves the linear system
      A.x = b
  using various iterative solvers.
@@ -16,7 +16,6 @@
 #include "monitor.h"
 #include "allocator.h"
 #include "bicgstab.h"
-#include "gmres.h"
 
 /// interface for a linear system
 class System
@@ -167,7 +166,6 @@ int main(int argc, char* argv[])
         return 1;
     const int dim = sys.dimension();
 
-    LinearSolvers::Matrix mH, mV;           // Matrices used for GMRES
     LinearSolvers::Allocator alc, tmp;      // memory allocation class
     LinearSolvers::Monitor mon(2*dim, 0.001); // max_iteration, absolute_tolerance
 
@@ -200,20 +198,6 @@ int main(int argc, char* argv[])
         blas::xaxpy(dim, -1.0, rhs, 1, vec, 1);
         real res = blas::nrm2(dim, vec);
         fprintf(stdout, " BiCGStab count %4u  residual %10.6f\n", mon.count(), res);
-    }
-
-    for ( int RS : {2, 4, 8, 16, 32, 64, 128} )
-    {
-        mon.reset();
-        zero_real(dim, sol);
-        LinearSolvers::GMRES(sys, rhs, sol, RS, mon, alc, mH, mV, tmp);
-        print_real(stdout, std::min(16, dim), sol, " sol |");
-        
-        // calculate true residual:
-        sys.multiply(sol, vec);
-        blas::xaxpy(dim, -1.0, rhs, 1, vec, 1);
-        real res = blas::nrm2(dim, vec);
-        fprintf(stdout, " GMRES%03i count %4u  residual %10.6f\n", RS, mon.count(), res);
     }
 
     free_real(sol);
