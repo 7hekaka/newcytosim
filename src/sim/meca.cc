@@ -39,19 +39,6 @@ With a sequential simulation, the second option is usually faster.
  */
 #define SEPARATE_RIGIDITY_TERMS ( DIM > 1 )
 
-/// number of threads running in parallel
-#define NUM_THREADS 1
-
-
-#if NUM_THREADS > 1
-/*
- Parallelization uses Intel's OpenMP.
- This requires a specific flag for the compiler, so adjust the makefile.inc
- CXXFLG := -std=c++17 -fopenmp
- */
-#include <omp.h>
-#endif
-
 /// this define will enable explicit integration (should be off)
 #define EXPLICIT_INTEGRATION 0
 
@@ -213,7 +200,7 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
 
 void Meca::addAllRigidity(const real* X, real* Y) const
 {
-    #pragma omp parallel for num_threads(NUM_THREADS)
+    #pragma omp parallel for
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
@@ -221,72 +208,6 @@ void Meca::addAllRigidity(const real* X, real* Y) const
     }
 }
 
-
-#if PARALLELIZE_MATRIX
-
-/**
-calculate the matrix vector product corresponding to 'mec'
-
-    Y <- X + alpha * speed( Y + diffP * X );
-
-*/
-void Meca::multiply1(Mecable const* mec, const real* X, real* Y) const
-{
-    const size_t inx = DIM * mec->matIndex();
-
-    // multiply the lines corresponding to this Mecable:
-    mFUL.vecMul(X, Y, mec->matIndex(), mec->matIndex()+mec->nbPoints());
-
-#if SEPARATE_RIGIDITY_TERMS
-    mec->addRigidity(X+inx, Y+inx);
-#endif
-
-#if ADD_PROJECTION_DIFF
-    if ( mec->hasProjectionDiff() )
-        mec->addProjectionDiff(X+inx, Y+inx);
-#endif
-
-    mec->projectForces(Y+inx, Y+inx);
-    // Y <- X + beta * Y
-    const real beta = -tau_ * mec->leftoverMobility();
-    blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
-}
-
-
-/**
- calculate the matrix product needed for the conjugate gradient algorithm
- 
-     Y <- X - time_step * speed( mISO + mFUL + diffP ) * X;
- 
- */
-void Meca::multiply(const real* X, real* Y) const
-{
-#if NUM_THREADS > 1
-    #pragma omp parallel for num_threads(NUM_THREADS)
-    for ( Mecable * mec : mecables )
-        multiply1(mec, X, Y);
-#else
-    mFUL.vecMul(X, Y);
-
-    for ( Mecable * mec : mecables )
-    {
-        const size_t inx = DIM * mec->matIndex();
-#  if SEPARATE_RIGIDITY_TERMS
-        mec->addRigidity(X+inx, Y+inx);
-#  endif
-#  if ADD_PROJECTION_DIFF
-        if ( mec->hasProjectionDiff() )
-            mec->addProjectionDiff(X+inx, Y+inx);
-#  endif
-        mec->projectForces(Y+inx, Y+inx);
-        // Y <- X + beta * Y
-        const real beta = -tau_ * mec->leftoverMobility();
-        blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
-    }
-#endif
-}
-
-#else  // PARALLELIZE_MATRIX
 
 /// Y <- X - time_step * speed( mISO + mFUL + diffP ) * X;
 void Meca::multiply(const real* X, real* Y) const
@@ -320,8 +241,6 @@ void Meca::multiply(const real* X, real* Y) const
         blas::xpay(cnt, X+inx, beta, Y+inx);
     }
 }
-
-#endif  // PARALLELIZE_MATRIX
 
 
 //------------------------------------------------------------------------------
@@ -369,7 +288,7 @@ void Meca::readyMecables()
     // reset base:
     zero_real(DIM*cnt, vBAS);
     
-    #pragma omp parallel for num_threads(NUM_THREADS)
+    #pragma omp parallel for
     for ( Mecable * mec : mecables )
     {
         mec->putPoints(vPTS+DIM*mec->matIndex());
@@ -680,7 +599,7 @@ unsigned Meca::solve()
      the `brownian_scale` is calculated from the Mecable's mobility
               vRHS <- tau * P * vRHS:
      */
-    #pragma omp parallel num_threads(NUM_THREADS)
+    #pragma omp parallel
     {
         real local = INFINITY;
         #pragma omp for
@@ -952,7 +871,7 @@ void Meca::apply()
          So it will be large for small time_step and large objects. They are not added.
          */
 
-        #pragma omp parallel for num_threads(NUM_THREADS)
+        #pragma omp parallel for
         for ( Mecable * mec : mecables )
         {
             const index_t off = DIM * mec->matIndex();

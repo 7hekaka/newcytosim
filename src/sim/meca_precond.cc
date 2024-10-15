@@ -217,7 +217,7 @@ void Meca::precondition(const real* X, real* Y) const
     if ( Y != X )
         copy_real(dimension(), X, Y);
     
-    #pragma omp parallel for num_threads(NUM_THREADS)
+    #pragma omp parallel for
     for ( Mecable const* mec : mecables )
     {
         const index_t inx = DIM * mec->matIndex();

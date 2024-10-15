@@ -32,27 +32,11 @@ class Simul;
  This makes the simulation a lot faster on isotropic systems (eg. self.cym), that
  are using isotropic force elements such as the Hookean link (Meca::addLink().
  It is useless for a purely non-isotropic system and causes a bit of overhead.
- 
- Finally, the parallelization code does not consider the ISO matrix, hence
- this option should be disabled if PARALLELIZE_MATRIX == 1
  */
 #define USE_ISO_MATRIX 1
 
 
-/**
- Set to 1 to distribute the Matrix Vector-multiplication in multithreaded code.
- This will select a type for matrix mFUL specifically built for that purpose.
- This option can only be beneficial if NUM_THREADS > 1
- Do not enable this option for sequential code.
- */
-#define PARALLELIZE_MATRIX 0
-
-
-#if PARALLELIZE_MATRIX
-typedef SparMatBlk BlockMatrixType;
-#else
 typedef SparMatSymBlkDiag BlockMatrixType;
-#endif
 
 
 /// MatrixBlock is an alias to a matrix class of size DIM * DIM

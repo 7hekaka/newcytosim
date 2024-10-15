@@ -58,10 +58,6 @@ To maximize the running speed:
 	#define NDEBUG
 	#define GRID_HAS_PERIODIC 0
 
-Enable multithreading, according to the machine:
-
-	#define NUM_THREAD 6
-
 For the 2D executable:
 
 	#define DIM 2
