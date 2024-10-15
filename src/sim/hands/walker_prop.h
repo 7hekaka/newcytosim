@@ -4,10 +4,6 @@
 
 #include "digit_prop.h"
 
-/// enable mesh-dependent speed of walkers (requires FIBER_HAS_DENSITY=1)
-#define NEW_VARIABLE_WALK 0
-
-
 /// Additional Property for Walker
 /**
  @ingroup Properties
@@ -45,18 +41,8 @@ public:
      In particular, `unbinding_chance` does not lead to the detachment of a stalled motor.
      */
     real unbinding_chance;
-    
-#if NEW_VARIABLE_WALK
-    /// portion of the speed that depends on position
-    real variable_speed;
-#endif
 
     /// @}
-    
-#if NEW_VARIABLE_WALK
-    /// portion of the speed that depends on position
-    float variable_walking_rate_dt;
-#endif
     
     
 private:
