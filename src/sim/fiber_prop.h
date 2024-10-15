@@ -24,7 +24,6 @@ class Space;
 #define NEW_FIBER_END_CHEW   0
 #define NEW_FIBER_CONFINE2   0
 #define NEW_FIBER_END_FORCE  0
-#define NEW_FIBER_MAKE_COUPLE 0
 
 /// Flag to add a line field of reals to each Fiber {0, 1}
 #define FIBER_HAS_DENSITY 1
@@ -310,13 +309,6 @@ public:
     /// maximum speed of disassembly due to chewing (speed)
     real max_chewing_speed;
 #endif
-#if NEW_FIBER_MAKE_COUPLE
-    /// rate of creation
-    real source_rate;
-    
-    /// type of couple being made
-    std::string source_type;
-#endif
 
     /// specialization
     /**
@@ -367,13 +359,6 @@ public:
 #if NEW_FIBER_CONFINE2
     /// pointer to actual confinement Space, derived from `confine2_spec`
     Space const* confine2_space;
-#endif
-#if NEW_FIBER_MAKE_COUPLE
-    /// rate
-    real source_rate_dt;
-    
-    /// type
-    CoupleProp * source_prop;
 #endif
 
     /// derived variable: pointer to associated Field

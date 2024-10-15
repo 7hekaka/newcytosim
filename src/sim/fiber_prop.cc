@@ -342,12 +342,6 @@ void FiberProp::clear()
     glue_single = "none";
     glue_prop = nullptr;
     
-#if NEW_FIBER_MAKE_COUPLE
-    source_rate = 0;
-    source_type = "none";
-    source_prop = nullptr;
-    source_rate_dt = 0;
-#endif
 #if NEW_COLINEAR_FORCE
     colinear_force = 0;
 #endif
@@ -504,10 +498,6 @@ void FiberProp::read(Glossary& glos)
     glos.set(confine_stiff[0], "confined", 1);
 #endif
 
-#if NEW_FIBER_MAKE_COUPLE
-    glos.set(source_rate, "source");
-    glos.set(source_type, "source", 1);
-#endif
 #if NEW_SQUEEZE_FORCE
     glos.set(squeeze_mode,  "squeeze", {{"off", 0}, {"all", 1}, {"minus_end", 2}});
     glos.set(squeeze_force, "squeeze", 1);
@@ -687,15 +677,6 @@ void FiberProp::complete(Simul const& sim)
     if ( drag_length <= 0 )
         throw InvalidParameter("fiber:drag_length must be > 0");
 
-#if NEW_FIBER_MAKE_COUPLE
-    if ( source_type == "none" )
-        source_prop = nullptr;
-    else
-        source_prop = sim.findProperty<CoupleProp>("couple", source_type);
-    if ( source_rate < 0 )
-        throw InvalidParameter(name()+":source_rate must be >= 0");
-    source_rate_dt = source_rate * time_step(sim);
-#endif
 #if NEW_FIBER_END_CHEW
     if ( max_chewing_speed < 0 )
         throw InvalidParameter("fiber:max_chewing_speed must be >= 0");
@@ -760,9 +741,6 @@ void FiberProp::write_values(std::ostream& os) const
     write_value(os, "steric",              steric_key, steric_radius, steric_range);
     write_value(os, "field",               field);
     write_value(os, "glue",                glue, glue_single);
-#if NEW_FIBER_MAKE_COUPLE
-    write_value(os, "source", source_rate, source_type);
-#endif
 #if NEW_COLINEAR_FORCE
     write_value(os, "colinear_force",      colinear_force);
 #endif
