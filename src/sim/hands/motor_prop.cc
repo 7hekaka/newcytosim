@@ -26,9 +26,6 @@ void MotorProp::clear()
     variable_speed    = 0;
     variable_speed_dt = 0;
 #endif
-#if NEW_UNBINDING_DENSITY
-    unbinding_density = 0;
-#endif
     var_speed_dt = 0;
     set_speed_dt = 0;
 }
@@ -48,9 +45,6 @@ void MotorProp::read(Glossary& glos)
     glos.set(variable_speed, "variable_speed");
 #endif
     glos.set(limit_speed,    "limit_speed");
-#if NEW_UNBINDING_DENSITY
-    glos.set(unbinding_density, "unbinding_density");
-#endif
 }
 
 
@@ -65,17 +59,6 @@ void MotorProp::complete(Simul const& sim)
 
 #if NEW_VARIABLE_SPEED
     variable_speed_dt = variable_speed * tau;
-#endif
-
-#if NEW_UNBINDING_DENSITY
-    if ( unbinding_density * abs_real(unloaded_speed) + unbinding_rate < 0 )
-        throw InvalidParameter("motor:unbinding_density must be > 0");
-
-    if ( primed(sim) && unbinding_density > 0 )
-    {
-        real rate = unbinding_rate + unbinding_density * unloaded_speed;
-        std::clog << name() + " unbinding rate: unloaded " << rate << " stalled " << unbinding_rate << '\n';
-    }
 #endif
 
     set_speed_dt = tau * unloaded_speed;
@@ -152,8 +135,5 @@ void MotorProp::write_values(std::ostream& os) const
     write_value(os, "variable_speed",    variable_speed);
 #endif
     write_value(os, "limit_speed",       limit_speed);
-#if NEW_UNBINDING_DENSITY
-    write_value(os, "unbinding_density", unbinding_density);
-#endif
 }
 

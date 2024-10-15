@@ -5,9 +5,6 @@
 
 #include "hand_prop.h"
 
-/// enable movement-dependent detachment of motors
-#define NEW_UNBINDING_DENSITY 0
-
 /// additional Property for Mighty
 /**
  @ingroup Properties
@@ -55,15 +52,6 @@ public:
      thus also excluding backward steps and excessive speed.
      */
     bool limit_speed;
-    
-#if NEW_UNBINDING_DENSITY
-    /// movement-induced probability of detaching
-    /**
-     This is a positive number specifying the probability of detaching
-     per unit-length of movement
-     */
-    real unbinding_density;
-#endif
     
     /// probability of rescuing a Fiber
     /**
