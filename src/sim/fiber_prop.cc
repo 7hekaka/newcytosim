@@ -330,10 +330,6 @@ void FiberProp::clear()
     confine2_spec = "first";
     confine2_space = nullptr;
 #endif
-#if NEW_CONFINE_RANGE
-    confine_range[0] = 0;
-    confine_range[1] = INFINITY;
-#endif
 
     steric_key = 0;
     steric_radius = 0;
@@ -457,9 +453,6 @@ void FiberProp::read(Glossary& glos)
                                   {"plus_end",  CONFINE_PLUS_END},
                                   {"minus_end", CONFINE_MINUS_END},
                                   {"both_ends", CONFINE_BOTH_ENDS},
-#if NEW_CONFINE_RANGE
-                                  {"range",     CONFINE_RANGE},
-#endif
                                   {"minus_out", CONFINE_MINUS_OUT},
                                   {"plus_out",  CONFINE_PLUS_OUT}});
     
@@ -494,9 +487,6 @@ void FiberProp::read(Glossary& glos)
 
     glos.set(confine2_stiff, 2, "confine2_stiffness");
     glos.set(confine2_spec, "confine2_space");
-#endif
-#if NEW_CONFINE_RANGE
-    glos.set(confine_range, 2,   "confine_range");
 #endif
 
     
@@ -766,9 +756,6 @@ void FiberProp::write_values(std::ostream& os) const
     write_value(os, "confine", confine, confine_stiff[0], confine_stiff[1], confine_spec);
 #if NEW_FIBER_CONFINE2
     write_value(os, "confine2", confine2, confine2_stiff[0], confine2_stiff[1], confine2_spec);
-#endif
-#if NEW_CONFINE_RANGE
-    write_value(os, "confine_range",       confine_range, 2);
 #endif
     write_value(os, "steric",              steric_key, steric_radius, steric_range);
     write_value(os, "field",               field);

@@ -1053,16 +1053,6 @@ void Fiber::setFiberConfinement(Meca& meca, Confinement mode, Space const* spc, 
             if ( spc->inside(pos) )
                 spc->setConfinement(pos, Mecapoint(this, L), meca, stiff);
         } break;
-#if NEW_CONFINE_RANGE
-        case CONFINE_RANGE:
-        {
-            // we use here the minus end as a reference... which maybe problematic
-            size_t S = indexSegmentM(prop->confine_range[0]);
-            size_t E = indexSegmentM(prop->confine_range[1]);
-            for ( size_t i = S; i < E; ++i )
-                spc->setConfinement(posP(i), Mecapoint(this, i), meca, stiff);
-        } break;
-#endif
         default:
             throw InvalidParameter("Invalid fiber:confine");
     }
