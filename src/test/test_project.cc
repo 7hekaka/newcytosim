@@ -14,7 +14,6 @@
 #include "vecprint.h"
 #include "blas.h"
 #include "lapack.h"
-#include "xpttrf.h"
 #include "cytoblas.h"
 #include "simd.h"
 #include "simd_float.h"
@@ -111,12 +110,12 @@ void projectForcesU_(index_t nbs, const real* dir, const real* src, real* mul)
 inline void DPTTRF(index_t nbs)
 {
     int info = 0;
-    alsatian_xpttrf(nbs, diag_, upper_, &info);
+    lapack::xpttrf(nbs, diag_, upper_, &info);
 }
 
 inline void DPTTS2(index_t nbs, real* Y)
 {
-    alsatian_xptts2(nbs, 1, diag_, upper_, Y, 0);
+    lapack::xptts2(nbs, 1, diag_, upper_, Y, 0);
 }
 
 //------------------------------------------------------------------------------
@@ -720,23 +719,6 @@ void projectForces_SSE(index_t nbs, const float* X, real* Y)
 }
 #endif
 
-#if REAL_IS_DOUBLE && USE_SIMD
-void projectForcesFused_SSE(index_t nbs, const double* X, real* Y)
-{
-#if ( DIM == 3 )
-    projectForces3D_SSE(nbs, dir_, X, lag_, diag_, upper_, Y);
-#elif ( DIM == 2 )
-    projectForces2D_SSE(nbs, dir_, X, lag_, diag_, upper_, Y);
-#endif
-}
-#endif
-
-#if REAL_IS_DOUBLE
-void projectForcesFused(index_t nbs, const double* X, real* Y)
-{
-    projectForces(nbs, dir_, X, lag_, diag_, upper_, Y);
-}
-#endif
 
 #if REAL_IS_DOUBLE && defined(__AVX__)
 void projectForces_AVX(index_t nbs, const double* X, real* Y)
@@ -796,7 +778,7 @@ void checkProject(index_t nbs, const char msg[])
 
 void onlyDPTTS(index_t nbs, const real* X, real* Y)
 {
-    alsatian_xptts2(nbs, 1, diag_, upper_, Y, NSEG);
+    lapack::xptts2(nbs, 1, diag_, upper_, Y, NSEG);
 }
 
 void projectDiff_(index_t nbs, const real* X, real* Y)
@@ -987,10 +969,8 @@ void testProjection(index_t cnt)
     setAnisotropy(NSEG);
     timeProject<projectForces>(cnt,    "projF");
 #if REAL_IS_DOUBLE
-    timeProject<projectForcesFused>(cnt, "fused");
 #  if USE_SIMD
     timeProject<projectForces_SSE>(cnt, "prSSE");
-    timeProject<projectForcesFused_SSE>(cnt, "fusedSSE");
 #  endif
 #  if defined(__AVX__)
     timeProject<projectForces_AVX>(cnt, "prAVX");
@@ -1029,8 +1009,6 @@ int main(int argc, char* argv[])
     {
 #if REAL_IS_DOUBLE
 #  if defined(__AVX__)
-        for ( index_t nbs = std::min(NSEG,(index_t)11); nbs > 0; --nbs )
-            checkProject<projectForcesFused>(nbs, "Fus");
         for ( index_t nbs = std::min(NSEG,(index_t)11); nbs > 0; --nbs )
             checkProject<projectForces_AVX>(nbs, "AVX");
 #  endif

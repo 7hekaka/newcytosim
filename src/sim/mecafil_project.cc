@@ -2,32 +2,17 @@
 
 #include "mecafil_code.cc"
 #include "exceptions.h"
-#include "xpttrf.h"
 
 // required for debugging:
 #include "cytoblas.h"
 #include "vecprint.h"
 
 /*
- Selection of LAPACK routines for tridiagonal matrix factorization
- The LAPACK implementation is the safest choice
- The Alsatian version is faster as it avoids divisions, and it permits using
- the 'Fused Project Forces' combining `projectForcesU` and `projectForcesD`
+ Selection of LAPACK routines, the safest choice
  */
 
-#if ( 1 )
-#  define DPTTRF alsatian_xpttrf
-#  define DPTTS2 alsatian_xptts2
-#  define USE_FUSED_PROJECT_FORCES ( REAL_IS_DOUBLE && USE_SIMD )
-#elif ( 0 )
-#  define DPTTRF lapack_xpttrf
-#  define DPTTS2 lapack_xptts2
-#  define USE_FUSED_PROJECT_FORCES 0
-#else
-#  define DPTTRF lapack::xpttrf
-#  define DPTTS2 lapack::xptts2
-#  define USE_FUSED_PROJECT_FORCES 0
-#endif
+#define DPTTRF lapack::xpttrf
+#define DPTTS2 lapack::xptts2
 
 
 /*
@@ -239,15 +224,6 @@ void Mecafil::projectForces(const real* X, real* Y) const
     
     const index_t nbs = nbSegments();
     //VecPrint::print("X", DIM*nbPoints(), X);
-
-// using the fused projectForces if possible, since this is fastest
-#if USE_FUSED_PROJECT_FORCES
-#  if ( DIM == 3 )
-    return projectForces3D_SSE(nbs, iDir, X, iLLG, iJJt, iJJtU, Y);
-#  elif ( DIM == 2 )
-    return projectForces2D_SSE(nbs, iDir, X, iLLG, iJJt, iJJtU, Y);
-#  endif
-#endif
     
     // calculate `iLLG` without modifying `X`
     projectForcesU(nbs, iDir, X, iLLG);

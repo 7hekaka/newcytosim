@@ -118,15 +118,6 @@ protected:
     /// oldest method to restore the distance between successive vertices
     static void reshape_global(index_t, const real*, real*, real cut);
 
-    /// (old) apply the forces movements needed to the distance between two points
-    static void reshape_apply_alt(index_t, const real*, const real*, real*);
-
-    /// (old) iterative method to restore the distance between successive vertices
-    static int reshape_calculate_alt(index_t, real, const real*, real*, index_t);
-    
-    /// (old) iterative method to restore the distance between successive vertices
-    static int reshape_calculate_old(index_t, real, const real*, real*, index_t);
-
     /// apply the forces movements needed to the distance between two points
     static void reshape_apply(index_t, const real*, const real*, real*);
 

@@ -2,7 +2,7 @@
 
 
 TESTS:=test_bits test_gillespie test_random test_math test_glossary\
-       test_xpttrs test_xtbsv test_quaternion test_rigidity test_project\
+       test_quaternion test_rigidity test_project\
        test_orthonormal test_matrix test_thread test_blas test_solver test_dot test_simd
 
 TESTS_GL:=test_solve test_opengl test_vbo test_glut test_glapp test_tesselator\
@@ -55,14 +55,6 @@ test_blas: test_blas.cc $(TEST_OBJ) | bin
 	$(DONE)
 
 test_project: test_project.cc $(TEST_OBJ) | bin
-	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
-	$(DONE)
-
-test_xpttrs: xpttrf.h test_xpttrs.cc $(TEST_OBJ) | bin
-	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
-	$(DONE)
-
-test_xtbsv: xtbsv.h test_xtbsv.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
