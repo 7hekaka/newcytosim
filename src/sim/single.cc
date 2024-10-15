@@ -148,19 +148,10 @@ void Single::stepA()
 }
 
 /**
- Add confinement force to the bound fiber
  */
 void Single::setInteractions(Meca& meca) const
 {
     assert_true( sHand->attached() );
-    
-#ifdef NEW_DANGEROUS_CONFINEMENTS
-    if ( prop->confine )
-    {
-        Space const* spc = prop->confine_space;
-        spc->setConfinement(sHand->interpolation(), meca, prop->stiffness, prop->confine);
-    }
-#endif
 }
 
 //------------------------------------------------------------------------------

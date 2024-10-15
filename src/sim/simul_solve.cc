@@ -109,35 +109,11 @@ void Simul::setAllInteractions(Meca& meca) const
     for ( Space const* e=spaces.first(); e; e=e->next() )
         e->setInteractions(meca, *this);
 
-#if 1
     for ( Single const* s=singles.firstA(); s ; s=s->next() )
         s->setInteractions(meca);
 
     for ( Couple const* c=couples.firstAA(); c ; c=c->next() )
         c->setInteractions(meca);
-#else
-    for ( Fiber * f=fibers.first(); f; f=f->next() )
-    {
-        f->sortHands();
-        for ( Hand const* h = f->firstHand(); h; h = h->next() )
-        {
-            HandMonitor const* m = h->monitor();
-            Hand const* g = m->otherHand(h);
-            if ( g > h  &&  g->attached() )
-                static_cast<Couple const*>(m)->setInteractions(meca);
-            else if ( !g )
-                static_cast<Single const*>(m)->setInteractions(meca);
-        }
-    }
-#endif
-    
-#ifdef NEW_DANGEROUS_CONFINEMENTS
-    for ( Couple const* c=couples.firstAF(); c ; c=c->next() )
-        c->setInteractionsAF(meca);
-
-    for ( Couple const* c=couples.firstFA(); c ; c=c->next() )
-        c->setInteractionsFA(meca);
-#endif
     
     for ( Organizer const* x = organizers.first(); x; x=x->next() )
         x->setInteractions(meca);

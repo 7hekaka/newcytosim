@@ -112,43 +112,18 @@ void Couple::setInteractions(Meca& meca) const
     assert_true( attached1() && attached2() );
     
     meca.addLink(cHand1->interpolation(), cHand2->interpolation(), prop->stiffness);
-    
-#ifdef NEW_DANGEROUS_CONFINEMENTS
-    if ( prop->confine )
-    {
-        Space const* spc = prop->confine_space;
-        spc->setConfinement(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
-        spc->setConfinement(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
-    }
-#endif
 }
 
 
 void Couple::setInteractionsAF(Meca& meca) const
 {
     assert_true( attached1() && !attached2() );
-    
-#ifdef NEW_DANGEROUS_CONFINEMENTS
-    if ( prop->confine )
-    {
-        Space const* spc = prop->confine_space;
-        spc->setConfinement(cHand1->interpolation(), meca, prop->stiffness, prop->confine);
-    }
-#endif
 }
 
 
 void Couple::setInteractionsFA(Meca& meca) const
 {
     assert_true( !attached1() && attached2() );
-    
-#ifdef NEW_DANGEROUS_CONFINEMENTS
-    if ( prop->confine )
-    {
-        Space const* spc = prop->confine_space;
-        spc->setConfinement(cHand2->interpolation(), meca, prop->stiffness, prop->confine);
-    }
-#endif
 }
 
 //------------------------------------------------------------------------------
