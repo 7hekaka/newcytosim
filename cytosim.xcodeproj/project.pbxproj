@@ -212,7 +212,6 @@
 		BB3417660C3294B40016CF18 /* filewrapper.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB20484A0AF203A0004EDA21 /* filewrapper.cc */; };
 		BB39EC26153806070047768E /* duo_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB39EC24153806070047768E /* duo_long.cc */; };
 		BB39EC27153806070047768E /* duo_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB39EC25153806070047768E /* duo_long.h */; };
-		BB3A4AE919351389005CD868 /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
 		BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3DA1DC254C8F0200226B81 /* object_pool.cc */; };
 		BB3DA1DF254C8F0300226B81 /* object_pool.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3DA1DD254C8F0300226B81 /* object_pool.h */; };
 		BB3E3CB6284B4C28000D158E /* multiplay.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEAA3EF283B633B0091DFA9 /* multiplay.cc */; };
@@ -937,8 +936,6 @@
 		BBD025DF1B28DF950002B9FE /* chewer_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DB1B28DF950002B9FE /* chewer_prop.h */; };
 		BBD025E01B28DF950002B9FE /* chewer.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD025DC1B28DF950002B9FE /* chewer.cc */; };
 		BBD025E11B28DF950002B9FE /* chewer.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD025DD1B28DF950002B9FE /* chewer.h */; };
-		BBD096E624D0767400084292 /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; };
-		BBD096E724D0767400084292 /* space_tee.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3A4AE519351389005CD868 /* space_tee.cc */; settings = {COMPILER_FLAGS = "-DDISPLAY"; }; };
 		BBD14D462820826C00B55817 /* signal_handlers.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD14D442820826C00B55817 /* signal_handlers.h */; };
 		BBD14D472820826C00B55817 /* signal_handlers.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD14D452820826C00B55817 /* signal_handlers.cc */; };
 		BBD1B1EE18FFD5DA00E5D80A /* project_ellipse.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD1B1EB18FFCE9A00E5D80A /* project_ellipse.cc */; };
@@ -1025,7 +1022,6 @@
 		BBE82A31233D15EB00BE44DF /* space_dice.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C610B48EF900A4028F /* space_dice.h */; };
 		BBE82A32233D15EB00BE44DF /* space_ellipse.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838C810B48EF900A4028F /* space_ellipse.h */; };
 		BBE82A33233D15EB00BE44DF /* space_mesh.h in Headers */ = {isa = PBXBuildFile; fileRef = BBA176EB22103C5C0046E858 /* space_mesh.h */; };
-		BBE82A34233D15EB00BE44DF /* space_tee.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3A4AE619351389005CD868 /* space_tee.h */; };
 		BBE82A35233D15EB00BE44DF /* space_polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838CE10B48EF900A4028F /* space_polygon.h */; };
 		BBE82A36233D15EB00BE44DF /* space_rotate.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D010B48EF900A4028F /* space_rotate.h */; };
 		BBE82A37233D15EB00BE44DF /* space_sphere.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8838D210B48EF900A4028F /* space_sphere.h */; };
@@ -1790,8 +1786,6 @@
 		BB351EFF2535DFD800007B88 /* meca_inter_draw.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = meca_inter_draw.cc; sourceTree = "<group>"; };
 		BB39EC24153806070047768E /* duo_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = duo_long.cc; path = couples/duo_long.cc; sourceTree = "<group>"; };
 		BB39EC25153806070047768E /* duo_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = duo_long.h; path = couples/duo_long.h; sourceTree = "<group>"; };
-		BB3A4AE519351389005CD868 /* space_tee.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = space_tee.cc; path = src/sim/spaces/space_tee.cc; sourceTree = SOURCE_ROOT; };
-		BB3A4AE619351389005CD868 /* space_tee.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = space_tee.h; path = src/sim/spaces/space_tee.h; sourceTree = SOURCE_ROOT; };
 		BB3AAF5806076A8B00508E18 /* fiber_grid2.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = fiber_grid2.cc; path = src/sim/fiber_grid2.cc; sourceTree = SOURCE_ROOT; };
 		BB3D2ADA05C8396B0022ACE5 /* spherical_code.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = spherical_code.cc; path = src/math/spherical_code.cc; sourceTree = SOURCE_ROOT; };
 		BB3D8E1615F490D0001851E1 /* simul_report.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simul_report.cc; sourceTree = "<group>"; };
@@ -3537,8 +3531,6 @@
 				BB8838D710B48EF900A4028F /* space_strip.cc */,
 				BB8838DC10B48EF900A4028F /* space_torus.h */,
 				BB8838DB10B48EF900A4028F /* space_torus.cc */,
-				BB3A4AE619351389005CD868 /* space_tee.h */,
-				BB3A4AE519351389005CD868 /* space_tee.cc */,
 			);
 			name = spaces;
 			path = src/sim/spaces;
@@ -4490,7 +4482,6 @@
 				BB8838E610B48EF900A4028F /* space_ellipse.h in Headers */,
 				BB805D68241A3F1500B62699 /* space_dynamic_sphere.h in Headers */,
 				BBA176ED22103C5C0046E858 /* space_mesh.h in Headers */,
-				BB3A4AE919351389005CD868 /* space_tee.h in Headers */,
 				BB8838EC10B48EF900A4028F /* space_polygon.h in Headers */,
 				BB8838EE10B48EF900A4028F /* space_rotate.h in Headers */,
 				BB8838F010B48EF900A4028F /* space_sphere.h in Headers */,
@@ -4522,7 +4513,6 @@
 				BBE82A32233D15EB00BE44DF /* space_ellipse.h in Headers */,
 				BB805D69241A3F1500B62699 /* space_dynamic_sphere.h in Headers */,
 				BBE82A33233D15EB00BE44DF /* space_mesh.h in Headers */,
-				BBE82A34233D15EB00BE44DF /* space_tee.h in Headers */,
 				BBE82A35233D15EB00BE44DF /* space_polygon.h in Headers */,
 				BBE82A36233D15EB00BE44DF /* space_rotate.h in Headers */,
 				BBE82A37233D15EB00BE44DF /* space_sphere.h in Headers */,
@@ -5935,7 +5925,6 @@
 				BB8838F510B48EF900A4028F /* space_strip.cc in Sources */,
 				BB805D71241A5A6000B62699 /* space_lid.cc in Sources */,
 				BB8838F910B48EF900A4028F /* space_torus.cc in Sources */,
-				BBD096E624D0767400084292 /* space_tee.cc in Sources */,
 				BBA176EF22103C5C0046E858 /* space_mesh.cc in Sources */,
 				BB88394D10B4912A00A4028F /* space_capsule.cc in Sources */,
 				BB805D66241A3F1500B62699 /* space_dynamic_sphere.cc in Sources */,
@@ -5977,7 +5966,6 @@
 				BBE82A55233D15EB00BE44DF /* space_strip.cc in Sources */,
 				BB805D72241A5A6000B62699 /* space_lid.cc in Sources */,
 				BBE82A57233D15EB00BE44DF /* space_torus.cc in Sources */,
-				BBD096E724D0767400084292 /* space_tee.cc in Sources */,
 				BBE82A58233D15EB00BE44DF /* space_mesh.cc in Sources */,
 				BBE82A59233D15EB00BE44DF /* space_capsule.cc in Sources */,
 				BB805D67241A3F1500B62699 /* space_dynamic_sphere.cc in Sources */,

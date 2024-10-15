@@ -3,7 +3,7 @@
 
 
 OBJ_SPACE := space.o space_prop.o space_square.o space_sphere.o space_disc.o\
-             space_capsule.o space_dice.o space_tee.o space_torus.o space_polygon.o\
+             space_capsule.o space_dice.o space_torus.o space_polygon.o\
              space_ellipse.o space_cylinder.o space_bicylinder.o space_ring.o space_mesh.o\
              space_cylinderZ.o space_polygonZ.o space_strip.o space_periodic.o\
              space_banana.o space_cylinderP.o space_lid.o space_force.o\

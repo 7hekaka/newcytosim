@@ -43,7 +43,6 @@ set(SOURCES_SPACES
     space_dynamic_disc.cc
     space_force.cc
     space_polygonZ.cc
-    space_tee.cc
     space_disc.cc
     space_lid.cc
     space_ring.cc

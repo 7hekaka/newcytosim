@@ -23,7 +23,6 @@
 #include "space_sphere.h"
 #include "space_square.h"
 #include "space_strip.h"
-#include "space_tee.h"
 #include "space_torus.h"
 
 #if NEW_SPACES
@@ -77,7 +76,6 @@
  `bicylinder`  | SpaceBicylinder      | radius=REAL;
  `ring`        | SpaceRing            | length=REAL; radius=REAL;
  `disc`        | SpaceDisc            | radius=REAL; bottom=REAL; top=REAL;
- `tee`         | SpaceTee             | length=REAL; radius=REAL; junction=REAL; arm=REAL;
  `mesh`        | SpaceMesh            | file=FILE
  
  Example:
@@ -129,7 +127,6 @@ Space * SpaceProp::newSpace() const
     if ( s=="bicylinder" ) return new SpaceBicylinder(this);
 #endif
     if ( s=="ring" )       return new SpaceRing(this);
-    if ( s=="tee" )        return new SpaceTee(this);
 #if NEW_SPACES
     if ( s=="mesh" )       return new SpaceMesh(this);
     if ( s=="force" )      return new SpaceForce(this);
