@@ -32,10 +32,6 @@ void SolidProp::clear()
     source_single = nullptr;
     source_rate_dt = 0;
 #endif
-#if NEW_SOLID_HAS_TWIN
-    twin_stiffness = 0;
-    twin_torque_stiffness = 0;
-#endif
     display = "";
     display_fresh = false;
 }
@@ -86,10 +82,6 @@ void SolidProp::read(Glossary& glos)
 #if NEW_SOLID_MAKE_COUPLE
     glos.set(source_rate, "source");
     glos.set(source_type, "source", 1);
-#endif
-#if NEW_SOLID_HAS_TWIN
-    glos.set(twin_stiffness, "twin_stiffness");
-    glos.set(twin_torque_stiffness, "twin_stiffness", 1);
 #endif
 
     if ( glos.set(display, "display") )
@@ -143,12 +135,6 @@ void SolidProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":source_rate must be >= 0");
     source_rate_dt = source_rate * time_step(sim);
 #endif
-#if NEW_SOLID_HAS_TWIN
-    if ( twin_stiffness < 0 )
-        throw InvalidParameter(name()+":twin_stiffness must be >= 0");
-    if ( twin_torque_stiffness < 0 )
-        throw InvalidParameter(name()+":twin_torque_stiffness must be >= 0");
-#endif
 }
 
 
@@ -164,9 +150,6 @@ void SolidProp::write_values(std::ostream& os) const
 #endif
 #if NEW_SOLID_MAKE_COUPLE
     write_value(os, "source", source_rate, source_type);
-#endif
-#if NEW_SOLID_HAS_TWIN
-    write_value(os, "twin_stiffness", twin_stiffness, twin_torque_stiffness);
 #endif
     write_value(os, "display",   "("+display+")");
 }

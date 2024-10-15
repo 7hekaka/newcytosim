@@ -22,9 +22,6 @@ class Space;
 /// new option to create Couple from Solid's spheres
 #define NEW_SOLID_MAKE_COUPLE 0
 
-/// option to create a mirror image of a Solid with 'new'
-#define NEW_SOLID_HAS_TWIN 0
-
 /// Property for Bead and Solid
 /*
  @ingroup Properties
@@ -98,11 +95,6 @@ public:
     
     /// type
     std::string source_type;
-#endif
-    
-#if NEW_SOLID_HAS_TWIN
-    real twin_stiffness;
-    real twin_torque_stiffness;
 #endif
     
     /// display string (see @ref PointDispPar)

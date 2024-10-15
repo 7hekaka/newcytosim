@@ -49,29 +49,6 @@ void Solid::setInteractions(Meca& meca) const
         meca.addPointClamp(Mecapoint(this,0), clamp_place, clamp_stiff);
     }
 #endif
-#if NEW_SOLID_HAS_TWIN
-    if ( soTwin && soTwin != this )
-    {
-        const index_t off = DIM+1; // index of point to be linked
-        const index_t sup = std::min(nPoints-off, off+1); // last point to be linked
-        for ( index_t POLE = 0; POLE <= sup; POLE += off+1 )
-        {
-            const real stiff = prop->twin_stiffness;
-            if ( stiff > 0 )
-            {
-                meca.addLink(Mecapoint(this, POLE+off), Mecapoint(soTwin, POLE+off), stiff);
-                //oldLinkTwins(meca, prop->twin_stiffness, prop->twin_separation);
-            }
-            const real torque = prop->twin_torque_stiffness;
-            if ( torque > 0 )
-            {
-                index_t ii = POLE + matIndex();
-                index_t jj = POLE + soTwin->matIndex();
-                meca.addTorque4(ii, ii+off, jj+off, jj, torque);
-            }
-        }
-    }
-#endif
     if ( prop->confine != CONFINE_OFF )
     {
         Space const* spc = prop->confine_space;
@@ -156,9 +133,6 @@ void Solid::reset()
     soDrag   = 0;
 #if ( DIM > 2 )
     soMomentum = Matrix33(0, 1);
-#endif
-#if NEW_SOLID_HAS_TWIN
-    soTwin = nullptr;
 #endif
 #if NEW_SOLID_CLAMP
     clamp_place.reset();
@@ -514,22 +488,6 @@ index_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& va
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+str+"'");
             SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
-#if ( DIM > 1 ) && NEW_SOLID_HAS_TWIN
-            if ( str == "cap111" )
-            {
-                // distribute points randomly over a portion of the unit sphere:
-                const real cap = 0.18;
-                Rotation rot = Rotation::align111();
-                std::vector<Vector> pts(num, Vector(0,0,0));
-                size_t cnt = tossPointsCap(pts, cap, 1024);
-                for ( size_t i = 0; i < cnt; ++i )
-                {
-                    Wrist * w = sip->newWrist(this, ref, -rot.trans_vecmul(pts[i]));
-                    objs.push_back(w);
-                }
-            }
-            else
-#endif
             if ( str.size() )
                 addWrists(objs, num, sip, ref, str);
             else
@@ -596,70 +554,6 @@ Fiber* Solid::makeFiber(ObjectList& objs, Glossary& opt, std::string const& var,
         w2->attach(FiberSite(F, F->abscissaM()+len));
     }
     return F;
-}
-
-
-/* 2023: twin solid to represent Kinetochore pairs */
-void Solid::buildTwin(ObjectList& objs, Glossary& opt, std::string const& str, Simul& sim)
-{
-#if NEW_SOLID_HAS_TWIN
-    real rad = radius(0);
-    real sep = 0;
-    opt.set(sep, "twin", 1);
-    sep = std::max(rad, sep/2-rad);
-    //addPoint(Vector(sep, 0, 0));
-    if ( str == "mirror" )
-    {
-        // translate to bring plate to origin:
-        ObjectSet::translateObjects(objs, Vector(-sep, 0, 0));
-        if ( !soTwin )
-        {
-            // create a twin Solid that is the mirror image of *this:
-            Solid * S = new Solid(prop);
-            S->soTwin = this; // tag S as younger twin
-            ObjectList list = S->build(opt, sim);
-            ObjectSet::rotateObjects(list, Rotation::flipX());
-            S->fixShape();
-            objs.append(list);
-            soTwin = this; // tag *this as elder twin!
-        }
-    }
-    else
-    {
-        Solid * S = sim.pickSolid(str);
-        if ( !S )
-            std::cerr << " INCIDENT: could not find twin Solid `" << str << "'\n";
-        else if ( S->nbPoints() <= DIM )
-            throw InvalidParameter("Solid's twin lacks sufficient points");
-    }
-    /* 01.2023: Michelin's chromosomes: overlapping spheres outline a silhouette */
-    real len = 2, chi = 0.5; // length, relative position of chiasma
-    if ( opt.set(len, "chromosome") )
-    {
-        real RAD = 0.200; // upper radius limit reached away from chiasma
-        // chiasma set as second argument
-        opt.set(chi, "chromosome", 1);
-        opt.set(RAD, "chromosome", 2);
-        for ( int i = 0; i < 18; ++i )
-        {
-            real y = ( i / 17.0 ) * len - chi; // in [-chi, len-chi]
-            if ( abs_real(y) > rad )
-            {
-                real T = 0.5 * std::tanh(5.0*abs_real(y)-M_SQRT2) + 0.5; // in [0, 1]
-                real R = rad + ( RAD - rad ) * T; // in [R0, R1]
-                real X = sep + ( RAD - sep ) * T; // in [sep, R1];
-                addSphere(Vector(-std::max(X,R), y, 0), R);
-                /* Could add chromokinesins here */
-                //addTriad(R);
-            }
-        }
-    }
-    
-    if ( nbPoints() % (DIM+2) )
-        ;//throw InvalidParameter("missing handle point in solid::twin");
-#else
-    throw InvalidParameter("Solid's twin code is not enabled");
-#endif
 }
 
 
@@ -844,9 +738,6 @@ ObjectList Solid::build(Glossary& opt, Simul& sim)
     }
 
     objs.push_back(this);
-
-    if ( opt.set(str, "twin") && str != "off" )
-        buildTwin(objs, opt, str, sim);
     
     return objs;
 }
@@ -1713,18 +1604,6 @@ void Solid::write(Outputter& out) const
 #endif
 }
 
-#if NEW_SOLID_HAS_TWIN
-void Solid::writeTwin(Outputter& out) const
-{
-    writeMarker(out, SOLID_TAG);
-    if ( soTwin )
-        out.writeUInt32(soTwin->identity());
-    else
-        out.writeUInt32(0);
-    out.writeFloat(0.0);
-}
-#endif
-
 
 void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
@@ -1751,17 +1630,6 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
     {
         [[maybe_unused]] ObjectID id = in.readUInt32();
         in.readFloat();
-#if NEW_SOLID_HAS_TWIN
-        if ( id == identity() )
-            soTwin = this;
-        else
-        {
-            /* This only works if the twin Solid is already loaded */
-            soTwin = sim.solids.identifyObject(id);
-            if ( id && !soTwin )
-                std::clog << "Warning: could not find Solid twin " << id << "\n";
-        }
-#endif
     }
     else if ( tag == CLAMP_TAG )
     {

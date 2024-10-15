@@ -75,13 +75,6 @@ private:
 
     /// second moment of the reference shape
     real soVariance;
-#if NEW_SOLID_HAS_TWIN
-    /// pointer to younger twin Solid, or to self if this is the elder twin
-    Solid * soTwin;
-    
-    /// former way of linking Twins (25.03.2023)
-    void oldLinkTwins(Meca&, real, real) const;
-#endif
     
     /// the number of points when fixShape() was last called, used for verifications.
     SIZE_T soAmount;
@@ -118,9 +111,6 @@ private:
 
     /// part of build()
     void addWrists(ObjectList&, index_t num, SingleProp const*, index_t ref, std::string const&);
-
-    /// part of build()
-    void buildTwin(ObjectList&, Glossary&, std::string const&, Simul&);
 
 public:
     
@@ -247,25 +237,6 @@ public:
 
     /// force due to clamping
     Vector clampForce() const { return clamp_stiff * ( clamp_place - posPoint(0) ); }
-#endif
-#if NEW_SOLID_HAS_TWIN
-    /// pointer to the original Solid, if this is a mirror twin
-    Solid const* twin() const { return soTwin; }
-    
-    /// pointer to the original Solid, if this is a mirror twin
-    bool elder_twin() const { return soTwin && soTwin != this; }
-
-    /// sum distance squared of links between twins
-    real twinTensionSqr() const
-    {
-        index_t i = 1+DIM;
-        if ( soTwin && soTwin != this )
-            return distanceSqr(posPoint(i), soTwin->posPoint(i));
-        return 0;
-    }
-
-    /// save info to file
-    void writeTwin(Outputter&) const;
 #endif
 
     //--------------------------------------------------------------------------

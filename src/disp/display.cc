@@ -2211,10 +2211,6 @@ void Display::drawSolid(Solid const& obj)
     PointDisp const* dis = obj.prop->disp;
     gym_color col = bodyColorF(obj);
     const float rad = pixscale(dis->size);
-#if NEW_SOLID_HAS_TWIN
-    if ( obj.elder_twin() )
-        col = bodyColorF(*obj.twin()).tweak(obj.signature());
-#endif
 
     //display points:
     if (( dis->style & 2 ) && dis->perceptible )
@@ -2250,99 +2246,6 @@ void Display::drawSolid(Solid const& obj)
     }
 #endif
     
-#if NEW_SOLID_HAS_TWIN
-    // display links between twin solids
-    if ( obj.elder_twin() && ( obj.prop->twin_stiffness > 0 ) )
-    {
-        Solid const* twi = obj.twin();
-        gym_color lor = bodyColorF(*twi).mix(col);
-        const float wid = M_SQRT2 * rad;
-        gym::ref_view();
-        gym::enableLighting();
-        gym::disableCullFace();
-        const index_t off = DIM+1; // index of point to be linked
-        const index_t sup = std::min(obj.lastPoint(), index_t(2*off+1)); // last to be linked
-        for ( index_t inx = off; inx <= sup; inx += off+1 )
-        {
-            gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), wid);
-            gym::color_back(lor.darken(0.5));
-            gym::color_front(lor, 1);
-            gle::helix();
-        }
-        gym::restoreCullFace();
-    }
-#endif
-
-#ifdef OLD_SOLID_HAS_TWIN
-    // display links between twin solids
-    if ( obj.elder_twin() && ( dis->style & 6 ) && dis->perceptible )
-    {
-        Solid const* twi = obj.twin();
-        gym_color lor = bodyColorF(*twi);
-        // draw links between 'obj' and its Twin
-        const float wid = M_SQRT2 * rad;
-        const index_t inx = 0;
-        // three points are expected:
-        if ( obj.radius(inx) > 0 && obj.nbPoints() > inx+4 )
-        {
-            gym::enableLighting();
-            gym::color_both(col, 1);
-            Vector S(obj.posPoint(inx));
-            Vector A(obj.posPoint(inx+1));
-            Vector B(obj.posPoint(inx+2));
-            Vector T(twi->posPoint(inx));
-            Vector X(twi->posPoint(inx+1));
-            Vector Y(twi->posPoint(inx+2));
-            Vector S3(obj.posPoint(inx+DIM+1));
-            Vector T3(twi->posPoint(inx+DIM+1));
-#if ( DIM >= 3 )
-            real R = 3 * pixscale(dis->size) / obj.radius(inx);
-            Vector C(obj.posPoint(inx+3));
-            Vector dA = R*(A-S), dB = R*(B-S), dC = R*(C-S);
-            Vector Z(twi->posPoint(inx+3));
-            Vector dX = R*(X-T), dY = R*(Y-T), dZ = R*(Z-T);
-#endif
-            gym::ref_view();
-            if ( obj.prop->twin_stiffness > 0 )
-            {
-                gym::color_both(col.mix(lor), 1);
-                gym::stretchAlignZ(S3, T3, wid);
-                gle::hexTube();
-#if ( DIM >= 4 )
-                gle::paintSpikyPrism(dX, dY, dZ, X, dA, dB, dC, A);
-                gle::paintSpikyPrism(dX, dY, dZ, Y, dA, dB, dC, B);
-                gle::paintSpikyPrism(dX, dY, dZ, Z, dA, dB, dC, C);
-#elif ( DIM == 2 )
-                gle::drawSpikyBand(A, X, wid);
-                gle::drawSpikyBand(B, Y, wid);
-#endif
-            }
-            else
-            {
-#if ( DIM >= 3 )
-                // A and B are swapped since the triad is inverted
-                gym::color_both(col, 1);
-                gle::paintTetrahedron(dB, dA, dC, A);
-                gle::paintTetrahedron(dB, dA, dC, B);
-                gle::paintTetrahedron(dB, dA, dC, C);
-                // draw the other guy's handles
-                gym::color_both(lor, 1);
-                gle::paintTetrahedron(dX, dY, dZ, X);
-                gle::paintTetrahedron(dX, dY, dZ, Y);
-                gle::paintTetrahedron(dX, dY, dZ, Z);
-#elif ( DIM == 2 )
-                Vector2 N = 2 * S - ( A + B );
-                gym::transAlignZ(A, wid, N); gle::pyramid();
-                gym::transAlignZ(B, wid, N); gle::pyramid();
-                Vector2 D = 2 * T - ( A + B );
-                gym::transAlignZ(X, wid, D); gle::pyramid();
-                gym::transAlignZ(Y, wid, D); gle::pyramid();
-#endif
-            }
-        }
-    }
-#endif
-
     //display outline of spheres in 2D
     if ( dis->style & 8 )
     {
@@ -2416,10 +2319,6 @@ void Display::drawSolidT(Solid const& obj, unsigned inx) const
         gym::setClipPlane(5-i, normalize(X-P), (0.5-0.5*A)*X+(0.5+0.5*A)*P);
     }
     gym_color col = bodyColorF(obj);
-#if NEW_SOLID_HAS_TWIN
-    if ( obj.elder_twin() )
-        col = bodyColorF(*obj.twin()).tweak(obj.signature());
-#endif
     col.set_alpha(obj.prop->disp->color.alpha());
 #if ( DIM > 2 )
     gym::color_both(col);
@@ -2447,21 +2346,6 @@ void Display::drawSolids(SolidSet const& set)
                 index_t sup = obj->nbPoints();
                 if ( dis->style & 4 ) sup = 1;
 #if ( DIM >= 3 )
-#if NEW_SOLID_HAS_TWIN
-                Solid const * twi = obj->twin();
-                if ( twi )
-                {
-                    if ( twi != obj ) // only select elder twin
-                    for ( index_t inx = 0; inx+DIM < obj->nbPoints(); inx += DIM+2 )
-                    {
-                        gym::enableLighting();
-                        gym_color black(0,0,0,1);
-                        gym_color col = bodyColorF(*twi);
-                        drawFootball(*obj, inx, col, black, true); // elder twin
-                        drawFootball(*twi, inx, col, black, false); // younger twin
-                    }
-                } else
-#endif
                 if ( dis->color.transparent() )
                 {
                     for ( index_t i = 0; i < sup; ++i )
