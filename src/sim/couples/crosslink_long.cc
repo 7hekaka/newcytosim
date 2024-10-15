@@ -100,15 +100,6 @@ void CrosslinkLong::setInteractions(Meca& meca) const
     mArm2 = std::copysign(len, cross(dir, pt2.diff()));
     meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop()->stiffness);
 
-#elif ( DIM >= 3 ) && FIBER_HAS_FAMILY > 12
-    
-    /* calculate the Arms to offset the position along the radial direction
-    of the microtubules */
-    mArm1 = fiber1()->orthoRadial(abscissa1()).normalized(len);
-    mArm2 = fiber2()->orthoRadial(abscissa2()).normalized(len);
-    // this can be improved, since this still allows the MTs to rotate around
-    meca.addSideSideLink(pt1, mArm1, pt2, mArm2, prop()->stiffness);
-    
 #elif ( DIM >= 3 )
     
     Vector dir = pt2.pos() - pt1.pos();

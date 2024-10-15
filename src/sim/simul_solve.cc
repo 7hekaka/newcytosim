@@ -141,9 +141,6 @@ void Simul::setAllInteractions(Meca& meca) const
     
     for ( Organizer const* x = organizers.first(); x; x=x->next() )
         x->setInteractions(meca);
-    
-    for ( Tubule const* t = tubules.first(); t; t=t->next() )
-        t->setInteractions(meca);
 
     
     // add steric interactions

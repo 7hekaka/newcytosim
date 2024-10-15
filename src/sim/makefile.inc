@@ -51,7 +51,6 @@ OBJ_SIM := primitives.o mecable.o object.o object_pool.o object_set.o\
            sphere_prop.o sphere.o sphere_set.o\
            solid_prop.o solid.o solid_set.o bead.o bead_set.o\
            field.o field_prop.o field_set.o event.o event_set.o\
-           tubule_prop.o tubule.o tubule_set.o\
            mecapoint.o interpolation.o interpolation4.o\
            fiber_grid.o point_grid.o locus_grid.o meca.o\
            simul_prop.o simul.o simul_part.o interface.o parser.o

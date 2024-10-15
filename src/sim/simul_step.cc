@@ -18,7 +18,6 @@ void Simul::steps()
     // Monte-Carlo step for all objects
     events.steps();
     organizers.steps();
-    tubules.steps();
     fields.steps();
     spaces.steps();
     spheres.steps();

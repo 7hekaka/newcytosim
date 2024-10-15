@@ -12,7 +12,6 @@
 #include "modulo.h"
 #include "random_seed.h"
 
-#include "tubule.h"
 #include "fiber.h"
 #include "field.h"
 #include "event.h"
@@ -32,7 +31,7 @@ const char Simul::TRAJECTORY[] = "objects.cmo";
 Simul::Simul()
 : prop(""), spaces(*this), fields(*this), fibers(*this),
 spheres(*this), beads(*this), solids(*this), singles(*this),
-couples(*this), organizers(*this), tubules(*this), events(*this)
+couples(*this), organizers(*this), events(*this)
 {
     pMeca1D = nullptr;
     parser_ = nullptr;
@@ -83,7 +82,6 @@ void Simul::initCytosim()
 void Simul::eraseObjects()
 {
     //fprintf(stderr, "Simul:%p:eraseObjects()\n", this);
-    tubules.erase();
     organizers.erase();
     fibers.erase();
     spheres.erase();
@@ -342,7 +340,6 @@ ObjectSet * Simul::findSet(const std::string& cat)
     if ( cat == spheres.title() )    return &spheres;
     if ( cat == singles.title() )    return &singles;
     if ( cat == couples.title() )    return &couples;
-    if ( cat == tubules.title() )    return &tubules;
     if ( cat == organizers.title() ) return &organizers;
     if ( cat == "aster" )            return &organizers;
     if ( cat == "bundle" )           return &organizers;
@@ -377,7 +374,6 @@ ObjectSet * Simul::findSetT(const ObjectTag tag)
         case        Sphere::TAG: return &spheres;
         case         Field::TAG: return &fields;
         case         Space::TAG: return &spaces;
-        case        Tubule::TAG: return &tubules;
         case         Event::TAG: return &events;
         case Organizer::NUCLEUS_TAG: return &organizers;
         case  Organizer::BUNDLE_TAG: return &organizers;

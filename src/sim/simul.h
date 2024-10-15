@@ -18,7 +18,6 @@
 #include "solid_set.h"
 #include "sphere_set.h"
 #include "organizer_set.h"
-#include "tubule_set.h"
 #include "field_set.h"
 #include "space_set.h"
 #include "event_set.h"
@@ -112,9 +111,6 @@ public:
     
     /// list of Organizer in the Simulation
     OrganizerSet organizers;
-
-    /// list of Tubules
-    TubuleSet tubules;
     
     /// list of Events in the Simulation
     EventSet events;

@@ -111,7 +111,6 @@ void Simul::writeObjects(Outputter& out) const
     singles.writeSet(out);
     couples.writeSet(out);
     organizers.writeSet(out);
-    tubules.writeSet(out);
     //events.write(out);
 
     out.write("\n#section end");
@@ -179,7 +178,6 @@ public:
         sim->beads.freeze();
         sim->solids.freeze();
         sim->spheres.freeze();
-        sim->tubules.freeze();
         sim->organizers.freeze();
         sim->fields.freeze();
         sim->spaces.freeze();
@@ -191,7 +189,6 @@ public:
     {
         //sim->events.defrost();
         sim->organizers.defrost();
-        sim->tubules.defrost();
         sim->couples.defrostStore();
         sim->singles.defrostStore();
         sim->beads.defrostMore();
@@ -217,7 +214,6 @@ public:
         sim->couples.thaw();
         sim->singles.thaw();
         sim->organizers.thaw();
-        sim->tubules.thaw();
         sim->beads.thaw();
         sim->solids.thaw();
         sim->spheres.thaw();

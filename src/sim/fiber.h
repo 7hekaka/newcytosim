@@ -175,9 +175,6 @@ public:
     Fiber const* family_;
     Fiber const* sister_;
     Fiber const* brother_;
-    
-    /// direction tangent to the Tubule surface and orthogonal to the MT symmetry axis, at the specified abscissa
-    Vector orthoRadial(real a) const { a-=abscissaM(); return brother_->posM(a) - sister_->posM(a); }
 
     /// position of a point specified by distance from the minus end
     Vector displayPosM(real a) const;

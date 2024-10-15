@@ -16,7 +16,6 @@ set(SOURCES_SIM
     single.cc single_prop.cc single_set.cc
     couple.cc couple_prop.cc couple_set.cc
     organizer.cc organizer_set.cc
-    tubule_prop.cc tubule.cc tubule_set.cc
     fiber_grid.cc point_grid.cc locus_grid.cc
     space.cc space_prop.cc space_set.cc
     simul.cc simul_prop.cc simul_part.cc
