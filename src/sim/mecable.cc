@@ -18,9 +18,6 @@ Mecable::Mecable()
     nPoints    = 0;
     pBlock     = nullptr;
     pBlockAlc  = 0;
-#if RECYCLED_PRECONDITIONNER
-    pBlockAge  = 0;
-#endif
     pBlockType = 0;
     pPos       = nullptr;
     pForce     = nullptr;

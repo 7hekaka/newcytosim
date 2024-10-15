@@ -12,9 +12,6 @@
 class Meca;
 class Space;
 
-/// include some experimental preconditionner methods
-#define RECYCLED_PRECONDITIONNER 0
-
 
 /**
  Add correction terms to the projection in constrainted dynamics
@@ -84,14 +81,6 @@ private:
     
     /// type of preconditionner
     SIZE_T pBlockType;
-
-#if RECYCLED_PRECONDITIONNER
-    /// Number of time_step current pBlock[] was used for preconditionning
-    SIZE_T pBlockAge;
-    
-    /// Matrix used for preconditionning
-    MatrixFull  pBlockMatrix;
-#endif
     
 public:
 
@@ -302,26 +291,10 @@ public:
     
     /// Returns address of memory available to store pivoting indices
     int * pivot() const { return pPivot; }
-    
-#if RECYCLED_PRECONDITIONNER
-    /// Type of block: 0=identity; 1=full; 2=band; 3=custom
-    void blockType(SIZE_T t) { pBlockType = t; pBlockAge = 0; }
-
-    /// True if preconditionner block is 'in use'
-    SIZE_T blockAge() const { return pBlockAge; }
-    
-    /// Change preconditionning flag
-    void blockAge(SIZE_T b) { pBlockAge = b; }
-
-    /// Returns matrix allocated for preconditionning
-    MatrixFull& blockMatrix() { return pBlockMatrix; }
-    
-    /// Returns matrix allocated for preconditionning
-    void blockMultiply(const real* X, real* Y) const { return pBlockMatrix.vecMul(X, Y); }
-#else
+ 
     /// Type of block: 0=identity; 1=full; 2=band; 3=custom
     void blockType(SIZE_T t) { pBlockType = t; }
-#endif
+
     //--------------------------------------------------------------------------
     
     /// returns the force on point `p` calculated at the previous Meca's solve
