@@ -738,12 +738,6 @@ public:
 
     /// calculate Forces on Mecables and Lagrange multipliers for Fiber, without thermal motion
     void calculateForces();
-    
-    /// set connectivity matrix according to mFUL and mISO
-    void setAdjacencyMatrix(int[], index_t) const;
-
-    /// reorder Mecables according to connectivity, to minimize the matrix bandwidth
-    void reorderMecables();
 
     //----------------------- EXPORT/DEBUG FUNCTIONS ---------------------------
 

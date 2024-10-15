@@ -1481,13 +1481,6 @@ void Interface::execute_dump(std::string const& path, unsigned mode)
     Cytosim::log("Cytosim is dumping a system of size ", dim, " in `", path, "'...");
     int cwd = FilePath::change_dir(path, true);
     
-    if ( mode & 32 )
-    {
-        // this will modify the system:
-        sim_->sMeca.reorderMecables();
-        sim_->setAllInteractions(sim_->sMeca);
-    }
-    
     if ( mode & 1 ) sim_->sMeca.saveSystem();
     if ( mode & 2 ) sim_->sMeca.dumpSystem();
     if ( mode & 4 ) sim_->sMeca.exportSystem();
