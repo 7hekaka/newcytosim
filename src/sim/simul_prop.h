@@ -19,12 +19,6 @@ class Space;
 #define NEW_CYTOPLASMIC_FLOW 0
 
 /**
-Enables code to simulate spindle flux by moving fibers
-Option normally OFF
-*/
-#define OLD_SPINDLE_FLUX 0
-
-/**
  @defgroup Parameters All Object parameters
  List of parameters for user-accessible objects.
  */
@@ -102,10 +96,6 @@ public:
 #if NEW_CYTOPLASMIC_FLOW
     /// uniform and constant fluid flow
     Vector uniform_flow;
-#endif
-#if OLD_SPINDLE_FLUX
-    /// special parameter for Spindle simulation (solve=flux)
-    real flux_speed;
 #endif
     
     /// Energy of Brownian motion in the system = Temperature * Boltzman constant

@@ -1179,7 +1179,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
     }
 #endif
     opt.set(solve, "solve", {{"off",0}, {"on",1}, {"auto",2}, {"force", 3},
-        {"uniaxial",4}, {"flux",5}, {"half",7}, {"separate", 8} });
+        {"uniaxial",4}, {"half",7} });
     opt.set(prune,  "prune");
     opt.set(binary, "binary");
     opt.set(frames, "nb_frames");
@@ -1213,7 +1213,6 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
             case 2: step_simul<&Simul::solve_auto>(); break;
             case 3: step_simul<&Simul::solve_force>(); break;
             case 4: step_simul<&Simul::solve_uniaxial>(); break;
-            case 5: step_simul<&Simul::solve_flux>(); break;
             case 7: step_simul<&Simul::solve_half>(); break;
         }
 

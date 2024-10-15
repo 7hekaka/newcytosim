@@ -21,9 +21,6 @@ void SimulProp::clear()
 #if NEW_CYTOPLASMIC_FLOW
     uniform_flow.reset();
 #endif
-#if OLD_SPINDLE_FLUX
-    flux_speed = 0;
-#endif
     kT = 0.0042;
     tolerance = 0.05;
     random_seed = 0;
@@ -72,9 +69,6 @@ void SimulProp::read(Glossary& glos)
     glos.set(viscosity, "viscosity");
 #if NEW_CYTOPLASMIC_FLOW
     glos.set(uniform_flow, "flow");
-#endif
-#if OLD_SPINDLE_FLUX
-    glos.set(flux_speed, "flux_speed");
 #endif
     if ( glos.set(time, "time") )
         end_time = INFINITY;
@@ -189,9 +183,6 @@ void SimulProp::write_values(std::ostream& os) const
     write_value(os, "viscosity", viscosity);
 #if NEW_CYTOPLASMIC_FLOW
     write_value(os, "flow", uniform_flow);
-#endif
-#if OLD_SPINDLE_FLUX
-    write_value(os, "flux_speed", flux_speed);
 #endif
     std::endl(os);
     write_value(os, "tolerance",       tolerance);
