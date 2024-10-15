@@ -148,10 +148,6 @@ void HandProp::clear()
     binding_rate  = 0;
     binding_range = 0;
     binding_key   = ~0U;  //all bits at 1
-#if NEW_BINDING_LIMITS
-    binding_limits[0]  = -INFINITY;
-    binding_limits[1]  = INFINITY;
-#endif
     unbinding_rate  = 0;
     unbinding_force = INFINITY;
     unbinding_force_inv = 0;
@@ -184,10 +180,6 @@ void HandProp::read(Glossary& glos)
     glos.set(binding_rate,  "binding_rate", 0,"binding", 0);
     glos.set(binding_range, "binding_range", 0, "binding", 1);
     glos.set(binding_key,   "binding_key", 0, "binding", 2);
-    
-#if NEW_BINDING_LIMITS
-    glos.set(binding_limits, 2, "binding_limits");
-#endif
     
     glos.set(unbinding_rate,  "unbinding_rate", 0, "unbinding", 0);
     glos.set(unbinding_force, "unbinding_force", 0, "unbinding", 1);
@@ -340,9 +332,6 @@ void HandProp::write_values(std::ostream& os) const
 {
     write_value(os, "binding",            binding_rate, binding_range);
     write_value(os, "binding_key",        binding_key);
-#if NEW_BINDING_LIMITS
-    write_value(os, "binding_limits",     binding_limits);
-#endif
     write_value(os, "unbinding",          unbinding_rate, unbinding_force);
     
     write_value(os, "bind_also_end",      bind_also_end);

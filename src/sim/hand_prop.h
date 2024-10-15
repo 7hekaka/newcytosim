@@ -9,9 +9,6 @@
 #include "fiber.h" // for FiberLattice
 
 
-/// enables "binding_limits" to restrict binding of Hands to Fibers
-#define NEW_BINDING_LIMITS 0
-
 /// enables "bind_only_free_end" to limit binding of Hands to Fibers
 #define NEW_BIND_ONLY_FREE_END 0
 
@@ -66,11 +63,6 @@ public:
     /// maximum distance at which the Hand can bind (also known as `binding[1]`)
     real binding_range;
     
-    
-#if NEW_BINDING_LIMITS
-    /// specifies a range of abscissa to which this motor can bind
-    real binding_limits[2];
-#endif
     
     /// This bitfield can be set to restrict binding to certain type of Fiber
     /**

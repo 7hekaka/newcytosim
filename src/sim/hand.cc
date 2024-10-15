@@ -144,13 +144,6 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
 {
     assert_true( sit.attached() );
     
-#if NEW_BINDING_LIMITS
-    if ( sit.abscissa() < prop->binding_limits[0] )
-        return false;
-    if ( sit.abscissa() > prop->binding_limits[1] )
-        return false;
-#endif
-    
     // check end-on binding:
     if ( sit.abscissaFromM() < 0 )
     {
