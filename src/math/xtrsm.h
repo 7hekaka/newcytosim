@@ -17,15 +17,6 @@
 #endif
 
 
-/* CLANG offers builtin non temporal load functions */
-#ifdef __clang__
-template < typename T >
-static inline float ntload(T const* x) { return __builtin_nontemporal_load(x); }
-#else
-template < typename T >
-static inline float ntload(T const* x) { return *x; }
-#endif
-
 /**
  This is a C-translation of the BLAS reference implementation of DTRSM
  FJN 03.05.2020
