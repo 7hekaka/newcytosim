@@ -18,7 +18,6 @@ class Space;
 
 
 /// compile switches to enable specialized features:
-#define OLD_DYNAMIC_ZONE     0
 #define NEW_SQUEEZE_FORCE    0
 #define NEW_COLINEAR_FORCE   0
 #define NEW_FIBER_END_CHEW   0

@@ -152,15 +152,6 @@ int DynamicFiber::stepMinusEnd()
 
         real hydrol = prop()->hydrolysis_rate_2dt[M];
 
-#if OLD_DYNAMIC_ZONE
-        // change Hydrolysis rate if plus end is far from origin:
-        if ( posEndM().normSqr() > prop()->zone_radius_sqr )
-            hydrol = prop()->zone_hydrolysis_rate_2dt[M];
-
-        if ( prop()->zone_space_ptr && !prop()->zone_space_ptr->inside(posEndM()) )
-            hydrol = prop()->zone_hydrolysis_rate_2dt[M];
-#endif
-
         // @todo detach_rate should depend on the state of the subunit
         real shrink = prop()->growing_off_rate_dt[M] + chewed;
 
@@ -342,15 +333,6 @@ int DynamicFiber::stepPlusEnd()
 #endif
 
         real hydrol = prop()->hydrolysis_rate_2dt[P];
-        
-#if OLD_DYNAMIC_ZONE
-        // change Hydrolysis rate if plus end is far from origin:
-        if ( posEndP().normSqr() > prop()->zone_radius_sqr )
-            hydrol = prop()->zone_hydrolysis_rate_2dt[P];
-        
-        if ( prop()->zone_space_ptr && !prop()->zone_space_ptr->inside(posEndP()) )
-            hydrol = prop()->zone_hydrolysis_rate_2dt[P];
-#endif
         
         // @todo detach_rate should depend on the state of the subunit
         real shrink = prop()->growing_off_rate_dt[P] + chewed;

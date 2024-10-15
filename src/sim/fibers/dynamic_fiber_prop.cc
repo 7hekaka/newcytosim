@@ -63,12 +63,6 @@ void DynamicFiberProp::clear()
         rebirth_rate[i]      = 0;
         unhydrolyzed_prob[i] = 0;
     }
-#if OLD_DYNAMIC_ZONE
-    zone_radius = INFINITY;
-    zone_space  = "";
-    for ( int i = 0; i < 2; ++i )
-        zone_hydrolysis_rate[i] = 0;
-#endif
 #if NEW_STALL_OUTSIDE
     stall_outside = 1;
     stall_label = "";
@@ -151,11 +145,6 @@ void DynamicFiberProp::read(Glossary& glos)
     glos.set(shrinking_speed,   2, "shrinking_speed");
     glos.set(rebirth_rate,      2, "rebirth_rate");
     glos.set(unhydrolyzed_prob, 2, "unhydrolyzed_prob");
-#if OLD_DYNAMIC_ZONE
-    glos.set(zone_space,              "zone_space");
-    glos.set(zone_radius,             "zone_radius");
-    glos.set(zone_hydrolysis_rate, 2, "zone_hydrolysis_rate");
-#endif
 #if NEW_STALL_OUTSIDE
     glos.set(stall_outside, "stall_outside");
     glos.set(stall_label, "stall_outside", 1);
@@ -211,17 +200,6 @@ void DynamicFiberProp::complete(Simul const& sim)
         if ( hydrolysis_rate[i] < 0 )
             throw InvalidParameter(name()+":hydrolysis_rate should be >= 0");
         hydrolysis_rate_2dt[i] = 2 * time_step(sim) * hydrolysis_rate[i];
-        
-#if OLD_DYNAMIC_ZONE
-        zone_space_ptr = sim.findSpace(zone_space);
-        if ( zone_radius < 0 )
-            throw InvalidParameter(name()+":zone_radius should be >= 0");
-        if ( zone_hydrolysis_rate[i] < 0 )
-            throw InvalidParameter(name()+":zone_hydrolysis_rate should be >= 0");
-        zone_hydrolysis_rate_2dt[i] = 2 * time_step(sim) * zone_hydrolysis_rate[i];
-
-        zone_radius_sqr = square(zone_radius);
-#endif
 
         if ( shrinking_speed[i] > 0 )
             throw InvalidParameter("fiber:shrinking_speed should be <= 0");
@@ -269,11 +247,6 @@ void DynamicFiberProp::write_values(std::ostream& os) const
     write_value(os, "shrinking_speed",      shrinking_speed, 2);
     write_value(os, "rebirth_rate",         rebirth_rate, 2);
     write_value(os, "unhydrolyzed_prob",    unhydrolyzed_prob, 2);
-#if OLD_DYNAMIC_ZONE
-    write_value(os, "zone_space",           zone_space);
-    write_value(os, "zone_radius",          zone_radius);
-    write_value(os, "zone_hydrolysis_rate", zone_hydrolysis_rate, 2);
-#endif
 #if NEW_STALL_OUTSIDE
     write_value(os, "stall_outside", stall_outside, stall_label);
 #endif
