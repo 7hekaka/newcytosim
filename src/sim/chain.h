@@ -11,9 +11,6 @@ class Interpolation;
 class Mecapoint;
 class Glossary;
 
-/// Option to segment Filaments according to their curvature (experimental)
-#define CURVATURE_DEPENDENT_SEGMENTATION 0
-
 /// include a normal used for fancy display of fibers as helices
 #define FIBER_HAS_NORMAL 0
 
@@ -87,18 +84,7 @@ private:
 
     /// abscissa of the minus-end (equal to zero initially)
     real fnAbscissaM;
-    
-#if CURVATURE_DEPENDENT_SEGMENTATION
-    /// error due to the cutting at different steps
-    real autoCutVal;
-    
-    /// number of errors accumulated
-    int  autoCutCnt;
-    
-    /// reset auto variables
-    void resetAutoCounters();
-    void clearAutoCounters();
-#endif
+
 #if FIBER_HAS_NORMAL
     /// vector orthogonal to backbone at the origin, used for display only
     mutable Vector3 fnNormal;
