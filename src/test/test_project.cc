@@ -1067,9 +1067,11 @@ void testProjection(UINT cnt)
     timeProject<projectForces_AVX>(cnt, "prAVX");
 #  endif
 #endif
-    timeProject<onlyDPTTS>(cnt, "*dptts");
+    std::cout << "scale:\n";
     timeProject<onlyScale>(cnt, "*scale");
     timeProject<onlySCALE>(cnt, "*SCALE");
+    std::cout << "misc:\n";
+    timeProject<onlyDPTTS>(cnt, "*dptts");
     timeProject<anisoProject>(cnt, "*aniso");
 }
 

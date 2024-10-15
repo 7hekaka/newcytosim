@@ -84,7 +84,7 @@ namespace VecPrint
         {
             print(SUP/2, vec, digits);
             fprintf(OUT, "...");
-            print(SUP/2, vec+len-8, digits);
+            print(SUP/2, vec+len-SUP/2, digits);
         }
     }
     

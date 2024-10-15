@@ -671,7 +671,7 @@ void projectForcesU3D_SSE1(size_t nbs, const double* dir, const double* src, dou
          */
         vec2 s0 = mul2(loadu2(dir), sub2(loadu2(src+3), loadu2(src)));
         vec2 s1 = mul1(load1(dir+2), sub1(load1(src+5), load1(src+2)));
-        store1(mul, add1(s0, add1(s1, unpackhi2(s0, s0))));
+        store1(mul, add1(unpackhi2(s0, s0), add1(s0, s1)));
         src += 3;
         dir += 3;
         ++mul;
@@ -972,11 +972,14 @@ void projectForcesU3D_SSE(size_t nbs, const double* dir, const double* src, doub
          + dir[1] * ( src[DIM+1] - src[1] )
          + dir[2] * ( src[DIM+2] - src[2] );
          */
-        vec2 s0 = mul2(load2(dir  ), sub2(loadu2(src+3), loadu2(src)));
+        vec2 s0 = mul2(loadu2(dir ), sub2(loadu2(src+3), loadu2(src)));
         vec2 s1 = mul1(load1(dir+2), sub1(load1(src+5), load1(src+2)));
         vec2 ss = unpackhi2(s0, setzero2());
         
-        store1(mul, add1(s0, add1(s1, ss)));
+        store1(mul, add1(ss, add1(s0, s1)));
+        //src += 3;
+        //dir += 3;
+        //mul += 1;
    }
 }
 
