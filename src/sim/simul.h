@@ -232,9 +232,6 @@ public:
     
     /// like 'solve' but automatically selects the fastest preconditionning method
     void solve_auto();
-    
-    /// simulate the mechanics of the system and move Mecables accordingly
-    void solve_separate();
 
     /// do nothing
     void solve_not() {};

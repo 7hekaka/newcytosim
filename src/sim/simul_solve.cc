@@ -337,50 +337,6 @@ void Simul::computeForces() const
 }
 
 
-#if NEW_SOLVE_SEPARATE
-/**
- This is attempting to separate the system into subclusters
- that can be solved independently -- should lead to parallelization
- */
-void Simul::solve_separate()
-{
-    size_t cnt = fibers.size();
-#if 0
-    ObjectFlag sup = setUniqueFlags();
-    flagClustersCouples();
-#else
-    Object ** table = new Object*[cnt+2]{nullptr};
-    ObjectFlag sup = orderClustersCouple(table, cnt);
-    std::clog << "Ordered " << sup << " clusters:\n";
-    delete[] table;
-#endif
-    
-    sMeca.importParameters(prop);
-    sMeca.selectStericEngine(*this, prop);
-    //std::clog << "Separating " << cnt << " fibers\n";
-    for ( ObjectFlag f = 0; f <= sup; ++f )
-    {
-        // replacing Meca::getReady():
-        sMeca.mecables.clear();
-        for ( Fiber * F=fibers.first(); F; F=F->next() )
-            if ( F->flag() == f )
-                sMeca.addMecable(F);
-        size_t num = sMeca.mecables.size();
-        if ( num > 0 )
-        {
-            std::clog << "  cluster " << f << " has " << num << " fibers\n";
-            cnt -= num;
-            sMeca.tolerance_ = prop.tolerance;
-            sMeca.readyMecables();
-            sMeca.setSomeInteractions();
-            sMeca.solve();
-            sMeca.apply();
-        }
-    }
-    assert_true(cnt == 0);
-}
-#endif
-
 //==============================================================================
 //                              UNIAXIAL SOLVE
 //==============================================================================
