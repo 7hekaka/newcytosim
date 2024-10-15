@@ -21,11 +21,6 @@ class Duo : public Couple
 {
     friend class DuoLong;
     
-#if NEW_DUO_HAS_TORQUE && ( DIM == 2 )
-    /// sine of angle, with [up, down] sign in space for 2D
-    mutable real sine;
-#endif
-
     /// Gillespie countdown timer for deactivation event
     float nextDeact;
     
@@ -81,10 +76,6 @@ public:
     /// read from file
     void read(Inputter&, Simul&, ObjectTag);
     
-#if NEW_DUO_HAS_TORQUE
-    /// add interactions to a Meca
-    void setInteractions(Meca&) const;
-#endif
 };
 
 

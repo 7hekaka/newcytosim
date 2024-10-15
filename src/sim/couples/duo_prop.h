@@ -7,9 +7,6 @@
 #include "couple_prop.h"
 class Space;
 
-// if enabled, a Duo can exert torque
-#define NEW_DUO_HAS_TORQUE 1
-
 /// Additional Property for Duo and DuoLong
 /**
  @ingroup Properties
@@ -40,17 +37,6 @@ public:
     /// if true, the deactivation clock runs at all time
     bool vulnerable;
     
-#if NEW_DUO_HAS_TORQUE
-    /// Resting angle in radian (set as `torque[0]`)
-    real rest_angle;
-    
-    /// Stiffness of the angular link, in Torque per radians (pN.um/radian) (set as `torque[1]`)
-    real angular_stiffness;
-    
-    /// Allow the angle to flip in 2D
-    bool flip;
-#endif
-    
     /// @}
 
     /// last message from splash()
@@ -61,11 +47,6 @@ public:
     
     // Space inside which the Duo is activated
     Space const* activation_space;
-    
-#if NEW_DUO_HAS_TORQUE
-    /// derived variable: [cos(angle), sin(angle)]
-    Vector2 rest_dir;
-#endif
 
 public:
     

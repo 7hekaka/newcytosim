@@ -141,25 +141,5 @@ void DuoLong::setInteractions(Meca& meca) const
     meca.addSideLink3D(pt1, pt2, mArm, prop()->stiffness);
     
 #endif
-    
-#if NEW_DUO_HAS_TORQUE
-#if ( DIM == 2 )
-    if ( prop()->flip )
-    {
-        Vector2 dir = prop()->rest_dir;
-        // flip the angle to match the current configuration of the bond
-        sine = std::copysign(dir.YY, cross(pt1.diff(), pt2.diff()));
-        dir.YY = sine;
-        meca.addTorque(pt1, pt2, dir, prop()->angular_stiffness);
-    }
-    else
-    {
-        meca.addTorque(pt1, pt2, prop()->rest_dir, prop()->angular_stiffness);
-    }
-    //meca.addTorquePoliti(pt1, pt2, dir, prop()->angular_stiffness);
-#elif ( DIM == 3 )
-    meca.addTorque(pt1, pt2, prop()->rest_dir, prop()->angular_stiffness);
-#endif
-#endif
 }
 
