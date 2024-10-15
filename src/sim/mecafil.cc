@@ -17,9 +17,6 @@ Mecafil::Mecafil()
     iDir = nullptr;
     iLag = nullptr;
     iLLG = nullptr;
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    iAni = nullptr;
-#endif
 }
 
 void Mecafil::release()
@@ -28,9 +25,6 @@ void Mecafil::release()
     iDir = nullptr;
     iLag = nullptr;
     iLLG = nullptr;
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    iAni = nullptr;
-#endif
 }
 
 Mecafil::~Mecafil()
@@ -56,7 +50,7 @@ Mecafil& Mecafil::operator = (Mecafil const&)
 void Mecafil::allocateMecable(const index_t nbp)
 {
     index_t add = ADD_PROJECTION_DIFF ? 3 : 2;
-    index_t top = NEW_ANISOTROPIC_FIBER_DRAG ? 3*DIM+1 : DIM+2;
+    index_t top = DIM+2;
     real * ptr = Mecable::allocateMemory(nbp, add+top);
     /*
      if Mecable::allocateMecable() allocated memory, it will return a
@@ -68,18 +62,10 @@ void Mecafil::allocateMecable(const index_t nbp)
         //std::clog << "Mecafil::allocateMecable " << ms << '\n';
         allocateProjection(all, ptr);
         
-#if NEW_ANISOTROPIC_FIBER_DRAG
-        // allocations: iDir=DIM*N  iLag=N  iLLG=DIM*N  iAni=DIM*N
-        iDir = ptr + all*add;
-        iLag = iDir + all*DIM;
-        iLLG = iLag + all;
-        iAni = iLLG + all*DIM;
-#else
         // allocations: iDir=DIM*N  iLag=N  iLLG=N
         iDir = ptr + all*add;
         iLag = iDir + all*DIM;
         iLLG = iLag + all;
-#endif
         
         // reset Lagrange multipliers
         zero_real(all, iLag);
@@ -135,25 +121,6 @@ void Mecafil::storeDirections()
         normalize(diffPoints(p)).store(iDir+DIM*p);
 #endif
     //VecPrint::print("iDir", end, iDir);
-
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    /*
-     Calculate the average filament direction at each vertex
-     */
-    const real* dir = iDir;
-    // for the extremities, copy direction of the nearby segment:
-    for ( size_t d = 0; d < DIM; ++d )
-    {
-        iAni[d]     = dir[d];
-        iAni[d+end] = dir[d+end-DIM];
-    }
-    
-    // for inner vertices, average directions of the flanking segments:
-    for ( size_t p = DIM ; p < end; ++p )
-        iAni[p] = 0.5 * ( dir[p-DIM] + dir[p] );
-
-    //VecPrint::print("iAni", end+DIM, iAni);
-#endif
 }
 
 //------------------------------------------------------------------------------
@@ -182,9 +149,6 @@ void Mecafil::projectForces(const real* X, real* Y) const
         sum += X[ii];
     
     sum = sum / (real)nPoints;
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    sum *= 2;
-#endif
     for ( size_t ii = 0; ii < nPoints; ++ii )
         Y[ii] = sum;
 }

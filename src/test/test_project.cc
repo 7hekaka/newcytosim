@@ -671,51 +671,6 @@ void projectForcesD3D_sse(index_t nbs, const double* dir,
 #endif
 
 //------------------------------------------------------------------------------
-#pragma mark - Fiber::scaleTangentially()
-
-void scaleTANGENTIALLY(index_t nbp, const real* src, const real* dir, real* dst)
-{
-    for ( index_t i = 0; i < nbp; ++i )
-    {
-        real const* xxx = src + DIM * i;
-        real const* ddd = dir + DIM * i;
-        real      * yyy = dst + DIM * i;
-        // compute scalar product and add, assuming ||dir|| == 1
-#if ( DIM == 2 )
-        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1];
-        yyy[0] = xxx[0] + s * ddd[0];
-        yyy[1] = xxx[1] + s * ddd[1];
-#elif ( DIM >= 3 )
-        real s = xxx[0] * ddd[0] + xxx[1] * ddd[1] + xxx[2] * ddd[2];
-        yyy[0] = xxx[0] + s * ddd[0];
-        yyy[1] = xxx[1] + s * ddd[1];
-        yyy[2] = xxx[2] + s * ddd[2];
-#endif
-    }
-}
-
-void scaleTangentially(index_t nbp, const real* src, const real* dir, real* dst)
-{
-    const real* const end = src + DIM * nbp;
-    while ( src < end )
-    {
-#if ( DIM == 2 )
-        real s = src[0] * dir[0] + src[1] * dir[1];
-        dst[0] = src[0] + s * dir[0];
-        dst[1] = src[1] + s * dir[1];
-#elif ( DIM >= 3 )
-        real s = src[0] * dir[0] + src[1] * dir[1] + src[2] * dir[2];
-        dst[0] = src[0] + s * dir[0];
-        dst[1] = src[1] + s * dir[1];
-        dst[2] = src[2] + s * dir[2];
-#endif
-        src += DIM;
-        dir += DIM;
-        dst += DIM;
-    }
-}
-
-
 void addProjectionDiff_(const index_t nbs, const real* mul, const real* X, real* Y)
 {
     for ( index_t i = 0; i < nbs; ++i )
@@ -842,29 +797,6 @@ void checkProject(index_t nbs, const char msg[])
 void onlyDPTTS(index_t nbs, const real* X, real* Y)
 {
     alsatian_xptts2(nbs, 1, diag_, upper_, Y, NSEG);
-}
-
-void onlyScale(index_t nbs, const real* X, real* Y)
-{
-    scaleTangentially(nbs+1, X, ani_, Y);
-    scaleTangentially(nbs+1, Y, ani_, Y);
-}
-
-void onlySCALE(index_t nbs, const real* X, real* Y)
-{
-    scaleTANGENTIALLY(nbs+1, X, ani_, Y);
-    scaleTANGENTIALLY(nbs+1, Y, ani_, Y);
-}
-
-void anisoProject(index_t nbs, const real* X, real* Y)
-{
-    scaleTangentially(nbs+1, X, ani_, tmp_);
-    projectForcesU_(nbs, dir_, tmp_, lag_);
-    
-    DPTTS2(nbs, lag_);
-
-    projectForcesD_(nbs, dir_, X, lag_, Y);
-    scaleTangentially(nbs+1, Y, ani_, Y);
 }
 
 void projectDiff_(index_t nbs, const real* X, real* Y)
@@ -1064,12 +996,8 @@ void testProjection(index_t cnt)
     timeProject<projectForces_AVX>(cnt, "prAVX");
 #  endif
 #endif
-    std::cout << "scale:\n";
-    timeProject<onlyScale>(cnt, "*scale");
-    timeProject<onlySCALE>(cnt, "*SCALE");
     std::cout << "misc:\n";
     timeProject<onlyDPTTS>(cnt, "*dptts");
-    timeProject<anisoProject>(cnt, "*aniso");
 }
 
 void testProjectionDiff(index_t cnt)

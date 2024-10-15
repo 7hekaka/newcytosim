@@ -762,11 +762,7 @@ void Fiber::join(Fiber * fib)
 #pragma mark - Mobility
 
 
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    constexpr real DRAG = 4;
-#else
     constexpr real DRAG = 3;
-#endif
 
 
 /**
@@ -972,15 +968,7 @@ void Fiber::prepareMecable()
 {
     setDragCoefficient();
     storeDirections();
-#if NEW_UNCONSTRAINED_LENGTH
-    constrainLength(prop->constrain_length);
-    if ( !unconstrainLength )
-#endif
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    makeProjectionAnisotropic();
-#else
     makeProjection();
-#endif
     //printProjection(stderr);
 
     assert_true( iPointMobility >= 0 );

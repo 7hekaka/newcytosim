@@ -18,7 +18,7 @@
 #if ( 1 )
 #  define DPTTRF alsatian_xpttrf
 #  define DPTTS2 alsatian_xptts2
-#  define USE_FUSED_PROJECT_FORCES ( REAL_IS_DOUBLE && USE_SIMD && !NEW_ANISOTROPIC_FIBER_DRAG )
+#  define USE_FUSED_PROJECT_FORCES ( REAL_IS_DOUBLE && USE_SIMD )
 #elif ( 0 )
 #  define DPTTRF lapack_xpttrf
 #  define DPTTS2 lapack_xptts2
@@ -150,51 +150,6 @@ void Mecafil::makeProjection()
 }
 
 
-#if NEW_ANISOTROPIC_FIBER_DRAG
-/** This version assumes that drag coefficients are doubled in the directions
- orthogonal to the fiber axis. It must be used with anisotropic fiber drag. */
-void Mecafil::makeProjectionAnisotropic()
-{
-    assert_true( nbPoints() >= 2 );
-
-    //set the diagonal and off-diagonal of J*J'
-    const index_t nbu = nbPoints() - 2;
-    real b = 1;
-
-    for ( size_t jj = 0; jj < nbu; ++jj )
-    {
-        const real* X = iDir + DIM * jj;
-#if ( DIM == 2 )
-        real xn = X[0]*X[2] + X[1]*X[3];
-#else
-        real xn = X[0]*X[3] + X[1]*X[4] + X[2]*X[5];
-#endif
-        real a = 0.25 * ( 1 + xn ) * ( 1 + xn );
-        iJJt[jj]  = 2.0 + a + b;
-        iJJtU[jj] = -xn - a;
-        b = a;
-    }
-    
-    iJJt[nbu] = 3.0 + b;
-    
-    int info = 0;
-    DPTTRF(nbu+1, iJJt, iJJtU, &info);
-
-    if ( 0 )
-    {
-        VecPrint::print("aD", nbu+1, iJJt, 2);
-        VecPrint::print("_U", nbu, iJJtU, 2);
-        //VecPrint::print("X", DIM*(nbu+2), pPos, 2);
-    }
-
-    if ( info )
-    {
-        std::clog << "Mecafil::makeProjectionAnisotropic failed (" << info << ")\n";
-        throw Exception("could not build Fiber's projection matrix");
-    }
-}
-#endif
-
 //------------------------------------------------------------------------------
 #pragma mark - Reference (scalar) code
 
@@ -265,38 +220,6 @@ void projectForcesD_(const size_t nbs, const real* dir, const real* src, const r
 }
 
 
-/**
- This will update each vector of `dst`:
-
-     dst <- src + (TT') src
-
- Where T is a local direction given by `dir` at every vertex.
- This is used to double the tangential component of force `X`,
- without changing the orthogonal components.
- 
- Note that this must work properly even if `dst` == `src`
- */
-void scaleTangentially(size_t nbp, const real* src, const real* dir, real* dst)
-{
-    const real* const end = src + DIM * nbp;
-    while ( src < end )
-    {
-#if ( DIM == 2 )
-        real s = src[0] * dir[0] + src[1] * dir[1];
-        dst[0] = src[0] + s * dir[0];
-        dst[1] = src[1] + s * dir[1];
-#elif ( DIM >= 3 )
-        real s = src[0] * dir[0] + src[1] * dir[1] + src[2] * dir[2];
-        dst[0] = src[0] + s * dir[0];
-        dst[1] = src[1] + s * dir[1];
-        dst[2] = src[2] + s * dir[2];
-#endif
-        src += DIM;
-        dir += DIM;
-        dst += DIM;
-    }
-}
-
 //------------------------------------------------------------------------------
 
 /*
@@ -327,12 +250,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
 #endif
     
     // calculate `iLLG` without modifying `X`
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, X, iAni, Y);
-    projectForcesU(nbs, iDir, Y, iLLG);
-#else
     projectForcesU(nbs, iDir, X, iLLG);
-#endif
     
     // Calculate Lagrange multipliers: iLLG <- inv( J * Jt ) * iLLG
     DPTTS2(nbs, 1, iJJt, iJJtU, iLLG, nbs);
@@ -340,9 +258,6 @@ void Mecafil::projectForces(const real* X, real* Y) const
     // set Y, using values in X and multipliers in iLLG
     projectForcesD(nbs, iDir, X, iLLG, Y);
 
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    scaleTangentially(nPoints, Y, iAni, Y);
-#endif
     //VecPrint::print("Y", DIM*nbPoints(), Y);
 }
 
@@ -354,13 +269,7 @@ void Mecafil::computeTensions(const real* force)
 {
     const index_t nbs = nbSegments();
     
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    // iLLG is used as a temporary space to store nPoints * DIM scalars:
-    scaleTangentially(nPoints, force, iAni, iLLG);
-    projectForcesU(nbs, iDir, iLLG, iLag);
-#else
     projectForcesU(nbs, iDir, force, iLag);
-#endif
     
     // determine the multipliers: iLag <- inv( J * Jt ) * iLag
     DPTTS2(nbs, 1, iJJt, iJJtU, iLag, nbs);

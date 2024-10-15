@@ -6,15 +6,6 @@
 #include "cymdef.h"  // needed for NEW_FIBER_LOOP
 
 /**
- If the keyword below is defined, the viscous drag of the fibers
- will be different in the transverse and parallel directions, such that
- it will be 2x easier to move a fiber along it longitudinal direction.
- 
- This is unpublished development, and you should set to zero
- */
-#define NEW_ANISOTROPIC_FIBER_DRAG 0
-
-/**
  Enable this option to build the projection matrix explicitly.
  Alternatively, the projection is calculated directly using vectors only.
  Having two methods is useful for cross-validation, but the matrix version is SLOWER
@@ -49,11 +40,6 @@ private:
     
     /// work array allocated to hold `DIM*nbPoints` scalar values
     real * iLLG;
-    
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    /// local filament direction vectors used to calculate anisotropic drag
-    real * iAni;
-#endif
 
 #if OLD_PROJECT_WITH_MATRIX
     
@@ -169,10 +155,6 @@ public:
     /// prepare for projection by building projection matrix
     void makeProjection();
     
-#if NEW_ANISOTROPIC_FIBER_DRAG
-    /// build projection matrix corresponding to current configuration
-    void makeProjectionAnisotropic();
-#endif
 #if ADD_PROJECTION_DIFF
     /// select corrections to the projection, from the Lagrange multipliers
     void setProjectionDiff(real threshold);
