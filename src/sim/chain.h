@@ -98,11 +98,6 @@ protected:
     /// length increment at plus end during last time-step
     real cDeltaP;
 
-#if NEW_UNCONSTRAINED_LENGTH
-    /// true if projection operator is identity
-    bool unconstrainLength;
-#endif
-
     /// flag to update
     bool needUpdate;
 
@@ -171,18 +166,9 @@ public:
 
     /// change the current segmentation to force `length()==len` (normally not needed)
     void imposeLength(real len) { setSegmentation(len/real(nbSegments())); fnAbscissaP = fnAbscissaM + len; }
-   
-#if NEW_UNCONSTRAINED_LENGTH
-    void constrainLength(bool s) { unconstrainLength = !s; }
-
-    /// Number of distance constraints applied to the movements of vertices
-    index_t nbConstraints() const { return unconstrainLength ? 0 : nPoints - 1; }
-#else
-    void constrainLength(bool s) { if (!s) ABORT_NOW("NEW_UNCONSTRAINED_LENGTH is off"); }
     
     /// Number of distance constraints applied to the movements of vertices
     index_t nbConstraints() const { return nPoints - 1; }
-#endif
     
     /// change Lagrange multipliers (do not use: this is done by computeTensions)
     virtual void setTensions(const real*) {}

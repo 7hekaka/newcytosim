@@ -339,11 +339,6 @@ public:
     bool loop;
 #endif
     
-#if NEW_UNCONSTRAINED_LENGTH
-    /// if `true` do not enforce segment length constraints
-    bool constrain_length;
-#endif
-    
     /// @}
 
     /// derived variable: flag to indicate that `display` has a new value

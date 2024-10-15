@@ -633,10 +633,6 @@ void Chain::reshape_global(const index_t ns, const real* src, real* dst, const r
  */
 void Chain::getPoints(real const* ptr)
 {
-#if NEW_UNCONSTRAINED_LENGTH
-    if ( unconstrainLength )
-        return copy_real(DIM*nPoints, ptr, pPos);
-#endif
     constexpr index_t NVEC = 8U;
 #if 0
     // using static memory

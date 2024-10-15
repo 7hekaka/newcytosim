@@ -213,15 +213,6 @@ void projectForcesD_(const size_t nbs, const real* dir, const real* src, const r
  */
 void Mecafil::projectForces(const real* X, real* Y) const
 {
-#if NEW_UNCONSTRAINED_LENGTH
-    if ( unconstrainLength )
-    {
-        if ( X != Y )
-            copy_real(DIM*nPoints, X, Y);
-        return;
-    }
-#endif
-    
     const index_t nbs = nbSegments();
     //VecPrint::print("X", DIM*nbPoints(), X);
     
@@ -439,10 +430,7 @@ void Mecafil::makeProjectionDiff(const real* force)
         VecPrint::print("iLLG ", nbSegments(), iLLG);
     }
 
-#if NEW_UNCONSTRAINED_LENGTH
-    if ( !unconstrainLength )
-#endif
-        setProjectionDiff(0);
+    setProjectionDiff(0);
 }
 
 #elif ADD_PROJECTION_DIFF
@@ -450,9 +438,6 @@ void Mecafil::makeProjectionDiff(const real* force)
 /** This is the normal pathway without verifications */
 void Mecafil::makeProjectionDiff(const real*)
 {
-#if NEW_UNCONSTRAINED_LENGTH
-    if ( !unconstrainLength )
-#endif
     setProjectionDiff(0);
 }
 
