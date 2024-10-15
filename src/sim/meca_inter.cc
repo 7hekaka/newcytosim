@@ -5047,33 +5047,3 @@ void Meca::addTriLink(Interpolation const& pt1, const real w1,
 }
 
 
-/**
- Do not use this function!
- 
- If `weigth > 0`, this creates an attractive force that decreases like 1/R^3
- */
-void Meca::addCoulomb(Mecapoint const& ptA, Mecapoint const& ptB, real weight)
-{
-    Vector ab = position_diff(ptA, ptB);
-    real abnSqr = ab.normSqr(), abn=std::sqrt(abnSqr);
-    
-    const index_t ii0 = ptA.matIndex0();
-    const index_t ii1 = ptB.matIndex0();
-    
-    if ( abn < REAL_EPSILON ) return;
-    ab /= abn;
-    
-    real abn3 = weight / abnSqr;
-    real abn5 = weight / ( abnSqr * abn );
-    
-    sub_base(ii0, ab, 3*abn3);
-    add_base(ii1, ab, 3*abn3);
-    
-    // abn5 * I + [ ab (x) ab ] * (-3))
-    MatrixBlock B = MatrixBlock::offsetOuterProduct(abn5, ab, -3);
-
-    sub_block_diag(ii0, B);
-    sub_block_diag(ii1, B);
-    add_block(ii0, ii1, B);
-}
-

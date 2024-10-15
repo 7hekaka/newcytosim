@@ -705,9 +705,6 @@ public:
     /// Create a 3-way link with given weights on each branch
     void addTriLink(Interpolation const& pt1, real w1, Interpolation const& pt2, real w2, Interpolation const& pt3, real w3);
 
-    /// Linearized Coulomb repulsive force (experimental)
-    void addCoulomb(Mecapoint const&, Mecapoint const&, real weight);
-
     //-------------------------- COMPUTING METHODS -----------------------------
 
     /// select which engine will be used, and ready it

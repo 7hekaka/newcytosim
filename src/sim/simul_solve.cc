@@ -502,13 +502,6 @@ void Simul::addExperimentalInteractions(Meca& meca) const
 {
     // ALL THE FORCES BELOW ARE FOR DEVELOPMENT/TESTING PURPOSES:
 #if ( 0 )
-    LOG_ONCE("AD-HOC FUNKY REPULSIVE FORCE ENABLED\n");
-    // add pairwise repulsive force:
-    for ( Bead const* i=beads.first(); i ; i=i->next() )
-        for ( Bead * j=i->next()    ; j ; j=j->next() )
-            meca.addCoulomb(Mecapoint(i,0), Mecapoint(j,0), 0.1);
-#endif
-#if ( 0 )
     LOG_ONCE("AD-HOC BEAD-STRING FORCES ENABLED\n");
     // attach beads together into an open/closed string:
     const real stiff = 1000;
