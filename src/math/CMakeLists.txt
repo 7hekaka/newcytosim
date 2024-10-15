@@ -23,7 +23,6 @@ set(SOURCES_MATH
     tesselator.cc
     random_vector.cc
     project_ellipse.cc
-    quartic_solver.cc
     SFMT.c
 )
 

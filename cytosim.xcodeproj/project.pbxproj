@@ -140,7 +140,6 @@
 		BB19FEF712F352A400ACEA12 /* inventoried.h in Headers */ = {isa = PBXBuildFile; fileRef = BB19FEF312F352A400ACEA12 /* inventoried.h */; };
 		BB19FEF812F352A400ACEA12 /* inventory.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB19FEF412F352A400ACEA12 /* inventory.cc */; };
 		BB19FEF912F352A400ACEA12 /* inventory.h in Headers */ = {isa = PBXBuildFile; fileRef = BB19FEF512F352A400ACEA12 /* inventory.h */; };
-		BB1D4B5A16B86B320087CC48 /* quartic_solver.h in Headers */ = {isa = PBXBuildFile; fileRef = BB1D4B5916B86B320087CC48 /* quartic_solver.h */; };
 		BB1F0BBF0653D5F4003F4957 /* exceptions.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587505B98DA3006956D5 /* exceptions.h */; };
 		BB1F0BC20653D5F5003F4957 /* messages.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587A05B98DA3006956D5 /* messages.h */; };
 		BB1F0BC80653D5F6003F4957 /* iowrapper.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587D05B98DA3006956D5 /* iowrapper.h */; };
@@ -646,7 +645,6 @@
 		BB71926B0EF1D10600CED9E2 /* libcytomath.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7191C50EF1CD9900CED9E2 /* libcytomath.a */; };
 		BB738A6420C51E620039C670 /* SFMT.c in Sources */ = {isa = PBXBuildFile; fileRef = BBE447D12064697D0058ADAC /* SFMT.c */; };
 		BB746D51283783AE001688B5 /* (null) in Headers */ = {isa = PBXBuildFile; };
-		BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB749D6017935DAC00B43298 /* quartic_solver.cc */; };
 		BB749D661793645D00B43298 /* polygon.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB749D641793645C00B43298 /* polygon.cc */; };
 		BB749D671793645D00B43298 /* polygon.h in Headers */ = {isa = PBXBuildFile; fileRef = BB749D651793645D00B43298 /* polygon.h */; };
 		BB74F41A231C334D0019D68E /* sparmatblk.h in Headers */ = {isa = PBXBuildFile; fileRef = BB74F418231C334D0019D68E /* sparmatblk.h */; };
@@ -1749,7 +1747,6 @@
 		BB19FEF312F352A400ACEA12 /* inventoried.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inventoried.h; sourceTree = "<group>"; };
 		BB19FEF412F352A400ACEA12 /* inventory.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = inventory.cc; sourceTree = "<group>"; };
 		BB19FEF512F352A400ACEA12 /* inventory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inventory.h; sourceTree = "<group>"; };
-		BB1D4B5916B86B320087CC48 /* quartic_solver.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = quartic_solver.h; path = src/math/quartic_solver.h; sourceTree = SOURCE_ROOT; };
 		BB1DCBF21421FE850061547C /* line_disp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = line_disp.cc; sourceTree = "<group>"; };
 		BB1DCBF31421FE850061547C /* line_disp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = line_disp.h; sourceTree = "<group>"; };
 		BB1F9C2B0FD5A9790047327F /* glossary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = glossary.h; path = src/base/glossary.h; sourceTree = SOURCE_ROOT; };
@@ -1973,8 +1970,6 @@
 		BB73591105B98DA3006956D5 /* test_rasterizer.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_rasterizer.cc; path = src/test/test_rasterizer.cc; sourceTree = SOURCE_ROOT; };
 		BB73591405B98DA3006956D5 /* test_solve.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_solve.cc; path = src/test/test_solve.cc; sourceTree = SOURCE_ROOT; };
 		BB73591705B98DA3006956D5 /* test_sphere.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_sphere.cc; path = src/test/test_sphere.cc; sourceTree = SOURCE_ROOT; };
-		BB749D6017935DAC00B43298 /* quartic_solver.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = quartic_solver.cc; path = src/math/quartic_solver.cc; sourceTree = SOURCE_ROOT; };
-		BB749D621793620500B43298 /* test_quartic.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = test_quartic.cc; sourceTree = "<group>"; };
 		BB749D641793645C00B43298 /* polygon.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = polygon.cc; path = src/math/polygon.cc; sourceTree = SOURCE_ROOT; };
 		BB749D651793645D00B43298 /* polygon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = polygon.h; path = src/math/polygon.h; sourceTree = SOURCE_ROOT; };
 		BB74F418231C334D0019D68E /* sparmatblk.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sparmatblk.h; sourceTree = "<group>"; };
@@ -3065,8 +3060,6 @@
 			isa = PBXGroup;
 			children = (
 				BB0CB11A20C170C10016D73D /* qmr.h */,
-				BB1D4B5916B86B320087CC48 /* quartic_solver.h */,
-				BB749D6017935DAC00B43298 /* quartic_solver.cc */,
 				BB21854D0B40836900B75436 /* linear_solvers.h */,
 				BB2185620B4084CC00B75436 /* linear_solvers.cc */,
 				BB8CB8551523147900505E89 /* bicgstab.h */,
@@ -3372,7 +3365,6 @@
 				BBD3030225798FC600C6D61A /* test_orthonormal.cc */,
 				BBC91299204EC2DC00219DC5 /* test_pipe.cc */,
 				BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */,
-				BB749D621793620500B43298 /* test_quartic.cc */,
 				BB73590F05B98DA3006956D5 /* test_quaternion.cc */,
 				BB73591005B98DA3006956D5 /* test_random.cc */,
 				BB73591105B98DA3006956D5 /* test_rasterizer.cc */,
@@ -4395,7 +4387,6 @@
 				BBD69A122D0AF16C00982B65 /* random_seed.h in Headers */,
 				BB9EC397209235CC00EF00E7 /* SFMT-avx2.h in Headers */,
 				BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */,
-				BB1D4B5A16B86B320087CC48 /* quartic_solver.h in Headers */,
 				BB749D671793645D00B43298 /* polygon.h in Headers */,
 				BB7B89AA27C965C50094532C /* matrix33sym.h in Headers */,
 				BB560C301813DC8800CB1BF5 /* vecprint.h in Headers */,
@@ -5735,7 +5726,6 @@
 				BB151D65270C85F2003ECD4E /* space_dynamic_disc.cc in Sources */,
 				BB0E4BD91002698100A96B34 /* random_vector.cc in Sources */,
 				BB19DA9F231BF792001488A5 /* matrix34.cc in Sources */,
-				BB749D6117935DAC00B43298 /* quartic_solver.cc in Sources */,
 				BB749D661793645D00B43298 /* polygon.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

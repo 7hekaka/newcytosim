@@ -86,10 +86,6 @@ test_glossary: test_glossary.cc glossary.o filepath.o tokenizer.o stream_func.o 
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_quartic: test_quartic.cc quartic_solver.o $(TEST_OBJ) | bin
-	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
-	$(DONE)
-
 test_quaternion: test_quaternion.cc matrix33.o $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
