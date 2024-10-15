@@ -5,9 +5,6 @@
 
 #include "hand_prop.h"
 
-/// enable mesh-dependent speed of motors (requires FIBER_HAS_DENSITY=1)
-#define NEW_VARIABLE_SPEED 0
-
 /// Additional Property for Motor
 /**
  @ingroup Properties
@@ -45,11 +42,6 @@ public:
      */
     real unloaded_speed;
     
-#if NEW_VARIABLE_SPEED
-    /// portion of the speed that depends on position
-    real variable_speed;
-#endif
-    
     /// if true, the speed is limited to the range [0, 2*unloaded_speed]
     /** 
      With ( limit_speed = 1 ), a plus-end directed motor will never move towards
@@ -60,11 +52,6 @@ public:
     bool limit_speed;
 
     /// @}
-
-#if NEW_VARIABLE_SPEED
-    /// portion of the speed that depends on position
-    real variable_speed_dt;
-#endif
 
 private:
     

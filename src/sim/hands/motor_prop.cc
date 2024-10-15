@@ -22,10 +22,6 @@ void MotorProp::clear()
     stall_force       = 0;
     unloaded_speed    = 0;
     limit_speed       = true;
-#if NEW_VARIABLE_SPEED
-    variable_speed    = 0;
-    variable_speed_dt = 0;
-#endif
     var_speed_dt = 0;
     set_speed_dt = 0;
 }
@@ -41,9 +37,6 @@ void MotorProp::read(Glossary& glos)
     if ( glos.set(unloaded_speed, "max_speed") )
         Cytosim::warn("'max_speed' is deprecated: use 'unloaded_speed'\n");
 #endif
-#if NEW_VARIABLE_SPEED
-    glos.set(variable_speed, "variable_speed");
-#endif
     glos.set(limit_speed,    "limit_speed");
 }
 
@@ -56,10 +49,6 @@ void MotorProp::complete(Simul const& sim)
         throw InvalidParameter("motor:stall_force must be > 0");
     
     const real tau = time_step(sim);
-
-#if NEW_VARIABLE_SPEED
-    variable_speed_dt = variable_speed * tau;
-#endif
 
     set_speed_dt = tau * unloaded_speed;
     var_speed_dt = abs_real(set_speed_dt) / stall_force;
@@ -131,9 +120,6 @@ void MotorProp::write_values(std::ostream& os) const
     HandProp::write_values(os);
     write_value(os, "stall_force",       stall_force);
     write_value(os, "unloaded_speed",    unloaded_speed);
-#if NEW_VARIABLE_SPEED
-    write_value(os, "variable_speed",    variable_speed);
-#endif
     write_value(os, "limit_speed",       limit_speed);
 }
 
