@@ -281,14 +281,6 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
             fib->densityField().clear(val);
     }
 #endif
-#if NEW_FIBER_SILHOUETTE
-    if ( opt.set(fib->chiasma_, "chiasma") )
-    {
-        fib->chiasma_ /= fib->length();
-        if ( fib->chiasma_ < 0 || fib->chiasma_ > 1 )
-            throw InvalidParameter("fiber::chiasma must be in [0, fiber_length]");
-    }
-#endif
 
     return fib;
 }

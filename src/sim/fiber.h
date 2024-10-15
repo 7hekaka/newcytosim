@@ -317,23 +317,6 @@ public:
     /// register a chewing effect of magnitude 'x'
     void chew(FiberEnd e, const real x) { assert_true(e>0); fChew[e-1] += x; }
 #endif
-#if NEW_FIBER_SILHOUETTE
-    real chiasma_;
-    
-    /// return the radius of i-th segment (`i` in [0, n_points-2])
-    real silhouette(size_t i) const
-    {
-        real pos = real(i) / lastSegment() - chiasma_; // in [0, 1] - chiasma
-        real amp = 2.0 + std::tanh(10.0 * std::fabs(pos) - M_SQRT2); // in [1, 3]
-        return amp * prop->steric_radius;
-    }
-    
-    void chiasma(real c) { chiasma_ = c; }
-    real chiasma() const { return chiasma_; }
-#else
-    void chiasma(real c) { }
-    real chiasma() const { return 0.0; }
-#endif
 #if FIBER_HAS_BIRTHTIME
     /// returns simulation time at which Fiber was created
     real birthTime() const { return fBirthTime; }

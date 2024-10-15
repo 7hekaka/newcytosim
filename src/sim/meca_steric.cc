@@ -106,21 +106,6 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
     // distribute Fiber-points on the grid
     for ( Fiber const* F=sim.fibers.first(); F; F=F->next() )
     {
-#if NEW_FIBER_SILHOUETTE
-        if ( F->chiasma() > -1 )
-        {
-            /* With this option, the steric radius of the fiber may vary,
-             as specified by Fiber::silhouette() */
-            for ( index_t i = 0; i < F->nbSegments(); ++i )
-            {
-                real rad = F->silhouette(i);
-                real rge = rad + F->prop->steric_range;
-                real sup = rge + 0.5 * F->segmentation();
-                grid.add(F, i, rad, rge, sup);
-            }
-        }
-        else
-#endif
         if ( has_steric(F, grid.nbPanes()) )
         {
             const real rad = F->prop->steric_radius; // equilibrium radius

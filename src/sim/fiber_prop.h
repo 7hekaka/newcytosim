@@ -25,7 +25,6 @@ class Space;
 #define NEW_FIBER_CONFINE2   0
 #define NEW_CONFINE_RANGE    0
 #define NEW_FIBER_END_FORCE  0
-#define NEW_FIBER_SILHOUETTE 0
 #define NEW_FIBER_MAKE_COUPLE 0
 
 /// Flag to add a line field of reals to each Fiber {0, 1}

@@ -252,9 +252,6 @@ Fiber::Fiber(FiberProp const* p)
     fChew[0] = 0;
     fChew[1] = 0;
 #endif
-#if NEW_FIBER_SILHOUETTE
-    chiasma_ = -1.0;
-#endif
 }
 
 #if FIBER_HAS_FAMILY
@@ -1901,10 +1898,10 @@ void Fiber::write(Outputter& out) const
 {
     writeMarker(out, tag());
     Chain::write(out);
-#if FIBER_HAS_BIRTHTIME || NEW_FIBER_SILHOUETTE
+#if FIBER_HAS_BIRTHTIME
     writeMarker(out, FIBINFO_TAG);
     out.writeFloat(birthTime());
-    out.writeFloat(chiasma());
+    out.writeFloat(0.0);
     out.writeFloat(0.0);
     out.writeFloat(0.0);
 #endif
@@ -2013,7 +2010,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     else if ( tag == FIBINFO_TAG )
     {
         birthTime(in.readFloat());
-        chiasma(in.readFloat());
+        in.readFloat();
         in.readFloat();
         in.readFloat();
     }
