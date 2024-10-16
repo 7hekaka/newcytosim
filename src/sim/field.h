@@ -263,22 +263,22 @@ public:
     
     /// write Field to file using VAL::write()
     /** Some of this should be moved to Grid */
-    void write(Outputter& out) const
+    void write(Outputter& o) const
     {
         if ( mGrid.hasCells() && prop->save )
         {
-            writeMarker(out, Field::TAG);
-            out.writeUInt16(DIM);
+            writeMarker(o, Field::TAG);
+            o.writeUInt16(DIM);
             for ( int d = 0; d < DIM; ++d )
             {
-                out.writeUInt32(mGrid.breadth(d), ' ');
-                out.writeFloat(mGrid.inf(d));
-                out.writeFloat(mGrid.sup(d));
+                o.writeUInt32(mGrid.breadth(d), ' ');
+                o.writeFloat(mGrid.inf(d));
+                o.writeFloat(mGrid.sup(d));
             }
-            out.writeUInt32(mGrid.nbCells(), ' ');
+            o.writeUInt32(mGrid.nbCells(), ' ');
             for ( size_t c = 0; c < mGrid.nbCells(); ++c )
-                mGrid.icell(c).write(out);
-            out.writeSoftNewline();
+                mGrid.icell(c).write(o);
+            o.writeSoftNewline();
         }
         
         if ( prop->positive )
