@@ -9,23 +9,24 @@
 #include "vecprint.h"
 
 /*
- Selection of LAPACK routines
+ Selection of LAPACK routines for tridiagonal matrix factorization
  The LAPACK implementation is the safest choice
- The Alsatian version is faster as it avoids divisions
+ The Alsatian version is faster as it avoids divisions, and it permits using
+ the 'Fused Project Forces' combining `projectForcesU` and `projectForcesD`
  */
 
 #if ( 1 )
 #  define DPTTRF alsatian_xpttrf
 #  define DPTTS2 alsatian_xptts2
-#elif ( 0 )
-#  define DPTTRF italian_xpttrf
-#  define DPTTS2 italian_xptts2
+#  define USE_FUSED_PROJECT_FORCES ( USE_SIMD && !NEW_ANISOTROPIC_FIBER_DRAG )
 #elif ( 0 )
 #  define DPTTRF lapack_xpttrf
 #  define DPTTS2 lapack_xptts2
+#  define USE_FUSED_PROJECT_FORCES 0
 #else
 #  define DPTTRF lapack::xpttrf
 #  define DPTTS2 lapack::xptts2
+#  define USE_FUSED_PROJECT_FORCES 0
 #endif
 
 
@@ -317,7 +318,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
     //VecPrint::print("X", DIM*nbPoints(), X);
 
 // using the fused projectForces if possible, since this is fastest
-#if REAL_IS_DOUBLE && USE_SIMD && !NEW_ANISOTROPIC_FIBER_DRAG
+#if USE_FUSED_PROJECT_FORCES
 #  if ( DIM == 3 )
     return projectForces3D_SSE(nbs, iDir, X, iLLG, iJJt, iJJtU, Y);
 #  elif ( DIM == 2 )
