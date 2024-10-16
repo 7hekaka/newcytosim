@@ -114,7 +114,7 @@ void drawFacesArray()
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
     glNormalPointer(GL_FLOAT, 0, ico->vertex_data());
-    static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort));
+    static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
     glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_SHORT, ico->face_data());
     glDisableClientState(GL_NORMAL_ARRAY);
 }
@@ -155,7 +155,7 @@ void drawFacesVBO()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-    static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort));
+    static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
     glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_SHORT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     

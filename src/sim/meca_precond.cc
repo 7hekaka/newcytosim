@@ -113,7 +113,7 @@ static inline void applyPrecondBand(Mecable const* mec, real* Y)
     const int bks = DIM * mec->nbPoints();
     assert_true( (int)BAND_NUD < bks );
 #if SAUERKRAUT && REAL_IS_DOUBLE && USE_SIMD
-    static_assert(BAND_NUD==6);
+    static_assert(BAND_NUD==6, "BAND_NUD should be 6");
     alsatian_xtbsvLNN6K_SSE(bks, (float*)mec->pblock(), BAND_LDD, Y);
     alsatian_xtbsvLTN6K_SSE(bks, (float*)mec->pblock(), BAND_LDD, Y);
 #elif SAUERKRAUT

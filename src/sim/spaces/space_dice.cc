@@ -341,7 +341,7 @@ void SpaceDice::draw3D() const
     memcpy(inx, mesh.face_data(), tri*sizeof(Tesselator::INDEX));
     gym::unmapIndexBuffer();
 
-    static_assert(sizeof(Tesselator::INDEX) == sizeof(unsigned short));
+    static_assert(sizeof(Tesselator::INDEX) == sizeof(unsigned short), "Index type mismatch");
     glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_SHORT, nullptr);
     gym::unbind2();
 #endif

@@ -1620,7 +1620,7 @@ namespace gle
         // the normal in each vertex is equal to the vertex!
         gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort));
+        static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         gym::unbind2();
         gym::cleanupVN();
@@ -1635,7 +1635,7 @@ namespace gle
         gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
         gym::switchCullFace(GL_FRONT);
-        static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort));
+        static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
         gym::switchCullFace(GL_BACK);
         glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
