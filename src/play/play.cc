@@ -167,6 +167,7 @@ void print_error(Exception const& e)
 {
     print_magenta(stderr, e.brief());
     fputs(e.info().c_str(), stderr);
+    putc('\n', stderr);
 }
 
 
