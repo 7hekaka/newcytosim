@@ -499,7 +499,7 @@ void Chain::reshape_apply_alt(const size_t nbs, const real* src,
 
 
 //==============================================================================
-#pragma mark -
+#pragma mark - Reshape
 
 /*
  This deals with Fiber having one segment only,
@@ -748,7 +748,7 @@ void Chain::reshape_apply(const size_t nbs, const real* src,
 }
 
 
-/*
+/**
  Try to re-establish the length of the segments, by moving points along
  the directions of the flanking segments
  
@@ -839,14 +839,6 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
 }
 
 
-/**
- The response of this method to a sudden perpendicular force is not ideal:
- For example, a force applied to the bottom of a vertical fibers leads
- to a 'L' configuration after one step of `Meca::solve`.
- reshape() reduces the bottom leg of the 'L', by translating the entire vertical portion
- of the fiber, irrespective of the length of this section.
- */
-
 #if ( 1 )   // 1 = optimized version of Chain::reshape_global()
 
 /**
@@ -854,10 +846,15 @@ int Chain::reshape_local(const size_t nbs, const real* src, real* dst,
  all segments have the same distance `cut` (ie. parameter `segmentation`).
  This is operation does not change the center of gravity of the fiber.
 
- 
  NOTE: if two consecutive points overlap, there is no unique way to
- restore the constraints! We do nothing in that case, because most 
+ restore the constraints! We do nothing in that case, because most
  likely, the Brownian motion will push the points apart soon.
+
+ Applying this method after a sudden perpendicular force is not ideal:
+ For example, a force applied to the bottom of a vertical fibers leads
+ to a 'L' configuration after one step of `Meca::solve`.
+ reshape_global() reduces the bottom leg of the 'L', by translating the entire
+ vertical portion of the fiber, irrespective of the length of this section.
  */
 
 void Chain::reshape_global(const size_t ns, const real* src, real* dst, const real cut)
