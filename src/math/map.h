@@ -114,7 +114,7 @@ protected:
     size_t  mNbCells;
     
     /// The number of cells in each dimension
-    size_t  mDim[4];
+    size_t mDim[ORD<4?4:ORD];
     
     /// Offset between two consecutive cells along each dimension
     size_t  mStride[ORD];
