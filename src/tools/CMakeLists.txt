@@ -7,6 +7,7 @@ set(TOOL_LIBS
     "${MATH_LIBRARY}"
     "${BASE_LIBRARY}"
     "${LAPACK_BLAS}"
+    "${CURSES_LIBRARY}"
     Threads::Threads
 )
 

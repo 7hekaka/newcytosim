@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.2.0)
+cmake_minimum_required(VERSION 3.5)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS ON)
@@ -37,9 +37,9 @@ set(PLAY_TARGET "play")
 #-------------------------------- Libraries ------------------------------------
 
 if(NOT UNIX)
-    message(FATAL_ERROR "CMake File currently only setup to build on Linux and Mac")
+    message(FATAL_ERROR "CMake File currently only setup to build on Linux/macOS")
 elseif(APPLE)
-    message(">>>>>> Building for APPLE")
+    message(">>>>>> Building for MacOS")
 else()
     message(">>>>>> Building for Linux")
     link_libraries("gfortran")
@@ -65,6 +65,9 @@ set(LAPACK_BLAS "${LAPACK_LIB}" "${BLAS_LIB}")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIR})
 
 #-------------------------- Graphical Libraries --------------------------------
 

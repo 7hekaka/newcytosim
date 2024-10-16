@@ -8,6 +8,7 @@ set(TEST_LIBS
     Threads::Threads
     "${MATH_LIBRARY}"
     "${BASE_LIBRARY}"
+    "${CURSES_LIBRARY}"
 )
 
 set(TEST_LIST
@@ -44,6 +45,7 @@ set(TEST_GL_LIBS
     "${MATH_LIBRARY}"
     "${BASE_LIBRARY}"
     "${LAPACK_BLAS}"
+    "${CURSES_LIBRARY}"
     Threads::Threads
     "${OPENGL_LIBS}"
 )

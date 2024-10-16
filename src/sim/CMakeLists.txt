@@ -150,6 +150,7 @@ if(MAKE_SIM)
         "${MATH_LIBRARY}"
         "${BASE_LIBRARY}"
         "${LAPACK_BLAS}"
+        "${CURSES_LIBRARY}"
         Threads::Threads
     )
     

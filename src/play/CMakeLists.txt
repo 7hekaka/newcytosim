@@ -17,6 +17,7 @@ if(MAKE_PLAY)
         "${BASE_LIBRARY}"
         "${OPENGL_LIBS}"
         "${LAPACK_BLAS}"
+        "${CURSES_LIBRARY}"
         Threads::Threads
     )
     
