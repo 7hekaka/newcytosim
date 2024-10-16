@@ -368,11 +368,11 @@ void Inputter::readFloats(double ptr[], const unsigned dim)
         if ( stop != fread(flt, 4, stop, mFile) )
             throw InvalidIO("readFloats(double) failed");
         if ( binary_ == 2 ) {
-            while ( d < stop )
-                ptr[d++] = byteswap32(flt[d]);
+            for ( ; d < stop; ++d )
+                ptr[d] = byteswap32(flt[d]);
         } else {
-            while ( d < stop )
-                ptr[d++] = flt[d];
+            for ( ; d < stop; ++d )
+                ptr[d] = flt[d];
         }
     }
     else
