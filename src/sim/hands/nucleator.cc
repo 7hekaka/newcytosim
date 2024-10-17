@@ -207,12 +207,6 @@ void Nucleator::stepUnloaded()
         relocateM();
     else if ( prop()->track_end == PLUS_END )
         relocateP();
-    
-    if ( prop()->stabilize != 0 )
-    {
-        Fiber * fib = modifiableFiber();
-        fib->stabilize(nearestEnd(), prop()->stabilize);
-    }
 }
 
 
@@ -225,12 +219,6 @@ void Nucleator::stepLoaded(Vector const& force)
         relocateM();
     else if ( prop()->track_end == PLUS_END )
         relocateP();
-    
-    if ( prop()->stabilize != 0 )
-    {
-        Fiber * fib = modifiableFiber();
-        fib->stabilize(nearestEnd(), prop()->stabilize);
-    }
 }
 
 

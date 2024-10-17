@@ -27,7 +27,6 @@ void NucleatorProp::clear()
     hold_end   = MINUS_END;
     addictive  = false;
     addictive_state = STATE_RED;
-    stabilize = 0;
     branch_angle = 0;
     nucleation_limit = 0;
     nucleate_in_plane = "";
@@ -71,7 +70,6 @@ void NucleatorProp::read(Glossary& glos)
     
     glos.set(addictive, "addictive");
     glos.set(addictive_state, "addictive", 1, keys);
-    glos.set(stabilize, "stabilize");
     
     if ( glos.set(track_end, "track_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}}) )
@@ -148,6 +146,5 @@ void NucleatorProp::write_values(std::ostream& os) const
     write_value(os, "hold_end",  hold_end);
     write_value(os, "track_end", track_end);
     write_value(os, "addictive", addictive, addictive_state);
-    write_value(os, "stabilize", stabilize);
 }
 

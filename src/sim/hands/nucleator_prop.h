@@ -97,9 +97,6 @@ public:
     /// the dynamic state of the fiber tip after detachment
     state_t addictive_state;
     
-    /// stabilize attached fibers plus-ends
-    real stabilize;
-    
     /// @}
     
     /// type of fiber to be nucleated

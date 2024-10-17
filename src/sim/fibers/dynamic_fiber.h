@@ -95,9 +95,6 @@ private:
 
     /// dynamic state of minus end
     state_t mStateM;
-
-    /// stabilizing factor
-    real stabilized_[2];
     
     /// calculate dynamic state from unit states near plus end
     state_t calculateStateP() const;
@@ -153,14 +150,8 @@ public:
 
     //--------------------------------------------------------------------------
     
-    /// register stabilizing effect
-    void stabilize(FiberEnd e, real s) { assert_true(e>0); stabilized_[e-1] += s; }
-    
     /// simulate dynamic instability of plus end
     int stepPlusEnd();
-    
-    /// simulate dynamic instability for a stabilized plus end 
-    int stepPlusEndStabilized(real);
 
     /// simulate dynamic instability of minus end
     int stepMinusEnd();

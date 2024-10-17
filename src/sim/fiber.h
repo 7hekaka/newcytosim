@@ -244,9 +244,6 @@ public:
     /// should be called if any Fiber tip has elongated or shortened
     void updateFiber();
     
-    /// register a stabilizing effect
-    virtual void stabilize(FiberEnd, real) {}
-    
     /// simulation step
     virtual void step();
 

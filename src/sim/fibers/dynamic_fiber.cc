@@ -20,8 +20,6 @@ DynamicFiber::DynamicFiber(DynamicFiberProp const* p) : Fiber(p)
 {
     initM();
     initP();
-    stabilized_[0] = 0;
-    stabilized_[1] = 0;
 }
 
 
@@ -382,56 +380,6 @@ int DynamicFiber::stepPlusEnd()
     return res;
 }
 
-
-/*
- Special case for Kinetochores: grow slowly with no catastrophe...
- pulling force promotes assembly rate with scale `stabilized_growing_force`
-*/
-int DynamicFiber::stepPlusEndStabilized(real factor)
-{
-    constexpr unsigned P = 0;
-    int res = 0;
-
-    // get growth rate scaled to account for available monomers, time_step included:
-    real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
-
-    // pulling force (force directed in the direction of growth) promotes assembly rate
-    if ( growth > 0 )
-    {
-        real scale = prop()->stabilized_growing_force_inv;
-        
-        // calculate the force acting on the point at the end:
-        real forceP = projectedForceEndP();
-        //real fP = tension(lastSegment()); // different way to get the force
-
-        /*
-         we use a continuous function derived from exp(-force):
-         - actual_growth vanish if force is negative and >> than `stabilized_growing_force`
-         - actual_growth = growth / factor if force = 0;
-         - actual_growth reaches growth if force is positive and >> `stabilized_growing_force`
-         */
-        real e = std::exp(-forceP * scale);
-        real g = 1 + e * ( factor - 1 );
-        
-        //printf("* %s force/f0 %8.4f  growth/g0 %6.4f\n", reference().c_str(), forceP*scale, 1.0/g);
-
-        nextGrowthP -= growth / g;
-        
-        while ( nextGrowthP < 0 )
-        {
-            if ( scale == 0 )
-            {
-                real F = prop()->growing_force[0] / M_SQRT2;
-                std::clog << "ERROR: for compatibility, use "+prop()->name()+":stabilized_growing_force = "<<F<<"\n";
-                ABORT_NOW("DynamicFiber:stabilized_growing_force was not set");
-            }
-            addUnitP();
-            ++res;
-        }
-    }
-    return res;
-}
-
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -491,11 +439,6 @@ void DynamicFiber::step()
         // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
         if ( RNG.test(prop()->rebirth_prob[P]) )
             setEndStateP(STATE_GREEN);
-    }
-    else if ( stabilized_[P] > 0 )
-    {
-        addP = stepPlusEndStabilized(stabilized_[P]);
-        stabilized_[P] = 0;
     }
     else
         addP = stepPlusEnd();
