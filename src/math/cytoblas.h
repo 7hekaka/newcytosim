@@ -115,7 +115,7 @@ inline real nrm8seq(const size_t cnt, const real* X)
     return res;
 }
 
-#ifdef __AVX__
+#if defined(__AVX__) && USE_SIMD
 
 inline double nrm8(const size_t cnt, const double* ptr)
 {
@@ -187,7 +187,7 @@ inline float nrm8(const size_t siz, const float* ptr)
     return res;
 }
 
-#elif defined(__ARM_NEON__)
+#elif defined(__ARM_NEON__) && USE_SIMD
 
 inline double nrm8(const size_t cnt, const double* ptr)
 {
