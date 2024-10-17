@@ -24,6 +24,9 @@ void DynamicFiberProp::clear()
     // we use the tubulin heterodimer length by default:
     unit_length = 0.008;
     
+    // parameter added 17.10.2024, previously was using 'growing_force':
+    stabilized_growing_force = INFINITY;
+    
     for ( int i = 0; i < 2; ++i )
     {
         growing_speed[i]     = 0;
@@ -117,6 +120,7 @@ void DynamicFiberProp::read(Glossary& glos)
     glos.set(growing_speed,     2, "growing_speed");
     glos.set(growing_off_speed, 2, "growing_off_speed");
     glos.set(growing_force,     2, "growing_force");
+    glos.set(stabilized_growing_force, "stabilized_growing_force");
     glos.set(hydrolysis_rate,   2, "hydrolysis_rate");
     glos.set(shrinking_speed,   2, "shrinking_speed");
     glos.set(rebirth_rate,      2, "rebirth_rate");
@@ -202,7 +206,7 @@ void DynamicFiberProp::complete(Simul const& sim)
         rebirth_prob[i] = -std::expm1( -rebirth_rate[i] * time_step(sim) );
 
         if ( unhydrolyzed_prob[i] < 0 || unhydrolyzed_prob[i] > 1 )
-			throw InvalidParameter("fiber:unhydrolyzed_prob should be in [0, 1]");
+            throw InvalidParameter("fiber:unhydrolyzed_prob should be in [0, 1]");
     }
 
     if ( min_length <= 0 )
@@ -218,6 +222,11 @@ void DynamicFiberProp::complete(Simul const& sim)
     else if ( primed(sim) && stall_outside != 1 )
         throw InvalidParameter("A space must be specified as stall_outside[1]");
 #endif
+    
+    if ( stabilized_growing_force <= 0 )
+        throw InvalidParameter(name()+":stabilized_growing_force should be > 0");
+    stabilized_growing_force_inv = 1.0 / stabilized_growing_force;
+    
 }
 
 
@@ -229,6 +238,7 @@ void DynamicFiberProp::write_values(std::ostream& os) const
     write_value(os, "growing_speed",        growing_speed, 2);
     write_value(os, "growing_off_speed",    growing_off_speed, 2);
     write_value(os, "growing_force",        growing_force, 2);
+    write_value(os, "stabilized_growing_force", stabilized_growing_force, 2);
     write_value(os, "hydrolysis_rate",      hydrolysis_rate, 2);
     write_value(os, "shrinking_speed",      shrinking_speed, 2);
     write_value(os, "rebirth_rate",         rebirth_rate, 2);

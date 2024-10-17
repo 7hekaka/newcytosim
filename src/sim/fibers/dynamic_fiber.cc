@@ -403,35 +403,42 @@ int DynamicFiber::stepPlusEnd()
 
 /*
  Special case for Kinetochores: grow slowly with no catastrophe...
- force modulates assembly rate exponentially
+ pulling force promotes assembly rate with scale `stabilized_growing_force`
 */
 int DynamicFiber::stepPlusEndStabilized(real factor)
 {
     constexpr size_t P = 0;
     int res = 0;
-    
-    // calculate the force acting on the point at the end:
-    real forceP = projectedForceEndP();
-    //real fP = tension(lastSegment());
 
-    // get growth parameter scaled for available monomers:
+    // get growth rate scaled to account for available monomers, time_step included:
     real growth = prop()->growing_rate_dt[P] * prop()->free_polymer;
-    
-    // force modulates assembly rate exponentially
+
+    // pulling force (force directed in the direction of growth) promotes assembly rate
     if ( growth > 0 )
     {
-        real f = max_real(0.0, forceP);
-        // we use tanh(force) which is bounded, scaled to approach exp(-F):
-        real e = std::exp(-M_SQRT2 * f * prop()->growing_force_inv[P]);
-        real g = 1 + e * ( factor - 1 );
-        //printf("* %s Vg %8.4f +end_force %+6.4f growth_reduction %+6.4f\n", reference().c_str(), growth, forceP, g);
-        growth /= g;
+        real scale = prop()->stabilized_growing_force_inv;
         
-        nextGrowthP -= growth;
+        // calculate the force acting on the point at the end:
+        real forceP = projectedForceEndP();
+        //real fP = tension(lastSegment()); // different way to get the force
+
+        /*
+         we use a continuous function derived from exp(-force):
+         - actual_growth vanish if force is negative and >> than `stabilized_growing_force`
+         - actual_growth = growth / factor if force = 0;
+         - actual_growth reaches growth if force is positive and >> `stabilized_growing_force`
+         */
+        real e = std::exp(-forceP * scale);
+        real g = 1 + e * ( factor - 1 );
+        
+        //printf("* %s force/f0 %8.4f  growth/g0 %6.4f\n", reference().c_str(), forceP*scale, 1.0/g);
+
+        nextGrowthP -= growth / g;
         
         while ( nextGrowthP < 0 )
         {
-            //printf("* %s %8.4f : %6.4f\n", reference().c_str(), forceP*prop()->growing_force_inv[P], growth/prop()->growing_rate_dt[P]);
+            if ( scale == 0 )
+                std::clog << "WARNING: stabilized_growing_force was not set (use "<<prop()->growing_force[0]/M_SQRT2<<") ?\n";
             addUnitP();
             ++res;
         }

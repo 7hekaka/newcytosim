@@ -58,10 +58,18 @@ public:
      </em>
      */
     real growing_force[2];
+    
+    /// Characteristic force for polymer assembly at plus-ends of stabilized (kinetochore) microtubules, that are nucleated by a nucleator hand with property 'stabilized' > 0.
+    /*
+     Growth is slowed by a factor of: 1 + exp(-sqrt(2)*force/stabilized_growing_force) * (stabilized - 1),
+     so that when force = 0, growth /= stabilized,
+     and as force -> infinity, growth /= 1.
+     */
+    real stabilized_growing_force;
 
     /// Hydrolysis rate of G-units, which defines the catastrophe rate
     /**
-     Without spontaneous off rate (`growing_off_rate==0`), 
+     Without spontaneous off rate (`growing_off_rate==0`),
      the catastrophe rate is set by
      
          catastrophe_rate = 3 * hydrolysis_rate ^2 / growing_rate;
@@ -111,6 +119,7 @@ private:
     real growing_rate_dt[2];
     real growing_off_rate_dt[2];
     real growing_force_inv[2];
+    real stabilized_growing_force_inv;
     real hydrolysis_rate_2dt[2];
     real shrinking_rate_dt[2];
     real rebirth_prob[2];

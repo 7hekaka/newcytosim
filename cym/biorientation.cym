@@ -1,42 +1,52 @@
-% Arabidopsis taliana spindle
-% Collaboration Mariana Romeiro Motta (PhD student) Arp Schnittger (Uni. Hamburg)
-% F. Nedelec, Cambridge 12.11.2022, Sunny. 25.11.2022, Rainy; Fat Chromosomes: 31.12.2022
+% Biorientation!
 % FJN, Strasbourg 26.03.2023: new linkage of Twin Solids
 % This relies on: NEW_SOLID_HAS_TWIN, NEW_SOLID_MAKE_COUPLE
+% 5.9.2024
 
+% pixelSize  0.002 unitValue  5.971 :  0.005
 set simul system
 {
     viscosity = 0.1
     time_step = 0.001
-    steric = 1, 1111, 222
-    precondition = 6
-    verbose = 0
-    dim = 3
+    steric = 1, 333, 11
+    precondition = 0
+    verbose = 7
 }
 
 set system display
 {
-    size=1280, 512;
-    point_value=0.01;
-    point_size=0.5; 
-    line_width=1; 
-    zoom=2;
-    style=3;
-    magic_key1 = x, (set kinetochore {twin_stiffness=0})
-    label = (Press 'x' to delete cohesins!)
+    style = 3;
+    size = 1280, 512;
+    point_value = 0.01;
+    point_size = 0.5;
+    line_width = 1;
+    magic_key1 = X, (set kinetochore {twin_stiffness=0})
+    magic_key2 = C, (set corona {stiffness=100;anchor_stiffness=0;})
+    magic_key3 = c, (set simul {stiffness=0;anchor_stiffness=88;})
+    label = (Press 'X' to delete cohesins!)
     back_color = black
 }
 
 set space cell
 {
-    shape = capsule
+    shape = sphere
     display = ( color=0xFFFFFF04; visible=1 )
 }
 
 new cell
 {
-    length = 10
-    radius = 2
+    radius = 1.5
+}
+
+set space pin
+{
+    shape = sphere
+    display = ( visible=0 )
+}
+
+new pin
+{
+    radius = 0
 }
 
 % ---------------------- MICROTUBULES ------------------------
@@ -44,18 +54,18 @@ new cell
 set fiber microtubule
 {
     rigidity = 20
-    segmentation = 0.5
-    steric = 1, 0.025, 0.015
-    confine = inside, 77, cell
+    segmentation = 0.25
+    steric = 1, 0.025, 0.025
     
     activity = dynamic
     min_length = 0.024
     growing_speed = 0.210
-    shrinking_speed = -0.42, -0.04
+    shrinking_speed = -0.42, -0.42
     hydrolysis_rate = 1.0
-    growing_force = 10
+    growing_force = 5
+    stabilized_growing_force = 3.53
     total_polymer = 300
-    display = ( color=0xFFFFFF88; line_width=2.5; style=2; coloring=2; )
+    display = ( color=white; line_width=2.5; style=2; coloring=2; )
 }
 
 % ---------------------- AMPLIFICATION ------------------------
@@ -64,16 +74,16 @@ set hand nucleator
 {
     unbinding = 0, inf
     activity = nucleate
-    nucleation_angle = 0
-    nucleate = 0.1, microtubule, ( length=0.032; end_state=grow,white; )
-    display = ( color=yellow; size=2; width=3; )
+    specificity = mostly_parallel
+    nucleate = 0.2, microtubule, ( length=0.032; end_state=grow,white; )
+    display = ( color=yellow, yellow; size=3; width=3; )
 }
 
 set hand activator
 {
     binding = 250, 0.020
-    unbinding = 0.01, 4
-    display = ( color=green; size=5; width=3; )
+    unbinding = 0.05, 4
+    display = ( color=green, green; size=2.5; width=3; )
 }
 
 set couple augmin
@@ -83,22 +93,24 @@ set couple augmin
     stiffness = 100
     activity = duo
     vulnerable = 0
-    deactivation = 2, delete
+    deactivation = 4, delete
     trans_activated = 1
     length = 0.050
     diffusion = 0.02
+    torque = 1, 0
+    confine = off
 }
 
 % ---------------------- KINESIN-5 ------------------------
 
 set hand para_kinesin
 {
-    binding = 16, 0.070
-    unbinding = 2, 6
+    binding = 16, 0.072
+    unbinding = 1, 6
     
     activity = mighty
     unloaded_speed = 0.060
-    stall_force = 5
+    stall_force = 3
     display = ( color=blue; size=1.5; )
 }
 
@@ -108,20 +120,20 @@ set couple parakin
     hand1 = para_kinesin
     hand2 = para_kinesin
     stiffness = 400
-    length = 0.060
+    length = 0.058
     diffusion = 5
     fast_diffusion = 1
 }
 
 set hand anti_kinesin
 {
-    binding = 16, 0.070
-    unbinding = 2, 6
+    binding = 16, 0.072
+    unbinding = 0.5, 6
     
     activity = mighty
     unloaded_speed = 0.060
-    stall_force = 5
-    rescue_chance = 0.0125
+    stall_force = 3
+    %rescue_chance = 0.0125
     display = ( color=orange; size=1.5; )
 }
 
@@ -131,7 +143,7 @@ set couple antikin
     hand1 = anti_kinesin
     hand2 = anti_kinesin
     stiffness = 400
-    length = 0.060
+    length = 0.058
     diffusion = 5
     fast_diffusion = 1
 }
@@ -141,20 +153,20 @@ set couple antikin
 set hand ndc80
 {
     binding = 0, 0.050
-    unbinding = 0.01, inf  % force is high on kinetochore-MTs
+    unbinding = 0, inf  % kinetochore never release MTs
     track_end = plus_end
     hold_shrinking_end = 0
     activity = nucleate
-    nucleate = 1.0, microtubule, ( length=0.032; end_state=grow,white; mark=0; )
+    nucleate = 1.0, microtubule, ( length=0.032; end_state=grow,white; mark=1; )
     addictive = 1, shrink
-    stabilize = 5   % ndc80 unbinding rate sets the growth time of the fiber.
+    stabilize = 7   % growth speed slower than Kinesin5
     display = ( color=white; size=4; )
 }
 
 set single corona
 {
     hand = ndc80
-    stiffness = 666
+    stiffness = 400
     anchor_stiffness = 88
     diffusion = 10
 }
@@ -162,45 +174,63 @@ set single corona
 set solid kinetochore
 {
     viscosity = 0.5
+    confine = point, 0.01, pin
     steric = 1
     source = 1, augmin
     twin_stiffness = 100, 10
-    display = ( coloring=1; color=0x00FFFF44; size=2; style=5; )
+    display = ( color=white; size=2; style=5; )
 }
 
-% ---------------------- CUTTING ------------------------
+% -------------------------- CUTTER ---------------------------
 
-new event
+set hand cutman
 {
-    code = (cut microtubule { plane=1 0 0, 4; new_end_state=red,red; };)
-    rate = 10.0
+    binding = 8, 0.050
+    unbinding = 0.2, 3
+    activity = cut
+    cutting_rate = 1
+    diffusion = 1
+    new_end_state = red, white;
+    display = ( size=3; color=red; )
 }
-new event
+
+set couple cutter
 {
-    code = (cut microtubule { plane=1 0 0,-4; new_end_state=red,red; };)
-    rate = 10.0
+    hand1 = cutman
+    hand2 = cutman
+    stiffness = 1
+    diffusion = 0.01
+    activity = duo
+    vulnerable = 0
+    deactivation = 8, delete
 }
+
+set single katanin
+{
+    hand = cutman
+    diffusion = 10
+}
+
 
 % ---------------------- SYSTEM! ------------------------
 
-new [5 * volume] parakin
-new [40 * volume] antikin
-new 0 clasp
+new [32 * volume] parakin
+new [32 * volume] antikin
+new 32 katanin
 new 0 augmin
-new 0 katanin
-
 
 new kinetochore
 {
-    sphere1 = 0 -0.1 0, 0.070, corona -0.5 -0.9, corona -0.9 -0.5
-    point1 = 0.1 -0.1 0
+    sphere1 = 0 0 0, 0.070, corona -0.2 -0.8 -0.8, corona -0.8 -0.2 -0.8, corona -0.8 -0.8 -0.2
+    point1 = 0.065 0 0
+
     position = 0 0 0
     direction = 1 0 0
-    twin = mirror, 0.35
+    twin = mirror, 0.14
 }
 
 run 500000 system
 {
-    nb_frames = 1000
+    nb_frames = 200
 }
 
