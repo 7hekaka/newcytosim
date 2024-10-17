@@ -1280,7 +1280,7 @@ namespace gle
     }
 
     //-----------------------------------------------------------------------
-    #pragma mark - Tubes
+    #pragma mark - Tubes primitives
 
     inline size_t nbTrianglesCylinder(size_t inc, int top = 0)
     {
@@ -1470,6 +1470,42 @@ namespace gle
         return i;
     }
 
+    /**
+     Set triangles for a surface of revolution around the Z-axis.
+     The surface goes from Z = [ B, T ] with increments dZ, and its radius is
+     given by the function `radius(Z)` provided as argument.
+     */
+    size_t setRevolution(flute6 * flu, float (*radius)(float), float B, const float T, float dZ)
+    {
+        size_t i = 0;
+        float Z = B, R, Q = radius(B);
+        while ( B < T )
+        {
+            Z += dZ;
+            R = radius(Z);
+            
+            float dR = ( R - Q ) / dZ;
+            float dN = 1.0f / sqrtf( 1 + dR * dR );
+            dR = -dR * dN;
+            
+            for ( size_t n = 0; n <= pi_twice; ++n )
+            {
+                float S = sin_(n), C = cos_(n);
+                flu[i++] = {R*C, R*S, Z, dN*C, dN*S, dR};
+                flu[i++] = {Q*C, Q*S, B, dN*C, dN*S, dR};
+            }
+            flu[i++] = {Q, 0, B, dN, dN, dR};
+            flu[i++] = {R, 0, Z, dN, dN, dR};
+            B = Z;
+            Q = R;
+        }
+        assert_true( i == 2*(2+pi_twice)*(1+std::ceil((T-B)/dZ)) );
+        return i;
+    }
+    
+    //-----------------------------------------------------------------------
+    #pragma mark - Tubes buffers
+    
     static size_t sizeTubeBuffers()
     {
         return 4 + 52 * pi_twice;  // this is empirical!
@@ -1906,7 +1942,7 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - 3D volume primitives
     
-    /// set Triangle strip for a Torus of radius R and a thickness 2*T
+    /// draw a Torus of radius R and a thickness 2*T
     void torusZ(float R, float T, size_t inc)
     {
         for ( size_t n = 0; n < pi_twice; n += inc )
@@ -1934,35 +1970,12 @@ namespace gle
      */
     void drawRevolution(float (*radius)(float), float B, const float T, float dZ)
     {
-        size_t cnt = 2 * ( 2 + pi_twice ) * ( 1 + std::ceil(( T - B ) / dZ));
+        size_t cnt = 2*(2+pi_twice)*(1+std::ceil((T-B)/dZ));
         flute6 * flu = gym::mapBufferV3N3(cnt+4);
-        flute6 * ptr = flu;
-
-        float Z = B, R, Q = radius(B);
-        while ( B < T )
-        {
-            Z += dZ;
-            R = radius(Z);
-            
-            float dR = ( R - Q ) / dZ;
-            float dN = 1.0f / sqrtf( 1 + dR * dR );
-            dR = -dR * dN;
-            
-            for ( size_t n = 0; n <= pi_twice; ++n )
-            {
-                float S = sin_(n), C = cos_(n);
-                ptr[0] = {R*C, R*S, Z, dN*C, dN*S, dR};
-                ptr[1] = {Q*C, Q*S, B, dN*C, dN*S, dR};
-                ptr += 2;
-            }
-            ptr[0] = {Q, 0, B, dN, dN, dR};
-            ptr[1] = {R, 0, Z, dN, dN, dR};
-            ptr += 2;
-            B = Z;
-            Q = R;
-        }
+        size_t i = setRevolution(flu, radius, B, T, dZ);
+        assert_true( i <= cnt );
         gym::unmapBufferV3N3();
-        gym::drawTriangleStrip(0, ptr-flu);
+        gym::drawTriangleStrip(0, cnt);
         gym::cleanupVN();
     }
 

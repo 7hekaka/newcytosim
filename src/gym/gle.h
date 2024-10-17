@@ -222,7 +222,7 @@ namespace gle
     void barrel();
     /// draw a 3-portion cylinder with a larger central section
     void dualPassBarrel();
-    /// display a dumbbell aligned with the Z axis, or radius 1/3, lenth 1
+    /// display a dumbbell aligned with the Z axis, of radius 1/3, lenth 1
     void dumbbell();
     /// draw Torus of radius `rad` and thickness `thick`
     void torusZ(float rad, float thick, size_t inc = 1);
