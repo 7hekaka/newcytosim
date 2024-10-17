@@ -547,58 +547,6 @@ void projectForcesD2D_AVX(index_t nbs, const double* dir,
 #endif
 
 
-void projectForcesU3D_SSE1(index_t nbs, const double* dir, const double* src, double* mul)
-{
-    const double *const end = mul + nbs;
-
-    while ( mul < end )
-    {
-        /*
-         *mul = dir[0] * ( src[DIM  ] - src[0] )
-         + dir[1] * ( src[DIM+1] - src[1] )
-         + dir[2] * ( src[DIM+2] - src[2] );
-         */
-        vec2 s0 = mul2(loadu2(dir), sub2(loadu2(src+3), loadu2(src)));
-        vec2 s1 = mul1(load1(dir+2), sub1(load1(src+5), load1(src+2)));
-        store1(mul, add1(unpackhi2(s0, s0), add1(s0, s1)));
-        src += 3;
-        dir += 3;
-        ++mul;
-   }
-}
-
-
-void projectForcesD3D_SSE1(index_t nbs, const double* dir,
-                           const double* src, const double* mul, double* dst)
-{
-    double const*const start = mul;
-    mul += nbs;
-    dst += 3 * nbs + 3;
-    src += 3 * nbs;
-    dir += 3 * nbs;
-    vec2 p2 = loadu2(src);
-    vec2 p3 = load1(src+2);
-    
-    while ( mul > start )
-    {
-        --mul;
-        vec2 mm = loaddup2(mul);
-        dir -= 3;
-        vec2 x0 = mul2(loadu2(dir), mm);
-        vec2 x1 = mul1(load1(dir+2), mm); // only lower value used
-        src -= 3;
-        dst -= 3;
-        storeu2(dst , sub2(p2, x0));
-        store1(dst+2, sub1(p3, x1));
-        p2 = add2(loadu2(src), x0);
-        p3 = add2(load1(src+2), x1);
-    }
-    dst -= 3;
-    storeu2(dst, p2);
-    store1(dst+2, p3);
-}
-
-
 //------------------------------------------------------------------------------
 #pragma mark - 3D SIMD
 

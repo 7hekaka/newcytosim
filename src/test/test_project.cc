@@ -923,7 +923,6 @@ void testProjectionU(index_t cnt)
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && USE_SIMD
     testU<projectForcesU3D_SSE>(cnt, "U_SSE");
-    testU<projectForcesU3D_SSE1>(cnt, "U_SSE1");
 #endif
 #if ( DIM == 3 ) && REAL_IS_DOUBLE && defined(__AVX__)
     testU<projectForcesU3D_AVX>(cnt, "U_AVX");
@@ -942,9 +941,6 @@ void testProjectionD(index_t cnt)
     testD<projectForcesD_PTR>(cnt, "D_PTR");
 #if REAL_IS_DOUBLE && ( DIM == 3 ) && USE_SIMD
     testD<projectForcesD3D_SSE>(cnt, "D_SSE");
-#endif
-#if REAL_IS_DOUBLE && ( DIM == 3 ) && USE_SIMD
-    testD<projectForcesD3D_SSE1>(cnt, "D_SSE1");
 #endif
 #if REAL_IS_DOUBLE
 #if ( DIM == 3 ) && USE_SIMD
@@ -1018,7 +1014,7 @@ int main(int argc, char* argv[])
 #  endif
 #endif
     }
-    if ( 0 )
+    if ( 1 )
     {
         setFilament(NSEG, 0.2, 20.0, 1.0);
         testProjectionU(REP);
