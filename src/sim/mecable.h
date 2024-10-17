@@ -40,8 +40,8 @@ class Mecable : public Object, public Buddy
 {
 public:
     
-    /// to save memory, SIZE_T could be defined here to use down to 2 bytes.
-    /* The limit imposed on the size of the Mecable is then 65536 */
+    /// to save memory, SIZE_T could be defined here to use only 2 bytes.
+    /* The limit imposed on the size of the Mecable is then 65535 vertices */
     typedef unsigned short SIZE_T;
 
 protected:
