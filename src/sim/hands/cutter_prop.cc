@@ -19,7 +19,6 @@ void CutterProp::clear()
 {
     HandProp::clear();
 
-    selective = 0;
     line_diffusion = 0;
     cutting_rate = 0;
     cutting_range = INFINITY;
@@ -34,8 +33,6 @@ void CutterProp::read(Glossary& glos)
 {
     HandProp::read(glos);
     
-    glos.set(selective, "selective", {{"none", CUT_ANY_FIBER},
-             {"bridge", CUT_IF_BRIDGE}, {"top", CUT_TOP_FIBER}} );
     glos.set(line_diffusion, "diffusion");
     glos.set(cutting_rate, "cutting_rate");
     glos.set(cutting_range, "cutting_range");
@@ -118,7 +115,6 @@ void CutterProp::checkStiffness(real stiff, real len, real mul, real kT) const
 void CutterProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);
-    write_value(os, "selective", selective);
     write_value(os, "diffusion", line_diffusion);
     write_value(os, "cutting_rate",  cutting_rate);
     write_value(os, "cutting_range", cutting_range);
