@@ -210,6 +210,15 @@ private:
     /// Matrices used for GMRES
     //LinearSolvers::Matrix mH, mV;
 
+    /// address of force base (for pycytosim)
+    real * base() { return vBAS; }
+    
+    /// address of points vector (for pycytosim)
+    real * points() { return vPTS; }
+    
+    /// address of force vector (for pycytosim)
+    real * force() { return vFOR; }
+
 public:
     
     /// record of time (CPU cycles)

@@ -54,7 +54,7 @@ vpath miniz.h src/gym/deps
 vpath miniz.c src/gym/deps
 
 build/miniz.o: miniz.c miniz.h | build
-	$(CXX) $(FAST) -x c -c $< -o $@
+	$(CXX) $(FAST) -x c -fPIC -c $< -o $@
 
 build/spng.o: spng.c spng.h | build
 	$(CXX) $(FAST) -Isrc/gym/deps -DSPNG_STATIC -DSPNG_USE_MINIZ -x c -c $< -o $@

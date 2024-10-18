@@ -215,6 +215,12 @@ public:
     /// simulate the mechanics of the system and move Mecables accordingly
     void solve_meca();
     
+    /// prepares system for solving
+    void prepare_meca() { sMeca.getReady(*this); };
+
+    /// same as `solve_meca` but skipping the `prepare_meca` part.
+    void prepared_solve();
+
     /// calculate forces given the current positions
     void solve_force();
 

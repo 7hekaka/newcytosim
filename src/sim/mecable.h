@@ -133,9 +133,12 @@ public:
     /** this is identical to posPoint(), it exists for historical reasons*/
     Vector posP(size_t p)     const { return Vector(pPos+DIM*p); }
     
+    /// modifiable address of coordinate array
+    real * addrPoints() { return pPos; }
+
     /// Address of coordinate array
-    const real * addrPoints()        const { return pPos; }
-    
+    const real * addrPoints() const { return pPos; }
+
     /// Address of point `p`
     const real * addrPoint(size_t p) const { assert_true(p<nPoints); return pPos + DIM*p; }
 

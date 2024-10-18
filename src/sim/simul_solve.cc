@@ -202,6 +202,14 @@ void Simul::solve_meca()
 }
 
 
+void Simul::prepared_solve()
+{
+    setAllInteractions(sMeca);
+    sMeca.solve();
+    sMeca.apply();
+}
+
+
 void Simul::solve_force()
 {
     sMeca.getReady(*this);

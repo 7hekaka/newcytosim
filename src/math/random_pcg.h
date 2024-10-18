@@ -1,6 +1,9 @@
 // Melissa E. O’Neill Permuted Congruential Generator
 // https://en.wikipedia.org/wiki/Permuted_congruential_generator
 
+#ifndef RANDOM_PCG
+#define RANDOM_PCG
+
 #include <stdint.h>
 
 static uint64_t const multiplier = 6364136223846793005u;
@@ -54,3 +57,5 @@ inline uint32_t distribute_bits(unsigned b, uint64_t& state)
     }
     return i;
 }
+
+#endif

@@ -279,6 +279,9 @@ public:
     /// add usage counts from another Glossary
     void add_reads(Glossary const&);
 
+    /// ordered list of key-values pairs; needed for python access
+    map_type terms() const { return mTerms; };
+
     /// create a new Glossary with only the given key
     Glossary get_term(key_type const&) const;
     
