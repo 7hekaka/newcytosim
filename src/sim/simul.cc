@@ -314,19 +314,19 @@ Space const* Simul::findSpace(std::string spec) const
     if ( spec == "master" )
         return static_cast<Space const*>(spaces.master());
 
-    // get a Space if specified:
+    // check if a Space name was specified:
+    Property * sp = properties.find("space", spec);
+    
+    if ( sp )
+        return pickSpace(sp);
+
+    // check if `name + id` was specified:
     long num = 0;
     if ( Tokenizer::split_polysymbol(spec, num) )
     {
         Object* obj = spaces.findObject(spaces.title(), spec, num);
         return static_cast<Space const*>(obj);
     }
-
-    // pick a random Space if only name is specified:
-    Property * sp = properties.find("space", spec);
-    
-    if ( sp )
-        return pickSpace(sp);
     
     return nullptr;
 }
