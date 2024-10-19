@@ -10,6 +10,8 @@
 
 2024
 
+- [A role for cross-linking proteins in actin filament network
+organization and force generation](https://doi.org/10.1073/pnas.2407838121)
 - [Wave-like oscillations of clamped microtubules driven by collective dynein transport](https://doi.org/10.1016/j.bpj.2024.01.016)
 - [Force Propagation in Active Cytoskeletal Networks](https://arxiv.org/abs/2401.04217)
 - [Rotation-Beating dynamics of a driven flexible filament: role of motor protein properties](https://arxiv.org/abs/2409.12729)
