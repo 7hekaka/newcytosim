@@ -785,10 +785,11 @@ namespace gle
         cubes_[4] = i+s; i += setArrowTail(ptr+i);
         cubes_[5] = i+s; i += setCubeFaces(ptr+i, 1.0f, 1.0f, 1.0f);
         cubes_[6] = i+s; i += setCubeFaces(ptr+i, 0.57735f, 0.57735f, 0.57735f);
-        cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);
-        cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);
-        cubes_[9] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f);
-        cubes_[10] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 1.02, 0.333);
+        cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);  // hexTube
+        cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);  // thinTube
+        cubes_[9] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f); // thinLongTube
+        
+        cubes_[11] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 1.02, 0.333);
         assert_true( i <= sizeCubeBuffers() );
         return i;
     }
@@ -838,7 +839,8 @@ namespace gle
     void hexTube()      { doCubeStrip(7, 22); }
     void thinTube()     { doCubeStrip(8, 22); }
     void thinLongTube() { doCubeStrip(9, 22); }
-    void footballPentagons() { doCubeStrip(10, 12*12); }
+    
+    void footballPentagons() { doCubeStrip(11, 12*12); }
     
     void ICOSAHEDRON()
     {
@@ -1980,10 +1982,11 @@ namespace gle
     }
 
     /// some volume of revolution with axis along Z
-    float dumbbellRadius(float z) { return sinf(M_PI*z) * (1.3f+cosf(2*M_PI*z)); }
     float barrelRadius(float z) { return sinf(M_PI*z); }
-    void dumbbell() { drawRevolution(dumbbellRadius, 0, 1, 0.0625); }
-    void barrel() { drawRevolution(barrelRadius, 0, 1, 0.025); }
+    void barrel() { drawRevolution(barrelRadius, 0, 1, 0.0625); }
+
+    float dumbbellRadius(float z) { return sinf(M_PI*z) * (1.3f+cosf(2*M_PI*z)); }
+        void dumbbell() { drawRevolution(dumbbellRadius, 0, 1, 0.0625); }
 
     void dualPassBarrel() { gym::dualPass(barrel); }
 

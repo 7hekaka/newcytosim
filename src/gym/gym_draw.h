@@ -87,8 +87,10 @@ namespace gym
 
     inline static void no_emission(GLenum face)
     {
+        /*
         float blk[4] = { 0, 0, 0, 1 };
         glMaterialfv(face, GL_EMISSION, blk);
+         */
     }
     
     /// set FRONT and BACK material property for lighting
@@ -134,18 +136,23 @@ namespace gym
     {
         //glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col_);
         float blk[4] = { 0, 0, 0, 1 };
-        glMaterialfv(GL_BACK, GL_AMBIENT, col);
-        //glMaterialfv(GL_BACK, GL_DIFFUSE, col);
-        glMaterialfv(GL_BACK, GL_EMISSION, blk);
+        glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col);
+        no_emission(GL_BACK);
     }
     
+    /// set BACK material property for lighting
+    inline void color_back(const float col[], float a)
+    {
+        float mat[4] = { col[0], col[1], col[2], clamp(a) };
+        glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, mat);
+        no_emission(GL_BACK);
+    }
+
     inline void color_back(float R, float G, float B, float A)
     {
-        float blk[4] = { 0, 0, 0, 1 };
         float col[4] = { clamp(R), clamp(G), clamp(B), clamp(A) };
-        glMaterialfv(GL_BACK, GL_AMBIENT, col);
-        glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
-        glMaterialfv(GL_BACK, GL_EMISSION, blk);
+        glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col);
+        no_emission(GL_BACK);
     }
 
     /// set FRONT and BACK material property for lighting
@@ -156,9 +163,8 @@ namespace gym
         glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, col_);
         glMaterialfv(GL_BACK, GL_AMBIENT, col_);
         glMaterialfv(GL_BACK, GL_DIFFUSE, blk);
-#else
-        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col);
 #endif
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, col);
         no_emission(GL_FRONT_AND_BACK);
     }
     

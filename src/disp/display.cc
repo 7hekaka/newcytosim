@@ -2257,7 +2257,8 @@ void Display::drawSolid(Solid const& obj)
         for ( unsigned inx = off; inx <= sup; inx += off+1 )
         {
             gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), rad);
-            gym::color_both(lor, 1);
+            gym::color_back(lor.darken(0.5));
+            gym::color_front(lor, 1);
             gle::helix();
         }
         gym::restoreCullFace();

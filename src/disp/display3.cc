@@ -1173,7 +1173,7 @@ void Display3::drawCoupleBwalk(Couple const* cx) const
         
         gym::color_both(pd2->color.mix(pd1->color));
         gym::stretchAlignZ(P1+h1, P2+h2, pixscale(pd1->width));
-        gle::hexTube();
+        gle::thinTube();
 
 #if ( DIM > 2 )
         // the axes around which uplifted hands revolve are tilted w/r dif
