@@ -135,12 +135,6 @@ void Interface::change_property(Property * pp, Glossary& def)
 }
 
 
-void Interface::change_simul_property(Glossary& opt)
-{
-    change_property(&sim_->prop, opt);
-}
-
-
 // in this form, 'name' designates the property name
 Property * Interface::execute_change(std::string const& name, Glossary& def, bool strict)
 {

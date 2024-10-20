@@ -18,7 +18,7 @@
 
 // Use second definition to trace execution
 #define VLOG(ARG) ((void) 0)
-//#define VLOG(ARG) std::clog << ARG;
+//#define VLOG(ARG) std::clog << ARG << '\n';
 
 
 //------------------------------------------------------------------------------
@@ -136,11 +136,12 @@ void Parser::parse_set(std::istream& is)
         if ( name.empty() )
             throw InvalidParameter("unexpected syntax");
         blok = Tokenizer::get_block(is, '{', true);
+        VLOG("-SET SIMUL `" << name << "'");
 
         if ( name == "display" || para == "display" )
         {
-            opt.define("display", blok);
-            change_simul_property(opt);
+            sim_->prop.display = blok;
+            sim_->prop.display_fresh = true;
         }
         else
         {
@@ -153,7 +154,7 @@ void Parser::parse_set(std::istream& is)
             if ( do_change )
             {
                 sim_->rename(name);
-                change_simul_property(opt);
+                change_property(&sim_->prop, opt);
             }
             else
             {
@@ -170,7 +171,8 @@ void Parser::parse_set(std::istream& is)
          */
         name = Tokenizer::get_symbol(is);
         blok = Tokenizer::get_block(is, '{', true);
-        
+        VLOG("-SET " << cat << " `" << name << "'");
+
         if ( name.empty() )
             throw InvalidParameter("unexpected syntax");
 
@@ -199,7 +201,10 @@ void Parser::parse_set(std::istream& is)
     }
     else
     {
-        // in this form, 'set' changes the value of an existing Property
+        /* in this form:
+         set NAME { PARAMETER = VALUE }
+         'set' changes the value of an existing Property
+         */
         name = cat;
 #if BACKWARD_COMPATIBILITY < 50
         if ( spec )
@@ -215,22 +220,31 @@ void Parser::parse_set(std::istream& is)
             // set NAME PARAMETER { VALUE }
             para = Tokenizer::get_symbol(is);
         }
-        
+        VLOG("-SET `" << name << "' " << para);
+
         // set NAME { PARAMETER = VALUE }
         blok = Tokenizer::get_block(is, '{', true);
         
-        if ( do_change )
+        if ( para == "display" )
+        {
+            if ( name == sim_->prop.name() )
+            {
+                sim_->prop.display = blok;
+                sim_->prop.display_fresh = true;
+            }
+            else
+            {
+                opt.define(para, blok);
+                execute_change(name, opt, false);
+            }
+        }
+        else if ( do_change )
         {
             if ( para.empty() )
                 opt.read(blok);
             else
                 opt.define(para, blok);
             pp = execute_change(name, opt, do_set);
-        }
-        else if ( para == "display" )
-        {
-            opt.define(para, blok);
-            execute_change(name, opt, false);
         }
     }
 
@@ -1150,7 +1164,7 @@ void Parser::parse_repeat(std::istream& is)
     
     for ( size_t c = 0; c < cnt; ++c )
     {
-        VLOG("--repeat code " << c+1 << "/" << cnt << "\n");
+        VLOG("--repeat code " << c+1 << "/" << cnt);
         std::istringstream iss(code);
         std::streampos ipos(0);
         try {
@@ -1240,12 +1254,12 @@ void Parser::parse_for(std::istream& is)
     std::string code = Tokenizer::get_block(is, '{');
     code = Tokenizer::trim(code);
     
-    VLOG("--For `" << code << "' " << start << ":" << inc << ":" << end << "\n");
+    VLOG("--For `" << code << "' " << start << ":" << inc << ":" << end);
 
     for ( long v = start; v < end; v += inc )
     {
         std::string str = replace_bracketed_code(code, Evaluator{{var, v}});
-        VLOG("--for " << v << " -> |" << str << "|\n");
+        VLOG("--for " << v << " -> |" << str << "|");
         std::istringstream iss(str);
         std::streampos ipos(0);
         try {
@@ -1438,8 +1452,8 @@ void Parser::evaluate(std::string const& code)
 
 void Parser::readConfig(std::istream& is, std::string const& filename)
 {
-    VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change);
-    VLOG("  new " << do_new << "  run " << do_run << "  write " << do_write << "\n");
+    VLOG("--Parse `" << filename << "'  set " << do_set << "  change " << do_change\
+         << "  new " << do_new << "  run " << do_run << "  write " << do_write);
 
     Parser * back = sim_->parser();
     sim_->parser(this);

@@ -30,9 +30,6 @@ private:
     /// usually create one object, following options in Glossary
     ObjectList new_object(ObjectSet*, Property const*, Glossary&);
     
-    /// change values in given Property as specified in Glossary
-    void change_property(Property*, Glossary&);
-    
     /// read the specification of position and orientation of an object
     bool read_placement(Isometry&, Glossary&);
     
@@ -92,9 +89,9 @@ public:
     /// change values of all Property of category `cat`
     void execute_change_all(std::string const& cat, Glossary&);
     
-    /// change some value in the Simul's property
-    void change_simul_property(Glossary& opt);
-    
+    /// change values in given Property as specified in Glossary
+    void change_property(Property*, Glossary&);
+
     /// create `cnt` objects of type `name`, following options in Glossary
     ObjectList execute_new(std::string const& cat, std::string const& name, Glossary&, size_t cnt);
 
