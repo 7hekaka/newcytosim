@@ -130,10 +130,20 @@ static void changePointDispSize(PropertyList const& plist, int inc, bool dos, bo
 static void setPointDispVisible(PropertyList const& plist, int val)
 {
     if ( plist.empty() )
+    {
         flashText("no relevant object");
+        return;
+    }
     
     for ( Property * i : plist )
         toPointDisp(i)->visible = val;
+
+    std::string cat = plist.front()->category();
+
+    if ( val )
+        flashText("All "+cat+" visible");
+    else
+        flashText("No "+cat+" visible");
 }
 
 
@@ -167,15 +177,10 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
     else
     {
         size_t cnt = 0;
-        std::string cat = plist.front()->category();
         PointDisp * p = nextVisiblePointDisp(plist, cnt);
         if ( cnt == 0 )
         {
             setPointDispVisible(plist, val);
-            if ( val )
-                flashText("All "+cat+" visible");
-            else
-                flashText("No "+cat+" visible");
         }
         else
         {
@@ -187,8 +192,6 @@ static void shufflePointDispVisible(const PropertyList& plist, int val)
                 p->visible = val;
                 flashText("Only `%s' is visible", p->name_str());
             }
-            else
-                flashText("No "+cat+" visible");
         }
     }
 }
@@ -1212,14 +1215,12 @@ void processKey(unsigned char key, int modifiers = 0)
             break;
 
         case '0':
-            if ( altKeyDown || shiftKeyDown )
-                setPointDispVisible(player.allHandDisp(), shiftKeyDown);
-            else
-                shufflePointDispVisible(player.allHandDisp(), 1);
+            shufflePointDispVisible(player.allHandDisp(), 1);
             break;
         
-        case 3:  // ENTER
-            setPointDispVisible(player.allHandDisp(), 1);
+        case ')': // flip between hiding/showing all hands
+            setPointDispVisible(player.allHandDisp(), player.allVisibleHandDisp().empty());
+            break;
 
 #if 0
         case 185: //that is the key left of '=' on the numpad
