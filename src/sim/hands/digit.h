@@ -77,7 +77,7 @@ public:
 
 
     /// transfer to given site if it is vacant
-    void jumpTo(lati_t p) { if ( vacantLattice(p) ) hopLattice(p); }
+    void jumpTo(lati_t p) { if ( !valLattice(p) ) hopLattice(p); }
     
     /// relocate without checking intermediate sites
     void jumpToEndM() { jumpTo(lattice()->entry()); }

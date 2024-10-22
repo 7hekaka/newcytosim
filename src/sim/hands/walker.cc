@@ -64,7 +64,7 @@ void Walker::stepUnloaded()
             if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
-        else if ( vacantLattice(s) )
+        else if ( !valLattice(s) )
             hopLattice(s);
     
         nextAct += RNG.exponential();
@@ -105,7 +105,7 @@ void Walker::stepLoaded(Vector const& force)
             if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
-        else if ( vacantLattice(s) )
+        else if ( !valLattice(s) )
             hopLattice(s);
         
         nextAct += RNG.exponential();

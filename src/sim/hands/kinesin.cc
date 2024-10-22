@@ -52,7 +52,7 @@ void Kinesin::stepUnloaded()
             if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
-        else if ( vacantLattice(s) )
+        else if ( !valLattice(s) )
             hopLattice(s);
     
         if ( dir == 1 )
@@ -90,7 +90,7 @@ void Kinesin::stepLoaded(Vector const& force)
             if ( RNG.test_not(prop()->hold_growing_end[out-1]) )
                 return detach();
         }
-        else if ( vacantLattice(s) )
+        else if ( !valLattice(s) )
             hopLattice(s);
     
         if ( dir == 1 )

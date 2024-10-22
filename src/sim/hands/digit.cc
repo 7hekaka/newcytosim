@@ -49,13 +49,9 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
                 return false;
         }
         
-#if FIBER_HAS_LATTICE > 0
-        if ( lat->data(s) & prop()->footprint )
+        if ( valLattice(lat, s) )
             return false;
-#elif FIBER_HAS_LATTICE < 0
-        if ( lat->data(s) != 0.0 )
-            return false;
-#endif
+        
         // adjust to match selected lattice site:
         sit.engageLattice(s, prop()->site_shift);
 #endif
@@ -100,7 +96,7 @@ void Digit::crawlP(const int n)
     
     while ( s < e )
     {
-        if ( vacantLattice(s+1) )
+        if ( !valLattice(s+1) )
             ++s;
         else
             break;
@@ -120,7 +116,7 @@ void Digit::crawlM(const int n)
     
     while ( s > e )
     {
-        if ( vacantLattice(s-1) )
+        if ( !valLattice(s-1) )
             --s;
         else
             break;
@@ -237,7 +233,7 @@ bool Fiber::resetLattice(bool lazy)
         {
             Digit* i = static_cast<Digit*>(h);
             FiberSite::lati_t s = i->site();
-            if ( i->vacantLattice(s) )
+            if ( !i->valLattice(s) )
             {
                 i->incLattice();
                 i->setAbscissa(uni * s + i->prop()->site_shift);

@@ -38,7 +38,7 @@ void Myosin::stepUnloaded()
         lati_t s = site() + 1;
         if ( outsideMP(s) ) //immediately detach at the end of the Fiber:
             return detach();
-        if ( vacantLattice(s) )
+        if ( !valLattice(s) )
             hopLattice(s);
         nextAct += RNG.exponential();
     }
@@ -65,7 +65,7 @@ void Myosin::stepLoaded(Vector const& force)
         lati_t s = site() + 1;
         if ( outsideMP(s) )  //immediately detach at the end of the Fiber:
             return detach();
-        if ( vacantLattice(s) )
+        if ( !valLattice(s) )
             hopLattice(s);
         nextAct += RNG.exponential();
     }

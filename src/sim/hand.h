@@ -176,14 +176,17 @@ public:
 
 #if FIBER_HAS_LATTICE > 0
     
-    /// true if none of the Lattice's site bits matches the footprint
-    bool vacantLattice(lati_t s) const { return 0 == (hLattice->data(s) & prop->footprint); }
+    /// return current Lattice's site bits corresponding to the hand's footprint
+    lati_t valLattice(lati_t s) const { return (hLattice->data(s) & prop->footprint); }
+
+    /// return given lattice site bits corresponding to the hand's footprint
+    lati_t valLattice(FiberLattice const* lat, lati_t s) const { return (lat->data(s) & prop->footprint); }
 
     /// flip footprint bits on current site
-    void incLattice() const { assert_true(vacantLattice(hSite)); hLattice->data(hSite) ^= prop->footprint; }
+    void incLattice() const { assert_false(valLattice(hSite)); hLattice->data(hSite) ^= prop->footprint; }
 
     /// flip footprint bits on current site
-    void decLattice() const { hLattice->data(hSite) ^= prop->footprint; assert_true(vacantLattice(hSite)); }
+    void decLattice() const { hLattice->data(hSite) ^= prop->footprint; assert_false(valLattice(hSite)); }
 
     /// set FiberSite at index `s` with an abscissa `off` within the site
     void hopLattice(lati_t s)
@@ -199,8 +202,11 @@ public:
 
 #elif FIBER_HAS_LATTICE < 0
 
-    /// true if given Lattice's site is zero
-    bool vacantLattice(lati_t s) const { return hLattice->data(s) == 0.0; }
+    /// return current lattice value at given site
+    auto valLattice(lati_t s) const { return hLattice->data(s); }
+
+    /// return given lattice value at given site
+    auto valLattice(FiberLattice const* lat, lati_t s) const { return lat->data(s); }
 
     /// add 1.0 to Lattice's site
     void incLattice() const { hLattice->data(hSite) += prop->footprint; }
@@ -222,7 +228,7 @@ public:
 
 #else
 
-    bool vacantLattice(lati_t) const { return true; }
+    bool valLattice(lati_t) const { return false; }
     void incLattice() const {}
     void decLattice() const {}
     
