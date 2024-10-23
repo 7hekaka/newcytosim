@@ -1570,7 +1570,8 @@ Draw segments of length 'inc' and 'onk' of alternating colors, in register with 
 void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
                                  gym_color col, real onk, gym_color lor) const
 {
-    const gym_color black(0,0,0,1);
+    gym_color black(0,0,0,1);
+    if ( fib.mark() ) black.set(0.75,0.75,0.75,1);
     const real uni = inc + onk;
     const real len = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
@@ -1636,7 +1637,8 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
 void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
                                gym_color col, real onk, gym_color lor) const
 {
-    const gym_color black(0,0,0,1);
+    gym_color black(0,0,0,1);
+    if ( fib.mark() ) black.set(0.75,0.75,0.75,1);
     const real uni = inc + onk;
     Vector pos, nxt, old = fib.displayPosM(0);
     const real len = fib.length();
@@ -1690,7 +1692,8 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
 void Display::drawFiberStripedClip(Fiber const& fib, float rad, real inc,
                                    gym_color col, real onk, gym_color lor) const
 {
-    const gym_color black(0,0,0,1);
+    gym_color black(0,0,0,1);
+    if ( fib.mark() ) black.set(0.75,0.75,0.75,1);
     const real uni = inc + onk;
     Vector pos, nxt, old = fib.displayPosM(0);
     const real len = fib.length();
