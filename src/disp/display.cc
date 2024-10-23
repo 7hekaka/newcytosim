@@ -1565,26 +1565,26 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
 
 
 /**
-Draw segments of length 'inc' and 'onc' of alternating colors, in register with Fiber's abscissa
+Draw segments of length 'inc' and 'onk' of alternating colors, in register with Fiber's abscissa
 */
 void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
-                                 gym_color col, real onc, gym_color lor) const
+                                 gym_color col, real onk, gym_color lor) const
 {
     const gym_color black(0,0,0,1);
-    const real uni = inc + onc;
+    const real uni = inc + onk;
     const real len = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
     real abs = uni * cnt - fib.abscissaM();
     // abs in [0, uni] is now relative to minus end
-    if ( abs > onc )
+    if ( abs > onk )
     {
         cnt = 2*cnt - 1; // drawing first slice of size `inc`
-        abs -= onc;
-        std::swap(inc, onc);
+        abs -= onk;
+        std::swap(inc, onk);
     }
     else
     {
-        cnt = 2*cnt; // drawing second slice of size `onc`
+        cnt = 2*cnt; // drawing second slice of size `onk`
         std::swap(col, lor);
     }
     gym_color clr = col;
@@ -1609,7 +1609,7 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
         ptr[0] = { clr, pos - off };
         ptr[1] = { clr, pos + off };
         std::swap(col, lor);
-        std::swap(inc, onc);
+        std::swap(inc, onk);
         if ( (++cnt & 15) == 1 ) clr = black; else clr = col;
         ptr[2] = { clr, pos - off };
         ptr[3] = { clr, pos + off };
@@ -1630,29 +1630,29 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
 
 
 /**
- Draw segments of length 'inc, onc' of alternating colors, in register with Fiber's abscissa
+ Draw segments of length 'inc, onk' of alternating colors, in register with Fiber's abscissa
  Every 16th stripe is drawn in black, hence with separation of 256 nm for microtubules
 */
 void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
-                               gym_color col, real onc, gym_color lor) const
+                               gym_color col, real onk, gym_color lor) const
 {
     const gym_color black(0,0,0,1);
-    const real uni = inc + onc;
+    const real uni = inc + onk;
     Vector pos, nxt, old = fib.displayPosM(0);
     const real len = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
     real abs = uni * cnt - fib.abscissaM();
     // abs in [0, uni] is now relative to minus end
-    if ( abs > onc )
+    if ( abs > onk )
     {
         cnt = 2*cnt - 1; // drawing first slice of size `inc`
-        pos = fib.displayPosM(abs-onc);
+        pos = fib.displayPosM(abs-onk);
         nxt = fib.displayPosM(abs);
         gym::color_load(col);
     }
     else
     {
-        cnt = 2*cnt; // drawing second slice of size `onc`
+        cnt = 2*cnt; // drawing second slice of size `onk`
         pos = fib.displayPosM(abs);
         nxt = fib.displayPosM(abs+inc);
         gym::color_load(lor);
@@ -1665,7 +1665,7 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
     // draw middle segments:
     while ( abs < len )
     {
-        abs += (cnt&1)?inc:onc;
+        abs += (cnt&1)?inc:onk;
         old = pos;
         pos = nxt;
         nxt = fib.displayPosM(abs);
@@ -1684,29 +1684,29 @@ void Display::drawFiberStriped(Fiber const& fib, float rad, real inc,
 
 
 /**
- Draw segments of length 'inc, onc' of alternating colors, in register with Fiber's abscissa
+ Draw segments of length 'inc, onk' of alternating colors, in register with Fiber's abscissa
  Every 16th stripe is drawn in black, hence with separation of 256 nm for microtubules
 */
 void Display::drawFiberStripedClip(Fiber const& fib, float rad, real inc,
-                               gym_color col, real onc, gym_color lor) const
+                                   gym_color col, real onk, gym_color lor) const
 {
     const gym_color black(0,0,0,1);
-    const real uni = inc + onc;
+    const real uni = inc + onk;
     Vector pos, nxt, old = fib.displayPosM(0);
     const real len = fib.length();
     int cnt = 1 + (int)std::floor(fib.abscissaM()/uni);
     real abs = uni * cnt - fib.abscissaM();
     // abs in [0, uni] is now relative to minus end
-    if ( abs > onc )
+    if ( abs > onk )
     {
         cnt = 2*cnt - 1; // drawing first slice of size `inc`
-        pos = fib.displayPosM(abs-onc);
+        pos = fib.displayPosM(abs-onk);
         nxt = fib.displayPosM(abs);
         gym::color_load(col);
     }
     else
     {
-        cnt = 2*cnt; // drawing second slice of size `onc`
+        cnt = 2*cnt; // drawing second slice of size `onk`
         pos = fib.displayPosM(abs);
         nxt = fib.displayPosM(abs+inc);
         gym::color_load(lor);
@@ -1730,7 +1730,7 @@ void Display::drawFiberStripedClip(Fiber const& fib, float rad, real inc,
     // draw segments
     while ( abs < len )
     {
-        abs += (cnt&1)?inc:onc;
+        abs += (cnt&1)?inc:onk;
         old = pos;
         pos = nxt;
         nxt = fib.displayPosM(abs);

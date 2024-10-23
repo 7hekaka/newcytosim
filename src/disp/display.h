@@ -215,16 +215,16 @@ public:
     void drawFiberWide(Fiber const& fib, float rad) const;
 
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
-    void drawFiberStriped2D(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
+    void drawFiberStriped2D(Fiber const&, float rad, real inc, gym_color, real onk, gym_color) const;
     
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
-    void drawFiberArrowed2D(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
+    void drawFiberArrowed2D(Fiber const&, float rad, real inc, gym_color, real onk, gym_color) const;
 
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
-    void drawFiberStriped(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
+    void drawFiberStriped(Fiber const&, float rad, real inc, gym_color, real onk, gym_color) const;
 
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
-    void drawFiberStripedClip(Fiber const&, float rad, real inc, gym_color, real onc, gym_color) const;
+    void drawFiberStripedClip(Fiber const&, float rad, real inc, gym_color, real onk, gym_color) const;
 
     /// actin-like rendering using a sphere to represent each monomer
     void drawFilament(Fiber const& fib, real, gym_color, gym_color, gym_color) const;
