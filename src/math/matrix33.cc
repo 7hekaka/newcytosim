@@ -22,10 +22,11 @@ Vector3 Matrix33::rotationAxis() const
         return Vector3(1, 0, 0);
 }
 
-// trace() = 1 + 2 * cos(angle) =  { 3, -1 }
+// trace() = 1 + 2 * cos(angle) in [ -1, 3 ]
 real Matrix33::rotationAngle() const
 {
-    return std::acos(0.5*trace()-0.5);
+    real t = 0.5 * trace() - 0.5;
+    return std::acos(std::min(real(1), std::max(real(-1), t)));
 }
 
 
