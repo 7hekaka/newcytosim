@@ -1109,8 +1109,7 @@ void glApp::flashText(std::string const& str)
     if ( views.size() > 1 )
     {
         View & view = glApp::currentView();
-        view.flashText(str);
-        if ( view.window()==1 )
+        if ( view.flashText(str) )
             glutPostWindowRedisplay(1);
     }
 }

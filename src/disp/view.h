@@ -272,7 +272,7 @@ public:
     void drawMagnifier(float factor, Vector3 foc, Vector3 cen, int mX, int mY, int R) const;
     
     /// draw text for a brief moment near top-right corner
-    void flashText(std::string const& str);
+    bool flashText(std::string const& str);
 
     //---------------------------------------------------------------------------
 

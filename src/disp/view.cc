@@ -922,14 +922,16 @@ void View::drawMagnifier(float mag, Vector3 foc, Vector3 cen, int mX, int mY, in
 }
 
 
-void View::flashText(std::string const& str)
+bool View::flashText(std::string const& str)
 {
     if ( str != flash )
     {
         //std::clog << " flashText " << str << "\n";
         flash = str;
         flash_end = TimeDate::seconds_since_1970() + 3.0;
+        return window() == 1;
     }
+    return 0;
 }
 
 
