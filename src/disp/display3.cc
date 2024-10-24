@@ -1194,10 +1194,12 @@ void Display3::drawCoupleBwalk(Couple const* cx) const
         gym_color lor = pd1->color;
         if ( int(i) & 1 ) col = col.darken(DK); else lor = lor.darken(DK);
         gym::color_both(col);
-        drawObject(h1+fib->pos(b), S, gle::blob);
+        gym::transScale(h1+fib->pos(b), S);
+        gle::blob();
         gym::color_both(lor);
-        drawObject(h1+fib->pos(x)+y*T1, S, gle::blob);
-        
+        gym::transScale(h1+fib->pos(x)+y*T1, S);
+        gle::blob();
+
         // grounded foot is at position 'b' and uplifted one at (x, y):
         fib = cx->fiber2();
         a = cx->hand2()->abscissa();
@@ -1211,9 +1213,11 @@ void Display3::drawCoupleBwalk(Couple const* cx) const
         lor = pd2->color;
         if ( int(i) & 1 ) col = col.darken(DK); else lor = lor.darken(DK);
         gym::color_both(col);
-        drawObject(h2+fib->pos(b), S, gle::blob);
+        gym::transScale(h2+fib->pos(b), S);
+        gle::blob();
         gym::color_both(lor);
-        drawObject(h2+fib->pos(x)+y*T2, S, gle::blob);
+        gym::transScale(h2+fib->pos(x)+y*T2, S);
+        gle::blob();
     }
 }
 
