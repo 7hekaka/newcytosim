@@ -18,7 +18,7 @@
 #if ( 1 )
 #  define DPTTRF alsatian_xpttrf
 #  define DPTTS2 alsatian_xptts2
-#  define USE_FUSED_PROJECT_FORCES ( USE_SIMD && !NEW_ANISOTROPIC_FIBER_DRAG )
+#  define USE_FUSED_PROJECT_FORCES ( REAL_IS_DOUBLE && USE_SIMD && !NEW_ANISOTROPIC_FIBER_DRAG )
 #elif ( 0 )
 #  define DPTTRF lapack_xpttrf
 #  define DPTTS2 lapack_xptts2
