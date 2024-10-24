@@ -178,13 +178,20 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
         if ( S > 0.1 )
         {
             Vector3 vec(mat);
-            // switch between immediate alignment versus slow by default:
-            real damp = ( mode & 16 ? 20 : 0 );
-            real flip = std::copysign(1.0, dot(view.firstAxis(), vec));
-            // if `damp>0`, time-average the direction vector:
-            dir = ( dir * damp + vec * flip ).normalized();
-            if ( glApp::mouseS ) // only track if mouse button is up!
-                view.align_with(dir, 0.01);
+            vec *= std::copysign(1.0, dot(dir, vec));
+            // switch between immediate alignment (default) versus gradual:
+            if ( mode & 16 )
+            {
+                // time-average the direction vector:
+                dir = ( dir * 20 + vec ).normalized();
+                if ( glApp::mouseS ) // only track if mouse button is up!
+                    view.align_with(dir, false, 0.01);
+            }
+            else
+            {
+                dir = vec;
+                view.align_with(dir, false, 1.0);
+            }
         }
     }
 
@@ -302,7 +309,7 @@ void Player::drawCytosim()
 #if 0
     static double sec = TimeDate::milliseconds();
     double now = TimeDate::milliseconds();
-    fprintf(stderr, "drawCytosim(%8.3f) %.0f\n", simul.time(), now-sec);
+    fprintf(stderr, "drawCytosim(%8.3f) %.2f msec\n", simul.time(), now-sec);
     sec = now;
 #endif
     try {

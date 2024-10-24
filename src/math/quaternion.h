@@ -582,7 +582,7 @@ public:
         v[3] = std::atan2(q[3], q[2]);
     }
     
-    /// set as rotation of axis v, angle defined by cosine & sine of HALF-ANGLE
+    /// set as rotation of axis v, angle defined by cosine & sine of the HALF-ANGLE
     /** argument `v` should be unitary (norm=1), or S should be divided by the norm */
     void setFromAxis(const REAL v[3], REAL C, REAL S)
     {
@@ -664,18 +664,15 @@ public:
     {
         // axis is obtained by vector product: axis = cross(X, dir)
         REAL axis[3] = { 0, dir[2], -dir[1] };
-        // norm(axis) = sin(angle) = 2 * S * C
+        // norm(axis) = sin(angle) = 2 * S * C, with C,S for the half-angle!
         // cosine(angle) = scalar product(dir, X) = dir[0]
         // need half-angle for Quaternion, obtained by trigonometric identity:
         REAL half(0.5);
         REAL C = std::max(REAL(0), std::sqrt(half+half*dir[0]));
         if ( C > FLT_EPSILON )
             setFromAxis(axis, C, half/C); // since S / n = 0.5 / C
-        else
-        {
-            REAL nX = std::sqrt(dir[1]*dir[1] + dir[2]*dir[2]);
-            setFromAxis(axis, 0, REAL(1)/nX);
-        }
+        else // this can only be if dir = {-1,0,0}
+            set(0,0,1,0);
     }
     
     /// set as rotation to transform `dir` into (1, 0, 0), assuming norm(dir)==1
@@ -684,8 +681,13 @@ public:
         // axis is obtained by vector product: axis = cross(X, dir)
         REAL axis[3] = { 0, dir[2], -dir[1] };
         REAL N = std::sqrt(dir[1]*dir[1] + dir[2]*dir[2]);
-        REAL A = std::atan2(N, dir[0]) * ( 0.5 * scale );
-        setFromAxis(axis, std::cos(A), std::sin(A)/N);
+        if ( N > FLT_EPSILON )
+        {
+            REAL A = std::atan2(N, dir[0]) * ( 0.5 * scale );
+            setFromAxis(axis, std::cos(A), std::sin(A)/N);
+        }
+        else
+            set(1,0,0,0);
     }
 
     /// set as rotation transforming `A` into `B`, assuming norm(B)==1
@@ -707,15 +709,13 @@ public:
          */
         REAL half(0.5);
         REAL C = std::sqrt(std::max(REAL(0), half+half*d));
+        
         //REAL S = std::sqrt(std::max(REAL(0), half-half*d));
         //printf(" axis( %+9.3f %+9.3f %+9.3f  %9.3f )", X[0], X[1], X[2], C*C+S*S);
         if ( C > FLT_EPSILON )
             setFromAxis(X, C, half/(nA*C));
         else
-        {
-            REAL nX = std::sqrt( X[0]*X[0] + X[1]*X[1] + X[2]*X[2] );
-            setFromAxis(X, 0, REAL(1)/nX);
-        }
+            set(0,0,1,0);
 #if 0
         real V[3] = { A[0], A[1], A[2] };
         rotateVector(V, V);
@@ -749,7 +749,7 @@ public:
         return 0;
     }
     
-    /// compute the axis and return the angle of the rotation
+    /// compute the axis of the rotation
     void getAxis(REAL v[3]) const
     {
         REAL n = std::sqrt( q[1]*q[1] + q[2]*q[2] + q[3]*q[3] );
