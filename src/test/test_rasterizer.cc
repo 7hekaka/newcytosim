@@ -49,13 +49,13 @@ extern bool rasterizer_draws;
 
 void drawDots(size_t N, const Vector P[], float size, gym_color col)
 {
-    gym::ref_view();
     flute8 * flu = gym::mapBufferC4V4(N);
     size_t i = 1;
     flu[0] = { col.mix(gym_color(1,1,1,1)), P[0] };
     for ( ; i < N; ++i )
         flu[i] = { col, P[i] };
     gym::unmapBufferC4V4();
+    gym::ref_view();
     gym::drawPoints(size, 0, i);
     gym::cleanupCV();
 }

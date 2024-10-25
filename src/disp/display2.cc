@@ -237,7 +237,6 @@ void Display2::drawCoupleB(Couple const* cx) const
     
     if ( pd1->perceptible || pd2->perceptible )
     {
-        gym::ref_view();
         flute4D* flu = gym::mapBufferC4VD(4);
 #if DIM < 2
         flu[0] = { pd1->color, p1 };
@@ -260,6 +259,7 @@ void Display2::drawCoupleB(Couple const* cx) const
         flu[3] = { col2, p2 };
 #endif
         gym::unmapBufferC4VD();
+        gym::ref_view();
         gym::drawLines(pd1->widthX, 0, 4);
         gym::cleanupCV();
     }

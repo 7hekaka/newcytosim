@@ -405,7 +405,6 @@ namespace gle
     // this is used to calculate the vertices of the icosahedron
     void icoFace(float* a, float* b, float* c)
     {
-        gym::ref_view();
         float nx = (a[0]+b[0]+c[0]) / 3.0f;
         float ny = (a[1]+b[1]+c[1]) / 3.0f;
         float nz = (a[2]+b[2]+c[2]) / 3.0f;
@@ -418,6 +417,7 @@ namespace gle
         pts[1] = {b[0], b[1], b[2], nx, ny, nz};
         pts[2] = {c[0], c[1], c[2], nx, ny, nz};
         gym::unmapBufferV3N3();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 3);
         if ( 1 ) {
             printf("%2.0f, %2.0f, %2.0f, %+9.7f, %+9.7f, %+9.7f\n", a[0], a[1], a[2], nx, ny, nz);
@@ -1998,7 +1998,6 @@ namespace gle
         real n = d.norm();
         if ( n > 0 )
         {
-            gym::ref_view();
             d *= rad / n;
             flute2 * pts = gym::mapBufferV2(4);
             pts[0] = A + d;
@@ -2006,6 +2005,7 @@ namespace gle
             pts[2] = B + d;
             pts[3] = B - d;
             gym::unmapBufferV2();
+            gym::ref_view();
             gym::drawTriangleStrip(0, 4);
         }
     }
@@ -2017,7 +2017,6 @@ namespace gle
         real n = t.norm();
         if ( n > 0 )
         {
-            gym::ref_view();
             d *= rad / n;
             t *= rad / n;
             flute2 * pts = gym::mapBufferV2(6);
@@ -2028,6 +2027,7 @@ namespace gle
             pts[4] = B + d;
             pts[5] = B + t;
             gym::unmapBufferV2();
+            gym::ref_view();
             gym::drawTriangleStrip(0, 6);
         }
     }
@@ -2036,7 +2036,6 @@ namespace gle
     void drawBand(Vector1 const& A, float rA,
                   Vector1 const& B, float rB)
     {
-        gym::ref_view();
         float AX(A.XX);
         float BX(B.XX);
         flute2 * pts = gym::mapBufferV2(4);
@@ -2045,6 +2044,7 @@ namespace gle
         pts[2] = { BX, rB };
         pts[3] = { BX,-rB };
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
     }
     
@@ -2055,7 +2055,6 @@ namespace gle
         real n = d.norm();
         if ( n > 0 )
         {
-            gym::ref_view();
             float dX(d.XX/n), dY(d.YY/n);
             float AX(A.XX), AY(A.YY);
             float BX(B.XX), BY(B.YY);
@@ -2065,6 +2064,7 @@ namespace gle
             pts[4] = { BX+rB*dX, BY+rB*dY };
             pts[7] = { BX-rB*dX, BY-rB*dY };
             gym::unmapBufferV2();
+            gym::ref_view();
             gym::drawTriangleStrip(0, 4);
         }
     }
@@ -2072,7 +2072,6 @@ namespace gle
     void drawBand(Vector1 const& A, float rA, gym_color cA,
                   Vector1 const& B, float rB, gym_color cB)
     {
-        gym::ref_view();
         float AX(A.XX);
         float BX(B.XX);
         flute6 * flu = gym::mapBufferC4V2(4);
@@ -2081,6 +2080,7 @@ namespace gle
         flu[2] = { cB, BX, -rB };
         flu[3] = { cB, BX,  rB };
         gym::unmapBufferC4V2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
         gym::cleanupCV();
     }
@@ -2088,7 +2088,6 @@ namespace gle
     void drawBand(Vector2 const& A, float rA, gym_color cA,
                   Vector2 const& B, float rB, gym_color cB)
     {
-        gym::ref_view();
         Vector2 d = ( B - A ).orthogonal();
         real n = d.norm();
         if ( n > 0 )
@@ -2102,6 +2101,7 @@ namespace gle
             flu[2] = { cB, BX+rB*dX, BY+rB*dY };
             flu[3] = { cB, BX-rB*dX, BY-rB*dY };
             gym::unmapBufferC4V2();
+            gym::ref_view();
             gym::drawTriangleStrip(0, 4);
             gym::cleanupCV();
         }
@@ -2115,7 +2115,6 @@ namespace gle
     void drawHourglass(Vector2 const& A, Vector2 const& dA,
                        Vector2 const& B, Vector2 const& dB)
     {
-        gym::ref_view();
         flute2 * pts = gym::mapBufferV2(6);
         pts[0] = B-dB;
         pts[1] = B;
@@ -2124,6 +2123,7 @@ namespace gle
         pts[4] = B;
         pts[5] = B+dB;
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 6);
     }
     
@@ -2154,7 +2154,6 @@ namespace gle
     void drawCross(Vector2 const& A, Vector2 const& dA,
                    Vector2 const& B, Vector2 const& dB, real rad)
     {
-        gym::ref_view();
         flute2 * pts = gym::mapBufferV2(8);
         pts[0] = A-rad*dA;
         pts[1] = A;
@@ -2165,6 +2164,7 @@ namespace gle
         pts[6] = B;
         pts[7] = B+rad*dB;
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
         gym::drawTriangleStrip(4, 4);
         gym::cleanupV();
@@ -2173,7 +2173,6 @@ namespace gle
     void drawBar(Vector3 const& A, Vector3 const& dA,
                  Vector3 const& B, Vector3 const& dB, real rad)
     {
-        gym::ref_view();
         Vector3 ab = normalize( A - B );
         Vector3 ea = cross(ab, dA);
         Vector3 eb = cross(ab, dB);
@@ -2195,6 +2194,7 @@ namespace gle
         pts[14] = B-rad*dB;
         pts[15] = B+rad*dB;
         gym::unmapBufferV3();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
         gym::drawTriangleStrip(4, 4);
         gym::drawTriangleStrip(8, 4);
@@ -2209,7 +2209,6 @@ namespace gle
      */
     void drawDumbbell(Vector2 const& A, Vector2 const& B, float diameter)
     {
-        gym::ref_view();
         const float S(1.0996361107912678f); //sqrt( 2 * M_PI / ( 3 * sqrt(3) ));
         const float R(diameter * S);
         Vector2 x = ( B - A ).normalized(R*0.8660254037844386f);
@@ -2228,13 +2227,13 @@ namespace gle
         pts[10] = B+x-y;
         pts[11] = B+x+y;
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 12);
         gym::cleanupV();
     }
     
     void drawTipi(real* ref, int inx, real rad)
     {
-        gym::ref_view();
         flute3 S(ref+3*inx);
         flute3 A(ref+3*inx+1);
         flute3 B(ref+3*inx+2);
@@ -2242,6 +2241,7 @@ namespace gle
         flute6 * pts = gym::mapBufferV3N3(18);
         pts[0] = {S, B};
         gym::unmapBufferV3N3();
+        gym::ref_view();
         gym::drawTriangles(0, 4);
         gym::cleanupVN();
     }
@@ -2251,7 +2251,6 @@ namespace gle
     
     void drawCone(Vector1 const& pos, Vector1 const& dir, const float rad)
     {
-        gym::ref_view();
         float dx = rad * dir.XX, cx = pos.XX;
         flute2 * pts = gym::mapBufferV2(4);
         pts[0] = {cx-dx, dx};
@@ -2259,12 +2258,12 @@ namespace gle
         pts[2] = {cx+dx+dx, 0};
         pts[3] = {cx-dx,-dx };
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
     }
     
     void drawCone(Vector2 const& pos, Vector2 const& dir, const float rad)
     {
-        gym::ref_view();
         float dx(rad*dir.XX), cx(pos.XX);
         float dy(rad*dir.YY), cy(pos.YY);
         float dxy = dx + dy, dyx = dy - dx;
@@ -2274,6 +2273,7 @@ namespace gle
         pts[2] = {cx+2*dx, cy+2*dy};
         pts[3] = {cx+dyx, cy-dxy};
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
     }
     
@@ -2287,7 +2287,6 @@ namespace gle
     
     void drawCylinder(Vector1 const& pos, Vector1 const& dir, float rad)
     {
-        gym::ref_view();
         float cx(pos.XX);
         float dx(rad * dir.XX * 0.5);
         flute2 * pts = gym::mapBufferV2(4);
@@ -2296,12 +2295,12 @@ namespace gle
         pts[2] = {cx+dx,-rad};
         pts[3] = {cx+dx, rad};
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
     }
     
     void drawCylinder(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        gym::ref_view();
         float dx(rad * dir.XX), cx(pos.XX - dx * 0.5);
         float dy(rad * dir.YY), cy(pos.YY - dy * 0.5);
         flute2 * pts = gym::mapBufferV2(4);
@@ -2310,6 +2309,7 @@ namespace gle
         pts[2] = {cx+dx+dy, cy+dy-dx};
         pts[3] = {cx+dx-dy, cy+dy+dx};
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 4);
     }
     
@@ -2324,7 +2324,6 @@ namespace gle
     
     void drawArrowTail(Vector1 const& pos, Vector1 const& dir, float rad)
     {
-        gym::ref_view();
         float dx(rad * dir.XX);
         float cx(pos.XX - dx * 0.5 );
         flute2 * pts = gym::mapBufferV2(6);
@@ -2335,12 +2334,12 @@ namespace gle
         pts[4] = {cx-dx, dx};
         pts[5] = {cx+dx, dx};
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 6);
     }
     
     void drawArrowTail(Vector2 const& pos, Vector2 const& dir, float rad)
     {
-        gym::ref_view();
         float dx(rad * dir.XX);
         float dy(rad * dir.YY);
         float cx(pos.XX - 1.5f * dx);
@@ -2355,6 +2354,7 @@ namespace gle
         pts[4] = {cx-dy, cy+dx};
         pts[5] = {ex-dy, ey+dx};
         gym::unmapBufferV2();
+        gym::ref_view();
         gym::drawTriangleStrip(0, 6);
     }
     

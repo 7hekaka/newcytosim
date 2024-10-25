@@ -1185,7 +1185,6 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
-    gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
     gym_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
@@ -1233,6 +1232,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
             *ptr++ = {c, fib.pos(uni*(sup+0.5))};
         *ptr++ = {c, fib.posEndP()};
     }
+    gym::ref_view();
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLineStrip(rad, 0, ptr-flu);
@@ -1252,7 +1252,6 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
-    gym::ref_view();
     FiberDisp const*const disp = fib.prop->disp;
     gym_color c, col = disp->color;
     const real fac = 1 / disp->lattice_scale;
@@ -1302,6 +1301,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
         *ptr++ = {c, fib.posEndP()};
     }
     assert_true( ptr <= flu+cnt );
+    gym::ref_view();
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLines(rad, 0, ptr-flu);
@@ -1449,7 +1449,6 @@ void Display::drawFiberLabels(Fiber const& fib, int style) const
 /// display forces acting on the fiber's vertices, using lines scaled by 'mag'
 void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 {
-    gym::ref_view();
     gym_color col = fib.prop->disp->force_color;
     gym_color lor = col.alpha_scaled(0.5f);
     unsigned cnt = 2 * fib.nbPoints();
@@ -1461,6 +1460,7 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
         flu[  2*i] = { col, P };
         flu[1+2*i] = { lor, P+F };
     }
+    gym::ref_view();
     gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawLines(size, 0, cnt);
@@ -1556,8 +1556,8 @@ void Display::drawFiberArrowed2D(Fiber const& fib, float rad, real inc,
     ptr += 4;
     assert_true( ptr <= flu+top );
 
-    gym::unmapBufferC4VD();
     gym::ref_view();
+    gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawTriangleStrip(0, ptr-flu);
     gym::cleanupCV();
@@ -1622,8 +1622,8 @@ void Display::drawFiberStriped2D(Fiber const& fib, float rad, real inc,
     ptr += 2;
     assert_true( ptr <= flu+top );
 
-    gym::unmapBufferC4VD();
     gym::ref_view();
+    gym::unmapBufferC4VD();
     gym::disableLighting();
     gym::drawTriangleStrip(0, ptr-flu);
     gym::cleanupCV();

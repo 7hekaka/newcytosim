@@ -613,8 +613,8 @@ void View::sliceView(int mode) const
     if ( 0 == ( mode & 7 ))
         return;
     real off = 0.5;
-    gym::ref_view();
     Vector3 V = depthAxis();
+    gym::ref_view();
     switch ( mode )
     {
         case 1:

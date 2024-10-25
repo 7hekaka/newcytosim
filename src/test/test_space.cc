@@ -582,8 +582,6 @@ int display(View& view)
         spc->draw2D(1);
 #endif
     }
-    gym::ref_view();
-    gym::disableLighting();
     
     flute8* flu = gym::mapBufferC4V4(2*n_pts);
     gym_color col(0.f, COL, 0.f), lor(0.f, 0.f, COL);
@@ -599,6 +597,8 @@ int display(View& view)
         }
     }
     gym::unmapBufferC4V4();
+    gym::ref_view();
+    gym::disableLighting();
     gym::drawPoints(PS, 0, 2*n);
 
     if ( showProjection )
