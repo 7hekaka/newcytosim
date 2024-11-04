@@ -198,7 +198,7 @@ public:
     /// link unattached Single
     void addFreeSingle(Single*);
     
-    /// create a Single at given position
+    /// register given Single, which must be unattached
     Single * addFreeSingle(SingleProp const*, Vector const&);
 
     //--------------------------

@@ -940,7 +940,7 @@ real FiberSet::infoPosition(ObjectList const& objs, Vector& M, Vector& G, Vector
 static real computeNematicEigenvectors(real res[9], real sum, real M[9])
 {
     // rescale matrix, to ensure eigenvalue = 1 in perfect order
-    real beta = ( DIM >= 3 ) ? 0.5 : 1.0;
+    const real beta = ( DIM >= 3 ) ? 0.5 : 1.0;
     sum = beta * DIM / sum;
     for ( size_t d = 0; d < 9; ++d )
         M[d] = sum * M[d];
@@ -1142,7 +1142,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
     for ( Object * i : objs )
     {
         Fiber * fib = Fiber::toFiber(i);
-       if ( fib )
+        if ( fib )
         {
             const real w = fib->length() / fib->nbPoints();
             for ( size_t n = 0; n < fib->nbPoints(); ++n )
@@ -1171,7 +1171,7 @@ int FiberSet::infoComponents(ObjectList const& objs,
     
     /**
      Remove the mean:
-       (x-a)*(x-a) = x*x - 2x*a + a*a
+       (x-a)*(x-a) = x*x - 2x*a + a*a, hence <(x-a)^2> = <x^2> - a^2
        (x-a)*(y-b) = x*y - x*b - y*a + a*b
      */
     

@@ -364,7 +364,7 @@ int main(int argc, char* argv[])
                 std::cerr << " warning: could not read `" << setup << "'\n";
         }
         
-        // read settings, but keep anything set on the command-line:
+        // read settings, but keep anything already set on the command-line:
         arg.read(simul.prop.display, 1);
         simul.prop.display_fresh = false;
         //arg.print(std::cout);

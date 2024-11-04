@@ -246,7 +246,7 @@ public:
     /// create unattached Couples
     void makeCouples(size_t cnt[], PropertyID n_cnt);
     
-    /// return a Couple from the reserve, or made by newCouple()
+    /// register given Couple, which must be unattached
     void addFreeCouple(Couple*);
 
     //--------------------------

@@ -249,7 +249,7 @@ public:
     Vector clampForce() const { return clamp_stiff * ( clamp_place - posPoint(0) ); }
 #endif
 #if NEW_SOLID_HAS_TWIN
-    /// pointer to Solid linked to this one
+    /// pointer to the original Solid, if this is a twin
     Solid const* twin() const { return soTwin; }
     
     /// sum distance squared of links between twins
