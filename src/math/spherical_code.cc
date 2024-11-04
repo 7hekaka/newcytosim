@@ -78,22 +78,28 @@ void SphericalCode::scale(const real factor)
 }
 
 
-void SphericalCode::printAllPositions( FILE* file )
+void SphericalCode::printPoints(size_t num, real vec[], FILE* file)
 {
-    for ( size_t ii = 0; ii < num_points_; ++ii )
-        fprintf( file, "%f %f %f\n", coord_[3*ii], coord_[3*ii+1], coord_[3*ii+2]);
+    for ( size_t ii = 0; ii < num; ++ii )
+        fprintf(file, "%3lu   %f %f %f\n", ii, vec[3*ii], vec[3*ii+1], vec[3*ii+2]);
 }
 
 
-real SphericalCode::distance3( const real P[], const real Q[] )
+real SphericalCode::distance3(const real P[], const real Q[])
 {
-    return std::sqrt( (P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]) );
+    real X = P[0]-Q[0];
+    real Y = P[1]-Q[1];
+    real Z = P[2]-Q[2];
+    return std::sqrt(X*X + Y*Y + Z*Z);
 }
 
 
-real SphericalCode::distance3Sqr( const real P[], const real Q[] )
+real SphericalCode::distance3Sqr(const real P[], const real Q[])
 {
-    return (P[0]-Q[0])*(P[0]-Q[0]) + (P[1]-Q[1])*(P[1]-Q[1]) + (P[2]-Q[2])*(P[2]-Q[2]);
+    real X = P[0]-Q[0];
+    real Y = P[1]-Q[1];
+    real Z = P[2]-Q[2];
+    return (X*X + Y*Y + Z*Z);
 }
 
 //------------------------------------------------------------------------------
@@ -138,6 +144,80 @@ void SphericalCode::randomize(real P[3])
 }
 
 
+/// distribute the points randomly on the sphere:
+void SphericalCode::randomize(size_t num, real* vec)
+{
+    for ( size_t i = 0; i < num; ++i )
+        randomize(vec+i*3);
+}
+
+
+/// use Fibonacci's spiral on the sphere:
+void SphericalCode::distribute(size_t num, real* vec)
+{
+    real gold = 4 * M_PI / ( 1.0 + sqrt(5) );
+    real beta = 2.0 / num;
+    for ( size_t i = 0; i < num; ++i )
+    {
+        real a = i * gold;
+        real p = acos(1-(i+0.5)*beta);
+        vec[  i*3] = cos(a)*sin(p);
+        vec[1+i*3] = sin(a)*sin(p);
+        vec[2+i*3] = cos(p);
+    }
+}
+
+
+/// accessory class to pack 3D vertex data
+struct real3
+{
+    real xyz[3];
+    real3() : xyz{0, 0, 0} {}
+    real3(real x, real y, real z) : xyz{x, y, z} {}
+    //operator real const*() const { return xyz; }
+    operator real*() { return xyz; }
+};
+
+
+size_t initBlob(real3 vec[])
+{
+    const size_t FF = 54;
+    real U = 1.0;
+    real H = 0.5;
+    real S = M_SQRT1_2;
+    real O = std::sqrt(1/3.0); //0.57735
+    real T = std::sqrt(2/3.0); //0.816497
+    
+    real3 pts[] = {
+        {T, O, 0}, {H, S, H}, {U, 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
+        {0, -U, 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-U, 0, 0}, {-H, S, H},
+        {-T, O, 0}, {0, U, 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
+        {0, 0, -U}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {-S, 0, -S}, {0, O, T},
+        {0, 0, U}, {0, -O, T}
+    };
+
+    int inx[FF] = {
+        0, 1, 2, 3, 4, 5,
+        6, 7, 8, 9, 10, 11,
+        12, 13, 14, 15, 16, 17,
+        18, 19, 20, 21, 18, 22,
+        16, 14, 14, 12, 12, 14,
+        10, 22, 8, 21, 6, 19,
+        4, 17, 2, 15, 0, 13,
+        1, 11, 23, 9, 24, 7,
+        25, 5, 24, 3, 23, 1
+    };
+
+    for ( size_t i = 0; i < FF; ++i )
+        vec[i] = { 0, 0, 0 };
+
+    for ( size_t i = 0; i < 26; ++i )
+        SphericalCode::project(vec[i], pts[i]);
+
+    return FF;
+}
+
+
 //------------------------------------------------------------------------------
 /**
  With N points on the sphere according to a triagular lattice, 
@@ -167,18 +247,18 @@ real SphericalCode::minimumDistance()
 }
 
 
-real SphericalCode::coulombEnergy( const real P[] )
+real SphericalCode::coulombEnergy(size_t num, const real vec[])
 {
-    real dist, result = 0;
-    for ( size_t ii = 1; ii < num_points_; ++ii )
+    real res = 0;
+    for ( size_t ii = 1; ii < num; ++ii )
     {
         for ( size_t jj = 0; jj < ii; ++jj )
         {
-            dist = distance3( P + 3 * ii, P + 3 * jj );
-            if ( dist > 0 ) result += 1.0 / dist;
+            real d = distance3(vec + 3 * ii, vec + 3 * jj);
+            if ( d > 0 ) res += 1.0 / d;
         }
     }
-    return result;
+    return res;
 }
 
 //------------------------------------------------------------------------------
@@ -288,47 +368,33 @@ void SphericalCode::allocate(size_t nbp)
 }
 
 
-void SphericalCode::initializePoints()
-{
-#if 0
-    // distribute the points randomly on the sphere:
-    for ( size_t i = 0; i < num_points_; ++i )
-        randomize(coord_+i*3);
-#else
-    // use Fibonacci's spiral on the sphere:
-    real gold = 4 * M_PI / ( 1.0 + sqrt(5) );
-    real beta = 2.0 / num_points_;
-    for ( size_t i = 0; i < num_points_; ++i )
-    {
-        real a = i * gold;
-        real p = acos(1-(i+0.5)*beta);
-        coord_[  i*3] = cos(a)*sin(p);
-        coord_[1+i*3] = sin(a)*sin(p);
-        coord_[2+i*3] = cos(p);
-    }
-#endif
-}
-
-
 /**
  create a relatively even distribution of nbp points on the sphere
  the coordinates are stored in real array coord_[]
  */
 size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_iterations)
 {
+    size_t res = 0;
     allocate(nbp);
-    initializePoints();
+    if ( nbp == 26 )
+        initBlob((real3*)coord_);
+    else
+        distribute(nbp, coord_);
 
     //--------- for one point only, we return:
     if ( nbp > 1 )
-        return refinePoints(precision, mx_iterations);
-    return 0;
+    {
+        res = refinePoints(precision, mx_iterations);
+        //printPoints(nbp, coord_);
+    }
+    return res;
 }
 
 
 /**
  create a relatively even distribution of nbp points on the sphere
  the coordinates are stored in real array coord_[]
+ @ return number of iterations
  */
 size_t SphericalCode::refinePoints(real precision, size_t mx_iterations)
 {
@@ -351,7 +417,7 @@ size_t SphericalCode::refinePoints(real precision, size_t mx_iterations)
     
     //make an initial guess for the step size:
     unsigned history = 0;
-    energy_ = coulombEnergy(coord_);
+    energy_ = coulombEnergy(num_points_, coord_);
 
     size_t step = 0;
     for ( step = 0; step < mx_iterations; ++step )
@@ -363,7 +429,7 @@ size_t SphericalCode::refinePoints(real precision, size_t mx_iterations)
             movePoints(coord, coord_, force, mag);
             
             // energy of new configuration:
-            real energy = coulombEnergy(coord);
+            real energy = coulombEnergy(num_points_, coord);
             
             //printf("%3lu   %5lu : energy %18.10f   %18.10f\n", num_points_, step, energy, energy-energy_);
 

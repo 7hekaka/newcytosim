@@ -47,6 +47,30 @@ public:
     
     /// a-priori expected distance between neighboring points, as a function of number of points
     static real expectedDistance(size_t);
+    
+    /// set coordinates point P randomly on the sphere
+    static void randomize(real[3]);
+
+    /// distribute point randomly
+    static void randomize(size_t, real*);
+    
+    /// distribute point regularly
+    static void distribute(size_t, real*);
+    
+    /// project W on the sphere
+    static bool project(real P[3], const real W[3]);
+    
+    /// Calculate distance between point given their coordinates P and Q (3-dim)
+    static real distance3(const real P[], const real Q[]);
+    
+    /// Calculate distance between point given their coordinates P and Q (3-dim)
+    static real distance3Sqr(const real P[], const real Q[]);
+    
+    /// calculate Coulomb energy
+    static real coulombEnergy(size_t, const real P[]);
+    
+    /// write points coordinates
+    static void printPoints(size_t, real vec[], FILE* file = stdout);
 
     /// default constructor, does nothing
     SphericalCode();
@@ -61,7 +85,7 @@ public:
     size_t refinePoints(real precision, size_t mx_nb_iterations);
 
     /// distribute the nbp points on the sphere and store their coordinates
-    size_t distributePoints(size_t nbp, real precision, size_t mx_nb_iterations);
+    size_t distributePoints(size_t nbp, real precision, size_t mx_iterations);
 
     /// default destructor
     virtual ~SphericalCode();
@@ -93,9 +117,6 @@ public:
     /// copy the points coordinates onto `x[]`, allocated to hold `sup` elements
     void putPoints(real ptr[], const size_t sup);
     
-    /// write points coordinates
-    void printAllPositions(FILE* file = stdout);
-    
 private:
 
     /// This number affects convergence speed but not the result
@@ -116,21 +137,6 @@ private:
     /// Coulomb energy of current configuration
     real energy_;
     
-    /// project W on the sphere
-    bool project(real P[3], const real W[3]);
-    
-    /// set coordinates point P randomly on the sphere
-    void randomize(real P[3]);
-    
-    /// Calculate distance between point given their coordinates P and Q (3-dim)
-    real distance3(const real P[], const real Q[]);
-    
-    /// Calculate distance between point given their coordinates P and Q (3-dim)
-    real distance3Sqr(const real P[], const real Q[]);
-    
-    /// calculate Coulomb energy
-    real coulombEnergy(const real P[]);
-    
     /// calculate Coulomb forces
     void setForces(real forces[], real threshold);
     
@@ -139,9 +145,6 @@ private:
 
     /// allocated memory
     void allocate(size_t);
-    
-    /// distribute point randomly
-    void initializePoints();
 
 };
 

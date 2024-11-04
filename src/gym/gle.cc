@@ -906,33 +906,37 @@ namespace gle
     
     size_t setBlob(flute3* flu)
     {
+        const size_t FF = 54;
         float U = 1.0;
         float H = 0.5;
         float S = M_SQRT1_2;
         float O = std::sqrt(1/3.0); //0.57735
         float T = std::sqrt(2/3.0); //0.816497
         
-        flute3 src[54] = {{T, O, 0}, {H, S, H}, {U, 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
+        flute3 pts[] = {
+            {T, O, 0}, {H, S, H}, {U, 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
             {0, -U, 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-U, 0, 0}, {-H, S, H},
             {-T, O, 0}, {0, U, 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
-            {0, 0, -U}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {0, 0, -U}, {-S, 0, -S},
-            {0, O, -T}, {-H, S, -H},   {-H, S, -H}, {-T, O, 0},   {-T, O, 0}, {-H, S, -H},
-            {-U, 0, 0}, {-S, 0, -S}, {-T, -O, 0}, {-H, -S, -H}, {0, -U, 0}, {H, -S, -H},
-            {T, -O, 0}, {S, 0, -S}, {U, 0, 0}, {H, S, -H}, {T, O, 0}, {0, U, 0},
-            {H, S, H}, {-H, S, H}, {0, O, T}, {-S, 0, S}, {0, 0, U}, {-H, -S, H},
-            {0, -O, T}, {H, -S, H}, {0, 0, U}, {S, 0, S}, {0, O, T}, {H, S, H}};
-        
-        for ( size_t i = 0; i < 54; ++i )
-            flu[i] = normalize(src[i]);
+            {0, 0, -U}, {H, -S, -H}, {0, -O, -T}, {-H, -S, -H}, {-S, 0, -S}, {0, O, T},
+            {0, 0, U}, {0, -O, T}
+        };
 
-        return 54;
-    }
-    
-    /* This moves some vertices to smoothen the blob */
-    void normalizePoints(flute3 * flu, size_t cnt)
-    {
-        for ( size_t i = 0; i < cnt; ++i )
-            flu[i] = normalize(flu[i]);
+        int inx[FF] = {
+            0, 1, 2, 3, 4, 5,
+            6, 7, 8, 9, 10, 11,
+            12, 13, 14, 15, 16, 17,
+            18, 19, 20, 21, 18, 22,
+            16, 14, 14, 12, 12, 14,
+            10, 22, 8, 21, 6, 19,
+            4, 17, 2, 15, 0, 13,
+            1, 11, 23, 9, 24, 7,
+            25, 5, 24, 3, 23, 1
+        };
+
+        for ( size_t i = 0; i < FF; ++i )
+            flu[i] = normalize(pts[inx[i]]);
+
+        return FF;
     }
 
     /* This moves some vertices to add an hexagonal needle to the blob */
