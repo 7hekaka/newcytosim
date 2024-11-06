@@ -599,7 +599,7 @@ namespace gle
         flu[11] = { 0,  0,  H};
 
         const size_t F = 30; // number of points in the triangle strip
-        GLushort strip[F] = {5,1,0,2,3, 3,0,4,5, 5,9,4,8,3,7,2,6,1,10,5,9, 9,10,11,6,7, 7,11,8,9};
+        GLushort strip[F] = {0,1,2,6,7,11, 11,8,7,3,2,0, 0,3,4,8,9,11, 11,10,9,5,4,0, 0,5,1,10,6,11};
         memcpy(idx, strip, F*sizeof(GLushort));
         return F;
     }

@@ -31,8 +31,8 @@ public:
     typedef unsigned short INDEX;
 
     /// starting shapes
-    enum Polyhedra { UNSET=0, TETRAHEDRON=1, OCTAHEDRON=2, ICOSAHEDRON=3,
-        ICOSAHEDRONX=4, HEMISPHERE=5, DOME=6, CYLINDER=7, DICE=8, DROPLET=9, PIN=10 };
+    enum Polyhedra { UNSET=0, TETRAHEDRON, OCTAHEDRON, ICOSAHEDRON, ICOSAHEDRONS,
+        ICOSAHEDRONX, HEMISPHERE, DOME, CYLINDER, DICE, DROPLET, PIN };
     
     /// One of the vertex of the unrefined template model
     struct Apex
@@ -129,8 +129,8 @@ private:
     void addEdge(unsigned, unsigned);
     void cutEdge(unsigned a, unsigned b, unsigned div);
     void cutFace(unsigned a, unsigned b, unsigned c, unsigned div, unsigned*);
-    void cutQuad(unsigned*, unsigned quad[4], unsigned div);
-    void cutStrip(unsigned cnt, unsigned inx[], unsigned div);
+    void cutQuad(unsigned quad[4], unsigned div, unsigned*);
+    void cutStrip(unsigned inx[6], unsigned div, unsigned*);
     
     void allocate();
     void destroy();
@@ -154,6 +154,7 @@ public:
     void buildTetrahedron(unsigned div, int make = 1);
     void buildOctahedron(unsigned div, int make = 1);
     void buildIcosahedron(unsigned div, int make = 1);
+    void buildIcosahedronS(unsigned div, int make = 1);
     void buildIcosahedronX(unsigned div, int make = 1);
     void buildCylinder(unsigned div, int make = 1);
     void buildHemisphere(unsigned div, int make = 1);

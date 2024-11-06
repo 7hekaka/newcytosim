@@ -186,11 +186,11 @@ void namePoints(View& view)
     for ( unsigned i=0; i < ico->num_vertices(); ++i )
     {
         Tesselator::Vertex & dv = ico->vertex(i);
-        float col[4] = {1.f, 1.f, 1.f, 1.f};
-        if ( dv.weight(0) == 0 )
-            col[2] = 0;
+        float col[4] = {1.f, 0.f, 0.f, 1.f};
+        if ( dv.weight(1) == 0 )
+            col[2] = 1;
         if ( dv.weight(2) == 0 )
-            col[1] = 0;
+            col[1] = 1;
         
         gym::color(col);
         const float* ptr = ico->vertex_data(i);
@@ -292,7 +292,7 @@ void processNormalKey(unsigned char c, int x, int y)
     {
         case ' ': reset(kind, rank); break;
         case 'i': reset(Tesselator::ICOSAHEDRON, rank); break;
-        case 'I': reset(Tesselator::ICOSAHEDRONX, rank); break;
+        case 'I': reset(Tesselator::ICOSAHEDRONS, rank); break;
         case 'o': reset(Tesselator::OCTAHEDRON, rank); break;
         case 'd': reset(Tesselator::DICE, rank); break;
         case 'h': reset(Tesselator::HEMISPHERE, rank); break;
