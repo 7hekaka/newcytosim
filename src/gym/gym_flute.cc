@@ -61,7 +61,7 @@ namespace gym
     void setBufferV(size_t pts, size_t stride, size_t off)
     {
         glVertexPointer(pts, GL_FLOAT, pts*stride*Q, (void*)(off*Q));
-        gym::unbind();
+        gym::unbind1();
     }
 
     void setBufferVxT2(size_t pts, size_t stride)
@@ -70,7 +70,7 @@ namespace gym
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glVertexPointer(std::min(pts, 3UL), GL_FLOAT, stride*Q, nullptr);
         glTexCoordPointer(2, GL_FLOAT, stride*Q, (void*)(pts*Q));
-        gym::unbind();
+        gym::unbind1();
     }
 
     void setBufferVN(size_t pts, size_t nor)
@@ -87,7 +87,7 @@ namespace gym
         {
             assert_true(!glIsEnabled(GL_NORMAL_ARRAY));
         }
-        gym::unbind();
+        gym::unbind1();
     }
     
     void bindBufferV2(GLuint buf, size_t off)
@@ -115,7 +115,7 @@ namespace gym
         glVertexPointer(3, GL_FLOAT, 3*Q, (void*)(first*Q));
         glEnableClientState(GL_NORMAL_ARRAY);
         glNormalPointer(GL_FLOAT, 3*Q, (void*)(first*Q));
-        gym::unbind();
+        gym::unbind1();
     }
 
     /// use same data for position and normal
@@ -140,7 +140,7 @@ namespace gym
         }
         assertVertexArray();
         glVertexPointer(std::min(pts, 3UL), GL_FLOAT, stride*Q, (void*)(col*Q));
-        gym::unbind();
+        gym::unbind1();
     }
 
     void setBufferCNV(size_t col, size_t nor, size_t pts, size_t stride)
@@ -167,7 +167,7 @@ namespace gym
         }
         assertVertexArray();
         glVertexPointer(pts, GL_FLOAT, stride*Q, (void*)((col+nor)*Q));
-        gym::unbind();
+        gym::unbind1();
     }
     
     unsigned short* mapIndexBuffer(size_t cnt)

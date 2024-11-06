@@ -363,7 +363,8 @@ void Tesselator::addFace(unsigned a, unsigned b, unsigned c)
 }
 
 
-void Tesselator::cutFace(unsigned* line, unsigned a, unsigned b, unsigned c, unsigned div)
+/** 'line' is only used locally here */
+void Tesselator::cutFace(unsigned a, unsigned b, unsigned c, unsigned div, unsigned* line)
 {
     for ( unsigned u = 0; u <= div; ++u )
         line[u] = getEdgeVertex(a, div-u, b, u);
@@ -472,7 +473,7 @@ void Tesselator::refineTriangles(unsigned n_fac, unsigned fac[][3], unsigned div
     
     unsigned* line = new unsigned[div+1];
     for ( unsigned f = 0; f < n_fac; ++f )
-        cutFace(line, fac[f][0], fac[f][1], fac[f][2], div);
+        cutFace(fac[f][0], fac[f][1], fac[f][2], div, line);
     delete[] line;
 }
 

@@ -60,7 +60,7 @@ namespace gym
     inline void rebind() { glBindBuffer(GL_ARRAY_BUFFER, currStream()); }
 
     /// it is not necessary to unbind buffer, but might be useful for debugging
-    inline void unbind() { } //glBindBuffer(GL_ARRAY_BUFFER, 0); }
+    inline void unbind1() { } //glBindBuffer(GL_ARRAY_BUFFER, 0); }
     
     /// it is not necessary to unbind buffer, but might be useful for debugging
     inline void unbind2() { } //glBindBuffer(GL_ARRAY_BUFFER, 0); glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); }

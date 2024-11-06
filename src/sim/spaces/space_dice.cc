@@ -317,7 +317,7 @@ void SpaceDice::read(Inputter& in, Simul&, ObjectTag)
 
 void SpaceDice::draw2D(float width) const
 {
-    const size_t CNT = 128;
+    const unsigned CNT = 128;
     drawSection(2, 0, CNT, width);
 }
 
@@ -330,18 +330,18 @@ void SpaceDice::draw3D() const
 #if 1
     Tesselator mesh;
     mesh.buildDice(X, Y, Z, edge_, 2*gle::finesse, 1, 1);
-    size_t cnt = mesh.num_vertices();
+    unsigned cnt = mesh.num_vertices();
     flute3 * fl3 = gym::mapBufferV3(cnt);
     mesh.store_vertices((float*)fl3);
     gym::unmapBufferV3N0();
     //gym::drawPoints(4, 0, cnt);
     // do not copy the last 12 triangles, corresponding to the faces drawn below
-    size_t tri = 3 * ( mesh.num_faces() - 12 );
+    unsigned tri = 3 * ( mesh.num_faces() - 12 );
     unsigned short* inx = gym::mapIndexBuffer(tri);
     memcpy(inx, mesh.face_data(), tri*sizeof(Tesselator::INDEX));
     gym::unmapIndexBuffer();
 
-    static_assert(sizeof(Tesselator::INDEX) == sizeof(unsigned short), "Index type mismatch");
+    static_assert(std::is_same<Tesselator::INDEX, GLushort>::value, "Index type mismatch");
     glDrawElements(GL_TRIANGLES, tri, GL_UNSIGNED_SHORT, nullptr);
     gym::unbind2();
 #endif

@@ -168,7 +168,7 @@ void PointDisp::strokeA(float w) const
     if ( w > 0 )
     {
         gym::color(color.darken(2.0));
-        gle::thin_ring();  /*gym::zoo_stroke(shape);*/ 
+        gle::thinRing();  /*gym::zoo_stroke(shape);*/ 
         if ( symbol )
         {
             /* Character C of width ~104.76 units, and ~150 unit high max

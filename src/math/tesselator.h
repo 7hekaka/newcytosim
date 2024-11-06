@@ -128,7 +128,7 @@ private:
     void addFace(unsigned, unsigned, unsigned);
     void addEdge(unsigned, unsigned);
     void cutEdge(unsigned a, unsigned b, unsigned div);
-    void cutFace(unsigned*, unsigned a, unsigned b, unsigned c, unsigned div);
+    void cutFace(unsigned a, unsigned b, unsigned c, unsigned div, unsigned*);
     void cutQuad(unsigned*, unsigned quad[4], unsigned div);
     void cutStrip(unsigned cnt, unsigned inx[], unsigned div);
     

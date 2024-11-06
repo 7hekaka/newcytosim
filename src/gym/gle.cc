@@ -40,18 +40,13 @@ namespace gle
     unsigned discs_[8] = { 0 };
 
     /// offset of first vertex coordinate in buffer object
-    unsigned ico_pts_[10] = { 0 };
-    /// offset of first index in buffer object
-    unsigned ico_idx_[10] = { 0 };
+    unsigned ico_pts_[12] = { 0 };
+    /// offset, in bytes, of first index in buffer object
+    unsigned ico_idx_[12] = { 0 };
     /// number of triangles making up the faces in icosahedrons
-    unsigned ico_cnt_[10] = { 0 };
-    
-    /// index of first vertex in buffer object
-    unsigned icoid_pts_ = 0;
-    /// index of first vertex index in buffer object
-    unsigned icoid_idx_ = 0;
-    /// number of faces in icosahedrons
-    unsigned icoid_cnt_ = 0;
+    unsigned ico_cnt_[12] = { 0 };
+    /// index used for the icoid object:
+    const unsigned ICOID = 11;
     
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle
@@ -578,6 +573,58 @@ namespace gle
         return i;
     }
     
+    /// this only sets vertices, skipping normals
+    size_t setIcoidBuffer(flute3* flu, GLushort* idx)
+    {
+        const float U = 1.0;
+        const float Z = std::sqrt(0.2);
+        const float C = std::cos(M_PI*0.4);
+        const float S = std::sin(M_PI*0.4);
+        const float D = C*C - S*S;
+        const float T = C*S + S*C;
+        const float H = std::sqrt(1 + Z*Z);
+
+        // Twelve vertices of icosahedron on unit sphere
+        flu[0] = { 0,  0, -H};
+        flu[1] = { U,  0, -Z};
+        flu[2] = { C, -S, -Z};
+        flu[3] = { D, -T, -Z};
+        flu[4] = { D,  T, -Z};
+        flu[5] = { C,  S, -Z};
+        flu[6] = {-D, -T,  Z};
+        flu[7] = {-C, -S,  Z};
+        flu[8] = {-U,  0,  Z};
+        flu[9] = {-C,  S,  Z};
+        flu[10] = {-D,  T,  Z};
+        flu[11] = { 0,  0,  H};
+
+        const size_t F = 30; // number of points in the triangle strip
+        GLushort strip[F] = {5,1,0,2,3, 3,0,4,5, 5,9,4,8,3,7,2,6,1,10,5,9, 9,10,11,6,7, 7,11,8,9};
+        memcpy(idx, strip, F*sizeof(GLushort));
+        return F;
+    }
+    
+    /// this only sets vertices, skipping normals
+    size_t setCuboid(flute3* flu, float R)
+    {
+        const float U = -R;
+        flu[0] = {R, U, U};
+        flu[1] = {U, U, U};
+        flu[2] = {R, R, U};
+        flu[3] = {U, R, U};
+        flu[4] = {U, R, R};
+        flu[5] = {U, U, U};
+        flu[6] = {U, U, R};
+        flu[7] = {R, U, U};
+        flu[8] = {R, U, R};
+        flu[9] = {R, R, U};
+        flu[10] = {R, R, R};
+        flu[11] = {U, R, R};
+        flu[12] = {R, U, R};
+        flu[13] = {U, U, R};
+        return 14;
+    }
+
     /// Three fins similar to the tail of a V2 rocket
     size_t setArrowTail(flute6* flt, float R=0.1f, float B=-0.5f,
                          float H=-1.5f, float L=2.0f)
@@ -652,38 +699,6 @@ namespace gle
         return i;
     }
     
-    /// this only sets vertices, skipping normals
-    size_t setIcoidBuffer(flute3* flu, GLshort* idx)
-    {
-        const float U = 1.0;
-        const float Z = std::sqrt(0.2);
-        const float C = std::cos(M_PI*0.4);
-        const float S = std::sin(M_PI*0.4);
-        const float D = C*C - S*S;
-        const float T = C*S + S*C;
-        const float H = std::sqrt(1 + Z*Z);
-
-        size_t i = 0;
-        // Twelve vertices of icosahedron on unit sphere
-        flu[i++] = { 0,  0, -H};
-        flu[i++] = { U,  0, -Z};
-        flu[i++] = { C, -S, -Z};
-        flu[i++] = { D, -T, -Z};
-        flu[i++] = { D,  T, -Z};
-        flu[i++] = { C,  S, -Z};
-        flu[i++] = {-D, -T,  Z};
-        flu[i++] = {-C, -S,  Z};
-        flu[i++] = {-U,  0,  Z};
-        flu[i++] = {-C,  S,  Z};
-        flu[i++] = {-D,  T,  Z};
-        flu[i++] = { 0,  0,  H};
-
-        const size_t n_faces = 30;
-        GLshort strip[n_faces] = {5,1,0,2,3, 3,0,4,5, 5,9,4,8,3,7,2,6,1,10,5,9, 9,10,11,6,7, 7,11,8,9};
-        memcpy(idx, strip, n_faces*sizeof(GLshort));
-        return n_faces;
-    }
-    
     /// set 12 pentagon as on a football constructed as a truncated icosahedron
     size_t setFootballPentagons(flute6* flu, float R, float P)
     {
@@ -745,27 +760,6 @@ namespace gle
             i += 12;
         }
         return i;
-    }
-    
-    /// this only sets vertices, skipping normals
-    size_t setCuboid(flute3* flu, float R)
-    {
-        const float U = -R;
-        flu[0] = {R, U, U};
-        flu[1] = {U, U, U};
-        flu[2] = {R, R, U};
-        flu[3] = {U, R, U};
-        flu[4] = {U, R, R};
-        flu[5] = {U, U, U};
-        flu[6] = {U, U, R};
-        flu[7] = {R, U, U};
-        flu[8] = {R, U, R};
-        flu[9] = {R, R, U};
-        flu[10] = {R, R, R};
-        flu[11] = {U, R, R};
-        flu[12] = {R, U, R};
-        flu[13] = {U, U, R};
-        return 14;
     }
     
     //-----------------------------------------------------------------------
@@ -913,7 +907,7 @@ namespace gle
         float O = std::sqrt(1/3.0); //0.57735
         float T = std::sqrt(2/3.0); //0.816497
         
-        flute3 pts[] = {
+        flute3 pts[26] = {
             {T, O, 0}, {H, S, H}, {U, 0, 0}, {S, 0, S}, {T, -O, 0}, {H, -S, H},
             {0, -U, 0}, {-H, -S, H}, {-T, -O, 0}, {-S, 0, S}, {-U, 0, 0}, {-H, S, H},
             {-T, O, 0}, {0, U, 0}, {-H, S, -H}, {H, S, -H}, {0, O, -T}, {S, 0, -S},
@@ -1548,7 +1542,7 @@ namespace gle
         tubes_[18] = i+s; i += setCylinder(ptr+i, 2, 0, 1, 0); // cone2
         tubes_[19] = i+s; i += setCylinder(ptr+i, 2,-1, 1, 0); // coneC
         tubes_[20] = i+s; i += setCylinder(ptr+i, 2, -1, 2, 0); // longCone
-        tubes_[21] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // truncatedCone
+        tubes_[21] = i+s; i += setCone(ptr+i, 2, 0, 1, 1, 0.5); // cutCone
         tubes_[22] = i+s; i += setHelix(ptr+i, 0, 1, 5);
 
         tubes_[24] = i+s; i += setDisc(ptr+i, 1, 0, 1);
@@ -1610,7 +1604,7 @@ namespace gle
     void cone2()         { doTubeStrip(18, nbTrianglesCylinder(2)); }
     void coneC()         { doTubeStrip(19, nbTrianglesCylinder(2)); }
     void longCone()      { doTubeStrip(20, nbTrianglesCylinder(2)); }
-    void truncatedCone() { doTubeStrip(21, nbTrianglesTube(2)); }
+    void cutCone()       { doTubeStrip(21, nbTrianglesTube(2)); }
     void helix()         { doTubeStrip(22, nbTrianglesHelix(5)); }
 
     void disc1()         { doTubeStrip(24, pi_twice); }
@@ -1620,7 +1614,7 @@ namespace gle
     void discBottom1()   { doTubeStrip(28, pi_twice); }
     void discBottom2()   { doTubeStrip(29, pi_twice/2); }
     void ring()          { doTubeStrip(30, 2+pi_twice); }
-    void thin_ring()     { doTubeStrip(31, 2+pi_twice); }
+    void thinRing()      { doTubeStrip(31, 2+pi_twice); }
 
     void stripedTube(float w, gym_color col) { doStripedTubeStrip(w, 3, nbTrianglesTube(8), col); }
 
@@ -1643,9 +1637,10 @@ namespace gle
 #pragma mark - Spheres made from refined Icosahedrons
     
     /// using icosahedrons to render the sphere:
-    static unsigned setIcoBuffer(Tesselator& ico, float*& ptr, Tesselator::INDEX*& idx)
+    static unsigned setIcoBuffer(Tesselator& ico, float*& ptr, GLushort*& idx)
     {
         //fprintf(stderr, "setIcoBuffer %i: %u %u\n", i, ico.max_vertices(), ico.num_vertices());
+        static_assert(std::is_same<Tesselator::INDEX, GLushort>::value, "Index type mismatch");
         assert_true(ico.num_vertices() <= 65535);
         ico.store_vertices(ptr);
         ptr += 3 * ico.num_vertices();
@@ -1656,19 +1651,18 @@ namespace gle
         return cnt;
     }
     
-    void drawIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
+    void drawIcoBuffer(GLsizei pts, unsigned inx, GLsizei cnt)
     {
         assert_true(buf_[0]); assert_true(buf_[1]);
         // the normal in each vertex is equal to the vertex!
         gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)inx);
         gym::unbind2();
         gym::cleanupVN();
     }
     
-    void dualPassIcoBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
+    void dualPassIcoBuffer(GLsizei pts, unsigned inx, GLsizei cnt)
     {
         assertLighting();
         assertCullFace();
@@ -1677,10 +1671,20 @@ namespace gle
         gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
         gym::switchCullFace(GL_FRONT);
-        static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)inx);
         gym::switchCullFace(GL_BACK);
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)inx);
+        gym::unbind2();
+        gym::cleanupVN();
+    }
+
+    void drawStripBuffer(GLsizei pts, unsigned inx, GLsizei cnt)
+    {
+        assert_true(buf_[0]); assert_true(buf_[1]);
+        gym::bindBufferV3N0(buf_[0], pts);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+        glDrawElements(GL_TRIANGLE_STRIP, cnt, GL_UNSIGNED_SHORT, (void*)inx);
+        gym::drawPoints(4, 0, 12);
         gym::unbind2();
         gym::cleanupVN();
     }
@@ -1702,22 +1706,9 @@ namespace gle
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
     void dualPassSphere8() { dualPassIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
 
-    void drawTriangleStripBuffer(GLsizei pts, GLsizei inx, GLsizei cnt)
-    {
-        assert_true(buf_[0]); assert_true(buf_[1]);
-        // the normal in each vertex is equal to the vertex!
-        //glPointSize(7); glColor3f(1,1,1);
-        gym::bindBufferV3N0(buf_[0], pts);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        glDrawElements(GL_TRIANGLE_STRIP, cnt, GL_UNSIGNED_SHORT, (void*)(inx*sizeof(GLshort)));
-        gym::unbind2();
-        gym::cleanupVN();
-    }
-
-    void icoid() { drawTriangleStripBuffer(icoid_pts_, icoid_idx_, icoid_idx_); }
-    
+    void icoid() { drawStripBuffer(ico_pts_[ICOID], ico_idx_[ICOID], ico_cnt_[ICOID]); }
     // this draws without loading/initializing the buffer
-    void icoidF() { glDrawElements(GL_TRIANGLE_STRIP, icoid_cnt_, GL_UNSIGNED_SHORT, (void*)(icoid_idx_*sizeof(GLshort))); }
+    void icoidF() { glDrawElements(GL_TRIANGLE_STRIP, ico_cnt_[ICOID], GL_UNSIGNED_SHORT, (void*)ico_idx_[ICOID]); }
     
     void createBuffers()
     {
@@ -1734,7 +1725,7 @@ namespace gle
         ico[8].buildDroplet(finesse*2);
         ico[9].buildDroplet(finesse);
 
-        size_t F = 32; // reserve for setIcoidBuffer
+        size_t F = 32; // reserve for ICOID (30)
         size_t S = 12;
         for ( int i = 0; i < 10; ++i )
         {
@@ -1748,14 +1739,16 @@ namespace gle
         size_t B = 3 * sizeBlobBuffers();
         size_t O = 2 * sizeCircBuffers();
 
+        // request buffer for vertex data:
         glBufferData(GL_ARRAY_BUFFER, (S+T+C+B+O)*sizeof(float), nullptr, GL_STATIC_DRAW);
         float* ptr = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
         
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, F*sizeof(Tesselator::INDEX), nullptr, GL_STATIC_DRAW);
-        Tesselator::INDEX* idx = (unsigned short*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+        // request buffer for index data:
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, F*sizeof(GLushort), nullptr, GL_STATIC_DRAW);
+        GLushort* idx = (GLushort*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
 
         float*const ptr0 = ptr;
-        Tesselator::INDEX*const idx0 = idx;
+        GLushort*const idx0 = idx;
         
         ptr += 6 * setTubeBuffers((flute6*)ptr, (flute6*)ptr0);
         //fprintf(stderr, "setTubeBuffers : %li %li\n", ptr-ptr0, t); float* sub=ptr;
@@ -1768,17 +1761,18 @@ namespace gle
         for ( int i = 0; i < 10; ++i )
         {
             ico_pts_[i] = ptr - ptr0;
-            ico_idx_[i] = idx - idx0;
+            ico_idx_[i] = ( idx - idx0 ) * sizeof(GLushort);
             unsigned cnt = setIcoBuffer(ico[i], ptr, idx);
             assert_true( 0 == cnt % 3 );
             ico_cnt_[i] = cnt;
         }
 
-        icoid_pts_ = ptr - ptr0;
-        icoid_idx_ = idx - idx0;
-        icoid_cnt_ = setIcoidBuffer((flute3*)ptr, (GLshort*)idx);
+        assert_true(ICOID >= 10);
+        ico_pts_[ICOID] = ptr - ptr0;
+        ico_idx_[ICOID] = ( idx - idx0 ) * sizeof(GLushort);
+        ico_cnt_[ICOID] = setIcoidBuffer((flute3*)ptr, idx);
         ptr += 3*12;
-        idx += icoid_cnt_;
+        idx += ico_cnt_[ICOID];
         
         //fprintf(stderr, "setIcoBuffer : %li %li -- %li\n", ptr-sub, s, idx-idx0); sub=ptr;
         assert_true( ptr <= ptr0 + S + C + T );
