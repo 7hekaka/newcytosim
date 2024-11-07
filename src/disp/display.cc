@@ -98,7 +98,7 @@ void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*
 void drawBallT(Vector const& pos, real rad, ObjectMark mark)
 {
     gym::transScale(pos, rad);
-    if ( mark && mark < 8 )
+    if ( mark & 7 )
         gle::football2(gym_color(0,0,0));
     else
         gle::dualPassSphere2();
@@ -108,7 +108,7 @@ void drawBallT(Vector const& pos, real rad, ObjectMark mark)
 void drawBeadS(Vector const& pos, real rad, ObjectMark mark)
 {
     gym::transScale(pos, rad);
-    if ( mark && mark < 8 )
+    if ( mark & 7 )
         gle::football4(gym_color(0,0,0));
     else
         gle::dualPassSphere4();
@@ -2196,7 +2196,7 @@ void Display::drawSolid(Solid const& obj)
     PointDisp const* disp = obj.prop->disp;
     gym_color col = bodyColorF(obj);
 #if NEW_SOLID_HAS_TWIN
-    if ( obj.twin() )
+    if ( obj.elder_twin() )
         col = bodyColorF(*obj.twin()).tweak(obj.signature());
 #endif
 
@@ -2237,9 +2237,9 @@ void Display::drawSolid(Solid const& obj)
     
 #if NEW_SOLID_HAS_TWIN
     // display links between twin solids
-    Solid const* twi = obj.twin();
-    if ( twi && ( obj.prop->twin_stiffness > 0 ) )
+    if ( obj.elder_twin() && ( obj.prop->twin_stiffness > 0 ) )
     {
+        Solid const* twi = obj.twin();
         gym_color lor = bodyColorF(*twi).mix(col);
         real rad = M_SQRT2 * pixscale(disp->size);
         gym::ref_view();
@@ -2260,9 +2260,9 @@ void Display::drawSolid(Solid const& obj)
 
 #if OLD_SOLID_HAS_TWIN
     // display links between twin solids
-    Solid const* twi = obj.twin();
-    if ( twi && ( disp->style & 6 ) && disp->perceptible )
+    if ( obj.elder_twin() && ( disp->style & 6 ) && disp->perceptible )
     {
+        Solid const* twi = obj.twin();
         gym_color lor = bodyColorF(*twi);
         // draw links between 'obj' and its Twin
         real rad = M_SQRT2 * pixscale(disp->size);
@@ -2402,7 +2402,7 @@ void Display::drawSolidT(Solid const& obj, unsigned inx) const
     }
     gym_color col = bodyColorF(obj);
 #if NEW_SOLID_HAS_TWIN
-    if ( obj.twin() )
+    if ( obj.elder_twin() )
         col = bodyColorF(*obj.twin()).tweak(obj.signature());
 #endif
     col.set_alpha(obj.prop->disp->color.alpha());
@@ -2436,6 +2436,7 @@ void Display::drawSolids(SolidSet const& set)
                 Solid const * twi = obj->twin();
                 if ( twi )
                 {
+                    if ( twi != obj ) // only select elder twin
                     for ( size_t inx = 0; inx+DIM < obj->nbPoints(); inx += DIM+2 )
                     {
                         gym::enableLighting();
@@ -2445,7 +2446,7 @@ void Display::drawSolids(SolidSet const& set)
                         drawFootball(*obj, inx, scol, black, true);
                         drawFootball(*twi, inx, tcol, black, false);
                     }
-                }
+                } else
 #endif
                 if ( disp->color.transparent() )
                 {

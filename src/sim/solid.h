@@ -76,7 +76,7 @@ private:
     /// second moment of the reference shape
     real soVariance;
 #if NEW_SOLID_HAS_TWIN
-    /// another Solid mechanically linked to this one
+    /// pointer to younger twin Solid, or to self if this is the elder twin
     Solid * soTwin;
     
     /// former way of linking Twins (25.03.2023)
@@ -249,23 +249,19 @@ public:
     Vector clampForce() const { return clamp_stiff * ( clamp_place - posPoint(0) ); }
 #endif
 #if NEW_SOLID_HAS_TWIN
-    /// pointer to the original Solid, if this is a twin
+    /// pointer to the original Solid, if this is a mirror twin
     Solid const* twin() const { return soTwin; }
     
-    /// sum distance squared of links between twins
-    real oldTwinTensionSqr() const
-    {
-        real res = 0;
-        for ( size_t i = 1; i <= DIM; ++i )
-            res += distanceSqr(posPoint(i), soTwin->posPoint(i));
-        return res;
-    }
-    
+    /// pointer to the original Solid, if this is a mirror twin
+    bool elder_twin() const { return soTwin && soTwin != this; }
+
     /// sum distance squared of links between twins
     real twinTensionSqr() const
     {
         size_t i = 1+DIM;
-        return distanceSqr(posPoint(i), soTwin->posPoint(i));
+        if ( soTwin && soTwin != this )
+            return distanceSqr(posPoint(i), soTwin->posPoint(i));
+        return 0;
     }
 
     /// save info to file

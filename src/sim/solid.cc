@@ -28,30 +28,6 @@ void Solid::step()
 }
 
 
-#if NEW_SOLID_HAS_TWIN
-/** Old way of linking Twins before 25.03.2023*/
-void Solid::oldLinkTwins(Meca& meca, real stiff, real separation) const
-{
-    real R0 = radius(0);
-    constexpr real Q = (DIM==3)?M_SQRT1_3:M_SQRT1_2;
-    const real sep = max_real(0, separation/2-R0*(1+Q));
-    // Linking the 3 points forming the first triad
-    size_t off = matIndex();
-    // X = 1 contributes to a distance R*sqrt(DIM) along the X-axis
-    real X = 2 * Q * sep / R0;
-    for ( int i = 1; i <= DIM; ++i )
-    {
-        real alp[4] = { -DIM*X, X, X, X };
-        alp[i] += 1;
-#if ( DIM == 3 )
-        meca.addLink4(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], alp[3], stiff);
-#elif ( DIM == 2 )
-        meca.addLink3(Mecapoint(soTwin, i), off, alp[0], alp[1], alp[2], stiff);
-#endif
-    }
-}
-#endif
-
 void Solid::setInteractions(Meca& meca) const
 {
 #if NEW_RADIAL_FLOW
@@ -74,7 +50,7 @@ void Solid::setInteractions(Meca& meca) const
     }
 #endif
 #if NEW_SOLID_HAS_TWIN
-    if ( soTwin )
+    if ( soTwin && soTwin != this )
     {
         const size_t off = DIM+1; // index of point to be linked
         const size_t sup = std::min(nPoints-off, off+1); // last point to be linked
@@ -636,8 +612,12 @@ void Solid::buildTwin(ObjectList& objs, Glossary& opt, std::string const& str, S
         {
             // create a twin Solid that is the mirror image of *this:
             Solid * S = new Solid(prop);
-            S->soTwin = this;
-            objs.append(S->build(opt, sim));
+            S->soTwin = this; // tag S as younger twin
+            ObjectList list = S->build(opt, sim);
+            ObjectSet::rotateObjects(list, Rotation::flipX());
+            S->fixShape();
+            objs.append(list);
+            soTwin = this; // tag *this as elder twin!
         }
     }
     else
@@ -669,12 +649,6 @@ void Solid::buildTwin(ObjectList& objs, Glossary& opt, std::string const& str, S
                 //addTriad(R);
             }
         }
-    }
-    if ( soTwin )
-    {
-        // flip 'S' (X -> -X) resulting in the twins being mirror-images
-        ObjectSet::rotateObjects(objs, Rotation::flipX());
-        fixShape();
     }
     
     if ( nbPoints() % (DIM+2) )
@@ -1774,10 +1748,15 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
         ObjectID id = in.readUInt32();
         in.readFloat();
 #if NEW_SOLID_HAS_TWIN
-        /* This only works if the twin Solid is already loaded */
-        soTwin = sim.solids.identifyObject(id);
-        if ( id && !soTwin )
-            std::clog << "Warning: could not find Solid twin " << id << "\n";
+        if ( id == identity() )
+            soTwin = this;
+        else
+        {
+            /* This only works if the twin Solid is already loaded */
+            soTwin = sim.solids.identifyObject(id);
+            if ( id && !soTwin )
+                std::clog << "Warning: could not find Solid twin " << id << "\n";
+        }
 #endif
     }
     else if ( tag == CLAMP_TAG )

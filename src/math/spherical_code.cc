@@ -381,7 +381,6 @@ size_t SphericalCode::distributePoints(size_t nbp, real precision, size_t mx_ite
     else
         distribute(nbp, coord_);
 
-    //--------- for one point only, we return:
     if ( nbp > 1 )
     {
         res = refinePoints(precision, mx_iterations);
