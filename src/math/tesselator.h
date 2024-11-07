@@ -4,6 +4,7 @@
 #define TESSELATOR_H
 
 #include <cstdio>
+#include <math.h>
 
 /// Provides a triangulation of a surface made by refining a Platonic solid
 /**
@@ -31,7 +32,7 @@ public:
     typedef unsigned short INDEX;
 
     /// starting shapes
-    enum Polyhedra { UNSET=0, TETRAHEDRON, OCTAHEDRON, ICOSAHEDRON, ICOSAHEDRONS,
+    enum Polyhedra { UNSET=0, TETRAHEDRON, OCTAHEDRON, ICOSAHEDRON, 
         ICOSAHEDRONX, HEMISPHERE, DOME, CYLINDER, DICE, DROPLET, PIN };
     
     /// One of the vertex of the unrefined template model
@@ -207,7 +208,7 @@ public:
     unsigned num_faces() const { return num_faces_; }
     
     /// number of faces to be drawn if you want to display a football
-    unsigned num_faces_third() const { unsigned R = rank_/3; return num_faces_ - 60*(R*R); }
+    unsigned num_faces_third() const { unsigned R = rint(rank_*0.33333); return num_faces_ - 60*(R*R); }
 
     /// array of indices to the vertices in each face (3 vertices per face)
     INDEX * face_data() const { return faces_; }

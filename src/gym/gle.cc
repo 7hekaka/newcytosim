@@ -31,7 +31,7 @@ namespace gle
     unsigned tubes_[32] = { 0 };
 
     /// offset for object's data with 6 floats / vertex
-    unsigned cubes_[12] = { 0 };
+    unsigned cubes_[10] = { 0 };
     
     /// offset for object's data with 3 floats / vertex
     unsigned blobs_[4] = { 0 };
@@ -45,6 +45,8 @@ namespace gle
     unsigned ico_idx_[12] = { 0 };
     /// number of triangles making up the faces in icosahedrons
     unsigned ico_cnt_[12] = { 0 };
+    /// another number of faces
+    unsigned ico_mid_[12] = { 0 };
     /// index used for the icoid object:
     const unsigned ICOID = 11;
     
@@ -766,7 +768,7 @@ namespace gle
     
     static size_t sizeCubeBuffers()
     {
-        return ( 12*2 + 36 + 60 + 45 + 36*2 + 22*3 + 12*12 );
+        return ( 12*2 + 36 + 60 + 45 + 36*2 + 22*3 );
     }
     
     size_t setCubeBuffers(flute6* ptr, flute6* const ori)
@@ -782,8 +784,6 @@ namespace gle
         cubes_[7] = i+s; i += setHexTube(ptr+i, 0, 1, 1.0f);  // hexTube
         cubes_[8] = i+s; i += setHexTube(ptr+i, 0, 1, 0.5f);  // thinTube
         cubes_[9] = i+s; i += setHexTube(ptr+i, 0, 256.f, 0.5f); // thinLongTube
-        
-        cubes_[11] = i+s; i += setFootballPentagons((flute6*)(ptr+i), 1.02, 0.333);
         assert_true( i <= sizeCubeBuffers() );
         return i;
     }
@@ -833,8 +833,6 @@ namespace gle
     void hexTube()      { doCubeStrip(7, 22); }
     void thinTube()     { doCubeStrip(8, 22); }
     void thinLongTube() { doCubeStrip(9, 22); }
-    
-    void footballPentagons() { doCubeStrip(11, 12*12); }
     
     void ICOSAHEDRON()
     {
@@ -1282,7 +1280,7 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Tubes primitives
 
-    inline size_t nbTrianglesCylinder(size_t inc, int top = 0)
+    inline unsigned nbTrianglesCylinder(size_t inc, int top = 0)
     {
         return 2 + 2 * (( pi_6half + top*pi_once ) / inc );
     }
@@ -1345,7 +1343,7 @@ namespace gle
     }
 
     /// return essentially finesse * 24 / inc
-    inline size_t nbTrianglesTube(size_t inc)
+    inline int nbTrianglesTube(size_t inc)
     {
         return 2 + 2 * ( pi_twice / inc );
     }
@@ -1558,14 +1556,14 @@ namespace gle
         return i;
     }
 
-    inline void doTubeStrip(size_t inx, size_t cnt)
+    inline void doTubeStrip(size_t inx, unsigned cnt)
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(tubes_[inx], cnt);
         gym::cleanupVN();
     }
     
-    inline void doStripedTubeStrip(float line_width, size_t inx, size_t cnt, gym_color col)
+    inline void doStripedTubeStrip(float line_width, size_t inx, unsigned cnt, gym_color col)
     {
         gym::bindBufferV3N3(buf_[0]);
         gym::drawTriangleStrip(tubes_[inx], cnt);
@@ -1651,7 +1649,7 @@ namespace gle
         return cnt;
     }
     
-    void drawIcoBuffer(GLsizei pts, unsigned inx, GLsizei cnt)
+    void drawIcoBuffer(GLsizei pts, size_t inx, GLsizei cnt)
     {
         assert_true(buf_[0]); assert_true(buf_[1]);
         // the normal in each vertex is equal to the vertex!
@@ -1662,7 +1660,20 @@ namespace gle
         gym::cleanupVN();
     }
     
-    void dualPassIcoBuffer(GLsizei pts, unsigned inx, GLsizei cnt)
+    void drawIcoBuffer(GLsizei pts, size_t inx, GLsizei cnt, gym_color col, GLsizei mid)
+    {
+        assert_true(buf_[0]); assert_true(buf_[1]);
+        // the normal in each vertex is equal to the vertex!
+        gym::bindBufferV3N0(buf_[0], pts);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+        glDrawElements(GL_TRIANGLES, mid, GL_UNSIGNED_SHORT, (void*)inx);
+        gym::color_both(col);
+        glDrawElements(GL_TRIANGLES, cnt-mid, GL_UNSIGNED_SHORT, (void*)(inx+2*mid));
+        gym::unbind2();
+        gym::cleanupVN();
+    }
+
+    void dualPassIcoBuffer(GLsizei pts, size_t inx, GLsizei cnt)
     {
         assertLighting();
         assertCullFace();
@@ -1678,7 +1689,7 @@ namespace gle
         gym::cleanupVN();
     }
 
-    void drawStripBuffer(GLsizei pts, unsigned inx, GLsizei cnt)
+    void drawStripBuffer(GLsizei pts, size_t inx, GLsizei cnt)
     {
         assert_true(buf_[0]); assert_true(buf_[1]);
         gym::bindBufferV3N0(buf_[0], pts);
@@ -1701,10 +1712,18 @@ namespace gle
     void pin() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
     void droplet() { drawIcoBuffer(ico_pts_[8], ico_idx_[8], ico_cnt_[8]); }
 
+    // dual pass routines can be used to draw transparent spheres:
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
     void dualPassSphere2() { dualPassIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1]); }
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
     void dualPassSphere8() { dualPassIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
+
+    void football() { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0], gym_color(0,0,0), ico_mid_[0]); }
+
+    void football1(gym_color col) { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0], col, ico_mid_[0]); }
+    void football2(gym_color col) { drawIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1], col, ico_mid_[1]); }
+    void football4(gym_color col) { drawIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2], col, ico_mid_[2]); }
+    void football8(gym_color col) { drawIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3], col, ico_mid_[3]); }
 
     void icoid() { drawStripBuffer(ico_pts_[ICOID], ico_idx_[ICOID], ico_cnt_[ICOID]); }
     // this draws without loading/initializing the buffer
@@ -1713,16 +1732,16 @@ namespace gle
     void createBuffers()
     {
         Tesselator ico[10];
-        ico[0].buildIcosahedron(finesse*8);
-        ico[1].buildIcosahedron(finesse*4);
-        ico[2].buildIcosahedron(finesse*2);
+        ico[0].buildIcosahedron(finesse*9);
+        ico[1].buildIcosahedron(finesse*6);
+        ico[2].buildIcosahedron(finesse*3);
         ico[3].buildIcosahedron(finesse);
 
-        ico[4].buildHemisphere(finesse*2);
+        ico[4].buildHemisphere(finesse*3);
         ico[5].buildHemisphere(finesse);
         ico[6].buildDome(finesse);
-        ico[7].buildPin(finesse*2);
-        ico[8].buildDroplet(finesse*2);
+        ico[7].buildPin(finesse*3);
+        ico[8].buildDroplet(finesse*3);
         ico[9].buildDroplet(finesse);
 
         size_t F = 32; // reserve for ICOID (30)
@@ -1765,6 +1784,7 @@ namespace gle
             unsigned cnt = setIcoBuffer(ico[i], ptr, idx);
             assert_true( 0 == cnt % 3 );
             ico_cnt_[i] = cnt;
+            ico_mid_[i] = 3*ico[i].num_faces_third();
         }
 
         assert_true(ICOID >= 10);
@@ -1932,13 +1952,6 @@ namespace gle
         tennisballSeamCurve(1.02, 1);
     }
     
-    void football()
-    {
-        sphere1();
-        gym::color_front(0, 0, 0);
-        footballPentagons();
-    }
-
     //-----------------------------------------------------------------------
     #pragma mark - 3D volume primitives
     

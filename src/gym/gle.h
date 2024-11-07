@@ -20,16 +20,16 @@ namespace gle
 {
     /// `finesse` sets the number of triangles used to draw shapes such as cylinders
     /** Higher values are better: 2 is okay, 4 is good, 8 is nice and 16 is very nice */
-    constexpr size_t finesse = 2;
+    constexpr unsigned finesse = 2;
     
     /// number of circle points stored in buffer
     /** We use multiples of 5 to match circles and the icosahedron */
-    constexpr size_t pi_6half = finesse * 30;
-    constexpr size_t pi_5half = finesse * 25;
-    constexpr size_t pi_twice = finesse * 20;
-    constexpr size_t pi_3half = finesse * 15;
-    constexpr size_t pi_once = finesse * 10;
-    constexpr size_t pi_half = finesse * 5;
+    constexpr unsigned pi_6half = finesse * 30;
+    constexpr unsigned pi_5half = finesse * 25;
+    constexpr unsigned pi_twice = finesse * 20;
+    constexpr unsigned pi_3half = finesse * 15;
+    constexpr unsigned pi_once = finesse * 10;
+    constexpr unsigned pi_half = finesse * 5;
 
     /// values of cosine, sine over two full circonvolutions
     extern float circle_[4*pi_twice+8];
@@ -248,6 +248,7 @@ namespace gle
     /// draw a very nice sphere of radius 1 at the origin
     void sphere1();
     
+    // dual pass is used to draw transparent spheres:
     void dualPassSphere1();
     void dualPassSphere2();
     void dualPassSphere4();
@@ -268,14 +269,20 @@ namespace gle
     inline void sphere() { sphere1(); }
     /// draw nicest hemisphere available
     inline void hemisphere() { hemisphere1(); }
-    /// draw 12 pentagons distributed on a sphere
-    void footballPentagons();
+
+    /// draw a sphere decorated with 12 black pentagons
+    void football();
+    /// draw a sphere decorated with 12 pentagons
+    void football1(gym_color);
+    /// draw a sphere decorated with 12 pentagons
+    void football2(gym_color);
+    /// draw a sphere decorated with 12 pentagons
+    void football4(gym_color);
+
     /// draw a line on the sphere
     void baseballSeamCurve(float R, float W);
     /// draw a line on the sphere
     void tennisballSeamCurve(float R, float W);
-    /// draw a sphere decorated with 12 pentagons
-    void football();
     /// draw a white baseball
     void baseball();
     /// draw a yellow tennisball

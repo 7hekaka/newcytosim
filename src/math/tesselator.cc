@@ -612,7 +612,6 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case TETRAHEDRON: buildTetrahedron(div); break;
         case OCTAHEDRON: buildOctahedron(div); break;
         case ICOSAHEDRON: buildIcosahedron(div); break;
-        case ICOSAHEDRONS: buildIcosahedronS(div); break;
         case ICOSAHEDRONX: buildIcosahedronX(div); break;
         case HEMISPHERE: buildHemisphere(div); break;
         case DOME: buildDome(div); break;
@@ -702,7 +701,7 @@ void Tesselator::buildOctahedron(unsigned div)
     delete[] line;
 }
 
-
+/** Vertices are numbered with 1 opposite of 0, 3 opposite of 1, etc. */
 void Tesselator::buildIcosahedronX(unsigned div)
 {
     div = std::max(div, 1U);
@@ -750,64 +749,6 @@ void Tesselator::buildIcosahedronX(unsigned div)
         {2,  4, 10},
         {6,  5, 11},
         {4,  7, 10},
-    };
-    
-    allocate();
-    setApices(vex, div);
-    refineTriangles(20, fac, div);
-}
-
-/** The faces are draw in order of increasing Z */
-void Tesselator::buildIcosahedronS(unsigned div)
-{
-    div = std::max(div, 1U);
-    setGeometry(ICOSAHEDRON, 12, 30, 20, div);
-    
-    const FLOAT Z = std::sqrt(0.2);
-    const FLOAT C = std::cos(M_PI*0.4);
-    const FLOAT S = std::sin(M_PI*0.4);
-    const FLOAT D = C*C - S*S;
-    const FLOAT T = C*S + C*S;
-    const FLOAT H = std::sqrt(1 + Z*Z);
-
-    // Twelve vertices of icosahedron
-    FLOAT vex[12][3] = {
-        { 0,  0, -H},
-        { 1,  0, -Z},
-        { C, -S, -Z},
-        { D, -T, -Z},
-        { D,  T, -Z},
-        { C,  S, -Z},
-        {-D, -T,  Z},
-        {-C, -S,  Z},
-        {-1,  0,  Z},
-        {-C,  S,  Z},
-        {-D,  T,  Z},
-        { 0,  0,  H}
-    };
-    
-    // ordered faces: Counter-Clockwise = facing out
-    unsigned fac[20][3] = {
-        {0,  1,  2},
-        {0,  2,  3},
-        {0,  3,  4},
-        {0,  4,  5},
-        {0,  5,  1} ,
-        {1,  6,  2},
-        {2,  7,  3},
-        {3,  8,  4},
-        {4,  9,  5},
-        {5, 10,  1} ,
-        {6,  7,  2},
-        {7,  8,  3},
-        {8,  9,  4},
-        {9, 10,  5},
-        {10, 6,  1} ,
-        {11, 7,  6},
-        {11, 8,  7},
-        {11, 9,  8},
-        {11, 10, 9},
-        {11, 6, 10}
     };
     
     allocate();

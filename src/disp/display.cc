@@ -98,25 +98,20 @@ void Display::drawObject(Vector const& pos, Vector const& dir, float rad, void(*
 void drawBallT(Vector const& pos, real rad, ObjectMark mark)
 {
     gym::transScale(pos, rad);
-    gle::dualPassSphere2();
     if ( mark && mark < 8 )
-    {
-        gym::color_front(0,0,0);
-        gle::footballPentagons();
-        //gle::baseballSeamCurve(1.01, 1);
-    }
+        gle::football2(gym_color(0,0,0));
+    else
+        gle::dualPassSphere2();
 }
 
 // using sphere4() for presumably smaller objects
 void drawBeadS(Vector const& pos, real rad, ObjectMark mark)
 {
     gym::transScale(pos, rad);
-    gle::dualPassSphere4();
     if ( mark && mark < 8 )
-    {
-        gym::color_front(0,0,0);
-        gle::footballPentagons();
-    }
+        gle::football4(gym_color(0,0,0));
+    else
+        gle::dualPassSphere4();
 }
 
 
@@ -149,14 +144,9 @@ static void drawFootball(Solid const& obj, size_t inx, gym_color col, gym_color 
     gym::transScale(X, obj.radius(inx));
 #endif
     if ( flip ) glFrontFace(GL_CW);
-#if 1
     gym::color_front(col, 1.0);
-    gle::sphere1();
-    gym::color_front(bak);
-    gle::footballPentagons();
-#else
-    gle::baseball();
-#endif
+    gle::football1(bak);
+    //gle::baseball();
     if ( flip ) glFrontFace(GL_CCW);
 }
 

@@ -114,7 +114,7 @@ void drawFacesArray()
     glEnableClientState(GL_NORMAL_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, ico->vertex_data());
     glNormalPointer(GL_FLOAT, 0, ico->vertex_data());
-    static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
+    static_assert(std::is_same<Tesselator::INDEX, GLushort>::value, "Index type mismatch");
     glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_SHORT, ico->face_data());
     glDisableClientState(GL_NORMAL_ARRAY);
 }
@@ -155,7 +155,7 @@ void drawFacesVBO()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffers[1]);
-    static_assert(sizeof(Tesselator::INDEX) == sizeof(GLshort), "wrong Index type");
+    static_assert(std::is_same<Tesselator::INDEX, GLushort>::value, "Index type mismatch");
     glDrawElements(GL_TRIANGLES, 3*ico->num_faces(), GL_UNSIGNED_SHORT, nullptr);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     
@@ -221,7 +221,7 @@ void drawPoints()
     glDisableClientState(GL_NORMAL_ARRAY);
 }
 
-void drawObject()
+void drawSkeleton()
 {
     glLineWidth(1);
     glPointSize(10);
@@ -244,7 +244,7 @@ int display(View& view)
     glMaterialfv(GL_FRONT, GL_AMBIENT_AND_DIFFUSE, blue);
     glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, pink);
 
-    //drawObject();
+    //drawSkeleton();
     glDepthMask(GL_TRUE);
     if ( showPlane )
     {
