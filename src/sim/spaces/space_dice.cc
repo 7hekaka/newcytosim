@@ -329,7 +329,7 @@ void SpaceDice::draw3D() const
     
 #if 1
     Tesselator mesh;
-    mesh.buildDice(X, Y, Z, edge_, 2*gle::finesse, 1, 1);
+    mesh.buildDice(X, Y, Z, edge_, 2*gle::finesse, 1);
     unsigned cnt = mesh.num_vertices();
     flute3 * fl3 = gym::mapBufferV3(cnt);
     mesh.store_vertices((float*)fl3);

@@ -27,7 +27,7 @@ public:
     /// floating type used for calculations
     typedef float FLOAT;
 
-    /// floating type used for calculations
+    /// integer type used for vertex indexing
     typedef unsigned short INDEX;
 
     /// starting shapes
@@ -53,12 +53,6 @@ public:
     /// A vertex is interpolated from 3 Apex
     class Vertex
     {
-    private:
-        
-        void swap(unsigned, unsigned);
-        
-        bool smaller(unsigned, unsigned);
-        
     public:
         
         /// pointers to the apices being interpolated
@@ -73,8 +67,9 @@ public:
         ///
         Vertex() { index_[0]=-1; index_[1]=-1; index_[2]=-1; }
                 
+        void set(unsigned, unsigned);
         void set(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
-        
+
         unsigned weight(int x) const { return weight_[x]; }
         
         void print(unsigned, FILE*) const;
@@ -114,9 +109,12 @@ private:
     /// number of edges
     unsigned num_edges_, max_edges_;
     
-    ///
+    /// type
     int kind_;
     
+    /// number of subdivision in an edge
+    int rank_;
+
     unsigned findEdgeVertex(unsigned, unsigned, unsigned, unsigned) const;
     unsigned getEdgeVertex(unsigned, unsigned, unsigned, unsigned) const;
     unsigned addVertex(unsigned, unsigned, unsigned, unsigned, unsigned, unsigned);
@@ -137,8 +135,7 @@ private:
     void destroy();
     void setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned div);
 
-    void interpolate(Vertex const&, float vec[3]) const;
-    void interpolate(Vertex const&, double vec[3]) const;
+    template < typename REAL > void interpolate(REAL vec[3], Vertex const&) const;
     template < typename REAL > void projectVertices(REAL*) const;
 
 public:
@@ -152,17 +149,17 @@ public:
     /// build as polyhedra refined by order `div`
     void construct(Polyhedra, unsigned div, int make = 0);
 
-    void buildTetrahedron(unsigned div, int make = 1);
-    void buildOctahedron(unsigned div, int make = 1);
-    void buildIcosahedron(unsigned div, int make = 1);
-    void buildIcosahedronS(unsigned div, int make = 1);
-    void buildIcosahedronX(unsigned div, int make = 1);
-    void buildCylinder(unsigned div, int make = 1);
-    void buildHemisphere(unsigned div, int make = 1);
-    void buildDome(unsigned div, int make = 1);
-    void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid, int make);
-    void buildDroplet(unsigned div, int make = 1);
-    void buildPin(unsigned div, int make = 1);
+    void buildTetrahedron(unsigned div);
+    void buildOctahedron(unsigned div);
+    void buildIcosahedron(unsigned div);
+    void buildIcosahedronS(unsigned div);
+    void buildIcosahedronX(unsigned div);
+    void buildCylinder(unsigned div);
+    void buildHemisphere(unsigned div);
+    void buildDome(unsigned div);
+    void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid);
+    void buildDroplet(unsigned div);
+    void buildPin(unsigned div);
 
     /// set array of indices that define the edges
     void setEdges();
@@ -209,6 +206,9 @@ public:
     /// number of faces (each face is a triangle of 3 vertices)
     unsigned num_faces() const { return num_faces_; }
     
+    /// number of faces to be drawn if you want to display a football
+    unsigned num_faces_third() const { unsigned R = rank_/3; return num_faces_ - 60*(R*R); }
+
     /// array of indices to the vertices in each face (3 vertices per face)
     INDEX * face_data() const { return faces_; }
     
@@ -220,15 +220,16 @@ public:
 
     
     /// return address of first vertex of edge `e`
-    const float* edge_vertex0(int e) const { return vex_ + 3 * edges_[2*e]; }
+    const float* edge_vertex0(unsigned e) const { return vex_ + 3 * edges_[2*e]; }
     /// return address of second vertex of edge `e`
-    const float* edge_vertex1(int e) const { return vex_ + 3 * edges_[2*e+1]; }
+    const float* edge_vertex1(unsigned e) const { return vex_ + 3 * edges_[2*e+1]; }
+    
     /// return address of first vertex of face `f`
-    const float* face_vertex0(int f) const { return vex_ + 3 * faces_[3*f]; }
+    const float* face_vertex0(unsigned f) const { return vex_ + 3 * faces_[3*f]; }
     /// return address of second vertex of face `f`
-    const float* face_vertex1(int f) const { return vex_ + 3 * faces_[3*f+1]; }
+    const float* face_vertex1(unsigned f) const { return vex_ + 3 * faces_[3*f+1]; }
     /// return address of third vertex of face `f`
-    const float* face_vertex2(int f) const { return vex_ + 3 * faces_[3*f+2]; }
+    const float* face_vertex2(unsigned f) const { return vex_ + 3 * faces_[3*f+2]; }
 };
 
 #endif
