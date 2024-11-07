@@ -179,6 +179,7 @@ void drawEdges()
 
 void namePoints(View& view)
 {
+    const float S = 1.03;
     gym::disableLighting();
     gym::disableAlphaTest();
     gym::cancelRotation();
@@ -195,7 +196,7 @@ void namePoints(View& view)
         gym::color(col);
         const float* ptr = ico->vertex_data(i);
         snprintf(tmp, sizeof(tmp), "%u", i);
-        view.strokeString(ptr[0], ptr[1], ptr[2], tmp);
+        view.strokeString(S*ptr[0], S*ptr[1], S*ptr[2], tmp);
     }
     gym::restoreAlphaTest();
     gym::restoreLighting();
@@ -292,12 +293,13 @@ void processNormalKey(unsigned char c, int x, int y)
     {
         case ' ': reset(kind, rank); break;
         case 'i': reset(Tesselator::ICOSAHEDRON, rank); break;
-        case 'I': reset(Tesselator::ICOSAHEDRONS, rank); break;
+        case 'I': reset(Tesselator::ICOSAHEDRONX, rank); break;
         case 'o': reset(Tesselator::OCTAHEDRON, rank); break;
         case 'd': reset(Tesselator::DICE, rank); break;
         case 'h': reset(Tesselator::HEMISPHERE, rank); break;
         case 'a': reset(Tesselator::DROPLET, rank); break;
         case 'c': reset(Tesselator::CYLINDER, rank); break;
+        case 't': reset(Tesselator::TETRAHEDRON, rank); break;
         case ']': reset(kind, rank+1); break;
         case '}': reset(kind, rank+16); break;
         case '[': reset(kind, std::max(rank-1, 1)); break;
@@ -311,8 +313,8 @@ void processNormalKey(unsigned char c, int x, int y)
         case 'n': showNames = !showNames; break;
         case 'p': showPoints = !showPoints; break;
         case 'v': showPlane = !showPlane; break;
-        case 'k': cull_test = !cull_test; break;
-        case 't': flip_cap(GL_DEPTH_TEST); break;
+        case 'C': cull_test = !cull_test; break;
+        case 'D': flip_cap(GL_DEPTH_TEST); break;
 
         case 's': style = (style+1) % 2; glApp::flashText("style = %i", style); break;
         default: glApp::processNormalKey(c,x,y); return;

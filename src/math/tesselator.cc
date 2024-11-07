@@ -263,6 +263,22 @@ void Tesselator::sortVertices()
 }
 
 
+/// qsort function comparing the two faces
+static int compareFace(const void * A, const void * B)
+{
+    unsigned const* a = (unsigned const*)A;
+    unsigned const* b = (unsigned const*)B;
+    return ( a > b ) - ( a < b );
+}
+
+
+/** Sort vertices in Z order and reassign the face indices */
+void Tesselator::sortFaces()
+{
+    qsort(faces_, num_faces_, sizeof(VertexIZ), &compareFace);
+}
+
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -348,6 +364,19 @@ void Tesselator::cutEdge(unsigned a, unsigned b, unsigned div)
 }
 
 
+void Tesselator::cutEdges(unsigned cnt, unsigned edges[][2], unsigned div)
+{
+    for ( int i = 0; i < cnt; ++i )
+    {
+        unsigned A = edges[i][0];
+        unsigned B = edges[i][1];
+        for ( unsigned u = 1; u < div; ++u )
+            addVertex(A, div-u, B, u, 0, 0);
+    }
+    num_edge_vertices_ = num_vertices_;
+}
+
+
 void Tesselator::addFace(unsigned a, unsigned b, unsigned c)
 {
     //printf("face %i %i %i\n", a, b, c);
@@ -386,6 +415,7 @@ void Tesselator::cutFace(unsigned a, unsigned b, unsigned c, unsigned div, unsig
 }
 
 
+/* Refine */
 void Tesselator::cutQuad(unsigned quad[4], unsigned div, unsigned* line)
 {
     unsigned A = quad[0];
@@ -441,44 +471,48 @@ void Tesselator::cutStrip(unsigned inx[6], unsigned div, unsigned * line)
     
     for ( unsigned ii = 1; ii <= div; ++ii )
     {
+        // first triangle: A,B,C
         unsigned x = getEdgeVertex(B, ii, A, div-ii);
-        addFace(line[1], line[0], x);
+        addFace(line[0], x, line[1]);
         line[0] = x;
         unsigned stop = div-ii;
         for ( unsigned jj = 1; jj <= stop; ++jj )
         {
             x = makeVertex(C, jj, B, ii, A, div-ii-jj);
             addFace(line[jj], line[jj-1], x);
-            addFace(line[jj+1], line[jj], x);
+            addFace(line[jj], x, line[jj+1]);
             line[jj] = x;
         }
+        // second triangle: B,C,D
         for ( unsigned jj = stop+1; jj < div; ++jj )
         {
             x = makeVertex(D, jj-stop, B, stop+ii-jj, C, div-ii);
             addFace(line[jj], line[jj-1], x);
-            addFace(line[jj+1], line[jj], x);
+            addFace(line[jj], x, line[jj+1]);
             line[jj] = x;
         }
         x = getEdgeVertex(D, ii, C, div-ii);
         addFace(line[div], line[div-1], x);
-        addFace(neli[1], neli[0], x);
+        // third triangle: C,D,E
+        addFace(neli[0], x, neli[1]);
         line[div] = x;
         for ( unsigned jj = 1; jj <= stop; ++jj )
         {
             x = makeVertex(E, jj, D, ii, C, div-ii-jj);
             addFace(neli[jj], neli[jj-1], x);
-            addFace(neli[jj+1], neli[jj], x);
+            addFace(neli[jj], x, neli[jj+1]);
             neli[jj] = x;
         }
+        // fourth triangle: D,E,F
         for ( unsigned jj = stop+1; jj < div; ++jj )
         {
             x = makeVertex(F, jj-stop, D, stop+ii-jj, E, div-ii);
             addFace(neli[jj], neli[jj-1], x);
-            addFace(neli[jj+1], neli[jj], x);
+            addFace(neli[jj], x, neli[jj+1]);
             neli[jj] = x;
         }
         x = getEdgeVertex(F, ii, E, div-ii);
-        addFace(neli[div], neli[div-1], x);
+        addFace(neli[div-1], x, neli[div]);
         neli[div] = x;
     }
 }
@@ -538,6 +572,8 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case DROPLET: buildDroplet(div, make); break;
         case PIN: buildPin(div, make); break;
     }
+    if ( make & 2 ) setVertexCoordinates();
+    if ( make & 4 ) setEdges();
 }
 
 
@@ -558,19 +594,25 @@ void Tesselator::buildTetrahedron(unsigned div, int make)
         { 0,  0,   1},
     };
     
-    // ordered faces: Counter-Clockwise = facing out
-    unsigned fac[4][3] = {
-        {0, 2, 1},
-        {1, 3, 0},
-        {0, 3, 2},
-        {1, 2, 3}
-    };
-    
     allocate();
     setApices(vex, div);
-    refineTriangles(4, fac, div);
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
+    
+    unsigned edges[30][2] = {
+        {0, 1}, {0, 2}, {0, 3},
+        {1, 2}, {1, 3}, {2, 3}
+    };
+
+    cutEdges(6, edges, div);
+    
+    unsigned quad[2][4] = {
+        {0, 2, 1, 3},
+        {1, 3, 0, 2},
+    };
+
+    unsigned* line = new unsigned[div+1];
+    for ( int i = 0; i < 2; ++i )
+        cutQuad(quad[i], div, line);
+    delete[] line;
 }
 
 
@@ -589,23 +631,26 @@ void Tesselator::buildOctahedron(unsigned div, int make)
         { 0,  1,  0},
     };
     
-    // ordered faces: Counter-Clockwise = facing out
-    unsigned fac[8][3] = {
-        {2, 0, 4},
-        {1, 3, 5},
-        {0, 3, 4},
-        {1, 5, 2},
-        {3, 0, 5},
-        {1, 2, 4},
-        {0, 2, 5},
-        {1, 4, 3}
-    };
-    
     allocate();
     setApices(vex, div);
-    refineTriangles(8, fac, div);
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
+    
+    unsigned edges[12][2] = {
+        {0, 2}, {0, 3}, {0, 4}, {0, 5},
+        {2, 4}, {3, 4}, {2, 5}, {3, 5},
+        {1, 2}, {1, 3}, {1, 4}, {1, 5}
+    };
+
+    cutEdges(12, edges, div);
+    
+    unsigned strip[2][6] = {
+        {0, 2, 5, 1, 3, 4},
+        {1, 2, 4, 0, 3, 5},
+    };
+
+    unsigned* line = new unsigned[2*(div+1)];
+    for ( int i = 0; i < 2; ++i )
+        cutStrip(strip[i], div, line);
+    delete[] line;
 }
 
 
@@ -661,8 +706,6 @@ void Tesselator::buildIcosahedronX(unsigned div, int make)
     allocate();
     setApices(vex, div);
     refineTriangles(20, fac, div);
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
 }
 
 /** The faces are draw in order of increasing Z */
@@ -721,12 +764,10 @@ void Tesselator::buildIcosahedronS(unsigned div, int make)
     allocate();
     setApices(vex, div);
     refineTriangles(20, fac, div);
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
 }
 
 
-/** The faces are draw in order of increasing Z */
+/** This refines 5 triangle strips to cover the full icosahedron */
 void Tesselator::buildIcosahedron(unsigned div, int make)
 {
     div = std::max(div, 1U);
@@ -767,14 +808,7 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
         {6, 11}, {7, 11}, {8, 11}, {9, 11}, {10, 11}
     };
 
-    for ( int i = 0; i < 30; ++i )
-    {
-        unsigned A = edges[i][0];
-        unsigned B = edges[i][1];
-        for ( unsigned u = 1; u < div; ++u )
-            addVertex(A, div-u, B, u, 0, 0);
-    }
-    num_edge_vertices_ = num_vertices_;
+    cutEdges(30, edges, div);
     
     unsigned strip[5][6] = {
         {0, 1, 2, 6, 7, 11},
@@ -788,8 +822,8 @@ void Tesselator::buildIcosahedron(unsigned div, int make)
     for ( int i = 0; i < 5; ++i )
         cutStrip(strip[i], div, line);
     delete[] line;
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
+    
+// sortFaces:
 }
 
 
@@ -798,6 +832,20 @@ static void triangle(unsigned i[3], unsigned a, unsigned b, unsigned c)
     i[0] = a;
     i[1] = b;
     i[2] = c;
+}
+
+static void mirror(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3])
+{
+    x[0] = a[0];
+    x[1] = a[1];
+    x[2] = a[2];
+}
+
+static void middle(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3], Tesselator::FLOAT b[3])
+{
+    x[0] = 0.5 * ( a[0] + b[0] );
+    x[1] = 0.5 * ( a[1] + b[1] );
+    x[2] = 0.5 * ( a[2] + b[2] );
 }
 
 /**
@@ -866,8 +914,6 @@ void Tesselator::buildCylinder(unsigned div, int make)
     setApices(vex, div);
     refineTriangles(f, fac, div);
     sortVertices();
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
 }
 
 void Tesselator::buildPin(unsigned div, int make)
@@ -884,26 +930,13 @@ void Tesselator::buildDroplet(unsigned div, int make)
     kind_ = DROPLET;
 }
 
-static void copyme(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3])
-{
-    x[0] = a[0];
-    x[1] = a[1];
-    x[2] = a[2];
-}
-
-static void middle(Tesselator::FLOAT x[3], Tesselator::FLOAT a[3], Tesselator::FLOAT b[3])
-{
-    x[0] = 0.5 * ( a[0] + b[0] );
-    x[1] = 0.5 * ( a[1] + b[1] );
-    x[2] = 0.5 * ( a[2] + b[2] );
-}
 
 void Tesselator::buildHemisphere(unsigned div, int make)
 {
     div = std::max(div, 1U);
     setGeometry(HEMISPHERE, 26, 75, 40, div);
     
-    const FLOAT P = M_PI/10.;
+    const FLOAT P = M_PI*0.1;
     const FLOAT D = M_PI*0.4;
     FLOAT C[5], S[5];
     for ( int i = 0; i < 5; ++i )
@@ -936,7 +969,7 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     FLOAT vex[26][3];
     unsigned fac[40][3];
     
-    copyme(vex[j++], ico[0]);
+    mirror(vex[j++], ico[0]);
     for ( int i = 1; i <= 5; ++i )
     {
         middle(vex[j++], ico[0], ico[i]);
@@ -951,7 +984,7 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     for ( int i = 1; i <= 5; ++i )
     {
         unsigned p = i<2 ? 5 : i-1;
-        copyme(vex[j++], ico[i]);
+        mirror(vex[j++], ico[i]);
         triangle(fac[f++], i, p+5, i+10);
         triangle(fac[f++], i, i+10, i+5);
     }
@@ -972,8 +1005,6 @@ void Tesselator::buildHemisphere(unsigned div, int make)
     allocate();
     setApices(vex, div);
     refineTriangles(f, fac, div);
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
 }
 
 
@@ -1010,6 +1041,8 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
         {+X, Y,-Zr}, { X,-Y,-Zr}, {-X, Y,-Zr}, {-X,-Y,-Zr}
     };
     
+    // Quads are numbered as a triangle strip:
+    // 0 and 3 (and 1 2) are opposite corners defining a diagonal to the Quad
     unsigned quad[18][4] = {
         { 0, 1, 2, 3 }, { 4, 5, 6, 7 },         // faces at +X and -X
         { 8, 9, 10, 11 }, { 12, 13, 14, 15 },   // faces at +Y and -Y
@@ -1025,7 +1058,7 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
         { 14, 15, 21, 23 }, { 20, 22, 8, 9 }
     };
     
-    unsigned fac[12][3] = {
+    unsigned fac[8][3] = {
         { 0, 20, 8 }, { 1, 10, 16 },
         { 2, 14, 21 }, { 3, 18, 12 },
         { 4, 23, 15 }, { 5, 13, 19 },
@@ -1046,9 +1079,12 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
         cutEdge(b, d, div);
         cutEdge(c, d, div);
     }
-    refineTriangles(8, fac, div);
     
     unsigned* line = new unsigned[div+1];
+
+    for ( unsigned f = 0; f < 8; ++f )
+        cutFace(fac[f][0], fac[f][1], fac[f][2], div, line);
+    
     // 4 edges parallel to the Z axis
     for ( int n = 6; n < 10; ++n )
         cutQuad(quad[n], div, line);
@@ -1066,8 +1102,6 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
         cutQuad(quad[n], vid, line);
     
     delete[] line;
-    if ( make & 2 ) setVertexCoordinates();
-    if ( make & 4 ) setEdges();
 }
 
 

@@ -128,6 +128,7 @@ private:
     void addFace(unsigned, unsigned, unsigned);
     void addEdge(unsigned, unsigned);
     void cutEdge(unsigned a, unsigned b, unsigned div);
+    void cutEdges(unsigned, unsigned[][2], unsigned div);
     void cutFace(unsigned a, unsigned b, unsigned c, unsigned div, unsigned*);
     void cutQuad(unsigned quad[4], unsigned div, unsigned*);
     void cutStrip(unsigned inx[6], unsigned div, unsigned*);
@@ -165,8 +166,11 @@ public:
 
     /// set array of indices that define the edges
     void setEdges();
-    /// calculate coordinates of vertices used in vertex_data()
+    /// sort faces
+    void sortFaces();
+    /// sort vertices in Z and update faces
     void sortVertices();
+
     /// calculate coordinates of vertices used in vertex_data()
     void setVertexCoordinates();
 
