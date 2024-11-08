@@ -166,7 +166,7 @@ void Random::urand2(real& C, real& S)
     S = ( x*y + x*y ) / d;
 }
 
-/** Set two signed random numbers in [-1, 1] such that `C*C + S*S == R` */
+/** Set two signed random numbers in [-R, R] such that `C*C + S*S == R*R` */
 void Random::urand2(real& C, real& S, const real R)
 {
     real d, x, y;
@@ -174,9 +174,6 @@ void Random::urand2(real& C, real& S, const real R)
         sreal2(x, y);
         d = x*x + y*y;
     } while (( d > 1.0 )|( d == 0 ));
-    // we can avoid the square root here by using the half angle formula:
-    // consider the imaginary number a = x + i*y = sqrt(d) * exp(i*angle), then
-    // a*a = d * exp(i*2*angle), thus a*a/d is uniformly distributed in the unit disc:
     d = R / d;
     C = ( x*x - y*y ) * d;
     S = ( x*y + x*y ) * d;

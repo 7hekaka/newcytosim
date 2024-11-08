@@ -372,7 +372,7 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
                 throw InvalidParameter("thickness T must be >= 0 in `circle R T`");
 #if ( DIM >= 3 )
             real C, S;
-            RNG.urand2(C, S);
+            RNG.urand2(C, S, R);
             Vector3 W = (0.5*T) * Vector3::randU();
             switch( get_axis(tok, 6) )
             {
