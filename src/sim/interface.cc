@@ -246,7 +246,7 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
         iso.rot = Cytosim::readOrientation(iss, iso.mov, spc);
         size_t t = has_trail(iss);
         if ( t )
-            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `"+StreamFunc::extract_line(iss)+"'");
+            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `orientation = "+StreamFunc::extract_line(iss)+"'");
     }
     else
         iso.rot = Rotation::randomRotation();
@@ -262,7 +262,7 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
         Rotation rot = Cytosim::readOrientation(iss, iso.mov, spc);
         size_t t = has_trail(iss);
         if ( t )
-            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `"+StreamFunc::extract_line(iss)+"'");
+            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `orientation = "+StreamFunc::extract_line(iss)+"'");
         iso.rotate(rot);
     }
     
