@@ -9,7 +9,7 @@ Extension | Type             | Typical usage
 `*.cyp`   | text file, input | configuration file for `play` with display parameters
 
 
-# Files associated with `sim`
+# Files associated with "sim"
  
 `sim` only has one input file: the config file (by default *config.cym*), and usually produces 3 output:
  
@@ -21,7 +21,7 @@ File             | Type           | Content
  
 The file `objects.cmo` is called the trajectory file.
  
-# Files associated with `play`
+# Files associated with "play"
  
 `play` in the normal replay mode will read this file for input:
  
@@ -32,10 +32,10 @@ The file `objects.cmo` is called the trajectory file.
 `style.cyp`       | text           | display parameters
 
 However, `play live` reads the configuration file and usually does not write any file,
-except to save images or export simulation snapshot (a trajectory file containing only one time point), see menu -> export.
+except to save images or export simulation snapshot (a trajectory file containing only one time point), see menu --> export.
  
 
-# Files associated with `report`
+# Files associated with "report"
 
 `report` reads `properties.cmp` and `objects.cmo`, and sends output to the terminal.
 

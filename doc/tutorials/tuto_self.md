@@ -102,16 +102,16 @@ You can also set their position exactly:
 
 You can use multiple `new` to create more complex patterns, like this one:
 	
-	new 50 microtubule
-	{
-	    length = 9
-	    orientation = horizontal
-	}
-	new 50 microtubule
-	{
-	    length = 9
-	    orientation = vertical
-	}
+    new 50 microtubule
+    {
+        length = 9
+        direction = horizontal
+    }
+    new 50 microtubule
+    {
+        length = 9
+        direction = vertical
+    }
 
 Take some time to become familiar with this approach, and try different combinations of parameters.
 

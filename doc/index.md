@@ -1,24 +1,24 @@
-# Cytosim's Documentation
-
-*This is work in progress*
+# Cytosim's documentation pages
 
 *  [**Overview**](main/overview.md)
+*  [**Tutorials**](tutorials/index.md)
 *  [The configuration file](sim/config.md)
 *  [Placement of objects](sim/placement.md)
 *  [Units in Cytosim `(s, um, pN)`](sim/units.md)
-*  [Set of standard config files](main/examples.md)
+*  [Collection of config files](main/examples.md)
 *  [Introduction to the command line](main/starter.md)
-*  [**Tutorials**](tutorials/index.md)
-*  [Simulation engine](sim/index.md)
+*  [Cytosim's simulation engine](sim/index.md)
 *  [The different executables](main/executables.md)
 *  [Running simulations on your computer](main/runs.md)
-*  [Running cytosim on a cluster](main/run_slurm.md)
-*  [Graphical rendering](sim/graphics.md)
+*  [Running Cytosim on a SLURM cluster](main/run_slurm.md)
+*  [Adjusting the graphical display](sim/graphics.md)
 *  [Exporting images and making movies](main/movies.md)
 *  [Getting numbers out of Cytosim with `report`](sim/report.md)
 *  [Publications](publications/index.md)
-*  [File types](main/file_types.md)
 *  [Installation](main/installation.md)
+*  [File types](main/file_types.md)
+
+*This is work in progress*
 
 # Frequently asked questions
 

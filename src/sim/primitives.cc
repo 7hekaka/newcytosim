@@ -1121,7 +1121,7 @@ Rotation Cytosim::readRotation(std::istream& is)
 #endif
     
     if ( tok.size() )
-        throw InvalidSyntax("unexpected token in rotation");
+        throw InvalidSyntax("unexpected token `"+tok+"' in rotation");
     return Rotation(0, 1);
 }
 
