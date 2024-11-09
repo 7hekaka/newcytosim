@@ -1,0 +1,108 @@
+% Growing and colliding microtubules in 3D, anchored to the surface
+% Value/code in double brackets are replaced by preconfig
+% R is the radius of the cell created
+% L is the length of the probe filament initially
+% `angle` is the collision angles in radians between the 2 microtubules
+% Maud Formanek 01.06.2020, FJN 1.10.2021, 1.11.2022, Sphere 16.04.2024
+
+
+
+
+set simul system
+{
+    dim = 3
+    time_step = 0.005
+    viscosity = 1
+    steric = 1, 1884.9204
+    steric_region = -9 -9 9, 9 0.5 13
+    precondition = 1
+}
+
+set space cell
+{
+    shape = sphere
+}
+
+new cell
+{
+    radius = 12
+}
+
+set fiber microtubule
+{
+    steric = 1, 0.041145
+    rigidity = 20   
+    segmentation = 0.2
+    activity = dynamic
+    growing_speed = 0.18
+    shrinking_speed = -0.36
+    growing_force = 1.67
+    hydrolysis_rate = 0.2496
+    max_length = 16
+    min_length = 0.5
+    confine = in_out, 2.1271, 2000
+}
+
+set fiber obstacle
+{
+    steric = 1, 0.041145
+    rigidity = 20   
+    segmentation = 0.25
+    confine = in_out, 2.1271, 2000
+}
+
+set hand binder  
+{
+    binding_rate = 0.00070569
+    binding_range = 0.076912
+    unbinding_rate = 4.3042e-05
+    unbinding_force = 3
+}
+
+set single grafted 
+{
+    hand = binder
+    stiffness = 273.2043
+    length = 0.030367
+    activity = fixed
+}
+
+new event
+{
+    delay = 0.25
+    code = ( report microtubule:collision * {verbose=0})
+}
+
+for A=10:1430
+{
+    new obstacle
+    {
+        length = 16
+        position = 0 0 0
+        rotation = off
+        shape = curved, 12, 0 0 1
+    }
+    
+    new microtubule
+    {
+        length = 1.5
+        position = 0 -0.100 0
+        shape = curved, 12, 0 0 1
+        rotation = Y -0.6042, Z [0.0021825*A]
+        end_state = grow
+        placement = anywhere
+    }
+	
+    new 90566 grafted (cap 12.0304 2.5758 if (Y < 0.5))
+
+    call single:equilibrate
+    
+    run system
+    {
+        time = 80
+    }
+    report microtubule:collision * {verbose=0; print=1;}
+    delete all single
+    delete all fiber
+}
+
