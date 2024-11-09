@@ -21,7 +21,7 @@ SphericalCode * front = &S;
 pthread_t thread;
 pthread_mutex_t lock;
 
-int n_points = 26;
+size_t n_points = 26;
 
 //------------------------------------------------------------------------------
 

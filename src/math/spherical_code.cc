@@ -80,8 +80,8 @@ void SphericalCode::scale(const real factor)
 
 void SphericalCode::printPoints(size_t num, real vec[], FILE* file)
 {
-    for ( size_t ii = 0; ii < num; ++ii )
-        fprintf(file, "%3lu   %f %f %f\n", ii, vec[3*ii], vec[3*ii+1], vec[3*ii+2]);
+    for ( size_t i = 0; i < num; ++i )
+        fprintf(file, "%3lu   %f %f %f\n", i, vec[3*i], vec[3*i+1], vec[3*i+2]);
 }
 
 
@@ -207,9 +207,6 @@ size_t initBlob(real3 vec[])
         1, 11, 23, 9, 24, 7,
         25, 5, 24, 3, 23, 1
     };
-
-    for ( size_t i = 0; i < FF; ++i )
-        vec[i] = { 0, 0, 0 };
 
     for ( size_t i = 0; i < 26; ++i )
         SphericalCode::project(vec[i], pts[i]);
@@ -356,14 +353,22 @@ void SphericalCode::movePoints(real Pnew[], const real Pold[], real forces[], re
 }
 
 
+/// reallocate the array only if more is needed
 void SphericalCode::allocate(size_t nbp)
 {
-    //reallocate the array if needed:
-    if ( num_points_ != nbp || ! coord_ )
+    if ( num_points_ < nbp )
     {
-        free_real(coord_);
-        coord_ = new_real(3*nbp);
+        real * vec = new_real(3*nbp);
+        if ( coord_ )
+        {
+            for ( size_t i = 0; i < 3*num_points_; ++i )
+                vec[i] = coord_[i];
+            for ( size_t i = 3*num_points_; i < 3*nbp; ++i )
+                vec[i] = 0;
+            free_real(coord_);
+        }
         num_points_ = nbp;
+        coord_ = vec;
     }
 }
 
@@ -422,8 +427,9 @@ size_t SphericalCode::refinePoints(real precision, size_t mx_iterations)
     for ( step = 0; step < mx_iterations; ++step )
     {
         setForces(force, threshold);
+        //printPoints(num_points_, force, stdout);
         
-        while ( 1 ) 
+        while ( 1 )
         {
             movePoints(coord, coord_, force, mag);
             

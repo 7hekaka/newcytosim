@@ -1406,14 +1406,14 @@ namespace gle
         return 2 + pi_twice * ( 2 * turns + 1 );
     }
 
-    /// set triangle strip for a spiral, with Z in [B, T]
+    /// set triangle strip for a spiral, with Z in [Z, T]
     size_t setHelix(flute6* flu, float Z, float T, int turns)
     {
         assert_true( Z <= T );
         float W = ( T - Z ) / ( 1 + turns * 2 );
         float dZ = 2.0 * W / pi_twice;
         size_t i = 0;
-        // add quarter-turn with no increment
+        // add quarter-turn with no increment in Z
         for ( size_t p = pi_3half; p < pi_twice; ++p )
         {
             float C = cos_(p), S = sin_(p);
@@ -1428,7 +1428,7 @@ namespace gle
             flu[i++] = { C, S, Z, C, S, 0 };
             Z += dZ;
         }
-        // add quarter-turn with no increment
+        // add quarter-turn with no increment in Z
         for ( size_t p = 0; p <= pi_half; ++p )
         {
             float C = cos_(p), S = sin_(p);
