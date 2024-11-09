@@ -3328,8 +3328,7 @@ void Simul::reportAshbya(std::ostream& out) const
  */
 void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber const* fox, const int print) const
 {
-    int abort = 0;
-    static int mode = 1;
+    static int decided = 0;
     static real abs = -77; // abscissa of contact point on fox
     static real ang = 777; // angle at first contact
     static real dis = INFINITY; // minimum distance reached
@@ -3342,7 +3341,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
     bool B = 0; // fib below obstacle fox
     bool M = 0; // obstacle (fox) has moved
     
-    if ( fib && fox )
+    if ( !decided && fib && fox )
     {
         const real sup = 3 * fib->prop->steric_radius;
         
@@ -3426,7 +3425,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
                 if ( contact )
                     kat = 'K';
                 // but in any case, we can stop the simulation
-                abort = 1;
+                decided = 1;
             }
             else if ( M ) kat = 'M';
             else if ( X ) kat = B?'B':'X';
@@ -3435,30 +3434,31 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
         }
 
         // since these states are final, we can terminate the simulation
-        if ( strchr("KXBMZ", kat) )
-            abort = 1;
+        if ( strchr("BKMXZ", kat) )
+            decided = 1;
     }
 
-    if ( print == 1 )
+    if ( print )
     {
         out << LIN << std::fixed << std::setprecision(5) << ang;
         out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
         out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << kat;
-        if ( mode == 2 ) mode = 0;
     }
-    if ( print == 2 )
-        mode = 2;
     if ( print )
     {
-        // reset static variables for next round:
+        // reset static variables:
+        decided = 0;
         abs = -77;
         ang = 777;
         dis = INFINITY;
         hit.set(0,0,0);
         kat = 'U';
     }
-    else if ( abort && mode )
+    else if ( decided == 1 )
+    {
         end_now();
+        decided = 2;
+    }
 }
 
 
@@ -3479,16 +3479,15 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         else
             fox = f;
     }
+    // discard case if fiber has reached its max length
+    if ( fib && fib->length()+0.01 > fib->prop->max_length )
+        fib = nullptr;
+
+    int print = 0;
+    opt.set(print, "print");
     
     if ( fox && fib )
-    {
-        int print = 0;
-        opt.set(print, "print");
-        // do not consider case where fiber has reached its max length
-        if ( fib->length()+0.01 > fib->prop->max_length )
-            fib = nullptr;
         reportFiberCollision(out, fib, fox, print);
-    }
 }
 
 

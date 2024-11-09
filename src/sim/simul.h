@@ -187,8 +187,8 @@ public:
     /// ask to stop the 'run' at the next recorded frame, if time exceeds 't'
     void end_at(double t) const { prop.end_time = std::min(t, prop.end_time); }
     
-    /// ask to stop the 'run' immediately
-    void end_now() const { double t = time(); prop.end_time = t; prop.stop_time = t; }
+    /// ask to stop the 'run' after t seconds
+    void end_now(double t = 0.0) const { t += time(); end_at(t); stop_at(t); }
 
     /// true if `time >= end_time`
     bool should_end() const { return prop.time >= prop.end_time; }
