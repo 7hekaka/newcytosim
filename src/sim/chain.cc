@@ -108,19 +108,19 @@ void Chain::setCurved(Vector dir, real rad, real len, real off)
     assert_true( len > 0 );
     // ensure that `dir` is orthogonal to X:
     dir.XX = 0;
-    dir.normalize(rad);
+    dir.normalize();
     size_t np = bestNumberOfPoints(len/fnSegmentation);
     setNbPoints(np);
     real S = len / ( np - 1 );
     setSegmentation(S);
     fnAbscissaP = fnAbscissaM + len;
     real delta = 2 * std::asin(0.5*S/rad);
-    real angle = -delta * np * 0.5;
+    real angle = -0.5 * delta * np;
     for ( size_t p = 0 ; p < np; ++p, angle += delta )
     {
-        real S = std::sin(angle);
-        real C = std::cos(angle) - off;
-        setPoint(p, Vector(rad*S, 0, 0) + dir*(C-off));
+        real S = rad * std::sin(angle);
+        real C = rad * std::cos(angle) - off;
+        setPoint(p, Vector(S, 0, 0) + dir*C);
     }
     updateFiber();
 }
