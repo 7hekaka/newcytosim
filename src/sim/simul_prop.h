@@ -79,7 +79,7 @@ public:
      .
      */
     double time_step;
-        
+    
     /// the time at which the current run will halt
     double stop_time;
     

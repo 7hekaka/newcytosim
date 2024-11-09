@@ -3458,11 +3458,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
         kat = 'U';
     }
     else if ( abort && mode )
-    {
-        real when = time();
-        end_at(when);
-        stop_at(when);
-    }
+        end_now();
 }
 
 

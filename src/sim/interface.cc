@@ -1185,7 +1185,7 @@ void Interface::execute_run(real sec, Glossary& opt, bool do_write)
         // check if ending the simulation was requested:
         if ( sim_->should_end() )
         {
-            sim_->never_end();
+            sim_->end_never(); // cleanup for next run
             break;
         }
     }
@@ -1228,9 +1228,9 @@ void Interface::execute_run(real sec)
         sim_->steps();
     }
     
-    // reset termination time:
+    // reset termination time for next run:
     if ( sim_->should_end() )
-        sim_->never_end();
+        sim_->end_never();
 
     sim_->relax();
     VLOG("-RUN END");

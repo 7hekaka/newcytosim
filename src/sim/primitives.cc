@@ -1040,7 +1040,7 @@ Rotation Cytosim::readRotation(std::istream& is)
     
     if ( tok == "random" )
         return Rotation::randomRotation();
-    else if ( tok == "identity" || tok == "off" || tok == "none" )
+    else if ( tok == "off" || tok == "identity" )
         return Rotation::one();
     else if ( tok == "align111" )
         return Rotation::align111();
@@ -1133,7 +1133,7 @@ Rotation Cytosim::readRotation(std::string const& arg)
     try {
         rot = Cytosim::readRotation(iss);
         // can combine another rotation:
-        if ( iss.good() )
+        if ( iss.peek() != EOF )
             rot = Cytosim::readRotation(iss) * rot;
     }
     catch ( Exception& e )

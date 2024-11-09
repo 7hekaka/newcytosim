@@ -169,6 +169,9 @@ public:
     /// perform one Monte-Carlo step, corresponding to the time step
     void steps();
 
+    /// time step (shortcut to `SimulProp::time_step`)
+    double time_step() const { return prop.time_step; }
+
     /// time in the simulated world (shortcut to `SimulProp::time`)
     double time() const { return prop.time; }
 
@@ -183,15 +186,15 @@ public:
     
     /// ask to stop the 'run' at the next recorded frame, if time exceeds 't'
     void end_at(double t) const { prop.end_time = std::min(t, prop.end_time); }
+    
+    /// ask to stop the 'run' immediately
+    void end_now() const { double t = time(); prop.end_time = t; prop.stop_time = t; }
 
     /// true if `time >= end_time`
     bool should_end() const { return prop.time >= prop.end_time; }
 
     /// reset `end_time` such as to never terminate
-    void never_end() const { prop.end_time = INFINITY; }
-
-    /// time step (shortcut to `SimulProp::time_step`)
-    double time_step() const { return prop.time_step; }
+    void end_never() const { prop.end_time = INFINITY; }
 
     /// this is called after a sequence of `step()` have been done
     void relax();
