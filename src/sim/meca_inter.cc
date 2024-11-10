@@ -4724,14 +4724,14 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
 #else
     MatrixBlock LL = MatrixBlock(0, -leg * leg);
 #endif
-    MatrixBlock MM = MatrixBlock::vectorProduct(0, leg); // anti-symmetric
-    
-    //std::clog<<-At.mul(aR)<<" "<<-Bt.mul(bR)<<" "<<-Bt.mul(aR)<<" \n";
-    //std::clog<<LL.plus_diagonal(-cc0*cc0)<<" "<<LL.plus_diagonal(-cc1*cc1)<<" "<<MM-LL.plus_diagonal(cc0*cc1)<<" /\n";
+    MatrixBlock MM = MatrixBlock::vectorProduct(-cc0*cc1, leg);
+
+    //std::clog<<-At.mul(aR)<<" "<<-Bt.mul(bR)<<" "<<-Bt.mul(aR)<<"\n";
+    //std::clog<<LL.plus_diagonal(-cc0*cc0)<<" "<<LL.plus_diagonal(-cc1*cc1)<<" "<<MM-LL<<"/\n\n";
 
     // the diagonal blocs are symmetric but not diagonal
     add_block_diag(ii0, weight, LL.plus_diagonal(-cc0*cc0));
-    add_block(ii1, ii0, weight, MM-LL.plus_diagonal(cc0*cc1));
+    add_block(ii1, ii0, weight, MM-LL);
     add_block_diag(ii1, weight, LL.plus_diagonal(-cc1*cc1));
 #endif
     
