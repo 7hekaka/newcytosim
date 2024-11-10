@@ -929,19 +929,17 @@ void Display3::drawSinglesF(SingleSet const& set) const
             else
                 gym::color_both(dis->color2.tweak(obj->signature()));
 #if ( 0 )
-            if ( dis->style == 2 )
+            // draw anchored single using a flatten dome, instead of a sphere
+            Space const* spc = obj->confineSpace();
+            if ( spc )
             {
-                Space const* spc = obj->confineSpace();
-                if ( spc )
-                {
-                    const float rad = pixscale(dis->size);
-                    /// draw a disc tangent to the Space:
-                    Vector pos = obj->posFoot();
-                    Vector dir = spc->normalToEdge(pos);
-                    drawObject(pos, dir, rad, gle::dome);
-                    continue;
-                }
+                const float rad = pixscale(dis->size);
+                /// draw a flat dome tangent to the Space:
+                Vector pos = obj->posFoot();
+                Vector dir = spc->normalToEdge(pos);
+                drawObject(pos, dir, rad, gle::dome);
             }
+            else
 #endif
             drawObject(obj->posFoot(), pixscale(dis->size), gle::blob);
         }
