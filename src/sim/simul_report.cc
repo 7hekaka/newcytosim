@@ -3348,8 +3348,8 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
         // K = state at plus-end
         K = ( fib->endStateP() == 4 );
         
-        // check if tip of 'fib' is close to 'fox':
         Vector tip = fib->posEndP();
+        // find closest point to 'fib' plus end, located on 'fox':
         real dpe, aaa = fox->projectPoint(tip, dpe);
         Vector dir = fox->dir(aaa);
         dis = std::min(dis, dpe);
@@ -3362,7 +3362,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
         bool contact = ( dpe < sup*sup );
         if ( contact )
         {
-            // check direction of fib's tip to fox at closest point:
+            // check angle of fib's tip with respect to fox at closest point:
             real C = dot(fib->dirEndP(), dir);
             real A = std::acos(C);
             // the angle and abscissa are set at first contact:
@@ -3370,7 +3370,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
             {
                 ang = A;
                 abs = aaa;
-                hit = tip;
+                hit = fox->pos(aaa);
             }
             // 'zippering' implies 'being tangent' and 'significant growth' along the obstacle
             T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
@@ -3431,11 +3431,11 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
             else if ( X ) kat = B?'B':'X';
             // can be 'Z' only if 'X' is not true
             else if ( Z ) kat = 'Z';
-        }
 
-        // since these states are final, we can terminate the simulation
-        if ( strchr("BKMXZ", kat) )
-            decided = 1;
+            // since these states are final, we can terminate the simulation
+            if ( strchr("BKMXZ", kat) )
+                decided = 1;
+        }
     }
 
     if ( print )
@@ -3446,7 +3446,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
     }
     if ( print )
     {
-        // reset static variables:
+        // reset static variables for next round:
         decided = 0;
         abs = -77;
         ang = 777;
