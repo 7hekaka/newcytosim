@@ -173,20 +173,8 @@ void Tesselator::setVertexCoordinates()
 }
 
 
-void scale_(size_t num, float* ptr, float X, float Y, float Z)
-{
-    for ( unsigned n = 0; n < num; ++n )
-    {
-        ptr[3*n  ] *= X;
-        ptr[3*n+1] *= Y;
-        ptr[3*n+2] *= Z;
-    }
-}
-
-
 /** This scales the 3D points by (X, Y, Z) */
-template < typename FLOAT >
-static void scale_(size_t num, FLOAT* ptr, FLOAT X, FLOAT Y, FLOAT Z)
+void Tesselator::scale(size_t num, float* ptr, float X, float Y, float Z)
 {
     for ( unsigned n = 0; n < num; ++n )
     {
@@ -614,7 +602,6 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case ICOSAHEDRON: buildIcosahedron(div); break;
         case ICOSAHEDRONX: buildIcosahedronX(div); break;
         case HEMISPHERE: buildHemisphere(div); break;
-        case DOME: buildDome(div); break;
         case CYLINDER: buildCylinder(div); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div); break;
         case DROPLET: buildDroplet(div); break;
@@ -998,14 +985,6 @@ void Tesselator::buildHemisphere(unsigned div)
 }
 
 
-void Tesselator::buildDome(unsigned div)
-{
-    div = std::max(div, 1U);
-    buildHemisphere(div);
-    kind_ = DOME;
-}
-
-
 /**
  This divides the rounded edges by 'div' and the 6 flat square faces bi 'vid'
  */
@@ -1099,15 +1078,6 @@ void Tesselator::buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, uns
 #pragma mark - Solid vertices
 
 template < typename REAL >
-static void scale_(REAL& X, REAL& Y, REAL& Z, REAL n)
-{
-    X *= n;
-    Y *= n;
-    Z *= n;
-}
-
-
-template < typename REAL >
 static void projectSphere(REAL* X)
 {
     REAL n = 1.0 / std::sqrt(X[0]*X[0] + X[1]*X[1] + X[2]*X[2]);
@@ -1199,8 +1169,6 @@ void Tesselator::projectVertices(REAL * vec) const
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
             projectSphere(vec+3*n);
-        if ( kind_ == DOME )
-            scale_(num_vertices_, vec, 1., 1., REAL(0.5));
     }
 }
 

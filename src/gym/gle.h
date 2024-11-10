@@ -258,8 +258,10 @@ namespace gle
     void hemisphere1();
     /// draw a nice half-sphere of radius 1 in Z < 0
     void hemisphere2();
-    /// draw a flattened dome of radius 1 in XY and 0.5 in Z < 0
+    /// draw a flattened dome of radius 1 in XY with Z in [-0.5, 0]
     void dome();
+    /// draw a very flat dome of radius 1 in XY with Z in [-0.25, 0]
+    void roof();
     /// draw a blob with a pointy ends up in Z
     void pin();
     /// draw a sphere stretched in Z

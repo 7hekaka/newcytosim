@@ -33,7 +33,7 @@ public:
 
     /// starting shapes
     enum Polyhedra { UNSET=0, TETRAHEDRON, OCTAHEDRON, ICOSAHEDRON, 
-        ICOSAHEDRONX, HEMISPHERE, DOME, CYLINDER, DICE, DROPLET, PIN };
+        ICOSAHEDRONX, HEMISPHERE, CYLINDER, DICE, DROPLET, PIN };
     
     /// One of the vertex of the unrefined template model
     struct Apex
@@ -157,7 +157,6 @@ public:
     void buildIcosahedronX(unsigned div);
     void buildCylinder(unsigned div);
     void buildHemisphere(unsigned div);
-    void buildDome(unsigned div);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid);
     void buildDroplet(unsigned div);
     void buildPin(unsigned div);
@@ -181,7 +180,9 @@ public:
     /// copy coordinates of points to given array
     void store_vertices(double* vec) const;
 
-    
+    /** Scale all 3D points by (X, Y, Z) */
+    static void scale(size_t num, float* ptr, float X, float Y, float Z);
+
     /// number of derived vertices
     unsigned max_vertices() const { return max_vertices_; }
        

@@ -47,6 +47,10 @@ namespace gle
     unsigned ico_cnt_[12] = { 0 };
     /// another number of faces
     unsigned ico_mid_[12] = { 0 };
+
+    /// index used for the dome:
+    const unsigned DOME = 9;
+    const unsigned ROOF = 10;
     /// index used for the icoid object:
     const unsigned ICOID = 11;
     
@@ -1707,10 +1711,13 @@ namespace gle
     
     void hemisphere1() { drawIcoBuffer(ico_pts_[4], ico_idx_[4], ico_cnt_[4]); }
     void hemisphere2() { drawIcoBuffer(ico_pts_[5], ico_idx_[5], ico_cnt_[5]); }
-    void dome() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
 
-    void pin() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
-    void droplet() { drawIcoBuffer(ico_pts_[8], ico_idx_[8], ico_cnt_[8]); }
+    void pin() { drawIcoBuffer(ico_pts_[6], ico_idx_[6], ico_cnt_[6]); }
+    void droplet() { drawIcoBuffer(ico_pts_[7], ico_idx_[7], ico_cnt_[7]); }
+    void droplet2() { drawIcoBuffer(ico_pts_[8], ico_idx_[8], ico_cnt_[8]); }
+    
+    void dome() { drawIcoBuffer(ico_pts_[DOME], ico_idx_[DOME], ico_cnt_[DOME]); }
+    void roof() { drawIcoBuffer(ico_pts_[ROOF], ico_idx_[ROOF], ico_cnt_[ROOF]); }
 
     // dual pass routines can be used to draw transparent spheres:
     void dualPassSphere1() { dualPassIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0]); }
@@ -1739,18 +1746,25 @@ namespace gle
 
         ico[4].buildHemisphere(finesse*3);
         ico[5].buildHemisphere(finesse);
-        ico[6].buildDome(finesse);
-        ico[7].buildPin(finesse*3);
-        ico[8].buildDroplet(finesse*3);
-        ico[9].buildDroplet(finesse);
+        ico[6].buildPin(finesse*3);
+        ico[7].buildDroplet(finesse*3);
+        ico[8].buildDroplet(finesse);
 
+        const int DOME_ICO = 5;
+        
         size_t F = 32; // reserve for ICOID (30)
         size_t S = 12;
-        for ( int i = 0; i < 10; ++i )
+        for ( int i = 0; i < 9; ++i )
         {
             F += 3 * ico[i].max_faces();
             S += 3 * ico[i].max_vertices();
         }
+        // reserve for DOME
+        F += 3 * ico[DOME_ICO].max_faces();
+        S += 3 * ico[DOME_ICO].max_vertices();
+        // reserve for ROOF
+        F += 3 * ico[DOME_ICO].max_faces();
+        S += 3 * ico[DOME_ICO].max_vertices();
 
         // required buffer size:
         size_t T = 6 * sizeTubeBuffers();
@@ -1777,17 +1791,30 @@ namespace gle
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
         assert_true( ptr <= ptr0 + C + T );
 
-        for ( int i = 0; i < 10; ++i )
+        for ( int i = 0; i < 9; ++i )
         {
             ico_pts_[i] = ptr - ptr0;
             ico_idx_[i] = ( idx - idx0 ) * sizeof(GLushort);
             unsigned cnt = setIcoBuffer(ico[i], ptr, idx);
-            assert_true( 0 == cnt % 3 );
             ico_cnt_[i] = cnt;
             ico_mid_[i] = 3*ico[i].num_faces_third();
         }
 
-        assert_true(ICOID >= 10);
+        assert_true(DOME >= 9);
+        float * dome = ptr;
+        ico_pts_[DOME] = ptr - ptr0;
+        ico_idx_[DOME] = ( idx - idx0 ) * sizeof(GLushort);
+        ico_cnt_[DOME] = setIcoBuffer(ico[DOME_ICO], ptr, idx);
+        Tesselator::scale(ico_cnt_[DOME], dome, 1.f, 1.f, 0.5f);
+        
+        assert_true(ROOF >= 10);
+        float * roof = ptr;
+        ico_pts_[ROOF] = ptr - ptr0;
+        ico_idx_[ROOF] = ( idx - idx0 ) * sizeof(GLushort);
+        ico_cnt_[ROOF] = setIcoBuffer(ico[DOME_ICO], ptr, idx);
+        Tesselator::scale(ico_cnt_[ROOF], roof, 1.f, 1.f, 0.33f);
+
+        assert_true(ICOID >= 11);
         ico_pts_[ICOID] = ptr - ptr0;
         ico_idx_[ICOID] = ( idx - idx0 ) * sizeof(GLushort);
         ico_cnt_[ICOID] = setIcoidBuffer((flute3*)ptr, idx);
