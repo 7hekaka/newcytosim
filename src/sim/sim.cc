@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
         std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
     }
 
-    Cytosim::out << "% " << TimeDate::date_string() << '\n';
+    Cytosim::out << "% " << TimeDate::date_string() << " PID " << getpid() << '\n';
     print_version(Cytosim::out);
     
     Simul simul;

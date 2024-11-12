@@ -173,9 +173,9 @@ real SpaceStrip::surface() const
 #if ( DIM == 1 )
     return -1;
 #elif ( DIM == 2 )
-    return (no_top_?1:2) * 2 * half_[0];
+    return (no_top_?2:4) * half_[0];
 #else
-    return (no_top_?1:2) * 4 * half_[0] * half_[1];
+    return (no_top_?4:8) * half_[0] * half_[1];
 #endif
 }
 
