@@ -21,7 +21,7 @@ namespace Cytosim
     Vector readPosition(std::istream&, Space const*);
     
     /// modify a position in space
-    Vector modifyPosition(std::istream&, Space const*, Vector);
+    void modifyPosition(std::istream&, Space const*, Vector&);
 
     /// convert string to a position
     Vector readPosition(std::string const&, Space const*);

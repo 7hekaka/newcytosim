@@ -515,7 +515,7 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
  Modify a vector, according to further instructions from `is`.
  This applies `at`, `blur`, `if`, `or`...
 */
-Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
+void Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector& pos)
 {
     std::string tok;
     std::streampos isp;
@@ -527,20 +527,29 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
         //StreamFunc::mark_line(std::cerr, is);
 
         if ( tok.empty() )
-            return pos;
+            return;
         
         // Translation is specified with 'at' or 'move'
-        if ( tok == "at"  ||  tok == "move" )
+        if ( tok == "at" )
         {
             Vector vec(0,0,0);
             extract(is, vec);
-            pos = pos + vec;
+            pos += vec;
         }
+#if ( DIM == 3 )
+        // translate in Z
+        else if ( tok == "addZ" )
+        {
+            real Z = 0;
+            extract(is, Z);
+            pos.ZZ += Z;
+        }
+#endif
         // Convolve with shape
         else if ( tok == "add" )
         {
             Vector vec = readPositionPrimitive(is, spc);
-            pos = pos + vec;
+            pos += vec;
         }
         // Alignment with a vector is specified with 'align'
         else if ( tok == "align" )
@@ -589,7 +598,8 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
         else if ( tok == "to" )
         {
             Vector vec = readPositionPrimitive(is, spc);
-            return pos + ( vec - pos ) * RNG.preal();
+            pos += ( vec - pos ) * RNG.preal();
+            return;
         }
         // returns one of the two points specified
         else if ( tok == "or" )
@@ -599,12 +609,16 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
         }
         else if ( tok == "if" )
         {
+            constexpr real alpha = 1.0 / ( DIM==3? M_SQRT3: M_SQRT2 );
             tok = Tokenizer::get_token(is);
-            real S = pos.e_sum()/std::sqrt(DIM);
+            real S = pos.e_sum() * alpha;
             Evaluator evaluator{{"X", pos.x()}, {"Y", pos.y()}, {"Z", pos.z()}, {"S", S}};
             try {
                 if ( 0 == evaluator.eval(tok) )
-                    return Vector(nan(""), nan(""), nan(""));
+                {
+                    pos.set(nan(""), nan(""), nan(""));
+                    return;
+                }
             }
             catch( Exception& e ) {
                 e.message(e.message()+" in `"+tok+"'");
@@ -632,7 +646,6 @@ Vector Cytosim::modifyPosition(std::istream& is, Space const* spc, Vector pos)
             break;
         }
     }
-    return pos;
 }
 
 
@@ -668,7 +681,7 @@ Vector Cytosim::readPosition(std::istream& is, Space const* spc)
     is.clear();
     int c = Tokenizer::skip_space(is, false);
     if ( isalpha(c) )
-        return modifyPosition(is, spc, pos);
+        modifyPosition(is, spc, pos);
     return pos;
 }
 
