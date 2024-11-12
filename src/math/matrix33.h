@@ -750,7 +750,7 @@ public:
     void add_full(const real alpha, Matrix33 const& M)
     {
         real const* src = M.val;
-#if MATRIX33_USES_AVX  && ( BLD == 4 )
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         vec4 a = set4(alpha);
         store4(val  , fmadd4(a, load4(src  ), load4(val  )));
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
@@ -765,7 +765,7 @@ public:
     void sub_full(Matrix33 const& M)
     {
         real const* src = M.val;
-#if MATRIX33_USES_AVX  && ( BLD == 4 )
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         store4(val  , sub4(load4(val  ), load4(src  )));
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
@@ -779,7 +779,7 @@ public:
     void sub_full(const real alpha, Matrix33 const& M)
     {
         real const* src = M.val;
-#if MATRIX33_USES_AVX  && ( BLD == 4 )
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         vec4 a = set4(alpha);
         store4(val  , fnmadd4(a, load4(src  ), load4(val  )));
         store4(val+4, fnmadd4(a, load4(src+4), load4(val+4)));
@@ -821,7 +821,7 @@ public:
     void add_half(Matrix33 const& M)
     {
         real const* src = M.val;
-#if MATRIX33_USES_AVX  && ( BLD == 4 )
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         store4(val  , add4(load4(val  ), load4(src  )));
         store4(val+4, add4(load4(val+4), load4(src+4)));
         store4(val+8, add4(load4(val+8), load4(src+8)));
@@ -840,12 +840,19 @@ public:
     {
         real const* src = M.val;
         //std::clog << "matrix alignment " << ((uintptr_t)src & 63) << "\n";
-#if MATRIX33_USES_AVX  && ( BLD == 4 )
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         vec4 a = set4(alpha);
         store4(val  , fmadd4(a, load4(src  ), load4(val  )));
         store4(val+4, fmadd4(a, load4(src+4), load4(val+4)));
         store4(val+8, fmadd4(a, load4(src+8), load4(val+8)));
 #elif ( 1 )
+        val[0] += alpha * src[0];
+        val[1] += alpha * src[1];
+        val[2] += alpha * src[2];
+        val[1+BLD] += alpha * src[1+BLD];
+        val[2+BLD] += alpha * src[2+BLD];
+        val[2+BLD*2] += alpha * src[2+BLD*2];
+#elif ( 0 )
         for ( index u = 0; u < BLD*3; ++u )
             val[u] += alpha * src[u];
 #else
@@ -859,7 +866,7 @@ public:
     void sub_half(Matrix33 const& M)
     {
         real const* src = M.val;
-#if MATRIX33_USES_AVX  && ( BLD == 4 )
+#if MATRIX33_USES_AVX && ( BLD == 4 )
         store4(val  , sub4(load4(val  ), load4(src  )));
         store4(val+4, sub4(load4(val+4), load4(src+4)));
         store4(val+8, sub4(load4(val+8), load4(src+8)));
