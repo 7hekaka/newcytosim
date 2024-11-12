@@ -162,7 +162,8 @@ void Simul::setAllInteractions(Meca& meca) const
 #endif
 }
 
-#pragma mark -
+//------------------------------------------------------------------------------
+#pragma mark - Solve
 
 void Simul::solve_meca()
 {

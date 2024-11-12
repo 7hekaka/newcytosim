@@ -3,22 +3,33 @@
 #include "xtbsv.h"
 #include "xtrsm.h"
 
-#ifdef __APPLE__
+/**
+ machine_time() provides a timer used to evaluate the Preconditionner's performance
+This can be disabled if you are not using auto-selection of preconditionners
+ */
+#if ( 1 )
+static inline unsigned long machine_time()
+{
+    return 0;
+}
+#elif defined(__APPLE__)
 #  include <mach/mach_time.h>
-unsigned long machine_time()
+static inline unsigned long machine_time()
 {
     // the units of this counter is not specified, but seems close to nanosec
     return mach_absolute_time() >> 10;
 }
 #else
 #  include <sys/time.h>
-unsigned long machine_time()
+static inline unsigned long machine_time()
 {
     timespec tv;
     clock_gettime(CLOCK_MONOTONIC, &tv);
     return 1000 * (unsigned long)tv.tv_sec + tv.tv_nsec / 1000;
 }
 #endif
+
+//------------------------------------------------------------------------------
 
 /// if you like Alsatian specialities, set this to a prime number
 #define CHOUCROUTE 7

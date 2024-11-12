@@ -751,7 +751,7 @@ unsigned Meca::solve()
     // compute preconditionner:
     auto start = machine_time();
     computePreconditionner();
-    auto factor = machine_time() - start;
+    auto factorize = machine_time() - start;
     cycles_ = 0;
 
     /*
@@ -957,9 +957,9 @@ unsigned Meca::solve()
         {
             unsigned cnt = std::max(1U, monitor.count());
             oss << "  cycles " << precond_ << "T " << std::setw(8) << cycles_;
-            oss << " F " << std::setw(8) << factor << std::setw(6) << factor/cnt;
+            oss << " F " << std::setw(8) << factorize << std::setw(6) << factorize/cnt;
             oss << " S " << std::setw(8) << apply << std::setw(6) << apply/cnt;
-            oss << " M " << std::setw(6) << ( cycles_ - factor - apply ) / cnt;
+            oss << " M " << std::setw(6) << ( cycles_ - factorize - apply ) / cnt;
         }
         Cytosim::out << oss.str() << std::endl;
         //std::clog << oss.str() << std::endl;
