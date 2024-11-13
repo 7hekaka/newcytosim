@@ -928,7 +928,8 @@ void SingleSet::equilibrate()
     {
         nxt = obj->next();
         Vector pos = obj->position();
-        HandProp const* hp = obj->prop->hand_prop;
+        Hand * ha = obj->hand();
+        HandProp const* hp = ha->property();
         real sup = square(hp->binding_range);
         // probability of finding hand in the bound state at equilibrium:
         const real prob = hp->binding_rate / ( hp->binding_rate + hp->unbinding_rate );
@@ -942,9 +943,9 @@ void SingleSet::equilibrate()
             {
                 // ATTENTION: convert `abs` relative to the segment to Fiber's abscissa
                 FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
-                if ( obj->hand()->attachmentAllowed(sit) )
+                if ( ha->attachmentAllowed(sit) )
                 {
-                    obj->hand()->attach(sit);
+                    ha->attach(sit);
                     //std::clog << "   bind " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
                     break;
                 }
