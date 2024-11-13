@@ -205,9 +205,9 @@ static void shuffleSingleSelect()
     unsigned int & select = disp.single_select;
     switch( select )
     {
-        case 3:  select = 0; flashText("single:select=0: hidden");      break;
-        case 0:  select = 2; flashText("single:select=2: bound only");  break;
+        case 3:  select = 2; flashText("single:select=2: bound only");  break;
         case 2:  select = 1; flashText("single:select=1: free only");   break;
+        case 1:  select = 0; flashText("single:select=0: hidden");      break;
         default: select = 3; flashText("single:select=3: all");         break;
     }
 }
@@ -218,10 +218,10 @@ static void shuffleCoupleSelect()
     unsigned int & select = disp.couple_select;
     switch( select )
     {
-        case 7:  select = 0; flashText("couple:select=0: hidden");        break;
-        case 0:  select = 4; flashText("couple:select=4: bridging only"); break;
+        case 7:  select = 4; flashText("couple:select=4: bridging only"); break;
         case 4:  select = 2; flashText("couple:select=2: bound only");    break;
         case 2:  select = 1; flashText("couple:select=1: free only");     break;
+        case 1:  select = 0; flashText("couple:select=0: hidden");        break;
         default: select = 7; flashText("couple:select=7: all");           break;
     }
 }
