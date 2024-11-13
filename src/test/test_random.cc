@@ -210,6 +210,7 @@ template < typename REAL >
 void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)())
 {
     REAL ix = INFINITY, iy = INFINITY, iz = INFINITY;
+    REAL sx = -INFINITY, sy = -INFINITY, sz = -INFINITY;
     real avg = 0, var = 0;
     for ( size_t i = 0; i < cnt; ++i )
     {
@@ -219,6 +220,9 @@ void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)()
         ix = std::min(ix, x);
         iy = std::min(iy, y);
         iz = std::min(iz, z);
+        sx = std::max(sx, x);
+        sy = std::max(sy, y);
+        sz = std::max(sz, z);
         x -= off;
         y -= off;
         z -= off;
@@ -227,6 +231,7 @@ void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)()
         //printf("%12.8f  %12.8f  %12.8f  %12.8f\n", x, y, z, t);
     }
     ix = std::min(std::min(ix, iy), iz);
+    sx = std::max(std::max(sx, sy), sz);
     cnt *= 3;
     if ( cnt > 0 )
     {
@@ -235,7 +240,7 @@ void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)()
     }
     if ( cnt > 1 )
         var /= real(cnt-1);
-    printf("%-16s  avg: %12.8f  var: %12.8f  min: %20.12e  off: %.4f\n", str, avg+off, var, ix, off);
+    printf("%-16s  avg: %12.8f  var: %12.8f  min: %20.12e  max: %20.12e  (off %.4f)\n", str, avg+off, var, ix, sx, off);
 }
 
 
