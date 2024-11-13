@@ -34,7 +34,7 @@ private:
     Nucleator();
     
     /// create a new Fiber
-    ObjectList makeFiber(Simul&, Vector pos, FiberProp const*, Glossary&);
+    ObjectList createFiber(Simul&, Vector pos, FiberProp const*, Glossary&);
 
 public:
     
