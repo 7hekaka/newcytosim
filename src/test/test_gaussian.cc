@@ -10,6 +10,7 @@
 #include <new>
 
 #include "timer.h"
+#include "assert_macro.h"
 #include "SFMT.h"
 
 #include "simd.h"
@@ -71,11 +72,17 @@ real * makeGaussians_std(real dst[], size_t cnt, const uint32_t[])
 }
 
 
-/** Using -log(1-R) where R is randomly distributed in [0, 1[ */
+/** Using -log(R) where R is randomly distributed in [0, 1[ */
 float * makeExponentials_(float dst[], size_t cnt, const uint32_t src[])
 {
+    const float alpha(TWO_POWER_MINUS_32);
     for ( size_t i = 0; i < cnt; ++i )
-        dst[i] = -std::log(real(1) - real(src[i]) * TWO_POWER_MINUS_32);
+    {
+        float x = static_cast<float>(src[i]);
+        float y = alpha * x + alpha;
+        assert_true( y > 0.f );
+        dst[i] = -logf(y);
+    }
     return dst + cnt;
 }
 
@@ -258,7 +265,7 @@ int main(int argc, char* argv[])
 {
     size_t cnt = 1<<18;
     printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
-    sfmt_t sfmt;
+    sfmt_t sfmt alignas(32);
     sfmt_init_gen_rand(&sfmt, device());
 
     tick();

@@ -359,8 +359,8 @@ float * makeExponentials(float dst[], size_t cnt, const uint32_t src[])
     for ( size_t i = 0; i < cnt; ++i )
     {
         float x = static_cast<float>(src[i]);
-        // since x < 2^32, the argument to log should be > 0:
-        dst[i] = -logf( 1.f - alpha * x );
+        float y = alpha * x + alpha;
+        dst[i] = -logf(y);
     }
     return dst + cnt;
 }
