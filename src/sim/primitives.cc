@@ -456,11 +456,18 @@ Vector Cytosim::readPositionPrimitive(std::istream& is, Space const* spc)
         
         if ( tok == "square" )
         {
-            real x = 1;
-            extract(is, x);
-            return Vector::randS(x);
+            real R = 1;
+            extract(is, R);
+            return Vector(R*RNG.shalf(), R*RNG.shalf(), 0);
         }
         
+        if ( tok == "cube" )
+        {
+            real R = 1;
+            extract(is, R);
+            return Vector::randH()*R;
+        }
+
         if ( tok == "rectangle" )
         {
             Vector S(0, 0, 0);
