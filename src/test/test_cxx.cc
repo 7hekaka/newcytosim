@@ -22,23 +22,24 @@
 #include <new>
 
 
-class Base
+class Bot
 {
 protected:
     int x;
 public:
-    Base() { x = 0; printf("Base()\n"); }
-    ~Base() { printf("~Base\n"); }
+    Bot() { printf(" Bot\n"); }
+    Bot(int) { x=0; printf("Bot(0)\n"); }
+    ~Bot() { printf("~Bot\n"); }
     virtual int val() { return x; }
-    virtual void func() { --x; printf("Base::dec\n"); }
+    virtual void func() { ++x; printf("Bot::inc\n"); }
 };
 
-class Obj: public Base
+class Top: public Bot
 {
 public:
-    Obj() { printf("Obj()\n"); }
-    ~Obj() { printf("~Obj\n"); }
-    virtual void func() { ++x; printf("Obj::inc\n");  }
+    Top() { printf(" Top\n"); }
+    ~Top() { printf("~Top\n"); }
+    virtual void func() { --x; printf("Top::dec\n");  }
 };
 
 
@@ -48,24 +49,29 @@ public:
  */
 void test_placement()
 {
-    printf("sizeof(Base) = %lu ", sizeof(Base));
-    printf("sizeof(Obj) = %lu\n", sizeof(Obj));
+    printf("sizeof(Bot) = %lu ", sizeof(Bot));
+    printf("sizeof(Top) = %lu\n", sizeof(Top));
     
-    Base B;
+    Bot B(0);
     (&B)->func();
+    printf("value = %i\n", B.val());
 
-    Obj* O = new (&B) Obj;
+    // construct Obj in place of B
+    Top* O = new (&B) Top;
     
     if ( O != &B )
         printf("pointers: %p != %p\n", &B, O);
 
-    O->func();
-    O->~Obj();
+    B.func();      // not-virtual: Base::func called
+    (&B)->func();  // virtual: Obj::func is called
     
     if ( O->val() == 1 )
         printf("PASSED: value == 1\n");
     else
         printf("FAILED: value %i != 1\n", O->val());
+
+    // destructor must be called explicitly
+    O->~Top();
 }
 
 
