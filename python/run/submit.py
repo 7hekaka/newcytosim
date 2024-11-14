@@ -40,7 +40,7 @@ Examples:
        Submit a different job for each config file provided, with 10 repeats of each
     
     
-Last updated 26.09.2018
+Last updated 14.11.2024
 F. Nedelec
 """
 
@@ -61,15 +61,15 @@ jdir = 'job00'
 
 #-------------------------------------------------------------------------------
 
-def execute(cmd):
+def execute(arg):
     """execute given command with subprocess.call()"""
     try:
-        val = subprocess.call(cmd)
+        val = subprocess.call(arg)
         if val:
             out.write("ERROR: command failed with value %i\n" % val)
-            print(cmd)
+            print(arg)
     except OSError:
-        out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
+        out.write("ERROR, command failed: "+' '.join(arg)+"\n")
 
 
 def make_new_directory(root):
@@ -86,11 +86,11 @@ def make_new_directory(root):
     return ''
 
 
-def write_script(filename, cmd):
+def write_script(filename, arg):
     """create an executable file containing the commands"""
     f = open(filename, 'w')
     f.write("#!/bin/bash\n")
-    for s in cmd:
+    for s in arg:
         f.write(s+'\n')
     f.close()
     os.chmod(filename, 0o0700)
@@ -99,64 +99,64 @@ def write_script(filename, cmd):
 
 def job_script(path, conf, exe, jarg):
     """return bash script that will run one job"""
-    cmd  = ['cd %s;' % path]
+    res = [f'cd {path};']
     # change time of script file to indicate activity:
-    cmd += ['touch %s;' % conf]
+    res.append(f'touch {conf};')
     # actual work: the job will call go_sim.py once:
-    cmd += ['go_sim.py exe="%s" %s %s;' % (exe, jarg, conf)]
+    res.append(f'go_sim.py exe="{exe}" {jarg} {conf};')
     # cleanup: move config file into subdirectory 'done'
-    cmd += ['mv '+conf+' '+jdir+'/done/.;']
+    res.append(f'mv {conf} {jdir}/done/.;')
     # cleanup: move itself into subdirectory 'done'
-    cmd += ['mv $0 '+jdir+'/done/.;']
-    return cmd
+    res.append(f'mv $0 {jdir}/done/.;')
+    return res
 
 
 def sub_script(exe):
     """return command that will submit one job"""
     # specify memory, shell, minimum number of cores and queue
-    cmd  = [submit, '--nodes=1', '--ntasks=1']
+    res = [submit, '--nodes=1', '--ntasks=1']
     # specify number of threads if executable is threaded:
     if ncpu > 1:
-        cmd += ['--cpus-per-task=%i' % ncpu]
-    cmd += ['--job-name='+jdir]
-    cmd += ['--partition='+queue] 
-    cmd += ['--time='+runtime] 
-    cmd += ['--mem='+repr(memory)]
+        res.append(f'--cpus-per-task={ncpu}')
+    res.append(f'--job-name={jdir}')
+    res.append(f'--partition={queue}')
+    res.append(f'--time={runtime}')
+    res.append(f'--mem={memory}')
     # define signals sent if time is exceeded:
-    cmd += ['--signal=INT@240']
-    cmd += ['--signal=TERM@10']
+    res.append('--signal=INT@240')
+    res.append('--signal=TERM@10')
     # redirect stderr and sdtout to files:
-    cmd += ['--output='+jdir+'/logs/out']
-    cmd += ['--error='+jdir+'/logs/err']
+    res.append(f'--output={jdir}/logs/out')
+    res.append(f'--error={jdir}/logs/err')
     # call executable:
-    cmd += [exe]
-    return cmd
+    res.append(exe)
+    return res
 
 
 def array_script(jobcnt):
     """return command that will submit a job-array"""
     # define parameters directly in the script:
-    cmd  = ['#SBATCH --nodes=1']
-    cmd += ['#SBATCH --ntasks=1']
+    res  = ['#SBATCH --nodes=1']
+    res.append('#SBATCH --ntasks=1')
     # specify number of threads if executable is threaded:
     if ncpu > 1:
-        cmd += ['--cpus-per-task=%i' % ncpu]
-    cmd += ['#SBATCH --partition='+queue]
-    cmd += ['#SBATCH --time='+runtime]
-    cmd += ['#SBATCH --mem='+repr(memory)]
+        res.append(f'--cpus-per-task={ncpu}')
+    res.append(f'#SBATCH --partition={queue}')
+    res.append(f'#SBATCH --time={runtime}')
+    res.append(f'#SBATCH --mem={memory}')
     # define signals sent if time is exceeded:
-    cmd += ['#SBATCH --signal=INT@240']
-    cmd += ['#SBATCH --signal=TERM@10']
+    res.append('#SBATCH --signal=INT@240')
+    res.append('#SBATCH --signal=TERM@10')
     # redirect stderr and sdtout to files:
-    cmd += ['#SBATCH --output='+jdir+'/logs/%a.out']
-    cmd += ['#SBATCH --error='+jdir+'/logs/%a.err']
+    res.append(f'#SBATCH --output='+jdir+'/logs/%a.out')
+    res.append(f'#SBATCH --error='+jdir+'/logs/%a.err')
     # defines the job name and index range:
-    cmd += ['#SBATCH --job-name='+jdir]
-    cmd += ['#SBATCH --array=1-%i' % jobcnt]
-    cmd += ['']
+    res.append(f'#SBATCH --job-name={jdir}')
+    res.append(f'#SBATCH --array=1-{jobcnt}')
+    res.append('')
     # this will execute 'R????' files in `todo` subdirectory:
-    cmd += [jdir+'/todo/R$SLURM_ARRAY_TASK_ID']
-    return cmd
+    res.append(f'{jdir}/todo/R$SLURM_ARRAY_TASK_ID')
+    return res
 
 #-------------------------------------------------------------------------------
 
@@ -247,12 +247,12 @@ def main(args):
 
     if jcnt > 1:
         print("    submit.py created %i scripts in `%s'" % (jcnt, todo))
-        jame = jdir + '/job.bash';
         # create script file to run job array:
+        job = jdir + '/job.bash';
         cmd = array_script(jcnt)
-        write_script(jame, cmd)
+        write_script(job, cmd)
         # make command to submit this script:
-        cmd = (submit, jame)
+        cmd = (submit, job)
     else:
         cmd = sub_script(jame)
     execute(cmd)
