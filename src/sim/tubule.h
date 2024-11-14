@@ -25,7 +25,7 @@ private:
     
     /// number of protofilaments
     static constexpr size_t NFIL = 13U;
-    static constexpr size_t FILM = 14U;
+    static constexpr size_t FILM = 16U;
 
     /// central backbone if present
     Fiber* bone_;
