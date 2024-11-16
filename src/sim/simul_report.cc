@@ -3328,42 +3328,51 @@ void Simul::reportAshbya(std::ostream& out) const
  */
 void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber const* fox, const int print) const
 {
+    const real COS20 = 0.94;
+    const real COS10 = 0.985;
+    const real L0 = 1.0; // threshold used to decide on events
+    const real M0 = L0 * L0 * 0.25; // threshold used to decide on 'M'
+
     static int decided = 0;
     static real abs = -77; // abscissa of contact point on fox
     static real ang = 777; // angle at first contact
     static real dis = INFINITY; // minimum distance reached
     static Vector hit(0,0,0); // position of first contact
+    static Vector aim(0,0,0); // direction of plus-end at first contact
     static char kat = 'U'; // category
+    
     bool K = 1; // catastrophe
     bool X = 0; // crossing
     bool T = 0; // tangent
     bool Z = 0; // zippering
     bool B = 0; // fib below obstacle fox
     bool M = 0; // obstacle (fox) has moved
+    bool P = 0; // fib tip is not deflected
     
     if ( !decided && fib && fox )
     {
         const real sup = 3 * fib->prop->steric_radius;
         
-        // K = state at plus-end
-        K = ( fib->endStateP() == 4 );
-        
+        // K = plus-end is shrinking
+        K = ( fib->endStateP() == STATE_RED );
+
         Vector tip = fib->posEndP();
+        Vector dir = fib->dirEndP();
         // find closest point to 'fib' plus end, located on 'fox':
         real dpe, aaa = fox->projectPoint(tip, dpe);
-        Vector dir = fox->dir(aaa);
+        Vector dirFox = fox->dir(aaa);
         dis = std::min(dis, dpe);
         
         // check if obstacle has moved after contact by more than 250 nm:
         if ( abs > 0 )
-            M = ( distanceSqr(hit, fox->pos(abs)) > 0.0625 );
+            M = ( distanceSqr(hit, fox->pos(abs)) > M0 );
         
         // plus-tip of 'fil' is in contact with 'fox':
         bool contact = ( dpe < sup*sup );
         if ( contact )
         {
             // check angle of fib's tip with respect to fox at closest point:
-            real C = dot(fib->dirEndP(), dir);
+            real C = dot(dir, dirFox);
             real A = std::acos(C);
             // the angle and abscissa are set at first contact:
             if ( ang > 700 )
@@ -3371,34 +3380,44 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
                 ang = A;
                 abs = aaa;
                 hit = fox->pos(aaa);
+                aim = dir;
             }
             // 'zippering' implies 'being tangent' and 'significant growth' along the obstacle
-            T = ( abs_real(C) > 0.94 );   // tangent within 20 degrees
+            T = ( abs_real(C) > COS20 );   // tangent within 20 degrees
             // distanced zipped is measured along the obstacle, using abscissa:
-            Z = ( abs_real(aaa-abs) > 2.0 ); // has zipped over more than 2um
+            Z = ( abs_real(aaa-abs) > 2*L0 ); // has zipped over more than 2xL0
         }
-        else if ( fib->length() > 1.0 )
+        else if ( fib->length() > L0 && ( dpe > L0*L0 ) )
         {
+            // the plus tip is growing in the same direction as when contact was made:
+            P = ( dot(aim, dir) > COS10 );
+
             // the plus-tip may have crossed the other filament if it is not in contact
-            // consider a point 1um back, and check if it is on opposite side of 'fox'
-            Vector bak = fib->posFrom(1.0, PLUS_END);
+            // consider a point 2um back, and check if it is on opposite side of 'fox'
+            Vector bak = fib->posFrom(2*L0, PLUS_END);
             real ddd, bbb = fox->projectPoint(bak, ddd);
             // bbb = 0.5 * ( aaa + bbb );  // OLD formula before 13.04.2023
             // the abscissa on `fox` below the intersection is estimated with Thales's theorem:
             real alpha = std::sqrt(dpe) / ( std::sqrt(dpe) + std::sqrt(ddd) );
             bbb = aaa + ( bbb - aaa ) * alpha; // abscissa on 'fox'
-            Vector mid = fox->pos(bbb);  // position below the intersection
+
+            Vector mid = fox->pos(bbb);  // position adjacent to the intersection
             Vector axs = fox->dir(bbb);
             Torque TP = cross(axs, tip-mid);
             Torque TM = cross(axs, bak-mid);
+            /**
+             For X, the plus-tip should be on the other side of the fiber, at least by L0,
+             And the angle should be within 20 degree of the angle at contact
+            */
             X = ( dot(TP, TM) < 0 );
+            
             if ( X )
             {
                 // check if 'fib' is below 'fox':
                 Space const* spc = fib->prop->confine_space;
                 Vector prj = spc->project(mid);  // on the edge
                 Vector dwn = spc->normalToEdge(mid); // directed outward
-                real ccc = fib->abscissaP() - alpha; // intersection on 'fib'
+                real ccc = fib->abscissaP() - alpha * 2 * L0; // intersection on 'fib'
                 // calculate distances to the edge:
                 real foxZ = dot(prj-mid, dwn);
                 real fibZ = dot(prj-fib->pos(ccc), dwn);
@@ -3422,18 +3441,18 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
             if ( K )
             {
                 // recorded catastrophes must be at contact
-                if ( contact )
-                    kat = 'K';
-                // but in any case, we can stop the simulation
+                kat = ( contact ? 'K' : 'k' );
+                // in any case, we can stop the simulation
                 decided = 1;
             }
             else if ( M ) kat = 'M';
-            else if ( X ) kat = B?'B':'X';
+            else if ( X && P ) kat = B?'B':'X';
             // can be 'Z' only if 'X' is not true
             else if ( Z ) kat = 'Z';
+            else if ( X ) kat = 'Y';
 
             // since these states are final, we can terminate the simulation
-            if ( strchr("BKMXZ", kat) )
+            if ( strchr("BKMXYZ", kat) )
                 decided = 1;
         }
     }
@@ -3442,7 +3461,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
     {
         out << LIN << std::fixed << std::setprecision(5) << ang;
         out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
-        out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << kat;
+        out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << P << SEP << kat;
     }
     if ( print )
     {
@@ -3452,6 +3471,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
         ang = 777;
         dis = INFINITY;
         hit.set(0,0,0);
+        aim.set(0,0,0);
         kat = 'U';
     }
     else if ( decided == 1 )
