@@ -685,7 +685,7 @@ public:
     void reportAshbya(std::ostream&) const;
     
     /// analysis of MT collisions in the plant cortex
-    void reportFiberCollision(std::ostream&, Fiber const*, Fiber const*, int) const;
+    void reportFiberCollision(std::ostream&, Fiber*, Fiber const*, int) const;
 
     /// analysis of MT collisions in the plant cortex
     void reportFiberCollision(std::ostream&, Property const*, Glossary&) const;

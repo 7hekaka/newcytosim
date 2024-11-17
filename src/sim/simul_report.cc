@@ -3326,12 +3326,13 @@ void Simul::reportAshbya(std::ostream& out) const
  1.10.2021 -- 11.2022,
  7.04.2024: added case 'B' if `fib` crosses below `fox`, and 'M' if `fox` has moved
  */
-void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber const* fox, const int print) const
+void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox, const int print) const
 {
+    assert_true( fib && fox );
     const real COS20 = 0.94;
     const real COS10 = 0.985;
-    const real L0 = 1.0; // threshold used to decide on events
-    const real M0 = L0 * L0 * 0.25; // threshold used to decide on 'M'
+    const real L1 = 1.0; // threshold used to decide on events
+    const real M0 = L1 * L1 * 0.25; // threshold used to decide on 'M'
 
     static int decided = 0;
     static real abs = -77; // abscissa of contact point on fox
@@ -3349,7 +3350,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
     bool M = 0; // obstacle (fox) has moved
     bool P = 0; // fib tip is not deflected
     
-    if ( !decided && fib && fox )
+    if ( !decided )
     {
         const real sup = 3 * fib->prop->steric_radius;
         
@@ -3367,7 +3368,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
         if ( abs > 0 )
             M = ( distanceSqr(hit, fox->pos(abs)) > M0 );
         
-        // plus-tip of 'fil' is in contact with 'fox':
+        // plus-tip of 'fib' is within distance 'sup' from 'fox':
         bool contact = ( dpe < sup*sup );
         if ( contact )
         {
@@ -3385,16 +3386,16 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
             // 'zippering' implies 'being tangent' and 'significant growth' along the obstacle
             T = ( abs_real(C) > COS20 );   // tangent within 20 degrees
             // distanced zipped is measured along the obstacle, using abscissa:
-            Z = ( abs_real(aaa-abs) > 2*L0 ); // has zipped over more than 2xL0
+            Z = ( abs_real(aaa-abs) > 2*L1 ); // has zipped over more than 2xL0
         }
-        else if ( fib->length() > L0 && ( dpe > L0*L0 ) )
+        else if ( fib->length() > L1 && ( dpe > L1*L1 ) )
         {
             // the plus tip is growing in the same direction as when contact was made:
             P = ( dot(aim, dir) > COS10 );
 
             // the plus-tip may have crossed the other filament if it is not in contact
             // consider a point 2um back, and check if it is on opposite side of 'fox'
-            Vector bak = fib->posFrom(2*L0, PLUS_END);
+            Vector bak = fib->posFrom(2*L1, PLUS_END);
             real ddd, bbb = fox->projectPoint(bak, ddd);
             // bbb = 0.5 * ( aaa + bbb );  // OLD formula before 13.04.2023
             // the abscissa on `fox` below the intersection is estimated with Thales's theorem:
@@ -3406,7 +3407,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
             Torque TP = cross(axs, tip-mid);
             Torque TM = cross(axs, bak-mid);
             /**
-             For X, the plus-tip should be on the other side of the fiber, at least by L0,
+             For X, the plus-tip should be on the other side of the fiber, at least by L1,
              And the angle should be within 20 degree of the angle at contact
             */
             X = ( dot(TP, TM) < 0 );
@@ -3417,7 +3418,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
                 Space const* spc = fib->prop->confine_space;
                 Vector prj = spc->project(mid);  // on the edge
                 Vector dwn = spc->normalToEdge(mid); // directed outward
-                real ccc = fib->abscissaP() - alpha * 2 * L0; // intersection on 'fib'
+                real ccc = fib->abscissaP() - alpha * 2 * L1; // intersection on 'fib'
                 // calculate distances to the edge:
                 real foxZ = dot(prj-mid, dwn);
                 real fibZ = dot(prj-fib->pos(ccc), dwn);
@@ -3440,6 +3441,13 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber const* fib, Fiber cons
         {
             if ( K )
             {
+                // rescue microtubule if nothing was detected
+                if ( !contact )
+                {
+                    fib->setEndStateP(STATE_GREEN);
+                    //out << fib->reference() << " rescued\n";
+                    return;
+                }
                 // recorded catastrophes must be at contact
                 kat = ( contact ? 'K' : 'k' );
                 // in any case, we can stop the simulation
@@ -3491,8 +3499,8 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     if ( fibers.size() > 2 )
         throw InvalidParameter("fiber:collision can only handle 2 fibers");
     
-    Fiber const * fib = nullptr, * fox = nullptr;
-    for ( Fiber const* f = fibers.first(); f; f = f->next() )
+    Fiber * fib = nullptr, * fox = nullptr;
+    for ( Fiber * f = fibers.first(); f; f = f->next() )
     {
         if ( f->prop == sel )
             fib = f;
