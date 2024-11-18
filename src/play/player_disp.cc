@@ -166,18 +166,19 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
         // align with mean nematic direction
         static Vector3 dir(1, 0, 0);
         ObjectList objs = sim.fibers.collect();
-        Space const* spc = sim.spaces.master();
-        real T = -1;
-        if ( spc )
-            T = FiberSet::infoOrthoNematic(objs, mat, spc);
         real S = FiberSet::infoNematic(objs, mat);
-        if ( spc )
+        Vector3 vec(mat);
+
+        Space const* spc = sim.spaces.master();
+        if ( spc && spc->prop->shape== "sphere" )
+        {
+            real T = FiberSet::infoOrthoNematic(objs, mat, spc);
             flashText("Nematic order %5.3f %5.3f", S, T);
+        }
         else
             flashText("Nematic order %5.3f", S);
         if ( S > 0.1 )
         {
-            Vector3 vec(mat);
             vec *= std::copysign(1.0, dot(dir, vec));
             // switch between immediate alignment (default) versus gradual:
             if ( mode & 16 )
