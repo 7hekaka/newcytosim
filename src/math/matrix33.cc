@@ -195,6 +195,21 @@ Matrix33 Matrix33::rotationToVector(const Vector3& vec)
 
 
 /**
+ Set a matrix that transform (1,0,0) into X, and (0,0,1) into Z
+ */
+Matrix33 Matrix33::rotationToVectors(Vector3 X, Vector3 Z)
+{
+    X.normalize();
+    Z = normalize(Z - dot(Z, X) * X);
+    Vector3 Y = cross(Z, X);
+
+    Matrix33 res;
+    res.setColumns(X, Y, Z);
+    return res;
+}
+
+
+/**
  The rotation is chosen uniformly among all rotations transforming (1,0,0) into `vec`.
  The function will fail if ( vec == 0 ), but vec does not need to be normalized.
  */
@@ -204,14 +219,13 @@ Matrix33 Matrix33::randomRotationToVector(const Vector3& vec)
     Vector3 X, Y, Z = normalize(vec);
     Z.orthonormal(X, Y);
 #if ( 0 )
-    real a = M_PI * RNG.sreal();
-    real c = std::cos(a), s = std::sin(a);
-    res.setColumns(Z, X*c+Y*s, Y*c-X*s);
+    real A = M_PI * RNG.sreal();
+    real C = std::cos(A), S = std::sin(A);
 #else
     real C, S;
     RNG.urand2(C, S);
-    res.setColumns(Z, X*C+Y*S, Y*C-X*S);
 #endif
+    res.setColumns(Z, X*C+Y*S, Y*C-X*S);
     return res;
 }
 

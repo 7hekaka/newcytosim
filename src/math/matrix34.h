@@ -1191,6 +1191,9 @@ public:
     /// return a rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     static Matrix34 rotationToVector(const Vector3&);
     
+    /// return a matrix that transform (1,0,0) into X, and (0,0,1) into Z
+    static Matrix34 rotationToVectors(Vector3 X, Vector3 Z);
+
     /// return a random rotation that transforms (1,0,0) into `vec` ( norm(vec) should be > 0 )
     /**
      In 3D, this rotation is chosen uniformly among all the rotation transforming (1,0,0) into `vec`.

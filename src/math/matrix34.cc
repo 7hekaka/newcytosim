@@ -181,6 +181,21 @@ Matrix34 Matrix34::rotationToVector(const Vector3& vec)
 }
 
 
+/**
+ Set a matrix that transform (1,0,0) into X, and (0,0,1) into Z
+ */
+Matrix34 Matrix34::rotationToVectors(Vector3 X, Vector3 Z)
+{
+    X.normalize();
+    Z = normalize(Z - dot(Z, X) * X);
+    Vector3 Y = cross(Z, X);
+
+    Matrix34 res;
+    res.setColumns(X, Y, Z);
+    return res;
+}
+
+
 Matrix34 Matrix34::randomRotationToVector(const Vector3& vec)
 {
     Matrix34 res;

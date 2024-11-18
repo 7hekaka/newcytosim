@@ -44,7 +44,7 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
         }
         else
         {
-            // nucleating radially out from a Mecable:
+            // nucleating radially out from a Mecable, or randomly:
             dir = hMonitor->linkDir(this);
         }
     }
@@ -74,10 +74,13 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
         Space const* spc = fip->confine_space;
         Vector out = spc->normalToEdge(pos);
         // make 'dir' tangent to the Space's edge
-        dir = ( dir - dot(dir, out) * out ).normalized();
-        rot = Rotation::rotationAroundAxis(out, std::cos(A), F*std::sin(A));
-        rot = rot * Rotation::randomRotationToVector(dir);
-    }
+        dir = out.orthogonal(dir, 1.0);
+        rot = Rotation::rotationAroundZ(std::cos(A), F*std::sin(A));
+        rot = Rotation::rotationToVectors(dir, out) * rot;
+        // shift position sideways by the length of the interaction:
+        pos += rot * Vector(0, F*L, 0);
+        rot = rot * Rotation::rotationAroundX(M_PI*RNG.sreal());
+     }
     else
 #endif
     {
@@ -87,10 +90,9 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
 #elif ( DIM == 3 )
         rot = rot * Rotation::rotationAroundZ(A);
 #endif
+        // shift position sideways by the length of the interaction:
+        pos += rot * Vector(0, F*L, 0);
     }
-
-    // shift position by the length of the interaction:
-    pos += rot * Vector(0, L*F, 0);
 
     // mark fiber to highlight mode of nucleation:
     ObjectMark mk = 0;
