@@ -1170,6 +1170,9 @@ public:
     /// mirror image: X -> -X
     static Matrix34 flipX();
 
+    /// a rotation that brings (1, 1, 1) into (1, 0, 0)
+    static Matrix34 align111();
+
     /// rotation around axis Z, of angle defined by Cosine, Sine values
     static Matrix34 rotationAroundZ(const real C, const real S)
     {

@@ -61,6 +61,15 @@ Matrix34 Matrix34::flipX()
 }
 
 
+Matrix34 Matrix34::align111()
+{
+    real X = 1.0/M_SQRT3;
+    real Y = -sqrt((2+M_SQRT3)/6.0);
+    real Z = (3-M_SQRT3)/6.0;
+    return Matrix34(X,Y,Z,X,Z,Y,X,X,X);
+}
+
+
 Matrix34 Matrix34::rotationAroundX(const real angle)
 {
     real c = std::cos(angle);
