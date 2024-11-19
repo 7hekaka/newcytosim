@@ -128,7 +128,7 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
 
 Fake::~Fake()
 {
-    //Cytosim::log("destroying %c%lu\n", TAG, identity());
+    //Cytosim::log("destroying ", TAG, identity(), "\n");
     fkSolid = nullptr;
     prop = nullptr;
 }

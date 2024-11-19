@@ -164,7 +164,7 @@ public:
     ImportLock(Simul * s)
     : sim(s)
     {
-        //Cytosim::log("Simul::ImportLock created with %i objects\n", sim->nbObjects());
+        //Cytosim::log("Simul::ImportLock created with ", sim->nbObjects(), " objects\n");
         sim->couples.freeze();
         sim->singles.freeze();
         sim->fibers.freeze();
@@ -225,7 +225,7 @@ public:
         if ( sim )
             thaw_all();
         sim = nullptr;
-        //Cytosim::log("Simul::ImportLock deleted with %i objects\n", sim->nbObjects());
+        //Cytosim::log("Simul::ImportLock deleted with ", sim->nbObjects(), " objects\n");
     }
 };
 

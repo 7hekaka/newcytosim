@@ -136,7 +136,7 @@ void Simul::setFiberGrid(Space const* spc, real& grid_step) const
 
     if ( res > 0 && res != grid_step )
     {
-        Cytosim::log("simul:binding_grid_step <-- %.3f\n", res);
+        Cytosim::log("simul:binding_grid_step <-- ", res, "\n");
         grid_step = res;
     }
 

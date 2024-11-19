@@ -211,7 +211,7 @@ void DynamicFiberProp::complete(Simul const& sim)
 
     if ( min_length <= 0 )
     {
-        Cytosim::log("fiber:min_length <-- %.3f\n", unit_length);
+        Cytosim::log.print("fiber:min_length <-- %.3f\n", unit_length);
         min_length = unit_length;
     }
     

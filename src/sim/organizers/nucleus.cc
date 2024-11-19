@@ -117,7 +117,7 @@ ObjectList Nucleus::build(Glossary& opt, Simul& sim)
 
 Nucleus::~Nucleus()
 {
-    //Cytosim::log("destroying %c%lu\n", TAG, identity());
+    //Cytosim::log("destroying ", TAG, identity(), "\n");
     nuSphere = nullptr;
     prop = nullptr;
 }

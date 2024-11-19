@@ -22,7 +22,7 @@ static void setStericGrid(GRID& grid, Vector const& inf, Vector const& sup, real
 
     if ( res != range )
     {
-        Cytosim::log("simul:steric_max_range <-- %.3f\n", res);
+        Cytosim::log("simul:steric_max_range <-- ", res, "\n");
         range = res;
     }
     

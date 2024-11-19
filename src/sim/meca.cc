@@ -845,8 +845,8 @@ unsigned Meca::solve()
     if ( resid > tolerance_ )
     {
         doNotify = 1;
-        Cytosim::out("Failed size %lu precond %i flag %u count %4u residual %.3e (%.3e)",
-            dim, precond_, monitor.flag(), monitor.count(), resid, monitor.residual());
+        Cytosim::out.print("Failed size %lu precond %i flag %u count %4u residual %.3e (%.3e)",
+                           dim, precond_, monitor.flag(), monitor.count(), resid, monitor.residual());
         
         // in case the solver did not converge, continue with same method/vectors:
         monitor.reset();
@@ -856,7 +856,7 @@ unsigned Meca::solve()
             LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
         
         resid = residualNorm();
-        Cytosim::out(" --> prolong: count %4i residual %.3e\n", monitor.count(), resid);
+        Cytosim::out.print(" --> prolong: count %4i residual %.3e\n", monitor.count(), resid);
         
         if ( resid > tolerance_ )
         {
@@ -869,7 +869,7 @@ unsigned Meca::solve()
             else
                 LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
             resid = residualNorm();
-            Cytosim::out(" --> new noise count %4i residual %.3e", monitor.count(), resid);
+            Cytosim::out.print(" --> new noise count %4i residual %.3e", monitor.count(), resid);
         }
         
         if ( resid > tolerance_ )
@@ -881,7 +881,7 @@ unsigned Meca::solve()
             {
                 LinearSolvers::BCGS(*this, vRHS, vSOL, monitor, allocator_);
                 resid = residualNorm();
-                Cytosim::out(" --> extended: count %4i residual %.3e\n", monitor.count(), resid);
+                Cytosim::out.print(" --> extended: count %4i residual %.3e\n", monitor.count(), resid);
             }
             else
             {
@@ -890,7 +890,7 @@ unsigned Meca::solve()
                 computePreconditionner();
                 LinearSolvers::BCGSP(*this, vRHS, vSOL, monitor, allocator_);
                 resid = residualNorm();
-                Cytosim::out(" --> restarted precond 6: count %4i residual %.3e\n", monitor.count(), resid);
+                Cytosim::out.print(" --> restarted precond 6: count %4i residual %.3e\n", monitor.count(), resid);
             }
         }
 

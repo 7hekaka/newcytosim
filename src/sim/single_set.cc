@@ -83,7 +83,7 @@ was first before any transfer could occur, we process each Couple only once.
 */
 void SingleSet::steps()
 {
-    //Cytosim::log("SingleSet: F %5lu A %5lu\n", sizeF(), sizeA());
+    //Cytosim::log.print("SingleSet: F %5lu A %5lu\n", sizeF(), sizeA());
     
     Single *const fHead = firstF();
     bool fOdd = sizeF() & 1;
@@ -122,7 +122,7 @@ void SingleSet::steps()
 */
 void SingleSet::stepsSkippingUnattached()
 {
-    //Cytosim::log("SingleSet::stepsSkippingUnattached : F %5i A %5i\n", fList.size(), aList.size());
+    //Cytosim::log.print("SingleSet::stepsSkippingUnattached : F %5i A %5i\n", fList.size(), aList.size());
     
     step_singles<&Single::stepA>(firstA(), sizeA() & 1);
     if ( aList.size() > 1 ) aList.shuffle();

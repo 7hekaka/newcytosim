@@ -8,7 +8,7 @@
 
 Organizer::~Organizer()
 {
-    //Cytosim::log("destroying Organizer %p\n", this);
+    //Cytosim::log("destroying Organizer ", this, "\n");
 }
 
 

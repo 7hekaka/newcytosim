@@ -1032,11 +1032,11 @@ static void reportCPUtime(real t)
     if ( now > nxt )
     {
         nxt = (nxt>0?nxt:now) + 3600;
-        Cytosim::log << "% " << TimeDate::date_string() << '\n';
+        Cytosim::log("% ",TimeDate::date_string(),"\n");
     }
     static double clk = 0;
     double cpu = double(clock()) / CLOCKS_PER_SEC;
-    Cytosim::log("F%-6lu  %7.2fs   CPU %10.3fs  %10.0fs\n", frm, t, cpu-clk, cpu);
+    Cytosim::log.print("F%-6lu  %7.2fs   CPU %10.3fs  %10.0fs\n", frm, t, cpu-clk, cpu);
     clk = cpu;
     ++frm;
 }
@@ -1430,7 +1430,7 @@ void Interface::execute_dump(std::string const& path, int mode)
     sim_->solve_half();
     
     size_t dim = sim_->sMeca.dimension();
-    Cytosim::log("Cytosim is dumping a system of size %lu in `%s'...", dim, path.c_str());
+    Cytosim::log("Cytosim is dumping a system of size ", dim, " in `", path, "'...");
     int cwd = FilePath::change_dir(path, true);
     
     if ( mode & 32 )
@@ -1447,5 +1447,5 @@ void Interface::execute_dump(std::string const& path, int mode)
     if ( mode & 16 ) sim_->sMeca.saveConnectivityBitmap();
 
     FilePath::change_dir(cwd);
-    Cytosim::log("done\n");
+    Cytosim::log << "done\n";
 }

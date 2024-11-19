@@ -251,7 +251,7 @@ void Sphere::setDragCoefficientPiston(real thick)
     spDragRot = vr * square(rad) * std::sqrt(8/eps);
         
     //report the reduced mobility of the sphere:
-    Cytosim::log("Sphere of radius %.3f has piston mobility %.2e\n", spRadius, spDrag);
+    Cytosim::log.print("Sphere of radius %.3f has piston mobility %.2e\n", spRadius, spDrag);
 }
 
 

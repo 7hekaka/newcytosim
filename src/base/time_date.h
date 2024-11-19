@@ -18,7 +18,7 @@ namespace TimeDate
     /// set current date in short format, `buf` should be 26 character long or more
     void get_date(char * buf, size_t buf_size, bool no_year);
 
-    /// using a local char[] to call get_date()
+    /// using a local char[] buffer to call get_date()
     char const* date_string();
 
     

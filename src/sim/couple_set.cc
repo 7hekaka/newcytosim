@@ -85,7 +85,7 @@ void CoupleSet::uniStepCollect(Couple * obj)
 void CoupleSet::steps()
 {
     /*
-    Cytosim::log("CoupleSet::step : FF %5i AF %5i FA %5i AA %5i\n",
+    Cytosim::log.print("CoupleSet::step : FF %5i AF %5i FA %5i AA %5i\n",
                  ffList.size(), afList.size(), faList.size(), aaList.size());
     */
     
@@ -146,8 +146,8 @@ void CoupleSet::steps()
 void CoupleSet::stepsSkippingUnattached()
 {
     /*
-    Cytosim::log("CoupleSet::stepsSkippingUnattached : FF %5i AF %5i FA %5i AA %5i\n",
-                 ffList.size(), afList.size(), faList.size(), aaList.size());
+    Cytosim::log.print("CoupleSet::stepsSkippingUnattached : FF %5i AF %5i FA %5i AA %5i\n",
+                        ffList.size(), afList.size(), faList.size(), aaList.size());
     */
     
     Couple *const afHead = firstAF();

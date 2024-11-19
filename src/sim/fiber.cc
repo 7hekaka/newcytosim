@@ -993,8 +993,7 @@ void Fiber::prepareMecable()
 #if ( 0 )
     real energy = bendingEnergy();
     real euler = M_PI * M_PI * prop->rigidity / ( length() * length() );
-    Cytosim::log << "Euler buckling = " << euler << "    ";
-    Cytosim::log << "Bending energy = " << energy << '\n';
+    Cytosim::log("Euler buckling = ", euler, "    Bending energy = ", energy, '\n');
 #endif
 }
 

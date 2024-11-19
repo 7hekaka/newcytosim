@@ -52,7 +52,7 @@ void handle_abort(int sig)
 
 void handle_interrupt(int sig)
 {
-    Cytosim::out << "killed " << sig << "\n" << std::endl;
+    Cytosim::out("killed ", sig, "\n");
     _exit(sig);
 }
 
@@ -113,7 +113,7 @@ int main(int argc, char* argv[])
         std::clog << "Cytosim working directory is " << FilePath::get_cwd() << '\n';
     }
 
-    Cytosim::out << "% " << TimeDate::date_string() << " PID " << getpid() << '\n';
+    Cytosim::out("% ", TimeDate::date_string(), " PID ", getpid(), '\n');
     print_version(Cytosim::out);
     
     Simul simul;
@@ -124,7 +124,7 @@ int main(int argc, char* argv[])
         time_t sec = TimeDate::seconds_since_1970();
         // read and execute default config file:
         Parser(&simul, 1, 1, 1, 1, 1).readConfig();
-        Cytosim::out << "% " << TimeDate::date_string() << '\n';
+        Cytosim::out("% ", TimeDate::date_string(), '\n');
         sec = TimeDate::seconds_since_1970() - sec;
         Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";
     }

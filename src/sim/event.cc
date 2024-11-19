@@ -91,7 +91,7 @@ Event::Event(double now, Glossary& opt)
 
 Event::~Event()
 {
-    //Cytosim::log("destroying Event %p\n", this);
+    //Cytosim::log("destroying Event ", this, "\n");
 }
 
 

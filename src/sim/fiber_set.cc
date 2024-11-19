@@ -127,7 +127,7 @@ Fiber * FiberSet::newFiber(ObjectList& objs, FiberProp const* fip, Glossary& opt
  
     size_t inp = 1;
     std::string spe, var = "attach1";
-#if BACKWARD_COMPATIBILITY < 50
+#if BACKWARD_COMPATIBILITY <= 50
     if ( opt.has_key("attach") )
     {
         var = "attach";

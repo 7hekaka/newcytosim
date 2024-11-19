@@ -123,7 +123,7 @@ void Aster::setInteractions(Meca& meca) const
 
 Aster::~Aster()
 {
-    //Cytosim::log("destroying %c%lu\n", TAG, identity());
+    //Cytosim::log("destroying ", TAG, identity(), "\n");
     asSolid = nullptr;
     prop = nullptr;
 }

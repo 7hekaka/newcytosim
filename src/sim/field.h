@@ -153,7 +153,7 @@ public:
             }
             createCells();
             //std::clog << "Field step "<<prop->step<<" has "<<mGrid.nbCells()<<" cells\n";
-            Cytosim::log("Field %lx set with %i cells of size %.3f um\n", this, mGrid.nbCells(), prop->step);
+            Cytosim::log.print("Field %lx set with %i cells of size %.3f um\n", this, mGrid.nbCells(), prop->step);
         }
     }
     
