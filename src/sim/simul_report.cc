@@ -3471,7 +3471,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
         out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
         out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << P << SEP << kat;
     }
-    if ( print )
+    if ( print & 1 )
     {
         // reset static variables for next round:
         decided = 0;
@@ -3496,6 +3496,9 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
     throw InvalidParameter("fiber:collision meaningless in 1D");
 #endif
     
+    int print = 0;
+    opt.set(print, "print");
+
     if ( fibers.size() > 2 )
         throw InvalidParameter("fiber:collision can only handle 2 fibers");
     
@@ -3507,12 +3510,9 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
         else
             fox = f;
     }
-    // discard case if fiber has reached its max length
+    // discard condition when fiber has reached its max length
     if ( fib && fib->length()+0.01 > fib->prop->max_length )
-        fib = nullptr;
-
-    int print = 0;
-    opt.set(print, "print");
+        return;
     
     if ( fox && fib )
         reportFiberCollision(out, fib, fox, print);
