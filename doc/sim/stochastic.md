@@ -46,22 +46,23 @@ The Gillespie approach needs to be modified, and we follow the procedure describ
 >  A. Prados et al. Journal of Statistical Physics, Vol. 89, Nos. 3/4 - 1997  
  
 In practice, a normalized time `esp` is first generated,
-again using a random number uniformly distributed in [0,1] provided by `random()`.
+this time using random numbers exponentially distributed in [0,+inf] provided by `exponential()`.
+The mean and variance of `exponential()` are 1 and 1, and it can be produced by `-log(random())`.
 At each time step, `esp` is reduced as a function of the value of the rate during the interval.
 The associated event is performed if `esp` becomes negative, which is when the associated time
 crosses the 'present' into the past.
   
 	time = 0;
-	esp = -log(random());
+	esp = exponential();
 	
 	while ( time < max_time )
 	{
 		time = time + time_step;
-		esp = esp - time_step * rate(time);
+		esp -= time_step * rate(time);
 		while ( esp < 0 )
 		{
 		    do_event();
-		    esp = esp - log(random())
+		    esp += exponential();
 		}
 	}
  
