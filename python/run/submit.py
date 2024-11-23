@@ -103,7 +103,7 @@ def job_script(path, conf, exe, jarg):
     # change time of script file to indicate activity:
     res.append(f'touch {conf};')
     # actual work: the job will call go_sim.py once:
-    res.append(f'go_sim.py exe="{exe}" {jarg} {conf};')
+    res.append(f'python3 go_sim.py exe="{exe}" {jarg} {conf};')
     # cleanup: move config file into subdirectory 'done'
     res.append(f'mv {conf} {jdir}/done/.;')
     # cleanup: move itself into subdirectory 'done'

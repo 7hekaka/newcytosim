@@ -103,7 +103,7 @@ def job_script(path, conf, exe, jarg):
     # change time of script file to indicate activity:
     cmd += ['touch %s;' % conf]
     # actual work: the job will call go_sim.py once:
-    cmd += ['go_sim.py exe="%s" %s %s;' % (exe, jarg, conf)]
+    cmd += ['python3 go_sim.py exe="%s" %s %s;' % (exe, jarg, conf)]
     # cleanup: move config file into subdirectory 'done'
     cmd += ['mv '+conf+' '+jdir+'/done/.;']
     # cleanup: move itself into subdirectory 'done'
