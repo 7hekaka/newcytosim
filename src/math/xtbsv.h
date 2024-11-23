@@ -1290,7 +1290,7 @@ void alsatian_iso3_xtbsvLNN2K_AVX(const int N, const double* A, const int lda, d
     {
         storeu4(X, mul4(broadcast1(A), x2)); // 4th value to be overwritten
         x2 = fnmadd4(broadcast1(A+1), x2, x4); // x4 = load3(X+2);
-        store3(X+2, mul4(broadcast1(A+lda), x2));
+        store3(X+ORD, mul4(broadcast1(A+lda), x2));
     }
     else if ( N > 0 )
     {
