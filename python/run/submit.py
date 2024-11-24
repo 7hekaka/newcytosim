@@ -3,7 +3,7 @@
 # A script to submit jobs to the SLURM queuing system
 #
 # F. Nedelec, 10.2007 --- 9.02.2021, 10.01.2022, 14.03.2023
-# Adapted to SLURM at Cambridge on 29.01.2021
+# Adapted to SLURM at Cambridge on 29.01.2021, 24.11.2024
 
 """
     Submit an array of jobs to the SLURM system, to be handled by 'go_sim.py'
@@ -46,7 +46,8 @@ F. Nedelec
 
 # default parameters for submission:
 submit  = 'sbatch'
-queue   = 'sapphire'
+queue   = 'icelake'
+account = ''         # Project name
 
 runtime = '12:00:00' # 12 hours
 memory  = 4048       # in MB
@@ -118,6 +119,8 @@ def sub_script(exe):
     # specify number of threads if executable is threaded:
     if ncpu > 1:
         res.append(f'--cpus-per-task={ncpu}')
+    if account:
+        res.append(f'--account={account}')
     res.append(f'--job-name={jdir}')
     res.append(f'--partition={queue}')
     res.append(f'--time={runtime}')
@@ -141,6 +144,8 @@ def array_script(jobcnt):
     # specify number of threads if executable is threaded:
     if ncpu > 1:
         res.append(f'--cpus-per-task={ncpu}')
+    if account:
+        res.append(f'--account={account}')
     res.append(f'#SBATCH --partition={queue}')
     res.append(f'#SBATCH --time={runtime}')
     res.append(f'#SBATCH --mem={memory}')
@@ -229,6 +234,8 @@ def main(args):
                 runtime = val
             elif key == 'queue':
                 queue = val
+            elif key == 'account':
+                account = val
             else:
                 out.write("Error: I do not understand argument `%s'\n" % arg)
                 sys.exit()

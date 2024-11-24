@@ -31,6 +31,8 @@ import sys, os, subprocess, tempfile
 # default parameters for submission:
 submit  = 'sbatch'
 queue   = 'icelake'
+account = ''         # Project name
+
 runtime = '12:00:00' # 12 hour
 memory  = '4096'     # in MB
 ncpu    = 1          # nb of threads per job
@@ -68,6 +70,8 @@ def sub(file):
     # specify number of threads if executable is threaded:
     if ncpu > 1:
         cmd += ['--cpus-per-task=%i' % ncpu]
+    if account:
+        cmd += ['--account='+account]
     cmd += ['--partition='+queue]
     cmd += ['--time='+runtime]
     cmd += ['--mem='+memory]
@@ -129,6 +133,8 @@ def main(args):
                 runtime = val
             elif key == 'queue':
                 queue = val
+            elif key == 'account':
+                account = val
             elif key == 'exclusive':
                 exclusive = val
             else:
