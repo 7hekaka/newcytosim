@@ -140,9 +140,9 @@ void Simul::foldPositions() const
 }
 
 
+/// Using the parser which is set by Simul::parser()
 void Simul::perform(std::string const& code)
 {
-    // Using the parser which is set at the start of the config file
     if ( parser_ )
         parser_->evaluate(code);
     else

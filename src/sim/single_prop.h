@@ -92,7 +92,7 @@ public:
      - set to 0, for not saving objects in the trajectory file.
      This only affects singles in the unattached (F) state.
      */
-    unsigned store_unbound;
+    unsigned save_unbound;
     
 #if NEW_MOBILE_SINGLE
     /// constant drift

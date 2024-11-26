@@ -53,7 +53,7 @@ private:
     /// release Single from reserve lists
     void uniRelax();
 
-    /// save free Single for which `store_unbound > 0`
+    /// save free Single for which `save_unbound > 0`
     void writeSomeObjects(Outputter&) const;
 
 public:

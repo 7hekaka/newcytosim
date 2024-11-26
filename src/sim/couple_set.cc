@@ -647,10 +647,10 @@ void CoupleSet::writeSomeObjects(Outputter& out) const
     // count all the elements that are virtually present:
     for ( CoupleProp const* P : uniCouples )
         cnt[P->number()] = P->uni_counts;
-    // write Couple if `store_unbound > 0`:
+    // write Couple if `save_unbound > 0`:
     for ( Couple const* n=firstFF(); n; n=n->next() )
     {
-        if ( n->prop->store_unbound )
+        if ( n->prop->save_unbound )
             n->write(out);
         else
             ++cnt[n->prop->number()];
@@ -667,11 +667,11 @@ void CoupleSet::writeSomeObjects(Outputter& out) const
                 out.writeUInt(cnt[i], ' ');
         }
     }
-    // decrement `store_unbound`:
+    // decrement `save_unbound`:
     for ( Property * i : simul_.properties.find_all("couple") )
     {
         CoupleProp * P = static_cast<CoupleProp *>(i);
-        P->store_unbound -= ( P->store_unbound > 0 );
+        P->save_unbound -= ( P->save_unbound > 0 );
     }
 }
 

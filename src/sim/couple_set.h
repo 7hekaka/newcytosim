@@ -76,7 +76,7 @@ private:
     /// release Couples from reserve lists
     void uniRelax();
     
-    /// save free Couple for which `store_unbound > 0`
+    /// save free Couple for which `save_unbound > 0`
     void writeSomeObjects(Outputter&) const;
 
 public:

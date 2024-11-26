@@ -39,7 +39,7 @@ void CoupleProp::clear()
     diffusion      = 0;
     fast_diffusion = 0;
     fast_reservoir = 0;
-    store_unbound  = ~0U;
+    save_unbound  = ~0U;
     trans_activated = 0;
     min_loop       = 1;
     specificity    = BIND_ALWAYS;
@@ -66,7 +66,7 @@ void CoupleProp::read(Glossary& glos)
         glos.set(diffusion, "diffusion");
     glos.set(fast_diffusion, "fast_diffusion");
     glos.set(fast_reservoir, "fast_diffusion", 1);
-    glos.set(store_unbound, "store_unbound");
+    glos.set(save_unbound, "save_unbound");
 
     glos.set(trans_activated, "trans_activated");
     // changed 'stiff' to 'min_loop' on 26.04.2020

@@ -313,7 +313,7 @@ public:
     
     //------------------------- CODE EVALUATOR ---------------------------------
 
-    /// set Parser to be used in `evaluate()'
+    /// set Parser to be used in `perform()` below
     void parser(Parser * p) { parser_ = p; }
     
     /// return current Parser
