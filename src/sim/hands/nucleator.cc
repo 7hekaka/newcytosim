@@ -37,13 +37,24 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
     // determine direction of nucleation:
     if ( h && h->attached() )
     {
-        // nucleating on the side of a 'mother' fiber:
-        dir = h->dirFiber();
+        // deviation angle from 'dir'
         A = prop()->branch_angle;
-        // remove key to avoid unused warning:
-        opt.clear("direction");
         // get mark from mother fiber:
         mk = h->fiber()->mark();
+        // nucleating on the side of a 'mother' fiber:
+        switch ( prop()->branch_direction )
+        {
+            case NucleatorProp::BRANCH_PARALLEL:
+                dir = h->dirFiber(); break;
+            case NucleatorProp::BRANCH_MOSTLY_PARALLEL:
+                dir = h->dirFiber() * ( RNG.flip_8th() ? -1: +1 ); break;
+            case NucleatorProp::BRANCH_RANDOM:
+                dir = h->dirFiber(); A = M_PI * RNG.preal(); break;
+            case NucleatorProp::BRANCH_SPECIFIED:
+                dir = Cytosim::readDirection(opt.value("direction", 0), pos, fip->confine_space); break;
+        }
+        // remove key to avoid unused warning:
+        opt.clear("direction");
     }
     else
     {
@@ -58,16 +69,12 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
             // nucleating radially out from a Mecable, or randomly:
             dir = hMonitor->linkDir(this);
         }
+        // remove key to avoid unused warning:
+        opt.clear("branch_direction");
     }
     // flip direction if nucleator will stay at the plus end:
     if ( prop()->hold_end == PLUS_END )
         dir.negate();
-    
-    if ( prop()->specificity == NucleatorProp::NUCLEATE_MOSTLY_PARALLEL )
-    {
-        if ( RNG.flip_8th() )
-            dir.negate();
-    }
 
     ObjectList objs;
     Rotation rot(0, 1);

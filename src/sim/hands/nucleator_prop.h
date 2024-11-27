@@ -20,10 +20,12 @@ public:
     friend class Nucleator;
     
     /// indicates a specificity
-    enum Specificity
+    enum BranchSpecificity
     {
-        NUCLEATE_UNSPECIFIC = 0,
-        NUCLEATE_MOSTLY_PARALLEL
+        BRANCH_PARALLEL = 0,
+        BRANCH_MOSTLY_PARALLEL,
+        BRANCH_RANDOM,
+        BRANCH_SPECIFIED
     };
 
 public:
@@ -48,7 +50,7 @@ public:
      */
     std::string fiber_spec;
     
-    /// angle of newly made fiber, relative to mother filament for Nucleator in Couple
+    /// angle of newly made fiber, relative to mother filament
     real branch_angle;
     
     /// if specified, the space on the surface of which new fiber will be created
@@ -57,8 +59,8 @@ public:
     /// factor to limit the number of fibers nucleated in total
     float nucleation_limit;
     
-    /// specificity of nucleation
-    int specificity;
+    /// specificity for nucleation on the side of existing filament
+    int branch_direction;
 
     /// specifies if the nucleator attaches to fibers that it creates [none, minus_end, plus_end]
     /**

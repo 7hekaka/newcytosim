@@ -32,7 +32,7 @@ void NucleatorProp::clear()
     nucleation_limit = 0;
     nucleate_in_plane = "";
     nucleate_space = nullptr;
-    specificity = NUCLEATE_UNSPECIFIC;
+    branch_direction = BRANCH_PARALLEL;
 }
 
 
@@ -80,8 +80,18 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(hold_end, "hold_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}});
     
-    glos.set(specificity, "specificity", {{"off", NUCLEATE_UNSPECIFIC},
-        {"mostly_parallel", NUCLEATE_MOSTLY_PARALLEL}});
+#if BACKWARD_COMPATIBILITY < 100
+    glos.set(branch_direction, "specificity", {
+        {"off", BRANCH_SPECIFIED},
+        {"mostly_parallel", BRANCH_MOSTLY_PARALLEL} });
+#endif
+    
+    glos.set(branch_direction, "branch_direction", {
+        {"specified", BRANCH_SPECIFIED},
+        {"parallel", BRANCH_PARALLEL},
+        {"random", BRANCH_RANDOM},
+        {"mostly_parallel", BRANCH_MOSTLY_PARALLEL}});
+    
 }
 
 
@@ -131,6 +141,7 @@ void NucleatorProp::write_values(std::ostream& os) const
     HandProp::write_values(os);
     write_value(os, "nucleate",  nucleation_rate, fiber_type, "("+fiber_spec+")");
     write_value(os, "branch_angle", branch_angle);
+    write_value(os, "branch_direction", branch_direction);
     write_value(os, "nucleation_limit", nucleation_limit);
     write_value(os, "nucleate_in_plane", nucleate_in_plane);
 
@@ -138,6 +149,5 @@ void NucleatorProp::write_values(std::ostream& os) const
     write_value(os, "track_end", track_end);
     write_value(os, "addictive", addictive, addictive_state);
     write_value(os, "stabilize", stabilize);
-    write_value(os, "specificity", specificity);
 }
 
