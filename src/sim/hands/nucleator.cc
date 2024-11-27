@@ -28,11 +28,18 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
     Vector dir(1, 0, 0);
     Hand const* h = otherHand();
     
+    const real L = hMonitor->linkRestingLength();
+    // specified angle between extant and nucleated filament:
+    real A = 0;
+    // can flip the side in 2D or when nucleating 'in-plane'
+    const real F = RNG.sflip();
+
     // determine direction of nucleation:
     if ( h && h->attached() )
     {
         // nucleating on the side of a 'mother' fiber:
         dir = h->dirFiber();
+        A = prop()->branch_angle;
         // remove key to avoid unused warning:
         opt.clear("direction");
         // get mark from mother fiber:
@@ -61,12 +68,6 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
         if ( RNG.flip_8th() )
             dir.negate();
     }
-
-    // specified angle between extant and nucleated filament:
-    const real A = prop()->nucleation_angle;
-    const real L = hMonitor->linkRestingLength();
-    // can flip the side in 2D or when nucleating 'in-plane'
-    const real F = RNG.sflip();
 
     ObjectList objs;
     Rotation rot(0, 1);

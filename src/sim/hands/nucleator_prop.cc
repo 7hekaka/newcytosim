@@ -28,7 +28,7 @@ void NucleatorProp::clear()
     addictive  = false;
     addictive_state = STATE_RED;
     stabilize = 0;
-    nucleation_angle = 0;
+    branch_angle = 0;
     nucleation_limit = 0;
     nucleate_in_plane = "";
     nucleate_space = nullptr;
@@ -48,7 +48,7 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(fiber_type, "nucleate", 1);
     glos.set(fiber_spec, "nucleate", 2);
 
-    glos.set(nucleation_angle, "nucleation_angle");
+    glos.set(branch_angle, "branch_angle", "nucleation_angle");
     glos.set(nucleation_limit, "nucleation_limit");
     glos.set(nucleate_in_plane, "nucleate_in_plane");
 
@@ -130,7 +130,7 @@ void NucleatorProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);
     write_value(os, "nucleate",  nucleation_rate, fiber_type, "("+fiber_spec+")");
-    write_value(os, "nucleation_angle", nucleation_angle);
+    write_value(os, "branch_angle", branch_angle);
     write_value(os, "nucleation_limit", nucleation_limit);
     write_value(os, "nucleate_in_plane", nucleate_in_plane);
 

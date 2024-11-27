@@ -49,7 +49,7 @@ public:
     std::string fiber_spec;
     
     /// angle of newly made fiber, relative to mother filament for Nucleator in Couple
-    real nucleation_angle;
+    real branch_angle;
     
     /// if specified, the space on the surface of which new fiber will be created
     std::string nucleate_in_plane;
