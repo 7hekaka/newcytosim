@@ -51,9 +51,9 @@ public:
     /// angle of newly made fiber, relative to mother filament for Nucleator in Couple
     real nucleation_angle;
     
-    /// if true, new fiber is nucleated in the surface of the Space
-    bool nucleate_in_plane;
-    
+    /// if specified, the space on the surface of which new fiber will be created
+    std::string nucleate_in_plane;
+
     /// factor to limit the number of fibers nucleated in total
     float nucleation_limit;
     
@@ -102,6 +102,9 @@ public:
     /// type of fiber to be nucleated
     FiberProp const* fiber_class;
     
+    /// if true, new fiber is created in the surface of the Space
+    Space const* nucleate_space;
+
 private:
     
     real nucleation_rate_dt;

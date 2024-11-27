@@ -210,9 +210,11 @@ void ObjectSet::eraseObjects(ObjectList const& objs)
 }
 
 
-/// counting how many objects of the same property have lower identity
+/// return string that will identify the object in `pickObject`
 std::string ObjectSet::nameObject(Object const* obj) const
 {
+    if ( !obj )
+        return "none";
     Property const* prp = obj->property();
     ObjectID end = obj->identity();
     ObjectID cnt = 1;

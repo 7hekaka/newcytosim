@@ -25,9 +25,10 @@ Nucleator::Nucleator(NucleatorProp const* p, HandMonitor* h)
 ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, Glossary& opt)
 {
     ObjectMark mk = 0;
-    // determine direction of nucleation:
     Vector dir(1, 0, 0);
     Hand const* h = otherHand();
+    
+    // determine direction of nucleation:
     if ( h && h->attached() )
     {
         // nucleating on the side of a 'mother' fiber:
@@ -68,13 +69,14 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
     const real F = RNG.sflip();
 
     ObjectList objs;
-    Fiber * fib = sim.fibers.newFiber(objs, fip, opt);
-    // select rotation to align with direction of nucleation:
     Rotation rot(0, 1);
+    Fiber * fib = sim.fibers.newFiber(objs, fip, opt);
+
+    // select rotation to align with direction of nucleation:
 #if ( DIM >= 3 )
-    if ( prop()->nucleate_in_plane )
+    Space const* spc = prop()->nucleate_space;
+    if ( spc )
     {
-        Space const* spc = fip->confine_space;
         Vector out = spc->normalToEdge(pos);
         // make 'dir' tangent to the Space's edge
         dir = out.orthogonal(dir, 1.0);

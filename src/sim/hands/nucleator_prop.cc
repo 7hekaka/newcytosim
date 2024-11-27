@@ -30,7 +30,8 @@ void NucleatorProp::clear()
     stabilize = 0;
     nucleation_angle = 0;
     nucleation_limit = 0;
-    nucleate_in_plane = 0;
+    nucleate_in_plane = "";
+    nucleate_space = nullptr;
     specificity = NUCLEATE_UNSPECIFIC;
 }
 
@@ -103,6 +104,24 @@ void NucleatorProp::complete(Simul const& sim)
         throw InvalidParameter("if set, "+name()+":track_end should be equal to hold_end");
     
     nucleation_rate_dt = nucleation_rate * time_step(sim) * POOL_UNATTACHED;
+    
+#if BACKWARD_COMPATIBILITY < 100
+    // extended meaning of 'nucleate_in_plane' on 27.11.2024
+    if ( nucleate_in_plane == "1" )
+    {
+        nucleate_in_plane = sim.spaces.nameObject(fiber_class->confine_space);
+        Cytosim::log << name() << ":nucleate_in_plane <---- " << nucleate_in_plane << "\n";
+    }
+#endif
+
+    if ( ! nucleate_in_plane.empty() )
+    {
+        nucleate_space = sim.findSpace(nucleate_in_plane);
+        if ( nucleate_space )
+            nucleate_in_plane = sim.spaces.nameObject(nucleate_space);
+        else if ( sim.primed() )
+            throw InvalidParameter(name()+":nucleate_space `"+nucleate_in_plane+"' was not found");
+    }
 }
 
 
