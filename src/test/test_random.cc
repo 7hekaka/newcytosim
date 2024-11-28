@@ -212,11 +212,14 @@ void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)()
     REAL ix = INFINITY, iy = INFINITY, iz = INFINITY;
     REAL sx = -INFINITY, sy = -INFINITY, sz = -INFINITY;
     real avg = 0, var = 0;
+    size_t zeros = 0;
+    
     for ( size_t i = 0; i < cnt; ++i )
     {
         REAL x = (RNG.*FUNC)();
         REAL y = (RNG.*FUNC)();
         REAL z = (RNG.*FUNC)();
+        zeros += ( x == 0 ) + ( y == 0 ) + ( z == 0 );
         ix = std::min(ix, x);
         iy = std::min(iy, y);
         iz = std::min(iz, z);
@@ -240,7 +243,9 @@ void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)()
     }
     if ( cnt > 1 )
         var /= real(cnt-1);
-    printf("%-16s  avg: %12.8f  var: %12.8f  min: %20.12e  max: %20.12e  (off %.4f)\n", str, avg+off, var, ix, sx, off);
+    printf("%-16s  avg: %12.8f  var: %12.8f", str, avg+off, var);
+    printf("  min: %20.12e  max: %20.12e", ix, sx);
+    printf("  zeros: %lu   (off %.4f)\n", zeros, off);
 }
 
 
@@ -339,6 +344,7 @@ void speed_test_vector(size_t cnt)
 
 int main(int argc, char* argv[])
 {
+    size_t CNT = 1<<24;
     int mode = 1;
     RNG.seed();
 
@@ -357,10 +363,10 @@ int main(int argc, char* argv[])
             break;
             
         case 1:
-            check_random<real>("UNIFORM [0, 1]", 1<<22, 0.5, &Random::preal);
-            check_random<real>("UNIFORM [-1,1]", 1<<22, 0.0, &Random::sreal);
-            check_random<float>("EXPONENTIAL", 1<<22, 1.0, &Random::exponential);
-            check_random<real>("GAUSSIAN", 1<<22, 0.0, &Random::gauss);
+            check_random<real>("UNIFORM [0, 1]", CNT, 0.5, &Random::preal);
+            check_random<real>("UNIFORM [-1,1]", CNT, 0.0, &Random::sreal);
+            check_random<float>("EXPONENTIAL", CNT, 1.0, &Random::exponential);
+            check_random<real>("GAUSSIAN", CNT, 0.0, &Random::gauss);
             break;
 
         case 2:

@@ -353,16 +353,27 @@ void Random::gauss_boxmuller(real& x, real& y)
 #pragma mark - Exponential derivates
 
 /// this is the default implementation
+/**
+ From Luc Devroye: Non-uniform random variate generation. Page 394:
+ Generate independent identically distributed uniform [0,1] random variates U, V, W.
+ Y = -log(U*V)
+ RETURN W*Y, (l-W)*Y
+ */
 float * makeExponentials(float dst[], size_t cnt, const uint32_t src[])
 {
+    cnt -= 2;
     const float alpha(TWO_POWER_MINUS_32);
-    for ( size_t i = 0; i < cnt; ++i )
+    for ( size_t i = 0; i < cnt; i += 3 )
     {
-        float x = static_cast<float>(src[i]);
-        float y = alpha * x + alpha;
-        dst[i] = -logf(y);
+        float U = alpha *static_cast<float>(src[i]);
+        float V = alpha *static_cast<float>(src[i+1]);
+        float W = alpha *static_cast<float>(src[i+2]);
+        float y = -logf(U*V);
+        dst[0] = y * W;
+        dst[1] = y * ( 1.f - W );
+        dst += 2;
     }
-    return dst + cnt;
+    return dst;
 }
 
 

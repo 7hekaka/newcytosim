@@ -20,6 +20,22 @@
 
 std::random_device device;
 
+template < typename T >
+void print_floats(size_t cnt, T const* vec)
+{
+    for ( size_t i = 0; i < cnt; )
+    {
+        for ( int k = 0; k < 4; ++k )
+        {
+            if ( i >= cnt ) break;
+            printf(" :");
+            for ( int j = 0; j < 4; ++j )
+                printf(" %10.3e", vec[i++]);
+        }
+    }
+}
+
+
 #define TWO_POWER_MINUS_31 0x1p-31
 #define TWO_POWER_MINUS_32 0x1p-32
 /**
@@ -71,6 +87,8 @@ real * makeGaussians_std(real dst[], size_t cnt, const uint32_t[])
     return dst + cnt;
 }
 
+// defined in random.cc:
+extern float * makeExponentials(float dst[], size_t cnt, const uint32_t src[]);
 
 /** Using -log(R) where R is randomly distributed in [0, 1[ */
 float * makeExponentials_(float dst[], size_t cnt, const uint32_t src[])
@@ -86,22 +104,6 @@ float * makeExponentials_(float dst[], size_t cnt, const uint32_t src[])
     return dst + cnt;
 }
 
-
-template < typename T >
-void print_gaussian(size_t cnt, T const* vec)
-{
-    for ( size_t i = 0; i < cnt; )
-    {
-        for ( int k = 0; k < 4; ++k )
-        {
-            if ( i >= cnt ) break;
-            printf(" :");
-            for ( int j = 0; j < 4; ++j )
-                printf(" %8.4f", vec[i++]);
-        }
-        printf("\n");
-    }
-}
 
 template < typename REAL >
 void check_gaussian(size_t num, REAL* vec)
@@ -133,7 +135,7 @@ void check_gaussian(size_t num, REAL* vec)
             cov += ( vec[i-1] - avg ) * ( vec[i] - avg );
     }
     cov /= ( cnt / 2 );
-    printf("%6lu + %6lu NaNs: avg %7.4f var %7.4f cov %7.4f ", cnt, nan, avg, var, cov);
+    printf("%9lu + %6lu NaNs: avg %7.4f var %7.4f cov %7.4f ", cnt, nan, avg, var, cov);
 }
 
 
@@ -215,29 +217,39 @@ static real* check_log(real dst[], size_t cnt, const uint32_t arg[])
 
 
 template < typename REAL >
-void run(sfmt_t& sfmt, size_t cnt, const char str[], REAL* (*FUNC)(REAL*, size_t, const uint32_t*))
+void run(sfmt_t& sfmt, size_t rep, const char str[], REAL* (*FUNC)(REAL*, size_t, const uint32_t*))
 {
-    void * mem = nullptr;
-    if ( 0 == posix_memalign(&mem, 32, sizeof(REAL)*SFMT_N32) )
+    void * ptr = nullptr;
+    if ( 0 == posix_memalign(&ptr, 32, rep*sizeof(REAL)*SFMT_N32) )
     {
-        REAL * vec = (REAL*)mem;
+        REAL * mem = (REAL*)ptr;
+        REAL * vec = mem;
         tick();
-        for ( size_t i = 0; i < cnt; ++i )
+        for ( size_t i = 0; i < rep; ++i )
         {
             sfmt_gen_rand_all(&sfmt);
-            FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
+            vec = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
         }
-        REAL * end = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
-        printf("%-12s %5.2f :", str, tock(cnt>>10));
-        check_gaussian(end-vec, vec);
-        print_gaussian(std::min(end-vec, 8L), vec);
+        printf("\n%-12s %5.2f :", str, tock(rep));
+        check_gaussian(vec-mem, mem);
+        
+        size_t n = std::min(vec-mem, 8L);
+        std::sort(mem, vec);
+        print_floats(n, mem);
+        print_floats(n, vec-n);
+        
+        size_t z = 0;
+        for ( REAL * p = mem; p < vec; ++p )
+            z += ( *p == 0 );
+        printf(" (%lu zeros)", z);
+
         std::free(mem);
     }
 }
 
 
 template < typename REAL >
-void scan(size_t chunk, const char str[], REAL* (*FUNC)(REAL*, size_t, const uint32_t*))
+void scan(size_t chunk, size_t rep, REAL* (*FUNC)(REAL*, size_t, const uint32_t*))
 {
     void * src = nullptr;
     void * dst = nullptr;
@@ -247,13 +259,17 @@ void scan(size_t chunk, const char str[], REAL* (*FUNC)(REAL*, size_t, const uin
     if ( !e && !f )
     {
         uint32_t * rnd = (uint32_t*)src;
-        REAL * vec = (REAL*)dst;
-        for ( uint32_t i = 0; i < chunk; ++i )
-            rnd[i] = ~(32*i);
-        FUNC(vec, chunk, rnd);
-        for ( uint32_t i = 0; i < chunk; ++i )
-            printf("%.4e ", vec[i]);
-        printf("\n");
+        
+        for ( int r = 0; r < rep; ++r )
+        {
+            REAL * vec = (REAL*)dst;
+            for ( uint32_t i = 0; i < chunk; ++i )
+                rnd[i] = ~(r*chunk+i);
+            FUNC(vec, chunk, rnd);
+            for ( uint32_t i = 0; i < chunk; ++i )
+                printf("%.4e ", vec[i]);
+            printf("\n");
+        }
         std::free(src);
         std::free(dst);
     }
@@ -263,35 +279,39 @@ void scan(size_t chunk, const char str[], REAL* (*FUNC)(REAL*, size_t, const uin
 
 int main(int argc, char* argv[])
 {
-    size_t cnt = 1<<18;
-    printf("test_gaussian --- %lu bytes real --- %s\n", sizeof(real), __VERSION__);
+    const size_t CNT = 1024*256;
+    printf("test_gaussian --- %lu bytes real --- %s", sizeof(real), __VERSION__);
     sfmt_t sfmt alignas(32);
     sfmt_init_gen_rand(&sfmt, device());
 
     tick();
-    for ( size_t i = 0; i < cnt; ++i )
+    for ( size_t i = 0; i < CNT; ++i )
         sfmt_gen_rand_all(&sfmt);
-    printf("sfmt.refill  %5.2f\n", tock(cnt>>10));
+    printf("\nsfmt.refill  %5.2f", tock(CNT>>10));
     //print(vec, end);
     
-    //run(sfmt, cnt, "Gauss.STD", makeGaussians_std);
-    run(sfmt, cnt, "Gauss", makeGaussians_);
+    //run(sfmt, CNT, "Gauss.STD", makeGaussians_std);
+    run(sfmt, CNT, "Gauss", makeGaussians_);
 #if USE_SIMD
-    run(sfmt, cnt, "Gauss.SIMD", makeGaussians_SIMD);
-    run(sfmt, cnt, "GauBM.SIMD", makeGaussiansBM_SIMD);
+    run(sfmt, CNT, "Gauss.SIMD", makeGaussians_SIMD);
+    run(sfmt, CNT, "GauBM.SIMD", makeGaussiansBM_SIMD);
 #endif
 
 #if defined(__AVX__)
-    run(sfmt, cnt, "GauBM.AVX", makeGaussiansBM_AVX);
-    run(sfmt, cnt, "Gauss.AVX", makeGaussians_AVX);
-    run(sfmt, cnt, "Gauss.AVX2", makeGaussians_AVX2);
+    run(sfmt, CNT, "GauBM.AVX", makeGaussiansBM_AVX);
+    run(sfmt, CNT, "Gauss.AVX", makeGaussians_AVX);
+    run(sfmt, CNT, "Gauss.AVX2", makeGaussians_AVX2);
 #endif
     
-    run(sfmt, cnt, "Exponential", makeExponentials_);
+    run(sfmt, CNT, "Exponential", makeExponentials);
+    run(sfmt, CNT, "Exponential_", makeExponentials_);
 #if USE_SIMD
-    run(sfmt, cnt, "Expon.SIMD", makeExponentials_SIMD);
-    scan(16, "Exponential", makeExponentials_SIMD);
+    run(sfmt, CNT, "Expon.SIMD", makeExponentials_SIMD);
+    //printf("\nSCAN makeExponentials_SIMD:\n");
+    //scan(16, 64, makeExponentials_SIMD);
 #endif
-    scan(16, "Exponential", makeExponentials_);
+    //printf("\nSCAN makeExponentials_:\n");
+    //scan(16, 64, makeExponentials_);
+    printf("\n");
 }
 
