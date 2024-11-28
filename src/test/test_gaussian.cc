@@ -300,7 +300,6 @@ int main(int argc, char* argv[])
 #if defined(__AVX__)
     run(sfmt, CNT, "GauBM.AVX", makeGaussiansBM_AVX);
     run(sfmt, CNT, "Gauss.AVX", makeGaussians_AVX);
-    run(sfmt, CNT, "Gauss.AVX2", makeGaussians_AVX2);
 #endif
     
     run(sfmt, CNT, "Exponential", makeExponentials);
