@@ -106,11 +106,10 @@ float * makeExponentials_(float dst[], size_t cnt, const uint32_t src[])
 
 
 template < typename REAL >
-void check_gaussian(size_t num, REAL* vec)
+void check_gaussian(size_t num, REAL* vec, double off)
 {
     size_t cnt = 0;
     size_t nan = 0;
-    const double off = 0; // assumed mean
     double avg = 0, var = 0;
     for ( size_t i = 0; i < num; ++i )
     {
@@ -132,7 +131,7 @@ void check_gaussian(size_t num, REAL* vec)
     for ( size_t i = 1; i < num; i += 2 )
     {
         if ( !std::isnan(vec[i]) )
-            cov += ( vec[i-1] - avg ) * ( vec[i] - avg );
+            cov += ( vec[i-1] - off ) * ( vec[i] - off );
     }
     cov /= ( cnt / 2 );
     printf("%9lu + %6lu NaNs: avg %7.4f var %7.4f cov %7.4f ", cnt, nan, avg, var, cov);
@@ -217,7 +216,7 @@ static real* check_log(real dst[], size_t cnt, const uint32_t arg[])
 
 
 template < typename REAL >
-void run(sfmt_t& sfmt, size_t rep, const char str[], REAL* (*FUNC)(REAL*, size_t, const uint32_t*))
+void run(sfmt_t& sfmt, size_t rep, const char str[], REAL* (*FUNC)(REAL*, size_t, const uint32_t*), double off = 0)
 {
     void * ptr = nullptr;
     if ( 0 == posix_memalign(&ptr, 32, rep*sizeof(REAL)*SFMT_N32) )
@@ -230,8 +229,8 @@ void run(sfmt_t& sfmt, size_t rep, const char str[], REAL* (*FUNC)(REAL*, size_t
             sfmt_gen_rand_all(&sfmt);
             vec = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
         }
-        printf("\n%-12s %5.2f :", str, tock(rep));
-        check_gaussian(vec-mem, mem);
+        printf("\n%-12s %5.2f :", str, tock());
+        check_gaussian(vec-mem, mem, off);
         
         size_t n = std::min(vec-mem, 8L);
         std::sort(mem, vec);
@@ -302,10 +301,11 @@ int main(int argc, char* argv[])
     run(sfmt, CNT, "Gauss.AVX", makeGaussians_AVX);
 #endif
     
-    run(sfmt, CNT, "Exponential", makeExponentials);
-    run(sfmt, CNT, "Exponential_", makeExponentials_);
+    double one(1);
+    run(sfmt, CNT, "Exponential", makeExponentials, one);
+    run(sfmt, CNT, "Exponential_", makeExponentials_, one);
 #if USE_SIMD
-    run(sfmt, CNT, "Expon.SIMD", makeExponentials_SIMD);
+    run(sfmt, CNT, "Expon.SIMD", makeExponentials_SIMD, one);
     //printf("\nSCAN makeExponentials_SIMD:\n");
     //scan(16, 64, makeExponentials_SIMD);
 #endif

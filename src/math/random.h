@@ -318,7 +318,7 @@ public:
     /// fill array `vec` with independent random numbers following normal law N(0,v*v).
     void gauss_set(real vec[], size_t n, real v);
 
-    /// signed real number, following a normal law N(0,1), slower algorithm
+    /// set 2 statistically independent signed real number, following the normal law N(0,1), slower algorithm
     void gauss_boxmuller(real &, real&);
     
     /// refill array `exponentials_[]`, resetting `next_exponential_`

@@ -352,12 +352,17 @@ void Random::gauss_boxmuller(real& x, real& y)
 //------------------------------------------------------------------------------
 #pragma mark - Exponential derivates
 
-/// this is the default implementation
+/// fill array `dst` with random numbers following the Normal law.
 /**
- From Luc Devroye: Non-uniform random variate generation. Page 394:
- Generate independent identically distributed uniform [0,1] random variates U, V, W.
- Y = -log(U*V)
- RETURN W*Y, (l-W)*Y
+ Using idependent random numbers provided by 'src[]', or size `cnt`.
+ The Normal law has Mean = 0 and Variance = 1.
+ @return the address pass the last value set.
+ The number of values is `return - dst` which should be 2*cnt/3.
+ 
+ Using method from Luc Devroye: Non-uniform random variate generation. Page 394:
+ From 3 independent identically distributed uniform [0,1] random variates U, V, W.
+     Y = -log(U*V)
+     RETURN W*Y, (l-W)*Y
  */
 float * makeExponentials(float dst[], size_t cnt, const uint32_t src[])
 {
@@ -365,9 +370,9 @@ float * makeExponentials(float dst[], size_t cnt, const uint32_t src[])
     const float alpha(TWO_POWER_MINUS_32);
     for ( size_t i = 0; i < cnt; i += 3 )
     {
-        float U = alpha *static_cast<float>(src[i]);
-        float V = alpha *static_cast<float>(src[i+1]);
-        float W = alpha *static_cast<float>(src[i+2]);
+        float U = alpha * static_cast<float>(src[i+0]) + alpha;
+        float V = alpha * static_cast<float>(src[i+1]) + alpha;
+        float W = alpha * static_cast<float>(src[i+2]);
         float y = -logf(U*V);
         dst[0] = y * W;
         dst[1] = y * ( 1.f - W );

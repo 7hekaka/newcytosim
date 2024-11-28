@@ -207,7 +207,7 @@ void check_flip()
 
 
 template < typename REAL >
-void check_random(const char str[], size_t cnt, real off, REAL (Random::*FUNC)())
+void check_random(const char str[], size_t cnt, REAL off, REAL (Random::*FUNC)())
 {
     REAL ix = INFINITY, iy = INFINITY, iz = INFINITY;
     REAL sx = -INFINITY, sy = -INFINITY, sz = -INFINITY;
