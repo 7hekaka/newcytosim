@@ -1,24 +1,18 @@
 # Compute Cluster - SLURM
 
-This is a step-by-step introduction to running simulations on a SLURM cluster.
-The instructions work at EMBL, where the cluster is running [SLURM](https://slurm.schedmd.com), with access to [central storage space](http://intranet.embl.de/it_services/services/data_storage/index.html).
- 
-Check also the <a href="https://wiki.embl.de/cluster">EMBL Cluster wiki</a>.
+This is a step-by-step introduction to running simulations on a SLURM cluster. These instructions must be adapted, depending on how the system and storage space are organized.
 
 (F. Nedelec, 17.02.2018)
 
 # Storage
- 
+
 You need a storage space that is accessible from any node of the cluster, 
-and also from your local machine.
-For this we will use a group-disc.
-The first step is thus to make sure you know how access the group disc,
-and to create a new directory on this disc:
-	 
-	cd /g/nedelec/steve
+and also from your local machine. For this you will some sort of a shared storage server:
+
+	cd /storage/steve
 	mkdir screen
  
-Here 'nedelec' is the name of the disc, and 'steve' is the name of the user.
+Here 'storage' is the name of the disc, and 'steve' is the name of the user.
 You will need to substitute your username instead of 'steve' in the following
 commands. The name of the working directory `screen` can be changed.
  
@@ -30,7 +24,7 @@ Log into the cluster:
 
 Go to a working directory (you may need to create it first):
 
-	cd /g/nedelec/steve/screen
+	cd /storage/steve/screen
  
 Copy the necessary python scripts located in `python/run`:
 
@@ -41,20 +35,25 @@ Copy the necessary python scripts located in `python/run`:
 
 # Compile
  
-Copy your code to this new directory on the group disc:
+Copy your code to this new directory on the group disc.
+This can be done directly, if you already have a copy
 
-	cp -R ~/cytosim /g/nedelec/steve/screen/cytosim
+	cp -R ~/cytosim /storage/steve/screen/cytosim
+	
+But usually you will need to download the code from a server:
+
+	git clone http://www.gitlab.com/f-nedelec/cytosim cytosim
 
 Load modules needed to compile and run cytosim:
 
-	module load foss
-	module load LAPACK OpenBLAS
+	module load dot
+	module load gcc/11
 
-Loading these modules is necessary, even if you are only going to submit jobs.
+Please check if these are really the modules that are needed, as this depends on the cluster configuration.
 
 Edit `makefile.inc` to adjust compilation parameters for the cluster:
 
-	cd /g/nedelec/steve/screen/cytosim
+	cd /storage/steve/screen/cytosim
 	edit makefile.inc
 
 You need to change the target machine:
@@ -67,9 +66,9 @@ and you should probably tell the compiler to optimize for speed:
 
 Moreover, you can disable assertions by defining `NDEBUG` in `src/base/assert_macro.h`:
 
-	#define NDEBUG
+	#define NDEBUG 1
 
-Altogether, this will make the executable faster.
+Altogether, these modifications will make the executable faster.
 To compile using 4 parallel processes:
 
 	make -j4 sim
@@ -85,15 +84,13 @@ and check that it works:
 
 # Prepare
  
-As an example, here is how to configure a parametric sweep using a template
-configuration file `config.cym.tpl`, as explained in @ref RunCytosim.
+As an example, here is how to configure a parametric sweep using a template configuration file `config.cym.tpl`, as explained in @ref RunCytosim.
  
 Generate the config files. Depending on your template, this may be:
 
 	./preconfig.py config.cym.tpl
 
-or, if the template uses random sampling, you should specify the number of files
-(here 65) with:
+or, if the template uses random sampling, you should specify the number of files (here 65) with:
 
 	./preconfig.py 65 config.cym.tpl
 
@@ -105,8 +102,7 @@ Submit the jobs:
 
 The queue system attributes a job ID to your submission.
 
-Note that if the submission is successful, all the config files will be copied
-to the job folder, (in job??/todo) and you can thus delete the config files.
+Note that if the submission is successful, all the config files will be copied to the job folder, (in job??/todo) and you can thus delete the config files.
 
 Optional: check that your jobs are in the queue, with these commands:
 
@@ -119,34 +115,32 @@ If the jobs are correctly submitted, you can log out from the cluster:
 
 # Optimal Cluster Usage
 
-Multiple config files will be distributed to different nodes, but one can also
-specify that each 'config' should be repeated several times when you submit.
+Multiple config files will be distributed to different nodes, but one can also specify that each 'config' should be repeated several times when you submit.
 This can be interesting to runs multiple simulations with the same config,
-because cytosim is a stochastic engine, and this will allow you to probe the
-intrisic variability in the outcome of the simulation, due to stochasticity.
+because cytosim is a stochastic engine, and this will allow you to probe the intrisic variability in the outcome of the simulation, due to stochasticity.
 The repeated runs are performed sequentially on the same node.
 
 Examples:
 
 To run the different config file on different nodes:
 
-	./submit_slurm.py sim config1.cym config2.cym config3.cym config4.cym
+	./submit.py sim config1.cym config2.cym config3.cym config4.cym
 
 It is naturally always possible to submit the same task multiple times:
 
-	./submit_slurm.py sim config1.cym config1.cym config1.cym
+	./submit.py sim config1.cym config1.cym config1.cym
 
 The config file will be copied and submitted 3 times, and these 3 runs will
 be distributed to different nodes.
 
 To run the same config file 8 times, sequentially on the same node:
 
-	./submit_slurm.py 'sim 8' config.cym
+	./submit.py 'sim 8' config.cym
 
 By combining thes options, each config files can be repeated sequentially on the
 same node, while different configs files will be distributed to different nodes:
 
-	./submit_slurm.py 'sim 3' config1.cym config2.cym config3.cym
+	./submit.py 'sim 3' config1.cym config2.cym config3.cym
 
 Note: When repeating a simulation, you need to make sure to set `random_seed=0`
 otherwise the results might be identical. With `random_seed=0`, the random number
@@ -156,7 +150,7 @@ generator is initialized automatically. If `random_seed` is not specified in the
 
 # Cleanup
  
-The interesting results will be in `/g/nedelec/steve/screen/save`, 
+The interesting results will be in `/storage/steve/screen/save`, 
 which should contain the completed runs as `run0000`, `run0001`, etc.
 The other directories will have accessory informations.
  
@@ -180,12 +174,8 @@ proceeded without errors:
 
 	rm save/run*/log.txt
 	
-
 # Analysis
 
-The analysis should normally be done on a local machine, rather than on the cluster.
-You are not allowed to do it on the machine used to submit jobs.
- 
-The type of analysis depends very much on the project.
+The analysis should normally be done on a local machine, rather than on the cluster. The type of analysis depends very much on the project.
 Some general techniques are described in @ref RunCytosim.
  

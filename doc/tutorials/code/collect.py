@@ -103,8 +103,8 @@ def main(args):
     for arg in args:
         if arg=='-c' or arg=='--copy' or arg=='copy=1':
             do_copy = True
-        elif args[0].isdigit():
-            idx = int(args[0])
+        elif arg.isdigit():
+            idx = int(arg)
         elif os.path.isfile(arg) or os.path.isdir(arg):
             paths.append(arg)
         else:

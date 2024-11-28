@@ -10,9 +10,10 @@
  
 Syntax:
 
-    scan.py command [-] directory1 [directory2] [directory3] [...] [jobs=INTEGER]
+    scan.py command [-][+] directory1 [directory2] [directory3] [...] [jobs=INTEGER]
     
-    if '-' is specified, reduce output to the command
+    if '-' is specified, output is limited to what the command does
+    if '+' is specified, the directory path is printed without decoration
     if 'jobs' is set, run in parallel using specified number of threads
 
 Examples:
@@ -21,8 +22,8 @@ Examples:
     scan.py 'play image' run* jobs=2
     
     
-F. Nedelec, 02.2011, 09.2012, 03.2013, 01.2014, 06.2017, 07.2021
-S. Dmitreff, 06.2017
+F. Nedelec 02.2011, 09.2012, 03.2013, 01.2014, 06.2017, 07.2021, 21.03.2022, 8.04.2022
+S. Dmitreff 06.2017
 """
 
 try:
@@ -31,20 +32,49 @@ except ImportError:
     sys.stderr.write("Error: could not load necessary python modules\n")
     sys.exit()
 
-out = sys.stderr
-verbose = 1
+err = sys.stderr
+out = sys.stdout
+verbose = 2
 
 #------------------------------------------------------------------------
 
-def execute(tool, path):
+def assemble(path, lines, verb):
+    """
+    Assembles lines for output according to 'verb' argument
+    """
+    res = ''
+    if verb == 2:
+        for s in lines:
+            res += s
+    elif verb == 1:
+        res = os.path.basename(path) + " "
+        for s in lines:
+            res += s.replace('\n', ' ')
+        res += '\n'
+    else:
+        for s in lines:
+            res += s
+    return res
+
+
+def execute(tool, path, verb):
     """
     run executable in specified directory
     """
-    os.chdir(path)
+    lines = []
     try:
-        subprocess.run(tool, shell=True, check=True)
+        os.chdir(path)
+        if verb == 2:
+            sys.stderr.write('-  '*24+path+"\n")
+        sub = subprocess.Popen(tool, shell=True, stdout=subprocess.PIPE)
+        for s in sub.stdout:
+            lines.append(s.decode())
+        sub.stdout.close()
     except Exception as e:
-        sys.stderr.write("Error: %s\n" % repr(e))
+        err.write("Error: %s\n" % repr(e))
+    res = assemble(path, lines, verb)
+    out.write(res)
+    out.flush()
 
 
 def worker(queue):
@@ -53,12 +83,10 @@ def worker(queue):
     """
     while True:
         try:
-            t, p = queue.get(True, 1)
+            t, p, v = queue.get(True, 1)
         except:
             break;
-        execute(t, p)
-        if verbose:
-            out.write("done "+p+"\n")
+        execute(t, p, v)
 
 
 def main(args):
@@ -66,30 +94,39 @@ def main(args):
         read command line arguments and process command
     """
     global verbose
+    
+    if args[0] == '-':
+        verbose = 0
+        args.pop(0)
+    elif args[0] == '+':
+        verbose = 1
+        args.pop(0)
+    
     try:
         tool = args[0]
     except:
-        out.write("Error: you should specify a command to execute\n")
+        err.write("Missing command: scan.py command [-][+] directory1 [directory2]...\n")
         return 1
 
     njobs = 1
     paths = []
     for arg in args[1:]:
+        [key, equal, val] = arg.partition('=')
         if os.path.isdir(arg):
             paths.append(os.path.abspath(arg))
-        elif arg.startswith('nproc=') or arg.startswith('njobs='):
-            njobs = int(arg[6:])
-        elif arg.startswith('jobs='):
-            njobs = int(arg[5:])
+        elif key == 'nproc' or key == 'njobs' or key == 'jobs':
+            njobs = int(val)
         elif arg == '-':
             verbose = 0
+        elif arg == '+':
+            verbose = 1
         else:
-            out.write("  Warning: unexpected argument `%s'\n" % arg)
+            err.write("  Warning: unexpected argument `%s'\n" % arg)
             sys.exit()
 
     if not paths:
-        out.write(" scan.py will execute `%s`\n"%tool)
-        out.write("Error: you must specify directories: scan.py COMMAND PATHS\n")
+        err.write("Missing directories: scan.py command [-][+] directory1 [directory2]...\n")
+        err.write(" (scan.py would execute `%s`)\n"%tool)
         return 2
     
     njobs = min(njobs, len(paths))
@@ -100,7 +137,7 @@ def main(args):
             from multiprocessing import Process, Queue
             queue = Queue()
             for p in paths:
-                queue.put((tool, p))
+                queue.put((tool, p, verbose))
             jobs = []
             for n in range(njobs):
                 j = Process(target=worker, args=(queue,))
@@ -112,18 +149,16 @@ def main(args):
                 j.close()
             return 0
         except ImportError:
-            out.write("Warning: multiprocessing module unavailable\n")
+            err.write("Warning: multiprocessing module unavailable\n")
     #process sequentially:
     for p in paths:
-        if verbose:
-            out.write('-  '*24+p+"\n")
-        execute(tool, p)
+        execute(tool, p, verbose)
     return 0
 
 #------------------------------------------------------------------------
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2 or sys.argv[1].endswith("help"):
+    if len(sys.argv) < 3 or sys.argv[1].endswith("help"):
         print(__doc__)
     else:
         main(sys.argv[1:])
