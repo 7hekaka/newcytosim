@@ -85,7 +85,6 @@ class Gosimer:
         self.err = sys.stderr
         self.out = sys.stdout
 
-        self.njobs  = 1
         self.repeat = 1
         self.park = ''
         self.exe = os.path.abspath('sim')
@@ -101,7 +100,7 @@ class Gosimer:
         try:
             (val, res) = go_sim_lib.run(self.exe, conf, self.arguments, name, self.config)
             if val == 0:
-                self.out.write("Completed `%s` in %s; " % (conf, res))
+                self.out.write("Completed `%s` in %s;\n" % (conf, res))
             else:
                 self.out.write("Failed `%s` in %s with value %i\n" % (conf, res, val))
         except KeyboardInterrupt:
@@ -122,9 +121,10 @@ class Gosimer:
         while True:
             try:
                 arg = self.queue.get(True, 1)
-                self.run_one(*arg)
+                #print("Queue -->", arg)
             except:
                 break;
+            self.run_one(*arg)
 
     def process(self, conf, name):
         """
@@ -154,7 +154,7 @@ class Gosimer:
                     n = name + '%04i' % i
             else:
                 n = name
-            if self.njobs > 1:
+            if self.queue:
                 self.queue.put((f, n))
                 #print('Queued ' + f + ' ' + n)
             else:
@@ -163,6 +163,7 @@ class Gosimer:
     def main(self, args):
         root = 'run'
         files = []
+        njobs = 1
         # parse arguments list:
         for arg in args:
             if arg.isdigit():
@@ -176,7 +177,7 @@ class Gosimer:
             else:
                 [key, equal, val] = arg.partition('=')
                 if key == 'nproc' or key == 'njobs' or key == 'jobs':
-                    self.njobs = int(val)
+                    njobs = int(val)
                 elif key == 'preconfig' or key == 'script':
                     self.script = val
                 elif key == 'name':
@@ -200,14 +201,13 @@ class Gosimer:
             sys.exit()
 
         # prepare for multiprocessing
-        if self.njobs > 1:
+        if njobs > 1:
             try:
                 from multiprocessing import Process, Queue
                 self.queue = Queue()
             except ImportError:
-                self.out.write("Warning: multiprocessing unavailable\n")
-                njobs = 1
-
+                sys.stderr.write("Warning: multiprocessing unavailable\n")
+        
         # process given files:
         if len(files) > 1:
             for i, f in enumerate(files):
@@ -216,16 +216,15 @@ class Gosimer:
             self.process(files[0], root)
 
         # process jobs:
-        if self.njobs > 1:
+        if njobs > 1:
             jobs = []
-            for n in range(self.njobs):
+            for n in range(njobs):
                 j = Process(target=self.run_queue)
                 jobs.append(j)
                 j.start()
             # wait for completion of all jobs:
             for j in jobs:
                 j.join()
-                j.close()
         return 0
 
 #-------------------------------------------------------------------------------

@@ -3,11 +3,12 @@
 #  It is not executable directly, and instead it is used by go_sim.py
 #  to create a directory, copy files, move directories, etc.
 #
-# Copyright F. Nedelec 2007--2023 with S. Dmitrieff 2019
+# Copyright F. Nedelec 2007--2024 with S. Dmitrieff 2019
 
 
 try:
-    import os, sys, shutil, subprocess
+    import os, sys, shutil
+    from subprocess import Popen
 except ImportError:
     host = os.getenv('HOSTNAME', 'unknown')
     sys.stderr.write("go_sim_lib.py could not load python modules on %s\n" % host)
@@ -30,8 +31,6 @@ class Error( exceptions.Exception ):
     def __str__(self):
         return repr(self.value)
 
-# name of the log file:
-logfile_name = 'log.txt'
 
 # default output for error messages:
 err = sys.stderr
@@ -160,36 +159,46 @@ def make_config(conf, repeat, script, dest):
         return copy_config(conf, repeat)
 
 
+def remove_if_empty(arg):
+    if os.path.isfile(arg) and not os.path.getsize(arg):
+        os.remove(arg)
+
+
 #=======================  RUNNING THE SIMULATION  ==============================
 
-def run_sim(exe, args):
+def start_sim(exe, path, args):
     """
-    Start executable in current directory, and wait for completion.
-    Standard output is sent to `out.txt' and standard error to `err.txt'.
-    The executable shall find its default configuration file.
+    Start simulation in specified working directory (path) as a subprocess
     """
-    outname = 'out.txt'
-    errname = 'err.txt'
+    exe = exe.split(' ')
+    outname = os.path.join(path, 'out.txt')
+    errname = os.path.join(path, 'err.txt')
     outfile = open(outname, 'w')
     errfile = open(errname, 'w')
-    exe = exe.split(' ')
-    # run simulation
-    if not args:
-        val = subprocess.call(exe, stdout=outfile, stderr=errfile)
+    # Option 'cwd=path' sets the current working directory of the subprocess
+    if args:
+        sub = Popen(exe+args, stdout=outfile, stderr=errfile, cwd=path)
     else:
-        val = subprocess.call(exe+args, stdout=outfile, stderr=errfile)
-    outfile.close()
-    errfile.close()
-    # remove output files if empty:
-    if os.path.isfile(outname) and not os.path.getsize(outname):
-        os.remove(outname)
-    if os.path.isfile(errname) and not os.path.getsize(errname):
-        os.remove(errname)
-    return val
+        sub = Popen(exe, stdout=outfile, stderr=errfile, cwd=path)
+    #print(f'Started {exe} process {sub.pid} in `{path}`')
+    return sub
 
 
-def info_start(filename, exe, conf, args, pid):
-    import time
+def after_sim(sub, path):
+    """
+    wait for subprocess running in 'path' to complete and return its output
+    """
+    ret = sub.wait()
+    if ret:
+        sys.stderr.write(f'{sub.pid} exitcode {ret}')
+    else:
+        # remove output files if empty:
+        remove_if_empty(os.path.join(path, 'out.txt'))
+        remove_if_empty(os.path.join(path, 'err.txt'))
+    return ret
+
+
+def info_log(filename, exe, conf, args, pid):
     with open(filename, "w") as f:
         f.write("host      %s\n" % os.getenv('HOSTNAME', 'unknown'))
         f.write("user      %s\n" % os.getenv('USER', 'unknown'))
@@ -197,9 +206,13 @@ def info_start(filename, exe, conf, args, pid):
         f.write("exec      %s\n" % exe)
         f.write("args      %s\n" % args)
         f.write("conf      %s\n" % conf)
-        f.write("pid       %s\n" % pid)
-        f.write("start     %s\n" % time.asctime())
+        f.write("pyid      %s\n" % pid)
 
+def info_start(filename, pid):
+    import time
+    with open(filename, "a") as f:
+        f.write("start     %s\n" % time.asctime())
+        f.write("pid       %s\n" % pid)
 
 def info_end(filename, val):
     import time
@@ -208,7 +221,7 @@ def info_end(filename, val):
         f.write("stop      %s\n" % time.asctime())
 
 
-def run(exe, conf, args, job_name, exe_input_name):
+def run(exe, conf, args, job_name, config_file):
     """
     Run one simulation in a new sub directory and wait for completion.
     The config file 'conf' is copied to the subdirectory.
@@ -220,16 +233,18 @@ def run(exe, conf, args, job_name, exe_input_name):
     conf = os.path.abspath(conf);
     wdir = make_run_directory(job_name, conf)
     os.chmod(wdir, 504)
-    os.chdir(wdir)
-    shutil.copyfile(conf, exe_input_name)
-    info_start(logfile_name, exe, conf, args, os.getpid())
-    val = run_sim(exe, args)
-    info_end(logfile_name, val)
+    log = os.path.join(wdir, 'log.txt')
+    shutil.copyfile(conf, os.path.join(wdir, config_file))
+    info_log(log, exe, conf, args, os.getpid())
+    sub = start_sim(exe, wdir, args)
+    info_start(log, sub.pid)
+    ret = after_sim(sub, wdir)
+    info_end(log, ret)
     os.chdir(cdir)
-    return (val, wdir)
+    return (ret, wdir)
 
 
-def start(exe, conf, args, root, exe_input_name):
+def start(exe, conf, args, root, config_file):
     """
     Start simulation in a new sub directory, and return immediately.
     The config file `conf` is copied to the sub-directory.
@@ -239,17 +254,12 @@ def start(exe, conf, args, root, exe_input_name):
         raise Error("missing/unreadable config file")
     conf = os.path.abspath(conf)
     wdir = make_directory(root)
-    os.chdir(wdir)
-    shutil.copyfile(conf, exe_input_name)
-    if exe != 'none':
-        outfile = open('out.txt', 'w')
-        errfile = open('err.txt', 'w')
-        #start simulation, but do not wait for completion:
-        pid = subprocess.Popen(['nohup', exe]+args, stdout=outfile, stderr=errfile).pid
-        info_start(logfile_name, exe, conf, args, pid)
-    else:
-        pid = 0
-    os.chdir(cdir)
-    return (pid, wdir)
+    os.chmod(wdir, 504)
+    log = os.path.join(wdir, 'log.txt')
+    shutil.copyfile(conf, os.path.join(wdir, config_file))
+    info_log(log, exe, conf, args, os.getpid())
+    sub = start_sim(exe, wdir, args)
+    info_start(log, sub.pid)
+    return (sub.pid, wdir)
 
 
