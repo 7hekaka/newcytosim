@@ -1019,25 +1019,28 @@ real FiberSet::infoNematic(ObjectList const& objs, real res[9])
         Fiber * fib = Fiber::toFiber(i);
         if ( fib )
         {
-            const size_t cnt = fib->nbSegments();
+            const size_t cnt = fib->nbPoints();
             real XX = 0, XY = 0, XZ = 0, YY = 0, YZ = 0, ZZ = 0;
-            for ( size_t n = 0; n < cnt; ++n )
+            Vector Q = fib->posP(0);
+            for ( size_t n = 1; n < cnt; ++n )
             {
-                Vector p = fib->diffPoints(n);
-                XX += p.XX * p.XX;
+                Vector P = fib->posP(n);
+                Vector d = P - Q;
+                XX += d.XX * d.XX;
 #if ( DIM > 1 )
-                XY += p.YY * p.XX;
-                YY += p.YY * p.YY;
+                XY += d.YY * d.XX;
+                YY += d.YY * d.YY;
 #endif
 #if ( DIM > 2 )
-                XZ += p.ZZ * p.XX;
-                YZ += p.ZZ * p.YY;
-                ZZ += p.ZZ * p.ZZ;
+                XZ += d.ZZ * d.XX;
+                YZ += d.ZZ * d.YY;
+                ZZ += d.ZZ * d.ZZ;
 #endif
+                Q = P;
             }
             // we should normalize by 1/L^2, but to weight by length, we use 1/L
             real w = fib->segmentation();
-            sum += cnt * w; // length of fiber
+            sum += ( cnt - 1 ) * w; // length of fiber
             w = 1.0 / w;
             // update lower triangle of 3x3 second-rank traceless tensor:
             M[0] += w * XX;
