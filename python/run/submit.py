@@ -143,9 +143,9 @@ def array_script(jobcnt):
     res.append('#SBATCH --ntasks=1')
     # specify number of threads if executable is threaded:
     if ncpu > 1:
-        res.append(f'--cpus-per-task={ncpu}')
+        res.append(f'#SBATCH --cpus-per-task={ncpu}')
     if account:
-        res.append(f'--account={account}')
+        res.append(f'#SBATCH --account={account}')
     res.append(f'#SBATCH --partition={queue}')
     res.append(f'#SBATCH --time={runtime}')
     res.append(f'#SBATCH --mem={memory}')

@@ -41,6 +41,9 @@ public:
     /// the Fiber
     Fiber const* fiber() const { return fib_; }
     
+    /// the Fiber's identity
+    ObjectID identity() const { if ( fib_ ) return fib_->identity(); return 0; }
+    
     /// index of segment
     unsigned point() const { return sgi_; }
     

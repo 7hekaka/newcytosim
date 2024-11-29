@@ -9,7 +9,7 @@
 #include "signal_handlers.h"
 #include "backtrace.h"
 
-//---------------------------  global variables/functions ---------------------
+//---------------------------- Signal Handlers --------------------------------
 
 static void out_of_memory_handler()
 {

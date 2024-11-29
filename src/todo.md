@@ -28,6 +28,7 @@ Cytosim Todo List
 - Could add color of Hands for summary obtained with 'I'
 - Implement two confinements for Mecables. That's easier than constructive geometry on Spaces
 - use 'cyo' as extension for ouput file
+- use Sphynx for documentation:
 
 # Spindles
 
