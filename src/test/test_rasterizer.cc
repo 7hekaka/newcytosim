@@ -297,7 +297,7 @@ int display(View& view)
             vex[i] = pts[i];
         
         // compute and draw convex-hull
-        size_t nb = Rasterizer::convexHull2D(n_pts, vex);
+        int nb = Rasterizer::convexHull2D(n_pts, vex);
         drawLines(nb, vex, 2);
 
         Rasterizer::paintPolygon2D(paint, nullptr, nb, vex, 0);

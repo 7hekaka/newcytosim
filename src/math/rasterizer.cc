@@ -32,14 +32,14 @@ void swap(VEC& A, VEC& B) { VEC T = A; A = B; B = T; }
  @returns The number of points in the convex hull (at most n_pts).
  */
 template<typename VEC>
-static size_t convexHull(size_t n_pts, VEC pts[])
+static int convexHull(int n_pts, VEC pts[])
 {
     //---------- find bottom and top points:
-    size_t inx = 0, top = 0;
+    int inx = 0, top = 0;
     Rasterizer::FLOAT y_bot = pts[0].YY;
     Rasterizer::FLOAT y_top = pts[0].YY;
     
-    for ( size_t n = 1; n < n_pts; ++n )
+    for ( int n = 1; n < n_pts; ++n )
     {
         if ( pts[n].YY < y_bot || ( pts[n].YY == y_bot  &&  pts[n].XX > pts[inx].XX ) )
         {
@@ -67,7 +67,7 @@ static size_t convexHull(size_t n_pts, VEC pts[])
     inx = 0;
     
     // wrap upward on the right side of the hull
-    size_t nxt;
+    int nxt;
     while ( 1 )
     {
         Rasterizer::FLOAT pX = pts[inx].XX;
@@ -78,7 +78,7 @@ static size_t convexHull(size_t n_pts, VEC pts[])
         Rasterizer::FLOAT dx = pts[top].XX - pX;
         Rasterizer::FLOAT dy = pts[top].YY - pY;
         
-        for ( size_t n = inx; n < n_pts; ++n )
+        for ( int n = inx; n < n_pts; ++n )
         {
             Rasterizer::FLOAT dxt = pts[n].XX - pX;
             Rasterizer::FLOAT dyt = pts[n].YY - pY;
@@ -108,7 +108,7 @@ static size_t convexHull(size_t n_pts, VEC pts[])
 }
 
 
-size_t Rasterizer::convexHull2D(size_t n_pts, Rasterizer::Vertex2 pts[])
+int Rasterizer::convexHull2D(int n_pts, Rasterizer::Vertex2 pts[])
 {
     return convexHull(n_pts, pts);
 }
@@ -371,16 +371,16 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
     }
 #endif
     
-    //order the points in increasing Z:
+    //order the points by increasing Z values:
     qsort(pts, n_pts, sizeof(Vertex3), &compareVertex3);
     
     //we can normally only cross four sides of a parallelogram in 3D
     //but in some degenerate cases, it can be more
-    const size_t limit = 16;
-    Vertex2d xy[limit];
+    constexpr size_t TOP = 8;
+    Vertex2dZ xydz[TOP];
     
-    size_t above = 0;
-    int zz = (int) std::ceil( pts[0].ZZ );
+    int above = 0;
+    int zzz = (int) std::ceil( pts[0].ZZ );
     
     while ( ++above < n_pts )
     {
@@ -388,64 +388,69 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
         
         //find the first point strictly above the plane Z = zz:
         //the index of this point is (above-1)
-        while ( pts[above].ZZ <= zz )
+        while ( pts[above].ZZ <= zzz )
         {
             if ( ++above >= n_pts )
                 return;
         }
         
         //the next time we have to recalculate the lines
-        //is when pts[above] will be below the plane Z = zzn:
-        int zzn = (int)std::ceil( pts[above].ZZ );
+        //is when pts[above] will be below the plane Z = ZZtop:
+        int ZZtop = (int) std::ceil( pts[above].ZZ );
         
         //number of edges crossing the plane at Z=zz;
-        size_t nbl = 0;
-        //set-up all the lines, which join any point below the plane
-        //to any point above the plane, being a edge of the solid polygon:
-        for ( size_t ii = 0;     ii < above; ++ii )
-        for ( size_t jj = above; jj < n_pts; ++jj )
+        int edg = 0;
+        //set-up all the edges of the solid 3D polygon, where one vertex
+        //is below the plane, and the other point above:
+        for ( int ii = 0;     ii < above; ++ii )
+        for ( int jj = above; jj < n_pts; ++jj )
         {
-            //test if [ii, jj] are joined:
+            //test if [ii, jj] constitute an edge of the solid 3D polygon:
             if ( pts[ii].UU  &  pts[jj].UU )
             {
-                FLOAT dzz = pts[jj].ZZ - pts[ii].ZZ;
+                FLOAT dZ = pts[jj].ZZ - pts[ii].ZZ;
                 
-                if ( dzz > 0 )
+                if ( dZ > FLT_EPSILON )
                 {
-                    FLOAT dxz = ( pts[jj].XX - pts[ii].XX ) / dzz;
-                    FLOAT dyz = ( pts[jj].YY - pts[ii].YY ) / dzz;
-                    FLOAT dz  = zz - pts[ii].ZZ;
-                    xy[nbl].set(pts[ii].XX + dxz * dz,
-                                pts[ii].YY + dyz * dz, dxz, dyz);
-                    ++nbl;
-                    assert_true( nbl < limit );
+                    FLOAT dXdZ = ( pts[jj].XX - pts[ii].XX ) / dZ;
+                    FLOAT dYdZ = ( pts[jj].YY - pts[ii].YY ) / dZ;
+                    FLOAT off  = zzz - pts[ii].ZZ;
+                    xydz[edg].set(pts[ii].XX + dXdZ * off, dXdZ,
+                                  pts[ii].YY + dYdZ * off, dYdZ);
+                    ++edg;
+                    assert_true( edg < TOP );
                 }
             }
         }
-        
-        // the edges of the convex solid polygon should not intersect,
-        // so we can take the convex hull only once in principle:
-        size_t nbp = convexHull(nbl, xy); //number of points in the hull.
-        bool need_hull = ( nbp != nbl );
-        
-        for ( ; zz < zzn; ++zz )
-        {
-            if ( need_hull )
-            {
-                //make the convex hull of the points from xy[]:
-                nbp = convexHull(nbl, xy);
-                //printf("zz %3i : nbp = %i\n", zz, nbp);
+        //printf("zz %3i : nbp = %i\n", zz, nbl);
 
-                //in the particular case where some points overlap, we might
-                //loose them, in which case we need to redo the hull later
-                need_hull = ( nbp != nbl );
-            }
+        // the edges of the convex solid polygon should not intersect,
+        // so we can take the convex hull only once in most cases:
+        int nbp = convexHull(edg, xydz);
+        
+        // nbp = number of points in the hull. If this is not equal to the
+        // the number of edges in the intersection, we have to redo the Hull:
+        for ( ; ( nbp != edg ) && ( zzz < ZZtop ); ++zzz )
+        {
+            paintPolygon(paint, arg, nbp, xydz, zzz);
             
-            paintPolygon(paint, arg, nbp, xy, zz);
+            //update X, Y coordinates according to the slopes, to reach Z+1:
+            for ( int i = 0; i < edg; ++i )
+                xydz[i].move();
+
+            //rebuild the convex hull around the points xydz[]:
+            nbp = convexHull(edg, xydz);
+            //printf("zz %3i : hull nbp = %i\n", zzz, nbp);
+        }
+
+        // from here on, we do not need to remake the convex hull:
+        for ( ; zzz < ZZtop; ++zzz )
+        {
+            paintPolygon(paint, arg, nbp, xydz, zzz);
             
-            //update the coordinates according to the slopes, for the next zz:
-            for ( size_t i = 0; i < nbl; ++i )
-                xy[i].move();
+            //update X, Y coordinates according to the slopes, to reach Z+1:
+            for ( int i = 0; i < edg; ++i )
+                xydz[i].move();
         }
     }
 }

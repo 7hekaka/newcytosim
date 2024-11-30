@@ -55,7 +55,7 @@ namespace Rasterizer
     };
 
     /// a point in 2D, with slopes in Z
-    struct Vertex2d
+    struct Vertex2dZ
     {
         /// coordinates of the point
         FLOAT XX, YY;
@@ -63,11 +63,11 @@ namespace Rasterizer
         /// derivatives of the line with respect to Z
         FLOAT dX, dY;
         
-        Vertex2d()
+        Vertex2dZ()
         {
         }
 
-        void set(FLOAT x, FLOAT y, FLOAT dx, FLOAT dy)
+        void set(FLOAT x, FLOAT dx, FLOAT y, FLOAT dy)
         {
             XX = x;
             YY = y;
@@ -137,7 +137,7 @@ namespace Rasterizer
 #pragma mark - 2D
     
     /// compute convex hull of points in the plane
-    size_t convexHull2D(size_t n_pts, Vertex2 pts[]);
+    int convexHull2D(int n_pts, Vertex2 pts[]);
 
     /// Paint a polygon in 2D
     /**
