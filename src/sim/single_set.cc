@@ -274,19 +274,11 @@ Single * SingleSet::makeSingle(SingleProp const* P)
 void SingleSet::makeSingles(SingleProp const* P, size_t cnt)
 {
     reserve(inventory_.highest()+cnt);
-    if ( P->fast_diffusion > 0 )
+    while ( cnt-- > 0 )
     {
-        while ( cnt-- > 0 )
-        {
-            Single * S = makeSingle(P);
-            S->randomizePosition();
-            addFreeSingle(S);
-        }
-    }
-    else
-    {
-        while ( cnt-- > 0 )
-            addFreeSingle(makeSingle(P));
+        Single * S = makeSingle(P);
+        S->randomizePosition();
+        addFreeSingle(S);
     }
 }
 

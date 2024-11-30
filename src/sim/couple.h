@@ -124,7 +124,7 @@ public:
     /// bring object to centered image using periodic boundary conditions
     void foldPosition(Modulo const*);
     
-    /// set the position randomly inside prop->confine_spec
+    /// move to a random position inside the confining space
     void randomizePosition();
     
     //--------------------------------------------------------------------------
