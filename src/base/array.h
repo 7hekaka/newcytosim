@@ -32,7 +32,7 @@
  */
 
 /// Dynamically allocated array of VAL
-template <typename VAL>
+template <typename VAL, unsigned CHUNK = 4>
 class Array final
 {
 public:
@@ -57,35 +57,21 @@ private:
     /// number of objects currently present in the array
     size_t nbo_;
     
-    /// size of the chunk used for memory allocation (a power of 2)
-    size_t chk_;
-    
 #pragma mark -
 private:
     
     /// additional size allocated at the end of the array
     static constexpr size_t EXTRA = 0;
 
-    /// the integer above s that is a multiple of chk_
+    /// the integer above `s` that is a multiple of CHUNK
     size_t chunked(size_t s)
     {
-        return ( s + chk_ - 1 ) & ~( chk_ - 1 );
-    }
-    
-    /// return smallest power of 2 that is greater or equal to `s`
-    size_t next_power(size_t x)
-    {
-        if ( x > 0 )
-        {
-            --x;
-            x |= x >> 1;
-            x |= x >> 2;
-            x |= x >> 4;
-            x |= x >> 8;
-            x |= x >> 16;
-            x |= x >> 32;
-        }
-        return x+1;
+        if ( CHUNK > 0 )
+            return ( s + CHUNK - 1 ) & ~( CHUNK - 1 );
+        else if ( val_ && alc_ > 0 )
+            return 2 * alc_;
+        else
+            return 4;
     }
     
     /// copy data
@@ -105,15 +91,16 @@ private:
 public:
         
     /// Default creator does not allocate
-    Array() : val_(nullptr), alc_(0), nbo_(0), chk_(16)
+    Array() : val_(nullptr), alc_(0), nbo_(0)
     {
+        assert_true(__builtin_popcount(CHUNK) <= 1);
     }
 
     /// allocate to hold `a` objects and set chunk size to `k`
-    Array(size_t a, size_t k) : nbo_(0)
+    Array(size_t a) : alc_(0), nbo_(0)
     {
+        assert_true(__builtin_popcount(CHUNK) <= 1);
         //printf("Array %p constructor size %i\n", this, alc_);
-        chk_ = std::max(next_power(k), 4UL);
         alc_ = chunked(a);
         if ( alc_ > 0 )
             val_ = new VAL[alc_+EXTRA];
@@ -122,7 +109,7 @@ public:
     }
     
     /// create list with only one entry
-    Array(VAL arg) : alc_(1), nbo_(1), chk_(1)
+    Array(VAL arg) : alc_(1), nbo_(1)
     {
         //printf("Array %p constructor(obj)\n", this);
         val_ = new VAL[1+EXTRA];
@@ -130,8 +117,7 @@ public:
     }
 
     /// Copy constructor
-    Array(const Array<VAL>& o)
-    : val_(nullptr), alc_(0), nbo_(o.nbo_), chk_(o.chk_)
+    Array(const Array<VAL, CHUNK>& o) : val_(nullptr), alc_(0), nbo_(o.nbo_)
     {
         if ( o.alc_ )
         {
@@ -148,7 +134,7 @@ public:
     }
     
     /// Copy assignment operator
-    Array& operator = (Array<VAL> const& o)
+    Array& operator = (Array<VAL, CHUNK> const& o)
     {
         if ( o.nbo_ > alc_ )
         {
@@ -162,7 +148,7 @@ public:
     }
     
     /// Move assignment operator
-    Array& operator = (Array<VAL> && o)
+    Array& operator = (Array<VAL, CHUNK> && o)
     {
         //printf("Array %p <---move--- %p\n", this, o);
         delete[] val_;
@@ -425,7 +411,7 @@ public:
     }
 
     /// Add the elements of `array` at the end of this Array
-    void append(const Array<VAL> array)
+    void append(const Array<VAL, CHUNK> array)
     {
         allocate(nbo_+array.nbo_);
         for ( size_t i = 0; i < array.nbo_; ++i )
@@ -434,7 +420,7 @@ public:
     }
     
     /// Add the elements of `array` at the end of this Array
-    void append_except(const Array<VAL> array, VAL const& v)
+    void append_except(const Array<VAL, CHUNK> array, VAL const& v)
     {
         allocate(nbo_+array.nbo_);
         for ( size_t i = 0; i < array.nbo_; ++i )

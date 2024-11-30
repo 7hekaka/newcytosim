@@ -482,7 +482,7 @@ void Field::step(FiberSet& fibers)
     
 #if ( 0 ) // disabled features below
 
-    Array<FiberSite> loc(1024);
+    FiberSiteList loc(1024);
     
     // instantaneous transport along Fibers
     if ( prop->transport_strength > 0 )

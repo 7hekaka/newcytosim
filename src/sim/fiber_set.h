@@ -6,10 +6,10 @@
 #include "dim.h"
 #include "object_set.h"
 #include "fiber.h"
+#include "fiber_site.h"
 
 class FiberProp;
 class CoupleProp;
-class FiberSite;
 
 
 /// a list of Fiber
@@ -91,13 +91,13 @@ public:
     void foldPositions(Modulo const*) const;
     
     /// find intersections between fibers in entire network, within given threshold
-    void allIntersections(Array<FiberSite>&, Array<FiberSite>&, real max_distance) const;
+    void allIntersections(FiberSiteList&, FiberSiteList&, real max_distance) const;
     
     /// find intersections between fibers in entire network, within given threshold
-    void allIntersections0(Array<FiberSite>&, Array<FiberSite>&, real max_distance) const;
+    void allIntersections0(FiberSiteList&, FiberSiteList&, real max_distance) const;
 
     /// set random sites along the fibers, separated on average by `gap`
-    void uniFiberSites(Array<FiberSite>&, real gap) const;
+    void uniFiberSites(FiberSiteList&, real gap) const;
     
     /// a random site on the fibers, uniformly distributed over all Fibers
     FiberSite randomSite() const;
@@ -109,10 +109,10 @@ public:
     FiberSite someSite(std::string const& key, Glossary&) const;
 
     /// set random sites on newly polymerized Fiber sites at the plus end
-    void newFiberSitesP(Array<FiberSite>&, real gap) const;
+    void newFiberSitesP(FiberSiteList&, real gap) const;
     
     /// set random sites on newly polymerized Fiber sites at the minus end
-    void newFiberSitesM(Array<FiberSite>&, real gap) const;
+    void newFiberSitesM(FiberSiteList&, real gap) const;
     
     /// reverse the polarity of all fibers
     void flipFiberPolarity(FiberProp *);

@@ -1141,7 +1141,7 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
     else
         opt.set(gap, "interval", "gap");
     
-    Array<FiberSite> loc(1024, 1024);
+    FiberSiteList loc(1024);
     fibers.uniFiberSites(loc, gap);
     
     Fiber const* ofib = nullptr;

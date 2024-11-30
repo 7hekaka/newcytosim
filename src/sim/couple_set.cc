@@ -892,7 +892,7 @@ void CoupleSet::uniRefill(CoupleProp const* cop, size_t cnt)
  Attach Hand1 of exactly one Couple from `can` to each site in `loc`.
  If `can` is not large enough, a subset of `loc` is selected.
  */
-void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleStock& can)
+void CoupleSet::uniAttach1(FiberSiteList& loc, CoupleStock& can)
 {
     // crop list to match available number of candidates:
     loc.shuffle_truncate(can.size());
@@ -915,7 +915,7 @@ void CoupleSet::uniAttach1(Array<FiberSite>& loc, CoupleStock& can)
  Attach Hand2 of exactly one Couple from `can` to each site in `loc`.
  If `can` is not large enough, a subset of `loc` is selected.
  */
-void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleStock& can)
+void CoupleSet::uniAttach2(FiberSiteList& loc, CoupleStock& can)
 {
     // crop list to match available number of candidates:
     loc.shuffle_truncate(can.size());
@@ -940,7 +940,7 @@ void CoupleSet::uniAttach2(Array<FiberSite>& loc, CoupleStock& can)
  FiberSet::allIntersections().
  The Couples are distributed randomly on the crosspoints
  */
-void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
+void CoupleSet::uniAttach12(FiberSiteList& loc1, FiberSiteList& loc2,
                             CoupleStock& can, size_t count)
 {
     const size_t nbc = loc1.size();
@@ -991,7 +991,7 @@ void CoupleSet::uniAttach12(Array<FiberSite>& loc1, Array<FiberSite>& loc2,
 void CoupleSet::uniAttach(FiberSet const& fibers)
 {
     // preallocate array:
-    Array<FiberSite> loc(128, 128);
+    FiberSiteList loc(128);
     
 #if ( 0 )
     // this performs a basic verification of fibers.uniFiberSites()
@@ -1099,7 +1099,7 @@ void CoupleSet::uniRelax()
 
 void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleProp const* cop, size_t total)
 {
-    Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
+    Array<FiberSite, 0> loc1(16), loc2(16);
     CoupleStock & can = cop->stocks;
     
     if ( cop->hand1_prop != cop->hand2_prop )
@@ -1172,7 +1172,7 @@ void CoupleSet::equilibrateSym(FiberSet const& fibers, CoupleProp const* cop, si
  */
 void CoupleSet::equilibrate(FiberSet const& fibers, CoupleProp const* cop, CoupleStock& can, size_t total)
 {
-    Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
+    FiberSiteList loc1(1024), loc2(1024);
     if ( cop->trans_activated )
         throw InvalidParameter("Cannot equilibrate trans_activated Couple");
     
@@ -1309,7 +1309,7 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleStock& can, Pr
         throw InvalidParameter("cannot connect network!");
     
     // get all crosspoints within this range:
-    Array<FiberSite> loc1(1024, 1024), loc2(1024, 1024);
+    FiberSiteList loc1(1024), loc2(1024);
     fibers.allIntersections(loc1, loc2, range);
     
     Cytosim::log << "Connect on " << loc1.size() << " intersections within range " << range << "\n";

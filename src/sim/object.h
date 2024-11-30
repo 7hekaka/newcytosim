@@ -178,8 +178,8 @@ bool match_mark(Object const* obj, void const* mrk);
 bool match_property(Object const* obj, void const* val);
 
 
-/// a list of pointers to Object
-typedef Array<Object *> ObjectList;
+/// a variable list of pointers to Object
+typedef Array<Object *, 4> ObjectList;
 //typedef std::vector<Object *> ObjectList;
 
 

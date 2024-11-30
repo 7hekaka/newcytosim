@@ -645,7 +645,7 @@ ObjectList Interface::execute_new(std::string const& name, size_t cnt,
         throw InvalidSyntax("could not determine the class of `"+name+"'");
 
     Glossary opt;
-    ObjectList res(cnt, 8);
+    ObjectList res(cnt);
     set->reserve(cnt+set->inventory_.highest());
     for ( size_t n = 0; n < cnt; ++n )
     {

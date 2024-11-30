@@ -45,7 +45,7 @@ private:
     void uniRefill(SingleProp const*, size_t cnt);
 
     /// attach Singles from `can` on locations specified in `loc`
-    void uniAttach(Array<FiberSite>& can, SingleStock& loc);
+    void uniAttach(FiberSiteList& can, SingleStock& loc);
     
     /// `fast_diffusion` attachment assuming that free Singles are uniformly distributed
     void uniAttach(FiberSet const&);

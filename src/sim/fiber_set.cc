@@ -179,7 +179,7 @@ Object * FiberSet::newObject(const ObjectTag tag, PropertyID pid)
 
 ObjectList FiberSet::newObjects(Property const* p, Glossary& opt)
 {
-    ObjectList res(4, 4);
+    ObjectList res(4);
     newFiber(res, static_cast<FiberProp const*>(p), opt);
     return res;
 }
@@ -350,7 +350,7 @@ void FiberSet::foldPositions(Modulo const* m) const
  Calculate intersection between all fibers,
  and report the corresponding abscissa in arrays 'res1' and 'res2'.
  */
-void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
+void FiberSet::allIntersections0(FiberSiteList& res1, FiberSiteList& res2,
                                  const real max_distance) const
 {
     const real sup = square(max_distance);
@@ -399,7 +399,7 @@ void FiberSet::allIntersections0(Array<FiberSite>& res1, Array<FiberSite>& res2,
  and report the corresponding abscissa in arrays 'res1' and 'res2'.
  This version is using the FiberGrid for faster results
  */
-void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
+void FiberSet::allIntersections(FiberSiteList& res1, FiberSiteList& res2,
                                 const real max_distance) const
 {
     FiberGrid & grid = simul_.fiberGrid;
@@ -480,7 +480,7 @@ void FiberSet::allIntersections(Array<FiberSite>& res1, Array<FiberSite>& res2,
  
  Condition: ( gap > 0 )
  */
-void FiberSet::uniFiberSites(Array<FiberSite>& res, const real gap) const
+void FiberSet::uniFiberSites(FiberSiteList& res, const real gap) const
 {
     assert_true( gap > 0 );
 
@@ -623,7 +623,7 @@ FiberSite FiberSet::someSite(std::string const& key, Glossary& opt) const
 
  This is for the plus end
  */
-void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real gap) const
+void FiberSet::newFiberSitesP(FiberSiteList& res, const real gap) const
 {
     assert_true( gap > 0 );
     
@@ -657,7 +657,7 @@ void FiberSet::newFiberSitesP(Array<FiberSite>& res, const real gap) const
 
  This is for the minus end
  */
-void FiberSet::newFiberSitesM(Array<FiberSite>& res, const real gap) const
+void FiberSet::newFiberSitesM(FiberSiteList& res, const real gap) const
 {
     assert_true( gap > 0 );
     

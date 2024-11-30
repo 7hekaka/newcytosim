@@ -8,8 +8,8 @@
 #define CYMDEF_H
 
 /**
- Enable code to be able to read old trajectory files.
- The value indicates the earliest file format that should still be readable.
+ Enable code to read trajectory files writen in older format.
+ The value indicates the earliest file format that this aimed to be supported
  
  default = 50
  */

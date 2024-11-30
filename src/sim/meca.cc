@@ -78,7 +78,7 @@ With a sequential simulation, the second option is usually faster.
 #pragma mark - Allocate
 
 Meca::Meca()
-: mecables(32, 32), pointGrid(*this), locusGrid(*this)
+: mecables(32), pointGrid(*this), locusGrid(*this)
 {
     tau_ = 0;
     alpha_ = 0;

@@ -227,6 +227,8 @@ public:
 /// output operator for debugging purpose
 std::ostream& operator << (std::ostream&, FiberSite const&);
 
+/// a variable-size list of fiber sites
+typedef Array<FiberSite, 0> FiberSiteList;
 
 #endif
 

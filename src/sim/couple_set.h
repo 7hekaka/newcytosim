@@ -62,13 +62,13 @@ private:
     void uniRefill(CoupleProp const*, size_t cnt);
 
     /// attach Hand1 of Couple from `can` on locations specified in `loc`
-    void uniAttach1(Array<FiberSite>& loc, CoupleStock& can);
+    void uniAttach1(FiberSiteList& loc, CoupleStock& can);
     
     /// attach Hand2 of Couple from `can` on locations specified in `loc`
-    void uniAttach2(Array<FiberSite>& loc, CoupleStock& can);
+    void uniAttach2(FiberSiteList& loc, CoupleStock& can);
     
     /// attach both Hands of `nb` Couple at crossing points specified by arguments 1 & 2
-    void uniAttach12(Array<FiberSite>&, Array<FiberSite>&, CoupleStock&, size_t nb);
+    void uniAttach12(FiberSiteList&, FiberSiteList&, CoupleStock&, size_t nb);
 
     /// `fast_diffusion` attachment assuming that free Couples are uniformly distributed
     void uniAttach(FiberSet const&);

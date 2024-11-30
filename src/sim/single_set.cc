@@ -756,7 +756,7 @@ void SingleSet::uniRefill(SingleProp const* sip, size_t cnt)
  Attach exactly one Single from `can` to each site in `loc`.
  If `can` is not large enough, a subset of `loc` is selected.
  */
-void SingleSet::uniAttach(Array<FiberSite>& loc, SingleStock& can)
+void SingleSet::uniAttach(FiberSiteList& loc, SingleStock& can)
 {
     // crop list to match available number of candidates:
     loc.shuffle_truncate(can.size());
@@ -829,7 +829,7 @@ void SingleSet::uniAttach(Array<FiberSite>& loc, SingleStock& can)
  */
 void SingleSet::uniAttach(FiberSet const& fibers)
 {
-    Array<FiberSite> loc(128, 128);
+    FiberSiteList loc(128);
     
     // uniform attachment for selected classes:
     for ( SingleProp const* P : uniSingles )
