@@ -111,34 +111,34 @@ public:
 protected:
    
     /// Total number of cells in the map; size of cells[]
-    size_t  mNbCells;
+    size_t mNbCells;
     
     /// The number of cells in each dimension
     size_t mDim[ORD<4?4:ORD];
     
     /// Offset between two consecutive cells along each dimension
-    size_t  mStride[ORD];
+    size_t mStride[ORD];
     
     /// The position of the inferior (min) edge in each dimension
-    real    mInf[ORD];
+    real mInf[ORD];
     
     /// The position of the superior (max) edge in each dimension
-    real    mSup[ORD];
+    real mSup[ORD];
 
     /// The size of a cell: cWidth[d] = ( mSup[d] - inf[d] ) / mDim[d]
-    real    cWidth[ORD];
+    real cWidth[ORD];
     
     /// cDelta[d] = 1.0 / cWidth[d]
-    real    cDelta[ORD];
+    real cDelta[ORD];
     
     /// mStart[d] = mInf[d] / cWidth[d]
-    real    mStart[ORD];
+    real mStart[ORD];
 
     /// The volume of one cell
-    real    cVolume;
+    real cVolume;
     
     /// true if Map has periodic boundary conditions
-    bool    mPeriodic[ORD];
+    bool mPeriodic[ORD];
 
 protected:
     
@@ -353,11 +353,11 @@ public:
     /// inverse of the widths of a cell
     real delta(int d)     const { return cDelta[d]; }
     
-    /// access to data of the same
-    const real*  inf()        const { return mInf; }
-    const real*  sup()        const { return mSup; }
-    const real*  cellWidth()  const { return cWidth; }
-    const real*  delta()      const { return cDelta; }
+    /// access to data vectors
+    const real * inf()       const { return mInf; }
+    const real * sup()       const { return mSup; }
+    const real * cellWidth() const { return cWidth; }
+    const real * delta()     const { return cDelta; }
 
     /// the volume of a cell
     real cellVolume() const { return cVolume; }
