@@ -129,10 +129,10 @@ else ifeq ($(COMPILER),icc)
 
     LIBTOOL  := ar -rcs
 
-    #CXX := icpc -fp-trap=common -vec-report0
-    #CXX := icpc -bind_at_load -fvisibility=hidden -wd1224,161
-    CXX := icpc -fp-trap=none -vec-report0 -wd1224,161,1478
-    CXX := icpc -fargument-noalias -fp-trap=none -wd1224,161,1478
+    #CXX := icpx -vec-report0
+    #CXX := icpx -bind_at_load -fvisibility=hidden -wd1224,161
+    CXX := icpx -vec-report0 -wd1224,161,1478
+    CXX := icpx -fargument-noalias 
     # Intel advanced instruction sets:
     # '-xHost' to optimize for host machine
     # '-msse3' for SSE3 or '-xAVX' for AVX
@@ -206,7 +206,8 @@ ifeq ($(MACHINE),cluster)
     MKLDIR := $(MKLROOT)/lib/intel64
 
     # Beware of AVX2 and other advanced features on heterogeneous clusters:
-    FAST   := -O2 -fno-devirtualize -mavx2 -mfma -ffp-contract=fast
+    FAST := -O3 -fno-devirtualize -mavx2 -mfma -ffp-contract=fast
+    FAST := -O3 -mavx2 -mfma
 
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := $(FAST) $(ALIGN) -O0 -fno-inline -pg
