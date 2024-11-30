@@ -1007,17 +1007,16 @@ void Meca::apply()
         {
             const size_t off = DIM * mec->matIndex();
             const size_t len = DIM * mec->nbPoints();
-            if ( 1 )
+#ifndef __FAST_MATH__
+            // check validity of results:
+            size_t a = has_nan(len, vPTS+off);
+            size_t b = has_nan(len, vFOR+off);
+            if ( a | b )
             {
-                // check validity of results:
-                size_t a = has_nan(len, vPTS+off);
-                size_t b = has_nan(len, vFOR+off);
-                if ( a | b )
-                {
-                    fprintf(stderr, "invalid results for %s : %lu %lu NaNs / %lu\n", mec->reference().c_str(), a, b, len);
-                    continue;
-                }
+                fprintf(stderr, "invalid results for %s : %lu %lu NaNs / %lu\n", mec->reference().c_str(), a, b, len);
+                continue;
             }
+#endif
             // transfer new coordinates to Mecable:
             mec->getForces(vFOR+off);
             mec->getPoints(vPTS+off);

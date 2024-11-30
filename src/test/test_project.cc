@@ -827,7 +827,7 @@ void checkProject(UINT nbs, const char msg[])
     print_floating_point_exceptions(msg);
     
     real err = blas::difference(nbv, y, z);
-    if ( std::isnan(err) || abs_real(err) > 64*REAL_EPSILON )
+    if ( not ( abs_real(err) < 64*REAL_EPSILON ) )
     {
         printf(" WRONG! %e:\n", err);
         VecPrint::edges("ref ", nbv, y);

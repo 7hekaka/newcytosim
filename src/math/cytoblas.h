@@ -234,11 +234,6 @@ inline real difference(const size_t N, const real* X, const real* Y)
 {
     if ( N == 0 )
         return 0;
-    for ( size_t i = 0; i < N; ++i )
-    {
-        if ( std::isnan(X[i]) ) return X[i];
-        if ( std::isnan(Y[i]) ) return Y[i];
-    }
     real u = abs_real(X[0]-Y[0]);
     for ( size_t i = 1; i < N; ++i )
         u = std::max(u, abs_real(X[i]-Y[i]));

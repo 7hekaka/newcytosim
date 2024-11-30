@@ -238,12 +238,14 @@ inline static float max_float(const float x, const float y) { return std::max(x,
 
 //----------------------------------- DEBUG ------------------------------------
 
-/// count number of Not-A-Number values in `ptr[]` of size `cnt`
+/// count number of invalid values in `ptr[]` of size `cnt`
 inline static size_t has_nan(size_t cnt, real const* ptr)
 {
     size_t res = 0;
+#ifndef __FAST_MATH__
     for ( size_t i = 0; i < cnt; ++i )
         res += std::isnan(ptr[i]);
+#endif
     return res;
 }
 

@@ -130,7 +130,7 @@ void check_gaussian(size_t num, REAL* vec, double off)
     double cov = 0;
     for ( size_t i = 1; i < num; i += 2 )
     {
-        if ( !std::isnan(vec[i]) )
+        if ( vec[i] == vec[i] )
             cov += ( vec[i-1] - off ) * ( vec[i] - off );
     }
     cov /= ( cnt / 2 );

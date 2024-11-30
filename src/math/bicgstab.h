@@ -10,6 +10,7 @@
 #include "monitor.h"
 
 
+#ifndef __FAST_MATH__
 static void check_numbers(real const* vec, size_t len, size_t cnt)
 {
     size_t nan = 0;
@@ -18,6 +19,7 @@ static void check_numbers(real const* vec, size_t len, size_t cnt)
     if ( nan )
         fprintf(stderr, "BCGS %lu : %lu NaNs\n", cnt, nan);
 }
+#endif
 
 
 /// using BLAS requires functions calls, and more loops are required.

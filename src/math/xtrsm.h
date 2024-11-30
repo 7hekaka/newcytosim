@@ -2181,7 +2181,8 @@ void alsatian_xgetrsN_SSE_CHECK(int N, const float* A, int LDA, const int* IPIV,
     // try second method:
     alsatian_xgetrsN(N, A, LDA, IPIV, T);
     real err = blas::difference(N, B, T);
-    if ( std::isnan(err) || err > 0.01 )
+    // this test is true even if `err` is not-a-number
+    if ( not ( err < 0.01 ) )
     {
         VecPrint::edges("xgetrs", N, B, 3);
         VecPrint::edges("ref---", N, T, 3);

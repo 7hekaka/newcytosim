@@ -35,7 +35,7 @@
 
 std::ostream& out = std::cout;
 
-typedef double real;
+#include "real.h"
 
 void signal_handler(int sig)
 {
@@ -72,13 +72,26 @@ void divide()
 
 void infinities()
 {
-    out << "0   < inf = " << ( 0 < INFINITY ) << '\n';
-    out << "inf < inf = " << ( INFINITY < INFINITY ) << '\n';
+    real i = INFINITY;
+    out << "0   < inf = " << ( 0 < i ) << '\n';
+    out << "inf < inf = " << ( i < i ) << '\n';
+    out << "std::isinf(inf) = " << std::isinf(i) << '\n';
     real z = 0;
     real y = 0 / z;
     real x = 1 / z;
     out << " 1.0/0.0 = " << x << '\n';
     out << " 0.0/0.0 = " << y << '\n';
+}
+
+void nans()
+{
+    real x = nan("");
+    out << " nan + 1 = " << ( x + 1. ) << '\n';
+    out << " nan < 1 = " << ( x < 1. ) << '\n';
+    out << " nan > 0 = " << ( x > 0. ) << '\n';
+    out << " std::min(nan, 1) = " << std::min(x, 1.) << '\n';
+    out << " std::max(nan, 1) = " << std::max(x, 1.) << '\n';
+    out << " abs_real(nan) = " << abs_real(x) << '\n';
 }
 
 void std_copysign()
@@ -138,6 +151,7 @@ int main(int argc, char* argv[])
     modulo();
     std_copysign();
     infinities();
+    nans();
     print_numbers();
     out << "test completed" << '\n';
 }
