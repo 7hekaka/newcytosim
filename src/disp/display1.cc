@@ -85,7 +85,6 @@ void Display1::drawObjects(Simul const& sim)
 #endif
 
     drawOrganizers(sim.organizers);
-    drawMisc(sim);
 }
 
 //------------------------------------------------------------------------------

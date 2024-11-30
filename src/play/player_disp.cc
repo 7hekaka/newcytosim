@@ -320,6 +320,8 @@ void Player::drawCytosim()
         else
             mDisplay->drawSimul(simul);
 
+        mDisplay->drawMisc(simul);
+
 #if DRAW_MECA_LINKS
         if ( disp.draw_links )
         {

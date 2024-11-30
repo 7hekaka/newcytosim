@@ -136,7 +136,6 @@ void Display3::drawObjects(Simul const& sim)
 
     drawOrganizers(sim.organizers);
     gym::disableCullFace();
-    drawMisc(sim);
 }
 
 
