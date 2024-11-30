@@ -1413,7 +1413,6 @@ void alsatian_xtrsmLLN1U_4U_SSE(const int M, const float* A, const int lda, doub
         A += lda;
         double * pB = B + K + 1;
         vec2 tt = loaddup2(B+K);
-        #pragma omp simd
         for ( pB = B + K + 1; pB < end; pB += 2 )
         {
             storeu2(pB, fnmadd2(tt, load2d(pA), loadu2(pB)));
@@ -1659,7 +1658,6 @@ void alsatian_strsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
         vec2f t = loaddupf(B);
         float const* pA = A + 1;
         // there is an even number of scalars, fitting perfectly:
-        #pragma omp simd
         for ( float * pB = B + 1; pB < end; pB += 2 )
         {
             store2f(pB, fnmadd2f(t, load2f(pA), load2f(pB)));
@@ -1681,7 +1679,6 @@ void alsatian_strsmLLN1U_SSE(const int M, const float* A, const int lda, float* 
         t0 = unpacklo2f(t0, t0);
         t1 = unpackhi2f(t1, t1);
         pA += 2;
-        #pragma omp simd
         for ( float * pB = B + K + 2; pB < end; pB += 2 )
         {
             vec2f x = fnmadd2f(t0, load2f(pA), load2f(pB));
@@ -1713,7 +1710,6 @@ void alsatian_strsmLUN1C_SSE(const int M, const float* A, const int lda, float* 
         t0 = unpacklo2f(t0, t0); // { T0, T0 }
         vec2f aa = mul2f(t0, load1f(A+K));
         // there is an even number of scalars remaining, fitting perfectly:
-        #pragma omp simd
         for ( float * pB = B ; pB < end; pB += 2 )
         {
             store2f(pB, fnmadd2f(t0, load2f(pA), load2f(pB)));
@@ -1741,7 +1737,6 @@ void alsatian_strsmLUN1C_SSE(const int M, const float* A, const int lda, float* 
         //B[K+1] = T1 * A[lda+K+1];
         //B[K  ] = T0 * A[    K  ];
         aa = mul2f(blend11f(t0, t1), blend11f(load2f(pA+K), aa));
-        #pragma omp simd
         for ( float * pB = B; pB < end; pB += 2 )
         {
             vec2f x = fnmadd2f(t0, load2f(pA), load2f(pB));
