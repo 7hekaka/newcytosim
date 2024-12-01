@@ -5,7 +5,6 @@
 #include <list>
 #include <set>
 #include "tokenizer.h"
-#include "stream_func.h"
 #include "organizer.h"
 #include "matrix22.h"
 #include "random_pcg.h"
@@ -132,6 +131,10 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     opt.set(p, "precision");
     opt.set(column_width, "column") || opt.set(column_width, "width");
 
+    // adjust floating-point notation:
+    out.setf(std::ios_base::fixed, std::ios_base::floatfield);
+    std::streamsize sp = out.precision(p);
+
     if ( ver & 1 )
     {
         //out << "% start\n";
@@ -140,23 +143,16 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     if ( ver > 0 )
     {
         out << "% report " << arg << " " << opt.to_string();
-        // adjust floating-point notation:
-        out.setf(std::ios_base::fixed, std::ios_base::floatfield);
-        std::streamsize sp = out.precision(p);
-        report_one(out, arg, opt);
-        out.precision(sp);
-        out << "\n";
+        report_one(out, out, arg, opt);
     }
     else
     {
-        std::stringstream ss;
-        ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
-        ss.precision(p);
-        report_one(ss, arg, opt);
-        StreamFunc::skip_lines(out, ss, '%', false);
+        std::ofstream nul("/dev/null");
+        report_one(out, nul, arg, opt);
     }
     if ( ver & 1 )
-        out << "% end\n";
+        out << "\n% end\n\n";
+    out.precision(sp);
 }
 
 
@@ -164,7 +160,7 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
  Split 'arg' into `who:what` and call report_one() accordingly
  Surround the report with comments to identify start/end
  */
-void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt) const
+void Simul::report_one(std::ostream& out, std::ostream& com, std::string const& arg, Glossary& opt) const
 {
     std::string who = arg, what;
     
@@ -186,35 +182,30 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
         int split = false;
         if ( opt.set(split, "split") && split )
         {
-            int com = 1;
-            opt.peek(com, "verbose");
+            int veb = 1;
+            opt.peek(veb, "verbose");
             // generate a separate report for all classes in this category:
             PropertyList plist = properties.find_all(who);
-            if ( com && plist.size() )
+            std::ofstream nul("/dev/null");
+            if ( veb && plist.size() )
             {
-                out << COM << "split:";
+                com << COM << "split:";
                 for ( Property const* sel : plist )
-                    out << SEP << sel->name();
+                    com << SEP << sel->name();
             }
             for ( Property const* sel : plist )
             {
-                if ( com )
-                {
-                    report_one(out, who, sel, what, opt);
-                    com = 0;
-                }
-                else
-                {
-                    std::stringstream ss;
-                    report_one(ss, who, sel, what, opt);
-                    StreamFunc::skip_lines(out, ss, '%');
-                }
+                if ( veb ) {
+                    report_one(out, com, who, sel, what, opt);
+                    veb = 0;
+                } else
+                    report_one(out, nul, who, sel, what, opt);
             }
         }
         else
         {
             // pool all objects in this category:
-            report_one(out, who, nullptr, what, opt);
+            report_one(out, com, who, nullptr, what, opt);
         }
     }
     else
@@ -223,9 +214,9 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
         Property const* sel = nullptr;
         sel = properties.find(who);
         if ( sel )
-            report_one(out, sel->category(), sel, what, opt);
+            report_one(out, com, sel->category(), sel, what, opt);
         else
-            report_one(out, who, nullptr, what, opt);
+            report_one(out, com, who, nullptr, what, opt);
     }
 }
 
@@ -303,87 +294,86 @@ void Simul::report_one(std::ostream& out, std::string const& arg, Glossary& opt)
  `couple:hands`          | Composition of couples
  
  */
-void Simul::report_one(std::ostream& out, std::string const& who, Property const* sel,
-                       std::string const& what, Glossary& opt) const
+void Simul::report_one(std::ostream& out, std::ostream& com, std::string const& who,
+                       Property const* sel, std::string const& what, Glossary& opt) const
 {
     if ( who == "fiber" )
     {
         if ( what.empty() || what == "position" )
-            return reportFibers(out, sel);
+            return reportFibers(out, com, sel);
         if ( what == "plus_end" )
-            return reportFiberEnds(out, PLUS_END, sel);
+            return reportFiberEnds(out, com, PLUS_END, sel);
         if ( what == "minus_end" )
-            return reportFiberEnds(out, MINUS_END, sel);
+            return reportFiberEnds(out, com, MINUS_END, sel);
         if ( what == "end" )
-            return reportFiberEnds(out, BOTH_ENDS, sel);
+            return reportFiberEnds(out, com, BOTH_ENDS, sel);
         if ( what == "point" )
-            return reportFiberPoints(out, sel);
+            return reportFiberPoints(out, com, sel);
         if ( what == "displacement" )
-            return reportFiberDisplacement(out, sel);
+            return reportFiberDisplacement(out, com, sel);
         if ( what == "direction" )
-            return reportFiberDirections(out, sel);
+            return reportFiberDirections(out, com, sel);
         if ( what == "moment" )
-            return reportFiberMoments(out);
+            return reportFiberMoments(out, com);
         if ( what == "speckle" )
-            return reportFiberSpeckles(out, opt);
+            return reportFiberSpeckles(out, com, opt);
         if ( what == "sample" )
-            return reportFiberSamples(out, opt);
+            return reportFiberSamples(out, com, opt);
         if ( what == "length" )
-            return reportFiberLengths(out, sel);
+            return reportFiberLengths(out, com, sel);
         if ( what == "mark" )
-            return reportMarkedFiberLengths(out, sel);
+            return reportMarkedFiberLengths(out, com, sel);
         if ( what == "distribution" || what == "histogram" )
-            return reportFiberLengthHistogram(out, opt);
+            return reportFiberLengthHistogram(out, com, opt);
         if ( what == "tension" )
-            return reportFiberTension(out, opt);
+            return reportFiberTension(out, com, opt);
         if ( what == "segment" )
-            return reportFiberSegments(out);
+            return reportFiberSegments(out, com);
         if ( what == "energy" )
-            return reportFiberBendingEnergy(out);
+            return reportFiberBendingEnergy(out, com);
         if ( what == "extension" )
-            return reportFiberExtension(out);
+            return reportFiberExtension(out, com);
         if ( what == "nematic" )
-            return reportFiberNematic(out, opt);
+            return reportFiberNematic(out, com, opt);
         if ( what == "end_state" || what == "dynamic" )
         {
-            reportFiberEndState(out, PLUS_END, sel);
-            std::stringstream ss;
-            reportFiberEndState(ss, MINUS_END, sel);
-            StreamFunc::skip_lines(out, ss, '%');
+            std::ofstream nul("/dev/null");
+            reportFiberEndState(out, com, PLUS_END, sel);
+            reportFiberEndState(out, nul, MINUS_END, sel);
             return;
         }
         if ( what == "plus_state" )
-            return reportFiberEndState(out, PLUS_END, sel);
+            return reportFiberEndState(out, com, PLUS_END, sel);
         if ( what == "minus_state" )
-            return reportFiberEndState(out, MINUS_END, sel);
+            return reportFiberEndState(out, com, MINUS_END, sel);
         if ( what == "force" )
-            return reportFiberForces(out);
+            return reportFiberForces(out, com);
         if ( what == "confine_force" )
-            return reportFiberConfineForce(out);
+            return reportFiberConfineForce(out, com);
         if ( what == "confinement" )
-            { reportFiberConfinement(out); return; }
+            { reportFiberConfinement(out, com); return; }
         if ( what == "cluster" )
-            return reportClusters(out, opt);
+            return reportClusters(out, com, opt);
         if ( what == "age" )
-            return reportFiberAge(out);
+            return reportFiberAge(out, com);
         if ( what == "intersection" )
-            return reportFiberIntersections(out, opt);
+            return reportFiberIntersections(out, com, opt);
         if ( what == "hand" )
-            return reportFiberHands(out);
+            return reportFiberHands(out, com);
         if ( what == "link" )
-            return reportFiberLinks(out);
+            return reportFiberLinks(out, com);
         if ( what == "lattice" )
-            return reportFiberLattice(out, sel);
+            return reportFiberLattice(out, com, sel);
         if ( what == "mesh" )
-            return reportFiberMeshAverage(out, false, sel);
+            return reportFiberMeshAverage(out, com, false, sel);
         if ( what == "mesh_density" )
-            return reportFiberMeshAverage(out, true, sel);
+            return reportFiberMeshAverage(out, com, true, sel);
         if ( what == "mesh_all" )
-            return reportFiberMesh(out, false, sel);
+            return reportFiberMesh(out, com, false, sel);
         if ( what == "connector" )
-            return reportFiberConnectors(out, opt);
+            return reportFiberConnectors(out, com, opt);
         if ( what == "collision" )
-            return reportFiberCollision(out, sel, opt);
+            return reportFiberCollision(out, com, sel, opt);
 
         throw InvalidSyntax("I can only report fiber: position, end, minus_end, plus_end, "\
                             "point, moment, speckle, sample, segment, dynamic, length, extension,"\
@@ -392,91 +382,91 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "bead" )
     {
         if ( what == "position" || what.empty() )
-            return reportBeadPosition(out, sel);
+            return reportBeadPosition(out, com, sel);
         if ( what == "single" )
-            return reportBeadSingles(out);
+            return reportBeadSingles(out, com);
         throw InvalidSyntax("I can only report bead: position, single\n");
     }
     if ( who == "solid" )
     {
         if ( what == "hand" )
-            return reportSolidHands(out, sel);
+            return reportSolidHands(out, com, sel);
         if ( what == "orientation" )
-            return reportSolidOrientation(out, sel);
+            return reportSolidOrientation(out, com, sel);
         if ( what == "position" || what.empty() )
-            return reportSolidPosition(out, sel);
+            return reportSolidPosition(out, com, sel);
         throw InvalidSyntax("I can only report solid: hand, position\n");
     }
     if ( who == "space" )
     {
         if ( what == "force" )
-            return reportSpaceForce(out);
+            return reportSpaceForce(out, com);
         if ( what.empty() )
-            return reportSpace(out);
+            return reportSpace(out, com);
         throw InvalidSyntax("I can only report `space` and space:force\n");
     }
     if ( who == "sphere" )
     {
         if ( what == "position" || what.empty() )
-            return reportSpherePosition(out, sel);
+            return reportSpherePosition(out, com, sel);
         throw InvalidSyntax("I can only report sphere:position\n");
     }
     if ( who == "single" )
     {
         if ( what.empty() )
-            return reportSingle(out, sel);
+            return reportSingle(out, com, sel);
         if ( what == "link" )
-            return reportSingleLink(out, sel);
+            return reportSingleLink(out, com, sel);
         if ( what == "state" )
-            return reportSingleState(out, sel);
+            return reportSingleState(out, com, sel);
         if ( what == "force" )
-            return reportSingleForce(out, sel);
+            return reportSingleForce(out, com, sel);
         if ( what == "position" )
-            return reportSinglePosition(out, sel);
+            return reportSinglePosition(out, com, sel);
         throw InvalidSyntax("I can only report single: link, state, force, position\n");
     }
     if ( who == "couple" )
     {
         if ( what.empty() )
-            return reportCouple(out, sel);
+            return reportCouple(out, com, sel);
         if ( what == "list" )
-            return reportCoupleList(out, sel);
+            return reportCoupleList(out, com, sel);
         if ( what == "state" )
-            return reportCoupleState(out, sel);
+            return reportCoupleState(out, com, sel);
         if ( what == "link" )
-            return reportCoupleLink(out, sel);
+            return reportCoupleLink(out, com, sel);
         if ( what == "configuration" )
-            return reportCoupleConfiguration(out, sel, opt);
+            return reportCoupleConfiguration(out, com, sel, opt);
         if ( what == "force" )
-            return reportCoupleForce(out, sel);
+            return reportCoupleForce(out, com, sel);
         if ( what == "histogram" )
-            return reportCoupleForceHistogram(out, opt);
+            return reportCoupleForceHistogram(out, com, opt);
         if ( what == "active" )
-            return reportCoupleActive(out, sel);
+            return reportCoupleActive(out, com, sel);
         if ( what == "anatomy" )
-            return reportCoupleAnatomy(out, sel);
+            return reportCoupleAnatomy(out, com, sel);
         throw InvalidSyntax("I can only report couple: state, link, configuration, active, force, anatomy\n");
     }
     if ( who == "organizer" )
     {
         if ( what.empty() )
-            return reportOrganizer(out);
+            return reportOrganizer(out, com);
         throw InvalidSyntax("I can only report `organizer'\n");
     }
     if ( who == "aster" )
     {
         if ( what.empty() )
-            return reportAster(out);
+            return reportAster(out, com);
         throw InvalidSyntax("I can only report `aster'\n");
     }
     if ( who == "field" )
     {
-        return reportField(out);
+        return reportField(out, com);
     }
     if ( who == "simul" || who.empty() )
     {
         if ( what.empty() )
-            return reportSimul(out);
+            return reportSimul(out, com);
         if ( what == "time" )
             return reportTime(out);
         if ( what == "inventory" )
@@ -497,32 +487,32 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "spindle" )
     {
         if ( what == "indice" )
-            return reportSpindleIndices(out);
+            return reportSpindleIndices(out, com);
         if ( what == "length" )
-            return reportSpindleLength(out, opt);
+            return reportSpindleLength(out, com, opt);
         if ( what == "minus_end" )
-            return reportMarkedFiberEnds(out, opt);
+            return reportMarkedFiberEnds(out, com, opt);
         if ( what == "profile" )
-            return reportSpindleProfile(out, opt);
+            return reportSpindleProfile(out, com, opt);
         if ( what == "fitnes" )
-            return reportSpindleFitness(out, opt);
+            return reportSpindleFitness(out, com, opt);
         throw InvalidSyntax("I can only report spindle: indices, profile, fitness\n");
     }
     if ( who == "network" )
     {
         if ( what == "bridge" )
-            return reportNetworkBridges(out, opt);
+            return reportNetworkBridges(out, com, opt);
         if ( what == "size" )
-            return reportNetworkSize(out);
+            return reportNetworkSize(out, com);
     }
     if ( who == "ring" )
-        return reportRing(out);
+        return reportRing(out, com);
     if ( who == "platelet" )
-        return reportPlatelet(out);
+        return reportPlatelet(out, com);
     if ( who == "ashbya" )
-        return reportAshbya(out);
+        return reportAshbya(out, com);
     if ( who == "something" )
-        return reportSomething(out);
+        return reportSomething(out, com);
 
     if ( what.empty() )
         throw InvalidSyntax("unknown report `"+who+"'\n");
@@ -536,14 +526,14 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
 /**
  Export average length and variance of lengths for each class of fiber
  */
-void Simul::reportFiberAge(std::ostream& out) const
+void Simul::reportFiberAge(std::ostream& out, std::ostream& com) const
 {
 #if !FIBER_HAS_BIRTHTIME
     out << SEP << "birthtime information disabled at compile time";
     return;
 #endif
-    out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
-    out << SEP << "var_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
+    com << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_birth";
+    com << SEP << "var_birth" << SEP << "avg_age" << SEP << "min_age" << SEP << "max_age";
     
     const real now = time();
 
@@ -589,10 +579,10 @@ static void printFiberLengths(std::ostream& out, ObjectList const& objs)
 /**
  Export average length and variance for each class of fiber
  */
-void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
+void Simul::reportFiberLengths(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
-    out << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
+    com << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
+    com << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
     
     if ( sel )
     {
@@ -614,10 +604,10 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
 /**
  Export average length and variance for fibers grouped by mark
  */
-void Simul::reportMarkedFiberLengths(std::ostream& out, Property const*) const
+void Simul::reportMarkedFiberLengths(std::ostream& out, std::ostream& com, Property const*) const
 {
-    out << COM << ljust("mark", 1, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
-    out << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
+    com << COM << ljust("mark", 1, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
+    com << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
     
     ObjectMark sup = 0;
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
@@ -639,7 +629,7 @@ void Simul::reportMarkedFiberLengths(std::ostream& out, Property const*) const
 /**
  Export length histograms for each class of fiber
  */
-void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
+void Simul::reportFiberLengthHistogram(std::ostream& out, std::ostream& com, Glossary & opt) const
 {
     const size_t BMAX = 256;
     unsigned cnt[BMAX+1];
@@ -657,7 +647,7 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
     
     if ( 1 )
     {
-        out << COM << "bin " << delta << " count " << fibers.size();
+        com << COM << "bin " << delta << " count " << fibers.size();
         out << LIN << ljust("scale", 2);
         std::streamsize p = out.precision(2);
         for ( size_t u = 0; u <= nbin; ++u )
@@ -691,15 +681,15 @@ void Simul::reportFiberLengthHistogram(std::ostream& out, Glossary & opt) const
 /**
  Export number of fiber, classified according to dynamic state of one end
  */
-void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const* sel) const
+void Simul::reportFiberEndState(std::ostream& out, std::ostream& com, FiberEnd end, Property const* sel) const
 {
     std::string name;
     if ( sel )
         name = sel->name() + ":";
     name.append(end==PLUS_END ?"plus":"minus");
     
-    out << COM << ljust("class", 2, 2) << SEP << "total" << SEP << "static";
-    out << SEP << "green" << SEP << "yellow" << SEP << "orange" << SEP << "red";
+    com << COM << ljust("class", 2, 2) << SEP << "total" << SEP << "static";
+    com << SEP << "green" << SEP << "yellow" << SEP << "orange" << SEP << "red";
     
     constexpr size_t MAX = 5;
     size_t cnt[MAX+1] = { 0 };
@@ -725,10 +715,10 @@ void Simul::reportFiberEndState(std::ostream& out, FiberEnd end, Property const*
 #pragma mark - Fiber conformation
 
 
-void Simul::reportFiberSegments(std::ostream& out) const
+void Simul::reportFiberSegments(std::ostream& out, std::ostream& com) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "fibers" << SEP << "joints";
-    out << SEP << "kinks" << SEP << "min_seg" << SEP << "max_seg" << SEP << "err_seg";
+    com << COM << ljust("class", 2, 2) << SEP << "fibers" << SEP << "joints";
+    com << SEP << "kinks" << SEP << "min_seg" << SEP << "max_seg" << SEP << "err_seg";
     
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -753,10 +743,10 @@ void Simul::reportFiberSegments(std::ostream& out) const
 /**
  Export fiber elastic bending energy
  */
-void Simul::reportFiberBendingEnergy(std::ostream& out) const
+void Simul::reportFiberBendingEnergy(std::ostream& out, std::ostream& com) const
 {
-    out << COM << ljust("bending_energy",2,2) << SEP << "count";
-    out << SEP << "sum" << SEP << "avg" << SEP << "var" << SEP << "rigidity";
+    com << COM << ljust("bending_energy",2,2) << SEP << "count";
+    com << SEP << "sum" << SEP << "avg" << SEP << "var" << SEP << "rigidity";
     
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -778,10 +768,10 @@ void Simul::reportFiberBendingEnergy(std::ostream& out) const
 }
 
 
-void Simul::reportFiberExtension(std::ostream& out) const
+void Simul::reportFiberExtension(std::ostream& out, std::ostream& com) const
 {
-    out << COM << ljust("end_to_end_dist",2,2) << SEP << "count";
-    out << SEP << "avg" << SEP << "var" << SEP << "min" << SEP << "max";
+    com << COM << ljust("end_to_end_dist",2,2) << SEP << "count";
+    com << SEP << "avg" << SEP << "var" << SEP << "min" << SEP << "max";
     
     for ( Property const* i : properties.find_all("fiber") )
     {
@@ -815,39 +805,44 @@ void Simul::reportFiberExtension(std::ostream& out) const
 }
 
 
-void Simul::reportFiberNematic(std::ostream& out, Glossary& opt) const
+void Simul::reportFiberNematic(std::ostream& out, std::ostream& com, FiberProp const* fp, Space const* spc) const
+{
+    com << COM << ljust("class",2,2) << SEP << "time" << SEP << "count";
+    com << SEP << "order" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
+    if ( spc )
+        com << SEP << "ortho" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
+    
+    ObjectList objs = fibers.collect(fp);
+    if ( objs.size() > 0 )
+    {
+        real S = 0;
+        real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
+        S = FiberSet::infoNematic(objs, vec);
+        out << LIN << ljust(fp->name(), 2);
+        out << SEP << time();
+        out << SEP << objs.size();
+        out << SEP << S;
+        out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];
+        if ( spc )
+        {
+            S = FiberSet::infoOrthoNematic(objs, vec, spc);
+            out << SEP << S;
+            out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];
+        }
+    }
+}
+
+
+void Simul::reportFiberNematic(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     std::string str;
     Space const* spc = nullptr;
     if ( opt.set(str, "space") )
         spc = findSpace(opt.value("space"));
-    
-    out << COM << ljust("class",2,2) << SEP << "time" << SEP << "count";
-    out << SEP << "order" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
-    if ( spc )
-        out << SEP << "ortho" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
 
     for ( Property const* i : properties.find_all("fiber") )
     {
-        FiberProp const* p = static_cast<FiberProp const*>(i);
-        ObjectList objs = fibers.collect(p);
-        if ( objs.size() > 0 )
-        {
-            real S = 0;
-            real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
-            S = FiberSet::infoNematic(objs, vec);
-            out << LIN << ljust(p->name(), 2);
-            out << SEP << time();
-            out << SEP << objs.size();
-            out << SEP << S;
-            out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];
-            if ( spc )
-            {
-                S = FiberSet::infoOrthoNematic(objs, vec, spc);
-                out << SEP << S;
-                out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];
-            }
-        }
+        reportFiberNematic(out, com, static_cast<FiberProp const*>(i), spc);
     }
 }
 
@@ -859,10 +854,10 @@ void Simul::reportFiberNematic(std::ostream& out, Glossary& opt) const
 /**
  Report quantity of substance in the fiber's Lattice
  */
-void Simul::reportFiberLattice(std::ostream& out, Property const* sel) const
+void Simul::reportFiberLattice(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "vacant";
-    out << SEP << "avg" << SEP << "avg_if" << SEP << "min" << SEP << "max";
+    com << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "vacant";
+    com << SEP << "avg" << SEP << "avg_if" << SEP << "min" << SEP << "max";
     
     size_t cnt = 0, vac = 0;
     real sum = 0, mn = INFINITY, mx = -INFINITY;
@@ -889,10 +884,10 @@ void Simul::reportFiberLattice(std::ostream& out, Property const* sel) const
 /**
  Report quantity of substance in the fiber's Mesh
  */
-void Simul::reportFiberMeshAverage(std::ostream& out, bool density, Property const* sel) const
+void Simul::reportFiberMeshAverage(std::ostream& out, std::ostream& com, bool density, Property const* sel) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "total";
-    out << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
+    com << COM << ljust("class", 2, 2) << SEP << "total";
+    com << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
     
     size_t cnt = 0, vac = 0;
     real len = 0, sum = 0, mn = INFINITY, mx = -INFINITY;
@@ -917,10 +912,10 @@ void Simul::reportFiberMeshAverage(std::ostream& out, bool density, Property con
 /**
  Report quantity of substance in the fiber's Mesh
  */
-void Simul::reportFiberMesh(std::ostream& out, bool density, Property const* sel) const
+void Simul::reportFiberMesh(std::ostream& out, std::ostream& com, bool density, Property const* sel) const
 {
-    out << COM << ljust("fiber", 2, 2) << SEP << "total";
-    out << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
+    com << COM << ljust("fiber", 2, 2) << SEP << "total";
+    com << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
     
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
@@ -980,14 +975,14 @@ static int compareFiberLength(Object const* A, Object const* B)
 /**
  Export length, position and directions at center of fibers
  */
-void Simul::reportFibersSorted(std::ostream& out, Property const* sel) const
+void Simul::reportFibersSorted(std::ostream& out, std::ostream& com, Property const* sel) const
 {
     // sort fibers by decreasing length:
     const_cast<FiberSet&>(fibers).pool_.blinksort(compareFiberLength);
     
-    out << COM << "class" << SEP << "identity" << SEP << "length";
-    out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
-    out << SEP << "cos" << SEP << "sin" << SEP << "organizer";
+    com << COM << "class" << SEP << "identity" << SEP << "length";
+    com << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
+    com << SEP << "cos" << SEP << "sin" << SEP << "organizer";
 
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
@@ -1000,11 +995,11 @@ void Simul::reportFibersSorted(std::ostream& out, Property const* sel) const
 /**
  Export length, position and directions at center of fibers
  */
-void Simul::reportFibers(std::ostream& out, Property const* sel) const
+void Simul::reportFibers(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << "length";
-    out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
-    out << SEP << "cos" << SEP << "sin" << SEP << "organizer";
+    com << COM << "class" << SEP << "identity" << SEP << "length";
+    com << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
+    com << SEP << "cos" << SEP << "sin" << SEP << "organizer";
     
     // list fibers in the order of the inventory:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
@@ -1019,13 +1014,13 @@ void Simul::reportFibers(std::ostream& out, Property const* sel) const
  Export dynamic state, positions and directions of fiber
  Argument `end` can be { MINUS_END, PLUS_END, BOTH_ENDS }
  */
-void Simul::reportFiberEnds(std::ostream& out, FiberEnd end, Property const* sel) const
+void Simul::reportFiberEnds(std::ostream& out, std::ostream& com, FiberEnd end, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << "length";
+    com << COM << "class" << SEP << "identity" << SEP << "length";
     if ( end & PLUS_END )
-        out << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
+        com << SEP << "stateP" << SEP << repeatXYZ("posP") << SEP << repeatXYZ("dirP");
     if ( end & MINUS_END )
-        out << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
+        com << SEP << "stateM" << SEP << repeatXYZ("posM") << SEP << repeatXYZ("dirM");
     
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
@@ -1053,16 +1048,16 @@ void Simul::reportFiberEnds(std::ostream& out, FiberEnd end, Property const* sel
 /**
  Export Fiber-number, position of vertices
  */
-void Simul::reportFiberPoints(std::ostream& out, Property const* sel) const
+void Simul::reportFiberPoints(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "identity" << SEP << repeatXYZ("pos") << SEP << "curvature";
+    com << COM << "identity" << SEP << repeatXYZ("pos") << SEP << "curvature";
 
     // list fibers in the order of the inventory:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( sel && sel != fib->prop )
             continue;
-        out << COM << "fiber " << fib->reference() << "  " << fib->segmentation();
+        com << COM << "fiber " << fib->reference() << "  " << fib->segmentation();
         
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
@@ -1085,7 +1080,7 @@ void Simul::reportFiberPoints(std::ostream& out, Property const* sel) const
  The distance between the speckles follows an exponential distribution
  with an average defined by a parameter `gap` or `1/density` defined in `opt`.
  */
-void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
+void Simul::reportFiberSpeckles(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     real gap = 1;
     if ( opt.set(gap, "density") )
@@ -1097,7 +1092,7 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
     Fiber const* fib = fibers.first();
     while ( fib )
     {
-        out << COM << "fiber " << fib->reference();
+        com << COM << "fiber " << fib->reference();
         
         // generate speckles below the origin of abscissa
         if ( fib->abscissaM() < 0 )
@@ -1137,7 +1132,7 @@ void Simul::reportFiberSpeckles(std::ostream& out, Glossary& opt) const
  Export positions of points taken randomly along all fibers,
  changing the distribution at every time.
  */
-void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
+void Simul::reportFiberSamples(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     real gap = 1;
     if ( opt.set(gap, "density") )
@@ -1153,7 +1148,7 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
     {
         if ( ofib != i.fiber() )
         {
-            out << COM << "fiber " << i.fiber()->reference();
+            com << COM << "fiber " << i.fiber()->reference();
             ofib = i.fiber();
         }
         
@@ -1167,13 +1162,13 @@ void Simul::reportFiberSamples(std::ostream& out, Glossary& opt) const
  to this function.
  \todo: it would be simpler to add a 'Vector oldPos;' directly in class Fiber.
  */
-void Simul::reportFiberDisplacement(std::ostream& out, Property const* sel) const
+void Simul::reportFiberDisplacement(std::ostream& out, std::ostream& com, Property const* sel) const
 {
     typedef std::map <ObjectID, Vector> fiber_map;
     static fiber_map positions;
     static double past = 0;
     
-    out << COM << "delta_time nb_fibers mean_squared_displacement";
+    com << COM << "delta_time nb_fibers mean_squared_displacement";
     
     real sum = 0;
     size_t cnt = 0;
@@ -1218,7 +1213,7 @@ static bool isSymmetricAroundAxisZ(std::string const& shape)
     return false;
 }
 
-void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
+void Simul::reportFiberDirections(std::ostream& out, std::ostream& com, Property const* sel) const
 {
     Space const* spc = spaces.master();
     if ( sel )
@@ -1272,7 +1267,7 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
     }
     // polar order parameter:
     real M = norm(avg);
-    out << COM << "n_seg" << SEP << "nematic" << SEP << "polar" << SEP << "avg_t" << SEP << "avg_z" << SEP << "mom_t" << SEP << "mom_z";
+    com << COM << "n_seg" << SEP << "nematic" << SEP << "polar" << SEP << "avg_t" << SEP << "avg_z" << SEP << "mom_t" << SEP << "mom_z";
     out << LIN << sum << SEP << S << SEP << M << SEP << avg.XX << SEP << avg.YY << SEP << X << SEP << Y;
 }
 
@@ -1280,11 +1275,11 @@ void Simul::reportFiberDirections(std::ostream& out, Property const* sel) const
 /**
  Export first and second-order moments of vertices for each class of Fiber
  */
-void Simul::reportFiberMoments(std::ostream& out) const
+void Simul::reportFiberMoments(std::ostream& out, std::ostream& com) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "sum";
-    out << SEP << "avgX" << SEP << "avgY" << SEP << "avgZ";
-    out << SEP << "varX" << SEP << "varY" << SEP << "varZ" << SEP << "var_sum";
+    com << COM << ljust("class", 2, 2) << SEP << "sum";
+    com << SEP << "avgX" << SEP << "avgY" << SEP << "avgZ";
+    com << SEP << "varX" << SEP << "varY" << SEP << "varZ" << SEP << "var_sum";
     out << std::fixed;
     
     Accumulator acc;
@@ -1316,9 +1311,9 @@ void Simul::reportFiberMoments(std::ostream& out) const
 /**
  Export first and second-order moments of vertices for each class of Fiber
  */
-void Simul::reportNetworkSize(std::ostream& out) const
+void Simul::reportNetworkSize(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "polymer" << SEP << "surface";
+    com << COM << "polymer" << SEP << "surface";
     out << std::fixed;
     Accumulator acc;
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
@@ -1340,16 +1335,16 @@ void Simul::reportNetworkSize(std::ostream& out) const
 /**
  Export Fiber-number, position of vertices and tension in each segment
  */
-void Simul::reportFiberForces(std::ostream& out) const
+void Simul::reportFiberForces(std::ostream& out, std::ostream& com) const
 {
     computeForces();
 
-    out << COM << "identity" << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force") << SEP << "tension";
+    com << COM << "identity" << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force") << SEP << "tension";
     
     // list fibers in the order of the inventory:
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
-        out << COM << "fiber " << fib->reference();
+        com << COM << "fiber " << fib->reference();
         
         for ( size_t p = 0; p < fib->nbPoints(); ++p )
         {
@@ -1373,11 +1368,11 @@ void Simul::reportFiberForces(std::ostream& out) const
      plane = NORMAL, SCALAR
 
  */
-void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
+void Simul::reportFiberTension(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     computeForces();
     
-    out << COM << "count" << SEP << "sum_force" << SEP << "min_force" << SEP << "max_force";
+    com << COM << "count" << SEP << "sum_force" << SEP << "min_force" << SEP << "max_force";
 
     Vector n(1,0,0);
     real ten = 0, inf = 0, sup = 0;
@@ -1406,7 +1401,7 @@ void Simul::reportFiberTension(std::ostream& out, Glossary& opt) const
     {
         real a = 0;
         opt.set(a, "plane", 1);
-        out << COM << "fiber tension orthogonal to plane: (" << n << ").pos = " << -a;
+        com << COM << "fiber tension orthogonal to plane: (" << n << ").pos = " << -a;
         fibers.infoTension(cnt, ten, inf, sup, n, a);
         out << LIN << cnt << SEP << ten << SEP << inf << SEP << sup;
     }
@@ -1461,15 +1456,15 @@ static bool vertexIsConfined(Confinement mode, Fiber const* fib, size_t inx)
 /**
  Export total magnitude of force exerted by Fiber on the confinement
  */
-void Simul::reportFiberConfineForce(std::ostream& out) const
+void Simul::reportFiberConfineForce(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "confinement forces";
-    out << COM << "identity" << SEP << "vertex" << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
+    com << COM << "confinement forces";
+    com << COM << "identity" << SEP << "vertex" << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
      
      // list fibers in the order of the inventory:
      for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
      {
-         out << COM << "fiber " << fib->reference();
+         com << COM << "fiber " << fib->reference();
          Space const* spc = findSpace(fib->prop->confine_spec);
          const real stiff = fib->prop->confine_stiff[0];
          const Confinement mode = fib->prop->confine;
@@ -1493,9 +1488,9 @@ void Simul::reportFiberConfineForce(std::ostream& out) const
  The radial components of the forces are summed up, which is only meaningful
  in very particular systems, when the geometry is circular around the Z-axis!
  */
-real Simul::reportFiberConfinement(std::ostream& out) const
+real Simul::reportFiberConfinement(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "count" << SEP << repeatXYZ("force") << SEP << "radial";
+    com << COM << "count" << SEP << repeatXYZ("force") << SEP << "radial";
     size_t cnt = 0;
     Vector sum(0,0,0);
     real   rad = 0;
@@ -1535,14 +1530,14 @@ real Simul::reportFiberConfinement(std::ostream& out) const
 #pragma mark - bound Hands per Fiber
 
 
-void Simul::reportFiberHands(std::ostream& out) const
+void Simul::reportFiberHands(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs";
+    com << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs";
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( fib->nbAttachedHands() > 0 )
         {
-            out << COM << "on fiber " << fib->reference();
+            com << COM << "on fiber " << fib->reference();
             fib->sortHands();
             for ( Hand const* h = fib->firstHand(); h; h = h->next() )
             {
@@ -1556,14 +1551,14 @@ void Simul::reportFiberHands(std::ostream& out) const
 }
 
 
-void Simul::reportFiberLinks(std::ostream& out) const
+void Simul::reportFiberLinks(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs" << SEP << "position";
+    com << COM << "fib_type" << SEP << "fib_id" << SEP << "class" << SEP << "abs" << SEP << "position";
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         if ( fib->nbAttachedHands() > 0 )
         {
-            out << COM << "on fiber " << fib->reference();
+            com << COM << "on fiber " << fib->reference();
             fib->sortHands();
             for ( Hand const* h = fib->firstHand(); h; h = h->next() )
             {
@@ -1585,7 +1580,7 @@ void Simul::reportFiberLinks(std::ostream& out) const
 #pragma mark - Networks
 
 
-void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
+void Simul::reportFiberIntersections(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     int details = 2;
     real up = 0;
@@ -1596,8 +1591,8 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
     
     if ( details == 2 )
     {
-        out << COM << "id1" << SEP << "abs1";
-        out << SEP << "id2" << SEP << "abs2" << SEP << repeatXYZ("pos");
+        com << COM << "id1" << SEP << "abs1";
+        com << SEP << "id2" << SEP << "abs2" << SEP << repeatXYZ("pos");
     }
     Accumulator acc;
     
@@ -1634,9 +1629,7 @@ void Simul::reportFiberIntersections(std::ostream& out, Glossary& opt) const
         }
         if ( cnt && details >= 1 )
         {
-            out << COM << "total";
-            out << SEP << fib->identity();
-            out << SEP << cnt;
+            com << COM << "total" << SEP << fib->identity() << SEP << cnt;
         }
     }
     acc.subtract_mean();
@@ -1664,19 +1657,19 @@ struct Connector
 /**
  This is the older version
  */
-void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
+void Simul::reportFiberConnectors(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     int details = 2;
     opt.set(details, "details");
 
     if ( details > 1 )
     {
-        out << COM << "class  identity      abs1    fiber1     hand1      dist";
-        out << "      abs2    fiber2     hand2      dist ...";
+        com << COM << "class  identity      abs1    fiber1     hand1      dist";
+        com << "      abs2    fiber2     hand2      dist ...";
     }
     else
     {
-        out << COM << "fiber connectors";
+        com << COM << "fiber connectors";
     }
     
     // used to calculate the size of the network from the position of connectors
@@ -1745,10 +1738,10 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
             }
             if ( details > 0 )
             {
-                out << COM << "total";
-                out << SEP << fib->prop->number();
-                out << SEP << fib->identity();
-                out << SEP << list.size();
+                com << COM << "total";
+                com << SEP << fib->prop->number();
+                com << SEP << fib->identity();
+                com << SEP << list.size();
             }
         }
     }
@@ -1760,12 +1753,12 @@ void Simul::reportFiberConnectors(std::ostream& out, Glossary& opt) const
 /**
  F. Nedelec, 18/08/2017
  */
-void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
+void Simul::reportNetworkBridges(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     int details = 0;
     opt.set(details, "details");
 
-    out << COM << "length" << SEP << "speed" << SEP << "type1" << SEP << "type2";
+    com << COM << "length" << SEP << "speed" << SEP << "type1" << SEP << "type2";
 
     typedef std::vector<Connector> clist_t;
     typedef std::map<ObjectID, clist_t> map_t;
@@ -1793,7 +1786,7 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
                 else if ( h->property() == hp2 )
                     map[f2].push_back(Connector(h->abscissa(), 2));
                 else
-                    out << COM << "report network:bridge can only handle 2 hand types";
+                    com << COM << "report network:bridge can only handle 2 hand types";
             }
         }
         if ( map.size() )
@@ -1828,9 +1821,9 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
             
             if ( details > 0 )
             {
-                out << COM << "connectors on fiber f" << fib->identity() << ":";
+                com << COM << "connectors on fiber f" << fib->identity() << ":";
                 // print all connector attachment positions:
-                out << COM << "abscissa" << SEP << "fiber_id" << SEP << "speed" << SEP << "type";
+                com << COM << "abscissa" << SEP << "fiber_id" << SEP << "speed" << SEP << "type";
                 for ( clist_t::const_iterator c = list.begin(); c != list.end(); ++c )
                 {
                     out << LIN << c->a;
@@ -1843,7 +1836,7 @@ void Simul::reportNetworkBridges(std::ostream& out, Glossary& opt) const
             {
                 // print all bridges
                 if ( details > 0 )
-                    out << COM << "length" << SEP << "speed" << SEP << "type1" << SEP << "type2";
+                    com << COM << "length" << SEP << "speed" << SEP << "type1" << SEP << "type2";
 #if ( 1 )
                 for ( clist_t::const_iterator p = list.begin(); p != list.end(); ++p )
                 for ( clist_t::const_iterator c = p+1; c != list.end(); ++c )
@@ -1874,9 +1867,9 @@ void Simul::reportTime(std::ostream& out) const
 
 void Simul::reportInventory(std::ostream& out) const
 {
-    //out << COM << "properties:";
+    //com << COM << "properties:";
     //properties.write_names(out, "");
-    //out << COM << "objects:";
+    //com << COM << "objects:";
     spaces.report(out);
     fields.report(out);
     fibers.report(out);
@@ -1917,10 +1910,10 @@ static void reportSet(std::ostream& out, SET& set, PropertyList const& propertie
     }
 }
 
-void Simul::reportSimul(std::ostream& out) const
+void Simul::reportSimul(std::ostream& out, std::ostream& com) const
 {
-    out << COM << ljust("class", 2, 2) << SEP << "objects" << SEP << "vertices";
-    out << SEP << "largest" << SEP << "identity";
+    com << COM << ljust("class", 2, 2) << SEP << "objects" << SEP << "vertices";
+    com << SEP << "largest" << SEP << "identity";
     reportSet(out,  fibers, properties);
     reportSet(out,  solids, properties);
     reportSet(out, spheres, properties);
@@ -1930,9 +1923,9 @@ void Simul::reportSimul(std::ostream& out) const
 /**
  Export position of all organizers
  */
-void Simul::reportOrganizer(std::ostream& out) const
+void Simul::reportOrganizer(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
+    com << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
 
     for ( Organizer const* obj=organizers.first(); obj; obj=obj->next() )
     {
@@ -1947,9 +1940,9 @@ void Simul::reportOrganizer(std::ostream& out) const
 /**
  Export position of Asters
  */
-void Simul::reportAster(std::ostream& out) const
+void Simul::reportAster(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
+    com << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
     
     for ( Organizer const* obj=organizers.first(); obj; obj=obj->next() )
     {
@@ -1966,9 +1959,9 @@ void Simul::reportAster(std::ostream& out) const
 /**
  Export position of Beads
  */
-void Simul::reportBeadPosition(std::ostream& out, Property const* sel) const
+void Simul::reportBeadPosition(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
+    com << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
     
     for ( Bead const* obj=beads.first(); obj; obj=obj->next() )
     {
@@ -1985,9 +1978,9 @@ void Simul::reportBeadPosition(std::ostream& out, Property const* sel) const
  Export number of beads classified as a function of
  the number of grafted Single that are attached to Fibers
  */
-void Simul::reportBeadSingles(std::ostream& out) const
+void Simul::reportBeadSingles(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "identity" << "amount(nb_attached_hands)";
+    com << COM << "identity" << "amount(nb_attached_hands)";
     
     std::map<ObjectID, int> cnt;
     
@@ -2011,10 +2004,10 @@ void Simul::reportBeadSingles(std::ostream& out) const
 /**
  Export position of Solids
  */
-void Simul::reportSolidPosition(std::ostream& out, Property const* sel) const
+void Simul::reportSolidPosition(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("cen");
-    out << SEP << repeatXYZ("point1") << SEP << repeatXYZ("point2");
+    com << COM << "class" << SEP << "identity" << SEP << repeatXYZ("cen");
+    com << SEP << repeatXYZ("point1") << SEP << repeatXYZ("point2");
         
     for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
@@ -2039,10 +2032,10 @@ void Simul::reportSolidPosition(std::ostream& out, Property const* sel) const
 /**
  Export orientation of Solids
  */
-void Simul::reportSolidOrientation(std::ostream& out, Property const* sel) const
+void Simul::reportSolidOrientation(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("cen");
-    out << SEP << repeatXYZ("dir");
+    com << COM << "class" << SEP << "identity" << SEP << repeatXYZ("cen");
+    com << SEP << repeatXYZ("dir");
         
     for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
@@ -2058,10 +2051,10 @@ void Simul::reportSolidOrientation(std::ostream& out, Property const* sel) const
 /**
  Export position of Solids with counts of Hands and attached Hands
  */
-void Simul::reportSolidHands(std::ostream& out, Property const* sel) const
+void Simul::reportSolidHands(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
-    out << SEP << "nb_hand" << SEP << "nb_link";
+    com << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
+    com << SEP << "nb_hand" << SEP << "nb_link";
         
     for ( Solid const* obj = solids.firstID(); obj; obj = solids.nextID(obj) )
     {
@@ -2084,10 +2077,10 @@ void Simul::reportSolidHands(std::ostream& out, Property const* sel) const
 /**
  Report position of Sphere
  */
-void Simul::reportSpherePosition(std::ostream& out, Property const* sel) const
+void Simul::reportSpherePosition(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity";
-    out << SEP << repeatXYZ("center") << SEP << repeatXYZ("point2");
+    com << COM << "class" << SEP << "identity";
+    com << SEP << repeatXYZ("center") << SEP << repeatXYZ("point2");
         
     for ( Sphere const* obj=spheres.first(); obj; obj=obj->next() )
     {
@@ -2105,9 +2098,9 @@ void Simul::reportSpherePosition(std::ostream& out, Property const* sel) const
 /**
  Report something about Space (incomplete)
  */
-void Simul::reportSpace(std::ostream& out) const
+void Simul::reportSpace(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "class" << SEP << "identity";
+    com << COM << "class" << SEP << "identity";
     
     for ( Space const* obj=spaces.firstID(); obj; obj=spaces.nextID(obj) )
     {
@@ -2121,9 +2114,9 @@ void Simul::reportSpace(std::ostream& out) const
 /**
  Report force on Space
  */
-void Simul::reportSpaceForce(std::ostream& out) const
+void Simul::reportSpaceForce(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << "shape";
+    com << COM << "class" << SEP << "identity" << SEP << "shape";
     
     for ( Space const* obj=spaces.first(); obj; obj=obj->next() )
     {
@@ -2138,12 +2131,12 @@ void Simul::reportSpaceForce(std::ostream& out) const
 /**
  Report quantity of substance in Field
  */
-void Simul::reportField(std::ostream& out) const
+void Simul::reportField(std::ostream& out, std::ostream& com) const
 {
     if ( fields.size() == 0 )
         return;
-    out << COM << ljust("class", 2, 2);
-    out << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max";
+    com << COM << ljust("class", 2, 2);
+    com << SEP << "total" << SEP << "avg" << SEP << "min" << SEP << "max";
     
     FieldCell s, a, n, x;
     // report total substance in each Field
@@ -2163,7 +2156,7 @@ void Simul::reportField(std::ostream& out) const
 //------------------------------------------------------------------------------
 #pragma mark - Single
 
-void write(std::ostream& out, Single const* obj, Simul const* simul)
+void writeSingle(std::ostream& out, Single const* obj, Simul const* simul)
 {
     out << LIN << obj->prop->number();
     out << SEP << obj->identity();
@@ -2189,25 +2182,25 @@ void write(std::ostream& out, Single const* obj, Simul const* simul)
 /**
  Export details of Singles, possiby selecting for a certain kind
  */
-void Simul::reportSingleState(std::ostream& out, Property const* sel) const
+void Simul::reportSingleState(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity";
-    out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
-    out << SEP << "fiber" << SEP << "abscissa" << SEP << "aster";
+    com << COM << "class" << SEP << "identity";
+    com << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
+    com << SEP << "fiber" << SEP << "abscissa" << SEP << "aster";
     
     for ( Single const* obj = singles.firstID(); obj; obj = singles.nextID(obj) )
         if ( !sel || sel == obj->prop )
-            write(out, obj, this);
+            writeSingle(out, obj, this);
 }
 
 
 /**
  Export details of attached Singles
  */
-void Simul::reportSinglePosition(std::ostream& out, Property const* sel) const
+void Simul::reportSinglePosition(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
-    out << SEP << "fiber" << SEP << "abscissa";
+    com << COM << "class" << SEP << "identity" << SEP << repeatXYZ("pos");
+    com << SEP << "fiber" << SEP << "abscissa";
         
     for ( Single const* obj = singles.firstID(); obj; obj = singles.nextID(obj) )
     {
@@ -2231,16 +2224,16 @@ void Simul::reportSinglePosition(std::ostream& out, Property const* sel) const
 /**
  Export details of attached Singles
  */
-void Simul::reportSingleLink(std::ostream& out, Property const* sel) const
+void Simul::reportSingleLink(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity";
-    out << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
-    out << SEP << "fiber" << SEP << "abscissa" << SEP << "aster";
+    com << COM << "class" << SEP << "identity";
+    com << SEP << repeatXYZ("pos") << SEP << repeatXYZ("force");
+    com << SEP << "fiber" << SEP << "abscissa" << SEP << "aster";
         
     for ( Single const* obj = singles.firstID(); obj; obj = singles.nextID(obj) )
     {
         if ( obj->attached()  && ( !sel || sel == obj->prop ))
-            write(out, obj, this);
+            writeSingle(out, obj, this);
     }
 }
 
@@ -2248,7 +2241,7 @@ void Simul::reportSingleLink(std::ostream& out, Property const* sel) const
 /**
  Export number of Single in each state
  */
-void Simul::reportSingle(std::ostream& out, Property const* sel) const
+void Simul::reportSingle(std::ostream& out, std::ostream& com, Property const* sel) const
 {
     constexpr PropertyID SUP = 128;
     
@@ -2272,11 +2265,11 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
         based[x] += ( i->base() != nullptr );
     }
     
-    out << COM << ljust("single", 2, 2);
-    out << SEP << "total";
-    out << SEP << "based";
-    out << SEP << "free";
-    out << SEP << "bound";
+    com << COM << ljust("single", 2, 2);
+    com << SEP << "total";
+    com << SEP << "based";
+    com << SEP << "free";
+    com << SEP << "bound";
     
     for ( Property const* i : properties.find_all("single") )
     {
@@ -2300,7 +2293,7 @@ void Simul::reportSingle(std::ostream& out, Property const* sel) const
 /**
  Export average properties of Couples forces
  */
-void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
+void Simul::reportSingleForce(std::ostream& out, std::ostream& com, Property const* sel) const
 {
     constexpr PropertyID SUP = 8;
     real cnt[SUP+1] = { 0 };
@@ -2322,7 +2315,7 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
         }
     }
     
-    out << COM << ljust("single", 2, 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
+    com << COM << ljust("single", 2, 2) << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
     for ( PropertyID i = 0; i < SUP; ++i )
     {
         if ( cnt[i] > 0 )
@@ -2340,9 +2333,9 @@ void Simul::reportSingleForce(std::ostream& out, Property const* sel) const
 //------------------------------------------------------------------------------
 #pragma mark - Couple
 
-void Simul::reportCoupleList(std::ostream& out, Property const* sel) const
+void Simul::reportCoupleList(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "couples" << SEP << "count";
+    com << COM << "couples" << SEP << "count";
 
     size_t cnt = couples.collect(match_property, sel).size();
 
@@ -2355,7 +2348,7 @@ void Simul::reportCoupleList(std::ostream& out, Property const* sel) const
  }
 
 
-void write(std::ostream& out, Couple const* obj)
+void writeCouple(std::ostream& out, Couple const* obj)
 {
     out << LIN << obj->prop->number();
     out << SEP << obj->identity();
@@ -2391,35 +2384,35 @@ void write(std::ostream& out, Couple const* obj)
 /**
  Export position of Couples of a certain kind
  */
-void Simul::reportCoupleState(std::ostream& out, Property const* sel) const
+void Simul::reportCoupleState(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity" << SEP << "active" << SEP << repeatXYZ("pos");
-    out << SEP << "fiber1" << SEP << "abscissa1" << SEP << "fiber2" << SEP << "abscissa2";
+    com << COM << "class" << SEP << "identity" << SEP << "active" << SEP << repeatXYZ("pos");
+    com << SEP << "fiber1" << SEP << "abscissa1" << SEP << "fiber2" << SEP << "abscissa2";
     
     for ( Couple const* obj=couples.firstFF(); obj ; obj=obj->next() )
         if ( !sel || sel == obj->prop )
-            write(out, obj);
+            writeCouple(out, obj);
     
     for ( Couple const* obj=couples.firstAF(); obj ; obj=obj->next() )
         if ( !sel || sel == obj->prop )
-            write(out, obj);
+            writeCouple(out, obj);
     
     for ( Couple const* obj=couples.firstFA(); obj ; obj=obj->next() )
         if ( !sel || sel == obj->prop )
-            write(out, obj);
+            writeCouple(out, obj);
     
     for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
         if ( !sel || sel == obj->prop )
-            write(out, obj);
+            writeCouple(out, obj);
 }
 
 
 /**
  Export position of active Couples of a certain kind
  */
-void Simul::reportCoupleActive(std::ostream& out, Property const* sel) const
+void Simul::reportCoupleActive(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "state" << SEP << repeatXYZ("pos");
+    com << COM << "state" << SEP << repeatXYZ("pos");
     
     for ( Couple const* obj=couples.firstFF(); obj ; obj=obj->next() )
         if ( obj->active()  &&  obj->prop == sel )
@@ -2442,12 +2435,12 @@ void Simul::reportCoupleActive(std::ostream& out, Property const* sel) const
 /**
  Export position and force of Couples that are bound to 2 filaments
  */
-void Simul::reportCoupleLink(std::ostream& out, Property const* sel) const
+void Simul::reportCoupleLink(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "class" << SEP << "identity";
-    out << SEP << "fiber1" << SEP << "abscissa1";// << SEP << repeatXYZ("pos1");
-    out << SEP << "fiber2" << SEP << "abscissa2";// << SEP << repeatXYZ("pos2");
-    out << SEP << "force" << SEP << "cos_angle";
+    com << COM << "class" << SEP << "identity";
+    com << SEP << "fiber1" << SEP << "abscissa1";// << SEP << repeatXYZ("pos1");
+    com << SEP << "fiber2" << SEP << "abscissa2";// << SEP << repeatXYZ("pos2");
+    com << SEP << "force" << SEP << "cos_angle";
         
     for ( Couple const* obj=couples.firstAA(); obj ; obj=obj->next() )
     {
@@ -2485,7 +2478,7 @@ void Simul::reportCoupleLink(std::ostream& out, Property const* sel) const
  Determinants of Polar versus Nematic Organization in Networks of Dynamic Microtubules
  and Mitotic Motors, Cell 2018
  */
-void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
+void Simul::reportCoupleConfiguration(std::ostream& out, std::ostream& com, Property const* sel,
                                       Glossary& opt) const
 {
     real dis = 0.010;  // max distance to end to constitute T or V link
@@ -2499,8 +2492,8 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
     }
     size_t S = T[0]+T[1]+T[2]+T[3]+T[4]+T[5]+T[6];
     
-    out << COM << "couples" << SEP << "Total" << SEP << "P" << SEP << "A";
-    out << SEP << "X" << SEP << "T+" << SEP << "V+" << SEP << "T-" << SEP << "V-";
+    com << COM << "couples" << SEP << "Total" << SEP << "P" << SEP << "A";
+    com << SEP << "X" << SEP << "T+" << SEP << "V+" << SEP << "T-" << SEP << "V-";
 
     if ( sel )
         out << LIN << sel->name();
@@ -2515,7 +2508,7 @@ void Simul::reportCoupleConfiguration(std::ostream& out, Property const* sel,
 /**
  Export average properties of Couples forces
  */
-void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
+void Simul::reportCoupleForce(std::ostream& out, std::ostream& com, Property const* sel) const
 {
     constexpr PropertyID SUP = 8;
     real cnt[SUP+1] = { 0 };
@@ -2537,7 +2530,7 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
         }
     }
         
-    out << COM << ljust("couple", 2) << SEP << "count" << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
+    com << COM << ljust("couple", 2) << SEP << "count" << SEP << "avg_force" << SEP << "max_force" << SEP << "max_len";
     for ( PropertyID i = 0; i < SUP; ++i )
     {
         if ( cnt[i] > 0 )
@@ -2556,7 +2549,7 @@ void Simul::reportCoupleForce(std::ostream& out, Property const* sel) const
 /**
  Export histogram of Couples forces
  */
-void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
+void Simul::reportCoupleForceHistogram(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     const PropertyID SUP = 8;
     const unsigned MAX = 256;
@@ -2586,9 +2579,9 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
     
     if ( 1 )
     {
-        std::streamsize p = out.precision(3);
-        out << COM << "force_distribution" << " (`scale` indicates the center of each bin)";
+        com << COM << "force_distribution" << " (`scale` indicates the center of each bin)";
         out << LIN << ljust("scale", 2);
+        std::streamsize p = out.precision(3);
         for ( size_t u = 0; u <= nbin; ++u )
             out << " " << std::setw(5) << delta * ( u + 0.5 );
         out.precision(p);
@@ -2613,7 +2606,7 @@ void Simul::reportCoupleForceHistogram(std::ostream& out, Glossary& opt) const
 /**
  Export number of Couples in each state
  */
-void Simul::reportCouple(std::ostream& out, Property const* sel) const
+void Simul::reportCouple(std::ostream& out, std::ostream& com, Property const* sel) const
 {
     constexpr PropertyID SUP = 128;
     int act[SUP] = { 0 }, cnt[SUP][4];
@@ -2658,13 +2651,9 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
         ++(cnt[x][3]);
     }
     
-    out << COM << ljust("couple", 2, 2);
-    out << SEP << "total";
-    out << SEP << "active";
-    out << SEP << "FF";
-    out << SEP << "AF";
-    out << SEP << "FA";
-    out << SEP << "AA";
+    com << COM << ljust("couple", 2, 2);
+    com << SEP << "total" << SEP << "active";
+    com << SEP << "FF" << SEP << "AF" << SEP << "FA"<< SEP << "AA";
     
     for ( Property const* i : properties.find_all("couple") )
     {
@@ -2688,9 +2677,9 @@ void Simul::reportCouple(std::ostream& out, Property const* sel) const
 /**
  Export composition of Couple classes
  */
-void Simul::reportCoupleAnatomy(std::ostream& out, Property const* sel) const
+void Simul::reportCoupleAnatomy(std::ostream& out, std::ostream& com, Property const* sel) const
 {
-    out << COM << "hand_id" << SEP << rjust("hand_name", 2);
+    com << COM << "hand_id" << SEP << rjust("hand_name", 2);
     
     for ( Property const* i : properties.find_all("hand") )
     {
@@ -2699,8 +2688,8 @@ void Simul::reportCoupleAnatomy(std::ostream& out, Property const* sel) const
         out << SEP << rjust(p->name(), 2);
     }
 
-    out << COM << "couple_id" << SEP << rjust("couple_name", 2);
-    out << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
+    com << COM << "couple_id" << SEP << rjust("couple_name", 2);
+    com << SEP << rjust("hand1", 2) << SEP << rjust("hand2", 2);
     
     for ( Property const* i : properties.find_all("couple") )
     {
@@ -2847,7 +2836,7 @@ Order Clusters from 1 to max, in order of decreasing size,
 and set fiber:flag() to the corresponding cluster index.
 @return number of clusters
 */
-size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, size_t details)
+size_t reportOrderedClusters(std::ostream& out, std::ostream& com, Fiber* first, size_t threshold, size_t details)
 {
     typedef std::vector<Fiber*> list_t;
     typedef std::map<ObjectFlag, list_t> map_t;
@@ -2874,12 +2863,12 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
     
     if ( details > 1 )
     {
-        out << COM << "cluster_id" << SEP << "nb_fibers :" << SEP << "fiber_id";
+        com << COM << "cluster_id" << SEP << "nb_fibers :" << SEP << "fiber_id";
         out << LIN << clusters.size() << " clusters:";
     }
     else if ( details > 0 )
     {
-        out << COM << "cluster_id" << SEP << "nb_fibers";
+        com << COM << "cluster_id" << SEP << "nb_fibers";
         out << LIN << clusters.size() << " clusters:";
     }
     
@@ -2910,7 +2899,7 @@ size_t reportOrderedClusters(std::ostream& out, Fiber* first, size_t threshold, 
  Export clusters defined by Simul::flagClusters()
  Clusters are ordered in decreasing size.
  */
-void Simul::reportClusters(std::ostream& out, Glossary& opt) const
+void Simul::reportClusters(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     size_t details = 128;
     bool C = false, S = false, M = false;
@@ -2922,8 +2911,8 @@ void Simul::reportClusters(std::ostream& out, Glossary& opt) const
     
     flagClusters(C, S, M);
     
-    out << COM << "cluster by couples " << C << " solids " << S << " meca " << M;
-    reportOrderedClusters(out, fibers.first(), 2, details);
+    com << COM << "cluster by couples " << C << " solids " << S << " meca " << M;
+    reportOrderedClusters(out, com, fibers.first(), 2, details);
 }
 
 
@@ -3079,9 +3068,9 @@ void Simul::analyzeRing(ObjectFlag flg, real& length, real& radius) const
 /**
 Calculate the length of the ring and its radius
 */
-void Simul::reportRing(std::ostream& out) const
+void Simul::reportRing(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "nb_rings" << SEP << "length" << SEP << "radius";
+    com << COM << "nb_rings" << SEP << "length" << SEP << "radius";
     size_t nring = flagRing();
     if ( nring == 1 )
     {
@@ -3100,7 +3089,7 @@ void Simul::reportRing(std::ostream& out) const
  Evaluates if the Fiber distribution makes a connected ring around the Z-axis
  FJN 8.07.2017, for Blood Platelet project
  */
-void Simul::reportPlatelet(std::ostream& out) const
+void Simul::reportPlatelet(std::ostream& out, std::ostream& com) const
 {
     size_t nfib = 0;
     real pol = 0, var = 0, mn = INFINITY, mx = -INFINITY, off = 0;
@@ -3110,7 +3099,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     if ( nfib > 1024 )
     {
         // the calculation can take too much time with lots of fibers, so we cut it here:
-        out << COM << "nb_fiber" << SEP << "polymer";
+        com << COM << "nb_fiber" << SEP << "polymer";
         out << LIN << nfib << SEP << std::fixed << pol;
         return;
     }
@@ -3132,7 +3121,7 @@ void Simul::reportPlatelet(std::ostream& out) const
     ten /= (real)cnt;
     
     std::ofstream nos("/dev/null");
-    real force = reportFiberConfinement(nos);
+    real force = reportFiberConfinement(nos, com);
 
     real len = 0.0, rad = 0.0;
     if ( flagRing() == 1 )
@@ -3140,7 +3129,7 @@ void Simul::reportPlatelet(std::ostream& out) const
 
     std::streamsize p = out.precision();
     if ( p < 3 ) out.precision(3);
-    out << COM << "nb_fiber" << SEP << "polymer" << SEP << "tension" << SEP << "force" << SEP << "length" << SEP << "radius";
+    com << COM << "nb_fiber" << SEP << "polymer" << SEP << "tension" << SEP << "force" << SEP << "length" << SEP << "radius";
     out << LIN << nfib << SEP << std::fixed << pol << SEP << ten << SEP << force << SEP << len << SEP << rad;
     out.precision(p);
 }
@@ -3152,9 +3141,9 @@ void Simul::reportPlatelet(std::ostream& out) const
 /**
  Export indices calculated by FiberSet::infoSpindle
  */
-void Simul::reportSpindleIndices(std::ostream& out) const
+void Simul::reportSpindleIndices(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "amount" << SEP << "radial" << SEP << "polar";
+    com << COM << "amount" << SEP << "radial" << SEP << "polar";
     real ixa, ixp;
     fibers.infoSpindle(ixa, ixp, Vector(1,0,0), 0, 10, 0.5);
     out << LIN << fibers.size();
@@ -3167,14 +3156,14 @@ void Simul::reportSpindleIndices(std::ostream& out) const
  Export average position of beads "condensate" located on left and right sides,
  and the distance between the two barycenters. Right/Left are defined on X-axis.
  */
-void Simul::reportSpindleLength(std::ostream& out, Glossary&) const
+void Simul::reportSpindleLength(std::ostream& out, std::ostream& com, Glossary&) const
 {
     Vector axis(1,0,0);
     BeadProp * bip = findProperty<BeadProp>("bead", "condensate");
     if ( bip )
     {
-        out << COM << "left_cnt" << SEP << repeatXYZ("left_");
-        out << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
+        com << COM << "left_cnt" << SEP << repeatXYZ("left_");
+        com << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
         Vector R(0,0,0), L(0,0,0);
         size_t nR = 0, nL = 0;
         
@@ -3194,11 +3183,11 @@ void Simul::reportSpindleLength(std::ostream& out, Glossary&) const
  Export number and average position of minus ends located on left and right sides,
  and the distance between the two barycenters. Right/Left are defined on X-axis.
  */
-void Simul::reportMarkedFiberEnds(std::ostream& out, Glossary& opt) const
+void Simul::reportMarkedFiberEnds(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     Vector axis(1,0,0);
-    out << COM << ljust("mark", 1, 2) << SEP << "left_cnt" << SEP << repeatXYZ("left_");
-    out << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
+    com << COM << ljust("mark", 1, 2) << SEP << "left_cnt" << SEP << repeatXYZ("left_");
+    com << SEP << "right_cnt" << SEP << repeatXYZ("right_") << SEP << "distance";
 
     ObjectMark sup = 0;
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
@@ -3231,9 +3220,9 @@ void Simul::reportMarkedFiberEnds(std::ostream& out, Glossary& opt) const
  that intersect a plane parallel to YZ.
  The planes are distributed regularly every 0.5 um along the X-axis.
  */
-void Simul::reportSpindleProfile(std::ostream& out, Glossary& opt) const
+void Simul::reportSpindleProfile(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
-    out << COM << "position" << SEP << "leftward" << SEP << "rightward" << SEP << "right-left";
+    com << COM << "position" << SEP << "leftward" << SEP << "rightward" << SEP << "right-left";
     Vector n(1,0,0);
     real m = 10, interval = 0.5;
     opt.set(interval, "interval");
@@ -3250,12 +3239,12 @@ void Simul::reportSpindleProfile(std::ostream& out, Glossary& opt) const
 
 
 /// print some coefficients calculated from the distribution of fibers
-void Simul::reportSpindleFitness(std::ostream& out, Glossary& opt) const
+void Simul::reportSpindleFitness(std::ostream& out, std::ostream& com, Glossary& opt) const
 {
     size_t cnt = 0, left = 0;
     real std = 0, dev = 0;
-    out << COM << "kin_left" << SEP << "kin_right" << SEP << "kin_devX" << SEP << "kin_devYZ";
-    out << SEP << "bead_left" << SEP << "bead_right" << SEP << "bead_dev";
+    com << COM << "kin_left" << SEP << "kin_right" << SEP << "kin_devX" << SEP << "kin_devYZ";
+    com << SEP << "bead_left" << SEP << "bead_right" << SEP << "bead_dev";
     real half_length = 4.0;
     opt.set(half_length, "half_length");
     /// check positions of kinetochores (Solid):
@@ -3303,9 +3292,9 @@ void Simul::reportSpindleFitness(std::ostream& out, Glossary& opt) const
  l'angle entre un vecteur 1 (centre du noyau --> SPB)
  et un vecteur 2 (axe de l'hyphe; gauche --> droite = sens du flow).
  */
-void Simul::reportAshbya(std::ostream& out) const
+void Simul::reportAshbya(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "class id point_0, vector_1, angle";
+    com << COM << "class id point_0, vector_1, angle";
     for ( Solid const* obj=solids.first(); obj; obj=obj->next() )
     {
         out << LIN << obj->prop->number();
@@ -3492,7 +3481,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
 }
 
 
-void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossary& opt) const
+void Simul::reportFiberCollision(std::ostream& out, std::ostream& com, Property const* sel, Glossary& opt) const
 {
 #if ( DIM == 1 )
     throw InvalidParameter("fiber:collision meaningless in 1D");
@@ -3524,9 +3513,9 @@ void Simul::reportFiberCollision(std::ostream& out, Property const* sel, Glossar
 /**
  Export end-to-end distance of Fiber
  */
-void Simul::reportSomething(std::ostream& out) const
+void Simul::reportSomething(std::ostream& out, std::ostream& com) const
 {
-    out << COM << "something";
+    com << COM << "something";
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         Vector ee = fib->posEndP() - fib->posEndM();
