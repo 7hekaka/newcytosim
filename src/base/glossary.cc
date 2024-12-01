@@ -829,8 +829,8 @@ int Glossary::warning(Glossary::pair_type const& pair, std::string& msg, size_t 
 
 /**
  @returns the type of warning associated with the entire set of terms
- If the return value is not zero, a message was printed to 'os', and
- at least a terminating '\n' should be printed to 'os' by the calling function.
+ If the return value is not zero, something was added to 'msg', and
+ this might be printed by the calling function.
  */
 int Glossary::has_warning(std::string& msg, size_t threshold) const
 {

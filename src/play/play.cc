@@ -337,7 +337,7 @@ int main(int argc, char* argv[])
         else
         {
             // get the name of 'simul' object and 'simul:display' from the config file
-            Parser(&simul, 1, 0, 0, 0, 0).readConfig();
+            Parser(&simul, 1, 0, 0, 0, 0, 0).readConfig();
         }
 
         // read Simul parameters from command line
@@ -359,7 +359,7 @@ int main(int argc, char* argv[])
         {
             // extract "simul:display" from setup
             if ( FilePath::is_file(setup) )
-                Parser(&simul, 1, 0, 0, 0, 0).readConfig(setup);
+                Parser(&simul, 1, 0, 0, 0, 0, 0).readConfig(setup);
             else
                 std::cerr << " warning: could not read `" << setup << "'\n";
         }

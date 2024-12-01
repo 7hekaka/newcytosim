@@ -26,7 +26,7 @@ static void thread_signal_handler(int sig)
  This uses a Parser that cannot write to disc.
  */
 SimThread::SimThread(Simul* sim)
-: Parser(sim, 1, 1, 1, 1, 0)
+: Parser(sim, 1, 1, 1, 1, 0, 0)
 {
     status_ = -2;
     repeat_ = 0;
@@ -490,7 +490,7 @@ void SimThread::reloadParameters(std::string const& file)
 {
     lock();
     // set a parser that can only change properties:
-    Parser(sim_, 1, 0, 0, 0, 0).readConfig(file);
+    Parser(sim_, 1, 0, 0, 0, 0, 0).readConfig(file);
     //std::cerr << "reloaded " << file << '\n';
     unlock();
 }

@@ -29,10 +29,11 @@
  - do_new: can create new Object
  - do_run: can perform simulation steps
  - do_write: can write to disc
+ - do_warn: can print warnings messages to stderr
  .
  */
-Parser::Parser(Simul* sim, bool c, bool s, bool n, bool r, bool w)
-: Interface(sim), do_change(c), do_set(s), do_new(n), do_run(r), do_write(w)
+Parser::Parser(Simul* sim, bool c, bool s, bool n, bool r, bool w, int v)
+: Interface(sim), do_change(c), do_set(s), do_new(n), do_run(r), do_write(w), do_warn(v)
 {
     restart_ = 0;
 }
@@ -47,10 +48,13 @@ static void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos,
         {
             size_t L;
             Cytosim::log << war << " in `" << StreamFunc::extract_line(is, ipos, L) << "' (line " << L << ")\n";
-            // also report to standard error:
-            print_yellow(stderr, war);
-            std::cerr << '\n';
-            StreamFunc::print_lines(std::cerr, is, ipos, is.tellg(), true);
+            if ( 1 )
+            {
+                // also report to standard error:
+                print_yellow(stderr, war);
+                std::cerr << '\n';
+                StreamFunc::print_lines(std::cerr, is, ipos, is.tellg(), true);
+            }
         }
     }
 }
@@ -248,7 +252,7 @@ void Parser::parse_set(std::istream& is)
         }
     }
 
-    if ( do_set || do_change )
+    if ( do_warn )
         check_warnings(opt, is, ipos);
 }
 
@@ -354,7 +358,7 @@ void Parser::parse_change(std::istream& is)
         else
             execute_change(name, opt, do_set);
  
-        if ( do_set )
+        if ( do_warn )
             check_warnings(opt, is, ipos, ~0U);
     }
     else if ( para == "display" )
@@ -473,7 +477,8 @@ void Parser::parse_new(std::istream& is)
             if ( opt.has_key("display") )
                 throw InvalidParameter("display parameters should be specified within `set'");
             
-            check_warnings(opt, is, ipos, ~0U);
+            if ( do_warn )
+                check_warnings(opt, is, ipos, ~0U);
         }
         else
         {
@@ -589,7 +594,8 @@ void Parser::parse_delete(std::istream& is)
     {
         Glossary opt(blok);
         execute_delete(name, opt, cnt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -636,7 +642,8 @@ void Parser::parse_move(std::istream& is)
     if ( do_run )
     {
         cnt = execute_move(name, opt, cnt);
-        check_warnings(opt, is, ipos, cnt);
+        if ( do_warn )
+            check_warnings(opt, is, ipos, cnt);
     }
 }
 
@@ -689,7 +696,8 @@ void Parser::parse_mark(std::istream& is)
     {
         Glossary opt(blok);
         execute_mark(name, opt, cnt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -763,7 +771,8 @@ void Parser::parse_cut(std::istream& is)
     {
         Glossary opt(blok);
         execute_cut(str, opt, cnt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -787,7 +796,8 @@ void Parser::parse_connect(std::istream& is)
     {
         Glossary opt(blok);
         execute_connect(name, opt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -861,7 +871,8 @@ void Parser::parse_run(std::istream& is)
         else if ( sec > 0 )
             execute_run(sec, opt, do_write);
 
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -895,7 +906,8 @@ void Parser::parse_read(std::istream& is)
     {
         Glossary opt(blok);
         opt.set(required, "required");
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
     
     if ( FilePath::is_file(file) )
@@ -960,7 +972,8 @@ void Parser::parse_import(std::istream& is)
     {
         Glossary opt(blok);
         execute_import(file, what, opt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -1008,7 +1021,8 @@ void Parser::parse_export(std::istream& is)
     {
         Glossary opt(blok);
         execute_export(file, what, opt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -1055,7 +1069,8 @@ void Parser::parse_report(std::istream& is)
     {
         Glossary opt(blok);
         execute_report(file, what, opt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -1104,7 +1119,8 @@ void Parser::parse_write(std::istream& is)
     {
         Glossary opt(blok);
         execute_report(file, what, opt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 
@@ -1133,7 +1149,8 @@ void Parser::parse_call(std::istream& is)
     {
         Glossary opt(blok);
         execute_call(str, opt);
-        check_warnings(opt, is, ipos);
+        if ( do_warn )
+            check_warnings(opt, is, ipos);
     }
 }
 

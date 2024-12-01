@@ -123,7 +123,7 @@ int main(int argc, char* argv[])
         simul.initCytosim();
         time_t sec = TimeDate::seconds_since_1970();
         // read and execute default config file:
-        Parser(&simul, 1, 1, 1, 1, 1).readConfig();
+        Parser(&simul, 1, 1, 1, 1, 1, 1).readConfig();
         Cytosim::out("% ", TimeDate::date_string(), '\n');
         sec = TimeDate::seconds_since_1970() - sec;
         Cytosim::out << "end  " << sec << " s ( " << (float)(sec)/3600 << " h )\n";

@@ -32,6 +32,9 @@ private:
     /// control switch to enable command 'write' (write files)
     bool do_write;
     
+    /// print warnings
+    int do_warn;
+
 protected:
     
     /// counters for the 'restart' command
@@ -99,7 +102,7 @@ protected:
 public:
     
     /// construct a Parser with given permissions
-    Parser(Simul*, bool Change, bool Set, bool New, bool Run, bool Write);
+    Parser(Simul*, bool Change, bool Set, bool New, bool Run, bool Write, int Warn);
     
     /// Parse next command in stream, advance stream pointer, return 0 if success
     int  evaluate_one(std::istream&);

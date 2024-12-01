@@ -4,6 +4,7 @@
 #include <fstream>
 #include <unistd.h>
 #include "messages.h"
+#include "filepath.h"
 #include "time_date.h"
 #include "parser.h"
 #include "print_color.h"
@@ -868,26 +869,23 @@ void Simul::writeProperties(bool prune) const
 }
 
 
-void Simul::loadProperties(const char file[])
+void Simul::loadProperties(const char file[], int verbose)
 {
     std::ifstream is(file, std::ifstream::in);
     if ( !is.good() )
         throw InvalidIO("could not find or read `"+std::string(file)+"'");
     std::streampos ipos(0);
-    Parser(this, 1, 1, 0, 0, 0).evaluate(is, ipos);
+    Parser(this, 1, 1, 0, 0, 0, verbose).evaluate(is, ipos);
 }
 
 
 void Simul::loadProperties()
 {
-    std::string file = prop.property_file;
-    std::ifstream is(file.c_str(), std::ifstream::in);
+    const char * def = prop.property_file.c_str();
 #if BACKWARD_COMPATIBILITY < 57
-    if ( !is.is_open() && file == "properties.cmp" )
-        is.open("properties.cmo", std::ifstream::in);
+    if ( ! FilePath::is_file(def) )
+        loadProperties("properties.cmo", 0);
+    else
 #endif
-    if ( !is.good() )
-        throw InvalidIO("could not find or read `"+file+"'");
-    std::streampos ipos(0);
-    Parser(this, 1, 1, 0, 0, 0).evaluate(is, ipos);
+    loadProperties(def, 0);
 }
