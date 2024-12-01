@@ -60,6 +60,8 @@ except ImportError:
     sys.stderr.write("go_sim.py could not load go_sim_lib.py\n")
     sys.exit()
 
+#-------------------------------------------------------------------------------
+
 def handle_signal(sig, frame):
     sys.stderr.write("go_sim.py escaped signal %i\n" % sig)
 
@@ -74,7 +76,8 @@ except ImportError:
     sys.stderr.write("go_sim.py could not load `signal` on %s\n" % host)
     pass
 
-def executable(arg):
+
+def is_executable(arg):
     return os.path.isfile(arg) and os.access(arg, os.X_OK)
 
 #-------------------------------------------------------------------------------
@@ -168,7 +171,7 @@ class Gosimer:
         for arg in args:
             if arg.isdigit():
                 self.repeat = int(arg)
-            elif executable(arg):
+            elif is_executable(arg):
                 self.exe = os.path.abspath(arg)
             elif os.path.isfile(arg):
                 files.append(arg)
