@@ -5,7 +5,14 @@
 
 const size_t SIZE = 8;
 
-
+/**
+ This is code by Katsura, from
+ https://katsurashareware.com/forum/viewtopic.php?f=9&t=16&sid=29d42f2f4ceb346c30efb844d6656a4a
+ 
+ https://developer.arm.com/documentation
+ Non-temporal loads
+ In AArch64 state, cache requests made by a non-temporal load instruction (LDNP) are treated as normal loads.
+ */
 void *ntbread(void *dst, const void *src, size_t bs)
 {
     __asm__ __volatile__ (
