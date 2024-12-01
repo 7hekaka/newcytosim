@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2024 Cambridge University
 
 #ifndef ACCUMULATOR_H
 #define ACCUMULATOR_H
@@ -95,27 +95,27 @@ public:
         return var[0] + var[4] + var[8];
     }
     
-    void print_doc(std::ostream& out) const
+    void print_doc(std::ostream& os) const
     {
-        out << COM << "cnt";
-        out << SEP << "avgX" << SEP << "avgY" << SEP << "avgZ";
-        out << SEP << "varX" << SEP << "varY" << SEP << "varZ";
-        out << SEP << "var_sum";
+        os << COM << "cnt";
+        os << SEP << "avgX" << SEP << "avgY" << SEP << "avgZ";
+        os << SEP << "varX" << SEP << "varY" << SEP << "varZ";
+        os << SEP << "var_sum";
     }
     
-    void print(std::ostream& out, bool mode)
+    void print(std::ostream& os, bool mode)
     {
         if ( mode )
-            out << LIN << (int) sum;
+            os << LIN << (int) sum;
         else
-            out << SEP << sum;
-        out << SEP << avg[0];
-        out << SEP << avg[1];
-        out << SEP << avg[2];
-        out << SEP << var[0];
-        out << SEP << var[4];
-        out << SEP << var[8];
-        out << SEP << var[0] + var[4] + var[8];
+            os << SEP << sum;
+        os << SEP << avg[0];
+        os << SEP << avg[1];
+        os << SEP << avg[2];
+        os << SEP << var[0];
+        os << SEP << var[4];
+        os << SEP << var[8];
+        os << SEP << var[0] + var[4] + var[8];
     }
 };
 
