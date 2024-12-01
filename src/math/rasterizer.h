@@ -67,7 +67,7 @@ namespace Rasterizer
         {
         }
 
-        void set(FLOAT x, FLOAT dx, FLOAT y, FLOAT dy)
+        void fix(FLOAT x, FLOAT dx, FLOAT y, FLOAT dy)
         {
             XX = x;
             YY = y;

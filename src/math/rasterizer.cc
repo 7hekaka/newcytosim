@@ -144,8 +144,8 @@ static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
     std::clog << " " << zz << '\n';
 #endif
   
-    Rasterizer::FLOAT xxR = pts[0].XX, yyR = pts[0].YY, dxR = 0;
-    Rasterizer::FLOAT xxL = pts[0].XX, yyL = pts[0].YY, dxL = 0;
+    double xxR = pts[0].XX, yyR = pts[0].YY, dxR = 0;
+    double xxL = pts[0].XX, yyL = pts[0].YY, dxL = 0;
 
     // start on the line just above the bottom point
     int yy = (int)std::ceil(pts[0].YY);
@@ -408,15 +408,15 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
             //test if [ii, jj] constitute an edge of the solid 3D polygon:
             if ( pts[ii].UU  &  pts[jj].UU )
             {
-                FLOAT dZ = pts[jj].ZZ - pts[ii].ZZ;
+                double dZ = pts[jj].ZZ - pts[ii].ZZ;
                 
                 if ( dZ > FLT_EPSILON )
                 {
-                    FLOAT dXdZ = ( pts[jj].XX - pts[ii].XX ) / dZ;
-                    FLOAT dYdZ = ( pts[jj].YY - pts[ii].YY ) / dZ;
-                    FLOAT off  = zzz - pts[ii].ZZ;
-                    xydz[edg].set(pts[ii].XX + dXdZ * off, dXdZ,
-                                  pts[ii].YY + dYdZ * off, dYdZ);
+                    double dXdZ = ( pts[jj].XX - pts[ii].XX ) / dZ;
+                    double dYdZ = ( pts[jj].YY - pts[ii].YY ) / dZ;
+                    double offZ = zzz - pts[ii].ZZ;
+                    xydz[edg].fix(pts[ii].XX + dXdZ * offZ, dXdZ,
+                                  pts[ii].YY + dYdZ * offZ, dYdZ);
                     ++edg;
                     assert_true( edg < TOP );
                 }

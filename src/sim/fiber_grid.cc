@@ -116,7 +116,7 @@ void paintCell(const int x_inf, const int x_sup, const int y, const int z, void 
 {
     const auto* grid = static_cast<PaintJob*>(arg)->grid;
     const auto& seg = static_cast<PaintJob*>(arg)->segment;
-    //printf("paint %p in (%i to %i, %i, %i)\n", seg, x_inf, x_sup, y, z);
+    //printf("paint %i:%i (%i --> %i, %i, %i)\n", seg.identity(), seg.point(), x_inf, x_sup, y, z);
 
 #if   ( DIM == 1 )
     FiberGrid::SegmentList * list = & grid->icell1D_clamped(x_inf);
@@ -146,9 +146,11 @@ void paintCellPeriodic(const int x_inf, const int x_sup, const int y, const int 
 {
     auto* grid = static_cast<PaintJob*>(arg)->grid;
     const auto& seg = static_cast<PaintJob*>(arg)->segment;
-    //printf("paint %p in (%i to %i, %i, %i)\n", seg, x_inf, x_sup, y, z);
-    //std::clog << " paint " << seg << " over ("<< x_inf << " " << x_sup << "; " << y << "; " << z << ")\n";
+    //printf("paintPeriodic %i:%i (%i --> %i, %i, %i)\n", seg.identity(), seg.point(), x_inf, x_sup, y, z);
 
+    // safety, to avoid instances wehere x_inf was a very large negative number
+    size_t w = grid->breadth(0);
+    
     #pragma ivdep
     for ( int x = x_inf; x <= x_sup; ++x )
     {
@@ -164,6 +166,11 @@ void paintCellPeriodic(const int x_inf, const int x_sup, const int y, const int 
 #else
         grid->icell3D( x, y, z ).push_back(seg);
 #endif
+        if ( --w == 0 )
+        {
+            printf("aborted paintCellPeriodic %i:%i (%i --> %i, %i, %i)\n", seg.identity(), seg.point(), x_inf, x_sup, y, z);
+            break;
+        }
     }
 }
 
