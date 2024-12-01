@@ -523,7 +523,10 @@ void Simul::report_one(std::ostream& out, std::string const& who, Property const
     if ( who == "something" )
         return reportSomething(out);
 
-    throw InvalidSyntax("unknown report `"+who+":"+what+"'\n");
+    if ( what.empty() )
+        throw InvalidSyntax("unknown report `"+who+"'\n");
+    else
+        throw InvalidSyntax("unknown report `"+who+":"+what+"'\n");
 }
 
 //------------------------------------------------------------------------------
@@ -821,7 +824,7 @@ void Simul::reportFiberNematic(std::ostream& out, Glossary& opt) const
     if ( opt.set(str, "space") )
         spc = findSpace(opt.value("space"));
     
-    out << COM << ljust("class",2,2) << SEP << "count";
+    out << COM << ljust("class",2,2) << SEP << "time" << SEP << "count";
     out << SEP << "order" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
     if ( spc )
         out << SEP << "ortho" << SEP << "dirX" << SEP << "dirY" << SEP << "dirZ";
@@ -836,6 +839,7 @@ void Simul::reportFiberNematic(std::ostream& out, Glossary& opt) const
             real vec[9] = { 1, 0, 0, 0, 1, 0, 0, 0, 1 };
             S = FiberSet::infoNematic(objs, vec);
             out << LIN << ljust(p->name(), 2);
+            out << SEP << time();
             out << SEP << objs.size();
             out << SEP << S;
             out << SEP << vec[0] << SEP << vec[1] << SEP << vec[2];

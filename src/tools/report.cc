@@ -119,9 +119,9 @@ int main(int argc, char* argv[])
     int ax = 1;
     while ( argc > ax+1 )
     {
-        if ( strstr(argv[ax], "time") )
+        if ( 0 == strncmp(argv[ax], "time", 4) )
             prefix |= 1;
-        else if ( strstr(argv[ax], "frame") )
+        else if ( 0 == strncmp(argv[ax], "frame", 5) )
             prefix |= 2;
         else
             break;
