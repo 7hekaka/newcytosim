@@ -131,10 +131,6 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     std::streamsize p = 4;
     opt.set(p, "precision");
     opt.set(column_width, "column") || opt.set(column_width, "width");
-    
-    // adjust floating-point notation:
-    out.setf(std::ios_base::fixed, std::ios_base::floatfield);
-    std::streamsize sp = out.precision(p);
 
     if ( ver & 1 )
     {
@@ -144,18 +140,23 @@ void Simul::mono_report(std::ostream& out, std::string const& arg, Glossary& opt
     if ( ver > 0 )
     {
         out << "% report " << arg << " " << opt.to_string();
+        // adjust floating-point notation:
+        out.setf(std::ios_base::fixed, std::ios_base::floatfield);
+        std::streamsize sp = out.precision(p);
         report_one(out, arg, opt);
+        out.precision(sp);
         out << "\n";
     }
     else
     {
         std::stringstream ss;
+        ss.setf(std::ios_base::fixed, std::ios_base::floatfield);
+        ss.precision(p);
         report_one(ss, arg, opt);
         StreamFunc::skip_lines(out, ss, '%', false);
     }
     if ( ver & 1 )
         out << "% end\n";
-    out.precision(sp);
 }
 
 
@@ -570,6 +571,7 @@ Export average length and variance of length for a class of fiber
 static void printFiberLengths(std::ostream& out, ObjectList const& objs)
 {
     size_t cnt = 0;
+    std::streamsize p = out.precision();
     real avg = 0, var = 0, mn = INFINITY, mx = -INFINITY, off = 0;
     FiberSet::infoLength(objs, cnt, avg, var, mn, mx, off);
     out << SEP << cnt;
@@ -581,7 +583,7 @@ static void printFiberLengths(std::ostream& out, ObjectList const& objs)
     out.precision(1);
     out << SEP << std::fixed << avg*cnt;
     out << SEP << std::fixed << off;
-
+    out.precision(p);
 }
 
 /**
@@ -592,7 +594,6 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
     out << COM << ljust("class", 2, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
     out << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
     
-    std::streamsize p = out.precision();
     if ( sel )
     {
         ObjectList objs = fibers.collect(sel);
@@ -608,7 +609,6 @@ void Simul::reportFiberLengths(std::ostream& out, Property const* sel) const
             printFiberLengths(out, objs);
         }
     }
-    out.precision(p);
 }
 
 /**
@@ -623,7 +623,6 @@ void Simul::reportMarkedFiberLengths(std::ostream& out, Property const*) const
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
         sup = std::max(sup, fib->mark());
 
-    std::streamsize p = out.precision();
     for ( ObjectMark k = 0; k <= sup; ++k )
     {
         uintptr_t val = k;
@@ -634,7 +633,6 @@ void Simul::reportMarkedFiberLengths(std::ostream& out, Property const*) const
             printFiberLengths(out, objs);
         }
     }
-    out.precision(p);
 }
 
 
@@ -875,14 +873,15 @@ void Simul::reportFiberLattice(std::ostream& out, Property const* sel) const
             fib->infoLattice(cnt, vac, sum, mn, mx);
     }
     
-    std::streamsize p = out.precision();
+    std::streamsize p = out.precision(4);
     out << LIN << ljust("fiber:lattice", 2);
     out << SEP << cnt;
     out << SEP << vac;
-    out << SEP << std::setprecision(4) << sum / (real)cnt;
-    out << SEP << std::setprecision(4) << sum / (real)(cnt-vac);
-    out << SEP << std::fixed << std::setprecision(2) << mn;
-    out << SEP << std::fixed << std::setprecision(2) << mx;
+    out << SEP << sum / (real)cnt;
+    out << SEP << sum / (real)(cnt-vac);
+    out.precision(2);
+    out << SEP << std::fixed << mn;
+    out << SEP << std::fixed << mx;
     out.precision(p);
 }
 
@@ -904,12 +903,13 @@ void Simul::reportFiberMeshAverage(std::ostream& out, bool density, Property con
             fib->infoMesh(len, cnt, vac, sum, mn, mx, density);
     }
     
-    std::streamsize p = out.precision();
+    std::streamsize p = out.precision(4);
     out << LIN << ljust("fiber:mesh", 2);
     out << SEP << sum;
-    out << SEP << std::setprecision(4) << sum / (real)cnt;
-    out << SEP << std::fixed << std::setprecision(6) << mn;
-    out << SEP << std::fixed << std::setprecision(6) << mx;
+    out << SEP << sum / (real)cnt;
+    out.precision(6);
+    out << SEP << std::fixed << mn;
+    out << SEP << std::fixed << mx;
     out << SEP << std::setprecision(3) << len;
     out.precision(p);
 }
@@ -929,10 +929,10 @@ void Simul::reportFiberMesh(std::ostream& out, bool density, Property const* sel
         if ( !sel || sel == fib->prop )
         {
             fib->infoMesh(len, cnt, vac, sum, mn, mx, density);
-            std::streamsize p = out.precision();
+            std::streamsize p = out.precision(4);
             out << LIN << ljust(fib->reference(), 2);
             out << SEP << sum;
-            out << SEP << std::setprecision(4) << sum / (real)cnt;
+            out << SEP << sum / (real)cnt;
             out << SEP << std::fixed << std::setprecision(6) << mn;
             out << SEP << std::fixed << std::setprecision(6) << mx;
             out << SEP << std::setprecision(3) << len;
@@ -3139,7 +3139,7 @@ void Simul::reportPlatelet(std::ostream& out) const
         analyzeRing(1, len, rad);
 
     std::streamsize p = out.precision();
-    out.precision(std::min(p,(std::streamsize)3));
+    if ( p < 3 ) out.precision(3);
     out << COM << "nb_fiber" << SEP << "polymer" << SEP << "tension" << SEP << "force" << SEP << "length" << SEP << "radius";
     out << LIN << nfib << SEP << std::fixed << pol << SEP << ten << SEP << force << SEP << len << SEP << rad;
     out.precision(p);
@@ -3204,7 +3204,6 @@ void Simul::reportMarkedFiberEnds(std::ostream& out, Glossary& opt) const
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
         sup = std::max(sup, fib->mark());
 
-    std::streamsize p = out.precision();
     for ( ObjectMark k = 0; k <= sup; ++k )
     {
         uintptr_t val = k;
@@ -3224,7 +3223,6 @@ void Simul::reportMarkedFiberEnds(std::ostream& out, Glossary& opt) const
             out << SEP << nL << SEP << L << SEP << nR << SEP << R << SEP << norm(R-L);
         }
     }
-    out.precision(p);
 }
 
 
