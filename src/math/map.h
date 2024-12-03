@@ -941,9 +941,10 @@ public:
         os << arg << " of dim " << ORD << " has " << mNbCells << " cells: ";
         for ( int d = 0; d < ORD; ++d )
         {
-            if ( mPeriodic[d] ) os << "P "; else os << " ";
-            os << "[" << mInf[d] << ", " << mSup[d];
-            os << "]/" << mDim[d] << " = " << cWidth[d];
+            char o = '[', c = ']';
+            if ( mPeriodic[d] ) { o = ']'; c = '['; }
+            os << " " << o << mInf[d] << ", " << mSup[d];
+            os << c << "/" << mDim[d] << " = " << cWidth[d];
         }
         os << std::endl;
     }
