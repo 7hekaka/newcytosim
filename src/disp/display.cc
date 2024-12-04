@@ -293,40 +293,40 @@ void Display::drawTiled(Simul const& sim, int tile)
  */
 void Display::initFiberDisp(FiberProp* fp, PropertyList& depot, gym_color col)
 {
-    FiberDisp *& disp = fp->disp;
+    FiberDisp *& dis = fp->disp;
     
     // recover existing property:
-    if ( !disp )
-        disp = static_cast<FiberDisp*>(depot.find("fiber:display", fp->name()));
+    if ( !dis )
+        dis = static_cast<FiberDisp*>(depot.find("fiber:display", fp->name()));
 
     // create new property with default values:
-    if ( !disp )
+    if ( !dis )
     {
-        disp = new FiberDisp(fp->name());
-        depot.push_back(disp);
+        dis = new FiberDisp(fp->name());
+        depot.push_back(dis);
         // set default:
-        disp->color      = col;
-        disp->back_color = col.darken(0.5);
-        disp->point_size = prop->point_size;
-        disp->line_width = prop->line_width;
+        dis->color      = col;
+        dis->back_color = col.darken(0.5);
+        dis->point_size = prop->point_size;
+        dis->line_width = prop->line_width;
     }
     
     // parse user-provided values:
     if ( fp->display_fresh )
     {
-        disp->read_string(fp->display, fp->name()+":display");
-        if ( disp->mask && !disp->mask_bitfield )
-            disp->mask_bitfield = distribute_bits(disp->mask, pcg32_state);
+        dis->read_string(fp->display, fp->name()+":display");
+        if ( dis->mask && !dis->mask_bitfield )
+            dis->mask_bitfield = distribute_bits(dis->mask, pcg32_state);
         fp->display_fresh = false;
     }
     
-    if ( disp->coloring == FiberDisp::COLORING_CLUSTER )
+    if ( dis->coloring == FiberDisp::COLORING_CLUSTER )
         prep_flag |= 1;
     
-    if ( disp->line_style == 2 || disp->line_style == 3 )
+    if ( dis->line_style == 2 || dis->line_style == 3 )
         prep_flag |= 2;
 
-    if ( disp->coloring == FiberDisp::COLORING_AGE )
+    if ( dis->coloring == FiberDisp::COLORING_AGE )
         prep_flag |= 4;
 }
 
@@ -334,24 +334,24 @@ void Display::initFiberDisp(FiberProp* fp, PropertyList& depot, gym_color col)
 /**
  set LineDisp for given Fiber
  */
-void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * self)
+void Display::initLineDisp(const Fiber * fib, FiberDisp const* dis, LineDisp * self)
 {
     bool hide = false;
     assert_true(fib->prop);
-    gym_color col = disp->color;
+    gym_color col = dis->color;
     
     // change body color depending on coloring mode:
-    switch ( disp->coloring )
+    switch ( dis->coloring )
     {
         default:
         case FiberDisp::COLORING_OFF:
-            col = disp->color;
+            col = dis->color;
             break;
         case FiberDisp::COLORING_RANDOM:
-            col = gym::bright_color(fib->signature()).match_a(disp->color);
+            col = gym::bright_color(fib->signature()).match_a(dis->color);
             break;
         case FiberDisp::COLORING_DIRECTION:
-            col = radial_color(fib->direction(), disp->color.alpha());
+            col = radial_color(fib->direction(), dis->color.alpha());
             break;
         case FiberDisp::COLORING_MARK:
             col = gym::get_color(fib->mark());
@@ -364,7 +364,7 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
             if ( fib->family_ )
                 col = gym::get_color(fib->family_->signature());
             else
-                col = disp->color;
+                col = dis->color;
             break;
 #endif
         case FiberDisp::COLORING_CLUSTER:
@@ -375,12 +375,12 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
             break;
         case FiberDisp::COLORING_PSTATE:
             if ( fib->endStateP() > 0 )
-                col = disp->end_colors[std::min(fib->endStateP(),5U)];
+                col = dis->end_colors[std::min(fib->endStateP(),5U)];
             break;
     }
     
     self->color = col;
-    self->color_scale = color_scale(fib, disp->line_style);
+    self->color_scale = color_scale(fib, dis->line_style);
     //std::cerr << fib->reference() << ":color_scale " << self->color_scale << "\n";
     
 #if ( 1 )
@@ -389,67 +389,67 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
     self->end_color[1] = col;
 #else
     // use colors of non-dynamic ends:
-    self->end_color[0] = disp->end_colors[0];
-    self->end_color[1] = disp->end_colors[0];
+    self->end_color[0] = dis->end_colors[0];
+    self->end_color[1] = dis->end_colors[0];
 #endif
     
 #if ( 1 )
     // For dynamic Fibers, change colors of tips according to state:
     if ( fib->endStateP() > 0 )
-        self->end_color[0] = disp->end_colors[std::min(fib->endStateP(),5U)];
+        self->end_color[0] = dis->end_colors[std::min(fib->endStateP(),5U)];
     if ( fib->endStateM() > 0 )
-        self->end_color[1] = disp->end_colors[std::min(fib->endStateM(),5U)];
+        self->end_color[1] = dis->end_colors[std::min(fib->endStateM(),5U)];
 #else
     // For dynamic Fibers, change colors of tips according to state:
     if ( fib->freshAssemblyP() > 0 )
-        self->end_color[0] = disp->end_colors[std::min(fib->endStateP(),5U)];
+        self->end_color[0] = dis->end_colors[std::min(fib->endStateP(),5U)];
     if ( fib->freshAssemblyM() > 0 )
-        self->end_color[1] = disp->end_colors[std::min(fib->endStateM(),5U)];
+        self->end_color[1] = dis->end_colors[std::min(fib->endStateM(),5U)];
 #endif
     
     // hide right or left-pointing fibers:
-    if (( disp->hide & 1 )  &&  dot(fib->diffPoints(0), Vector(disp->hide_axis)) < 0 )
+    if (( dis->hide & 1 )  &&  dot(fib->diffPoints(0), Vector(dis->hide_axis)) < 0 )
         hide = true;
-    if (( disp->hide & 2 )  &&  dot(fib->diffPoints(0), Vector(disp->hide_axis)) > 0 )
+    if (( dis->hide & 2 )  &&  dot(fib->diffPoints(0), Vector(dis->hide_axis)) > 0 )
         hide = true;
     
 #if ( DIM == 2 )
     // hide clockwise or counter-clockwise orientated fibers:
-    if (( disp->hide & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)) < 0 )
+    if (( dis->hide & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)) < 0 )
         hide = true;
-    if (( disp->hide & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)) > 0 )
+    if (( dis->hide & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)) > 0 )
         hide = true;
 #elif ( DIM >= 3 )
     // hide clockwise or counter-clockwise orientated fibers in the XY plane
-    if (( disp->hide & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ < 0 )
+    if (( dis->hide & 4 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ < 0 )
         hide = true;
-    if (( disp->hide & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ > 0 )
+    if (( dis->hide & 8 )  &&  cross(fib->posP(0), fib->diffPoints(0)).ZZ > 0 )
         hide = true;
 #endif
     
 #if ( 1 )
     // hide fibers depending on mask
-    if ( fib->signature() & disp->mask_bitfield )
+    if ( fib->signature() & dis->mask_bitfield )
         hide = true;
 #else
-    if ( fib->mark() & disp->mask_bitfield )
+    if ( fib->mark() & dis->mask_bitfield )
         hide = true;
 #endif
 
     // hide fibers in a specified state
-    if ( fib->endStateP() == disp->hide_state )
+    if ( fib->endStateP() == dis->hide_state )
         hide = true;
     
     // hide fibers except those with a certain mark
-    if ( disp->show_marked != ~0U && fib->mark() != disp->show_marked )
+    if ( dis->show_marked != ~0U && fib->mark() != dis->show_marked )
         hide = true;
 
     // change color of 'hidden' filament:
     if ( hide )
-        self->color = disp->hide_color;
+        self->color = dis->hide_color;
     
     // default visibility set from class:
-    if ( disp->visible )
+    if ( dis->visible )
     {
         // change visibility flag according to body color:
         if ( !self->color.visible() )
@@ -463,8 +463,8 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
         self->visible = 0;
     
     // set parameters for exploded display
-    if ( disp->explode_style )
-        self->explode_shift = ( fib->signature() * 0x1p-32 - 0.5 ) * disp->explode_range;
+    if ( dis->explode_style )
+        self->explode_shift = ( fib->signature() * 0x1p-32 - 0.5 ) * dis->explode_range;
     else
         self->explode_shift = 0;
 }
@@ -476,39 +476,39 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* disp, LineDisp * 
 template < typename T >
 void Display::initPointDisp(T * p, PropertyList& depot, gym_color col)
 {
-    PointDisp *& disp = p->disp;
+    PointDisp *& dis = p->disp;
     
     // create new property:
-    if ( !disp )
+    if ( !dis )
     {
         // search for matching property:
-        disp = static_cast<PointDisp*>(depot.find(p->category()+":display", p->name()));
-        if ( !disp )
+        dis = static_cast<PointDisp*>(depot.find(p->category()+":display", p->name()));
+        if ( !dis )
         {
             //std::clog <<" new " << p->category() << ":display " << p->name() << "\n";
-            disp = new PointDisp(p->category()+":display", p->name());
-            depot.push_back(disp);
+            dis = new PointDisp(p->category()+":display", p->name());
+            depot.push_back(dis);
             // set default:
-            disp->clear();
-            disp->color  = col;
-            disp->color2 = col.alpha_scaled(0.1875f);
-            disp->size   = prop->point_size;
+            dis->clear();
+            dis->color  = col;
+            dis->color2 = col.alpha_scaled(0.1875f);
+            dis->size   = prop->point_size;
             if ( p->category() == "hand" )
-                disp->width = prop->link_width;
+                dis->width = prop->link_width;
             else
-                disp->width = prop->line_width;
+                dis->width = prop->line_width;
         }
     }
     
     // parse display string once:
     if ( p->display_fresh )
     {
-        disp->read_string(p->display, p->name()+":display");
-        //std::clog << disp->color << "  " << p->name() << ":display (" << p->category() << ")\n";
+        dis->read_string(p->display, p->name()+":display");
+        //std::clog << dis->color << "  " << p->name() << ":display (" << p->category() << ")\n";
         p->display_fresh = false;
     }
     
-    disp->setPixels(pixelSize, unitValue, prop->style==2);
+    dis->setPixels(pixelSize, unitValue, prop->style==2);
 }
 
 
@@ -619,11 +619,11 @@ void Display::prepareDrawing(Simul const& sim, PropertyList& fiberDisp, Property
  */
 void Display::drawSpace3D(Space const* obj, bool back)
 {
-    PointDisp const* disp = obj->prop->disp;
-    bool front = back ^ ( disp->color.transparent() );
+    PointDisp const* dis = obj->prop->disp;
+    bool front = back ^ ( dis->color.transparent() );
     
-    back = ( disp->visible & 2 ) && back;
-    front = ( disp->visible & 1 ) && front;
+    back = ( dis->visible & 2 ) && back;
+    front = ( dis->visible & 1 ) && front;
     
     if ( back | front )
     {
@@ -632,13 +632,13 @@ void Display::drawSpace3D(Space const* obj, bool back)
         gym::enableCullFace(GL_FRONT);
         if ( back )
         {
-            gym::color_back(disp->color2);
+            gym::color_back(dis->color2);
             obj->draw3D();
         }
         if ( front )
         {
             gym::switchCullFace(GL_BACK);
-            gym::color_load(disp->color);
+            gym::color_load(dis->color);
             obj->draw3D();
         }
         gym::restoreCullFace();
@@ -662,13 +662,13 @@ void Display::drawSpaces(SpaceSet const& set)
     
     for ( Space * obj = set.first(); obj; obj=obj->next() )
     {
-        PointDisp const* disp = obj->prop->disp;
-        if ( disp->visible )
+        PointDisp const* dis = obj->prop->disp;
+        if ( dis->visible )
         {
             gym::disableLighting();
-            gym::color(disp->color);
+            gym::color(dis->color);
             gym::ref_view();
-            obj->draw2D(disp->widthX);
+            obj->draw2D(dis->widthX);
         }
     }
     
@@ -981,8 +981,8 @@ void Display::drawFiberLines(Fiber const& fib, const int style, float width) con
 
 void Display::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
-    const int style = disp->line_style;
+    FiberDisp const*const dis = fib.prop->disp;
+    const int style = dis->line_style;
     if ( style == 8 && fib.endStateP() != STATE_GREEN )
         return;
     size_t cnt = 8;
@@ -1028,7 +1028,7 @@ void Display::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
     gym::ref_view();
     gym::disableLighting();
     gym::unmapBufferC4VD();
-    gym::drawLineStrip(pixwidth(disp->line_width), 0, ptr-flu);
+    gym::drawLineStrip(pixwidth(dis->line_width), 0, ptr-flu);
     gym::restoreLighting();
     gym::cleanupCV();
 }
@@ -1036,14 +1036,14 @@ void Display::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
 
 void Display::drawFiberSpeckles(Fiber const& fib) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
-    const real gap = disp->speckle_gap;
+    FiberDisp const*const dis = fib.prop->disp;
+    const real gap = dis->speckle_gap;
 
     size_t i = 0, cnt = 8 + 4 * std::ceil(fib.length()/gap);
     fluteD* pts = gym::mapBufferVD(cnt);
 
     // display random speckles:
-    if ( disp->speckle_style == 1 )
+    if ( dis->speckle_style == 1 )
     {
         /*
          A simple random number generator seeded by fib.signature()
@@ -1078,7 +1078,7 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
             }
         }
     }
-    else if ( disp->speckle_style == 2 )
+    else if ( dis->speckle_style == 2 )
     {
         // display regular speckles
         real a = gap * std::ceil( fib.abscissaM() / gap );
@@ -1092,14 +1092,14 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
     gym::ref_view();
     gym::disableLighting();
     gym::color(fib.disp->color);
-    gym::drawPoints(disp->speckle_size, 0, i);
+    gym::drawPoints(dis->speckle_size, 0, i);
 }
 
 
 void Display::drawFiberPoints(Fiber const& fib) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
-    int style = disp->point_style;
+    FiberDisp const*const dis = fib.prop->disp;
+    int style = dis->point_style;
 
     if ( style == 1 )
     {
@@ -1108,15 +1108,15 @@ void Display::drawFiberPoints(Fiber const& fib) const
         gym::disableLighting();
         gym::color(fib.disp->color);
         gym::loadPoints(fib.nbPoints(), fib.addrPoints());
-        gym::drawSquarePoints(pixwidth(disp->point_size), 0, fib.nbPoints());
+        gym::drawSquarePoints(pixwidth(dis->point_size), 0, fib.nbPoints());
     }
     else if ( style == 2 )
     {
         gym::color_load(fib.disp->color);
-        gym::color_back(disp->back_color);
+        gym::color_back(dis->back_color);
         // display arrowheads along the fiber:
-        const float rad = pixscale(disp->point_size);
-        const real gap = disp->point_gap;
+        const float rad = pixscale(dis->point_size);
+        const real gap = dis->point_gap;
         real ab = std::ceil(fib.abscissaM()/gap) * gap;
         for ( ; ab <= fib.abscissaP(); ab += gap )
             gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
@@ -1124,8 +1124,8 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( style == 3 )
     {
         // display chevrons along the fiber:
-        const real gap = disp->point_gap;
-        const real rad = pixscale(disp->point_size);
+        const real gap = dis->point_gap;
+        const real rad = pixscale(dis->point_size);
         real beta = fib.segmentationInv() * rad;
         size_t cnt = 4 * fib.length() / gap + 8;
         fluteD* flu = gym::mapBufferVD(cnt);
@@ -1153,9 +1153,9 @@ void Display::drawFiberPoints(Fiber const& fib) const
     else if ( style == 4 )
     {
         gym::color_load(fib.disp->color);
-        gym::color_back(disp->back_color);
+        gym::color_back(dis->back_color);
         // display only middle of fiber:
-        drawObject(fib.posMiddle(), pixscale(2*disp->point_size), gle::sphere2);
+        drawObject(fib.posMiddle(), pixscale(2*dis->point_size), gle::sphere2);
     }
 }
 
@@ -1174,9 +1174,9 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
-    FiberDisp const*const disp = fib.prop->disp;
-    gym_color c, col = disp->color;
-    const real fac = 1 / disp->lattice_scale;
+    FiberDisp const*const dis = fib.prop->disp;
+    gym_color c, col = dis->color;
+    const real fac = 1 / dis->lattice_scale;
     size_t cnt = 2 * ( sup - inf );
     flute4D* flu = gym::mapBufferC4VD(cnt+4);
     flute4D* ptr = flu;
@@ -1197,7 +1197,7 @@ void Display::drawFiberLattice1(Fiber const& fib, VisibleLattice const& lat, flo
 
         real facM = fac;
         real facP = fac;
-        if ( disp->lattice_rescale )
+        if ( dis->lattice_rescale )
         {
             facM = ( lenM > 0.01*uni ? fac*uni/lenM : fac );
             facP = ( lenP > 0.01*uni ? fac*uni/lenP : fac );
@@ -1241,9 +1241,9 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
     const auto sup = lat.indexP();
     assert_true( inf <= sup );
     
-    FiberDisp const*const disp = fib.prop->disp;
-    gym_color c, col = disp->color;
-    const real fac = 1 / disp->lattice_scale;
+    FiberDisp const*const dis = fib.prop->disp;
+    gym_color c, col = dis->color;
+    const real fac = 1 / dis->lattice_scale;
     size_t cnt = 2 + 2 * ( sup - inf );
     flute4D* flu = gym::mapBufferC4VD(cnt);
     flute4D* ptr = flu;
@@ -1264,7 +1264,7 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
 
         real facM = fac;
         real facP = fac;
-        if ( disp->lattice_rescale )
+        if ( dis->lattice_rescale )
         {
             facM = ( lenM > 0.01*uni ? fac*uni/lenM : fac );
             facP = ( lenP > 0.01*uni ? fac*uni/lenP : fac );
@@ -1952,17 +1952,17 @@ void Display::drawMicrotubule(Fiber const& fib, gym_color colA, gym_color colB, 
 
 void Display::drawFiber(Fiber const& fib)
 {
-    FiberDisp const*const disp = fib.prop->disp;
-    int style = disp->line_style;
+    FiberDisp const*const dis = fib.prop->disp;
+    int style = dis->line_style;
     
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
-    if ( disp->lattice_style )
+    if ( dis->lattice_style )
     {
         VisibleLattice const* lat = fib.visibleLattice();
         if ( lat )
         {
-            float rad = disp->line_width;
-            switch ( disp->lattice_style )
+            float rad = dis->line_width;
+            switch ( dis->lattice_style )
             {
                 case 1:
                     return drawFiberLattice1(fib, *lat, rad);
@@ -1978,31 +1978,31 @@ void Display::drawFiber(Fiber const& fib)
     }
 #endif
 
-    if ( disp->style == 1 )
+    if ( dis->style == 1 )
         drawFiberBackbone(fib, fib.disp->color, prop->bone_width);
     // if the Lattice was displayed, do not draw fancy styles:
-    else if ( style && disp->style )
+    else if ( style && dis->style )
     {
         gym_color col1 = fib.disp->color.alpha(1.0);
         gym_color col2 = col1.darken(0.75);
         gym_color colE = fib.disp->end_color[0];
         
         // load backface color:
-        if ( disp->coloring )
+        if ( dis->coloring )
             gym::color_back(col1);
         else
-            gym::color_back(disp->back_color);
+            gym::color_back(dis->back_color);
         gym::enableLighting();
 
-        switch( disp->style )
+        switch( dis->style )
         {
-            case 2: drawFiberStriped(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2); break;
+            case 2: drawFiberStriped(fib, pixscale(dis->line_width), 0.008, col1, 0.024, col2); break;
             case 3: drawFilament(fib, 0.008, col1, col2, colE); break;
             case 4: drawActin(fib, col1, col2, colE); break;
             case 5: drawMicrotubule(fib, col1, col2, colE); break;
-            case 6: drawFiberStriped2D(fib, pixscale(disp->line_width), 0.008, col1, 0.024, col2); break;
+            case 6: drawFiberStriped2D(fib, pixscale(dis->line_width), 0.008, col1, 0.024, col2); break;
             case 7: {
-                float w = pixscale(disp->line_width);
+                float w = pixscale(dis->line_width);
                 float l = std::max(w, 0.008f);
                 drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
                 //drawFiberWide(fib, w);
@@ -2039,43 +2039,43 @@ void Display::drawFiber(Fiber const& fib)
     }
 #endif
 
-    if ( style && disp->line_width > 0 )
+    if ( style && dis->line_width > 0 )
     {
         /*
         if ( style == 1 ) // adding a black outline to filaments
-            drawFiberBackbone(fib, gym::background_color, 2*disp->line_width);
+            drawFiberBackbone(fib, gym::background_color, 2*dis->line_width);
          */
-        drawFiberLines(fib, style, disp->line_width);
+        drawFiberLines(fib, style, dis->line_width);
     }
     
-    if ( disp->end_style[0] )
+    if ( dis->end_style[0] )
     {
         gym::color_load(fib.disp->end_color[0]);
         //gym::color_load(fib.disp->color);
-        gym::color_back(disp->back_color);
-        drawFiberEndPlus(fib, disp->end_style[0], disp->end_size[0]);
+        gym::color_back(dis->back_color);
+        drawFiberEndPlus(fib, dis->end_style[0], dis->end_size[0]);
     }
 
-    if ( disp->end_style[1] )
+    if ( dis->end_style[1] )
     {
         gym::color_load(fib.disp->end_color[1]);
         //gym::color_load(fib.disp->color);
-        gym::color_back(disp->back_color);
-        drawFiberEndMinus(fib, disp->end_style[1], disp->end_size[1]);
+        gym::color_back(dis->back_color);
+        drawFiberEndMinus(fib, dis->end_style[1], dis->end_size[1]);
     }
 
-    if ( disp->growth_style )
-        drawFiberGrowth(fib, disp->line_width);
+    if ( dis->growth_style )
+        drawFiberGrowth(fib, dis->line_width);
     
-    if ( disp->point_style > 0 )
+    if ( dis->point_style > 0 )
         drawFiberPoints(fib);
     
-    if ( disp->speckle_style > 0 )
+    if ( dis->speckle_style > 0 )
         drawFiberSpeckles(fib);
 
     // draw other fiber elements only if fiber is fully visible:
-    if ( disp->force_style && fib.disp->visible > 0 )
-        drawFiberForces(fib, disp->force_scale, pixwidth(disp->point_size));
+    if ( dis->force_style && fib.disp->visible > 0 )
+        drawFiberForces(fib, dis->force_scale, pixwidth(dis->point_size));
 }
 
 
@@ -2107,9 +2107,9 @@ void Display::drawFiberTexts(FiberSet const& set)
     {
         if ( fib->disp && fib->disp->visible > 0 )
         {
-            FiberDisp const*const disp = fib->prop->disp;
+            FiberDisp const*const dis = fib->prop->disp;
 #if FIBER_HAS_LATTICE || FIBER_HAS_MESH
-            if ( disp->lattice_style == 5 )
+            if ( dis->lattice_style == 5 )
             {
                 VisibleLattice const* lat = fib->visibleLattice();
                 if ( lat )
@@ -2120,7 +2120,7 @@ void Display::drawFiberTexts(FiberSet const& set)
             }
 #endif
 #if FIBER_HAS_LATTICE
-            if ( disp->lattice_style == 6 )
+            if ( dis->lattice_style == 6 )
             {
                 VisibleLattice const* lat = fib->lattice();
                 if ( lat )
@@ -2130,10 +2130,10 @@ void Display::drawFiberTexts(FiberSet const& set)
                 }
             }
 #endif
-            if ( disp->label_style )
+            if ( dis->label_style )
             {
                 gym::color(fib->disp->color);
-                drawFiberLabels(*fib, disp->label_style);
+                drawFiberLabels(*fib, dis->label_style);
             }
         }
     }
@@ -2192,7 +2192,7 @@ void Display::drawCouplesB(CoupleSet const& set) const
 
 void Display::drawSolid(Solid const& obj)
 {
-    PointDisp const* disp = obj.prop->disp;
+    PointDisp const* dis = obj.prop->disp;
     gym_color col = bodyColorF(obj);
 #if NEW_SOLID_HAS_TWIN
     if ( obj.elder_twin() )
@@ -2200,9 +2200,9 @@ void Display::drawSolid(Solid const& obj)
 #endif
 
     //display points:
-    if (( disp->style & 2 ) && disp->perceptible )
+    if (( dis->style & 2 ) && dis->perceptible )
     {
-        const float rad = pixscale(disp->size);
+        const float rad = pixscale(dis->size);
         gym::color_both(col);
         gym::enableLighting();
         for ( size_t i = 0; i < obj.nbPoints(); ++i )
@@ -2230,7 +2230,7 @@ void Display::drawSolid(Solid const& obj)
     {
         gym::color_both(col);
         gym::enableLighting();
-        drawObject(obj.clampPosition(), pixscale(disp->size), gle::star);
+        drawObject(obj.clampPosition(), pixscale(dis->size), gle::star);
     }
 #endif
     
@@ -2240,7 +2240,7 @@ void Display::drawSolid(Solid const& obj)
     {
         Solid const* twi = obj.twin();
         gym_color lor = bodyColorF(*twi).mix(col);
-        real rad = M_SQRT2 * pixscale(disp->size);
+        real rad = M_SQRT2 * pixscale(dis->size);
         gym::ref_view();
         gym::enableLighting();
         gym::disableCullFace();
@@ -2259,12 +2259,12 @@ void Display::drawSolid(Solid const& obj)
 
 #if OLD_SOLID_HAS_TWIN
     // display links between twin solids
-    if ( obj.elder_twin() && ( disp->style & 6 ) && disp->perceptible )
+    if ( obj.elder_twin() && ( dis->style & 6 ) && dis->perceptible )
     {
         Solid const* twi = obj.twin();
         gym_color lor = bodyColorF(*twi);
         // draw links between 'obj' and its Twin
-        real rad = M_SQRT2 * pixscale(disp->size);
+        real rad = M_SQRT2 * pixscale(dis->size);
         const size_t inx = 0;
         // three points are expected:
         if ( obj.radius(inx) > 0 && obj.nbPoints() > inx+4 )
@@ -2280,7 +2280,7 @@ void Display::drawSolid(Solid const& obj)
             Vector S3(obj.posPoint(inx+DIM+1));
             Vector T3(twi->posPoint(inx+DIM+1));
 #if ( DIM >= 3 )
-            real R = 3 * pixscale(disp->size) / obj.radius(inx);
+            real R = 3 * pixscale(dis->size) / obj.radius(inx);
             Vector C(obj.posPoint(inx+3));
             Vector dA = R*(A-S), dB = R*(B-S), dC = R*(C-S);
             Vector Z(twi->posPoint(inx+3));
@@ -2328,7 +2328,7 @@ void Display::drawSolid(Solid const& obj)
 #endif
 
     //display outline of spheres in 2D
-    if ( disp->style & 8 )
+    if ( dis->style & 8 )
     {
         gym::color(col);
 #if ( DIM == 2 )
@@ -2338,7 +2338,7 @@ void Display::drawSolid(Solid const& obj)
             if ( obj.radius(i) > pixelSize )
             {
                 gym::transScale(obj.posP(i), obj.radius(i));
-                gle::circle1(disp->width);
+                gle::circle1(dis->width);
             }
         }
         gym::enableLighting();
@@ -2355,7 +2355,7 @@ void Display::drawSolid(Solid const& obj)
     }
     
     //print the number for each Solid
-    if ( disp->style & 16 )
+    if ( dis->style & 16 )
     {
         char tmp[32];
         gym::color(col);
@@ -2369,13 +2369,13 @@ void Display::drawSolid(Solid const& obj)
     }
     
     //draw polygon line joining vertices of Solid
-    if ( disp->style & 32 )
+    if ( dis->style & 32 )
     {
         gym::disableLighting();
         gym::color(col);
         gym::ref_view();
         gym::loadPoints(obj.nbPoints(), obj.addrPoints());
-        gym::drawLineStrip(disp->widthX, 0, obj.nbPoints());
+        gym::drawLineStrip(dis->widthX, 0, obj.nbPoints());
         gym::enableLighting();
     }
 }
@@ -2421,15 +2421,15 @@ void Display::drawSolids(SolidSet const& set)
 {
     for ( Solid * obj = set.first(); obj; obj=obj->next() )
     {
-        PointDisp const* disp = obj->prop->disp;
-        if ( disp->visible && disp->style )
+        PointDisp const* dis = obj->prop->disp;
+        if ( dis->visible && dis->style )
         {
             drawSolid(*obj);
-            if ( disp->style & 1 )
+            if ( dis->style & 1 )
             {
                 // draw Solid's balls which can be transparent or not
                 size_t sup = obj->nbPoints();
-                if ( disp->style & 4 ) sup = 1;
+                if ( dis->style & 4 ) sup = 1;
 #if ( DIM >= 3 )
 #if NEW_SOLID_HAS_TWIN
                 Solid const * twi = obj->twin();
@@ -2447,7 +2447,7 @@ void Display::drawSolids(SolidSet const& set)
                     }
                 } else
 #endif
-                if ( disp->color.transparent() )
+                if ( dis->color.transparent() )
                 {
                     for ( size_t i = 0; i < sup; ++i )
                         if ( obj->radius(i) > 0 )
@@ -2479,14 +2479,14 @@ void drawVector(Vector pos, Vector vec, real a, real b, gym_color col, float rad
 
 void Display::drawBead(Bead const& obj)
 {
-    PointDisp const* disp = obj.prop->disp;
+    PointDisp const* dis = obj.prop->disp;
     gym_color col = bodyColorF(obj);
     
     // display center:
-    if ( disp->style & 2 )
+    if ( dis->style & 2 )
     {
         gym::color_both(col, 1);
-        drawObject(obj.position(), pixscale(disp->size), gle::tetrahedron);
+        drawObject(obj.position(), pixscale(dis->size), gle::tetrahedron);
     }
     
 #if NEW_SOLID_CLAMP
@@ -2494,11 +2494,11 @@ void Display::drawBead(Bead const& obj)
     {
         gym::color_both(col);
         gym::enableLighting();
-        drawObject(obj.clampPosition(), pixscale(disp->size), gle::star);
+        drawObject(obj.clampPosition(), pixscale(dis->size), gle::star);
     }
 #endif
 
-    if ( disp->style & 4 )
+    if ( dis->style & 4 )
     {
 #if ( DIM <= 2 )
         // display outline:
@@ -2507,14 +2507,14 @@ void Display::drawBead(Bead const& obj)
             gym::disableLighting();
             gym::color(col);
             gym::transScale(obj.position(), obj.radius());
-            gle::circle1(disp->width);
+            gle::circle1(dis->width);
         }
 #else
         if ( obj.mark() )
         {
             col = gym::get_color(obj.mark());
             gym::color_both(col);
-            drawObject(obj.position(), pixscale(disp->size), gle::cube);
+            drawObject(obj.position(), pixscale(dis->size), gle::cube);
         }
 #endif
     }
@@ -2526,11 +2526,11 @@ void Display::drawBead(Bead const& obj)
  */
 void Display::drawBeadT(Bead const& obj) const
 {
-    PointDisp const* disp = obj.prop->disp;
+    PointDisp const* dis = obj.prop->disp;
     
-    assert_true( disp->style & 1 );
+    assert_true( dis->style & 1 );
     {
-        gym_color col = bodyColorF(obj).match_a(disp->color);
+        gym_color col = bodyColorF(obj).match_a(dis->color);
 #if ( DIM > 2 )
         gym::color_both(col);
         drawBeadS(obj.position(), obj.radius(), obj.mark());
@@ -2547,14 +2547,14 @@ void Display::drawBeads(BeadSet const& set)
     gym::enableLighting();
     for ( Bead * obj = set.first(); obj; obj=obj->next() )
     {
-        PointDisp const* disp = obj->prop->disp;
-        if ( disp->visible && disp->style )
+        PointDisp const* dis = obj->prop->disp;
+        if ( dis->visible && dis->style )
         {
             drawBead(*obj);
-            if ( disp->style & 1 )
+            if ( dis->style & 1 )
             {
 #if ( DIM >= 3 )
-                if ( disp->color.transparent() )
+                if ( dis->color.transparent() )
                     zObjects.emplace(obj);
                 else
 #endif
@@ -2570,13 +2570,13 @@ void Display::drawBeads(BeadSet const& set)
 
 void Display::drawSphere(Sphere const& obj)
 {
-    PointDisp const* disp = obj.prop->disp;
+    PointDisp const* dis = obj.prop->disp;
     
-    if ( disp->perceptible )
+    if ( dis->perceptible )
     {
-        const float rad = pixscale(disp->size);
+        const float rad = pixscale(dis->size);
         // display surface points
-        if ( disp->style & 2 )
+        if ( dis->style & 2 )
         {
             bodyColor(obj);
             for ( size_t i = obj.nbRefPoints; i < obj.nbPoints(); ++i )
@@ -2584,7 +2584,7 @@ void Display::drawSphere(Sphere const& obj)
         }
         
         // display center and reference points
-        if ( disp->style & 8 )
+        if ( dis->style & 8 )
         {
             bodyColor(obj);
             drawObject(obj.posP(0), rad, gle::star);
@@ -2597,22 +2597,22 @@ void Display::drawSphere(Sphere const& obj)
 
 void Display::drawSphereT(Sphere const& obj) const
 {
-    PointDisp const* disp = obj.prop->disp;
+    PointDisp const* dis = obj.prop->disp;
 
-    if ( disp->style & 7 )
+    if ( dis->style & 7 )
     {
-        gym_color col = bodyColorF(obj).match_a(disp->color);
+        gym_color col = bodyColorF(obj).match_a(dis->color);
         const Vector C = obj.posP(0);
 #if ( DIM < 3 )
         if ( obj.radius() > pixelSize )
         {
             gym::color(col);
             gym::transScale(C, obj.radius());
-            if ( disp->style & 1 )
-                gle::circle1(disp->widthX);
-            if ( disp->style & 2 )
+            if ( dis->style & 1 )
+                gle::circle1(dis->widthX);
+            if ( dis->style & 2 )
                 gle::disc();
-            if ( disp->style & 4 )
+            if ( dis->style & 4 )
                 drawDiscT(C, obj.radius());
         }
 #else
@@ -2623,9 +2623,9 @@ void Display::drawSphereT(Sphere const& obj) const
         gym::color_both(col);
         gym::enableLighting();
         gym::transRotate(C, obj.posP(1)-C, obj.posP(2)-C, obj.posP(3)-C);
-        if ( disp->style & 1 )
+        if ( dis->style & 1 )
             gle::dualPassSphere2();
-        if ( disp->style & 4 )
+        if ( dis->style & 4 )
             gle::threeArrowStrip(0.5, 1);
 #endif
     }
@@ -2636,13 +2636,13 @@ void Display::drawSpheres(SphereSet const& set)
 {
     for ( Sphere * obj=set.first(); obj ; obj=obj->next() )
     {
-        PointDisp const* disp = obj->prop->disp;
-        if ( disp->visible && disp->style )
+        PointDisp const* dis = obj->prop->disp;
+        if ( dis->visible && dis->style )
         {
-            if ( disp->perceptible )
+            if ( dis->perceptible )
                 drawSphere(*obj);
 #if ( DIM >= 3 )
-            if ( disp->color.transparent() )
+            if ( dis->color.transparent() )
                 zObjects.emplace(obj);
             else
 #endif
@@ -2660,15 +2660,15 @@ void Display::drawOrganizer(Organizer const& obj) const
     Solid const* sol = obj.solid();
     Sphere const* sph = obj.sphere();
     if ( !sol && !sph ) return;
-    PointDisp const* disp = ( sol ? sol->prop->disp : sph->prop->disp );
-    if ( !disp ) return;
+    PointDisp const* dis = ( sol ? sol->prop->disp : sph->prop->disp );
+    if ( !dis ) return;
     gym_color col;
-    if ( sol ) col = bodyColorF(*sol).match_a(disp->color);
-    if ( sph ) col = bodyColorF(*sph).match_a(disp->color);
+    if ( sol ) col = bodyColorF(*sol).match_a(dis->color);
+    if ( sph ) col = bodyColorF(*sph).match_a(dis->color);
 
     size_t i = 0, cnt = obj.nbLinks();
 
-    if ( disp->style & 2 )
+    if ( dis->style & 2 )
     {
         // draw links between Solid/Sphere and Mecables
         Vector P, Q;
@@ -2684,16 +2684,16 @@ void Display::drawOrganizer(Organizer const& obj) const
         gym::color(col);
         gym::ref_view();
         gym::disableLighting();
-        gym::drawLines(disp->widthX, 0, 2*i);
+        gym::drawLines(dis->widthX, 0, 2*i);
         gym::rebindBufferVD(2);
-        gym::drawPoints(disp->sizeX, 0, i);
+        gym::drawPoints(dis->sizeX, 0, i);
     }
 
     /**
      This display the Solid connecting two Aster as a spindle.
      Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
-    if ( disp->style & 1 && obj.tag() == Organizer::FAKE_TAG )
+    if ( dis->style & 1 && obj.tag() == Organizer::FAKE_TAG )
     {
         if ( sol && sol->nbPoints() >= 4 )
         {
@@ -2710,7 +2710,7 @@ void Display::drawOrganizer(Organizer const& obj) const
             gym::color(col);
             gym::ref_view();
             gym::loadPoints(sol->nbPoints(), sol->addrPoints());
-            gym::drawLines(disp->widthX, 0, sol->nbPoints());
+            gym::drawLines(dis->widthX, 0, sol->nbPoints());
 #endif
         }
     }
@@ -2742,26 +2742,26 @@ void zObject::calculate_depth(Vector const& axis)
 #if ( DIM >= 3 )
 
 /// display sub-part `inx` of object `obj`
-void zObject::draw(Display const* disp) const
+void zObject::draw(Display const* dis) const
 {
     assert_false( point_.invalid() );
     Mecable const * mec = point_.mecable();
     switch( mec->tag() )
     {
         case Fiber::TAG:
-            disp->drawFiberSegmentT(*static_cast<const Fiber*>(mec), point_.point());
+            dis->drawFiberSegmentT(*static_cast<const Fiber*>(mec), point_.point());
             break;
             
         case Solid::TAG:
-            disp->drawSolidT(*static_cast<const Solid*>(mec), point_.point());
+            dis->drawSolidT(*static_cast<const Solid*>(mec), point_.point());
             break;
             
         case Bead::TAG:
-            disp->drawBeadT(*static_cast<const Bead*>(mec));
+            dis->drawBeadT(*static_cast<const Bead*>(mec));
             break;
             
         case Sphere::TAG:
-            disp->drawSphereT(*static_cast<const Sphere*>(mec));
+            dis->drawSphereT(*static_cast<const Sphere*>(mec));
             break;
             
         default:

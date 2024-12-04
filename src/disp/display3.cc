@@ -72,9 +72,9 @@ void Display3::drawObjects(Simul const& sim)
         {
             if ( fib->disp->visible )
             {
-                FiberDisp const* disp = fib->prop->disp;
+                FiberDisp const* dis = fib->prop->disp;
                 glStencilFunc(GL_ALWAYS, ++val, ~0);
-                drawFiberLines(*fib, disp->line_style, disp->line_width);
+                drawFiberLines(*fib, dis->line_style, dis->line_width);
             }
         }
         // set Stencil to 0 for outer surfaces:
@@ -449,14 +449,14 @@ void Display3::drawFiberSectionsJoin(Fiber const& fib, float rad,
 
 void Display3::drawFiberLines(Fiber const& fib, int style, float width) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
+    FiberDisp const*const dis = fib.prop->disp;
     const float rad = pixscale(width);
 
     // set back color:
-    if ( disp->coloring )
+    if ( dis->coloring )
         gym::color_back(fib.disp->color);
     else
-        gym::color_back(disp->back_color);
+        gym::color_back(dis->back_color);
     gym::enableLighting();
     
     switch ( style )
@@ -505,10 +505,10 @@ void Display3::drawFiberLines(Fiber const& fib, int style, float width) const
 // displays segment 'inx' with transparency
 void Display3::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
-    const int style = disp->line_style;
+    FiberDisp const*const dis = fib.prop->disp;
+    const int style = dis->line_style;
     const real iseg = fib.segmentationInv();
-    real rad = pixscale(disp->line_width);
+    real rad = pixscale(dis->line_width);
 #if NEW_FIBER_SILHOUETTE
     if ( fib.chiasma() > -1 ) rad = fib.silhouette(inx);
 #endif
@@ -529,7 +529,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
     // truncate terminal segment according to length_scale
     if ( inx == 0 && style == 6 )
     {
-        real x = 3 * disp->length_scale * iseg;
+        real x = 3 * dis->length_scale * iseg;
         if ( x < 1.0 )
         {
             B = A + x * ( B - A );
@@ -540,7 +540,7 @@ void Display3::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
     // truncate terminal segment according to length_scale
     if ( inx == fib.lastSegment() && ( style == 7 || style == 8 ) )
     {
-        real x = 3 * disp->length_scale * iseg;
+        real x = 3 * dis->length_scale * iseg;
         if ( x < 1.0 )
         {
             A = B + x * ( A - B );
@@ -620,12 +620,12 @@ void Display3::drawFiberSegmentT(Fiber const& fib, unsigned inx) const
 void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, float rad,
                                 gym_color (*select_color)(Fiber const&, long, real)) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
+    FiberDisp const*const dis = fib.prop->disp;
 
     gym::enableLighting();
     GLfloat blk[] = { 0.f, 0.f, 0.f, 1.f };
     GLfloat bak[] = { 0.f, 0.f, 0.f, 1.f };
-    disp->back_color.store(bak);
+    dis->back_color.store(bak);
     glMaterialfv(GL_BACK, GL_AMBIENT,  blk);
     glMaterialfv(GL_BACK, GL_DIFFUSE,  bak);
     glMaterialfv(GL_FRONT, GL_AMBIENT,  blk);
@@ -634,7 +634,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, flo
     glMaterialfv(GL_FRONT_AND_BACK, GL_EMISSION, blk);
     glMateriali (GL_FRONT_AND_BACK, GL_SHININESS, 32);
 
-    const real fac = 1 / disp->lattice_scale;
+    const real fac = 1 / dis->lattice_scale;
     const real uni = lat.unit();
     const auto inf = lat.indexM();
     const auto sup = lat.indexP();
@@ -645,7 +645,7 @@ void Display3::drawFiberLattice(Fiber const& fib, VisibleLattice const& lat, flo
     real facM = fac;
     real facP = fac;
     
-    if ( disp->lattice_rescale )
+    if ( dis->lattice_rescale )
     {
         real lenM = abs + uni;                     // should be positive!
         real lenP = fib.abscissaP() - uni * sup;   // should be positive!
@@ -675,7 +675,7 @@ void Display3::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, fl
 void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
 #if 0
-    gym_color col = fib.disp->color;
+    gym_color col = fib.dis->color;
     gym_color lor = col.darken(0.75);
     const real uni = lat.unit();
     drawFiberStriped(fib, pixscale(rad), uni, col, uni, lor);
@@ -749,16 +749,16 @@ void Display3::drawFiberEndPlus(Fiber const& fib, int style, float size) const
 
 void Display3::drawFiberSpeckles(Fiber const& fib) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
-    const float rad = pixscale(disp->speckle_size);
+    FiberDisp const*const dis = fib.prop->disp;
+    const float rad = pixscale(dis->speckle_size);
     if ( rad < pixelSize )
         return;
     gym::color_front(fib.disp->color);
-    gym::color_back(disp->back_color);
+    gym::color_back(dis->back_color);
     assertLighting();
 
     // display random speckles:
-    if ( disp->speckle_style == 1 )
+    if ( dis->speckle_style == 1 )
     {
         /*
          A simple random number generator seeded by fib.signature()
@@ -766,7 +766,7 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
          with respect to the lattice of each fiber.
          */
         
-        const real gap = disp->speckle_gap;
+        const real gap = dis->speckle_gap;
         constexpr real TINY = 0x1p-32;
         // draw speckles below the origin of abscissa:
         if ( fib.abscissaM() < 0 )
@@ -797,10 +797,10 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
             }
         }
     }
-    else if ( disp->speckle_style == 2 )
+    else if ( dis->speckle_style == 2 )
     {
         //we distribute points regularly along the center line
-        const real gap = disp->speckle_gap;
+        const real gap = dis->speckle_gap;
         real a = gap * std::ceil( fib.abscissaM() / gap );
         while ( a <= fib.abscissaP() )
         {
@@ -814,12 +814,12 @@ void Display3::drawFiberSpeckles(Fiber const& fib) const
 
 void Display3::drawFiberPoints(Fiber const& fib) const
 {
-    FiberDisp const*const disp = fib.prop->disp;
+    FiberDisp const*const dis = fib.prop->disp;
     // diameter of lines and points in space units:
-    const float rad = pixscale(disp->point_size);
-    int style = disp->point_style;
+    const float rad = pixscale(dis->point_size);
+    int style = dis->point_style;
     gym::color_front(fib.disp->color);
-    gym::color_back(disp->back_color);
+    gym::color_back(dis->back_color);
 
     if ( rad > pixelSize )
     {
@@ -834,7 +834,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         {
             gym::enableLighting();
             // display arrowheads along the fiber:
-            const real gap = disp->point_gap;
+            const real gap = dis->point_gap;
             real ab = std::ceil(fib.abscissaM()/gap) * gap;
             for ( ; ab <= fib.abscissaP(); ab += gap )
                 gle::drawCone(fib.pos(ab), fib.dir(ab), rad);
@@ -843,7 +843,7 @@ void Display3::drawFiberPoints(Fiber const& fib) const
         {
             gym::enableLighting();
             // display cones regularly along the fiber:
-            const real gap = disp->point_gap;
+            const real gap = dis->point_gap;
             real ab = std::ceil(fib.abscissaM()/gap) * gap;
             for ( ; ab <= fib.abscissaP(); ab += gap )
                 gle::drawCone(fib.pos(ab), -fib.dir(ab), rad);
@@ -863,22 +863,22 @@ void Display3::drawOrganizer(Organizer const& obj) const
     Solid const* sol = obj.solid();
     Sphere const* sph = obj.sphere();
     if ( !sol && !sph ) return;
-    PointDisp const* disp = ( sol ? sol->prop->disp : sph->prop->disp );
-    if ( !disp ) return;
+    PointDisp const* dis = ( sol ? sol->prop->disp : sph->prop->disp );
+    if ( !dis ) return;
     gym_color col;
-    if ( sol ) col = bodyColorF(*sol).match_a(disp->color);
-    if ( sph ) col = bodyColorF(*sph).match_a(disp->color);
+    if ( sol ) col = bodyColorF(*sol).match_a(dis->color);
+    if ( sph ) col = bodyColorF(*sph).match_a(dis->color);
 
-    if ( disp->style & 2 )
+    if ( dis->style & 2 )
     {
         // draw links between Solid/Sphere and Mecables
         Vector P, Q;
         gym::color_front(col);
-        const float wid = pixscale(disp->width);
+        const float wid = pixscale(dis->width);
 
         for ( size_t i = 0; obj.getLink(i, P, Q); ++i )
         {
-            drawPoint(P, disp);
+            drawPoint(P, dis);
             if ( modulo ) modulo->fold(Q, P);
             gym::stretchAlignZ(P, Q, wid);
             gle::tube1();
@@ -888,7 +888,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
      This displays the Solid connecting two Aster as a spindle.
      Used for Cleo Kozlowski simulation of C. elegans (2007)
      */
-    if (( disp->style & 1 ) && obj.tag() == Organizer::FAKE_TAG )
+    if (( dis->style & 1 ) && obj.tag() == Organizer::FAKE_TAG )
     {
         if ( sol && sol->nbPoints() >= 4 )
         {
@@ -900,7 +900,7 @@ void Display3::drawOrganizer(Organizer const& obj) const
             gym::stretchAlignZ(a, b, 1);
             gle::dualPassBarrel();
 #else
-            const float wid = pixscale(disp->width);
+            const float wid = pixscale(dis->width);
             for ( size_t i = 0; i < sol->nbPoints(); i+=2 )
             {
                 gym::stretchAlignZ(sol->posPoint(i), sol->posPoint(i+1), wid);
@@ -1082,40 +1082,40 @@ void Display3::drawCouplesA(CoupleSet const& set) const
     for ( Couple * cx=set.firstAF(); cx ; cx=cx->next() )
     {
         Hand const* h = cx->hand1();
-        PointDisp const* disp = h->property()->disp;
+        PointDisp const* dis = h->disp();
 
-        if ( h->fiber()->disp->visible && disp->perceptible )
+        if ( h->fiber()->disp->visible && dis->perceptible )
         {
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber1()->disp->color.transparent() )
             {
-                gym::color_both(disp->color, cx->fiber1()->disp->color.transparency());
-                drawPoint(h->pos(), disp);
+                gym::color_both(dis->color, cx->fiber1()->disp->color.transparency());
+                drawPoint(h->pos(), dis);
                 continue;
             }
 #endif
-            drawHand(h->pos(), disp);
-            //drawObject(h->outerPos(), h->pos()-h->outerPos(), R*disp->size, gle::tetrahedron);
+            drawHand(h->pos(), dis);
+            //drawObject(h->outerPos(), h->pos()-h->outerPos(), R*dis->size, gle::tetrahedron);
         }
     }
     
     for ( Couple * cx=set.firstFA(); cx ; cx=cx->next() )
     {
         Hand const* h = cx->hand2();
-        PointDisp const* disp = h->property()->disp;
+        PointDisp const* dis = h->disp();
 
         if ( cx->fiber2()->disp->visible && cx->disp2()->perceptible )
         {
 #if ( 0 )  // ENDOCYTOSIS 2015
             if ( cx->fiber2()->disp->color.transparent() )
             {
-                gym::color_both(disp->color, cx->fiber2()->disp->color.transparency());
-                drawPoint(h->pos(), disp);
+                gym::color_both(dis->color, cx->fiber2()->disp->color.transparency());
+                drawPoint(h->pos(), dis);
                 continue;
             }
 #endif
-            drawHand(h->pos(), disp);
-            //drawObject(h->outerPos(), h->pos()-h->outerPos(), R*disp->size, gle::tetrahedron);
+            drawHand(h->pos(), dis);
+            //drawObject(h->outerPos(), h->pos()-h->outerPos(), R*dis->size, gle::tetrahedron);
         }
     }
 }

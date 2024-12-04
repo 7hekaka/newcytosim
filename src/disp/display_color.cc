@@ -185,15 +185,15 @@ namespace {
     template < typename T >
     gym_color bodyColorF(T const& obj)
     {
-        PointDisp const* disp = obj.prop->disp;
-        if ( disp->coloring && obj.mark() )
+        PointDisp const* dis = obj.prop->disp;
+        if ( dis->coloring && obj.mark() )
             return gym::bright_color(obj.mark());
-        switch ( disp->coloring )
+        switch ( dis->coloring )
         {
             case 1: return gym::bright_color(obj.signature());
             case 2: return gym::bright_color(obj.mark());
-            case 3: return disp->color.tweak(obj.signature());
-            default: return disp->color;
+            case 3: return dis->color.tweak(obj.signature());
+            default: return dis->color;
         }
     }
     
@@ -205,18 +205,18 @@ namespace {
     template < typename T >
     void bodyColor(T const& obj)
     {
-        PointDisp const* disp = obj.prop->disp;
-        if ( disp->coloring )
+        PointDisp const* dis = obj.prop->disp;
+        if ( dis->coloring )
         {
-            size_t i = ( disp->coloring == 2 ? obj.mark() : obj.signature());
+            size_t i = ( dis->coloring == 2 ? obj.mark() : obj.signature());
             gym_color col = gym::bright_color(i);
             gym::color_load(col);
             gym::color_back(col.darken(0.5));
         }
         else
         {
-            gym::color_front(disp->color, 1.0);
-            gym::color_back(disp->color2);
+            gym::color_front(dis->color, 1.0);
+            gym::color_back(dis->color2);
         }
     }
     
