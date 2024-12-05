@@ -1599,11 +1599,11 @@ void Simul::reportFiberIntersections(std::ostream& out, std::ostream& com, Gloss
     for ( Fiber const* fib = fibers.firstID(); fib; fib = fibers.nextID(fib) )
     {
         unsigned cnt = 0;
-        for ( Fiber const* fox = fibers.nextID(fib); fox; fox = fibers.nextID(fox) )
+        for ( unsigned ii = 0; ii < fib->nbSegments(); ++ii )
         {
-            for ( unsigned ii = 0; ii < fib->nbSegments(); ++ii )
+            FiberSegment seg(fib, ii);
+            for ( Fiber const* fox = fibers.nextID(fib); fox; fox = fibers.nextID(fox) )
             {
-                FiberSegment seg(fib, ii);
                 for ( unsigned jj = 0; jj < fox->nbSegments(); ++jj )
                 {
                     FiberSegment soc(fox, jj);
