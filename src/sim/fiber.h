@@ -366,7 +366,7 @@ public:
     /// modifiable reference to Fiber's Lattice
     FiberLattice * lattice() const { return &fLattice; }
     
-    /// recalculate occupancy lattice from bound Digits
+    /// recalculate all cell values given current list of bound digits
     bool resetLattice(bool);
 #else
     /// does nothing

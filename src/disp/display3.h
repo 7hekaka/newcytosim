@@ -47,7 +47,7 @@ private:
     void drawFiberSectionsJoin(Fiber const&, float rad, long inx, long last, real abs, real inc,
                                gym_color (*set_color)(Fiber const&, long, real), real fac, real facM, real facP) const;
 
-    /// display lattice subtance using specified color function
+    /// display lattice substance using specified color function
     void drawFiberLattice(Fiber const&, VisibleLattice const&, float rad, gym_color (*set_color)(Fiber const&, long, real)) const;
 
 public:
@@ -73,13 +73,13 @@ public:
     /// draw one segment of a Fiber
     void drawFiberSegmentT(Fiber const&, unsigned) const;
 
-    /// display lattice subtance using color
+    /// display lattice substance using color
     void drawFiberLattice1(Fiber const&, VisibleLattice const&, float rad) const;
     
-    /// display lattice subtance using color
+    /// display lattice substance using color
     void drawFiberLattice2(Fiber const&, VisibleLattice const&, float rad) const;
     
-    /// display lattice subtance using color
+    /// display lattice substance using color
     void drawFiberLattice3(Fiber const&, VisibleLattice const&, float rad) const;
 
     /// draw Edges of lattice

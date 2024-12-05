@@ -47,16 +47,16 @@ public:
 private:
     
     /// lowest valid index (can be negative or positive)
-    lati_t   laInf;
+    lati_t laInf;
     
     /// highest valid index plus one (laSup > laInf)
-    lati_t   laSup;
+    lati_t laSup;
     
     /// index of cell containing the minus end
-    lati_t   laIndexM;
+    lati_t laIndexM;
     
     /// index of cell containing the plus end
-    lati_t   laIndexP;
+    lati_t laIndexP;
     
     
     /// Array of sites, of valid range [laInf, laSup[
@@ -282,10 +282,10 @@ public:
     /// index of the site containing abscissa `a`
     lati_t index(real a)       const { return (lati_t)std::floor(a/laUnit); }
     
-    /// index of the site after the one containing abscissa `a`
+    /// index of the site just above the one containing abscissa `a`
     lati_t index_sup(real a)   const { return (lati_t)std::ceil(a/laUnit); }
 
-    /// index of the site after the one containing abscissa `a`
+    /// index of the site closest to abscissa `a`
     lati_t index_round(real a) const { return (lati_t)round(a/laUnit); }
 
     /// true if site `i` is covered by the lattice allocated range

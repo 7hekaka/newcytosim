@@ -1518,7 +1518,7 @@ void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real bind_rate) const
 
 /**
  Release a fraction 'frac' of the Mesh substance into the Field.
- The subtance in each Lattice site is released in a cell
+ The substance in each Lattice site is released in a cell
  corresponding to a random position within this site.
  The factor `frac` must be between 0 and 1.
  */
@@ -1606,7 +1606,7 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
 
 /**
  Release all Mesh substance into the Field.
- The subtance in each Lattice site is released in a cell
+ The substance in each Lattice site is released in a cell
  corresponding to a random position within this site.
  */
 void Fiber::releaseMeshValues(Lattice<real>& lat, Field * fld) const

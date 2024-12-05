@@ -1961,17 +1961,13 @@ void Display::drawFiber(Fiber const& fib)
         VisibleLattice const* lat = fib.visibleLattice();
         if ( lat )
         {
-            float rad = dis->line_width;
+            const float rad = dis->line_width;
             switch ( dis->lattice_style )
             {
-                case 1:
-                    return drawFiberLattice1(fib, *lat, rad);
-                case 2:
-                    return drawFiberLattice2(fib, *lat, rad);
-                case 3:
-                    return drawFiberLattice3(fib, *lat, rad);
-                case 4:
-                    drawFiberLatticeEdges(fib, *lat, rad); break;
+                case 1: drawFiberLattice1(fib, *lat, rad); break;
+                case 2: drawFiberLattice2(fib, *lat, rad); break;
+                case 3: drawFiberLattice3(fib, *lat, rad); break;
+                case 4: drawFiberLatticeEdges(fib, *lat, rad); break;
             }
             style = 0;
         }
@@ -2122,7 +2118,7 @@ void Display::drawFiberTexts(FiberSet const& set)
 #if FIBER_HAS_LATTICE
             if ( dis->lattice_style == 6 )
             {
-                VisibleLattice const* lat = fib->lattice();
+                FiberLattice const* lat = fib->lattice();
                 if ( lat )
                 {
                     gym::color(fib->disp->color);

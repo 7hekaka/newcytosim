@@ -67,19 +67,17 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
  */
 void Digit::attach(FiberSite const& sit)
 {
-    Hand::attach(sit);
 #if FIBER_HAS_LATTICE
     hSite = sit.site();
     hLattice = sit.lattice();
     //std::clog << "offset " << sit.abscissa() - hLattice->unit()*hSite - prop()->site_shift << "\n";
 #endif
-    incLattice();
+    Hand::attach(sit);
 }
 
 
 void Digit::detach()
 {
-    decLattice();
     Hand::detach();
 }
 

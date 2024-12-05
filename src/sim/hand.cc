@@ -218,7 +218,10 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
     return hMonitor->permitAttachment(sit, this);
 }
 
-
+/**
+ This is where member variables are really updated,
+ normally all derived Hand::attach() should call this.
+ */
 void Hand::do_attach(Fiber const* f, real a)
 {
     assert_true(f);
@@ -233,6 +236,10 @@ void Hand::do_attach(Fiber const* f, real a)
     hMonitor->afterAttachment(this);
     nextDetach = RNG.exponential();
     assert_true(nextDetach > 0);
+#if FIBER_HAS_LATTICE
+    if ( hLattice )
+        incLattice();
+#endif
 }
 
 
@@ -271,13 +278,13 @@ void Hand::detach()
     assert_true( attached() );
     hMonitor->beforeDetachment(this);
     hFiber->removeHand(this);
-    hFiber = nullptr;
 #if FIBER_HAS_LATTICE
     if ( hLattice ) {
         decLattice();
         hLattice = nullptr;
     }
 #endif
+    hFiber = nullptr;
 }
 
 //------------------------------------------------------------------------------

@@ -7,7 +7,9 @@ set simul system
     viscosity = 10
     display = (
         window_size = 1024, 256;
-        style = 3;
+        style = 1;
+        point_size = 1;
+        link_width = 0.5;
         point_value = 0.010;
         label = (Vanishing overlap -)
     )
@@ -29,7 +31,7 @@ set fiber microtubule
     rigidity = 20
     segmentation = 0.25
     lattice = 1, 0.010
-    display = ( line=2.5; coloring=2; minus_end=6,1 )
+    display = ( line=2.5; coloring=2; minus_end=3,1; lattice_style=1; )
 }
 
 set hand kinesin
@@ -46,7 +48,7 @@ set hand kinesin
     unbinding_force = 3
     hold_growing_end = 0
     hold_shrinking_end = 0
-    display = ( color=blue; width=1; size=2; )
+    display = ( color=blue; width=0.1; size=1; )
 }
 
 set couple complex

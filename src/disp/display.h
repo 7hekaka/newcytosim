@@ -241,10 +241,10 @@ public:
     /// draw fiduciary marks on all fibers
     virtual void drawFiberSpeckles(Fiber const&) const;
    
-    /// display lattice subtance using color
+    /// display lattice substance using color
     virtual void drawFiberLattice1(Fiber const&, VisibleLattice const&, float rad) const;
     
-    /// display lattice subtance using color
+    /// display lattice substance using color
     virtual void drawFiberLattice2(Fiber const&, VisibleLattice const&, float rad) const;
    
     /// display lattice cell substance and edges
@@ -253,10 +253,10 @@ public:
     /// display lattice cell edges
     virtual void drawFiberLatticeEdges(Fiber const&, VisibleLattice const&, float rad) const;
 
-    /// display lattice cell edges
+    /// display lattice cell values
     virtual void drawFiberLatticeValues(Fiber const&, VisibleLattice const&) const;
 
-    /// display lattice cell edges
+    /// display lattice bits
     virtual void drawFiberLatticeBits(Fiber const&, FiberLattice const&) const;
 
     /// display labels for a Fiber
