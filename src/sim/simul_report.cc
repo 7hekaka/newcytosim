@@ -109,7 +109,7 @@ void Simul::poly_report(std::ostream& out, std::string what, Glossary& opt, int 
     }
     if ( ver & 2 )
     {
-        out << "% end report\n\n";
+        out << "\n% end report\n\n";
     }
     {
         // check for unused characters in instruction stream
