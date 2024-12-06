@@ -207,6 +207,7 @@ ifeq ($(MACHINE),cluster)
 
     # Beware of AVX2 and other advanced features on heterogeneous clusters:
     FAST := -O3 -fno-devirtualize -mavx2 -mfma -ffp-contract=fast
+    # Options for Intel compiler ICPX:
     FAST := -O3 -mavx2 -mfma
 
     FlagsD := -O0 $(DEBUG) $(WARN)
@@ -214,19 +215,10 @@ ifeq ($(MACHINE),cluster)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
     FlagsF := $(FAST) $(ALIGN) -finline-functions
     
-    ### self-compiled BLAS/LAPACK fortran library:
-    # this works on the new cluster (64 bit, gcc 4.1 or higher)
-    #LINK  := -static -L/g/nedelec/opt/netlib/linux_em64t -llapack -lblas -lgfortran
-      
-    ### 64bit Linux distribution, 2011 (distribution on LSF EMBL cluster)
-    # ln -sf /usr/lib64/liblapack.so.3 /usr/lib64/liblapack.so
-    # ln -sf /usr/lib64/libblas.so.3 /usr/lib64/libblas.so
-    #LINK  := /usr/lib64/liblapack.so.3 /usr/lib64/libblas.so.3 -L/usr/lib64 $(LIBRARIES)
-    
     ### Automatic
     LINK := -llapack -lopenblas -lgfortran $(LIBRARIES)
-    ### Self-compiled LAPACK/BLAS (2022)
-    LINK := ~/lib/liblapack.a ~/lib/libblas.a -lgfortran $(LIBRARIES)
+    ### Static linking of libC and LibStdC++
+    LINK := -static-libstdc++ -static-libgcc -llapack -lopenblas -lgfortran $(LIBRARIES)
 
     # linkage options for programs using graphics:
     GRAFIX :=-L/usr/lib -lglut -lGL -lGLEW -lXt -lX11

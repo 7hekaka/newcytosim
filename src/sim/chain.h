@@ -172,9 +172,6 @@ public:
     unsigned indexSegmentM(const real a) const { return std::min(unsigned(std::max(a,(real)0)/fnCut), lastSegment()); }
 
     //---------------------
-    
-    /// set Lagrange multipliers (this is normally not needed)
-    virtual void setTensions(const real*) {}
 
     /// set position of minus end with given direction (length and Nb of points are not modified)
     /** dir does not need to be normalized */
@@ -210,6 +207,9 @@ public:
     unsigned nbConstraints() const { return nPoints - 1; }
 #endif
     
+    /// change Lagrange multipliers (do not use: this is done by computeTensions)
+    virtual void setTensions(const real*) {}
+
     //---------------------
     
     /// return Mecapoint of given end
