@@ -70,30 +70,6 @@ void divide()
     out << '\n';
 }
 
-void infinities()
-{
-    real i = INFINITY;
-    out << "0   < inf = " << ( 0 < i ) << '\n';
-    out << "inf < inf = " << ( i < i ) << '\n';
-    out << "std::isinf(inf) = " << std::isinf(i) << '\n';
-    real z = 0;
-    real y = 0 / z;
-    real x = 1 / z;
-    out << " 1.0/0.0 = " << x << '\n';
-    out << " 0.0/0.0 = " << y << '\n';
-}
-
-void nans()
-{
-    real x = nan("");
-    out << " nan + 1 = " << ( x + 1. ) << '\n';
-    out << " nan < 1 = " << ( x < 1. ) << '\n';
-    out << " nan > 0 = " << ( x > 0. ) << '\n';
-    out << " std::min(nan, 1) = " << std::min(x, 1.) << '\n';
-    out << " std::max(nan, 1) = " << std::max(x, 1.) << '\n';
-    out << " abs_real(nan) = " << abs_real(x) << '\n';
-}
-
 void std_copysign()
 {
     out << "copysign(1, +1) = " << std::copysign(1.0, +1.0) << '\n';
@@ -102,7 +78,38 @@ void std_copysign()
     out << "copysign(1, -0) = " << std::copysign(1.0, -0.0) << '\n';
 }
 
-void print_numbers()
+void infinities()
+{
+    real i = INFINITY;
+    real z = 0;
+    real y = 0 / z;
+    real x = 1 / z;
+    out << " -inf = " << -i << '\n';
+    out << " 1.0/0.0 = " << x << '\n';
+    out << " 0.0/0.0 = " << y << '\n';
+    out << " 0   < inf = " << ( 0 < i ) << '\n';
+    out << " inf < inf = " << ( i < i ) << '\n';
+    out << " std::isinf(inf) = " << std::isinf(i) << '\n';
+    out << " std::min(inf, 1) = " << std::min(i, 1.) << '\n';
+    out << " std::max(inf, 1) = " << std::max(i, 1.) << '\n';
+    out << " std::min(-inf, 1) = " << std::min(-i, 1.) << '\n';
+    out << " std::max(-inf, 1) = " << std::max(-i, 1.) << '\n';
+}
+
+void not_numbers()
+{
+    real x = nan("");
+    out << " nan + 1 = " << ( x + 1. ) << '\n';
+    out << " nan < 1 = " << ( x < 1. ) << '\n';
+    out << " nan > 0 = " << ( x > 0. ) << '\n';
+    out << " std::min(nan, 1) = " << std::min(x, 1.) << '\n';
+    out << " std::max(nan, 1) = " << std::max(x, 1.) << '\n';
+    out << " abs_real(nan) = " << abs_real(x) << '\n';
+    out << " std::ceil(nan) = " << std::ceil(x) << '\n';
+    out << " std::floor(nan) = " << std::floor(x) << '\n';
+}
+
+void numbers()
 {
     out << " 1.0 / 0 = " <<  1.0 / 0 << '\n';
     out << "-1.0 / 0 = " << -1.0 / 0 << '\n';
@@ -151,7 +158,7 @@ int main(int argc, char* argv[])
     modulo();
     std_copysign();
     infinities();
-    nans();
-    print_numbers();
+    not_numbers();
+    numbers();
     out << "test completed" << '\n';
 }
