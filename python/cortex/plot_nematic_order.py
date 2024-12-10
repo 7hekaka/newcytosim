@@ -68,13 +68,15 @@ def plot_data(X, Y, M, name):
     """
         Plot data as a function of time
     """
+    Xinf = math.floor(min(X)/100)*100
     Xsup = math.ceil(max(X)/100)*100
+    Yinf = 0.2
     Ysup = math.ceil(max(Y))
     fig = plt.figure(figsize=(4, 3))
     plt.plot(X, Y, label='nematic order', linewidth=4.0)
-    plt.plot([0, Xsup], [M, M], linewidth=1.0)
-    plt.xlim(0, Xsup)
-    plt.ylim(0, Ysup)
+    plt.plot([Xinf, Xsup], [M, M], linewidth=1.0)
+    plt.xlim(Xinf, Xsup)
+    plt.ylim(Yinf, Ysup)
     plt.xlabel('Time (s)', fontsize=fts)
     plt.ylabel('Order', fontsize=fts)
     plt.title('Nematic order', fontsize=fts)
