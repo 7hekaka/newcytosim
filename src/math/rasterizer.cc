@@ -114,8 +114,8 @@ int Rasterizer::convexHull2D(int n_pts, Rasterizer::Vertex2 pts[])
 }
 
 
-/*
- pts[] is an anti-clockwise polygon, starting with the point of lowest Y.
+/**
+ pts[] stores a counter-clockwise polygon, with pts[0] the point of lowest Y.
  */
 template < typename VEC >
 static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
@@ -144,31 +144,36 @@ static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
     std::clog << " " << zz << '\n';
 #endif
   
-    double xxR = pts[0].XX, yyR = pts[0].YY, dxR = 0;
-    double xxL = pts[0].XX, yyL = pts[0].YY, dxL = 0;
+    // start with bottom point:
+    Rasterizer::FLOAT xxR = pts[0].XX, yyR = pts[0].YY;
+    Rasterizer::FLOAT xxL = pts[0].XX, yyL = pts[0].YY;
 
-    // start on the line just above the bottom point
-    int yy = (int)std::ceil(pts[0].YY);
+    // start on the Y-line just above the bottom point
+    int yy = (int)std::ceil(yyR);
         
     size_t iR = 1;
     size_t iL = n_pts-1;
+    
+    // finish Y-lines for right and left sides:
+    int yR = (int)std::floor(pts[iR].YY);
+    int yL = (int)std::floor(pts[iL].YY);
+    
+    // left and right sided slopes dX/dY:
+    Rasterizer::FLOAT dxR = ( pts[iR].XX - xxR ) / ( pts[iR].YY - yyR );
+    Rasterizer::FLOAT dxL = ( pts[iL].XX - xxL ) / ( pts[iL].YY - yyL );
 
-    VEC R = pts[iR];
-    VEC L = pts[iL];
-
+    xxR += dxR * ( yy - yyR );
+    xxL += dxL * ( yy - yyL );
+    
+    //printf("\nY%i ", yy);
     while ( iR <= iL )
     {
         // index of the last line without changing edges:
-        int top = (int)std::floor(std::min(L.YY, R.YY));
-        
-        dxR = ( R.XX - xxR ) / ( R.YY - yyR );
-        xxR += dxR * ( yy - yyR );
-        
-        dxL = ( L.XX - xxL ) / ( L.YY - yyL );
-        xxL += dxL * ( yy - yyL );
+        int top = std::min(yL, yR);
         
         for ( ; yy <= top; ++yy )
         {
+            //printf("[%.2f %.2f]Y%i ", xxL, xxR, yy);
             int inf = (int) std::ceil(xxL);
             int sup = (int)std::floor(xxR);
             paint(inf, sup, yy, zz, arg);
@@ -176,28 +181,33 @@ static void paintPolygon(void (*paint)(int, int, int, int, void*), void * arg,
             xxR += dxR;
         }
         
+        //printf("y%i yL%i yR%i ", yy, yL, yR);
         // update point on right edge:
-        while ( R.YY <= yy )
+        if ( yR < yy )
         {
-            //printf("R%i ", yy);
-            if ( ++iR > iL )
-                return;
-            xxR = R.XX;
-            yyR = R.YY;
-            yyL = yy;
-            R = pts[iR];
+            xxR = pts[iR].XX;
+            yyR = pts[iR].YY;
+            do {
+                if ( ++iR > iL ) return;
+                yR = (int)std::floor(pts[iR].YY);
+            } while ( yR < yy );
+            //printf("R%iL%i ", yR, yL);
+            dxR = ( pts[iR].XX - xxR ) / ( pts[iR].YY - yyR );
+            xxR += dxR * ( yy - yyR );
         }
         
         // update point on left edge:
-        while ( L.YY <= yy )
+        if ( yL < yy )
         {
-            //printf("L%i ", yy);
-            if ( --iL < iR )
-                return;
-            xxL = L.XX;
-            yyL = L.YY;
-            yyR = yy;
-            L = pts[iL];
+            xxL = pts[iL].XX;
+            yyL = pts[iL].YY;
+            do {
+                if ( --iL < iR ) return;
+                yL = (int)std::floor(pts[iL].YY);
+            } while ( yL < yy );
+            //printf("L%iR%i ", yL, yR);
+            dxL = ( pts[iL].XX - xxL ) / ( pts[iL].YY - yyL );
+            xxL += dxL * ( yy - yyL );
         }
     }
 }

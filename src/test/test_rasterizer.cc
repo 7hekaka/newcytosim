@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright Cambridge University 2022
 // This is a visual test for the rasterizer used for attachment of Hands in Cytosim
-// Created by Francois Nedelec, October 2002
+// Created by FJN in October 2002, 10.12.2024
 
 #include <ctime>
 #include "gle.h"
@@ -28,9 +28,9 @@ typedef Vector3 Vector;
 
 
 const int SIZE = 10;  // dimension of grid
-const size_t MAX = 16;  // max nb of points
+const unsigned MAX = 64;  // max nb of points
 
-size_t n_pts = 2;
+unsigned n_pts = 2;
 real radius = 2;
 
 Vector shift(0, 0, 0);
@@ -47,10 +47,20 @@ extern bool rasterizer_draws;
 
 //------------------------------------------------------------------------------
 
-void drawDots(size_t N, const Vector P[], float size, gym_color col)
+void drawDot(const Vector P, float size, gym_color col)
+{
+    flute8 * flu = gym::mapBufferC4V4(1);
+    flu[0] = { col, P };
+    gym::unmapBufferC4V4();
+    gym::ref_view();
+    gym::drawSquarePoints(size, 0, 1);
+    gym::cleanupCV();
+}
+
+void drawDots(unsigned N, const Vector P[], float size, gym_color col)
 {
     flute8 * flu = gym::mapBufferC4V4(N);
-    size_t i = 1;
+    unsigned i = 1;
     flu[0] = { col.mix(gym_color(1,1,1,1)), P[0] };
     for ( ; i < N; ++i )
         flu[i] = { col, P[i] };
@@ -60,11 +70,11 @@ void drawDots(size_t N, const Vector P[], float size, gym_color col)
     gym::cleanupCV();
 }
 
-void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
+void drawLines(unsigned N, const Rasterizer::Vertex2 P[], float size)
 {
     gym_color col(1, 0, 1);
     flute8 * flu = gym::mapBufferC4V4(N);
-    size_t i = 0;
+    unsigned i = 0;
     for ( ; i < N; ++i )
         flu[i] = { col, P[i].XX, P[i].YY, 0.f };
     flu[0] = { gym_color(0, 1, 0), P[0].XX, P[0].YY, 0.f };
@@ -75,7 +85,7 @@ void drawLines(size_t N, const Rasterizer::Vertex2 P[], float size)
 
 void newPoints()
 {
-    for ( size_t i = 0; i < MAX ; ++i )
+    for ( unsigned i = 0; i < MAX ; ++i )
         pts[i] = (SIZE-1) * Vector::randS();
 }
 
@@ -122,7 +132,7 @@ void paint(int x_inf, int x_sup, int y, int z, void*)
     flu[1] = { col, (float)x_sup, (float)y, (float)z };
     gym::unmapBufferC4V4();
     gym::drawLines(1, 0, 2);
-    gym::drawPoints(3, 0, 1);
+    gym::drawPoints(4, 0, 1);
     gym::cleanupCV();
 }
 
@@ -143,16 +153,15 @@ void rasterize(Vector P, Vector Q, void (func)(int, int, int, int, void*))
 //------------------------------------------------------------------------------
 
 /// check if 'x' is within distance 'radius' from segment [pq]
-int inCylinder(Vector const& P, Vector const& Q, Vector const& X)
+int inCylinder(Vector const& P, Vector const& Q, Vector X)
 {
+    X -= P;
     const Vector PQ = Q - P;
-    const real len = PQ.norm();
-    const Vector PX = X - P;
-    real abs = dot(PQ, PX) / len;
-    abs /= len;
-    if ( abs < 0 ) abs = 0;
-    if ( abs > 1 ) abs = 1;
-    return ( PX - PQ*abs ).normSqr() <= radius * radius;
+    const real len = PQ.normSqr();
+    real abs = dot(PQ, X) / len;
+    abs = std::max(real(0), abs);
+    abs = std::min(real(1), abs);
+    return ( X - PQ*abs ).normSqr() <= radius * radius;
 }
 
 
@@ -169,7 +178,10 @@ bool checkPoint(Vector const& P, Vector const& Q, int i, int j, int k)
     
     if ( ht != in )
     {
-        drawDots(1, &V, 7, gym_color(1,0,0));
+        if ( ht )
+            drawDot(V, 7, gym_color(1,0,0,0.5));
+        else
+            drawDot(V, 7, gym_color(0.5,0.5,0.5));
     }
     
     return ( ht != in );
@@ -220,7 +232,9 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             glApp::resetView();
             break;
         case 'p': n_pts = std::min(n_pts+1, MAX); break;
-        case 'o': n_pts = std::max(n_pts-1, (size_t)1); break;
+        case 'o': n_pts = std::max(n_pts-1, 1U); break;
+        case 'P': n_pts = std::min(n_pts+8, MAX); break;
+        case 'O': n_pts = std::max(n_pts-8, 1U); break;
         case '2': n_pts = 2; break;
         case '3': n_pts = 3; break;
         case '4': n_pts = 4; break;
@@ -250,7 +264,7 @@ void drawGridPoints()
     size_t S = 2 * SIZE + 1;
     gym_color col(.5f, .5f, .5f);
     flute8 * flu = gym::mapBufferC4V4(S*S);
-    size_t n = 0;
+    unsigned n = 0;
     for ( int i = -SIZE; i <= SIZE; i += 1)
     for ( int j = -SIZE; j <= SIZE; j += 1)
         flu[n++] = { col, (float)i, (float)j, 0.f };
@@ -264,7 +278,7 @@ void drawGrid()
     float S = (float)SIZE;
     gym_color col(.5f, .5f, .5f);
     flute8 * flu = gym::mapBufferC4V4(2*SIZE+1);
-    size_t n = 0;
+    unsigned n = 0;
     for ( int i = -SIZE; i <= SIZE; i += 5 )
     {
         float I = (float)i;
@@ -287,6 +301,8 @@ int display(View& view)
     drawGrid();
     drawGridPoints();
 #endif
+    
+    // draw original points:
     drawDots(n_pts, pts, 16, gym_color(1,0,1));
     
 #if FLAT_RASTERIZER
