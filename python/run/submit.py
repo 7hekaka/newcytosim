@@ -116,9 +116,7 @@ def sub_script(exe):
     """return command that will submit one job"""
     # specify memory, shell, minimum number of cores and queue
     res = [submit, '--nodes=1', '--ntasks=1']
-    # specify number of threads if executable is threaded:
-    if ncpu > 1:
-        res.append(f'--cpus-per-task={ncpu}')
+    res.append(f'--cpus-per-task={ncpu}')
     if account:
         res.append(f'--account={account}')
     res.append(f'--job-name={jdir}')
@@ -141,9 +139,7 @@ def array_script(jobcnt):
     # define parameters directly in the script:
     res  = ['#SBATCH --nodes=1']
     res.append('#SBATCH --ntasks=1')
-    # specify number of threads if executable is threaded:
-    if ncpu > 1:
-        res.append(f'#SBATCH --cpus-per-task={ncpu}')
+    res.append(f'#SBATCH --cpus-per-task={ncpu}')
     if account:
         res.append(f'#SBATCH --account={account}')
     res.append(f'#SBATCH --partition={queue}')
