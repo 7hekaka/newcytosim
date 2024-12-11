@@ -15,6 +15,7 @@
 #include "gym_flute.h"
 #include "gym_draw.h"
 #include "gym_view.h"
+#include "gym_cap.h"
 
 // select between 2D or 3D mode:
 #define FLAT_RASTERIZER 0
@@ -297,6 +298,7 @@ int display(View& view)
 {
     view.openDisplay();
 
+    gym::disableLighting();
 #if FLAT_RASTERIZER
     drawGrid();
     drawGridPoints();
