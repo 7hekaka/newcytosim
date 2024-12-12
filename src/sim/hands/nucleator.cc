@@ -110,7 +110,7 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
     // mark fiber to highlight mode of nucleation:
     if ( opt.value_is("mark", 0, "random") )
         mk = RNG.pint32();
-    if ( opt.value_is("mark", 0, "add") )
+    else if ( opt.value_is("mark", 0, "add") )
         ++mk;
     else opt.set(mk, "mark");
     fib->mark(mk);
