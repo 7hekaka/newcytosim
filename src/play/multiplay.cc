@@ -24,8 +24,8 @@
 #include "glfw.h"
 
 #include "random_pcg.h"
-extern uint32_t get_random_seed();
-uint64_t pcg32_state;
+#include "random_seed.h"
+using namespace PCG32;
 
 int tileX = 2;
 int tileY = 3;
@@ -377,12 +377,12 @@ int main(int argc, char *argv[])
     Cytosim::silent();
 
     // seed all RNGs used by sim using a common random generator:
-    pcg32_state = get_random_seed();
+    seed_pcg32();
 
     for ( int i = 0; i < nbBugs(); ++i )
     {
         simul[i].prop.read(arg);
-        simul[i].prop.random_seed = pcg32(pcg32_state);
+        simul[i].prop.random_seed = pcg32();
         worker[i].simul(simul+i);
         worker[i].period(period);
         worker[i].start();

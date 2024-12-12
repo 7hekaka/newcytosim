@@ -21,7 +21,7 @@ vpath %.cc src/test
 
 GLTEST_MAKE = $(COMPILE) $(addprefix -Isrc/, math base sim gym disp) $(OBJECTS) $(LINK) $(GRAFIX) $(IMAGES) -o bin/$@
 
-TEST_OBJ = $(addprefix build/, random_vector.o random.o SFMT.o backtrace.o exceptions.o)
+TEST_OBJ = $(addprefix build/, random_vector.o random.o random_seed.o SFMT.o backtrace.o exceptions.o)
 
 #----------------------------Targets--------------------------------------------
 
@@ -127,7 +127,7 @@ test_sizeof: test_sizeof.cc | bin
 	$(COMPILE) $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 
-test_sort: test_sort.cc $(TEST_OBJ) | bin
+test_sort: test_sort.cc random_pcg.cc $(TEST_OBJ) | bin
 	$(COMPILE) -Isrc/base -Isrc/math $(OBJECTS) $(LINK) -o bin/$@
 	$(DONE)
 

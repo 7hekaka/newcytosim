@@ -17,7 +17,9 @@ set(SOURCES_MATH
     polygon.cc
     spherical_code.cc
     random.cc
-    modulo.cc 
+    random_seed.cc
+    random_pcg.cc
+    modulo.cc
     tesselator.cc
     random_vector.cc
     project_ellipse.cc

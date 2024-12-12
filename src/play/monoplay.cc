@@ -22,8 +22,8 @@
 #include "gle.h"
 
 #include "random_pcg.h"
-extern uint32_t get_random_seed();
-uint64_t pcg32_state;
+#include "random_seed.h"
+using namespace PCG32;
 
 // size of window (updated if window is resized)
 int winW = 1024;
@@ -273,7 +273,7 @@ int main(int argc, char *argv[])
     SimThread worker(&simul);
     
     simul.initCytosim();
-    pcg32_state = get_random_seed();
+    seed_pcg32();
 
     //parse the command line:
     Glossary arg;

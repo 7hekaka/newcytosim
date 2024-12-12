@@ -10,6 +10,7 @@
 #include "simul_prop.h"
 #include "backtrace.h"
 #include "modulo.h"
+#include "random_seed.h"
 
 #include "tubule.h"
 #include "fiber.h"
@@ -19,7 +20,6 @@
 
 const char Simul::TRAJECTORY[] = "objects.cmo";
 
-#include "../math/random_seed.cc"
 #include "simul_step.cc"
 #include "simul_file.cc"
 #include "simul_custom.cc"
@@ -63,17 +63,16 @@ Simul::~Simul()
 #pragma mark -
 
 /**
- This will initialize the Random number generator
+ This will initialize the Random number generator if needed
  */
 void Simul::initCytosim()
 {
-    // initialize the random number generator:
     if ( !RNG.seeded() )
     {
         if ( prop.random_seed )
             RNG.seed(prop.random_seed);
         else {
-            prop.random_seed = get_random_seed();
+            prop.random_seed = PCG32::get_random_seed();
             RNG.seed(prop.random_seed);
         }
     }

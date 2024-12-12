@@ -8,8 +8,7 @@
 #include "sphere_prop.h"
 #include "fiber_prop.h"
 #include "random_pcg.h"
-
-extern uint64_t pcg32_state;
+using namespace PCG32;
 
 #define DISPLAY 1
 #include "gym_color.h"

@@ -3,8 +3,8 @@
 OBJ_MATH := vector1.o vector2.o vector3.o vector4.o random_vector.o\
     	matrix11.o matrix22.o matrix33.o matrix.o sparmat.o sparmatsym.o\
     	sparmatsym1.o sparmatsym2.o matrix34.o matfull.o\
-        project_ellipse.o polygon.o quartic_solver.o\
-        rasterizer.o spherical_code.o random.o
+        project_ellipse.o polygon.o quartic_solver.o rasterizer.o\
+        spherical_code.o random.o random_seed.o random_pcg.o
 
 OBJ_MATH_DIM := modulo.o sparmatblk.o sparmatsymblk.o sparmatsymblkdiag.o
 

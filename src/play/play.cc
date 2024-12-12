@@ -10,7 +10,6 @@
 #include "splash.h"
 #include "print_color.h"
 #include "signal_handlers.h"
-#include "random_pcg.h"
 
 #include "gle.h"
 #include "player.h"
@@ -18,8 +17,9 @@
 
 Player player;
 
-extern uint32_t get_random_seed();
-uint64_t pcg32_state = 0;
+#include "random_pcg.h"
+#include "random_seed.h"
+using namespace PCG32;
 
 SimThread& worker = player.worker;
 Simul&      simul = player.simul;
@@ -303,8 +303,8 @@ int main(int argc, char* argv[])
 
     try
     {
-        pcg32_state = get_random_seed();
-        RNG.seed(pcg32(pcg32_state));
+        seed_pcg32();
+        RNG.seed(pcg32());
         has_frame = arg.set(frm, "frame");
     }
     catch( Exception & e )

@@ -968,6 +968,9 @@
 		BBD59C972498C738002A2E7B /* Accelerate.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBFEC8EC243DC0DB00D55D4C /* Accelerate.framework */; };
 		BBD5DA7A0FF7956C0010D08D /* organizer_set.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD5DA760FF7956C0010D08D /* organizer_set.cc */; };
 		BBD5DA7B0FF7956C0010D08D /* organizer_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD5DA770FF7956C0010D08D /* organizer_set.h */; };
+		BBD69A0F2D0AE7C300982B65 /* random_pcg.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD69A0E2D0AE7C300982B65 /* random_pcg.cc */; };
+		BBD69A122D0AF16C00982B65 /* random_seed.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD69A112D0AF16C00982B65 /* random_seed.h */; };
+		BBD69A172D0AF37800982B65 /* random_seed.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBEEF5D62B542550005E29EA /* random_seed.cc */; };
 		BBD6F5C112D9D16400A5F99B /* bundle_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5BD12D9D16400A5F99B /* bundle_prop.cc */; };
 		BBD6F5C212D9D16400A5F99B /* bundle_prop.h in Headers */ = {isa = PBXBuildFile; fileRef = BBD6F5BE12D9D16400A5F99B /* bundle_prop.h */; };
 		BBD6F5C312D9D16400A5F99B /* bundle.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBD6F5BF12D9D16400A5F99B /* bundle.cc */; };
@@ -2223,6 +2226,8 @@
 		BBD4BB3A1007F2D300D00914 /* fiber_disp.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; path = fiber_disp.h; sourceTree = "<group>"; };
 		BBD5DA760FF7956C0010D08D /* organizer_set.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = organizer_set.cc; path = src/sim/organizer_set.cc; sourceTree = SOURCE_ROOT; };
 		BBD5DA770FF7956C0010D08D /* organizer_set.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = organizer_set.h; path = src/sim/organizer_set.h; sourceTree = SOURCE_ROOT; };
+		BBD69A0E2D0AE7C300982B65 /* random_pcg.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = random_pcg.cc; sourceTree = "<group>"; };
+		BBD69A112D0AF16C00982B65 /* random_seed.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = random_seed.h; sourceTree = "<group>"; };
 		BBD6F5BD12D9D16400A5F99B /* bundle_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bundle_prop.cc; path = organizers/bundle_prop.cc; sourceTree = "<group>"; };
 		BBD6F5BE12D9D16400A5F99B /* bundle_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = bundle_prop.h; path = organizers/bundle_prop.h; sourceTree = "<group>"; };
 		BBD6F5BF12D9D16400A5F99B /* bundle.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = bundle.cc; path = organizers/bundle.cc; sourceTree = "<group>"; };
@@ -3907,9 +3912,11 @@
 			children = (
 				BB73589D05B98DA3006956D5 /* random.h */,
 				BB73589C05B98DA3006956D5 /* random.cc */,
-				BBEEF5D62B542550005E29EA /* random_seed.cc */,
 				BB901AD925B02E3B005FB57F /* random_simd.cc */,
+				BBD69A112D0AF16C00982B65 /* random_seed.h */,
+				BBEEF5D62B542550005E29EA /* random_seed.cc */,
 				BBA4C2172920EFC90069A220 /* random_pcg.h */,
+				BBD69A0E2D0AE7C300982B65 /* random_pcg.cc */,
 				BBEEF5D02B5403A6005E29EA /* random_splitmix64.cc */,
 				BBE447D920646A420058ADAC /* SFMT-common.h */,
 				BBE447CE2064697D0058ADAC /* SFMT-params.h */,
@@ -4422,6 +4429,7 @@
 				BB10378310B8032E00CEC5C6 /* assert_macro.h in Headers */,
 				BB6D309820CA754B009C5C7C /* matrix33.h in Headers */,
 				BB8CB8571523147900505E89 /* bicgstab.h in Headers */,
+				BBD69A122D0AF16C00982B65 /* random_seed.h in Headers */,
 				BB9EC397209235CC00EF00E7 /* SFMT-avx2.h in Headers */,
 				BB4737BD2024B39300FE6CEC /* accumulator.h in Headers */,
 				BB1D4B5A16B86B320087CC48 /* quartic_solver.h in Headers */,
@@ -5750,6 +5758,7 @@
 				BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */,
 				BB7191AB0EF1CD9900CED9E2 /* rasterizer.cc in Sources */,
 				BB767DAA27A9C2210060D3FA /* bitmap.cc in Sources */,
+				BBD69A172D0AF37800982B65 /* random_seed.cc in Sources */,
 				BB7191AE0EF1CD9900CED9E2 /* matsym.cc in Sources */,
 				BB7191B00EF1CD9900CED9E2 /* sparmatsym.cc in Sources */,
 				BB7191B40EF1CD9900CED9E2 /* sparmatsym1.cc in Sources */,
@@ -5761,6 +5770,7 @@
 				BB7191B90EF1CD9900CED9E2 /* vector1.cc in Sources */,
 				BB7191BA0EF1CD9900CED9E2 /* vector2.cc in Sources */,
 				BB7191BB0EF1CD9900CED9E2 /* vector3.cc in Sources */,
+				BBD69A0F2D0AE7C300982B65 /* random_pcg.cc in Sources */,
 				BB3DA1DE254C8F0300226B81 /* object_pool.cc in Sources */,
 				BB89135229B367A400423319 /* modulo.cc in Sources */,
 				BB089A0A2228A26D00C070E7 /* matrix11.cc in Sources */,

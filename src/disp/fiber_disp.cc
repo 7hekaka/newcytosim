@@ -2,7 +2,6 @@
 
 #include "fiber_disp.h"
 #include "glossary.h"
-#include "random_pcg.h"
 
 
 // this controls compatibility in display parameter, which is not critical

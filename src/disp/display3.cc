@@ -5,6 +5,7 @@
 #include "display3.h"
 #include "modulo.h"
 #include "random_pcg.h"
+using namespace PCG32;
 
 #include "gle.h"
 #include "gym_color.h"

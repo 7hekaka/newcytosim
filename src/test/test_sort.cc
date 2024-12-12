@@ -9,8 +9,8 @@
 #include "timer.h"
 #include "random_pcg.h"
 #include "random_seed.cc"
+using namespace PCG32;
 
-uint64_t pcg32_state;
 constexpr size_t LOAD = 128;
 
 int compare16(const void * A, const void * B)
@@ -103,7 +103,7 @@ void speed_test(const char str[], size_t cnt, size_t rep)
     for ( size_t r = 0; r < rep; ++r )
     {
         for ( size_t i = 0; i < cnt; ++i )
-            val[i] = pcg32(pcg32_state);
+            val[i] = pcg32();
     }
     double t0 = 1000*tock(cnt);
 
@@ -112,7 +112,7 @@ void speed_test(const char str[], size_t cnt, size_t rep)
     for ( size_t r = 0; r < rep; ++r )
     {
         for ( size_t i = 0; i < cnt; ++i )
-            val[i] = pcg32(pcg32_state);
+            val[i] = pcg32();
         qsort(val, cnt, sizeof(TYPE), FUNC);
     }
     double t1 = 1000*tock(cnt);
@@ -122,7 +122,7 @@ void speed_test(const char str[], size_t cnt, size_t rep)
     for ( size_t r = 0; r < rep; ++r )
     {
         for ( size_t i = 0; i < cnt; ++i )
-            val[i] = pcg32(pcg32_state);
+            val[i] = pcg32();
         std::sort(val, val+cnt, [](TYPE const& a, TYPE const& b) { return a < b; });
     }
     double t2 = 1000*tock(cnt);
@@ -136,7 +136,7 @@ int main(int argc, char* argv[])
     size_t cnt = 1<<16, rep = 32;
     if ( argc > 1 )
         cnt = std::max(2, atoi(argv[1]));
-    pcg32_state = get_random_seed();
+    seed_pcg32();
     speed_test<uint16_t, compare16>("int16", cnt, rep);
     speed_test<uint32_t, compare32>("int32", cnt, rep);
     speed_test<uint64_t, compare64>("int64", cnt, rep);

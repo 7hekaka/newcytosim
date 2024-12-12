@@ -7,7 +7,9 @@
 #include "tokenizer.h"
 #include "organizer.h"
 #include "matrix22.h"
+
 #include "random_pcg.h"
+using namespace PCG32;
 
 
 /// width of columns in formatted output, in number of characters
@@ -24,7 +26,7 @@ static int column_width = 10;
 
 #include "accumulator.h"
 
-/// pad string by adding white-space on the right up to size 'n * column_width - p'
+/// add white-space right of `str` to reach length 'n * column_width - p' at most
 static std::string ljust(std::string const& str, size_t n, size_t p = 0)
 {
     size_t a = n * column_width;
@@ -32,7 +34,7 @@ static std::string ljust(std::string const& str, size_t n, size_t p = 0)
     return str + std::string(s, ' ');
 }
 
-/// pad string by adding white-space on the left up to size 'n * column_width - p'
+/// add white-space left of `str` to reach length 'n * column_width - p' at most
 static std::string rjust(std::string const& str, size_t n, size_t p = 1)
 {
     size_t a = n * column_width;
@@ -60,6 +62,7 @@ static void remove_trailing_s(std::string & str)
         str.resize(str.size()-1);
 }
 
+//------------------------------------------------------------------------------
 
 /**
  combines multiple report, if `what` has multiple instructions separated by ','
