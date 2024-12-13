@@ -54,7 +54,7 @@ def format_values(val):
 class Instruction:
     words_ = []
     values_ = {}
-    code_ = {}
+    code_ = []
     
     def __init__(self, key):
         self.words_ = [ key ]
@@ -82,7 +82,9 @@ class Instruction:
     
     def format_horizontal(self):
         res = self.format_header() + "{ "
-        if self.code_:
+        if isinstance(self.code_, str):
+            res += self.code_
+        elif self.code_:
             for i in self.code_:
                 res += i.format_horizontal() + "; "
         else:
@@ -93,7 +95,9 @@ class Instruction:
     
     def format_vertical(self, indent = ""):
         res = indent + self.format_header() + "\n" + indent + "{\n"
-        if self.code_:
+        if isinstance(self.code_, str):
+            res += self.code_
+        elif self.code_:
             for i in self.code_:
                 res += i.format_vertical(indent+"   ")
         else:
@@ -168,6 +172,9 @@ def delimiter(c):
     if c == '(': return ')'
     if c == '{': return '}'
     if c == '[': return ']'
+    if c == ')': return '('
+    if c == '}': return '{'
+    if c == ']': return '['
     if c == '"': return '"'
     return 0
 
@@ -185,14 +192,26 @@ def get_block(fid, s, e):
     """
     Return a block including the enclosing delimiters
     """
-    res = s
     c = get_char(fid)
+    if s:
+        # read entry delimiter
+        while c.isspace():
+            c = get_char(fid)
+        if not s == c:
+            err.write("  Error: block delimiter "+s+"\n")
+            sys.exit(1)
+        res = c
+        c = get_char(fid)
+    else:
+        # assume entry delimiter has been read already
+        res = delimiter(e)
+    # read content:
     while c:
         if c == e:
             res += c
             return res
         if delimiter(c):
-            res += get_block(fid, c, delimiter(c))
+            res += get_block(fid, '', delimiter(c))
         else:
             res += c
         c = get_char(fid)
@@ -215,7 +234,7 @@ def get_token(fid):
     if c == '%':
         return '%' + fid.readline()
     if delimiter(c):
-        return get_block(fid, c, delimiter(c))
+        return get_block(fid, '', delimiter(c))
     if c.isdigit() or c == '-' or c == '+':
         return get_number(fid, c)
     res = c
@@ -228,6 +247,24 @@ def get_token(fid):
                 break
             res += c
     #print(" TOKEN |"+res+"|")
+    return res
+
+def get_string(fid):
+    """
+    Extract the next space-delimited string from the file
+    """
+    res = ''
+    pos = fid.tell()
+    c = get_char(fid)
+    while c.isspace() and c != '\n':
+        pos = fid.tell()
+        c = get_char(fid)
+    while not c.isspace():
+        res += c
+        pos = fid.tell()
+        c = get_char(fid)
+    fid.seek(pos)
+    #print(" STRING |"+res+"|")
     return res
 
 
@@ -347,7 +384,7 @@ def parse_config(fid):
     """
     return a list resulting from parsing the specified file
     """
-    keywords = [ 'set', 'new', 'run', 'call', 'delete', 'change', 'cut', 'mark', 'report', 'write', 'repeat' ];
+    keywords = [ 'set', 'new', 'run', 'call', 'delete', 'change', 'cut', 'mark', 'report', 'write' ];
     cur = []
     pile = []
     while fid:
@@ -359,25 +396,30 @@ def parse_config(fid):
             pass
         elif tok == '\n':
             pass
+        elif tok in {'for', 'repeat'}:
+            if cur:
+                pile.append(cur)
+            cur = Instruction(tok)
+            cur.words_.append(get_string(fid))
+            blk = get_block(fid, '{', '}')
+            cur.code_ = blk[1:-1]
         elif tok in keywords:
             if cur:
                 pile.append(cur)
             cur = Instruction(tok)
         elif tok[0] == '{' or tok[0] == '(':
-            if cur.words_[0] == 'repeat':
-                sfid = io.StringIO(tok[1:-1])
-                cur.code_ = parse_config(sfid)
-            else:
-                pam = read_list(file_object(tok[1:-1]))
-                #print("VALUES  : ", pam)
-                cur.values_ = simplify(pam)
-                #print("SIMPLIFIED: ", cur.values_)
+            pam = read_list(file_object(tok[1:-1]))
+            #print("VALUES  : ", pam)
+            cur.values_ = simplify(pam)
+            #print("SIMPLIFIED: ", cur.values_)
             pile.append(cur)
             cur = []
         elif cur and ( tok[0].isalpha() or tok.isdigit() or tok=='*' ):
             cur.words_.append(tok)
         else:
             print(">>>>>ignored |"+tok+"|")
+    if cur:
+        pile.append(cur)
     return pile
 
 
