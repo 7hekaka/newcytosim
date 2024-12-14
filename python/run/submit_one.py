@@ -2,11 +2,12 @@
 #
 # A script to submit analysis jobs to the SLURM queuing system
 #
-# Derived from submit_slurm.py
-# F. Nedelec, 4.11.2020, 30.09.2021, 28.10.2022, 26.01.2023, 1.2.2023
+# Derived from submit.py
+# F.Nedelec, 4.11.2020, 30.09.2021, 28.10.2022, 26.01.2023, 1.2.2023, 14.12.2024
 
 """
-    Submit a job to the SLURM system to be called in multiple directories
+    Submit jobs to the SLURM system to be called in multiple directories
+    One job will be submitted for each directory specified
     
 Syntax:
     
@@ -20,7 +21,6 @@ Syntax:
 Example:
     
     submit_one.py 'report platelet > platelet.txt' run????
-    Submit one job to run command in the directories provided
     
 F. Nedelec, Copyright Cambridge University. Last updated 1.2.2023
 """
@@ -33,13 +33,13 @@ submit  = 'sbatch'
 queue   = 'icelake'
 account = ''         # Project name
 
-runtime = '12:00:00' # 12 hour
+runtime = '3:00:00'  # 3 hours
 memory  = '4096'     # in MB
 ncpu    = 1          # nb of threads per job
 exclusive = 0        # node exclusivity
 
-# where output is sent:
-out = sys.stderr
+# where error messages are sent:
+err = sys.stderr
 
 #-------------------------------------------------------------------------------
 
@@ -48,10 +48,10 @@ def execute(cmd):
     try:
         val = subprocess.call(cmd)
         if val:
-            out.write("ERROR: command failed with value %i\n" % val)
+            err.write("ERROR: command failed with value %i\n" % val)
             print(cmd)
     except OSError:
-        out.write("ERROR, command failed: "+' '.join(cmd)+"\n")
+        err.write("ERROR, command failed: "+' '.join(cmd)+"\n")
 
 
 def write_script(fd, cmd):
@@ -101,7 +101,7 @@ def main(args):
     #find submit command:
     proc = subprocess.Popen(['which', submit], stdout=subprocess.PIPE)
     if proc.wait():
-        out.write("Error: submit command `"+submit+"' not found!\n")
+        err.write("Error: submit command `"+submit+"' not found!\n")
     else:
         submit = proc.stdout.readline().strip()
 
@@ -138,28 +138,28 @@ def main(args):
             elif key == 'exclusive':
                 exclusive = val
             else:
-                out.write("Error: I do not understand argument `%s'\n" % arg)
+                err.write("Error: I do not understand argument `%s'\n" % arg)
                 sys.exit()
     
     if int(memory) < 128:
-        out.write("Error: requested memory (%s MB) seems too low\n" % memory)
+        err.write("Error: requested memory (%s MB) seems too low\n" % memory)
         sys.exit()
 
     if ncpu < 1:
-        out.write("Error: number of cpu/job must be >= 1\n")
+        err.write("Error: number of cpu/job must be >= 1\n")
         sys.exit()
     if ncpu > 128:
-        out.write("Error: number of cpu/job is excessive?\n")
+        err.write("Error: number of cpu/job is excessive?\n")
         sys.exit()
 
     for p in paths:
         fd, file = tempfile.mkstemp('', 'j', p, True)
-        out.write("script %s : " % file)
         write_script(fd, ['cd '+p+' && '+cmd+';'])
         os.chmod(file, 0o700)
+        print(file, end=' ')
         execute(sub(file))
     if not paths:
-        out.write("Error: you need to specify at least one directory\n")
+        err.write("Error: you need to specify at least one directory\n")
 
 
 #-------------------------------------------------------------------------------
