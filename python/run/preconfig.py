@@ -3,8 +3,8 @@
 # PRECONFIG, a versatile configuration file generator for varying parameters
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
-# EMBL 2010--2017, Cambridge University 2019--2022
-# This is PRECONFIG version 1.60, last modified on 11.11.2024
+# EMBL 2010--2017, Cambridge University 2019--2024
+# This is PRECONFIG version 1.7, last modified on 15.12.2024
 
 """
 # SYNOPSIS
@@ -357,7 +357,7 @@ class Preconfig:
             self.out.write("|%50s --> %s\n" % (code, repr(val)) )
 
     def evaluate(self, arg):
-        """ Return evaluation of `arg', checking for syntax error"""
+        """ Return evaluation of `arg', exiting on syntax error"""
         try:
             #print("Preconfig:evaluate " + arg)
             res = eval(arg, GLOBALS, self.locals)
@@ -376,10 +376,28 @@ class Preconfig:
             except Exception:
                 pass
         return res
-    
-    def try_assignment(self, code, blok):
+        
+    def evaluate_code(self, code):
         """
-            Check if `arg` follows the format of a variable definition (X=RHS),
+            Evaluate `code`, returning [] if this caused an error
+        """
+        res = []
+        try:
+            res = self.evaluate(code)
+            self.report(code, '', res)
+        except NameError as e:
+            if self.verbose > 1:
+                sys.stderr.write("\033[1m\033[96m")
+                sys.stderr.write("Preconfig kept `%s' verbatim since %s" % (code, str(e)))
+                sys.stderr.write("\033[0m")
+                sys.stderr.write("\n")
+            #print(self.locals)
+            self.report(code, '', code)
+        return res
+
+    def try_assignment(self, code):
+        """
+            Check if `code` follows the format of a variable definition (X=RHS),
             and in that case return (key, self.evaluate(RHS)).
             Check for (X==RHS) with a double '==', returning (key, RHS) in that case.
             If `arg` is not an assignment, return ('', self.evaluate(arg))
@@ -387,31 +405,21 @@ class Preconfig:
         k = ''
         v = code
         rem = re.match(r" *([a-zA-Z]\w*) *= *(.*)", code)
-        #print(" preconfig:try_assignment(%s): %s" % (code, res.groups()))
         if rem and len(rem.groups()) > 1:
+            #print(f" preconfig:try_assignment({code}): {rem.groups()}")
             k = rem.group(1)
             v = rem.group(2).strip()
             if v[0] == '=':
-                # with '==' use raw right-hand side 
+                # with '==' use right-hand side verbatim
                 v = v[1:]
                 self.protected.append(k)
                 print("   protected `%s == %s'" % (k, v))
-                return (k, v)
+            else:
+                v = self.evaluate_code(v)
+                if v == []:
+                    return ('', code)
             #print("   identified `%s <- %s'" % (k, v))
-        try:
-            res = self.evaluate(v)
-        except NameError as e:
-            if self.verbose > 1:
-                sys.stderr.write("\033[1m\033[96m")
-                sys.stderr.write("Preconfig kept `%s' verbatim since %s" % (code, str(e)))
-                sys.stderr.write("\033[0m")
-                sys.stderr.write("\n")
-            exit_code = 1
-            #print(self.locals)
-            self.report(blok, '', blok)
-            return ('', blok)
-        self.report(code, k, res)
-        return (k, res)
+        return (k, v)
     
     def process(self, file, text):
         """
@@ -419,32 +427,29 @@ class Preconfig:
             in the input `file`. Generate output file evetytime EOF is reached.
         """
         output = text
-
         while file:
-            (pre, blok, eof) = get_block(file, CODE, DECO)
-            #print("%i characters +  '%s'" % (len(pre), blok))
-            output += pre
+            (before, blok, eof) = get_block(file, CODE, DECO)
             if eof:
-                if blok:
-                    sys.stderr.write("Preconfig Error: unclosed bracketted block in:\n")
-                    sys.stderr.write("    "+blok.split('\n', 1)[0]+'\n')
-                    sys.exit(2)
-                # having exhausted the input, we generate a file:
-                self.make_file(output)
-                return
+                break;
+            #print("%i characters +  '%s'" % (len(pre), blok))
             # remove outer brackets:
-            key = ''
             code = blok[2:-2].strip()
+            key = ''
+            val = ''
             # print("%4i characters... " % len(pre), end='')
-            if code[0]==CODE and code[1]==CODE and code[-1]==DECO and code[-2]==DECO:
+            if len(code)>3 and code[0]==CODE and code[1]==CODE and code[-1]==DECO and code[-2]==DECO:
                 # any further level of bracketting is not evaluated:
                 val = code
             elif code in self.locals:
                 # a defined variable is substituted but not expanded:
                 val = repr(self.locals[code])
-            else:
-                # check the code for assigment, and evaluate code:
-                key, vals = self.try_assignment(code, blok)
+            elif code:
+                # check the code for assignment, and evaluate code:
+                key, vals = self.try_assignment(code)
+                if not key:
+                    vals = self.evaluate_code(code)
+                    if vals == []:
+                        vals = blok
                 # print("code block `%s' -> %s" % (blok, vals))
                 if key:
                     self.locals[key] = vals
@@ -465,12 +470,24 @@ class Preconfig:
                 except (AttributeError, IndexError):
                     # a single value was specified:
                     val = vals
-            # handle remaining value:
+            # update text or local variables:
+            #print(f"{before}|{code}={val}|")
+            if not before.isspace():
+                output += before
             if key:
                 self.locals[key] = val
-            else:
+            elif val:
                 output += str(val)
-    
+        # having exhausted the input, we generate a file:
+        output += before
+        if blok:
+            sys.stderr.write(f"Preconfig Error: unclosed bracketted block in `{file.name}`,\n")
+            sys.stderr.write(f"below line {output.count('\n')}:\n")
+            sys.stderr.write("    "+blok.split('\n', 1)[0]+'\n')
+            sys.exit(2)
+        self.make_file(output)
+        return
+
     def set_template(self, name):
         """
         Initialize variable to process template file 'name'
@@ -618,7 +635,7 @@ class Preconfig:
             elif arg.startswith('-') and arg[1:].isdigit():
                 self.nb_digits = int(arg[1:])
             elif arg.find('=', 1) > 0:
-                k, v = self.try_assignment(arg, 0)
+                k, v = self.try_assignment(arg)
                 values[k] = v
             elif arg:
                 sys.stderr.write("Preconfig does not understand argument `%s'\n" % arg)
