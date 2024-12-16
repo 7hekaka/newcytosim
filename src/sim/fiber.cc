@@ -171,7 +171,7 @@ bool Fiber::updateLength(real addM, real addP, bool split)
             }
         }
     }
-    else if ( inc > 0 )
+    else if ( addP != 0 || addM != 0 )
     {
         if ( len < prop->max_length )
         {
