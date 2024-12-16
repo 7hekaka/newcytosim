@@ -658,7 +658,7 @@ void Glossary::read_entry(std::istream& is, int no_overwrite)
         while ( read_rhs(pair.first, pair.second, is) );
         
         if ( pair.second.empty() )
-            throw InvalidSyntax("expected value in assignement");
+            throw InvalidSyntax("expected value after `"+pair.first+"=`");
     }
     catch( Exception& e )
     {
@@ -724,7 +724,7 @@ void Glossary::read_string(const char arg[], int no_overwrite)
         {
             while ( read_rhs(pair.first, pair.second, iss) );
             if ( pair.second.empty() )
-                throw InvalidSyntax("expected value in assignement");
+                throw InvalidSyntax("expected value after `"+pair.first+"=`");
             add_entry(pair, no_overwrite);
         }
     }

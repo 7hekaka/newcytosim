@@ -60,9 +60,9 @@ void DynamicFiberProp::clear()
 static void splashGHU(std::ostream& os, real g, real h, real unit)
 {
     real ctime = ( 7*h*h + 12*g*h + 3*g*g ) / ( 3*h*h * ( 2*h + 3*g ) );
+    // if h << g, ctime ~ ( g + 4*h ) / ( 3*h*h );
     real len = g * unit * ctime;
     
-    //const real ctime = g / ( 3*h*h );  // that is only true if g >> h
     std::streamsize p = os.precision(5);
     os << " hydrolysis " << h << "/s growth " << g << "/s";
     os << "  catastrophe_time " << ctime << "s  rate " << 1/ctime << "/s";
