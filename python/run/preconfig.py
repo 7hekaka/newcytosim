@@ -10,6 +10,7 @@
 # SYNOPSIS
 
    Preconfig generates files from a template by evaluating doubly-bracketed Python code.
+   Preconfig generates files from a template by evaluating doubly-bracketed Python code.
    
 # Article:
 
@@ -377,11 +378,11 @@ class Preconfig:
                 pass
         return res
         
-    def evaluate_code(self, code):
+    def evaluate_code(self, code, blok):
         """
-            Evaluate `code`, returning [] if this caused an error
+            Evaluate `code`, returning `blok` if this caused an error
         """
-        res = []
+        res = blok
         try:
             res = self.evaluate(code)
             self.report(code, '', res)
@@ -392,7 +393,8 @@ class Preconfig:
                 sys.stderr.write("\033[0m")
                 sys.stderr.write("\n")
             #print(self.locals)
-            self.report(code, '', code)
+            res = blok
+        self.report(code, '', res)
         return res
 
     def try_assignment(self, code):
@@ -415,9 +417,9 @@ class Preconfig:
                 self.protected.append(k)
                 print("   protected `%s == %s'" % (k, v))
             else:
-                v = self.evaluate_code(v)
-                if v == []:
-                    return ('', code)
+                v = self.evaluate_code(v, code)
+                if v == code: # RHS evaluation failed
+                    k = ''
             #print("   identified `%s <- %s'" % (k, v))
         return (k, v)
     
@@ -447,9 +449,7 @@ class Preconfig:
                 # check the code for assignment, and evaluate code:
                 key, vals = self.try_assignment(code)
                 if not key:
-                    vals = self.evaluate_code(code)
-                    if vals == []:
-                        vals = blok
+                    vals = self.evaluate_code(code, blok)
                 # print("code block `%s' -> %s" % (blok, vals))
                 if key:
                     self.locals[key] = vals
@@ -476,7 +476,7 @@ class Preconfig:
                 output += before
             if key:
                 self.locals[key] = val
-            elif val:
+            elif str(val):
                 output += str(val)
         # having exhausted the input, we generate a file:
         output += before
