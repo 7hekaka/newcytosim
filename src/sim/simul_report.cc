@@ -3322,7 +3322,7 @@ void Simul::reportAshbya(std::ostream& out, std::ostream& com) const
  */
 void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox, const int print) const
 {
-    assert_true( fib && fox );
+    const real NO_CONTACT = 777;
     const real COS20 = 0.94;
     const real COS10 = 0.985;
     const real L1 = 1.0; // threshold used to decide on events
@@ -3330,7 +3330,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
 
     static int decided = 0;
     static real abs = -77; // abscissa of contact point on fox
-    static real ang = 777; // angle at first contact
+    static real ang = NO_CONTACT; // angle at first contact
     static real dis = INFINITY; // minimum distance reached
     static Vector hit(0,0,0); // position of first contact
     static Vector aim(0,0,0); // direction of plus-end at first contact
@@ -3346,6 +3346,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
     
     if ( !decided )
     {
+        assert_true( fib && fox );
         const real sup = 3 * fib->prop->steric_radius;
         
         // K = plus-end is shrinking
@@ -3370,7 +3371,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
             real C = dot(dir, dirFox);
             real A = std::acos(C);
             // the angle and abscissa are set at first contact:
-            if ( ang > 700 )
+            if ( ang == NO_CONTACT )
             {
                 ang = A;
                 abs = aaa;
@@ -3435,8 +3436,8 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
         {
             if ( K )
             {
-                // rescue microtubule if nothing was detected
-                if ( !contact )
+                // rescue microtubule if no contact was ever made:
+                if ( ang == NO_CONTACT )
                 {
                     fib->setEndStateP(STATE_GREEN);
                     //out << fib->reference() << " rescued\n";
@@ -3470,7 +3471,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
         // reset static variables for next round:
         decided = 0;
         abs = -77;
-        ang = 777;
+        ang = NO_CONTACT;
         dis = INFINITY;
         hit.set(0,0,0);
         aim.set(0,0,0);
