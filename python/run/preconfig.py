@@ -271,7 +271,7 @@ def pop_sequence(dic, protected):
     return ('', [])
 
 
-def get_block(file, S, E):
+def get_double_block(file, S, E):
     """
     Extract from `file` the next block starting with DOUBLE delimiters 'SS'
         and ending with matching 'EE'.
@@ -430,7 +430,7 @@ class Preconfig:
         """
         output = text
         while file:
-            (before, blok, eof) = get_block(file, CODE, DECO)
+            (before, blok, eof) = get_double_block(file, CODE, DECO)
             if eof:
                 break;
             #print("%i characters +  '%s'" % (len(pre), blok))
@@ -470,9 +470,12 @@ class Preconfig:
                 except (AttributeError, IndexError):
                     # a single value was specified:
                     val = vals
+            # print(f"{len(before)}...|{code}| --> |{val}|")
             # update text or local variables:
-            #print(f"{before}|{code}={val}|")
-            if not before.isspace():
+            # if ]]\ was used at the end of a line, we skip the newline.
+            if len(before) > 1 and before[0:2] == '\\\n':
+                output += before[2:]
+            else:
                 output += before
             if key:
                 self.locals[key] = val
