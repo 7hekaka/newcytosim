@@ -482,7 +482,7 @@ class Preconfig:
         output += before
         if blok:
             sys.stderr.write(f"Preconfig Error: unclosed bracketted block in `{file.name}`,\n")
-            sys.stderr.write(f"below line {output.count('\n')}:\n")
+            sys.stderr.write("below line %i:\n"%output.count('\n'))
             sys.stderr.write("    "+blok.split('\n', 1)[0]+'\n')
             sys.exit(2)
         self.make_file(output)
