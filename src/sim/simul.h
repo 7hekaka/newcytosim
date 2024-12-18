@@ -176,7 +176,7 @@ public:
     double time() const { return prop.time; }
 
     /// change time in the simulated world
-    void time(double t) { prop.time = t; }
+    void set_time(double t) { prop.time = t; }
 
     /// true if `SimulProp::time < SimulProp::stop_time`
     bool incomplete() const { return prop.time < prop.stop_time; }

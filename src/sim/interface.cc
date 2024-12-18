@@ -1260,14 +1260,15 @@ void Interface::execute_run(real sec)
  */
 void Interface::execute_import(std::string const& file, std::string const& what, Glossary& opt)
 {
-    // we could use the 'tag' to select a certain class of object
+    bool append = false;
     ObjectSet * subset = nullptr;
     
     if ( what != "all" && what != "objects" )
     {
+        append = true;
         subset = sim_->findSet(what);
         if ( !subset )
-            throw InvalidIO("expected class specifier (eg. `import all FILE' or `import fiber FILE')");
+            throw InvalidIO("expected a class to be specified (import fiber FILE)");
     }
 
     Inputter in(DIM, file.c_str(), true);
@@ -1275,7 +1276,6 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     if ( ! in.good() )
         throw InvalidIO("Could not open file `"+file+"'");
     
-    bool append = false;
     size_t cnt = 0, frm = 0;
 
     opt.set(frm, "frame");
@@ -1289,7 +1289,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
         {
             double t = sim_->time();
             sim_->reloadObjects(in, 0, subset);
-            sim_->time(t);
+            sim_->set_time(t);
         }
         else
             sim_->reloadObjects(in, 1, subset);
@@ -1313,7 +1313,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     // set time
     double t;
     if ( opt.set(t, "time") )
-        sim_->time(t);
+        sim_->set_time(t);
 }
 
 

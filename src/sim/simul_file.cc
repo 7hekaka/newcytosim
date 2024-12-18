@@ -502,7 +502,9 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
             lock.thaw_all();
         // renew pointers to objects, particularly 'confine_spec'
         prop.complete(*this);
-        fibers.updateFibers();
+        
+        if ( !subset || subset == &fibers )
+            fibers.updateFibers();
 
         assert_false(singles.bad());
         assert_false(couples.bad());
@@ -562,7 +564,7 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
         }
         if ( subset && objset != subset )
             in.skip_until("#section ");
-        if ( tok == "reheat" )
+        else if ( tok == "reheat" )
         {
             bool skip = ( objset != &couples && objset != &singles );
             if ( section == "couple" && prop.skip_free_couple )
