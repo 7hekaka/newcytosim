@@ -4,22 +4,27 @@
  `Frametool` is a simple utility that can read and extract frames in
  Cytosim's trajectory files, usually called "objects.cmo".
  
- `Frametool` only recognizes the START and END tags of frames, and will copy
- all the data contained between these tags verbatim.
+ Frametool only recognizes the START and END tags of frames, and will copy
+ all the data contained between these tags verbatim. It does not load the
+ objects stored in the data, and is not able to modify them.
  
- It can be used to extract one frame from the file, or multiple frames,
- specified using their indiced: start:period:end
+ Frametool can be used to extract one frame from the file, or multiple frames,
+ specified using numerical indices: START:PERIOD:END
+ These indices simply reflect the order in which the frame appear in the file,
+ starting at index 0.
 
- A typical use case is to reduce the file by dropping every odd frame:
- > frametool objects.cmo 0:2: > o.cmo
- > mv o.cmo objects.cmo
+ A typical use case is to reduce the file by dropping some intermediate frames.
+ Example, this will drop odd frames:
+    > frametool objects.cmo 0:2: o.cmo
+    > mv o.cmo objects.cmo
  
  Another tool `sieve` can be used to read/write object-files,
  allowing for a finer manipulation of the simulation frames.
  
- FJN, last updated 12.12.2023
+ FJN, last updated 12.12.2023, 18.12.2024
 */
 
+#include <unistd.h>
 #include <errno.h>
 #include <cstdio>
 #include <ctype.h>
@@ -31,7 +36,7 @@
 
 
 enum { COUNT, COPY, LAST, SIZE, EPID, SPLIT };
-enum { UNKNOWN, FRAME_START, FRAME_SECTION, FRAME_END };
+enum { UNKNOWN, FRAME_START, FRAME_SECTION, FRAME_END, TIME_LINE };
 
 const size_t buf_size = 128;
 char buf[buf_size];
@@ -39,7 +44,7 @@ char buf[buf_size];
 FILE * output = stdout;
 unsigned long frame_pid = 0;
 double frame_time = 0;
-
+double time_added = 0;
 
 FILE * openFile(char name[], char const* mode)
 {
@@ -63,8 +68,8 @@ FILE * openFile(char name[], char const* mode)
 
 
 /**
- read a line, and returns a code indicating if this is the start
- or the end of a cytosim frame
+ read a line, and send every characters to 'out', and returns a code
+ indicating if this line was the start or the end of a cytosim frame
  */
 int whatline(FILE* in, FILE* out)
 {
@@ -86,7 +91,7 @@ int whatline(FILE* in, FILE* out)
         
     } while ( c != '\n' );
     
-    // fill-in with zeros:
+    // terminate buffer with zeros:
     if ( ptr < end )
         *ptr = 0;
     else
@@ -104,8 +109,13 @@ int whatline(FILE* in, FILE* out)
         if ( 0 == strncmp(buf, "#end ", 5) )     return FRAME_END;
         if ( 0 == strncmp(buf, " #end ", 6) )    return FRAME_END;
         if ( 0 == strncmp(buf, "#section ", 9) ) return FRAME_SECTION;
-        if ( 0 == strncmp(buf, "#time ", 6) )
+        if ( 0 == strncmp(buf, "#time ", 6) ) {
             frame_time = strtod(buf+6, nullptr);
+            // add a second line to change the time:
+            if ( out && time_added > 0 )
+                fprintf(out, "#time %.6f sec\n", frame_time+time_added);
+            return TIME_LINE;
+        }
     }
     return UNKNOWN;
 }
@@ -363,6 +373,7 @@ void help()
     printf("    frametool FILENAME size\n");
     printf("    frametool FILENAME size+\n");
     printf("    frametool FILENAME pid=PID\n");
+    printf("    frametool FILENAME time+=FLOAT\n");
     printf("    frametool FILENAME INDICES\n");
     printf("    frametool FILENAME split\n");
     printf(" where INDICES specifies an integer or a range of integers as:\n");
@@ -403,7 +414,7 @@ int main(int argc, char* argv[])
     int has_file = 0;
     int mode = COUNT;
     int details = 0;
-    char cmd[256] = "";
+    char slice[256] = "";
     char filename[256] = "objects.cmo";
     char outputname[256] = { 0 };
     unsigned long pid = 0;
@@ -411,12 +422,12 @@ int main(int argc, char* argv[])
     for ( int i = 1; i < argc ; ++i )
     {
         char * arg = argv[i];
+        char * dot = strrchr(argv[i], '.');
         if ( 0 == strncmp(arg, "help", 4) )
         {
             help();
             return EXIT_SUCCESS;
         }
-        char *dot = strrchr(arg, '.');
         if ( is_file(arg) )
         {
             if ( has_file++ )
@@ -439,40 +450,51 @@ int main(int argc, char* argv[])
             snprintf(filename, sizeof(filename), "%s/objects.cmo", arg);
         else
         {
-            strncpy(cmd, argv[i], sizeof(cmd));
-            
-            if ( isdigit(*cmd) )
+            if ( isdigit(*arg) )
+            {
                 mode = COPY;
-            else if ( 0 == strncmp(cmd, "last", 4) )
+                strncpy(slice, argv[i], sizeof(slice));
+            }
+            else if ( 0 == strncmp(arg, "last", 4) )
                 mode = LAST;
-            else if ( 0 == strncmp(cmd, "split", 5) )
+            else if ( 0 == strncmp(arg, "split", 5) )
                 mode = SPLIT;
-            else if ( 0 == strncmp(cmd, "size", 4) )
+            else if ( 0 == strncmp(arg, "size", 4) )
             {
                 mode = SIZE;
-                if ( cmd[4] == '+' ) details = 1;
+                if ( arg[4] == '+' ) details = 1;
             }
-            else if ( 0 == strncmp(cmd, "+", 1) )
+            else if ( 0 == strncmp(arg, "+", 1) )
             {
                 mode = SIZE;
                 details = 1;
             }
-            else if ( 0 == strncmp(cmd, "count", 5) )
+            else if ( 0 == strncmp(arg, "count", 5) )
                 mode = COUNT;
-            else if ( 0 == strncmp(cmd, "pid=", 4) )
+            else if ( 0 == strncmp(arg, "pid=", 4) )
             {
                 mode = EPID;
                 errno = 0;
-                pid = strtoul(cmd+4, nullptr, 10);
+                pid = strtoul(arg+4, nullptr, 10);
                 if ( errno )
                 {
-                    fprintf(stderr, "syntax error");
+                    fprintf(stderr, "syntax error in `%s`\n", arg);
+                    return EXIT_FAILURE;
+                }
+            }
+            else if ( 0 == strncmp(arg, "time+=", 6) )
+            {
+                errno = 0;
+                time_added = strtod(arg+6, nullptr);
+                if ( errno )
+                {
+                    fprintf(stderr, "syntax error in `%s`\n", arg);
                     return EXIT_FAILURE;
                 }
             }
             else
             {
-                fprintf(stderr, "unexpected command (for help, invoke `frametool help`)\n");
+                fprintf(stderr, "unexpected command `%s` (for help, invoke `frametool help`)\n", arg);
                 return EXIT_FAILURE;
             }
         }
@@ -501,7 +523,12 @@ int main(int argc, char* argv[])
             }
         }
         if ( mode == COPY )
-            extract(file, output, Slice(cmd));
+        {
+            if ( output == stdout && isatty(1) )
+                fprintf(stderr, "Error: cannot send output to terminal!\n");
+            else
+                extract(file, output, Slice(slice));
+        }
         else if ( mode == LAST )
             extractLast(file);
         else if ( mode == EPID )
