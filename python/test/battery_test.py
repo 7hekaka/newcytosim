@@ -137,7 +137,6 @@ def main(args):
         # wait for completion of all jobs:
         for j in jobs:
             j.join()
-            j.close()
         return 0
     #process sequentially:
     if live:
