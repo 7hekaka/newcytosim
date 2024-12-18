@@ -19,6 +19,8 @@ cutoff = 4000
 
 #font size:
 fts = 14
+# file format
+format = 'png'
 
 import sys, os, math, subprocess
 import matplotlib
@@ -73,16 +75,19 @@ def plot_data(X, Y, M, name):
     Yinf = 0.2
     Ysup = math.ceil(max(Y))
     fig = plt.figure(figsize=(4, 3))
-    plt.plot(X, Y, label='nematic order', linewidth=4.0)
+    plt.scatter(X, Y, label='nematic order', marker='o', s=8)
     plt.plot([Xinf, Xsup], [M, M], linewidth=1.0)
     plt.xlim(Xinf, Xsup)
     plt.ylim(Yinf, Ysup)
     plt.xlabel('Time (s)', fontsize=fts)
     plt.ylabel('Order', fontsize=fts)
     plt.title('Nematic order', fontsize=fts)
-    plt.legend()
+    #plt.legend()
     fig.tight_layout()
-    plt.savefig('order.png', dpi=150)
+    if format == 'svg':
+        plt.savefig('order.svg', format='svg', dpi=150)
+    else:
+        plt.savefig('order.png', dpi=150)
     #plt.show()
     plt.close()
 
@@ -119,10 +124,13 @@ def process(dirpath):
 #------------------------------------------------------------------------
 
 def main(args):
+    global format
     paths = []
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
+        elif arg in ('png', 'svg' ):
+            format = arg
         else:
             sys.stderr.write(f"Error: unexpected argument `{arg}`\n")
             sys.exit()
