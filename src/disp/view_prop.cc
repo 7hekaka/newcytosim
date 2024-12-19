@@ -69,6 +69,20 @@ void ViewProp::invertColors()
     floor_color = floor_color.inverted();
 }
 
+void ViewProp::blackAndWhite()
+{
+    if ( back_color.brightness() < 0.5 )
+    {
+        back_color.set(0,0,0);
+        front_color.set(1,1,1);
+    }
+    else
+    {
+        back_color.set(1,1,1);
+        front_color.set(0,0,0);
+    }
+}
+
 
 void ViewProp::read(Glossary& glos)
 {

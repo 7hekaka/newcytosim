@@ -227,9 +227,12 @@ public:
     /// write all values
     void write_values(std::ostream&) const;
 
-    /// invert some colors
+    /// invert front and back colors
     void invertColors();
     
+    /// use back and white for front/back colors
+    void blackAndWhite();
+
 };
 
 #endif

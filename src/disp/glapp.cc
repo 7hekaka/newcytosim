@@ -463,6 +463,10 @@ void glApp::processNormalKey(unsigned char c, int modifiers)
         case 'i':
             view.invertColors();
             break;
+            
+        case 'I':
+            view.blackAndWhite();
+            break;
 
         case 'h':
             view.draw_memo = ( view.draw_memo + 1 ) % 3;
