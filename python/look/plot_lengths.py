@@ -8,27 +8,31 @@
 """
 Description:
     Plot the histogram of filament length distribution
-    This relies on 'reportN' to produce data in 'len.txt'
+    This relies on 'report3' to produce data in 'len.txt'
     
 Syntax:
     plot_lengths.py DIRECTORY_PATH
 
 """
 
-#font size:
+# size of font used in plots:
 fts = 14
+# file format: `png` or `svg`
+format = 'png'
 
 import sys, os, math, subprocess
 import matplotlib
 import matplotlib.pyplot as plt
-#matplotlib.use('SVG')
 
 
-def uncode(arg):
+def split_line(arg):
+    """
+        Not sure if this is useful... was needed in older python
+    """
     try:
-        return arg.decode('utf-8')
+        return arg.decode('utf-8').split()
     except:
-        return arg
+        return arg.split()
 
 
 def plot_histogram(time, data, scale, name):
@@ -58,7 +62,7 @@ def get_lengths(file):
     S = []
     F = 'fiber'
     for line in file:
-        s = uncode(line).split()
+        s = split_line(line)
         if len(s) < 2:
             pass
         elif s[0] == '%':
@@ -84,18 +88,24 @@ def process(dirpath):
     with open(filename, 'r') as f:
         T, D, S, F = get_lengths(f)
         plot_histogram(T, D, S, F)
-    plt.savefig('lengths.png', dpi=150)
     #plt.show()
+    if format == 'svg':
+        plt.savefig('lengths.svg', format='svg', dpi=150)
+    else:
+        plt.savefig('lengths.png', dpi=150)
     plt.close()
 
 #------------------------------------------------------------------------
 
 def main(args):
+    global format
     paths = []
     
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
+        elif arg in ('png', 'svg' ):
+            format = arg
         else:
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()

@@ -25,7 +25,7 @@
     
 Syntax:
     
-    make_plots.py DIRECTORY-PATH
+    plot_stuff.py DIRECTORY-PATH
     
 Description:
     
@@ -35,7 +35,6 @@ import sys, os, math, subprocess
 import numpy
 import matplotlib.pyplot as plt
 import read_config
-#matplotlib.use('SVG')
 
 fts = 14
 out = sys.stderr

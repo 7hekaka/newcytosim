@@ -2,7 +2,7 @@
 #
 # make_page.py creates a HTML page with links to files in given directories
 #
-# Copyright FJ Nedelec, 14.12.2007 -- 4.2015 & 7.3.2022, 15.3.2023
+# Copyright FJ Nedelec, 14.12.2007, 4.2015, 7.3.2022, 15.3.2023, 23.12.2024
 
 """
 Synopsis:
@@ -91,7 +91,6 @@ def getMovieSize(file):
 
 
 def writeImageLinks(files):
-    global out, iarg
     for f in sorted(files):
         shot = os.path.basename(f)
         #out.write('<br>%s: ' % shot)
@@ -212,6 +211,8 @@ def main(args):
                 paths.append(arg)
             elif arg.endswith('.html'):
                 output = arg
+            elif arg.isdigit():
+                iarg = 'height='+arg
             else:
                 sys.stderr.write("ignored '%s' on command line\n" % arg)
 

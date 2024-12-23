@@ -214,7 +214,7 @@ for their feedback which has contributed greatly to this development.
 We thanks Shaun Jackman and Steven Andrews for valuable feedback!
 
 Copyright Francois J. Nedelec and Serge Dmitrieff
-EMBL 2010--2017; Cambridge University 2019--2022
+EMBL 2010--2017; Cambridge University 2019--2024
 This is Free Software with no WARANTY, just hoping to be useful.
 Preconfig is distributed under GPL3.0 Licence (see LICENCE)
 """

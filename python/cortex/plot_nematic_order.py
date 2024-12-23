@@ -25,10 +25,12 @@ format = 'png'
 import sys, os, math, subprocess
 import matplotlib
 import matplotlib.pyplot as plt
-#matplotlib.use('SVG')
 
 
 def uncode(arg):
+    """
+        Not sure if this is useful... was needed in older python
+    """
     try:
         return arg.decode('utf-8')
     except:
@@ -83,12 +85,12 @@ def plot_data(X, Y, M, name):
     plt.ylabel('Order', fontsize=fts)
     plt.title('Nematic order', fontsize=fts)
     #plt.legend()
+    #plt.show()
     fig.tight_layout()
     if format == 'svg':
         plt.savefig('order.svg', format='svg', dpi=150)
     else:
         plt.savefig('order.png', dpi=150)
-    #plt.show()
     plt.close()
 
 
