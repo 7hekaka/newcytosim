@@ -179,9 +179,10 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
             flashText("Nematic order %5.3f", S);
         if ( S > 0.1 )
         {
+            // align `vec` to `dir`:
             vec *= std::copysign(1.0, dot(dir, vec));
             // switch between immediate alignment (default) versus gradual:
-            if ( mode & 16 )
+            if ( goLive && ( mode & 16 ))
             {
                 // time-average the direction vector:
                 dir = ( dir * 20 + vec ).normalized();
