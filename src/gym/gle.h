@@ -41,10 +41,10 @@ namespace gle
     inline float sin_(size_t n) { return circle_[1+2*n]; }
 
     /// calculate sine and cosine
-    void set_arc(size_t cnt, float CS[], double rad, double start, double delta, float cx, float cy);
+    void set_arc(size_t cnt, float CS[], double radius, double start, double delta, double cx, double cy);
 
     /// calculate sine and cosine for a circular arc
-    void compute_arc(size_t cnt, float CS[], double rad, double start, double angle, float cx, float cy);
+    void compute_arc(size_t cnt, float CS[], double radius, double start, double angle, double cx, double cy);
 
     /// initialize buffer object
     size_t setExplodedCube(flute6*, float, float, float, float, float, float);

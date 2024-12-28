@@ -66,45 +66,76 @@ namespace gle
         ptr[1+2*i] = rad * sin(start+i*delta) + cY
      ptr[] should be allocated to hold `2*cnt+2' values
     */
-    void set_arc(size_t cnt, float ptr[], double rad,
-                 double start, double delta, float cX, float cY)
+    void set_arc(size_t cnt, float ptr[], double radius,
+                 double start, double delta, double cX, double cY)
     {
 #ifdef __SSE3__
-        return set_arc_SSE(cnt, ptr, rad, start, delta, cX, cY);
+        return set_arc_SSE(cnt, ptr, radius, start, delta, cX, cY);
 #else
-        const double c = std::cos(delta);
-        const double s = std::sin(delta);
+        const double C = std::cos(delta);
+        const double S = std::sin(delta);
 
-        double t;
-        double x = rad * std::cos(start);
-        double y = rad * std::sin(start);
+        double x = radius * std::cos(start);
+        double y = radius * std::sin(start);
         
         for( size_t n = 0; n < cnt; ++n )
         {
-            ptr[  2*n] = float(x) + cX;
-            ptr[1+2*n] = float(y) + cY;
+            ptr[  2*n] = float(x + cX);
+            ptr[1+2*n] = float(y + cY);
             //apply the rotation matrix
-            t = x;
-            x = c * x - s * y;
-            y = s * t + c * y;
+            double t = x;
+            x = C * x - S * y;
+            y = S * t + C * y;
             //std::clog << n << " " << x << " " << y << "\n";
         }
-        ptr[  2*cnt] = float(x) + cX;
-        ptr[1+2*cnt] = float(y) + cY;
+        ptr[  2*cnt] = float(x + cX);
+        ptr[1+2*cnt] = float(y + cY);
 #endif
     }
     
-    void compute_circle(size_t cnt, float ptr[], double rad, double start)
+    /** Compute cosine and sine over [0, 2*PI],  setting 2 + 4 * cnt pairs of [cosine, sine] values */
+    void compute_circle(size_t cnt, float ptr0[], double radius, double start)
     {
-        set_arc(cnt, ptr, rad, start, 2*M_PI/cnt, 0, 0);
-        ptr[  2*cnt] = ptr[0];
-        ptr[1+2*cnt] = ptr[1];
+        const double delta = M_PI_2 / cnt;
+        const double C = std::cos(delta);
+        const double S = std::sin(delta);
+
+        double x = radius * std::cos(start);
+        double y = radius * std::sin(start);
+
+        float * ptr1 = ptr0 + 2 * cnt;
+        float * ptr2 = ptr0 + 4 * cnt;
+        float * ptr3 = ptr0 + 6 * cnt;
+        
+        for( size_t n = 0; n < cnt; ++n )
+        {
+            float fx = float(x);
+            float fy = float(y);
+            ptr0[0] = +fx;
+            ptr0[1] = +fy;
+            ptr0 += 2;
+            ptr1[0] = -fy;
+            ptr1[1] = +fx;
+            ptr1 += 2;
+            ptr2[0] = -fx;
+            ptr2[1] = -fy;
+            ptr2 += 2;
+            ptr3[0] = +fy;
+            ptr3[1] = -fx;
+            ptr3 += 2;
+            // apply rotation by angle 'delta':
+            double t = x;
+            x = C * x - S * y;
+            y = S * t + C * y;
+        }
+        ptr3[0] = float(x);
+        ptr3[1] = float(y);
     }
     
-    void compute_arc(size_t cnt, float ptr[], double rad, double start,
-                     double angle, float cX, float cY)
+    void compute_arc(size_t cnt, float ptr[], double radius, double start,
+                     double angle, double cX, double cY)
     {
-        set_arc(cnt, ptr, rad, start, angle/(cnt-1), cX, cY);
+        set_arc(cnt, ptr, radius, start, angle/(cnt-1), cX, cY);
     }
 
     //-----------------------------------------------------------------------
@@ -1862,7 +1893,9 @@ namespace gle
         }
 #endif
         // circle_[] covers 2 revolutions = 4 * PI
-        set_arc(2*pi_twice, circle_, 1, 0, 2*M_PI/pi_twice, 0, 0);
+        //set_arc(2*pi_twice, circle_, 1, 0, 2*M_PI/pi_twice, 0, 0);
+        compute_circle(pi_half, circle_, 1, 0);
+        compute_circle(pi_half, circle_+4*pi_once, 1, 0);
 
         if ( !glIsBuffer(buf_[0]) )
         {
