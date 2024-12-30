@@ -2,7 +2,7 @@
 #
 # Plot nematic order, calculated by `report fiber:nematic`
 #
-# F. Nedelec, Strasbourg, Chitry, 06-24.12.2024
+# F. Nedelec, Strasbourg, Chitry, 06-30.12.2024
 
 
 """
@@ -17,6 +17,8 @@ Syntax:
 # time cut off (seconds) above which data is averaged
 cutoff = 4000
 
+# size of marker in plots:
+mks = 4
 # size of font used in plots:
 fts = 14
 # file format: `png` or `svg`
@@ -79,10 +81,10 @@ def plot_data(X, Y, M = math.nan):
     Xsup = math.ceil(max(X)/100)*100
     Yinf = 0.2
     Ysup = math.ceil(max(Y))
-    fig = plt.figure(figsize=(8, 6))
-    plt.scatter(X, Y, label='Nematic Order', marker='o', s=3)
+    fig, axes = plt.subplots(figsize=(8, 6))
+    axes.plot(X, Y, label='Nematic Order', marker='o', markersize=mks)
     if not math.isnan(M):
-        plt.plot([Xinf, Xsup], [M, M], linewidth=1.0)
+        axes.plot([Xinf, Xsup], [M, M], linewidth=1.0)
     plt.xlim(Xinf, Xsup)
     plt.ylim(Yinf, Ysup)
     plt.xlabel('Time (s)', fontsize=fts)
@@ -91,6 +93,7 @@ def plot_data(X, Y, M = math.nan):
     fig.tight_layout()
     #plt.legend()
     #plt.show()
+    return fig, axes
 
 
 def save_plot(name):
@@ -103,7 +106,7 @@ def save_plot(name):
 
 def process(dirpath):
     """
-        Generate a plot in given directory
+        Generate data file and make plot in given directory
     """
     filename = output+'.txt'
     if not os.path.isfile(filename):
@@ -115,8 +118,6 @@ def process(dirpath):
             print(f"plot_nematic_order.py makes {dirpath}/order.txt");
             args = ["report3", "fiber:nematic", "verbose=0"]
             subprocess.call(args, stdout=open(filename, 'w'))
-    res = 0
-    avg = math.nan
     T, D = retreive_data(filename)
     if T:
         #print(T, D)
@@ -127,20 +128,7 @@ def process(dirpath):
         plot_data(T, D, avg)
         save_plot(output);
     print(f'{dirpath} {avg:6.3f}')
-
-
-def multi_plot(files):
-    """
-        Generate a plot in given directory
-    """
-    f = files[0]
-    T, D = retreive_data(f)
-    plot_data(T, D)
-    for f in files[1:]:
-        T, D = retreive_data(f)
-        if T:
-            plt.scatter(T, D, label='Nematic Order', marker='o', s=3)
-    save_plot(output);
+    return (T, D)
 
 
 #------------------------------------------------------------------------
@@ -161,14 +149,26 @@ def main(args):
         else:
             sys.stderr.write(f"Error: unexpected argument `{arg}`\n")
             sys.exit()
-    if files:
-        multi_plot(files)
-    else:
-        cdir = os.getcwd()
-        for p in paths:
-            os.chdir(p)
-            process(p)
-            os.chdir(cdir)
+    # generate/collect all data:
+    data = []
+    cdir = os.getcwd()
+    for p in paths:
+        os.chdir(p)
+        T, D = process(p)
+        if T:
+            data.append((T,D))
+        os.chdir(cdir)
+    for f in files:
+        T, D = retreive_data(f)
+        if T:
+            data.append((T,D))
+    # make conbined plot:
+    if data:
+        T, D = data[0]
+        fig, axes = plot_data(T, D)
+        for T, D in data[1:]:
+            axes.plot(T, D, marker='o', markersize=mks)
+        save_plot(output);
 
 
 if __name__ == "__main__":
