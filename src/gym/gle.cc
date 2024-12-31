@@ -1060,18 +1060,18 @@ namespace gle
         return 5;
     }
 
-    size_t setCircle(flute2* flu, size_t inc, float R)
+    size_t setCircle(flute2* flu, unsigned inc, float R)
     {
         size_t i = 0;
-        for ( size_t n = 0; n <= pi_twice; n += inc )
+        for ( unsigned n = 0; n <= pi_twice; n += inc )
             flu[i++] = {R*cos_(n), R*sin_(n)};
         return i;
     }
     
-    size_t setCircleZ(flute3* flu, size_t inc, float R, float Z, float N)
+    size_t setCircleZ(flute3* flu, unsigned inc, float R, float Z, float N)
     {
         size_t i = 0;
-        for ( size_t n = 0; n <= pi_twice; n += inc )
+        for ( unsigned n = 0; n <= pi_twice; n += inc )
         {
             float C = cos_(n), S = sin_(n);
             flu[i++] = {R*C, R*S, Z};
@@ -1191,7 +1191,7 @@ namespace gle
     {
         flute2 *buf = gym::mapBufferV2(2*pi_twice+2);
         flute2 *ptr = buf;
-        for ( size_t j = 0; j <= pi_twice; ++j )
+        for ( unsigned j = 0; j <= pi_twice; ++j )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { R0*C, R0*S };
@@ -1204,19 +1204,19 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void paintCapsule(float L, float R, float rad, size_t inc)
+    void paintCapsule(float L, float R, float rad, unsigned inc)
     {
         flute2 *buf = gym::mapBufferV2(pi_twice+4);
         flute2 *ptr = buf;
         *ptr++ = { R+rad, 0 };
-        for ( size_t j = inc; j <= pi_half; j += inc )
+        for ( unsigned j = inc; j <= pi_half; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + R,  rad*S };
             ptr[1] = { rad*C + R, -rad*S };
             ptr += 2;
         }
-        for ( size_t j = pi_half; j < pi_once; j += inc )
+        for ( unsigned j = pi_half; j < pi_once; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + L,  rad*S };
@@ -1230,13 +1230,13 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void strokeCapsule(float L, float R, float rad, float width, size_t inc)
+    void strokeCapsule(float L, float R, float rad, float width, unsigned inc)
     {
         flute2 *buf = gym::mapBufferV2(pi_twice+4);
         flute2 *ptr = buf;
-        for ( size_t j = pi_half; j <= pi_3half; j += inc )
+        for ( unsigned j = pi_half; j <= pi_3half; j += inc )
             *ptr++ = { rad*cos_(j) + L, rad*sin_(j) };
-        for ( size_t j = pi_3half; j <= pi_5half; j += inc )
+        for ( unsigned j = pi_3half; j <= pi_5half; j += inc )
             *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
         *ptr++ = { L, rad };
         gym::unmapBufferV2();
@@ -1245,35 +1245,35 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
         
-    void paintBicapsule(float L, float R, float rad, float G, float H, size_t inc)
+    void paintBicapsule(float L, float R, float rad, float G, float H, unsigned inc)
     {
         const float F = std::max(rad - G, 0.f);
         const float X = F + H;
         flute2 *buf = gym::mapBufferV2(2*pi_twice+4);
         flute2 *ptr = buf;
         *ptr++ = { R+rad, 0 };
-        for ( size_t j = inc; j <= pi_half; j += inc )
+        for ( unsigned j = inc; j <= pi_half; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + R,  rad*S };
             ptr[1] = { rad*C + R, -rad*S };
             ptr += 2;
         }
-        for ( size_t j = pi_half; j <= pi_once; j += inc )
+        for ( unsigned j = pi_half; j <= pi_once; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { F*C + X, +F*S + G };
             ptr[1] = { F*C + X, -F*S - G };
             ptr += 2;
         }
-        for ( size_t j = 0; j < pi_half; j += inc )
+        for ( unsigned j = 0; j < pi_half; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { F*C - X, +F*S + G };
             ptr[1] = { F*C - X, -F*S - G };
             ptr += 2;
         }
-        for ( size_t j = pi_half; j < pi_once; j += inc )
+        for ( unsigned j = pi_half; j < pi_once; j += inc )
         {
             float C = cos_(j), S = sin_(j);
             ptr[0] = { rad*C + L,  rad*S };
@@ -1287,23 +1287,23 @@ namespace gle
         //gym::drawPoints(width, 0, ptr-buf);
     }
 
-    void strokeBicapsule(float L, float R, float rad, float G, float H, float width, size_t inc)
+    void strokeBicapsule(float L, float R, float rad, float G, float H, float width, unsigned inc)
     {
         const float F = std::max(rad - G, 0.f);
         const float X = F + H;
         flute2 *buf = gym::mapBufferV2(2*pi_twice+8);
         flute2 *ptr = buf;
-        for ( size_t j = pi_half; j <= pi_3half; j += inc )
+        for ( unsigned j = pi_half; j <= pi_3half; j += inc )
             *ptr++ = { rad*cos_(j) + L, rad*sin_(j) };
-        for ( size_t j = pi_3half; j <= pi_twice; j += inc )
+        for ( unsigned j = pi_3half; j <= pi_twice; j += inc )
             *ptr++ = { F*cos_(j) - X, F*sin_(j) - G };
-        for ( size_t j = pi_once; j <= pi_3half; j += inc )
+        for ( unsigned j = pi_once; j <= pi_3half; j += inc )
             *ptr++ = { F*cos_(j) + X, F*sin_(j) - G };
-        for ( size_t j = pi_3half; j <= pi_5half; j += inc )
+        for ( unsigned j = pi_3half; j <= pi_5half; j += inc )
             *ptr++ = { rad*cos_(j) + R, rad*sin_(j) };
-        for ( size_t j = pi_half; j <= pi_once; j += inc )
+        for ( unsigned j = pi_half; j <= pi_once; j += inc )
             *ptr++ = { F*cos_(j) + X, F*sin_(j) + G };
-        for ( size_t j = 0; j <= pi_half; j += inc )
+        for ( unsigned j = 0; j <= pi_half; j += inc )
             *ptr++ = { F*cos_(j) - X, F*sin_(j) + G };
         *ptr++ = { L, rad };
         gym::unmapBufferV2();
@@ -1315,22 +1315,22 @@ namespace gle
     //-----------------------------------------------------------------------
     #pragma mark - Tubes primitives
 
-    inline unsigned nbTrianglesCylinder(size_t inc, int top = 0)
+    inline unsigned nbTrianglesCylinder(unsigned inc, int top = 0)
     {
         return 2 + 2 * (( pi_6half + top*pi_once ) / inc );
     }
 
     /// set triangle strip for a tube of radius 1 at Z=B, and R at Z=T, closed at Z=B
     /** Note that if T < B, the triangles will be given clockwise */
-    size_t setCylinder(flute6* flu, size_t inc, float B, float T, float R, int top = 0)
+    size_t setCylinder(flute6* flu, unsigned inc, float B, float T, float R, int top = 0)
     {
         const float H(T-B), W(R-1);
         const float Z = std::copysign(1.f, H);
         const float tg(1.f/sqrtf(H*H+W*W));
         const float X(tg*H);
         const float Y(tg*W);
-        size_t i = 0;
-        size_t p = pi_once;
+        unsigned i = 0;
+        unsigned p = pi_once;
         // bottom disc, from PI to 0:
         flu[i++] = { 1, 0, B, 0, 0, -Z };
         while ( p > inc )
@@ -1378,17 +1378,17 @@ namespace gle
     }
 
     /// return essentially finesse * 24 / inc
-    inline int nbTrianglesTube(size_t inc)
+    inline int nbTrianglesTube(unsigned inc)
     {
         return 2 + 2 * ( pi_twice / inc );
     }
 
     /// set triangle strip for a tube of constant radius 1 with Z in [B, T]
-    size_t setTube(flute6* flu, size_t inc, float B, float T)
+    size_t setTube(flute6* flu, unsigned inc, float B, float T)
     {
         assert_true( B <= T );
         size_t i = 0;
-        for( size_t p = 0; p <= pi_twice; p += inc )
+        for( unsigned p = 0; p <= pi_twice; p += inc )
         {
             float C = cos_(p), S = sin_(p);
             flu[i++] = { C, S, T, C, S, 0 };
@@ -1400,11 +1400,11 @@ namespace gle
     }
     
     /// set triangle strip for a tube of constant radius R with Z in [B, T]
-    size_t setTube(flute6* flu, size_t inc, float B, float T, float R)
+    size_t setTube(flute6* flu, unsigned inc, float B, float T, float R)
     {
         assert_true( B <= T );
         size_t i = 0;
-        for( size_t p = 0; p <= pi_twice; p += inc )
+        for( unsigned p = 0; p <= pi_twice; p += inc )
         {
             float C = cos_(p), S = sin_(p);
             flu[i++] = { R*C, R*S, T, C, S, 0 };
@@ -1414,7 +1414,7 @@ namespace gle
     }
     
     /// set triangle strip for a cone of radius rB at Z=B, and rT at Z=T
-    size_t setCone(flute6* flu, size_t inc, float B, float rB, float T, float rT)
+    size_t setCone(flute6* flu, unsigned inc, float B, float rB, float T, float rT)
     {
         assert_true( B <= T );
         const float H(T-B), W(rT-rB);
@@ -1422,7 +1422,7 @@ namespace gle
         const float x(t*H);
         const float y(t*W);
         size_t i = 0;
-        for( size_t n = 0; n <= pi_twice; n += inc )
+        for( unsigned n = 0; n <= pi_twice; n += inc )
         {
             float S = sin_(n), C = cos_(n);
             flu[i++] = { rT*C, rT*S, T, x*C, x*S, y };
@@ -1432,7 +1432,7 @@ namespace gle
     }
     
     /// return essentially finesse * 24 / inc
-    inline size_t nbTrianglesHelix(int turns)
+    inline unsigned nbTrianglesHelix(int turns)
     {
         return 2 + pi_twice * ( 2 * turns + 1 );
     }
@@ -1443,16 +1443,16 @@ namespace gle
         assert_true( Z <= T );
         float W = ( T - Z ) / ( 1 + turns * 2 );
         float dZ = 2.0 * W / pi_twice;
-        size_t i = 0;
+        unsigned i = 0;
         // add quarter-turn with no increment in Z
-        for ( size_t p = pi_3half; p < pi_twice; ++p )
+        for ( unsigned p = pi_3half; p < pi_twice; ++p )
         {
             float C = cos_(p), S = sin_(p);
             flu[i++] = { C, S, Z+W, C, S, 0 };
             flu[i++] = { C, S, Z, C, S, 0 };
         }
         for ( int t = 0; t < turns; ++t )
-        for ( size_t p = 0; p < pi_twice; ++p )
+        for ( unsigned p = 0; p < pi_twice; ++p )
         {
             float C = cos_(p), S = sin_(p);
             flu[i++] = { C, S, Z+W, C, S, 0 };
@@ -1460,23 +1460,23 @@ namespace gle
             Z += dZ;
         }
         // add quarter-turn with no increment in Z
-        for ( size_t p = 0; p <= pi_half; ++p )
+        for ( unsigned p = 0; p <= pi_half; ++p )
         {
             float C = cos_(p), S = sin_(p);
             flu[i++] = { C, S, Z+W, C, S, 0 };
             flu[i++] = { C, S, Z, C, S, 0 };
         }
-        size_t j = nbTrianglesHelix(turns);
+        unsigned j = nbTrianglesHelix(turns);
         assert_true( i <= j );
         return i;
     }
 
     /// set triangle strip for a disc at Z, with given normal in Z
-    size_t setDisc(flute6* flu, size_t inc, float Z, float N)
+    size_t setDisc(flute6* flu, unsigned inc, float Z, float N)
     {
-        size_t i = 0;
+        unsigned i = 0;
         flu[i++] = { 1, 0, Z, 0, 0, N };
-        for( size_t n = inc; n < pi_once; n += inc )
+        for( unsigned n = inc; n < pi_once; n += inc )
         {
             float S = N * sin_(n), C = cos_(n);
             flu[i++] = { C,  S, Z, 0, 0, N };
@@ -1487,12 +1487,12 @@ namespace gle
     }
     
     /// set triangle strip for a hollow disc at Z, with radius [ 1, R ] assuming R > 1
-    size_t setRing(flute6* flu, size_t inc, float R, float Z, float N)
+    size_t setRing(flute6* flu, unsigned inc, float R, float Z, float N)
     {
-        size_t i = 0;
+        unsigned i = 0;
         flu[i++] = { 1, 0, Z, 0, 0, N };
         flu[i++] = { R, 0, Z, 0, 0, N };
-        for( size_t n = inc; n < pi_twice; n += inc )
+        for( unsigned n = inc; n < pi_twice; n += inc )
         {
             float S = sin_(n), C = cos_(n);
             flu[i++] = { C, S, Z, 0, 0, N };
@@ -1508,9 +1508,9 @@ namespace gle
      The surface goes from Z = [ B, T ] with increments dZ, and its radius is
      given by the function `radius(Z)` provided as argument.
      */
-    size_t setRevolution(flute6 * flu, float (*radius)(float), float B, const float T, float dZ)
+    unsigned setRevolution(flute6 * flu, float (*radius)(float), float B, const float T, float dZ)
     {
-        size_t i = 0;
+        unsigned i = 0;
         float Z = B, R, Q = radius(B);
         while ( B < T )
         {
@@ -1521,7 +1521,7 @@ namespace gle
             float dN = 1.0f / sqrtf( 1 + dR * dR );
             dR = -dR * dN;
             
-            for ( size_t n = 0; n <= pi_twice; ++n )
+            for ( unsigned n = 0; n <= pi_twice; ++n )
             {
                 float S = sin_(n), C = cos_(n);
                 flu[i++] = {R*C, R*S, Z, dN*C, dN*S, dR};
@@ -1924,17 +1924,17 @@ namespace gle
      The band is in the XY plane. The axis of the cylinder is Z.
      The band is made of triangles indicating the clockwise direction.
      */
-    void arrowStrip(float width, const size_t inc)
+    void arrowStrip(float width, const unsigned inc)
     {
         float A(M_PI * inc / pi_half);
         float W(width * A / M_SQRT3);
         float R(1.0f / cosf(A*0.5f));
         
         flute6 * flu = gym::mapBufferV3N3(3*(1+pi_twice/(2*inc)));
-        size_t i = 0;
+        unsigned i = 0;
         flu[i++] = {R, 0, W, 1, 0, 0};
         flu[i++] = {R, 0,-W, 1, 0, 0};
-        for ( size_t n = 0; n < pi_twice; n += 2*inc )
+        for ( unsigned n = 0; n < pi_twice; n += 2*inc )
         {
             float c = R * cos_(n);
             float s = R * sin_(n);
@@ -1949,7 +1949,7 @@ namespace gle
     }
     
     
-    void threeArrowStrip(float w, const size_t inc)
+    void threeArrowStrip(float w, const unsigned inc)
     {
         arrowStrip(w, inc);
         gym::rotateX(0, -1);
@@ -1959,12 +1959,12 @@ namespace gle
     }
     
     /** The path followed by the seam of a tennis ball */
-    size_t setSeamCurve(flute3 * flu, float R, float B, float W, size_t inc)
+    unsigned setSeamCurve(flute3 * flu, float R, float B, float W, unsigned inc)
     {
         float A = R - B;
         float D = 2 * std::sqrt(A*B);
-        size_t cnt = 0;
-        for ( size_t i = 0; i <= pi_twice; i += inc )
+        unsigned cnt = 0;
+        for ( unsigned i = 0; i <= pi_twice; i += inc )
         {
             float C = cos_(i), S = sin_(i);
             float C2 = C*C-S*S, S2 = S*C+C*S;
@@ -1982,7 +1982,7 @@ namespace gle
     void baseballSeamCurve(float R, float W)
     {
         flute3 * flu = gym::mapBufferV3(2*pi_twice);
-        size_t cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
+        unsigned cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
         gym::unmapBufferV3();
         gym::drawLineStrip(4, 0, cnt);
     }
@@ -1991,7 +1991,7 @@ namespace gle
     void tennisballSeamCurve(float R, float W)
     {
         flute3 * flu = gym::mapBufferV3(2*pi_twice);
-        size_t cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
+        unsigned cnt = setSeamCurve(flu, R, R*0.3, W/28, 1);
         gym::unmapBufferV3();
         gym::drawTriangleStrip(0, cnt);
     }
@@ -2016,15 +2016,15 @@ namespace gle
     #pragma mark - 3D volume primitives
     
     /// draw a Torus of radius R and a thickness 2*T
-    void torusZ(float R, float T, size_t inc)
+    void torusZ(float R, float T, unsigned inc)
     {
-        for ( size_t n = 0; n < pi_twice; n += inc )
+        for ( unsigned n = 0; n < pi_twice; n += inc )
         {
             flute6 * flu = gym::mapBufferV3N3(2+pi_twice);
             float X0 = cos_(n), X1 = cos_(n+inc);
             float Y0 = sin_(n), Y1 = sin_(n+inc);
             size_t i = 0;
-            for ( size_t p = 0; p <= pi_twice; p += 2*inc )
+            for ( unsigned p = 0; p <= pi_twice; p += 2*inc )
             {
                 float S = sin_(p), C = cos_(p);
                 flu[i++] = {X0*(R+T*C), Y0*(R+T*C), T*S, X0*C, Y0*C, S};
@@ -2043,9 +2043,9 @@ namespace gle
      */
     void drawRevolution(float (*radius)(float), float B, const float T, float dZ)
     {
-        size_t cnt = 2*(2+pi_twice)*(1+std::ceil((T-B)/dZ));
+        unsigned cnt = 2*(2+pi_twice)*(1+std::ceil((T-B)/dZ));
         flute6 * flu = gym::mapBufferV3N3(cnt+4);
-        size_t i = setRevolution(flu, radius, B, T, dZ);
+        unsigned i = setRevolution(flu, radius, B, T, dZ);
         assert_true( i <= cnt );
         gym::unmapBufferV3N3();
         gym::drawTriangleStrip(0, cnt);

@@ -35,10 +35,10 @@ namespace gle
     extern float circle_[4*pi_twice+8];
 
     /// access to precomputed cosine
-    inline float cos_(size_t n) { return circle_[2*n]; }
+    inline float cos_(unsigned n) { return circle_[2*n]; }
     
     /// access to precomputed sine
-    inline float sin_(size_t n) { return circle_[1+2*n]; }
+    inline float sin_(unsigned n) { return circle_[1+2*n]; }
 
     /// calculate sine and cosine
     void set_arc(size_t cnt, float CS[], double radius, double start, double delta, double cx, double cy);
@@ -103,13 +103,13 @@ namespace gle
     /// paint a disc in XY plane, covering all points at distance to origin [ R0, R1 ]
     void paintHalo(float R0, float R1);
     /// paint spherocylinder in 2D, using current color
-    void paintCapsule(float left, float right, float rad, size_t inc=1);
+    void paintCapsule(float left, float right, float rad, unsigned inc=1);
     /// draw spherocylinder contour in 2D
-    void strokeCapsule(float left, float right, float rad, float stroke_width, size_t inc=1);
+    void strokeCapsule(float left, float right, float rad, float stroke_width, unsigned inc=1);
     /// paint two spherocylinder in 2D, joined by a cylinder of size tube x clos
-    void paintBicapsule(float left, float right, float rad, float clos, float tube, size_t inc=1);
+    void paintBicapsule(float left, float right, float rad, float clos, float tube, unsigned inc=1);
     /// draw two spherocylinder contours in 2D, joined by a cylinder of size tube x clos
-    void strokeBicapsule(float left, float right, float rad, float clos, float tube, float stroke_width, size_t inc=1);
+    void strokeBicapsule(float left, float right, float rad, float clos, float tube, float stroke_width, unsigned inc=1);
 
     /// draw a tetrahedron of radius 1
     void tetrahedron();
@@ -225,12 +225,12 @@ namespace gle
     /// display a dumbbell aligned with the Z axis, of radius 1/3, lenth 1
     void dumbbell();
     /// draw Torus of radius `rad` and thickness `thick`
-    void torusZ(float rad, float thick, size_t inc = 1);
+    void torusZ(float rad, float thick, unsigned inc = 1);
 
     /// draw a circular band composed of little triangles
-    void arrowStrip(float width, size_t inc);
+    void arrowStrip(float width, unsigned inc);
     /// draw 3 Arrowed Bands defining 8 quadrants on the sphere of radius 1
-    void threeArrowStrip(float width, size_t inc);
+    void threeArrowStrip(float width, unsigned inc);
  
     //------------------------------------------------------------------------------
     
