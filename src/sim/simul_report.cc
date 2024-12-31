@@ -3329,14 +3329,15 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
     const real M0 = L1 * L1 * 0.25; // threshold used to decide on 'M'
 
     static int decided = 0;
-    static real abs = -77; // abscissa of contact point on fox
+    static real abs = -77; // abscissa at first contact on fox
+    static real len = -77; // length of fib at first contact
     static real ang = NO_CONTACT; // angle at first contact
     static real dis = INFINITY; // minimum distance reached
     static Vector hit(0,0,0); // position of first contact
     static Vector aim(0,0,0); // direction of plus-end at first contact
     static char kat = 'U'; // category
     
-    bool K = 1; // catastrophe
+    bool K = 0; // catastrophe
     bool X = 0; // crossing
     bool T = 0; // tangent
     bool Z = 0; // zippering
@@ -3344,9 +3345,8 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
     bool M = 0; // obstacle (fox) has moved
     bool P = 0; // fib tip is not deflected
     
-    if ( !decided )
+    if ( fib && fox )
     {
-        assert_true( fib && fox );
         const real sup = 3 * fib->prop->steric_radius;
         
         // K = plus-end is shrinking
@@ -3376,21 +3376,23 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
                 ang = A;
                 abs = aaa;
                 hit = fox->pos(aaa);
+                len = fib->abscissaP();
                 aim = dir;
             }
             // 'zippering' implies 'being tangent' and 'significant growth' along the obstacle
             T = ( abs_real(C) > COS20 );   // tangent within 20 degrees
-            // distanced zipped is measured along the obstacle, using abscissa:
-            Z = ( abs_real(aaa-abs) > 2*L1 ); // has zipped over more than 2xL0
+            // the distance zipped is measured along the obstacle, using abscissa:
+            Z = ( abs_real(aaa-abs) > 2*L1 ); // has zipped over more than 2*L1
         }
-        else if ( fib->length() > L1 && ( dpe > L1*L1 ) )
+        else if ( ang != NO_CONTACT )
         {
             // the plus tip is growing in the same direction as when contact was made:
             P = ( dot(aim, dir) > COS10 );
 
             // the plus-tip may have crossed the other filament if it is not in contact
-            // consider a point 2um back, and check if it is on opposite side of 'fox'
-            Vector bak = fib->posFrom(2*L1, PLUS_END);
+            // consider a point back, and check if it is on opposite side of 'fox'
+            real a = std::min(0., 2*len-fib->abscissaP());
+            Vector bak = fib->pos(a);
             real ddd, bbb = fox->projectPoint(bak, ddd);
             // bbb = 0.5 * ( aaa + bbb );  // OLD formula before 13.04.2023
             // the abscissa on `fox` below the intersection is estimated with Thales's theorem:
@@ -3464,7 +3466,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
     {
         out << LIN << std::fixed << std::setprecision(5) << ang;
         out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
-        out << SEP << K << SEP << X << SEP << Z << SEP << T << SEP << P << SEP << kat;
+        out << SEP << K << SEP << X << SEP << Z << SEP << P << SEP << T << SEP << kat << " ";
     }
     if ( print & 1 )
     {
