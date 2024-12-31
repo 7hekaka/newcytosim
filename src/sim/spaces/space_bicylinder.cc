@@ -241,15 +241,16 @@ void SpaceBicylinder::read(Inputter& in, Simul&, ObjectTag)
 void SpaceBicylinder::draw3D() const
 {
     const float R(radius_);
-    size_t i = 0;
+    const unsigned inc = 1;
+    unsigned i = 0;
     flute6* flu = gym::mapBufferV3N3(2*gle::pi_twice+4);
-    for ( size_t n = gle::pi_half; n < gle::pi_3half; n += 1 )
+    for ( unsigned n = gle::pi_half; n < gle::pi_3half; n += inc )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
         flu[i++] = {R*C, +R*C, R*S, C, 0, S };
         flu[i++] = {R*C, -R*C, R*S, C, 0, S };
     }
-    for ( size_t n = gle::pi_3half; n <= gle::pi_5half; n += 1 )
+    for ( unsigned n = gle::pi_3half; n <= gle::pi_5half; n += inc )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
         flu[i++] = {R*C, -R*C, R*S, C, 0, S };
@@ -259,13 +260,13 @@ void SpaceBicylinder::draw3D() const
     gym::drawTriangleStrip(0, i);
     i = 0;
     flu = gym::mapBufferV3N3(2*gle::pi_twice+4);
-    for ( size_t n = gle::pi_half; n < gle::pi_3half; n += 1 )
+    for ( unsigned n = gle::pi_half; n < gle::pi_3half; n += inc )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
         flu[i++] = {-R*C, R*C, R*S, 0, C, S };
         flu[i++] = {+R*C, R*C, R*S, 0, C, S };
     }
-    for ( size_t n = gle::pi_3half; n <= gle::pi_5half; n += 1 )
+    for ( unsigned n = gle::pi_3half; n <= gle::pi_5half; n += inc )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
         flu[i++] = {+R*C, R*C, R*S, 0, C, S };

@@ -561,9 +561,10 @@ void SpaceCylinderZ::draw3D() const
     const float R(radius_), RE(radius_-edge_);
     const float E(edge_);
     
-    size_t cnt = 2 * ( gle::pi_once + 3 );
+    const unsigned inc = 1;
+    unsigned cnt = 2 * ( gle::pi_once + 3 );
     
-    for ( size_t u = 0; u < gle::pi_twice; ++u )
+    for ( unsigned u = 0; u < gle::pi_twice; u += inc )
     {
         flute6 * flu = gym::mapBufferV3N3(cnt);
         flute6 * ptr = flu;
@@ -575,7 +576,7 @@ void SpaceCylinderZ::draw3D() const
         if ( edge_ > 0 )
         {
             //draw top arc
-            for ( size_t j = 0; j <= gle::pi_half; ++j )
+            for ( unsigned j = 0; j <= gle::pi_half; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
@@ -593,7 +594,7 @@ void SpaceCylinderZ::draw3D() const
                 ptr += 4;
             }
             //draw bottom arc
-            for ( size_t j = gle::pi_half; j <= gle::pi_once; ++j )
+            for ( unsigned j = gle::pi_half; j <= gle::pi_once; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;

@@ -198,10 +198,11 @@ void SpacePolygonZ::setInteractions(Meca& meca, Simul const&) const
 
 void SpacePolygonZ::draw3D() const
 {
+    const unsigned inc = 1;
     const unsigned nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     
-    for ( size_t n = 0; n < nbp; n++ )
+    for ( unsigned n = 0; n < nbp; n++ )
     {
         // do not display special edges
         if ( pts[n].spot )
@@ -215,7 +216,7 @@ void SpacePolygonZ::draw3D() const
         {
             flute6 * flu = gym::mapBufferV3N3(2+2*gle::pi_twice);
             flute6 * ptr = flu;
-            for ( size_t j = 0; j <= gle::pi_twice; ++j )
+            for ( unsigned j = 0; j <= gle::pi_twice; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 ptr[0] = {R2*C, R2*S, Z2, nX*C, nX*S, nY};
@@ -233,10 +234,11 @@ void SpacePolygonZ::draw3D() const
 //display rings around:
 void SpacePolygonZ::drawRings(float width) const
 {
+    const unsigned inc = 1;
     const unsigned nbp = poly_.nbPoints();
     Polygon::Point2D const* pts = poly_.pts_;
     
-    for ( size_t n = 0; n < nbp; n++ )
+    for ( unsigned n = 0; n < nbp; n++ )
     {
         float R(pts[n].xx);
         float Z(pts[n].yy);
@@ -244,7 +246,7 @@ void SpacePolygonZ::drawRings(float width) const
         {
             float nX(pts[n].dy), nY(-pts[n].dx);
             flute6 * flu = gym::mapBufferV3N3(2+gle::pi_twice);
-            for ( size_t j = 0; j <= gle::pi_twice; ++j )
+            for ( unsigned j = 0; j <= gle::pi_twice; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 flu[j] = {R*C, R*S, Z, nX*C, nX*S, nY};
