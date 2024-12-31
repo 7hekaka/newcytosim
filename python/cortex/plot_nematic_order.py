@@ -26,7 +26,7 @@ format = 'png'
 # name of data & figure files to be made
 output = 'order'
 
-import sys, os, math, subprocess
+import sys, os, math, subprocess, random
 import matplotlib
 import matplotlib.pyplot as plt
 
@@ -50,7 +50,7 @@ def retreive_data(filename):
     ts = 0
     with open(filename, 'r') as file:
         for line in file:
-            v = uncode(line).split()
+            v = line.split()
             t = 0
             d = []
             if len(v) < 2:
@@ -81,15 +81,17 @@ def plot_data(X, Y, M = math.nan):
     Xsup = math.ceil(max(X)/100)*100
     Yinf = 0.2
     Ysup = math.ceil(max(Y))
-    fig, axes = plt.subplots(figsize=(8, 6))
-    axes.plot(X, Y, label='Nematic Order', marker='o', markersize=mks)
+    fig, axes = plt.subplots(figsize=(6, 4.5))
+    axes.plot(X, Y, label='Nematic Order', marker='o', markersize=mks, color=(0,0,1))
     if not math.isnan(M):
         axes.plot([Xinf, Xsup], [M, M], linewidth=1.0)
     plt.xlim(Xinf, Xsup)
     plt.ylim(Yinf, Ysup)
-    plt.xlabel('Time (s)', fontsize=fts)
-    plt.ylabel('Order', fontsize=fts)
-    plt.title('Nematic Order', fontsize=fts)
+    plt.xticks(fontsize=fts)
+    plt.yticks([0.2, 0.4, 0.6, 0.8, 1.0], fontsize=fts)
+    #plt.xlabel('Time (s)', fontsize=fts)
+    #plt.ylabel('Order', fontsize=fts)
+    #plt.title('Nematic Order', fontsize=fts)
     fig.tight_layout()
     #plt.legend()
     #plt.show()
@@ -131,6 +133,24 @@ def process(dirpath):
     return (T, D)
 
 
+def redish_color():
+    R = 0.5*random.random()
+    G = 0.5*random.random()
+    B = 0.5*random.random()
+    return ( 1-R, G, 1-B )
+    
+def greenish_color():
+    R = 0.5*random.random()
+    G = 0.5*random.random()
+    B = 0.5*random.random()
+    return ( R, 1-G, B )
+    
+def blueish_color():
+    R = 0.5*random.random()
+    G = 0.5*random.random()
+    B = 0.5*random.random()
+    return ( R, G, 1-B )
+
 #------------------------------------------------------------------------
 
 def main(args):
@@ -149,6 +169,8 @@ def main(args):
         else:
             sys.stderr.write(f"Error: unexpected argument `{arg}`\n")
             sys.exit()
+    if not paths and not files:
+        paths = ['.']
     # generate/collect all data:
     data = []
     cdir = os.getcwd()
@@ -166,8 +188,11 @@ def main(args):
     if data:
         T, D = data[0]
         fig, axes = plot_data(T, D)
-        for T, D in data[1:]:
-            axes.plot(T, D, marker='o', markersize=mks)
+        for T, D in data[1:5]:
+            axes.plot(T, D, marker='o', markersize=mks, color=blueish_color())
+        for T, D in data[5:]:
+            Tx = [ x-1000 for x in T];
+            axes.plot(Tx, D, marker='o', markersize=mks, color=greenish_color())
         save_plot(output);
 
 
