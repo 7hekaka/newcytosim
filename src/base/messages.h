@@ -116,7 +116,7 @@ namespace Cytosim
         void operator()(const std::string& s, const A& a)
         {
             std::ostringstream oss;
-            oss << pref_ << s << a;
+            oss << s << a;
             operator<<(oss.str());
         }
         
@@ -125,7 +125,7 @@ namespace Cytosim
         void operator()(const std::string& s, const A& a, const B& b)
         {
             std::ostringstream oss;
-            oss << pref_ << s << a << b;
+            oss << s << a << b;
             operator<<(oss.str());
         }
         
@@ -134,7 +134,7 @@ namespace Cytosim
         void operator()(const std::string& s, const A& a, const B& b, const C& c)
         {
             std::ostringstream oss;
-            oss << pref_ << s << a << b << c;
+            oss << s << a << b << c;
             operator<<(oss.str());
         }
         
@@ -143,7 +143,7 @@ namespace Cytosim
         void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d)
         {
             std::ostringstream oss;
-            oss << pref_ << s << a << b << c << d;
+            oss << s << a << b << c << d;
             operator<<(oss.str());
         }
         
@@ -152,7 +152,7 @@ namespace Cytosim
         void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const D& e)
         {
             std::ostringstream oss;
-            oss << pref_ << s << a << b << c << d << e;
+            oss << s << a << b << c << d << e;
             operator<<(oss.str());
         }
         
