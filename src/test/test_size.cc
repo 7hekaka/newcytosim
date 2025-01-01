@@ -44,95 +44,93 @@
 int main(int argc, char* argv[])
 {
     int x = ( argc>1 ? atoi(argv[1]) : 0 );
-    if ( x == 4 )
+    switch ( x )
     {
-        PRINT(Random);
-        PRINT(Array<int>);
-
-        PRINT(PointGrid)
-        PRINT(FatVector);
-        PRINT(FatPoint);
-        PRINT(FatLocus);
-        PRINT(PointGridCell);
-        
-        PRINT(BigVector);
-        PRINT(BigLocus);
-        PRINT(BigLocusList);
-        PRINT(LocusGrid);
-        
-        PRINT(Rasterizer::Vertex2);
-        PRINT(Rasterizer::Vertex2d);
-        PRINT(Rasterizer::Vertex3);
-    }
-    else if ( x == 3 )
-    {
-        PRINT(Single);
-        PRINT(Picket);
-        PRINT(PicketLong);
-        PRINT(Wrist);
-        PRINT(WristLong);
-        PRINT(Couple);
-        PRINT(Crosslink);
-        PRINT(Shackle);
-        PRINT(Bridge);
-        PRINT(Fork);
-        PRINT(Duo);
-        PRINT(CoupleLong);
-        PRINT(CrosslinkLong);
-        PRINT(ShackleLong);
-        PRINT(DuoLong);
-    }
-    else if ( x == 2 )
-    {
-        PRINT(Mecapoint);
-        PRINT(FiberSegment);
-        PRINT(Interpolation);
-        PRINT(HandMonitor);
-        PRINT(FiberSite);
-        PRINT(Hand);
-        PRINT(Motor);
-        PRINT(Cutter);
-        PRINT(Digit);
-        PRINT(Walker);
-        PRINT(Mighty);
-    }
-    else if ( x == 1 )
-    {
-        PRINT(Inventoried);
-        PRINT(Buddy);
-        PRINT(Object);
-        PRINT(Mecable);
-        PRINT(Chain);
-        PRINT(Mecafil);
-        PRINT(Fiber);
-        PRINT(Space);
-        PRINT(Solid);
-        PRINT(Bead);
-        PRINT(Sphere);
-        PRINT(Event);
-        PRINT(SimulProp);
-        PRINT(Simul);
-    }
-    else
-    {
-        PRINT(Vector1);
-        PRINT(Vector2);
-        PRINT(Vector3);
-        PRINT(Vector4);
-        
-        PRINT(Matrix11);
-        PRINT(Matrix22);
-        PRINT(Matrix33);
-        PRINT(Matrix34);
-        PRINT(Matrix44);
-        
-        PRINT(SparMatSym::Element);
-        PRINT(SparMatSym1::Element);
-        PRINT(SparMatSym2::Element);
-        
-        PRINT(SparMatBlk::Line);
-        PRINT(SparMatSymBlk::Column);
-        PRINT(SparMatSymBlkDiag::Block);
-        //PRINT(SparMatSymBlkDiag::Pilar);
+        case 4:
+            PRINT(Random);
+            PRINT(Array<int>);
+            
+            PRINT(PointGrid)
+            PRINT(FatVector);
+            PRINT(FatPoint);
+            PRINT(FatLocus);
+            PRINT(PointGridCell);
+            
+            PRINT(BigVector);
+            PRINT(BigLocus);
+            PRINT(BigLocusList);
+            PRINT(LocusGrid);
+            
+            PRINT(Rasterizer::Vertex2);
+            PRINT(Rasterizer::Vertex2dZ);
+            PRINT(Rasterizer::Vertex3);
+            break;
+        case 3:
+            PRINT(Single);
+            PRINT(Picket);
+            PRINT(PicketLong);
+            PRINT(Wrist);
+            PRINT(WristLong);
+            PRINT(Couple);
+            PRINT(Crosslink);
+            PRINT(Shackle);
+            PRINT(Bridge);
+            PRINT(Fork);
+            PRINT(Duo);
+            PRINT(CoupleLong);
+            PRINT(CrosslinkLong);
+            PRINT(ShackleLong);
+            PRINT(DuoLong);
+            break;
+        case 2:
+            PRINT(Mecapoint);
+            PRINT(FiberSegment);
+            PRINT(Interpolation);
+            PRINT(HandMonitor);
+            PRINT(FiberSite);
+            PRINT(Hand);
+            PRINT(Motor);
+            PRINT(Cutter);
+            PRINT(Digit);
+            PRINT(Walker);
+            PRINT(Mighty);
+            break;
+        case 1:
+            PRINT(Inventoried);
+            PRINT(Buddy);
+            PRINT(Object);
+            PRINT(Mecable);
+            PRINT(Chain);
+            PRINT(Mecafil);
+            PRINT(Fiber);
+            PRINT(Space);
+            PRINT(Solid);
+            PRINT(Bead);
+            PRINT(Sphere);
+            PRINT(Event);
+            PRINT(SimulProp);
+            PRINT(Simul);
+            break;
+        case 0:
+            PRINT(Vector1);
+            PRINT(Vector2);
+            PRINT(Vector3);
+            PRINT(Vector4);
+            
+            PRINT(Matrix11);
+            PRINT(Matrix22);
+            PRINT(Matrix33);
+            PRINT(Matrix34);
+            PRINT(Matrix44);
+            
+            PRINT(SparMatSym::Element);
+            PRINT(SparMatSym1::Element);
+            PRINT(SparMatSym2::Element);
+            
+            PRINT(SparMatBlk::Line);
+            PRINT(SparMatSymBlk::Column);
+            PRINT(SparMatSymBlkDiag::Block);
+            //PRINT(SparMatSymBlkDiag::Pilar);
+            break;
     }
 }
