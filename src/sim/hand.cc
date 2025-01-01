@@ -119,7 +119,7 @@ void Hand::relocate(Fiber const* f, const real a)
         hLattice = f->lattice();
 #endif
     hAbs = a;
-    reinterpolate(f->interpolate(a));
+    reinterpolate(f->interpolateAbs(a));
 }
 
 
@@ -232,7 +232,7 @@ void Hand::do_attach(Fiber const* f, real a)
     hAbs = a;
     hFiber = f;
     f->addHand(this);
-    reinterpolate(f->interpolate(a));
+    reinterpolate(f->interpolateAbs(a));
     hMonitor->afterAttachment(this);
     nextDetach = RNG.exponential();
     assert_true(nextDetach > 0);

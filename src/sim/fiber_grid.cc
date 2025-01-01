@@ -509,7 +509,7 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
         tryToAttach(pos, ha);
         if ( ha.attached() )
         {
-            Interpolation inter = ha.fiber()->interpolate(ha.abscissa());
+            Interpolation inter = ha.fiber()->interpolateAbs(ha.abscissa());
             FiberSegment seg(ha.fiber(), inter.point1());
             
             if ( hits.find(mingle(seg)) != hits.end() )

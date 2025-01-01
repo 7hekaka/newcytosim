@@ -125,7 +125,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
     
     if ( 0 <= abs )
     {
-        if ( abs <= bb.len() )
+        if ( abs <= bb.seg() )
         {
             // the point projects inside the segment
             if ( below(ab2, ran) )
@@ -238,7 +238,7 @@ void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, rea
          Check the projection of aa.vertex2(),
          on the segment represented by 'bb'
          */
-        assert_true(abs > aa.len());
+        assert_true(abs > aa.seg());
         assert_true(bb.isLast());
         
         Vector dab = bb.pos2() - aa.pos2();
@@ -367,7 +367,7 @@ void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
          Check the projection of aa.vertex2(),
          on the segment represented by 'bb'
          */
-        assert_true(abs > aa.len());
+        assert_true(abs > aa.seg());
         assert_true(bb.isLast());
         
         Vector vab = bb.pos2() - aa.pos2();
@@ -407,8 +407,8 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     Vector a1 = aa.pos1();
     Vector b1 = bb.pos1();
 
-    Vector daa = ( aa.pos2() - a1 ) * aa.lenInv();
-    Vector dbb = ( b1 - bb.pos2() ) * bb.lenInv(); // sign inverted on purpose
+    Vector daa = ( aa.pos2() - a1 ) * aa.segInv();
+    Vector dbb = ( b1 - bb.pos2() ) * bb.segInv(); // sign inverted on purpose
     Vector off = b1 - a1;
     if ( modulo )
         modulo->fold(off);
@@ -433,8 +433,8 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     else
     {
         // nearly parallel lines, which is unlikely in practice
-        const real len1 = aa.len();
-        const real len2 = bb.len();
+        const real len1 = aa.seg();
+        const real len2 = bb.seg();
         real p1 = m1 - C * len2;
         real p2 = m2 - C * len1;
         // clamp inside segment and use mid-point
@@ -451,7 +451,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         if ( aa.within(a) && bb.within(b) )
         {
             // Since axis is orthogonal to daa, we know the norm of the cross-product:
-            Vector leg = cross(daa, axis) * ( copysign(ran, D) * aa.lenInv() * sqrt(iS) );
+            Vector leg = cross(daa, axis) * ( copysign(ran, D) * aa.segInv() * sqrt(iS) );
             meca_.addSideSlidingLink3D(aa.interpolation(a), leg, bb.interpolation(b), daa, push_);
         }
         
@@ -462,7 +462,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         // the distance between bb.pos1() and segment `aa` is dis2-m1*m1:
         if ( below(dis2-m1*m1, ran) && aa.within(m1) )
         {
-            Vector leg = cross(daa, off).normalized( ran * aa.lenInv() );
+            Vector leg = cross(daa, off).normalized( ran * aa.segInv() );
             meca_.addSideSlidingLink3D(aa.interpolation(m1), leg, bb.vertex1(), daa, push_);
         }
         else if ( m1 < 0 )
@@ -478,7 +478,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
                 // the distance between b2 and segment `aa` is a1b2.normSqr()-mm*mm:
                 if ( below(a1b2.normSqr()-mm*mm, ran) )
                 {
-                    Vector leg = cross(daa, a1b2).normalized( ran * aa.lenInv() );
+                    Vector leg = cross(daa, a1b2).normalized( ran * aa.segInv() );
                     meca_.addSideSlidingLink3D(aa.interpolation(mm), leg, bb.vertex2(), daa, push_);
                 }
             }
@@ -489,7 +489,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         // the distance between aa.pos1() and segment `bb` is dis2-m2*m2:
         if ( below(dis2-m2*m2, ran) && bb.within(m2) )
         {
-            Vector leg = cross(dbb, off).normalized( ran * bb.lenInv() ); // two minus sign cancel out
+            Vector leg = cross(dbb, off).normalized( ran * bb.segInv() ); // two minus sign cancel out
             meca_.addSideSlidingLink3D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push_);
         }
         else if ( m2 < 0 )
@@ -504,7 +504,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
             {
                 if ( below(a2b1.normSqr()-mm*mm, ran) )
                 {
-                    Vector leg = cross(dbb, a2b1).normalized( ran * bb.lenInv() ); // two minus sign cancel out
+                    Vector leg = cross(dbb, a2b1).normalized( ran * bb.segInv() ); // two minus sign cancel out
                     meca_.addSideSlidingLink3D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push_);
                 }
             }
@@ -530,8 +530,8 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     Vector a1 = aa.pos1();
     Vector b1 = bb.pos1();
 
-    Vector daa = ( aa.pos2() - a1 ) * aa.lenInv();
-    Vector dbb = ( b1 - bb.pos2() ) * bb.lenInv(); // sign inverted on purpose
+    Vector daa = ( aa.pos2() - a1 ) * aa.segInv();
+    Vector dbb = ( b1 - bb.pos2() ) * bb.segInv(); // sign inverted on purpose
     Vector off = b1 - a1;
     if ( modulo )
         modulo->fold(off);
@@ -543,7 +543,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     // the distance between bb.pos1() and segment `aa` is dis2-m1*m1:
     if ( below(dis2-m1*m1, ran) && aa.within(m1) )
     {
-        real leg = std::copysign(ran*aa.lenInv(), cross(daa, off));
+        real leg = std::copysign(ran*aa.segInv(), cross(daa, off));
         meca_.addSideSlidingLink2D(aa.interpolation(m1), leg, bb.vertex1(), daa, push_);
     }
     else if ( m1 < 0 )
@@ -559,7 +559,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
             // the distance between b2 and segment `aa` is a1b2.normSqr()-mm*mm:
             if ( below(a1b2.normSqr()-mm*mm, ran) )
             {
-                real leg = std::copysign(ran*aa.lenInv(), cross(daa, a1b2));
+                real leg = std::copysign(ran*aa.segInv(), cross(daa, a1b2));
                 meca_.addSideSlidingLink2D(aa.interpolation(mm), leg, bb.vertex2(), daa, push_);
             }
         }
@@ -570,7 +570,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     // the distance between aa.pos1() and segment `bb` is dis2-m2*m2:
     if ( below(dis2-m2*m2, ran) && bb.within(m2) )
     {
-        real leg = std::copysign(ran*bb.lenInv(), cross(dbb, off)); // two minus sign cancel out
+        real leg = std::copysign(ran*bb.segInv(), cross(dbb, off)); // two minus sign cancel out
         meca_.addSideSlidingLink2D(bb.interpolation(m2), leg, aa.vertex1(), -dbb, push_);
     }
     else if ( m2 < 0 )
@@ -585,7 +585,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         {
             if ( below(a2b1.normSqr()-mm*mm, ran) )
             {
-                real leg = std::copysign(ran*bb.lenInv(), cross(dbb, a2b1)); // two minus sign cancel out
+                real leg = std::copysign(ran*bb.segInv(), cross(dbb, a2b1)); // two minus sign cancel out
                 meca_.addSideSlidingLink2D(bb.interpolation(mm), leg, aa.vertex2(), -dbb, push_);
             }
         }

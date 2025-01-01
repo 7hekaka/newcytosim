@@ -10,6 +10,7 @@
 #include "mecapoint.h"
 #include "fiber.h"
 #include "fiber_segment.h"
+#include "interpolation.h"
 #include "array.h"
 
 class Space;
@@ -63,7 +64,7 @@ public:
 };
 
 
-/// represents the Segment of a Fiber for steric interactions
+/// represents the Segment of a Fiber, or one vertex of a Mecable
 class BigLocus
 {
     friend class LocusGrid;
@@ -73,7 +74,7 @@ public:
     /// position of center, and radius of interaction
     BigVector pos_;
 
-    /// Fiber to which the segment belongs to
+    /// Fiber containing the segment, or Mecable containing a vertex
     Mecable const* obj_;
     
     /// equilibrium radius of the interaction (distance where force is zero)
@@ -111,14 +112,14 @@ public:
     /// offset = point1 - point0
     Vector prevDiff() const { return obj_->diffPoints(vix_-1); }
     
-    ///
+    /// a cast ot a fiber
     Fiber const* fiber() const { return static_cast<Fiber const*>(obj_); }
     
     /// length of segment
-    real len() const { return fiber()->segmentation(); }
+    real seg() const { return fiber()->segmentation(); }
 
-    /// should return 1.0 / len()
-    real lenInv() const { return fiber()->segmentationInv(); }
+    /// should return 1.0 / seg()
+    real segInv() const { return fiber()->segmentationInv(); }
     
     /// true if abscissa 'a', counted from point 0 is within the segment
     bool within(real a) const { return ( 0 <= a ) & ( a <= fiber()->segmentation() ); }
@@ -138,8 +139,8 @@ public:
     /// FiberSegment
     FiberSegment segment() const { return FiberSegment(fiber(), vix_); }
     
-    /// return interpolation at distance 'a' from point 1
-    Interpolation interpolation(real abs) const { return Interpolation(obj_, abs*lenInv(), vix_); }
+    /// return interpolation at distance 'abs' from vertex 1
+    Interpolation interpolation(real abs) const { return Interpolation(obj_, abs*segInv(), vix_, 1+vix_); }
 
 };
 

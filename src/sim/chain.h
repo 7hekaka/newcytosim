@@ -6,8 +6,8 @@
 #include "cymdef.h"
 #include "vector.h"
 #include "mecable.h"
-#include "interpolation.h"
 
+class Interpolation;
 class Mecapoint;
 class Glossary;
 
@@ -216,19 +216,16 @@ public:
     Mecapoint exactEnd(FiberEnd) const;
 
     /// interpolation of minus end
-    Interpolation interpolateEndM() const { return Interpolation(this, real(0.0), 0); }
+    Interpolation interpolateEndM() const;
 
     /// interpolation of plus end
-    Interpolation interpolateEndP() const { return Interpolation(this, real(1.0), nPoints-2); }
+    Interpolation interpolateEndP() const;
 
     /// interpolation of given end
     Interpolation interpolateEnd(FiberEnd) const;
 
     /// interpolation of the mid-point between the two ends
     Interpolation interpolateCenter() const;
-
-    /// interpolation of the site specified by its distance from the ORIGIN
-    Interpolation interpolate(const real& ab) const { return interpolateM(ab-fnAbscissaM); }
     
     /// interpolation of the site specified from the minus end
     Interpolation interpolateM(real ab) const;
@@ -236,6 +233,9 @@ public:
     /// interpolation of a site specified by its distance from a FiberEnd
     Interpolation interpolateFrom(real ab, FiberEnd ref) const;
     
+    /// interpolation of the site specified by its distance from the ORIGIN
+    Interpolation interpolateAbs(real ab) const;
+
     //---------------------
     
     /// length of the Fiber, estimated from the difference of abscissa at the ends

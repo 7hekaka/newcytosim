@@ -270,7 +270,7 @@ int FiberSite::bad() const
         //std::clog << "Interpolation " << std::scientific << e << '\n';
         if ( abs_real(e) > 1 )
         {
-            Interpolation pi = hFiber->interpolate(hAbs);
+            Interpolation pi = hFiber->interpolateAbs(hAbs);
             real b = hFiber->abscissaPoint(pi.point1() + pi.coef1());
             std::cerr << "FiberSite::Interpolation error " << e << " nm in abscissa:\n";
             std::cerr << "    binder       " << MAG * hAbs << "\n";

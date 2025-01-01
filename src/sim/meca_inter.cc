@@ -2579,7 +2579,7 @@ void Meca::addSideLink2D(Interpolation const& ptA,
 
     if ( any_equal(ii2, ii0, ii1) )
         return;
-    const real ee = arm / ptA.len(), we = weight * ee;
+    const real ee = arm * ptA.lenInv(), we = weight * ee;
 
     // interpolation coefficients and weights:
     const real cc0 = ptA.coef0(),  ww0 = weight * cc0;
@@ -2658,7 +2658,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     // interpolation coefficients:
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
-    const Torque leg = arm / ptA.len();
+    const Torque leg = arm * ptA.lenInv();
 
     MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
     MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
@@ -2804,7 +2804,8 @@ void Meca::addSideLink2D(Interpolation const& ptA,
     if ( any_equal(ii0, ii2, ii3) || any_equal(ii1, ii2, ii3) )
         return;
     
-    const real ee = -arm/ptA.len(),  we = weight * ee;
+    const real ee = -arm * ptA.lenInv();
+    const real we = weight * ee;
 
     // coefficients to form B-A:
     const real cc0 = -ptA.coef0(),  ww0 = weight * cc0;
@@ -2906,7 +2907,7 @@ void Meca::addSideLink3D(Interpolation const& ptA,
     const real cc1 =  ptA.coef1();
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
-    const Torque leg = arm / ptA.len();
+    const Torque leg = arm * ptA.lenInv();
 
     MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);
     MatrixBlock bR = MatrixBlock::vectorProduct(cc1,  leg);
@@ -2980,7 +2981,7 @@ void Meca::testSideLink(Interpolation const& ptA,
     }
     
     mFUL.reset();
-    addSideLink3D(ptA, Interpolation(ptB.mecable(), alpha, P), arm, weight);
+    addSideLink3D(ptA, Interpolation(ptB.mecable(), alpha, P, P+1), arm, weight);
     {
         std::ofstream o("y");
         o << "testSideLink " << ptA.matIndex1() << " " << ptB.matIndex0() << "\n";
@@ -3059,8 +3060,8 @@ void Meca::addSideSideLink2D(Interpolation const& ptA, const real armA,
     const real ca1 =  ptA.coef0(), ca2 =  ptA.coef1();
     const real cb1 = -ptB.coef0(), cb2 = -ptB.coef1();
     
-    const real ee1 = armA / ptA.len();
-    const real ee2 = armB / ptB.len();
+    const real ee1 = armA * ptA.lenInv();
+    const real ee2 = armB * ptB.lenInv();
     
     const real W = -weight;
     const real ca1w = ca1 * W, ca2w = ca2 * W;
@@ -3152,8 +3153,8 @@ void Meca::addSideSideLink(Interpolation const& ptA, Torque const& armA,
     const real cc2 = -ptB.coef0();
     const real cc3 = -ptB.coef1();
     
-    const Torque legA = armA / ptA.len();
-    const Torque legB = armB / ptB.len();
+    const Torque legA = armA * ptA.lenInv();
+    const Torque legB = armB * ptB.lenInv();
 
     MatrixBlock A = MatrixBlock::vectorProduct(cc0, -legA);
     MatrixBlock B = MatrixBlock::vectorProduct(cc1,  legA);
@@ -3361,8 +3362,8 @@ void Meca::addTiltedSideSideLink(Interpolation const& ptA, Torque const& armA,
                                  const real len, Vector2 const& ang,
                                  const real weight)
 {
-    const real a = len / ptA.len();
-    const real b = len / ptB.len();
+    const real a = len * ptA.lenInv();
+    const real b = len * ptB.lenInv();
 
     // R and T rotate and scale to get a vector of size 'len' from 'ptA.diff'
     MatrixBlock R = MatrixBlock::planarRotation(armA/len, a*ang.XX, a*ang.YY);
@@ -4638,7 +4639,7 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     const real A = ptA.coef0(),  wA = weight * A;
     const real B = ptA.coef1(),  wB = weight * B;
     
-    const real E = arm / ptA.len();
+    const real E = arm * ptA.lenInv();
     const real wE = weight * E;
     const real wEE = weight * E * E;
     
@@ -4696,8 +4697,8 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     // interpolation coefficients:
     const real cc0 = ptA.coef0();
     const real cc1 = ptA.coef1();
-    const Torque leg = arm / ptA.len();
-
+    const Torque leg = arm * ptA.lenInv();
+    
 #if ( DIM == 1 )
     // this implementation works in any dimension, but is slower than the one below
     MatrixBlock aR = MatrixBlock::vectorProduct(cc0, -leg);

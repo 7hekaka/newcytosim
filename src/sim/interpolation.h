@@ -7,6 +7,7 @@
 #include "vector.h"
 #include "mecable.h"
 #include "mecapoint.h"
+#include "chain.h"
 
 class FiberSegment;
 
@@ -35,6 +36,9 @@ private:
     /// interpolation coefficient: pos = (1-coef) * pt1_ + coef * pt2_
     real coef_;
 
+    /// 1.0 / ( distance between points )
+    real ilen_;
+    
     /// index of vertex 1 in mec_
     unsigned pt1_;
 
@@ -44,15 +48,15 @@ private:
 public:
     
     /// reset member variables
-    Interpolation() : mec_(nullptr), pt1_(0), pt2_(0) { }
+    Interpolation() : mec_(nullptr), coef_(0), ilen_(0), pt1_(0), pt2_(0) { }
     
     /// set to interpolate P and P+1 on `m`, with coefficient `c`
-    Interpolation(const Mecable * m, real c, unsigned P)
-    : mec_(m), coef_(c), pt1_(P), pt2_(P+1) { assert_true(P+1 < m->nbPoints() ); }
+    Interpolation(const Chain * m, real c, unsigned P)
+    : mec_(m), coef_(c), ilen_(m->segmentationInv()), pt1_(P), pt2_(P+1) { assert_true(P+1 < m->nbPoints() ); }
     
     /// set to interpolate P and Q on `m`, with coefficient `c`
     Interpolation(const Mecable * m, real c, unsigned P, unsigned Q)
-    : mec_(m), coef_(c), pt1_(P), pt2_(Q) { assert_true(Q < m->nbPoints() ); }
+    : mec_(m), coef_(c), ilen_(0), pt1_(P), pt2_(Q) { assert_true(Q < m->nbPoints() ); }
 
     /// disabled old-style constructor
     Interpolation(const Mecable*, unsigned, unsigned, real) = delete;
@@ -135,6 +139,9 @@ public:
 
     /// normalize(pos2() - pos1())
     Vector dir()  const { return normalize(diff()); }
+    
+    /// distance between point1 and point2
+    real lenInv() const { assert_true(ilen_>0); return ilen_; }
 
     /// true if the coefficient is in [0, 1]
     bool inside() const { return ( 0 <= coef_ ) && ( coef_ <= 1.0 ); }

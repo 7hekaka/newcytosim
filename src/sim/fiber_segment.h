@@ -6,6 +6,7 @@
 
 #include "real.h"
 #include "vector.h"
+#include "mecapoint.h"
 #include "fiber.h"
 
 

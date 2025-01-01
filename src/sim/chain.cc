@@ -1908,6 +1908,17 @@ FiberEnd Chain::whichEndDomain(const real ab, const real lambda) const
 //------------------------------------------------------------------------------
 #pragma mark -
 
+Interpolation Chain::interpolateEndM() const
+{
+    return Interpolation(this, real(0.0), 0);
+}
+
+
+Interpolation Chain::interpolateEndP() const
+{
+    return Interpolation(this, real(1.0), nPoints-2);
+}
+
 
 Mecapoint Chain::exactEnd(const FiberEnd end) const
 {
@@ -1963,12 +1974,20 @@ Interpolation Chain::interpolateM(const real ab) const
 }
 
 
+Interpolation Chain::interpolateAbs(const real ab) const
+{
+    real a = max_real((ab-fnAbscissaM)*iCut, 0);
+    unsigned i = std::min((unsigned)a, (unsigned)nPoints-2);
+    return Interpolation(this, std::min(a-i, real(1)), i);
+}
+
+
 Interpolation Chain::interpolateFrom(const real ab, const FiberEnd end) const
 {
     switch( end )
     {
         case ORIGIN:
-            return interpolate(ab);
+            return interpolateM(ab-fnAbscissaM);
             
         case MINUS_END:
             return interpolateM(ab);
@@ -1982,7 +2001,7 @@ Interpolation Chain::interpolateFrom(const real ab, const FiberEnd end) const
         default:
             ABORT_NOW("invalid argument value");
     }
-    return interpolate(0);
+    return interpolateM(-fnAbscissaM);
 }
 
 //------------------------------------------------------------------------------
