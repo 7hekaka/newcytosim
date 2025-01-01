@@ -636,7 +636,7 @@ public:
     void addSideLink(Interpolation const&, Mecapoint const&, real arm, real weight);
     
     /// Specialized version, where `leg` is already multiplied by the segment length
-    void addSideLink(Fiber const*, unsigned, real alpha, Mecapoint const&, Torque const& arm, real weight);
+    void addSideLinkS(Fiber const*, unsigned, real alpha, Mecapoint const&, Torque const& arm, real weight);
 
     
 #if ( DIM == 2 )

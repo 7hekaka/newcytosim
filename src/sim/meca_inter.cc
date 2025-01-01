@@ -2708,10 +2708,10 @@ void Meca::addSideLink3D(Interpolation const& ptA,
  This is a specialized version of addSideLink3D(), without Modulo
  `leg` is already normalized to include the Fiber's segmentation
  */
-void Meca::addSideLink(Fiber const* fibA, unsigned segA, real alpha,
-                       Mecapoint const& ptB,
-                       Torque const& leg,
-                       const real weight)
+void Meca::addSideLinkS(Fiber const* fibA, unsigned segA, real alpha,
+                        Mecapoint const& ptB,
+                        Torque const& leg,
+                        const real weight)
 {
     assert_true( weight >= 0 );
     
