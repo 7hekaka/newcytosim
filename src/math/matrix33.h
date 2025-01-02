@@ -1106,15 +1106,15 @@ public:
                          Z+Z);
     }
     
-    /// return symmetric matrix block :  dia * Id + [ dir (x) dir ]
-    static Matrix33 offsetOuterProduct(const real dia, Vector3 const& dir)
+    /// return symmetric matrix block :  -dir^2 * Id + [ dir (x) dir ]
+    static Matrix33 offsetOuterProduct(Vector3 const& dir)
     {
         real X = dir.XX;
         real Y = dir.YY;
         real Z = dir.ZZ;
-        return symmetric(X * X + dia, Y * X, Z * X,
-                         Y * Y + dia, Z * Y,
-                         Z * Z + dia);
+        return symmetric(-Y*Y - Z*Z, Y*X, Z*X,
+                         -X*X - Z*Z, Z*Y,
+                         -X*X - Y*Y);
     }
 
     /// return symmetric matrix block :  dia * Id + [ dir (x) dir ] * len

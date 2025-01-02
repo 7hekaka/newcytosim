@@ -913,17 +913,17 @@ public:
                          tt+tt);
     }
     
-    /// return symmetric matrix block :  dia * I + [ dir (x) dir ]
-    static Matrix44 offsetOuterProduct(const real dia, Vector4 const& dir)
+    /// return symmetric matrix block :  -dir^2 * Id + [ dir (x) dir ]
+    static Matrix44 offsetOuterProduct(Vector4 const& dir)
     {
         real X = dir.XX;
         real Y = dir.YY;
         real Z = dir.ZZ;
         real T = dir.TT;
-        return symmetric(X * X + dia, Y * X, Z * X, T * X,
-                         Y * Y + dia, Z * Y, T * Y,
-                         Z * Z + dia, T * Z,
-                         T * T + dia);
+        return symmetric(-Y*Y-Z*Z-T*T, Y * X, Z * X, T * X,
+                         -X*X-Z*Z-T*T, Z * Y, T * Y,
+                         -X*X-Y*Y-Z*Z, T * Z,
+                         -X*X-Y*Y-Z*Z);
     }
 
     /// return symmetric matrix block :  dia * I + [ dir (x) dir ]

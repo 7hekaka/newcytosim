@@ -4723,7 +4723,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
      
      */
 #if ( DIM >= 3 )
-    MatrixBlock LL = MatrixBlock::offsetOuterProduct(-leg.normSqr(), leg);
+    MatrixBlock LL = MatrixBlock::offsetOuterProduct(leg);
 #else
     MatrixBlock LL = MatrixBlock(0, -leg * leg);
 #endif
@@ -4742,8 +4742,8 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     //add_base(ii1, Bt*pos, weight); // Bt * pos = cc1 * pos - cross(len, pos)
 
     Vector vec = cross(leg, pos);
-    add_base(ii0, vec.extrapolated(cc0, pos), weight);
-    sub_base(ii1, vec.extrapolated(-cc1, pos), weight);
+    add_base(ii0, vec + cc0*pos, weight);
+    sub_base(ii1, vec - cc1*pos, weight);
 
     DRAW_LINK(ptA, cross(arm, ptA.dir()), pos);
 }
