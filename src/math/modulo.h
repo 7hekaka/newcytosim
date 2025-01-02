@@ -94,7 +94,7 @@ public:
     Vector offset(Vector const& pos) const;
     
     /// set `pos` to its canonical image, and return offset = pos - fold(pos)
-    void foldOffset(Vector& pos, Vector& off) const;
+    Vector foldOffset(Vector& pos) const;
     
     /// shift `pos` to its canonical image
     void fold_float(float* pos) const;

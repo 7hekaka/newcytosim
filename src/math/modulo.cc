@@ -82,12 +82,12 @@ Vector Modulo::offset(Vector const& pos) const
 }
 
 
-//calculate the canonical image of 'pos' and return the associated shift
-void Modulo::foldOffset(Vector& pos, Vector& off) const
+//set 'pos' to its canonical image and return the associated shift
+Vector Modulo::foldOffset(Vector& pos) const
 {
     Vector vec = pos;
     fold(pos);
-    off = vec - pos;
+    return vec - pos;
 }
 
 

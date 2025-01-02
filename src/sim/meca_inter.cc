@@ -2234,7 +2234,7 @@ void Meca::addLongLink(Mecapoint const& ptA,
     Vector off, axi = position_diff(ptA, ptB);
 
     if ( modulo )
-        modulo->foldOffset(axi, off);
+        off = modulo->foldOffset(axi);
 
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
@@ -2297,8 +2297,8 @@ void Meca::addLongLink(Mecapoint const& ptA,
     Vector off, axi = position_diff(ptA, ptB);
 
     if ( modulo )
-        modulo->foldOffset(axi, off);
-        
+        off = modulo->foldOffset(axi);
+
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
@@ -2382,8 +2382,8 @@ void Meca::addLongLink(Interpolation const& ptA,
     Vector off, axi = position_diff(ptA, ptB);
 
     if ( modulo )
-        modulo->foldOffset(axi, off);
-    
+        off = modulo->foldOffset(axi);
+
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
@@ -2472,8 +2472,8 @@ void Meca::addLongLink4(Interpolation const& ptA, const size_t ii2,
     Vector off;
 
     if ( modulo )
-        modulo->foldOffset(axi, off);
-    
+        off = modulo->foldOffset(axi);
+
     const real ab2 = axi.normSqr();
     if ( ab2 < REAL_EPSILON ) return;
     const real abn = std::sqrt(ab2);
