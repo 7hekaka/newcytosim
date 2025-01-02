@@ -128,7 +128,7 @@ inline void Meca::add_block(size_t i, size_t j, MatrixBlock const& T)
 }
 
 /// add `alpha * T` to the matrix.
-inline void Meca::add_block(size_t i, size_t j, real alpha, MatrixBlock const& T)
+inline void Meca::add_block(size_t i, size_t j, const real alpha, MatrixBlock const& T)
 {
     CHECK_INDICES(i,j,"add_alpha");
 #if USE_MATRIX_BLOCK
@@ -162,7 +162,7 @@ inline void Meca::sub_block(size_t i, size_t j, MatrixBlock const& T)
 }
 
 /// subtract `alpha * T` to the matrix.
-inline void Meca::sub_block(size_t i, size_t j, real alpha, MatrixBlock const& T)
+inline void Meca::sub_block(size_t i, size_t j, const real alpha, MatrixBlock const& T)
 {
     CHECK_INDICES(i,j,"sub_alpha");
 #if USE_MATRIX_BLOCK
@@ -197,7 +197,7 @@ inline void Meca::add_block_diag(size_t i, MatrixBlock const& T)
 }
 
 /// add `alpha * T` to the matrix diagonal. `T` should be symmetric
-inline void Meca::add_block_diag(size_t i, real alpha, MatrixBlock const& T)
+inline void Meca::add_block_diag(size_t i, const real alpha, MatrixBlock const& T)
 {
     CHECK_INDEX(i);
 #if USE_MATRIX_BLOCK
@@ -211,6 +211,27 @@ inline void Meca::add_block_diag(size_t i, real alpha, MatrixBlock const& T)
     for ( size_t x = 0; x < DIM; ++x )
     for ( size_t y = x; y < DIM; ++y )
         mFUL(DIM*i+y, DIM*i+x) += alpha * T(y,x);
+#endif
+}
+
+/// add `alpha * T` to the matrix diagonal. `T` should be symmetric
+inline void Meca::add_block_diag(size_t i, const real alpha, MatrixBlock const& T, const real dia)
+{
+    CHECK_INDEX(i);
+#if USE_MATRIX_BLOCK
+    assert_small(T.asymmetry());
+    mFUL.diag_block(i).add_half(alpha, T, dia);
+    PRINT_BLOCK(i,i,alpha*T);
+#elif ( DIM == 1 ) && USE_ISO_MATRIX
+    mISO.diagonal(i) += alpha * ( T.value() + dia );
+#else
+    // add lower part of block
+    for ( size_t x = 0; x < DIM; ++x )
+    {
+        mFUL(DIM*i+y, DIM*i+x) += alpha * ( T(y,x) + dia );
+        for ( size_t y = x+1; y < DIM; ++y )
+            mFUL(DIM*i+y, DIM*i+x) += alpha * T(y,x);
+    }
 #endif
 }
 
@@ -234,7 +255,7 @@ inline void Meca::sub_block_diag(size_t i, MatrixBlock const& T)
 
 
 /// add `val` to the XYZ-isometric matrix
-inline void Meca::add_iso(size_t i, size_t j, real val)
+inline void Meca::add_iso(size_t i, size_t j, const real val)
 {
     CHECK_INDICES(i,j,"add_iso");
 #if USE_ISO_MATRIX
@@ -248,7 +269,7 @@ inline void Meca::add_iso(size_t i, size_t j, real val)
 }
 
 /// add `-val` to the XYZ-isometric matrix
-inline void Meca::sub_iso(size_t i, size_t j, real val)
+inline void Meca::sub_iso(size_t i, size_t j, const real val)
 {
     CHECK_INDICES(i,j,"sub_iso");
 #if USE_ISO_MATRIX
@@ -262,7 +283,7 @@ inline void Meca::sub_iso(size_t i, size_t j, real val)
 }
 
 /// add `val` to the XYZ-isometric matrix
-inline void Meca::add_iso_diag(size_t i, real val)
+inline void Meca::add_iso_diag(size_t i, const real val)
 {
     CHECK_INDEX(i);
 #if USE_ISO_MATRIX
@@ -276,7 +297,7 @@ inline void Meca::add_iso_diag(size_t i, real val)
 }
 
 /// add `-val` to the XYZ-isometric matrix
-inline void Meca::sub_iso_diag(size_t i, real val)
+inline void Meca::sub_iso_diag(size_t i, const real val)
 {
     CHECK_INDEX(i);
 #if USE_ISO_MATRIX
@@ -298,7 +319,7 @@ inline void Meca::add_base(size_t i, Vector const& vec) const
 }
 
 /// add `alpha * vec` to the base
-inline void Meca::add_base(size_t i, Vector const& vec, real alpha) const
+inline void Meca::add_base(size_t i, Vector const& vec, const real alpha) const
 {
     CHECK_INDEX(i);
     vec.add_to(alpha, vBAS+DIM*i);
@@ -312,7 +333,7 @@ inline void Meca::sub_base(size_t i, Vector const& vec) const
 }
 
 /// add `-alpha * vec` to the base
-inline void Meca::sub_base(size_t i, Vector const& vec, real alpha) const
+inline void Meca::sub_base(size_t i, Vector const& vec, const real alpha) const
 {
     CHECK_INDEX(i);
     vec.sub_to(alpha, vBAS+DIM*i);
@@ -4730,12 +4751,13 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     MatrixBlock MM = MatrixBlock::vectorProduct(-cc0*cc1, leg);
 
     //std::clog<<-At.mul(aR)<<" "<<-Bt.mul(bR)<<" "<<-Bt.mul(aR)<<"\n";
-    //std::clog<<LL.plus_diagonal(-cc0*cc0)<<" "<<LL.plus_diagonal(-cc1*cc1)<<" "<<MM-LL<<"/\n\n";
+    //std::clog<<LL+MatrixBlock(0,-cc0*cc0)<<" "<<LL+MatrixBlock(0,-cc1*cc1)<<" "<<MM-LL<<"/\n\n";
 
     // the diagonal blocs are symmetric but not diagonal
-    add_block_diag(ii0, weight, LL.plus_diagonal(-cc0*cc0));
+    add_block_diag(ii0, weight, LL, -cc0*cc0);
     add_block(ii1, ii0, weight, MM-LL);
-    add_block_diag(ii1, weight, LL.plus_diagonal(-cc1*cc1));
+    add_block_diag(ii1, weight, LL, -cc1*cc1);
+    
 #endif
  
     //add_base(ii0, At*pos, weight); // At * pos = cc0 * pos + cross(len, pos)

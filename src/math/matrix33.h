@@ -862,6 +862,28 @@ public:
 #endif
     }
     
+    /// add lower triangle of matrix including diagonal: this <- this + alpha * M
+    void add_half(const real alpha, Matrix33 const& M, const real diag)
+    {
+        real const* src = M.val;
+        //std::clog << "matrix alignment " << ((uintptr_t)src & 63) << "\n";
+#if ( 1 )
+        val[0] += alpha * ( src[0] + diag );
+        val[1] += alpha * src[1];
+        val[2] += alpha * src[2];
+        val[1+BLD] += alpha * ( src[1+BLD] + diag );
+        val[2+BLD] += alpha * src[2+BLD];
+        val[2+BLD*2] += alpha * ( src[2+BLD*2] + diag );
+#else
+        for ( int x = 0; x < 3; ++x )
+        {
+            val[y+BLD*x] += alpha * ( src[y+BLD*x] + dia );
+            for ( int y = x+1; y < 3; ++y )
+                val[y+BLD*x] += alpha * src[y+BLD*x];
+        }
+#endif
+    }
+
     /// subtract lower triangle of matrix including diagonal: this <- this - M
     void sub_half(Matrix33 const& M)
     {

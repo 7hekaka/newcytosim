@@ -278,6 +278,9 @@ private:
     
     /// add block 'alpha*T' to mFUL at position (i, i)
     void add_block_diag(size_t i, real alpha, MatrixBlock const& T);
+    
+    /// add block 'alpha * (T + dia * Id)' to mFUL at position (i, i)
+    void add_block_diag(size_t i, real alpha, MatrixBlock const& T, real dia);
 
     /// add isotropic stiffness at position (i, j)
     void add_iso(size_t i, size_t j, real val);

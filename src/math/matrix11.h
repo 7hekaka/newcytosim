@@ -315,6 +315,12 @@ public:
         val_ += alpha * M.val_;
     }
     
+    /// add lower triangle of matrix including diagonal: this <- this + alpha * M
+    void add_half(const real alpha, Matrix11 const& M, const real dia)
+    {
+        val_ += alpha * ( M.val_ + dia );
+    }
+
     /// subtract lower triangle of matrix including diagonal: this <- this - M
     void sub_half(Matrix11 const& M)
     {

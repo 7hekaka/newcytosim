@@ -818,6 +818,18 @@ public:
 #endif
     }
     
+    /// add lower triangle of matrix including diagonal: this <- this + alpha * M
+    void add_half(const real alpha, Matrix34 const& M, const real dia)
+    {
+        real const* src = M.val;
+        for ( index i = 0; i < 3; ++i )
+        {
+            val[LVD*i+i] += alpha * ( src[LVD*i+i] + dia );
+            for ( index j = i+1; j < 3; ++j )
+                val[LVD*i+j] += alpha * src[LVD*i+j];
+        }
+    }
+
     /// subtract lower triangle of matrix including diagonal: this <- this - M
     void sub_half(Matrix34 const& M)
     {

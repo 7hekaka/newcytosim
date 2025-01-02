@@ -714,6 +714,14 @@ public:
 #endif
     }
     
+    /// add lower triangle of matrix including diagonal: this <- this + alpha * M
+    void add_half(const real alpha, Matrix22 const& M, const real dia)
+    {
+        val[0] += alpha * ( M.val[0] + dia );
+        val[1] += alpha * M.val[1];
+        val[3] += alpha * ( M.val[3] + dia );
+    }
+
     /// subtract lower triangle of matrix including diagonal: this <- this - M
     void sub_half(Matrix22 const& M)
     {
