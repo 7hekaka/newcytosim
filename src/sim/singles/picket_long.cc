@@ -23,11 +23,16 @@ PicketLong::~PicketLong()
 
 //------------------------------------------------------------------------------
 
-Torque PicketLong::calcArm(Interpolation const& pt, Vector const& pos, real len)
+/** This will modify 'pos' if periodic boundary conditions are used */
+Torque PicketLong::calcArm(Interpolation const& pt, Vector& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
+    {
+        Vector tmp = off;
         modulo->fold(off);
+        pos += tmp - off;
+    }
 #if ( DIM >= 3 )
     off = cross(off, pt.diff());
     real n = off.norm();
@@ -101,13 +106,13 @@ void PicketLong::setInteractions(Meca& meca) const
      The 'arm' is recalculated every time, but in 2D at least,
      this may not be necessary, as flipping should occur rarely.
      */
-    
-    mArm = calcArm(ipt, sPos, prop->length);
+    Vector pos = sPos;
+    mArm = calcArm(ipt, pos, prop->length);
     
 #if ( DIM == 2 )
-    meca.addSidePointClamp2D(ipt, sPos, mArm, prop->stiffness);
+    meca.addSidePointClamp2D(ipt, pos, mArm, prop->stiffness);
 #elif ( DIM >= 3 )
-    meca.addSidePointClamp3D(ipt, sPos, mArm, prop->stiffness);
+    meca.addSidePointClamp3D(ipt, pos, mArm, prop->stiffness);
 #endif
 
 #endif

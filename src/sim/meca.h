@@ -537,7 +537,7 @@ public:
     void addSidePointClamp3D(Interpolation const&, Vector, Torque const& arm, real weight);
 
     /// Link of stiffness `weight` with fixed position `pos`, on the side of the segment
-    void addSidePointClamp(Interpolation const&, Vector const& pos, real len, real weight);
+    void addSidePointClamp(Interpolation const&, Vector pos, real len, real weight);
     
     /// Link of stiffness `weight` with the X-axis
     void addLineClampX(Mecapoint const&, real weight);

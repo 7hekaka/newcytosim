@@ -4630,6 +4630,9 @@ void Meca::addCylinderClamp(Mecapoint const& pte,
 
 #if ( DIM == 2 )
 
+/**
+ This assumes that Modulo has been applied, such that 0 == modulo->offset( ptA.pos() - pos );
+ */
 void Meca::addSidePointClamp2D(Interpolation const& ptA,
                                Vector pos,
                                const real arm,
@@ -4656,9 +4659,6 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
     mFUL(DIM*ii0  , DIM*ii1+1) += wE;
     mFUL(DIM*ii0+1, DIM*ii1  ) -= wE;
 
-    if ( modulo )
-        pos += modulo->offset( ptA.pos() - pos );
-
     //it seems to works also fine without the term in eew* below:
     Vector off = wE * Vector(-pos.YY, pos.XX);
 
@@ -4682,6 +4682,8 @@ void Meca::addSidePointClamp2D(Interpolation const& ptA,
  `arm` must be perpendicular to link ( G - position(ptA) )
 
  F. Nedelec, March 2011, April 2024
+
+ This assumes that Modulo has been applied, such that 0 == modulo->offset( ptA.pos() - pos );
  
  */
 void Meca::addSidePointClamp3D(Interpolation const& ptA,
@@ -4735,9 +4737,6 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
     add_block(ii1, ii0, weight, MM-LL);
     add_block_diag(ii1, weight, LL.plus_diagonal(-cc1*cc1));
 #endif
-    
-    if ( modulo )
-        pos += modulo->offset( ptA.pos() - pos );
  
     //add_base(ii0, At*pos, weight); // At * pos = cc0 * pos + cross(len, pos)
     //add_base(ii1, Bt*pos, weight); // Bt * pos = cc1 * pos - cross(len, pos)
@@ -4762,7 +4761,7 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
  */
 
 void Meca::addSidePointClamp(Interpolation const& ptA,
-                             Vector const& pos,
+                             Vector pos,
                              const real len,
                              const real weight)
 {
@@ -4772,18 +4771,21 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
     
 #elif ( DIM == 2 )
     
-    // 'arm' is a vector in the Z direction
+    // 'arm' is a pseudo-vector in the Z direction
     real arm = std::copysign(len, cross(ptA.diff(), pos-ptA.pos1()));
     addSidePointClamp2D(ptA, pos, arm, weight);
    
 #else
-    
     // 'arm' perpendicular to link and fiber is obtained by vector product:
     //Vector arm = cross(ptA.diff(), pos-ptA.pos1());
-    Vector arm = pos-ptA.pos1();
+    Vector arm = ptA.pos1() - pos;
     if ( modulo )
+    {
+        Vector tmp = arm;
         modulo->fold(arm);
-    arm = cross(ptA.diff(), arm);
+        pos += tmp - arm;
+    }
+    arm = cross(arm, ptA.diff());
     real n = arm.norm();
     if ( n > REAL_EPSILON )
         addSidePointClamp3D(ptA, pos, arm*(len/n), weight);
