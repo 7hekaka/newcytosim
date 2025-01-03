@@ -65,7 +65,7 @@ protected:
     /// specialization of HandMonitor
     void beforeDetachment(Hand const*);
     /// specialization of HandMonitor
-    Single const* single() const { return this; }
+    Single const* toSingle() const { return this; }
 
     /// the position of the foot
     Vector sPos;

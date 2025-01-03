@@ -68,7 +68,7 @@ protected:
     /// specialization of HandMonitor
     Hand const* otherHand(Hand const*) const;
     /// specialization of HandMonitor
-    Couple const* couple() const { return this; }
+    Couple const* toCouple() const { return this; }
 
     /// true if both Hands are attached
     bool hasLink() const { return cHand1->attached() && cHand2->attached(); }

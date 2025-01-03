@@ -5,25 +5,27 @@
 
 #include <stddef.h>
 #include "blinksort.h"
+
 class Object;
 
 /// Doubly linked list of Objects
 /**
- 
+ The ObjectPool is a doubly-linked list of objects. It holds pointers to the first
+ and last elements of the list, and it keeps track of the number of objects linked.
+ Functions are given to link and unlink Objects in constant time.\n
+
  This class is similar to the standard template library <std::list>
  and the naming of the functions is consistent with STL whenever possible.
  
- The ObjectPool holds pointers to the first and last elements of the list,
- and it keeps track of the number of objects linked.
- Functions are given to link and unlink Objects in constant time.\n
- 
- A function mix() randomize the order of the Objects in the list, which is
+ In addition, a function shuffle() randomizes the order of the Objects in the list, as
  necessary in a simulation to avoid any bias which could derive from fixed ordering.
  
- The list is null-terminated on both sides, and it can be traversed in either ways:
- for ( Object * n = front(); n ; n = n->next() );
- for ( Object * n = back() ; n ; n = n->prev() );
+ Function blinksort() can be used to sort the objects using a compare function.
+
+ The list is null-terminated on both sides, and it can be traversed up or down:
  
+     for ( Object * n = front(); n ; n = n->next() );
+     for ( Object * n = back() ; n ; n = n->prev() ); 
  */
 
 class ObjectPool
@@ -149,7 +151,7 @@ public:
     /// count objects from ObjectPool for which `func(obj, val) == true`
     size_t count(bool (*func)(Object const*, void const*), void const* val) const;
 
-    /// test coherence of list
+    /// test coherence of data structure
     int bad() const;
 
 };

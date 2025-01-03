@@ -39,12 +39,13 @@ public:
     /// return the Hand that is not the argument, in a Couple
     virtual Hand const* otherHand(Hand const*) const { return nullptr; }
     
-    /// return the Single if `this` is a Single, and nullptr otherwise
-    virtual Single const* single() const { return nullptr; }
+    /// return this if `this` is a Single, and `nullptr` otherwise
+    virtual Single const* toSingle() const { return nullptr; }
 
-    /// return the Couple if `this` is a Couple, and nullptr otherwise
-    virtual Couple const* couple() const { return nullptr; }
+    /// return this if `this` is a Couple, and `nullptr` otherwise
+    virtual Couple const* toCouple() const { return nullptr; }
 
+    
     /// return the distal position of the link attached to this Hand
     /** returns the position of the other Hand, if the Hand is part of a Couple */
     virtual Vector linkFoot(Hand const*) const { return Vector(0,0,0); }
