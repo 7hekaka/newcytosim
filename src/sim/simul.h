@@ -452,7 +452,7 @@ public:
     void reportFibers(std::ostream&, std::ostream&, Property const*) const;
     
     /// print the length and the points of each fiber, sorted from longest to shortest
-    void reportFibersSorted(std::ostream&, std::ostream&, Property const*) const;
+    void reportFibersSorted(std::ostream&, std::ostream&, Property const*);
 
     /// print the coordinates of the vertices of each fiber
     void reportFiberPoints(std::ostream&, std::ostream&, Property const*) const;

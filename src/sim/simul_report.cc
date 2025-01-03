@@ -976,12 +976,12 @@ static int compareFiberLength(Object const* A, Object const* B)
 
 
 /**
+ This will sort fibers by decreasing length
  Export length, position and directions at center of fibers
  */
-void Simul::reportFibersSorted(std::ostream& out, std::ostream& com, Property const* sel) const
+void Simul::reportFibersSorted(std::ostream& out, std::ostream& com, Property const* sel)
 {
-    // sort fibers by decreasing length:
-    const_cast<FiberSet&>(fibers).pool_.blinksort(compareFiberLength);
+    fibers.pool_.blinksort(compareFiberLength);
     
     com << COM << "class" << SEP << "identity" << SEP << "length";
     com << SEP << repeatXYZ("pos") << SEP << repeatXYZ("dir") << SEP << "endToEnd";
