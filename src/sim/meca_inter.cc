@@ -4798,15 +4798,11 @@ void Meca::addSidePointClamp(Interpolation const& ptA,
     addSidePointClamp2D(ptA, pos, arm, weight);
    
 #else
+    
     // 'arm' perpendicular to link and fiber is obtained by vector product:
-    //Vector arm = cross(ptA.diff(), pos-ptA.pos1());
     Vector arm = ptA.pos1() - pos;
     if ( modulo )
-    {
-        Vector tmp = arm;
-        modulo->fold(arm);
-        pos += tmp - arm;
-    }
+        pos += modulo->foldOffset(arm);
     arm = cross(arm, ptA.diff());
     real n = arm.norm();
     if ( n > REAL_EPSILON )

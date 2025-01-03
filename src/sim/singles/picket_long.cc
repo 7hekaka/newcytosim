@@ -28,11 +28,7 @@ Torque PicketLong::calcArm(Interpolation const& pt, Vector& pos, real len)
 {
     Vector off = pt.pos1() - pos;
     if ( modulo )
-    {
-        Vector tmp = off;
-        modulo->fold(off);
-        pos += tmp - off;
-    }
+        pos += modulo->foldOffset(off);
 #if ( DIM >= 3 )
     off = cross(off, pt.diff());
     real n = off.norm();
