@@ -155,6 +155,9 @@ public:
     /// mix order of elements
     void shuffle();
 
+    /// sort attached singles
+    void sortAttachedSingles();
+    
     /// prepare for steps()
     void prepare(PropertyList const& properties);
     

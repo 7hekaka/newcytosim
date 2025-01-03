@@ -356,6 +356,30 @@ void SingleSet::foldPositions(Modulo const* m) const
 }
 
 
+/*
+ Sort singles by the fibers on which they are bound, and by increasing abscissa
+ */
+int compareSingles(const Object* a, const Object* b)
+{
+    Single const* A = static_cast<Single const*>(a);
+    Single const* B = static_cast<Single const*>(b);
+    unsigned iA = A->fiber()->matIndex();
+    unsigned iB = B->fiber()->matIndex();
+    if ( iA > iB ) return +1;
+    if ( iB > iA ) return -1;
+    real xA = A->abscissa();
+    real xB = B->abscissa();
+    return ( xA > xB ) - ( xB > xA );
+    return 0;
+}
+
+
+void SingleSet::sortAttachedSingles()
+{
+    aList.blinksort(compareSingles);
+}
+
+
 void SingleSet::shuffle()
 {
     if ( aList.size() > 1 ) aList.shuffle();

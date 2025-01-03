@@ -194,11 +194,14 @@ void Simul::solve_meca()
     sMeca.apply();
     //printf("     ::apply    %16llu\n", (timer()-rdt)>>5);
 #if ( 0 )
-    // check that recalculating gives similar forces
-    fibers.firstID()->printTensions(stderr, 47);
-    sMeca.calculateForces();
-    fibers.firstID()->printTensions(stderr, 92);
-    putc('\n', stderr);
+    Fiber * fib = fibers.firstID();
+    if ( fib ) {
+        // check that recalculating gives similar forces
+        fib->printTensions(stderr, 47);
+        sMeca.calculateForces();
+        fib->printTensions(stderr, 92);
+        putc('\n', stderr);
+    }
 #endif
 }
 
