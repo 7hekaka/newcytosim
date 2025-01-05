@@ -16,19 +16,19 @@ class Linkable
 {
 public:
     
-    Linkable * prev_;
-    Linkable * next_;
+    Linkable * prevL;
+    Linkable * nextL;
     
 public:
     
-    Linkable() : prev_(0), next_(0) {}
+    Linkable() : prevL(0), nextL(0) {}
     
     void push_front(Linkable *& head, Linkable *& tail)
     {
-        prev_ = nullptr;
-        next_ = head;
+        prevL = nullptr;
+        nextL = head;
         if ( head )
-            head->prev_ = this;
+            head->prevL = this;
         else
             tail = this;
         head = this;
@@ -36,10 +36,10 @@ public:
 
     void push_back(Linkable *& head, Linkable *& tail)
     {
-        prev_ = tail;
-        next_ = nullptr;
+        prevL = tail;
+        nextL = nullptr;
         if ( tail )
-            tail->next_ = this;
+            tail->nextL = this;
         else
             head = this;
         tail = this;
@@ -47,15 +47,15 @@ public:
     
     void pop(Linkable *& head, Linkable *& tail)
     {
-        if ( prev_ )
-            prev_->next_ = next_;
+        if ( prevL )
+            prevL->nextL = nextL;
         else
-            head = next_;
+            head = nextL;
         
-        if ( next_ )
-            next_->prev_ = prev_;
+        if ( nextL )
+            nextL->prevL = prevL;
         else
-            tail = prev_;
+            tail = prevL;
     }
 };
 
@@ -176,7 +176,7 @@ public:
         while ( i )
         {
             Event * e = static_cast<Event*>(i);
-            i = i->next_;
+            i = i->nextL;
             e->step(interval);
             if ( e->time() < 0 )
             {
@@ -191,7 +191,7 @@ public:
             Event * evt = static_cast<Event*>(H);
             real next_time = evt->time();
             // find earliest event in [H,T] list:
-            for ( iterator i = H->next_; i; i = i->next_ )
+            for ( iterator i = H->nextL; i; i = i->nextL )
             {
                 Event * e = static_cast<Event*>(i);
                 real t = e->time();
