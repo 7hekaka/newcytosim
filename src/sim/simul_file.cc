@@ -248,9 +248,9 @@ static ObjectID readObjectID_old(Inputter& in, ObjectTag& tag)
     if ( c == EOF )
         throw InvalidIO("unexpected end of file");
 
-    tag = c & LOW_BITS;
+    tag = c & Object::LOW_BITS;
     // detect fat reference:
-    int fat = ( c & HIGH_BIT );
+    int fat = ( c & Object::HIGH_BIT );
 #if BACKWARD_COMPATIBILITY < 50
     // up to format 49, a '$' was added to indicate fat format
     if ( c == '$' )
@@ -338,8 +338,8 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
         if ( in.formatID() < 58 ) // 57 before 26.11.2022
         {
             char c = in.get_char();
-            tag = c & LOW_BITS;
-            if ( c & HIGH_BIT )
+            tag = c & Object::LOW_BITS;
+            if ( c & Object::HIGH_BIT )
                 id = in.readUInt32bin();
             else if ( c != 'v' ) // NULL_TAG before 2.12.2023
                 id = in.readUInt16bin();
@@ -348,9 +348,9 @@ static ObjectID readObjectID(Inputter& in, ObjectTag& tag)
 #endif
         // binary format 58 (26.11.2022)
         int c = in.get_char();
-        tag = c & LOW_BITS;
+        tag = c & Object::LOW_BITS;
         //assert_true(isalpha(tag));
-        if ( c & HIGH_BIT )
+        if ( c & Object::HIGH_BIT )
         {
             ObjectID x = in.get_char();
             ObjectID y = in.get_char();
@@ -782,8 +782,8 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             }
 #endif
             // extract ASCII from character:
-            fat = ( tag & HIGH_BIT ) + in.binary();
-            tag = ( tag & LOW_BITS );
+            fat = ( tag & Object::HIGH_BIT ) + in.binary();
+            tag = ( tag & Object::LOW_BITS );
         } while ( !isAlpha(tag) );
         
         //VLOG("READ '" << (char)tag << "' " << (fat?"fat\n":"\n"));

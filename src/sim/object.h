@@ -26,12 +26,6 @@ typedef unsigned int ObjectMark;
 typedef unsigned int ObjectFlag;
 
 
-/// the highest bit that is not used by ASCII codes
-constexpr uint8_t HIGH_BIT = 128;
-/// bit mask for those bits which are used by ASCII codes
-constexpr uint8_t LOW_BITS = 127;
-
-
 /// Parent class for all simulated objects
 /**
  This is the interface used for writing / reading from a file.
@@ -71,8 +65,14 @@ private:
 
 public:
     
+    /// the highest bit that is not used by ASCII codes
+    static constexpr uint8_t HIGH_BIT = 128;
+    
+    /// bit mask for those bits which are used by ASCII codes
+    static constexpr uint8_t LOW_BITS = 127;
+
     /// Object::NULL_TAG is the 'void' pointer
-    static const ObjectTag NULL_TAG = '!';
+    static constexpr ObjectTag NULL_TAG = '!';
     
     /// build a reference string by concatenating (tag, property_number, ObjectID)
     static std::string make_reference(ObjectTag, unsigned, ObjectID);
