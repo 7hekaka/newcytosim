@@ -40,6 +40,9 @@ class Simul;
  */
 class Hand : public FiberSite
 {
+    /// to expose 
+    friend class BlinkSortJob<Hand>;
+    
     /// a monitor that does nothing
     static HandMonitor dummyMonitor;
 
@@ -48,7 +51,7 @@ private:
     /// disabled default constructor
     Hand();
    
-public:
+protected:
     
     /// Pointer used to build the list of Hands bound to a Fiber
     Hand * next_;

@@ -1,4 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
+
+#include "assert_macro.h"
+
 /**
  Templated sorting methods adapted for doubly-linked lists, 19.01.2023, 5.01.2024
  Three methods are implemented:
@@ -17,31 +20,32 @@ To sort in increasing order, COMP(OBJECT * a, OBJECT * b) should return:
    0 if (a=b)
   +1 if (a>b)
  .
-*/template<typename OBJECT>
+*/
+template<typename OBJECT>
 class BubbleSortJob
 {
 private:
 
     void push_after(OBJECT *& back, OBJECT * p, OBJECT * n)
     {
-        n->prev_ = p;
-        n->next_ = p->next_;
-        if ( p->next_ )
-            p->next_->prev_ = n;
+        n->prev(p);
+        n->next(p->next());
+        if ( p->next() )
+            p->next()->prev(n);
         else
             back = n;
-        p->next_ = n;
+        p->next(n);
     }
     
     void push_before(OBJECT *& front, OBJECT * p, OBJECT * n)
     {
-        n->next_ = p;
-        n->prev_ = p->prev_;
-        if ( p->prev_ )
-            p->prev_->next_ = n;
+        n->next(p);
+        n->prev(p->prev());
+        if ( p->prev() )
+            p->prev()->next(n);
         else
             front = n;
-        p->prev_ = n;
+        p->prev(n);
     }
     
 public:
@@ -53,33 +57,33 @@ public:
         if ( !ii )
             return;
         
-        ii = ii->next_;
+        ii = ii->next();
         
         while ( ii )
         {
-            OBJECT * kk = ii->next_;
-            OBJECT * jj = ii->prev_;
+            OBJECT * kk = ii->next();
+            OBJECT * jj = ii->prev();
             
             if ( COMP(ii, jj) > 0 )
             {
-                jj = jj->prev_;
+                jj = jj->prev();
                 
                 while ( jj && COMP(ii, jj) > 0 )
-                    jj = jj->prev_;
+                    jj = jj->prev();
                 
                 //pop(ii):
-                ii->prev_->next_ = ii->next_;
-                if ( ii->next_ )
-                    ii->next_->prev_ = ii->prev_;
+                ii->prev_->next(ii->next());
+                if ( ii->next() )
+                    ii->next()->prev(ii->prev());
                 else
-                    back = ii->prev_;
+                    back = ii->prev();
                 
                 if ( jj )
                     push_after(back, jj, ii);
                 else {
-                    ii->next_ = front;
-                    ii->prev_ = nullptr;
-                    front->prev_ = ii;
+                    ii->next(front);
+                    ii->prev(nullptr);
+                    front->prev(ii);
                     front = ii;
                 }
             }
@@ -101,17 +105,17 @@ private:
     void splitlist_(OBJECT *& head, OBJECT *& tail)
     {
         assert_true( head && head != tail );
-        while ( head != tail && head->next_ != tail )
+        while ( head != tail && head->next() != tail )
         {
-            head = head->next_;
-            tail = tail->prev_;
+            head = head->next();
+            tail = tail->prev();
         }
         
         if ( head == tail )
-            tail = head->next_;
+            tail = head->next();
         
-        head->next_ = nullptr;
-        tail->prev_ = nullptr;
+        head->next(nullptr);
+        tail->prev(nullptr);
     }
     
     
@@ -120,25 +124,25 @@ private:
         assert_true( head && from );
         if ( COMP(head, from) < 0 )
         {
-            OBJECT * temp = head->next_;
+            OBJECT * temp = head->next();
             if ( temp )
             {
                 // head remains on top of the list
                 mergelists_(temp, node, from, tail);
-                head->next_ = temp;
-                temp->prev_ = head;
+                head->next(temp);
+                temp->prev(head);
             }
             else
-                head->next_ = from;
+                head->next(from);
         }
         else
         {
-            if ( from->next_ )
-                mergelists_(head, node, from->next_, tail);
+            if ( from->next() )
+                mergelists_(head, node, from->next(), tail);
             // add `from` on top of the list
-            head->prev_ = from;
-            from->next_ = head;
-            from->prev_ = nullptr;
+            head->prev(from);
+            from->next(head);
+            from->prev(nullptr);
             head = from;
         }
     }

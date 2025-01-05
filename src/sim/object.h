@@ -3,6 +3,7 @@
 #ifndef OBJECT_H
 #define OBJECT_H
 
+#include "blinksort.h"
 #include "inventoried.h"
 #include "movable.h"
 #include "random.h"
@@ -41,10 +42,13 @@ typedef unsigned int ObjectFlag;
  */
 class Object : public Movable, public Inventoried
 {
+    /// to expose next and prev pointers for sorting:
+    friend class BlinkSortJob<Object>;
+
     /// allow container class to access members
     friend class ObjectPool;
 
-public:
+protected:
     
     /// the next Object in the list
     Object * next_;

@@ -4,7 +4,6 @@
 #define OBJECT_POOL_H
 
 #include <stddef.h>
-#include "blinksort.h"
 
 class Object;
 

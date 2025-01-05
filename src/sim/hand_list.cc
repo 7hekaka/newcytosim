@@ -4,7 +4,6 @@
 #include "hand_list.h"
 #include "hand_monitor.h"
 #include "hand.h"
-#include "blinksort.h"
 
 /**
 Link the hand at the front of the list.
