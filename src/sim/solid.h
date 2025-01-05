@@ -271,10 +271,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Solid * next() const { return static_cast<Solid*>(nextO); }
+    Solid * next() const { return static_cast<Solid*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Solid * prev() const { return static_cast<Solid*>(prevO); }
+    Solid * prev() const { return static_cast<Solid*>(prev_); }
     
     //--------------------------------------------------------------------------
 

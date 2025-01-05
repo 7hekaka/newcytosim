@@ -44,13 +44,13 @@ class Object : public Movable, public Inventoried
     /// allow container class to access members
     friend class ObjectPool;
 
-protected:
+public:
     
     /// the next Object in the list
-    Object * nextO;
+    Object * next_;
     
     /// the previous Object in the list
-    Object * prevO;
+    Object * prev_;
 
 private:
     
@@ -89,13 +89,13 @@ public:
 public:
     
     /// constructor
-    Object() : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(0), flag_(0) { }
+    Object() : next_(nullptr), prev_(nullptr), set_(nullptr), mark_(0), flag_(0) { }
 
     /// copy constructor
-    Object(Object const& o) : nextO(nullptr), prevO(nullptr), set_(nullptr), mark_(o.mark_), flag_(o.flag_) {}
+    Object(Object const& o) : next_(nullptr), prev_(nullptr), set_(nullptr), mark_(o.mark_), flag_(o.flag_) {}
     
     /// assignment operator
-    Object& operator = (const Object& o) { nextO=nullptr; prevO=nullptr; set_=nullptr; mark_=o.mark_; flag_=o.flag_; return *this; }
+    Object& operator = (const Object& o) { next_=nullptr; prev_=nullptr; set_=nullptr; mark_=o.mark_; flag_=o.flag_; return *this; }
     
     /// destructor
     virtual ~Object();
@@ -122,16 +122,16 @@ public:
     //--------------------------
     
     /// the next Object in the list, or zero if this is last
-    Object * next() const { return nextO; }
+    Object * next() const { return next_; }
     
     /// the previous Object in the list, or zero if this is first
-    Object * prev() const { return prevO; }
-    
+    Object * prev() const { return prev_; }
+
     /// set pointer to next Object
-    void next(Object* n) { nextO = n; }
+    void next(Object* n) { next_ = n; }
     
     /// set pointer to previous Object
-    void prev(Object* n) { prevO = n; }
+    void prev(Object* n) { prev_ = n; }
 
     //--------------------------
 

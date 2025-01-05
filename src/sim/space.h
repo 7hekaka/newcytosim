@@ -198,10 +198,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Space * next() const { return static_cast<Space*>(nextO); }
+    Space * next() const { return static_cast<Space*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Space * prev() const { return static_cast<Space*>(prevO); }
+    Space * prev() const { return static_cast<Space*>(prev_); }
     
     //--------------------------------------------------------------------------
 

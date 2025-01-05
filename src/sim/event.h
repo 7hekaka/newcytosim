@@ -104,10 +104,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Event * next() const { return static_cast<Event*>(nextO); }
+    Event * next() const { return static_cast<Event*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Event * prev() const { return static_cast<Event*>(prevO); }
+    Event * prev() const { return static_cast<Event*>(prev_); }
     
     //--------------------------------------------------------------------------
 

@@ -129,10 +129,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Bead * next() const { return static_cast<Bead*>(nextO); }
+    Bead * next() const { return static_cast<Bead*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Bead * prev() const { return static_cast<Bead*>(prevO); }
+    Bead * prev() const { return static_cast<Bead*>(prev_); }
     
     //--------------------------------------------------------------------------
 

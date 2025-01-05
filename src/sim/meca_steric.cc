@@ -185,7 +185,7 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
 
 
 //------------------------------------------------------------------------------
-#pragma mark - LocusGrid
+#pragma mark - streamlined LocusGrid
 
 
 /// distribute Mecables with steric enabled to `grid`

@@ -121,10 +121,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Organizer * next() const { return static_cast<Organizer*>(nextO); }
+    Organizer * next() const { return static_cast<Organizer*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Organizer * prev() const { return static_cast<Organizer*>(prevO); }
+    Organizer * prev() const { return static_cast<Organizer*>(prev_); }
     
     //--------------------------------------------------------------------------
     

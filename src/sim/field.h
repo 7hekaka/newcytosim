@@ -253,10 +253,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Field* next() const { return static_cast<Field*>(nextO); }
+    Field* next() const { return static_cast<Field*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Field* prev() const { return static_cast<Field*>(prevO); }
+    Field* prev() const { return static_cast<Field*>(prev_); }
     
     //------------------------------ read/write --------------------------------
 #pragma mark -

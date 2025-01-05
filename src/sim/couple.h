@@ -252,16 +252,16 @@ public:
     //--------------------------------------------------------------------------
 
     /// set next element
-    void next(Couple * x) { nextO = x; }
+    void next(Couple * x) { next_ = x; }
 
     /// set previous element
-    void prev(Couple * x) { prevO = x; }
+    void prev(Couple * x) { prev_ = x; }
 
     /// a static_cast<> of Object::next()
-    Couple * next() const { return static_cast<Couple*>(nextO); }
+    Couple * next() const { return static_cast<Couple*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Couple * prev() const { return static_cast<Couple*>(prevO); }
+    Couple * prev() const { return static_cast<Couple*>(prev_); }
     
     //------------------------------ read/write --------------------------------
 

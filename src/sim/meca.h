@@ -57,7 +57,7 @@ typedef SparMatSymBlkDiag BlockMatrixType;
 
 /// enables code attempting to separate the system into disconnected components
 /** The non-interacting separate components are then solved sequentially. */
-#define NEW_SOLVE_SEPARATE 0
+#define NEW_SOLVE_SEPARATE 1
 
 
 /// MatrixBlock is an alias to a matrix class of size DIM * DIM

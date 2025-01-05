@@ -4752,7 +4752,8 @@ void Meca::addSidePointClamp3D(Interpolation const& ptA,
 
     //std::clog<<-At.mul(aR)<<" "<<-Bt.mul(bR)<<" "<<-Bt.mul(aR)<<"\n";
     //std::clog<<LL+MatrixBlock(0,-cc0*cc0)<<" "<<LL+MatrixBlock(0,-cc1*cc1)<<" "<<MM-LL<<"/\n\n";
-
+    //std::clog << ii0 << "  " << ii1 << "\n";
+    
     // the diagonal blocs are symmetric but not diagonal
     add_block_diag(ii0, weight, LL, -cc0*cc0);
     add_block(ii1, ii0, weight, MM-LL);

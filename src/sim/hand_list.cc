@@ -93,7 +93,10 @@ static int compareHandAbscissa(const Hand* A, const Hand* B)
 void HandList::sort()
 {
     if ( haFront != haBack )
-        ::blinksort(haFront, haBack, compareHandAbscissa, haFront, haBack);
+    {
+        BlinkSortJob<Hand> job;
+        job.sort(haFront, haBack, compareHandAbscissa);
+    }
 }
 
 

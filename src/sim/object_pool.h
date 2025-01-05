@@ -117,14 +117,21 @@ public:
     void mergesort(int (*comp)(const Object*, const Object*))
     {
         if ( frontO != backO )
-            ::mergesort(frontO, backO, comp);
+        {
+            MergeSortJob<Object> job;
+            job.sort(frontO, backO, comp);
+        }
     }
     
     /// sort according to given function
     void blinksort(int (*comp)(const Object*, const Object*))
     {
         if ( frontO != backO )
-            ::blinksort(frontO, backO, comp, frontO, backO);
+        {
+            std::clog << "blinksort " << size() << "\n";
+            BlinkSortJob<Object> job;
+            job.sort(frontO, backO, comp);
+        }
     }
 
     /// Rearrange the list by exchanging the portions before and after `p`

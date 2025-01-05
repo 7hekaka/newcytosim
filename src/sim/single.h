@@ -178,16 +178,16 @@ public:
     //--------------------------------------------------------------------------
 
     /// set next element
-    void next(Single * x) { nextO = x; }
+    void next(Single * x) { next_ = x; }
 
     /// set previous element
-    void prev(Single * x) { prevO = x; }
+    void prev(Single * x) { prev_ = x; }
 
     /// a static_cast<> of Object::next()
-    Single * next() const { return static_cast<Single*>(nextO); }
+    Single * next() const { return static_cast<Single*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Single * prev() const { return static_cast<Single*>(prevO); }
+    Single * prev() const { return static_cast<Single*>(prev_); }
 
     //--------------------------------------------------------------------------
 

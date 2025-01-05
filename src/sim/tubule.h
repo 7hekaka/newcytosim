@@ -88,10 +88,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Tubule * next() const { return static_cast<Tubule*>(nextO); }
+    Tubule * next() const { return static_cast<Tubule*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Tubule * prev() const { return static_cast<Tubule*>(prevO); }
+    Tubule * prev() const { return static_cast<Tubule*>(prev_); }
     
     //--------------------------------------------------------------------------
 

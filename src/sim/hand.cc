@@ -18,7 +18,7 @@ HandMonitor Hand::dummyMonitor;
 //------------------------------------------------------------------------------
 
 Hand::Hand(HandProp const* p, HandMonitor* m)
-: nextH(nullptr), prevH(nullptr), prop(p), hMonitor(m), nextDetach(0), nextAct(0)
+: next_(nullptr), prev_(nullptr), prop(p), hMonitor(m), nextDetach(0), nextAct(0)
 {
     if ( !m )
         hMonitor = &dummyMonitor;

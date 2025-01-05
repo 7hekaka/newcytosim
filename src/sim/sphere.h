@@ -150,10 +150,10 @@ public:
     //--------------------------------------------------------------------------
 
     /// a static_cast<> of Object::next()
-    Sphere * next() const { return static_cast<Sphere*>(nextO); }
+    Sphere * next() const { return static_cast<Sphere*>(next_); }
     
     /// a static_cast<> of Object::prev()
-    Sphere * prev() const { return static_cast<Sphere*>(prevO); }
+    Sphere * prev() const { return static_cast<Sphere*>(prev_); }
     
     //------------------------------ read/write --------------------------------
     
