@@ -183,10 +183,11 @@ public:
  John M. Boyer, University of Southern Mississippi; ACM 1990
  Blink Sort is O(NlogN) for random data and 0(N) for reversed order and sorted lists.
  
- This uses the COMP() function provided,
+ The comparison function must return an integer less than, equal to, or greater than zero
+ if the first argument is considered to be respectively less than, equal to, or greater than the second.
  COMP(A, B) should return:
-     - a positive integer if 'A > B'
-     - a negative integer if 'B < A'
+     - a negative integer if 'A < B'
+     - a positive integer if 'B < A'
  for the list to be sorted in order of increasing values
  */
 template<typename OBJECT>
@@ -194,18 +195,19 @@ class BlinkSortJob
 {
 private:
     
-    OBJECT * front_;
-    OBJECT * back_;
+    OBJECT * FIRST;
+    OBJECT * LAST;
     
+    /// comparison function
     int (*COMP)(const OBJECT *, const OBJECT *);
     
-    void movebehind_(OBJECT *& subF, OBJECT *& subL, OBJECT * pvt, OBJECT * down)
+    void movebehind_(OBJECT *& subF, OBJECT *& subL, OBJECT* pvt, OBJECT* down)
     {
         if ( down != subL )
             down->next_->prev_ = down->prev_;
         else {
-            if ( down == back_ )
-                back_ = down->prev_;
+            if ( down == LAST )
+                LAST = down->prev_;
             else
                 down->next_->prev_ = down->prev_;
             subL = down->prev_;
@@ -217,8 +219,8 @@ private:
         if ( pvt != subF )
             down->prev_->next_ = down;
         else {
-            if ( pvt == front_ )
-                front_ = down;
+            if ( pvt == FIRST )
+                FIRST = down;
             else
                 down->prev_->next_ = down;
             subF = down;
@@ -241,9 +243,9 @@ private:
             while ( down != pvt2 )
             {
                 OBJECT * temp = down->prev_;
-                if ( COMP(pvt1, down) > 0 )
+                if ( COMP(down, pvt1) < 0 )
                     movebehind_(subF, subL, pvt1, down);
-                else if ( COMP(pvt2, down) > 0 )
+                else if ( COMP(down, pvt2) < 0 )
                     movebehind_(subF, subL, pvt2, down);
                 down = temp;
             }
@@ -260,18 +262,18 @@ private:
     
 public:
     
-    BlinkSortJob() : front_(nullptr), back_(nullptr), COMP(nullptr) {}
+    BlinkSortJob() : FIRST(nullptr), LAST(nullptr), COMP(nullptr) {}
 
     void sort(OBJECT *& front, OBJECT *& back, int (*comp)(const OBJECT *, const OBJECT *))
     {
         if ( front != back )
         {
             COMP = comp;
-            front_ = front;
-            back_ = back;
-            blinksort_(front_, back_);
-            front = front_;
-            back = back_;
+            FIRST = front;
+            LAST = back;
+            blinksort_(FIRST, LAST);
+            front = FIRST;
+            back = LAST;
         }
     }
 };
