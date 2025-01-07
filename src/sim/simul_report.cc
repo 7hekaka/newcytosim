@@ -3458,7 +3458,10 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
 
             // since these states are final, we can terminate the simulation
             if ( strchr("BKMXYZ", kat) )
+            {
                 decided = 1;
+                text_ = std::string(1, kat);
+            }
         }
     }
 
@@ -3478,10 +3481,11 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
         hit.set(0,0,0);
         aim.set(0,0,0);
         kat = 'U';
+        text_ = "";
     }
     else if ( decided == 1 )
     {
-        end_now();
+        end_now(0);
         decided = 2;
     }
 }

@@ -124,6 +124,9 @@ namespace glApp
     
     /// set message displayed on current window
     void setMessage(std::string const&);
+    
+    /// set message displayed on current window
+    void setSubtitle(std::string const&);
 
     /// display given text on screen for 3 sec
     void flashText(std::string const&);

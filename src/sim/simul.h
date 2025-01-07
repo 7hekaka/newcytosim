@@ -43,9 +43,12 @@ public:
     /// Meca used to solve the system with option 'solve=horizontal'
     Meca1D * pMeca1D;
     
-    /// member used to indicate that 'display' is up-to-date
+    /// member used to indicate that the simulation state was renewed
     int fresh_;
 
+    /// text for miscellaneous operations
+    mutable std::string text_;
+    
 private:
     
     /// signals that Simul is ready to perform a Monte-Carlo step
@@ -188,7 +191,7 @@ public:
     void end_at(double t) const { prop.end_time = std::min(t, prop.end_time); }
     
     /// ask to stop the 'run' after t seconds
-    void end_now(double t = 0.0) const { t += time(); end_at(t); stop_at(t); }
+    void end_now(double t = 0.0) const { t += time(); end_at(t); if ( t < prop.stop_time ) stop_at(t); }
 
     /// true if `time >= end_time`
     bool should_end() const { return prop.time >= prop.end_time; }

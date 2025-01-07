@@ -779,6 +779,18 @@ void Display::drawAverageFiber2(FiberSet const& fibers, Property const* arg) con
 
 void Display::drawMisc(Simul const& sim)
 {
+#if DRAW_MECA_LINKS
+    if ( prop->draw_links )
+    {
+        gym::ref_view();
+        gym::disableLighting();
+        sim.drawLinks();
+        gym::disableLineStipple();
+        gym::restoreLighting();
+        gym::cleanupCV();
+        CHECK_GL_ERROR("Simul::drawLinks()");
+    }
+#endif
 #if ( 0 )
     // display Grids for visual inspection:
     sim.fiberGrid.drawGrid();

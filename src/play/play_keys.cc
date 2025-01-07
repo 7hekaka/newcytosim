@@ -836,7 +836,7 @@ void processKey(unsigned char key, int modifiers = 0)
         
         case 'N':
             /**Need to share OpenGL context with the main window */
-            //glApp::newWindow(drawSimul);
+            //glApp::newWindow(drawSimulation);
             break;
 
 #if PLAY_CAN_WRITE

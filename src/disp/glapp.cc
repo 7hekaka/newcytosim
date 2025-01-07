@@ -1201,3 +1201,9 @@ void glApp::setMessage(std::string const& msg)
     glApp::currentView().setMessage(msg);
 }
 
+
+void glApp::setSubtitle(std::string const& msg)
+{
+    glApp::currentView().setSubtitle(msg);
+}
+

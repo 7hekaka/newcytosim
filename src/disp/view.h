@@ -162,7 +162,7 @@ public:
     void drawFPS() const;
 
     /// draw bottom-left label
-    void drawLabel() const;
+    void drawLabelAndText(std::string const&) const;
     
     /// display scale bar, info text, etc.
     void drawInteractiveFeatures() const;
@@ -195,6 +195,9 @@ public:
 
     /// set text displayed near top left corner of window
     void setMessage(std::string const& arg) { top_message = arg; }
+
+    /// set text displayed near top left corner of window
+    void setSubtitle(std::string const& arg) { subtitle = arg; }
 
     /// set OpenGL Fog, with mode (GL_EXP or GL_LINEAR), intensity and color
     void enableFog(GLint mode, float param, gym_color);

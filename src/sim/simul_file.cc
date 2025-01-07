@@ -756,8 +756,7 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
                         return 2;
                     }
                     has_frame = h;
-                    if ( has_frame )
-                        fresh_ = 1;
+                    fresh_ = 1;
                 }
                 continue;
             }

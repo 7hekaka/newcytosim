@@ -315,26 +315,13 @@ void Player::drawCytosim()
     sec = now;
 #endif
     try {
-        // draw:
+        // draw main elements:
         if ( modulo && disp.tile )
             mDisplay->drawTiled(simul, disp.tile);
         else
             mDisplay->drawSimul(simul);
 
         mDisplay->drawMisc(simul);
-
-#if DRAW_MECA_LINKS
-        if ( disp.draw_links )
-        {
-            gym::ref_view();
-            gym::disableLighting();
-            simul.drawLinks();
-            gym::disableLineStipple();
-            gym::restoreLighting();
-            gym::cleanupCV();
-            CHECK_GL_ERROR("Simul::drawLinks()");
-        }
-#endif
     }
     catch(Exception & e)
     {

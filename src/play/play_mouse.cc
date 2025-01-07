@@ -98,7 +98,7 @@ void timerCallback(const int value)
         if ( draw )
         {
             glApp::displayMain();
-            //glApp::displayOtherWindows(drawSimul);
+            //glApp::displayOtherWindows(drawSimulation);
         }
         else
             millisec = 100;

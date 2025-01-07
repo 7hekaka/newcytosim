@@ -149,7 +149,7 @@ public:
     /// get ready to display
     void prepareDrawing(Simul const&, PropertyList&, PropertyList&);
 
-    /// display the whole simulation
+    /// display all simulation objects
     void drawSimul(Simul const&);
     
     /// display for periodic systems

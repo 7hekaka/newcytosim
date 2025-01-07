@@ -337,7 +337,7 @@ void View::drawFPS() const
 }
 
 
-void View::drawLabel() const
+void View::drawLabelAndText(std::string const& text) const
 {
     int W = width(), H = height();
     //set pixel coordinate system:
@@ -345,7 +345,17 @@ void View::drawLabel() const
     gym::disableAlphaTest();
     gym::disableDepthTest();
     gym::one_view(W, H);
-    frameText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
+    
+    if ( label != "off" )
+        frameText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
+    
+    if ( text.size() )
+    {
+        float white[4] = {1,1,1,1};
+        float black[4] = {0,0,0,0.9};
+        frameText(5, BITMAP_TIMES_ROMAN_24, white, text.c_str(), black, W, H);
+    }
+
     gym::restoreDepthTest();
     gym::restoreAlphaTest();
     gym::restoreLighting();
@@ -374,11 +384,6 @@ void View::drawInteractiveFeatures() const
     if ( top_message.size() )
     {
         frameText(3, BITMAP_9_BY_15, front_color, top_message.c_str(), nullptr, W, H);
-    }
-    
-    if ( label != "off" )
-    {
-        frameText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
     }
     
     if ( subtitle.size() )

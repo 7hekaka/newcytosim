@@ -26,7 +26,7 @@ Simul&      simul = player.simul;
 PlayerProp&  prop = player.prop;
 DisplayProp& disp = player.disp;
 
-int drawSimul(View& view);
+int drawSimulation(View& view);
 
 /// create a player capable of command-line offscreen rendering only
 #define HEADLESS_PLAYER 0
@@ -77,22 +77,23 @@ void drawMag(View& view)
 /**
  calls prepareDisplay() and drawSystem()
  */
-int drawSimul(View& view)
+int drawSimulation(View& view)
 {
     if ( simul.prop.display_fresh )
     {
         player.readDisplayString(view, simul.prop.display);
         simul.prop.display_fresh = false;
     }
-    //worker.debug("drawSimul");
+    //worker.debug("drawSimulation");
     player.prepareDisplay(view);
     player.drawSystem(view);
+    view.drawLabelAndText(simul.text_);
     return 0;
 }
 
 
 /**
- call drawSimul() if data can be accessed by current thread
+ call drawSimulation() if data can be accessed by current thread
  */
 int drawLive(View& view)
 {
@@ -100,7 +101,7 @@ int drawLive(View& view)
     if ( 0 == worker.trylock() )
     {
         worker.read_input();
-        drawSimul(view);
+        drawSimulation(view);
         worker.unlock();
         return 0;
     }
@@ -185,7 +186,7 @@ int main(int argc, char* argv[])
     
 #if HEADLESS_PLAYER
     View view("*", DIM==3);
-    view.setDisplayFunc(drawSimul);
+    view.setDisplayFunc(drawSimulation);
 #else
     glApp::setDimensionality(DIM);
     View& view = glApp::views[0];
@@ -418,7 +419,7 @@ int main(int argc, char* argv[])
             do {
                 if ( ++s >= prop.period )
                 {
-                    drawSimul(view);
+                    drawSimulation(view);
                     if ( multi )
                         blitBuffers(multi, fbo, W, H);
                     player.saveView(view, frm++, prop.downsample);
@@ -435,9 +436,7 @@ int main(int argc, char* argv[])
                 // only save requested frames:
                 if ( worker.currentFrame() == frm )
                 {
-                    drawSimul(view);
-                    if ( view.label != "off" )
-                        view.drawLabel();
+                    drawSimulation(view);
                     if ( multi )
                         blitBuffers(multi, fbo, W, H);
                     player.saveView(view, frm, prop.downsample);
