@@ -3481,7 +3481,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
         hit.set(0,0,0);
         aim.set(0,0,0);
         kat = 'U';
-        text_ = "";
+        text_ = " ";
     }
     else if ( decided == 1 )
     {

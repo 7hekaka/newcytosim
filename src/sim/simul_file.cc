@@ -90,6 +90,13 @@ void Simul::writeObjects(Outputter& out) const
     
     out.write("\n#time "+std::to_string(prop.time)+" sec");
     
+    // save first line of text:
+    if ( text_.size() )
+    {
+        size_t n = text_.find('\n');
+        out.write("\n#text "+text_.substr(0, n));
+    }
+
     /*
      An object should be written after any other objects that it refers to.
      For example, Aster is written after Fiber, Couple after Fiber...
@@ -650,6 +657,12 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
     else if ( tok == "binary" )
     {
         in.setEndianess(line.substr(7).c_str());
+        return 1;
+    }
+    // text
+    else if ( tok == "text" )
+    {
+        text_ = line.substr(5);
         return 1;
     }
     // info line "#format 48 dim 2"
