@@ -87,7 +87,6 @@ int drawSimulation(View& view)
     //worker.debug("drawSimulation");
     player.prepareDisplay(view);
     player.drawSystem(view);
-    view.drawLabelAndText(simul.text_);
     return 0;
 }
 

@@ -357,6 +357,7 @@ void Player::drawSystem(View& view)
     CHECK_GL_ERROR("drawSystem");
     view.openDisplay();
     drawCytosim();
+    view.drawLabelAndText(simul.text_);
     view.closeDisplay();
 
     if ( prop.save_images > 0 )
