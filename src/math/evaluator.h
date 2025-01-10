@@ -65,8 +65,9 @@ private:
         if ( arg == "round" ) return 33;
         if ( arg == "trunc" ) return 34;
         if ( arg == "frac" ) return 35;
-        if ( arg == "prand" ) return 40;
-        if ( arg == "srand" ) return 41;
+        if ( arg == "rand" ) return 40;
+        if ( arg == "prand" ) return 41;
+        if ( arg == "srand" ) return 42;
         return 0;
     }
     
@@ -94,7 +95,8 @@ private:
             case 34: return trunc(x);
             case 35: return x-trunc(x);
             case 40: return RNG.preal();
-            case 41: return RNG.sreal();
+            case 41: return RNG.preal();
+            case 42: return RNG.sreal();
         }
         return x;
     }
@@ -177,7 +179,9 @@ private:
             if ( fun && *ptr == '(' )
             {
                 ++ptr; // '('
-                real val = expression_();
+                real val = NAN;
+                if ( *ptr != ')' )
+                    val = expression_();
                 if ( *ptr != ')' )
                     throw InvalidSyntax("missing closing parenthesis");
                 ++ptr; // ')'
@@ -271,9 +275,18 @@ public:
     /// evaluate expression in string argument
     real eval(char const* str) const
     {
-        ptr = str;
-        real res = expression_();
-        //std::clog << "eval(" << str << ") = " << res << "\n";
+        real res = NAN;
+        try
+        {
+            ptr = str;
+            res = expression_();
+            //std::clog << "eval(" << str << ") = " << res << "\n";
+        }
+        catch( Exception& e )
+        {
+            e << " while evaluating `" << str << "'";
+            throw;
+        }
         return res;
     }
     
