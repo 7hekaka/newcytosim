@@ -65,7 +65,7 @@ def get_data(file):
         s = uncode(line).split()
         if len(s) < 2:
             pass
-        elif s[0] == '%':
+        elif s[0] in ('%', '#'):
             pass
         elif len(s) == 12:
             T = float(s[0])

@@ -212,7 +212,7 @@ void View::strokeString(float X, float Y, float Z, const char str[]) const
 }
 
 
-/// width = text_width; height = text_heigth, (W, H) = window_size
+/// width = text_width; height = text_heigth, (W, H) = window size
 static float textPosition(float& X, float& Y, int width, int height, int lines,
                           int W, int H, const int position)
 {
@@ -243,7 +243,7 @@ static float textPosition(float& X, float& Y, int width, int height, int lines,
             X = std::max(0, ( W - width ) / 2);
             Y = ( H + lines*height ) / 2;
             return -height;
-        case 5: //centered, 3/4 down the window
+        case 5: //centered, 1/4 up from the bottom
             X = std::max(0, ( W - width ) / 2);
             Y = ( H + (lines-1)*height ) / 8;
             return -height;
@@ -264,7 +264,7 @@ static float textPosition(float& X, float& Y, int width, int height, int lines,
  - 4: center, text going down
  .
  
- Note: width and height are the current size of the viewport (window)
+ Note: W and H are the current size of the viewport (i.e. the window)
  */
 void View::frameText(int position, FontType font, const float color[4],
                      const char text[], const float back[4], int W, int H) const
