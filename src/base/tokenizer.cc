@@ -36,15 +36,14 @@ std::string Tokenizer::get_line(std::istream& is)
 
 int Tokenizer::skip_space(std::istream& is, bool eat_line)
 {
-    int c = is.get();
+    int c = is.peek();
     while ( isspace(c) )
     {
         if (( c == '\n' ) & !eat_line )
             break;
-        c = is.get();
+        is.get();
+        c = is.peek();
     }
-    if ( c != EOF )
-        is.unget();
     return c;
 }
 
@@ -97,15 +96,12 @@ int valid_hexadecimal(int c)
 std::string get_stuff(std::istream& is, int (*valid)(int))
 {
     std::string res;
-    res.reserve(64);
-    int c = is.get();
+    int c = is.peek();
     while ( valid(c) )
     {
-        res.push_back((char)c);
-        c = is.get();
+        res.push_back(is.get());
+        c = is.peek();
     }
-    if ( c != EOF )
-        is.unget();
     return res;
 }
 
@@ -120,12 +116,11 @@ std::string get_stuff(std::istream& is, int (*valid)(int))
  */
 std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
 {
+    std::string res;
     int c = skip_space(is, eat_line);
     
-    if ( !isalpha(c) )
-        return "";
-    
-    std::string res = get_stuff(is, valid_symbol);
+    if ( isalpha(c) )
+        res = get_stuff(is, valid_symbol);
     
     VLOG("Tokenizer:SYMBOL |" << res << "|\n");
     return res;
