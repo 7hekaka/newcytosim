@@ -191,373 +191,415 @@ Vector Cytosim::readPositionPrimitive(std::string const& arg, size_t& sci, Space
 {
     int c = skip_space(arg, sci, false);
 
-    if ( c == 0 )
-        return Vector(0,0,0);
-
     if ( isalpha(c) )
     {
         std::string tok = Tokenizer::get_symbol(arg, sci);
         //StreamFunc::mark_line(std::cerr, is);
 
-        if ( spc )
+        switch ( c )
         {
-            if ( tok == "inside" || tok == "random" )
-                return spc->place();
-            
-            if ( tok == "XY" )
-            {
-                Vector V = spc->place();
-                real H = 0;
-                extract(arg, sci, H);
-#if ( DIM > 2 )
-                V.ZZ = H;
-#endif
-                return V;
-            }
-            if ( tok == "YZ" || tok == "XZ" )
-            {
-                real H = 0;
-                extract(arg, sci, H);
-                Vector V = spc->place();
-                if ( tok == "YZ" ) V.XX = H;
-#if ( DIM > 1 )
-                if ( tok == "XZ" ) V.YY = H;
-#endif
-                return V;
-            }
-
-            if ( tok == "edge" )
-            {
-                real R = 0;
-                if ( !extract(arg, sci, R) || R < REAL_EPSILON )
-                    throw InvalidParameter("distance R must be > 0 in `edge R`");
-                return spc->placeNearEdge(R);
-            }
-            
-            if ( tok == "surface" )
-            {
-                real R = 1;
-                extract(arg, sci, R);
-                if ( R < REAL_EPSILON )
-                    throw InvalidParameter("distance R must be > 0 in `surface R`");
-                return spc->placeOnEdge(R);
-            }
-
-            if ( tok == "outside_sphere" )
-            {
-                real R = 0;
-                extract(arg, sci, R);
-                if ( R < 0 )
-                    throw InvalidParameter("distance R must be >= 0 in `outside_sphere R`");
-                Vector P;
-                do
-                    P = spc->place();
-                while ( P.norm() < R );
-                return P;
-            }
-            
-            if ( tok == "stripe" )
-            {
-                real S = -0.5, E = 0.5;
-                extract(arg, sci, S);
-                extract(arg, sci, E);
-                Vector inf, sup;
-                spc->boundaries(inf, sup);
-                Vector pos = inf + (sup-inf).e_mul(Vector::randP());
-                pos.XX = RNG.real_uniform(S, E);
-                return pos;
-            }
-        
-            if ( tok == "gradient" )
-            {
-                real B = -10, E = 10, R = 0;
-                extract(arg, sci, B);
-                extract(arg, sci, E);
-                extract(arg, sci, R);
-                if ( R == 0 )
+            case 'a':
+                
+                if ( tok == "arc" )
                 {
-                    Vector vec;
-                    real p;
-                    do {
-                        vec = spc->place();
-                        p = ( vec.XX - B ) / ( E - B );
-                    } while ( p < 0 || p > 1 || p < RNG.preal() );
-                    return vec;
+                    real L = -1, A = 1.57;
+                    if ( !extract(arg, sci, L) || L < 0 )
+                        throw InvalidParameter("length L must be >= 0 in `arc L`");
+                    extract(arg, sci, A);
+                    
+                    real x = 0, y = 0;
+                    if ( A == 0 ) {
+                        x = 0;
+                        y = L * RNG.shalf();
+                    }
+                    else {
+                        real R = L / A;
+                        real a = A * RNG.shalf();
+                        x = R * std::cos(a) - R; // origin centered on arc
+                        y = R * std::sin(a);
+                    }
+                    return Vector(x, y, 0);
                 }
-                real x = std::sqrt(RNG.preal());
-#if ( DIM < 3 )
-                return Vector(B+(E-B)*x, R*RNG.sreal(), 0);
-#else
-                real C, S;
-                RNG.urand2(C, S, R);
-                return Vector(B+(E-B)*x, C, S);
-#endif
-            }
-        
-            if ( tok == "exponential" )
-            {
-                real B = -10, E = 1, R = 0;
-                extract(arg, sci, B);
-                extract(arg, sci, E);
-                extract(arg, sci, R);
-                if ( R == 0 )
+                break;
+
+            case 'b':
+                
+                if ( tok == "ball" )
                 {
-                    Vector vec;
-                    real p;
-                    do {
-                        vec = spc->place();
-                        p = std::exp( ( B - vec.XX ) / E );
-                    } while ( p < 0 || p > 1 || p < RNG.preal() );
-                    return vec;
+                    real R = -1;
+                    if ( !extract(arg, sci, R) || R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `ball R`");
+                    return Vector::randB(R);
                 }
-                real x = RNG.exponential();
+                break;
+                
+            case 'c':
+                
+                if ( tok.compare(0, 3, "cap") == 0 )
+                {
+                    real R = 0, T = 0;
+                    if ( !extract(arg, sci, R) || R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `cap R`");
+                    if ( extract(arg, sci, T) && T < 0 )
+                        throw InvalidParameter("thickness T must be >= 0 in `cap R T`");
+                    real Z = std::max(R - T * RNG.preal(), -R);
+                    real r = std::sqrt(R*R - Z*Z);
+#if ( DIM >= 3 )
+                    real C, S;
+                    RNG.urand2(C, S, r);
+                    switch ( get_axis(tok, 3) )
+                    {
+                        case 'X': return Vector(Z, C, S);
+                        case 'Y': return Vector(C, Z, S);
+                        default : return Vector(C, S, Z);
+                    }
+#else
+                    return Vector(r*RNG.sflip(), Z, 0);
+#endif
+                }
+                
+                if ( tok.compare(0, 8, "cylinder") == 0 )
+                {
+                    real L = -1, R = -1;
+                    if ( !extract(arg, sci, L) || L < 0 )
+                        throw InvalidParameter("length L must be >= 0 in `cylinder L R`");
+                    if ( !extract(arg, sci, R) || R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
+                    const Vector2 V = Vector2::randB(R);
+                    switch ( get_axis(tok, 8) )
+                    {
+                        case 'X': return Vector(L*RNG.shalf(), V.XX, V.YY);
+                        case 'Y': return Vector(V.XX, L*RNG.shalf(), V.YY);
+                        default : return Vector(V.XX, V.YY, L*RNG.shalf());
+                    }
+                }
+ 
+                if ( tok.compare(0, 6, "circle") == 0 )
+                {
+                    real R = -1, T = 0;
+                    if ( !extract(arg, sci, R) || R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `circle R T`");
+                    if ( extract(arg, sci, T) && T < 0 )
+                        throw InvalidParameter("thickness T must be >= 0 in `circle R T`");
+#if ( DIM >= 3 )
+                    real C, S;
+                    RNG.urand2(C, S, R);
+                    Vector3 W = (0.5*T) * Vector3::randU();
+                    switch( get_axis(tok, 6) )
+                    {
+                        case 'X': return Vector3(0, C, S) + W;
+                        case 'Y': return Vector3(C, 0, S) + W;
+                        default : return Vector3(C, S, 0) + W;
+                    }
+#endif
+                    return Vector::randU(R) + Vector::randU(T*0.5);
+                }
+                
+                if ( tok == "cube" )
+                {
+                    real R = 1;
+                    extract(arg, sci, R);
+                    return Vector::randH()*R;
+                }
+                
+                if ( tok == "center" || tok == "origin" )
+                    return Vector(0,0,0);
+
+                break;
+                
+            case 'd':
+                
+                if ( tok.compare(0, 4, "disc") == 0 )
+                {
+                    real R = -1, T = 0;
+                    if ( !extract(arg, sci, R) || R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `disc R`");
+                    if ( extract(arg, sci, T) && T < 0 )
+                        throw InvalidParameter("thickness T must be >= 0 in `disc R T`");
+#if ( DIM >= 3 )
+                    //in 3D, a disc in the XY-plane of thickness T in Z-direction
+                    Vector2 V = Vector2::randB(R);
+                    switch( get_axis(tok, 4) )
+                    {
+                        case 'X': return Vector(T*RNG.shalf(), V.XX, V.YY);
+                        case 'Y': return Vector(V.XX, T*RNG.shalf(), V.YY);
+                        default : return Vector(V.XX, V.YY, T*RNG.shalf());
+                    }
+#endif
+                    //in 2D, a disc in the XY-plane
+                    return Vector::randB(R);
+                }
+                break;
+                
+            case 'e':
+                
+                if ( tok == "ellipse" )
+                {
+                    Vector S(1, 1, 0);
+                    extract(arg, sci, S);
+                    return S.e_mul(Vector::randB());
+                }
+                
+                if ( tok == "ellipse_surface" )
+                {
+                    Vector S(1, 1, 0);
+                    extract(arg, sci, S);
+                    return S.e_mul(Vector::randU());
+                }
+                 
+                if ( tok == "equator" )
+                {
+                    real R = 0, T = 0;
+                    if ( extract(arg, sci, R) && R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `equator R T`");
+                    if ( extract(arg, sci, T) && T < 0 )
+                        throw InvalidParameter("thickness T must be >= 0 in `equator R T`");
+                    real C, S;
+                    RNG.urand2(C, S, R);
+                    return Vector(C, S, T*RNG.shalf());
+                }
+
+                if ( spc && tok == "edge" )
+                {
+                    real R = 0;
+                    if ( !extract(arg, sci, R) || R < REAL_EPSILON )
+                        throw InvalidParameter("distance R must be > 0 in `edge R`");
+                    return spc->placeNearEdge(R);
+                }
+                
+                if ( spc && tok == "exponential" )
+                {
+                    real B = -10, E = 1, R = 0;
+                    extract(arg, sci, B);
+                    extract(arg, sci, E);
+                    extract(arg, sci, R);
+                    if ( R == 0 )
+                    {
+                        Vector vec;
+                        real p;
+                        do {
+                            vec = spc->place();
+                            p = std::exp( ( B - vec.XX ) / E );
+                        } while ( p < 0 || p > 1 || p < RNG.preal() );
+                        return vec;
+                    }
+                    real x = RNG.exponential();
 #if ( DIM < 3 )
-                return Vector(B+E*x, R*RNG.sreal(), 0);
+                    return Vector(B+E*x, R*RNG.sreal(), 0);
 #else
-                real C, S;
-                RNG.urand2(C, S, R);
-                return Vector(B+E*x, C, S);
+                    real C, S;
+                    RNG.urand2(C, S, R);
+                    return Vector(B+E*x, C, S);
 #endif
-            }
-        }
-        
-        if ( tok == "sphere" )
-        {
-            real R = -1, T = 0;
-            if ( !extract(arg, sci, R) || R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `sphere R`");
-            if ( extract(arg, sci, T) && T < 0 )
-                throw InvalidParameter("thickness T must be >= 0 in `sphere R T`");
-            return Vector::randU(R) + Vector::randU(T*0.5);
-        }
-        
-        if ( tok == "ball" )
-        {
-            real R = -1;
-            if ( !extract(arg, sci, R) || R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `ball R`");
-            return Vector::randB(R);
-        }
-        
-        if ( tok == "equator" )
-        {
-            real R = 0, T = 0;
-            if ( extract(arg, sci, R) && R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `equator R T`");
-            if ( extract(arg, sci, T) && T < 0 )
-                throw InvalidParameter("thickness T must be >= 0 in `equator R T`");
-            real C, S;
-            RNG.urand2(C, S, R);
-            return Vector(C, S, T*RNG.shalf());
-        }
-        
-        if ( tok.compare(0, 3, "cap") == 0 )
-        {
-            real R = 0, T = 0;
-            if ( !extract(arg, sci, R) || R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `cap R`");
-            if ( extract(arg, sci, T) && T < 0 )
-                throw InvalidParameter("thickness T must be >= 0 in `cap R T`");
-            real Z = std::max(R - T * RNG.preal(), -R);
-            real r = std::sqrt(R*R - Z*Z);
-#if ( DIM >= 3 )
-            real C, S;
-            RNG.urand2(C, S, r);
-            switch ( get_axis(tok, 3) )
-            {
-                case 'X': return Vector(Z, C, S);
-                case 'Y': return Vector(C, Z, S);
-                default : return Vector(C, S, Z);
-            }
+                }
+               break;
+                
+            case 'g':
+                
+                if ( spc && tok == "gradient" )
+                {
+                    real B = -10, E = 10, R = 0;
+                    extract(arg, sci, B);
+                    extract(arg, sci, E);
+                    extract(arg, sci, R);
+                    if ( R == 0 )
+                    {
+                        Vector vec;
+                        real p;
+                        do {
+                            vec = spc->place();
+                            p = ( vec.XX - B ) / ( E - B );
+                        } while ( p < 0 || p > 1 || p < RNG.preal() );
+                        return vec;
+                    }
+                    real x = std::sqrt(RNG.preal());
+#if ( DIM < 3 )
+                    return Vector(B+(E-B)*x, R*RNG.sreal(), 0);
 #else
-            return Vector(r*RNG.sflip(), Z, 0);
+                    real C, S;
+                    RNG.urand2(C, S, R);
+                    return Vector(B+(E-B)*x, C, S);
 #endif
-        }
+                }
+                break;
 
-        if ( tok.compare(0, 8, "cylinder") == 0 )
-        {
-            real L = -1, R = -1;
-            if ( !extract(arg, sci, L) || L < 0 )
-                throw InvalidParameter("length L must be >= 0 in `cylinder L R`");
-            if ( !extract(arg, sci, R) || R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `cylinder L R`");
-            const Vector2 V = Vector2::randB(R);
-            switch ( get_axis(tok, 8) )
-            {
-                case 'X': return Vector(L*RNG.shalf(), V.XX, V.YY);
-                case 'Y': return Vector(V.XX, L*RNG.shalf(), V.YY);
-                default : return Vector(V.XX, V.YY, L*RNG.shalf());
-            }
-        }
-        
-        if ( tok.compare(0, 4, "ring") == 0 )
-        {
-            real L = -1, R = -1, T = 0;
-            if ( !extract(arg, sci, L) || L < 0 )
-                throw InvalidParameter("length L must be >= 0 in `ring L R`");
-            if ( !extract(arg, sci, R) || R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `ring L R`");
-            if ( extract(arg, sci, T) && T < 0 )
-                throw InvalidParameter("thickness T must be >= 0 in `ring L R T`");
-            real C, S;
-            RNG.urand2(C, S, R * ( 1.0 + RNG.shalf()*T ));
-            switch ( get_axis(tok, 4) )
-            {
-                case 'X': return Vector(L*RNG.shalf(), C, S);
-                case 'Y': return Vector(C, L*RNG.shalf(), S);
-                default : return Vector(C, S, L*RNG.shalf());
-            }
-        }
-
-        if ( tok.compare(0, 6, "circle") == 0 )
-        {
-            real R = -1, T = 0;
-            if ( !extract(arg, sci, R) || R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `circle R T`");
-            if ( extract(arg, sci, T) && T < 0 )
-                throw InvalidParameter("thickness T must be >= 0 in `circle R T`");
+            case 'i':
+                if ( spc && ( tok == "inside" || tok == "random" ))
+                    return spc->place();
+                break;
+ 
+            case 'l':
+                
+                if ( tok == "line" )
+                {
+                    real L = -1, T = 0;
+                    if ( !extract(arg, sci, L) || L < 0 )
+                        throw InvalidParameter("length L must be >= 0 in `line L`");
+                    if ( extract(arg, sci, T) && T < 0 )
+                        throw InvalidParameter("thickness T must be >= 0 in `line L T`");
 #if ( DIM >= 3 )
-            real C, S;
-            RNG.urand2(C, S, R);
-            Vector3 W = (0.5*T) * Vector3::randU();
-            switch( get_axis(tok, 6) )
-            {
-                case 'X': return Vector3(0, C, S) + W;
-                case 'Y': return Vector3(C, 0, S) + W;
-                default : return Vector3(C, S, 0) + W;
-            }
+                    const Vector2 V = Vector2::randB(T);
+                    return Vector(L*RNG.shalf(), V.XX, V.YY);
 #endif
-            return Vector::randU(R) + Vector::randU(T*0.5);
-        }
-        
-        if ( tok.compare(0, 4, "disc") == 0 )
-        {
-            real R = -1, T = 0;
-            if ( !extract(arg, sci, R) || R < 0 )
-                throw InvalidParameter("radius R must be >= 0 in `disc R`");
-            if ( extract(arg, sci, T) && T < 0 )
-                throw InvalidParameter("thickness T must be >= 0 in `disc R T`");
-#if ( DIM >= 3 )
-            //in 3D, a disc in the XY-plane of thickness T in Z-direction
-            Vector2 V = Vector2::randB(R);
-            switch( get_axis(tok, 4) )
-            {
-                case 'X': return Vector(T*RNG.shalf(), V.XX, V.YY);
-                case 'Y': return Vector(V.XX, T*RNG.shalf(), V.YY);
-                default : return Vector(V.XX, V.YY, T*RNG.shalf());
-            }
-#endif
-            //in 2D, a disc in the XY-plane
-            return Vector::randB(R);
-        }
-        
-        if ( tok == "ellipse" )
-        {
-            Vector S(1, 1, 0);
-            extract(arg, sci, S);
-            return S.e_mul(Vector::randB());
-        }
-        
-        if ( tok == "ellipse_surface" )
-        {
-            Vector S(1, 1, 0);
-            extract(arg, sci, S);
-            return S.e_mul(Vector::randU());
-        }
-        
-        if ( tok == "line" )
-        {
-            real L = -1, T = 0;
-            if ( !extract(arg, sci, L) || L < 0 )
-                throw InvalidParameter("length L must be >= 0 in `line L`");
-            if ( extract(arg, sci, T) && T < 0 )
-                throw InvalidParameter("thickness T must be >= 0 in `line L T`");
-#if ( DIM >= 3 )
-            const Vector2 V = Vector2::randB(T);
-            return Vector(L*RNG.shalf(), V.XX, V.YY);
-#endif
-            return Vector(L*RNG.shalf(), T*RNG.shalf(), 0);
-        }
-        
-        if ( tok == "arc" )
-        {
-            real L = -1, A = 1.57;
-            if ( !extract(arg, sci, L) || L < 0 )
-                throw InvalidParameter("length L must be >= 0 in `arc L`");
-            extract(arg, sci, A);
-            
-            real x = 0, y = 0;
-            if ( A == 0 ) {
-                x = 0;
-                y = L * RNG.shalf();
-            }
-            else {
-                real R = L / A;
-                real a = A * RNG.shalf();
-                x = R * std::cos(a) - R; // origin centered on arc
-                y = R * std::sin(a);
-            }
-            return Vector(x, y, 0);
-        }
-        
-        if ( tok == "square" )
-        {
-            real R = 1;
-            extract(arg, sci, R);
-            return Vector(R*RNG.shalf(), R*RNG.shalf(), 0);
-        }
-        
-        if ( tok == "cube" )
-        {
-            real R = 1;
-            extract(arg, sci, R);
-            return Vector::randH()*R;
-        }
+                    return Vector(L*RNG.shalf(), T*RNG.shalf(), 0);
+                }
+                break;
 
-        if ( tok == "rectangle" )
-        {
-            Vector S(0, 0, 0);
-            extract(arg, sci, S);
-            return S.e_mul(Vector::randH());
-        }
+            case 'o':
+                
+                if ( spc && tok == "outside_sphere" )
+                {
+                    real R = 0;
+                    extract(arg, sci, R);
+                    if ( R < 0 )
+                        throw InvalidParameter("distance R must be >= 0 in `outside_sphere R`");
+                    Vector P;
+                    do
+                        P = spc->place();
+                    while ( P.norm() < R );
+                    return P;
+                }
+                break;
+                
+            case 'r':
+                
+                if ( tok == "rectangle" )
+                {
+                    Vector S(0, 0, 0);
+                    extract(arg, sci, S);
+                    return S.e_mul(Vector::randH());
+                }
 
+                if ( tok.compare(0, 4, "ring") == 0 )
+                {
+                    real L = -1, R = -1, T = 0;
+                    if ( !extract(arg, sci, L) || L < 0 )
+                        throw InvalidParameter("length L must be >= 0 in `ring L R`");
+                    if ( !extract(arg, sci, R) || R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `ring L R`");
+                    if ( extract(arg, sci, T) && T < 0 )
+                        throw InvalidParameter("thickness T must be >= 0 in `ring L R T`");
+                    real C, S;
+                    RNG.urand2(C, S, R * ( 1.0 + RNG.shalf()*T ));
+                    switch ( get_axis(tok, 4) )
+                    {
+                        case 'X': return Vector(L*RNG.shalf(), C, S);
+                        case 'Y': return Vector(C, L*RNG.shalf(), S);
+                        default : return Vector(C, S, L*RNG.shalf());
+                    }
+                }
+                break;
+
+            case 's':
+                if ( spc && tok == "surface" )
+                {
+                    real R = 1;
+                    extract(arg, sci, R);
+                    if ( R < REAL_EPSILON )
+                        throw InvalidParameter("distance R must be > 0 in `surface R`");
+                    return spc->placeOnEdge(R);
+                }
+
+                if ( spc && tok == "stripe" )
+                {
+                    real S = -0.5, E = 0.5;
+                    extract(arg, sci, S);
+                    extract(arg, sci, E);
+                    Vector inf, sup;
+                    spc->boundaries(inf, sup);
+                    Vector pos = inf + (sup-inf).e_mul(Vector::randP());
+                    pos.XX = RNG.real_uniform(S, E);
+                    return pos;
+                }
+                
+                if ( tok == "sphere" )
+                {
+                    real R = -1, T = 0;
+                    if ( !extract(arg, sci, R) || R < 0 )
+                        throw InvalidParameter("radius R must be >= 0 in `sphere R`");
+                    if ( extract(arg, sci, T) && T < 0 )
+                        throw InvalidParameter("thickness T must be >= 0 in `sphere R T`");
+                    return Vector::randU(R) + Vector::randU(T*0.5);
+                }
+                
+                if ( tok == "square" )
+                {
+                    real R = 1;
+                    extract(arg, sci, R);
+                    return Vector(R*RNG.shalf(), R*RNG.shalf(), 0);
+                }
 #if ( 1 )
-        /// A contribution from Beat Rupp
-        if ( tok == "segment" || tok == "newsegment" )
-        {
-            real B = 0, L = 0, T = 0, R = 0;
-            extract(arg, sci, B);
-            extract(arg, sci, L);
-            extract(arg, sci, T);
-            extract(arg, sci, R);
-            real x = T * RNG.shalf();
-            real y = L * RNG.preal();
-            if ( B > 0 ) {
-                real radius = L / (B * M_PI);
-                real inner = radius -T/2.0;
-                real theta = abs_real( L / radius );
-                real angle = RNG.preal() * theta;
-                // substract R to have the arc start from 0,0:
-                x = (inner + T * RNG.preal()) * std::cos(angle) - radius;
-                y = (inner + T * RNG.preal()) * std::sin(angle);
-            }
-            real C = std::cos(R);
-            real S = std::sin(R);
-            return Vector(C*x + S*y , -S*x + C*y, 0 );
-        }
+                /// A contribution from Beat Rupp
+                if ( tok == "segment" )
+                {
+                    real B = 0, L = 0, T = 0, R = 0;
+                    extract(arg, sci, B);
+                    extract(arg, sci, L);
+                    extract(arg, sci, T);
+                    extract(arg, sci, R);
+                    real x = T * RNG.shalf();
+                    real y = L * RNG.preal();
+                    if ( B > 0 ) {
+                        real radius = L / (B * M_PI);
+                        real inner = radius -T/2.0;
+                        real theta = abs_real( L / radius );
+                        real angle = RNG.preal() * theta;
+                        // substract R to have the arc start from 0,0:
+                        x = (inner + T * RNG.preal()) * std::cos(angle) - radius;
+                        y = (inner + T * RNG.preal()) * std::sin(angle);
+                    }
+                    real C = std::cos(R);
+                    real S = std::sin(R);
+                    return Vector(C*x + S*y , -S*x + C*y, 0 );
+                }
 #endif
-        if ( tok == "center" || tok == "origin" )
-            return Vector(0,0,0);
-        
+                break;
+                
+            case 'X':
+                if ( spc && tok == "XY" )
+                {
+                    Vector V = spc->place();
+                    real H = 0;
+                    extract(arg, sci, H);
+#if ( DIM > 2 )
+                    V.ZZ = H;
+#endif
+                    return V;
+                }
+#if ( DIM > 1 )
+                if ( spc && tok == "XZ" )
+                {
+                    real H = 0;
+                    extract(arg, sci, H);
+                    Vector V = spc->place();
+                    V.YY = H;
+                    return V;
+                }
+#endif
+                break;
+                
+            case 'Y':
+                if ( spc && tok == "YZ")
+                {
+                    real H = 0;
+                    extract(arg, sci, H);
+                    Vector V = spc->place();
+                    V.XX = H;
+                    return V;
+                }
+                break;
+                
+        }
         if ( spc )
             throw InvalidParameter("Unknown position specification `"+tok+"'");
         else
             throw InvalidParameter("Unknown position specification `"+tok+"' (with no space defined)");
     }
-    
+
     // accept a Vector:
     Vector vec(0,0,0);
-    if ( extract(arg, sci, vec) )
+    
+    if ( c == 0 || extract(arg, sci, vec) )
         return vec;
 
     throw InvalidParameter("cannot extract vector from `"+arg.substr(sci)+"`");
@@ -574,10 +616,7 @@ void Cytosim::modifyPosition(std::string const& arg, size_t& sci, Space const* s
     {
         size_t isp = sci;
         std::string tok = Tokenizer::get_symbol(arg, sci);
-
-        if ( tok.empty() )
-            return;
-        
+       
         // Translation is specified with 'at' or 'move'
         if ( tok == "at" )
         {
