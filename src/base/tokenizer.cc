@@ -105,6 +105,14 @@ std::string get_stuff(std::istream& is, int (*valid)(int))
     return res;
 }
 
+std::string get_stuff(std::string const& arg, size_t& sci, int (*valid)(int))
+{
+    size_t pos = sci;
+    while ( valid(arg[sci]) )
+        ++sci;
+    return arg.substr(pos, sci-pos);
+}
+
 //------------------------------------------------------------------------------
 #pragma mark -
 
@@ -121,6 +129,30 @@ std::string Tokenizer::get_symbol(std::istream& is, bool eat_line)
     
     if ( isalpha(c) )
         res = get_stuff(is, valid_symbol);
+    
+    VLOG("Tokenizer:SYMBOL |" << res << "|\n");
+    return res;
+}
+
+/**
+ get_symbol() reads consecutive characters:
+ - starting with a alpha-character,
+ - followed by alpha-numerical characters or '_'
+ .
+ */
+std::string Tokenizer::get_symbol(std::string const& str, size_t& sci)
+{
+    std::string res;
+    int c = str[sci];
+    while ( isspace(c) )
+    {
+        if ( c == '\n' )
+            break;
+        c = str[++sci];
+    }
+
+    if ( isalpha(c) )
+        res = get_stuff(str, sci, valid_symbol);
     
     VLOG("Tokenizer:SYMBOL |" << res << "|\n");
     return res;
@@ -153,15 +185,14 @@ std::string Tokenizer::split_symbol(std::string& arg)
 }
 
 
-bool Tokenizer::has_symbol(std::istream& is, std::string const& arg, bool eat_line)
+bool Tokenizer::has_symbol(std::string const& str, size_t& sci, std::string const& arg, bool eat_line)
 {
-    if ( is.good() )
+    if ( arg[sci] )
     {
-        std::streampos isp = is.tellg();
-        if ( get_symbol(is) == arg )
+        size_t pos = sci;
+        if ( get_symbol(str, sci) == arg )
             return true;
-        is.clear();
-        is.seekg(isp);
+        sci = pos;
     }
     return false;
 }
@@ -252,6 +283,9 @@ std::string Tokenizer::get_path(std::istream& is, bool eat_line)
     return res;
 }
 
+
+//------------------------------------------------------------------------------
+#pragma mark - Numbers
 
 /**
  Read multiple forms of integer:

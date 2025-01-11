@@ -23,7 +23,7 @@ namespace Tokenizer
     
     /// skip space and new-line if `eat_line==true`, returning the next character
     int skip_space(std::istream&, bool eat_line);
-    
+
     /// skip upcomming space-like characters, including new-line if `eat_line`==true
     int get_character(std::istream&, bool eat_space=true, bool eat_line=false);
     
@@ -63,8 +63,11 @@ namespace Tokenizer
     /// return next token if it looks like a variable name
     std::string get_symbol(std::istream&, bool eat_line=false);
 
+    /// return next token if it looks like a variable name
+    std::string get_symbol(std::string const&, size_t&);
+
     /// return 'true' if next symbol matches 'arg'
-    bool has_symbol(std::istream& is, std::string const& arg, bool eat_line=false);
+    bool has_symbol(std::string const&, size_t&, std::string const& arg, bool eat_line=false);
 
     /// return next token composed of multiple symbols concatenated with ':'
     std::string get_polysymbol(std::istream&, bool eat_line=false);

@@ -181,8 +181,6 @@ void Interface::execute_change_all(std::string const& cat, Glossary& def)
 //------------------------------------------------------------------------------
 #pragma mark -
 
-using StreamFunc::has_trail;
-
 /**
  Define a placement = ( position, orientation ) from the parameters set in `opt'
  */
@@ -242,11 +240,11 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
     }
     else if ( opt.set(str, "orientation") )
     {
-        std::istringstream iss(str);
-        iso.rot = Cytosim::readOrientation(iss, iso.mov, spc);
-        size_t t = has_trail(iss);
+        size_t sci = 0;
+        iso.rot = Cytosim::readOrientation(str, sci, iso.mov, spc);
+        size_t t = Cytosim::has_trail(str, sci);
         if ( t )
-            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `orientation = "+StreamFunc::extract_line(iss)+"'");
+            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `orientation = "+str+"'");
     }
     else
         iso.rot = Rotation::randomRotation();
@@ -258,11 +256,11 @@ bool Interface::read_placement(Isometry& iso, Glossary& opt)
     }
     else if ( opt.set(str, "orientation", 1) )
     {
-        std::istringstream iss(str);
-        Rotation rot = Cytosim::readOrientation(iss, iso.mov, spc);
-        size_t t = has_trail(iss);
+        size_t sci = 0;
+        Rotation rot = Cytosim::readOrientation(str, sci, iso.mov, spc);
+        size_t t = Cytosim::has_trail(str, sci);
         if ( t )
-            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `orientation = "+StreamFunc::extract_line(iss)+"'");
+            throw InvalidSyntax("unexpected `"+str.substr(t)+"' in `orientation = "+str+"'");
         iso.rotate(rot);
     }
     

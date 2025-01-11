@@ -390,4 +390,3 @@ size_t StreamFunc::has_trail(std::istream& is)
     }
     return 0;
 }
-

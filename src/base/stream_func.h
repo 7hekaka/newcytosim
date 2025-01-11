@@ -59,8 +59,8 @@ namespace StreamFunc
     /// replace all occurences of `fnd` by `rep` in `src`. Returns number of replacements done
     std::string replace_string(std::string const& src, std::string const& fnd, std::string const& rep, size_t& cnt);
 
-    /// true if stream has unread material
+    /// true if stream has significant unread material
     size_t has_trail(std::istream& is);
-     
+
 }
 
