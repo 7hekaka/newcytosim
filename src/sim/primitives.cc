@@ -695,15 +695,14 @@ void Cytosim::modifyPosition(std::string const& arg, size_t& sci, Space const* s
             Vector alt = readPositionPrimitive(arg, sci, spc);
             if ( RNG.flip() ) pos = alt;
         }
-        /*
         else if ( tok == "if" )
         {
-            constexpr real alpha = 1.0 / ( DIM==3? M_SQRT3: M_SQRT2 );
             int c = skip_space(arg, sci, false);
             if ( c == '(' )
-                tok = Tokenizer::get_block_text(arg, sci, 0, ')');
+                tok = Tokenizer::get_blocked_text(arg, ++sci, '(', ')');
             else
                 throw InvalidParameter("expected condition block `(...)' after if");
+            constexpr real alpha = 1.0 / ( DIM==3? M_SQRT3: M_SQRT2 );
             real S = pos.e_sum() * alpha;
             Evaluator evaluator{{"X", pos.x()}, {"Y", pos.y()}, {"Z", pos.z()}, {"S", S}};
             try {
@@ -718,7 +717,6 @@ void Cytosim::modifyPosition(std::string const& arg, size_t& sci, Space const* s
                 throw;
             }
         }
-         */
         else
         {
             // unget last token:
@@ -1030,7 +1028,6 @@ Vector Cytosim::readDirection(std::string const& arg, size_t& sci, Vector const&
     
 restart:
     sci = start;
-    
     dir = readDirectionPrimitive(arg, sci, pos, spc);
     
     while ( arg[sci] )
@@ -1062,24 +1059,19 @@ restart:
             Vector alt = readDirectionPrimitive(arg, sci, pos, spc);
             if ( RNG.flip() ) dir = alt;
         }
-        /*
         else if ( tok == "if" )
         {
             int c = skip_space(arg, sci, false);
             if ( c == '(' )
-                tok = Tokenizer::get_block_text(arg, sci, 0, ')');
+                tok = Tokenizer::get_blocked_text(arg, ++sci, '(', ')');
             else
                 throw InvalidParameter("expected condition block `(...)' after if");
-                
             Evaluator evaluator{{"X", dir.x()}, {"Y", dir.y()}, {"Z", dir.z()}};
             try {
                 if ( 0 == evaluator.eval(tok) )
                 {
                     if ( ++ouf < max_trials )
-                    {
-                        is.seekg(start);
                         goto restart;
-                    }
                     throw InvalidParameter("condition `"+tok+"' could not be fulfilled");
                     break;
                 }
@@ -1089,7 +1081,6 @@ restart:
                 throw;
             }
         }
-         */
         else
         {
             // unget last token

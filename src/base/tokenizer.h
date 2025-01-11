@@ -84,6 +84,9 @@ namespace Tokenizer
     /// read text until `c_out` is encountered, assuming `c_in` was already read
     std::string get_block_text(std::istream&, char c_in, char c_out);
     
+    /// read text until `c_out` is encountered, assuming `c_in` was already read
+    std::string get_blocked_text(std::string const&, size_t&, char c_in, char c_out);
+
     /// skip spaces and read a block delimited by `c_in`, or return empty string if `c_in` is not found
     std::string get_block(std::istream&, char c_in, bool or_die=false);
     

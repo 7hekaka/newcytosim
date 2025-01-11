@@ -667,6 +667,29 @@ std::string Tokenizer::get_block_text(std::istream& is, char c_in, const char c_
 
 
 /**
+ This will read a block, assuming that the opening delimiter has been read already.
+*/
+std::string Tokenizer::get_blocked_text(std::string const& arg, size_t& sci, char c_in, const char c_out)
+{
+    assert_true(c_out);
+    size_t start = sci;
+    char c;
+    
+    do {
+        c = arg[sci++];
+        if ( c == c_out )
+            return arg.substr(start, sci-start);
+        else if ( block_delimiter(c) )
+            get_blocked_text(arg, sci, c, block_delimiter(c));
+        else if ( c == ')' || c == '}' || c == ']' )
+            throw InvalidSyntax("unclosed delimiter '"+std::string(1,c_in)+"'");
+    } while ( c );
+    
+    throw InvalidSyntax("missing '"+std::string(1,c_out)+"'");
+    return "";
+}
+
+/**
  This will skip spaces and new-lines until a character is found.
  If this character is equal to `c_in`, then the block is read and returned.
  Otherwise returns empty string "".
