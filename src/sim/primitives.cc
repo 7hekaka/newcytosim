@@ -424,7 +424,8 @@ Vector Cytosim::readPositionPrimitive(std::string const& arg, size_t& sci, Space
                 break;
 
             case 'i':
-                if ( spc && ( tok == "inside" || tok == "random" ))
+                
+                if ( spc && tok == "inside" )
                     return spc->place();
                 break;
  
@@ -463,6 +464,9 @@ Vector Cytosim::readPositionPrimitive(std::string const& arg, size_t& sci, Space
                 
             case 'r':
                 
+                if ( spc && tok == "random" )
+                    return spc->place();
+
                 if ( tok == "rectangle" )
                 {
                     Vector S(0, 0, 0);
@@ -491,6 +495,7 @@ Vector Cytosim::readPositionPrimitive(std::string const& arg, size_t& sci, Space
                 break;
 
             case 's':
+                
                 if ( spc && tok == "surface" )
                 {
                     real R = 1;
@@ -757,7 +762,7 @@ Vector Cytosim::readPosition(std::string const& arg, size_t& sci, Space const* s
 {
     Vector vec = readPositionPrimitive(arg, sci, spc);
     assert_true( vec.valid() );
-    if ( arg[sci] ) // arg.length() > sci )
+    if ( arg[sci] )
     {
         int c = skip_space(arg, sci, false);
         if ( isalpha(c) )
