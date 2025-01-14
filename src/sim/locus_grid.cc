@@ -112,7 +112,7 @@ void LocusGrid::checkPP(BigPoint const& aa, BigPoint const& bb) const
  */
 void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
 {
-    //std::clog << "   PL- " << aa.mec_ << " " << bb.obj_ << '\n';
+    //std::clog << "   PL- " << aa.vertex1() << " " << bb.segment() << '\n';
     assert_true( aa.obj_->tag() != Fiber::TAG );
     assert_true( bb.obj_->tag() == Fiber::TAG );
 
@@ -170,7 +170,7 @@ void LocusGrid::checkPL(BigPoint const& aa, BigLocus const& bb) const
  */
 void LocusGrid::checkLLP1(BigLocus const& aa, BigLocus const& bb, float ran, real abs, Vector const& vab) const
 {
-    //std::clog << "   LLP1 " << aa.obj_ << " " << bb.vertex1() << '\n';
+    //std::clog << "   LLP1 " << aa.vertex1() << " " << bb.vertex1() << '\n';
 
     //const float ran = aa.rad_ + bb.rad_;
     if ( aa.isFirst() )
@@ -209,7 +209,7 @@ void LocusGrid::checkLLP1(BigLocus const& aa, BigLocus const& bb, float ran, rea
  */
 void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, real abs, Vector const& vab) const
 {
-    //std::clog << "   LLP2 " << aa.obj_ << " " << bb.vertex2() << '\n';
+    //std::clog << "   LLP2 " << aa.vertex1() << " " << bb.vertex2() << '\n';
     
     //const real ran = aa.rad_ + bb.rad_;
     if ( abs < 0 )
@@ -253,9 +253,14 @@ void LocusGrid::checkLLP2(BigLocus const& aa, BigLocus const& bb, float ran, rea
 
 
 /** Older version */
+/**
+ This is used to check a segment of a fiber against the vertex of a fiber
+
+ The interaction is applied only if the vertex projects 'inside' the segment.
+ */
 void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
 {
-    //std::clog << "   LL1 " << aa.obj_ << " " << bb.vertex1() << '\n';
+    //std::clog << "   LL1 " << aa.segment() << " " << bb.vertex1() << '\n';
 
     const float ran = aa.rad_ + bb.rad_;
 
@@ -316,7 +321,7 @@ void LocusGrid::checkLL1(BigLocus const& aa, BigLocus const& bb) const
  */
 void LocusGrid::checkLL2(BigLocus const& aa, BigLocus const& bb) const
 {
-    //std::clog << "   LL2 " << aa.obj_ << " " << bb.vertex2() << '\n';
+    //std::clog << "   LL2 " << aa.segment() << " " << bb.vertex2() << '\n';
 
     const real ran = aa.rad_ + bb.rad_;
     
@@ -458,7 +463,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
         /* If the shortest distance between the lines is greater than 'ran', then
           the vertices associated with this segment will also be too far to interact */
 
-        //std::clog << "   LL " << aa.obj_ << " " << bb.obj_ << '\n';
+        //std::clog << "   LL " << aa.segment() << " " << bb.segment() << '\n';
         // the distance between bb.pos1() and segment `aa` is dis2-m1*m1:
         if ( below(dis2-m1*m1, ran) && aa.within(m1) )
         {
@@ -539,7 +544,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     real m2 = dot(off, dbb);
     real dis2 = off.normSqr();
 
-    //std::clog << "   LL " << aa.obj_ << " " << bb.obj_ << '\n';
+    //std::clog << "   LL " << aa.segment() << " " << bb.segment() << '\n';
     // the distance between bb.pos1() and segment `aa` is dis2-m1*m1:
     if ( below(dis2-m1*m1, ran) && aa.within(m1) )
     {
@@ -642,7 +647,7 @@ void LocusGrid::checkLL(BigLocus const& aa, BigLocus const& bb) const
     }
 #endif
 
-    //std::clog << "   LL " << aa.obj_ << " " << bb.obj_ << '\n';
+    //std::clog << "   LL " << aa.segment() << " " << bb.segment() << '\n';
     checkLL1(aa, bb);
     
     if ( aa.isLast() )

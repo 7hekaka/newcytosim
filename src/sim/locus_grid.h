@@ -437,7 +437,7 @@ public:
 #else
         BigLocusList& bll = cell_pane(w, fib->prop->steric_key);
 #endif
-        bll.pane.emplace(fib, inx, rad, rad, w);
+        bll.pane.emplace(fib, inx, rad, rge, w);
         bll.locuses_ += 1;
     }
     
@@ -467,7 +467,7 @@ public:
 #else
         BigLocusList& bll = cell_pane(c, fib->prop->steric_key);
 #endif
-        bll.pane.emplace(fib, inx, rad, rad, w);
+        bll.pane.emplace(fib, inx, rad, rge, w);
         bll.locuses_ += 1;
     }
 
