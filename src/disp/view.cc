@@ -863,11 +863,12 @@ void View::setClipping() const
     {
         if ( clip_plane_mode[i] )
         {
+            gym::ref_view();
             // can make the plane relative the viewing 'eye'
             if ( clip_plane_mode[i] == 2 )
                 gym::eye_view(eyeDistance, zoom);
             Vector4 const& V = clip_plane[i];
-            gym::setClipPlane(i, V.XX, V.YY, V.ZZ, V.TT);
+            gym::enableClipPlane(i, V.XX, V.YY, V.ZZ, V.TT);
         }
         else
             gym::disableClipPlane(i);
