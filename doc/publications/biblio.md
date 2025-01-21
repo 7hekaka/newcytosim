@@ -8,6 +8,8 @@
 
 *Please, let us know of any citation we could add. This is important for our funders!*
 
+- [Force-Velocity Relationship in Branched Actin Networks: Consequences of Entanglement, Drag and Stall Force](https://arxiv.org/abs/2501.05335)
+
 2024
 
 - [A role for cross-linking proteins in actin filament network
