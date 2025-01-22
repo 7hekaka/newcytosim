@@ -931,7 +931,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
         Filter filter(sim_, pp, opt);
         ObjectList objs = set->collect(pass_filter, &filter, cnt);
         if ( objs.size() > 0 )
-            sim_->markObjects(objs, mk);
+            ObjectSet::markObjects(objs, mk);
         else
             Cytosim::warn << "found no `" << name << "' to mark\n";
     }
@@ -1304,7 +1304,7 @@ void Interface::execute_import(std::string const& file, std::string const& what,
     int mrk;
     if ( opt.set(mrk, "mark") )
     {
-        sim_->markObjects(objs, mrk);
+        ObjectSet::markObjects(objs, mrk);
     }
 #endif
     

@@ -36,6 +36,22 @@ void ObjectSet::unlink(Object * obj)
 #pragma mark -
 
 
+void ObjectSet::flagObjects(ObjectList const& objs, ObjectFlag f)
+{
+    for ( Object * obj : objs )
+        obj->flag(f);
+}
+
+
+void ObjectSet::markObjects(ObjectList const& objs, ObjectMark k)
+{
+    for ( Object * obj : objs )
+        obj->mark(k);
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
+
 /**
  Translate all listed movable objects ( Object::mobile() & 1 ) by `vec`
  */
@@ -64,13 +80,6 @@ void ObjectSet::moveObjects(ObjectList const& objs, Isometry const& iso)
     //std::clog << "moving " << objs.size() << " objects" << '\n';
     for ( Object * obj : objs )
         obj->move(iso);
-}
-
-
-void ObjectSet::flagObjects(ObjectList const& objs, ObjectFlag f)
-{
-    for ( Object * obj : objs )
-        obj->flag(f);
 }
 
 

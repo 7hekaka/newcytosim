@@ -248,14 +248,6 @@ void Simul::eraseObjects(ObjectList const& objs)
 #pragma mark -
 
 
-void Simul::markObjects(ObjectList const& objs, ObjectMark mrk)
-{
-    //std::clog << " Simul::erase("<< objs.size() <<" objects):" << '\n';
-    for ( Object * i : objs )
-        i->mark(mrk);
-}
-
-
 ObjectFlag Simul::setUniqueFlags() const
 {
     size_t f = 0;

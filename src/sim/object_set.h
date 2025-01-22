@@ -88,6 +88,12 @@ public:
     /// relink objects that are still on 'ice' because they were not imported
     void thaw();
     
+    /// set flag of all Objects to `f`
+    static void flagObjects(ObjectList const&, ObjectFlag f);
+
+    /// set mark of all Objects to `k`
+    static void markObjects(ObjectList const&, ObjectMark k);
+
     /// apply translation to all Objects in ObjectList
     static void translateObjects(ObjectList const&, Vector const&);
     
@@ -99,9 +105,6 @@ public:
 
     /// apply Isometry to all Objects in ObjectList
     static void moveObjects(ObjectList const&, Isometry const&);
-
-    /// set flag of all Objects to `f`
-    static void flagObjects(ObjectList const&, ObjectFlag f);
 
     /// apply translation to Objects with `flag() != f`
     static void translateObjects(ObjectList const&, Vector const&, ObjectFlag f);
