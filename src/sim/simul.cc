@@ -248,7 +248,7 @@ void Simul::eraseObjects(ObjectList const& objs)
 #pragma mark -
 
 
-void Simul::mark(ObjectList const& objs, ObjectMark mrk)
+void Simul::markObjects(ObjectList const& objs, ObjectMark mrk)
 {
     //std::clog << " Simul::erase("<< objs.size() <<" objects):" << '\n';
     for ( Object * i : objs )

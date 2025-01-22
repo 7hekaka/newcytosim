@@ -147,7 +147,7 @@ public:
     void eraseObjects(ObjectList const&);
 
     /// mark objects from given list
-    static void mark(ObjectList const&, ObjectMark);
+    static void markObjects(ObjectList const&, ObjectMark);
 
     /// reset simulation world (clear all sub-lists and variables)
     void eraseObjects();
