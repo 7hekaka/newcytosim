@@ -165,10 +165,7 @@ void View::closeDisplay() const
 {
     endClipping();
     
-    if ( scalebar )
-        drawScaleBar(scalebar, scalebar_length, scalebar_color);
-    
-    //drawFPS();
+    drawFPS();
     
 #if 0
     if ( label != "off" )
@@ -187,7 +184,7 @@ void View::closeDisplay() const
 #pragma mark - Text
 
 
-void View::drawString(const char str[], float size) const
+void View::strokeString(const char str[], float size) const
 {
     int W = width(), H = height();
     gym::disableLighting();
@@ -333,19 +330,23 @@ void View::drawFPS() const
         sec = now;
         cnt = 0;
     }
-    drawString(str, 1);
+    strokeString(str, 1);
 }
 
 
-void View::drawLabelAndText(std::string const& text) const
+void View::drawTextAndScale(std::string const& text) const
 {
     int W = width(), H = height();
     //set pixel coordinate system:
-    gym::disableLighting();
-    gym::disableAlphaTest();
     gym::disableDepthTest();
-    gym::one_view(W, H);
+    gym::disableLighting();
+
+    if ( scalebar )
+        drawScaleBar(scalebar, scalebar_length, scalebar_color);
     
+    gym::disableAlphaTest();
+    gym::one_view(W, H);
+
     if ( label != "off" )
         frameText(0, BITMAP_9_BY_15, front_color, full_label.c_str(), nullptr, W, H);
     
@@ -808,7 +809,7 @@ Vector3 View::unproject(float x, float y, float z) const
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Fog
 
 void View::setFog(GLint type, float param, gym_color color) const
 {
@@ -854,7 +855,7 @@ void View::enableFog(const GLint type, const float param)
 }
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - Clipping planes
 
 
 void View::setClipping() const
@@ -949,7 +950,7 @@ bool View::flashText(std::string const& str)
 
 
 //------------------------------------------------------------------------------
-#pragma mark -
+#pragma mark - scale bar
 
 
 /// set horizontal lines over [ -cnt*d, +cnt*d ]
@@ -1068,9 +1069,6 @@ void View::drawScaleX(float scale, float border) const
  */
 void View::drawScaleBar(int mode, const float S, const float color[4]) const
 {
-    gym::disableDepthTest();
-    gym::disableLighting();
-
     float shift(32 * pixelSize() * zoom);
     
     switch( mode )
@@ -1093,7 +1091,4 @@ void View::drawScaleBar(int mode, const float S, const float color[4]) const
             drawScaleX(S);
         } break;
     }
-
-    gym::restoreLighting();
-    gym::restoreDepthTest();
 }

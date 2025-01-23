@@ -162,7 +162,7 @@ public:
     void drawFPS() const;
 
     /// draw bottom-left label
-    void drawLabelAndText(std::string const&) const;
+    void drawTextAndScale(std::string const&) const;
     
     /// display scale bar, info text, etc.
     void drawInteractiveFeatures() const;
@@ -292,7 +292,7 @@ public:
     };
     
     /// display text in bottom-left corner
-    void drawString(const char[], float width) const;
+    void strokeString(const char[], float width) const;
 
     /// stroke text at given position
     void strokeString(float X, float Y, float Z, const char str[]) const;
