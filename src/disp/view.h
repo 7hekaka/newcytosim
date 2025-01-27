@@ -291,7 +291,7 @@ public:
         BITMAP_HELVETICA_18 = 8
     };
     
-    /// display text in bottom-left corner
+    /// display text in top-left corner
     void strokeString(const char[], float width) const;
 
     /// stroke text at given position

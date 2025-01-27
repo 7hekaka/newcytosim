@@ -165,17 +165,15 @@ void View::closeDisplay() const
 {
     endClipping();
     
-    drawFPS();
+    //drawFPS();
     
 #if 0
     if ( label != "off" )
     {
         // display only first line of text:
-        char str[256];
         size_t n = full_label.find('\n');
-        full_label.copy(str, sizeof(str), n);
-        str[n] = '\0';
-        strokeString(str, 1.f);
+        std::string str = full_label.substr(0, n);
+        strokeString(str.c_str(), 1.f);
     }
 #endif
 }
@@ -194,7 +192,7 @@ void View::strokeString(const char str[], float size) const
     gym::color(back_color);
     fgStrokeString(0, H-18, 1, 1, str, 4+size, 4+size, 0);
     gym::color(front_color);
-    fgStrokeString(0, H-18, 1, 1, str, size, 0, 0);
+    fgStrokeString(0, H-18, 1, 1, str, size, size, 0);
     gym::restoreDepthTest();
     gym::restoreAlphaTest();
     gym::restoreLighting();
@@ -314,7 +312,7 @@ void View::drawText(float X, float Y, float Z, const float color[4], const char 
 //------------------------------------------------------------------------------
 #pragma mark -
 
-// display FPS = frames per seconds
+/// display frames per seconds
 void View::drawFPS() const
 {
     static char str[16] = { 0 };
