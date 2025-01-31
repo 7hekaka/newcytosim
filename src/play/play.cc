@@ -345,6 +345,7 @@ int main(int argc, char* argv[])
     }
     catch( Exception & e )
     {
+        arg.print_warnings(stderr, 1, "\n");
         print_error(e);
         return 3;
     }
