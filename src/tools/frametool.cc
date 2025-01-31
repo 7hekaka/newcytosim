@@ -11,7 +11,7 @@
  Frametool can be used to extract one frame from the file, or multiple frames,
  specified using numerical indices: START:PERIOD:END
  These indices simply reflect the order in which the frame appear in the file,
- starting at index 0.
+ starting with index 0 for the first frame.
 
  A typical use case is to reduce the file by dropping some intermediate frames.
  Example, this will drop odd frames:
@@ -222,19 +222,21 @@ void sizeFrame(FILE* in, int details)
                     if ( str[0] )
                     {
                         if ( bytes > 1024 )
-                            printf(" %24s : %6lu kB\n", str, bytes>>10);
+                            printf(" %32s : %6lu kB\n", str, bytes>>10);
                         else
-                            printf(" %24s : %7lu B\n", str, bytes);
+                            printf(" %32s : %7lu B\n", str, bytes);
                     }
                     strncpy(str, buf, sizeof(str));
                     if ( isspace(str[strlen(buf)-1]) )
                         str[strlen(buf)-1] = 0;
-                    sec = ftell(in);
-                } break;
+                }
+                sec = ftell(in);
+                break;
             case FRAME_END: {
                 size_t kb = ( ftell(in) - pos ) >> 10;
                 printf("pid %lu   frame %6lu   time: %10.5f %6lu kB\n",
                        frame_pid, frm, frame_time, kb);
+                sec = 0;
                 ++frm;
             } // intentional fallthrough
             case FRAME_START:
@@ -242,6 +244,12 @@ void sizeFrame(FILE* in, int details)
                 *str = 0;
                 break;
             case EOF:
+                if ( sec )
+                {
+                    size_t kb = ( ftell(in) - pos ) >> 10;
+                    printf("+INCOMPLETE frame %6lu   time: %10.5f %6lu kB\n",
+                           frm, frame_time, kb);
+                }
                 return;
         }
     }
@@ -328,7 +336,7 @@ void extractLast(FILE* in)
 }
 
 
-void split(FILE * in)
+void separateFrames(FILE * in)
 {
     size_t frm = 0;
     char name[128] = { 0 };
@@ -522,20 +530,24 @@ int main(int argc, char* argv[])
                 return EXIT_FAILURE;
             }
         }
-        if ( mode == COPY )
+        
+        if ( output == stdout )
         {
-            if ( output == stdout && isatty(1) )
+            if ( isatty(1) )
                 fprintf(stderr, "Error: cannot send output to terminal!\n");
             else
-                extract(file, output, Slice(slice));
+            {
+                if ( mode == COPY )
+                    extract(file, output, Slice(slice));
+                else if ( mode == LAST )
+                    extractLast(file);
+                else if ( mode == EPID )
+                    extract_pid(file, pid);
+                else if ( mode == SPLIT )
+                    separateFrames(file);
+            }
         }
-        else if ( mode == LAST )
-            extractLast(file);
-        else if ( mode == EPID )
-            extract_pid(file, pid);
-        else if ( mode == SPLIT )
-            split(file);
-        if ( output != stdout )
+        else
         {
             fprintf(stderr, "> %s\n", outputname);
             fclose(output);
