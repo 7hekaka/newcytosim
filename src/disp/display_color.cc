@@ -82,7 +82,7 @@ namespace {
     gym_color color_by_distanceM(Fiber const& fib, real pti)
     {
         const real beta = fib.disp->color_scale;
-        real x = std::min(pti*beta, (real)32.0);
+        real x = min_real(pti*beta, 32);
         return fib.disp->color.alpha(std::exp(-x));
     }
     
@@ -91,7 +91,7 @@ namespace {
     {
         const real beta = fib.disp->color_scale;
         // using the distance at the vertex
-        real x = std::min((fib.lastPoint()-pti)*beta, (real)32.0);
+        real x = min_real((fib.lastPoint()-pti)*beta, 32);
         return fib.disp->color.alpha(std::exp(-x));
     }
     
@@ -99,7 +99,7 @@ namespace {
     gym_color color_by_abscissaM(Fiber const& fib, size_t seg)
     {
         const real beta = fib.disp->color_scale;
-        real x = std::min(seg*beta, (real)32.0);
+        real x = min_real(seg*beta, 32);
         return fib.disp->color.alpha(std::exp(-x));
     }
     
@@ -107,7 +107,7 @@ namespace {
     gym_color color_by_abscissaP(Fiber const& fib, size_t seg)
     {
         const real beta = fib.disp->color_scale;
-        real x = std::min((fib.lastSegment()-seg)*beta, (real)32.0);
+        real x = min_real((fib.lastSegment()-seg)*beta, 32);
         return fib.disp->color.alpha(std::exp(-x));
     }
     

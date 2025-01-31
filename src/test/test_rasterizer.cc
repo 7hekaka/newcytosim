@@ -160,8 +160,8 @@ int inCylinder(Vector const& P, Vector const& Q, Vector X)
     const Vector PQ = Q - P;
     const real len = PQ.normSqr();
     real abs = dot(PQ, X) / len;
-    abs = std::max(real(0), abs);
-    abs = std::min(real(1), abs);
+    abs = max_real(0, abs);
+    abs = min_real(1, abs);
     return ( X - PQ*abs ).normSqr() <= radius * radius;
 }
 

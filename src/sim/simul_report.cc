@@ -3391,7 +3391,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
 
             // the plus-tip may have crossed the other filament if it is not in contact
             // consider a point back, and check if it is on opposite side of 'fox'
-            real a = std::min(0., 2*len-fib->abscissaP());
+            real a = min_real(0, 2*len-fib->abscissaP());
             Vector bak = fib->pos(a);
             real ddd, bbb = fox->projectPoint(bak, ddd);
             // bbb = 0.5 * ( aaa + bbb );  // OLD formula before 13.04.2023

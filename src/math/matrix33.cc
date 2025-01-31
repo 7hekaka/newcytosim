@@ -26,7 +26,7 @@ Vector3 Matrix33::rotationAxis() const
 real Matrix33::rotationAngle() const
 {
     real t = 0.5 * trace() - 0.5;
-    return std::acos(std::min(real(1), std::max(real(-1), t)));
+    return std::acos(min_real(1, max_real(-1, t)));
 }
 
 

@@ -290,7 +290,7 @@ real MatrixFull::norm_inf() const
 {
     real res = 0;
     for ( size_t i = 0; i < size_*allo_; ++i )
-        res = std::max(res, abs_real(mat_[i]));
+        res = max_real(res, abs_real(mat_[i]));
     return res;
 }
 

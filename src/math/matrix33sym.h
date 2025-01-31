@@ -347,7 +347,7 @@ public:
     {
         real res = abs_real(val[0]);
         for ( index i = 1; i < 6; ++i )
-            res = std::max(res, abs_real(val[i]));
+            res = max_real(res, abs_real(val[i]));
         return res;
     }
     

@@ -392,7 +392,7 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
         if ( ++ouf > max_trials )
             break;
         
-        real u = std::max(1.0 - cap * RNG.preal(), -1.0);
+        real u = max_real(1.0 - cap * RNG.preal(), -1.0);
         real v = std::sqrt(1.0 - u*u);
         RNG.urand2(C, S, v);
         Vector3 pos(u, C, S);

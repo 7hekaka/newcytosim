@@ -386,7 +386,7 @@ public:
     {
         real a = std::max(abs_real(val[0]), abs_real(val[1]));
         real b = std::max(abs_real(val[2]), abs_real(val[3]));
-        return std::max(a, b);
+        return max_real(a, b);
     }
 
     /// determinant
