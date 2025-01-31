@@ -123,7 +123,7 @@ void FrameReader::savePos(size_t frm, const fpos_t& pos, int confidence)
 
 /**
  This uses the info stored in `framePos[]` to move to a position
- in the file where frame `frm` should start.
+ in the file where frame `frm` is known to start.
 */
 size_t FrameReader::seekPos(size_t frm)
 {
@@ -157,12 +157,12 @@ size_t FrameReader::seekPos(size_t frm)
 }
 
 
-size_t FrameReader::lastKnownFrame() const
+size_t FrameReader::lastGoodFrame() const
 {
     if ( framePos.empty() )
         return 0;
     size_t res = framePos.size()-1;
-    while ( 0 < res  &&  framePos[res].validity_ < 2 )
+    while ( 0 < res  &&  framePos[res].validity_ < 3 )
         --res;
     return res;
 }
@@ -183,43 +183,47 @@ int FrameReader::seekFrame(size_t frm)
     if ( inx == frm )
         return SUCCESS;
     
-    while ( ! inputter.eof() )
+    size_t len = 1024;
+    char * line = (char*)malloc(len);
+    
+    while ( inputter.good() )
     {
         fpos_t pos;
-        bool has_pos = false;
-        size_t len = 1024;
-        ssize_t read = 0;
-        char * line = (char*)malloc(len);
-
-        do {
-            has_pos = !inputter.get_pos(pos);
-            read = getline(&line, &len, inputter.file());
-
-            if ( inputter.eof() )
-                return END_OF_FILE;
-            
-#if 1 // backward compatibility code with format 42 before 2012
-            if ( 7 < read && 0 == memcmp(line, "#frame ", 7) )
-                break;
-#endif
-        } while ( read < 9 || memcmp(line, "#Cytosim ", 9) );
+        bool has_pos = !inputter.get_pos(pos);
+        ssize_t read = getline(&line, &len, inputter.file());
         
-        //std::clog << "******\n";
-        VLOG("           : " << line << '\n');
-        free(line);
+        if ( inputter.eof() )
+            return END_OF_FILE;
+        
+        if ( line[0] != '#' || read > 64 )
+            continue;
+        //VLOG("           :::  " << read << " " << line);
 
-        if ( ! inputter.eof() )
+        bool found = ( 8 < read && 0 == memcmp(line, "#Cytosim ", 9) );
+#if 1 // backward compatibility code with format 42 before 2012
+        if ( 7 < read && 0 == memcmp(line, "#frame ", 7) )
+            found = true;
+#endif
+        if ( found && has_pos )
         {
-            if ( has_pos ) savePos(inx, pos, 2);
+            savePos(inx, pos, 2);
             if ( inx == frm )
             {
-                if ( has_pos ) inputter.seek(pos);
+                inputter.seek(pos);
                 return SUCCESS;
             }
+            if ( inx > frm )
+                return NOT_FOUND;
+        }
+        if ( 11 < read && 0 == memcmp(line, "#end cytosim", 12) )
+        {
+            if ( framePos[inx].validity_ == 2 )
+                framePos[inx].validity_ = 3;
             ++inx;
         }
     }
     
+    free(line);
     VLOG("FrameReader: seekFrame("<< frm <<") reached EOF\n");
     return END_OF_FILE;
 }
@@ -323,30 +327,53 @@ int FrameReader::loadLastFrame(Simul& sim, size_t cnt)
         return BAD_FILE;
     
     /// seek last known position:
-    size_t frm = lastKnownFrame();
+    size_t frm = lastGoodFrame();
+    fpos_t pos = framePos[frm].position_;
+    
     if ( frm > 1 )
-        inputter.seek(framePos[frm].position_);
+    {
+        VLOG("FrameReader: seeking frame " << frm << " at " << pos << '\n');
+        inputter.seek(pos);
+    }
     else
         inputter.rewind();
     
-    /// go from here to last frame:
+    inputter.get_pos(pos);
+    /// read frames from here while there is no error:
     int res = NOT_FOUND;
-    while ( 0 == sim.reloadObjects(inputter) )
-    {
-        frameIndex = frm++;
-        res = SUCCESS;
-    }
+    int err = 0;
     
-    if ( res == SUCCESS && cnt > 0 )
+    try {
+        err = sim.reloadObjects(inputter);
+        while ( 0 == err )
+        {
+            res = SUCCESS;
+            VLOG("FrameReader: got frame " << frm << " at " << pos << '\n');
+            frameIndex = frm++;
+            err = sim.reloadObjects(inputter);
+        }
+    }
+    catch(Exception & e)
     {
-        frm = frm - 1 - cnt;
-        // go back up by 'cnt' frames:
-        if ( SUCCESS != seekFrame(frm) )
-            return NOT_FOUND;
-        
-        if ( !sim.reloadObjects(inputter) )
-            return NOT_FOUND;
+        VLOG("FrameReader: error at frame " << frm << ": "  << e.brief() << "\n");
+        err = 2;
+    }
 
+    if ( res == SUCCESS )
+    {
+        VLOG("FrameReader: error " << err << " at frame " << frm << '\n');
+        if ( err > 1 || cnt > 0 )
+        {
+            // need to reload frame since the one we have has error
+            frm -= 1 + cnt;
+            // go back up by 'cnt' frames:
+            if ( SUCCESS != seekFrame(frm) )
+                return NOT_FOUND;
+            
+            if ( !sim.reloadObjects(inputter) )
+                return NOT_FOUND;
+        }
+        
         frameIndex = frm;
         VLOG("FrameReader: loadFrame("<<frm<<") successful\n");
     }

@@ -68,7 +68,7 @@ public:
     size_t currentFrame() const { return ( frameIndex!=NO_FRAME ? frameIndex : 0 );  }
 
     /// last frame seen in the file
-    size_t lastKnownFrame() const;
+    size_t lastGoodFrame() const;
 
     /// true when end of file is reached
     bool eof() const { return inputter.eof();  }

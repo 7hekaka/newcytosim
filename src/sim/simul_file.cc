@@ -232,7 +232,6 @@ public:
     {
         if ( sim )
             thaw_all();
-        sim = nullptr;
         //Cytosim::log("Simul::ImportLock deleted with ", sim->nbObjects(), " objects\n");
     }
 };
@@ -496,9 +495,9 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
     ImportLock lock(this);
     try
     {
-        VLOG("readObjects start at [" << in.peek() << "]\n");
+        VLOG("readObjects starts at `" << in.peek() << "'\n");
         int err = readObjects(in, subset);
-        VLOG("readObjects end\n");
+        VLOG("readObjects done\n");
         in.unlock();
 
         primed_ = 0;
@@ -519,6 +518,7 @@ int Simul::reloadObjects(Inputter& in, bool prune, ObjectSet* subset)
     }
     catch(Exception & e)
     {
+        VLOG("readObjects failed " << e.brief() << "\n");
         in.unlock();
         throw;
     }
@@ -824,7 +824,10 @@ int Simul::readObjects(Inputter& in, ObjectSet* subset)
             {
                 in.skip_until("#section ");
                 if ( in.eof() )
+                {
+                    fprintf(stderr, " (eof)\n");
                     return 3;
+                }
                 std::cerr << e.info() << " (skipping section "+section+")\n";
             }
             else

@@ -68,7 +68,7 @@ void Inputter::setEndianess(const char data[2])
 int Inputter::readInt()
 {
     int i;
-    if ( 1 != fscanf(mFile, " %i", &i) )
+    if ( 1 != fscanf(mFile, " %d", &i) )
         throw InvalidIO("readInt failed");
     return i;
 }
@@ -365,8 +365,13 @@ void Inputter::readFloats(double ptr[], const unsigned dim)
     if ( binary_ && dim < 4 )
     {
         float flt[4] = { 0 };
-        if ( stop != fread(flt, 4, stop, mFile) )
+        size_t cnt = fread(flt, 4, stop, mFile);
+        if ( cnt < stop )
+        {
+            for ( size_t d = cnt; d < stop; ++d )
+                ptr[d] = 0;
             throw InvalidIO("readFloats(double) failed");
+        }
         if ( binary_ == 2 ) {
             for ( ; d < stop; ++d )
                 ptr[d] = byteswap32(flt[d]);

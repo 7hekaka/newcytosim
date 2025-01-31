@@ -668,21 +668,23 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
     }
     catch( Exception & e )
     {
-        e << "while loading " << obj->reference();
+        std::cerr << e.brief() << e.info() << " while loading " << obj->reference() << '\n';
+        if ( primary ) link(obj);
         throw;
     }
     
-    if ( obj->invalid() )
+    if ( primary )
     {
-        inventory_.unassign(obj);
-        if ( !primary )
-            unlink(obj);
-        delete(obj);
-    }
-    else if ( primary )
-    {
-        link(obj);
-        if ( mk ) obj->mark(mk);
+        if ( obj->invalid() )
+        {
+            inventory_.unassign(obj);
+            delete(obj);
+        }
+        else
+        {
+            link(obj);
+            if ( mk ) obj->mark(mk);
+        }
     }
 }
 
