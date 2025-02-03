@@ -594,12 +594,11 @@ void CoupleSet::reheat(size_t cnt[], PropertyID n_cnt)
     std::clog << "\n";
 #endif
     //std::clog << "Couple::reheat " << ice_.size() << "\n";
-    Object * i = ice_.front();
-    while ( i )
+    Object * i;
+    while (( i = ice_.front() ))
     {
+        ice_.pop_front();
         Couple* C = static_cast<Couple*>(i);
-        i = i->next();
-        ice_.pop(C);
         // we want to skip the 'beforeDetachment' here:
         if ( C->hand1()->attached() )
             C->hand1()->detachHand();

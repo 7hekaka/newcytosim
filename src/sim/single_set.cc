@@ -408,6 +408,7 @@ void SingleSet::defrostStore()
 
 void SingleSet::freeze()
 {
+    //std::clog << "Single::freeze " << fList.size() << " " << aList.size() << "\n";
     assert_true(ice_.empty());
     ice_.grab(aList);
     ice_.grab(fList);
@@ -417,13 +418,12 @@ void SingleSet::freeze()
 /** cnt[i] is the number of Singles of type `i` to be released */
 void SingleSet::reheat(size_t cnt[], PropertyID n_cnt)
 {
-    //std::clog << "Single::reheat " << ice_.size() << " " << cnt[1] << "\n";
-    Object * i = ice_.front();
-    while ( i )
+    //std::clog << "Single::reheat " << ice_.size() << " " << cnt[1] << " " << cnt[2] << "\n";
+    Object * i;
+    while (( i = ice_.front() ))
     {
+        ice_.pop_front();
         Single* S = static_cast<Single*>(i);
-        i = i->next();
-        ice_.pop(S);
         // we want to skip the 'beforeDetachment' here:
         if ( S->attached() )
             S->hand()->detachHand();
