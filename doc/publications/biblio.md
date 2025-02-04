@@ -8,6 +8,10 @@
 
 *Please, let us know of any citation we could add. This is important for our funders!*
 
+- [Microtubule stiffening by doublecor-n-domain protein ZYG-8 contributes to spindle orienta-on during C. elegans zygote division](https://doi.org/10.1101/2024.11.29.624795)
+- [Cofilin promotes actin turnover and flexibility to drive coordinated cell movements in vivo](https://doi.org/10.1101/2024.12.17.628979)
+- [Microscopic Control of Cortical Flows in Polarized C. elegans Zygotes](https://www.biorxiv.org/content/10.1101/2025.01.12.632635v1)
+- [Multi-kinesin clusters impart mechanical stress that reveals mechanisms of microtubule breakage in cells](https://doi.org/10.1101/2025.01.31.635950)
 - [Force-Velocity Relationship in Branched Actin Networks: Consequences of Entanglement, Drag and Stall Force](https://arxiv.org/abs/2501.05335)
 
 2024
@@ -18,7 +22,7 @@ organization and force generation](https://doi.org/10.1073/pnas.2407838121)
 - [Force Propagation in Active Cytoskeletal Networks](https://arxiv.org/abs/2401.04217)
 - [Rotation-Beating dynamics of a driven flexible filament: role of motor protein properties](https://arxiv.org/abs/2409.12729)
 - [A Role for Cross-linking Proteins in Actin Filament Network Organization and Force Generation](https://www.biorxiv.org/content/10.1101/2024.04.19.590161v1)
-- [Force-transducing molecular ensembles at growing microtubule tips control mitotic spindle size](https://www.biorxiv.org/content/10.1101/2024.02.01.578443v1.abstract)
+- [Force-transducing molecular ensembles at growing microtubule tips control mitotic spindle size](https://www.nature.com/articles/s41467-024-54123-2)
 - [Contractile to extensile transitions and mechanical adaptability enabled by activity in cytoskeletal structures](https://www.biorxiv.org/content/10.1101/2024.02.22.581411v1.abstract)
 
 2023
