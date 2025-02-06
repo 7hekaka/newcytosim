@@ -156,7 +156,7 @@ def main(args):
         fd, file = tempfile.mkstemp('', 'j', p, True)
         write_script(fd, ['cd '+p+' && '+cmd+';'])
         os.chmod(file, 0o700)
-        print(file, end=' ')
+        print(file, end=' : ', flush=True)
         execute(sub(file))
     if not paths:
         err.write("Error: you need to specify at least one directory\n")

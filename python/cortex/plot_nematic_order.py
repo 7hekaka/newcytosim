@@ -2,7 +2,7 @@
 #
 # Plot nematic order, calculated by `report fiber:nematic`
 #
-# F. Nedelec, Strasbourg, Chitry, 06-30.12.2024
+# F. Nedelec, Strasbourg, Chitry, 06-30.12.2024, 6.02.2025
 
 
 """
@@ -18,7 +18,7 @@ Syntax:
 cutoff = 4000
 
 # size of marker in plots:
-mks = 4
+mks = 3
 # size of font used in plots:
 fts = 14
 # file format: `png` or `svg`
@@ -51,7 +51,7 @@ def retreive_data(filename):
     with open(filename, 'r') as file:
         for line in file:
             v = line.split()
-            t = 0
+            t = ts
             d = []
             if len(v) < 2:
                 pass
@@ -61,7 +61,7 @@ def retreive_data(filename):
                 t = float(v[1])
                 d = float(v[3])
             if t < ts:
-                sys.stderr.write(f'Warning: discarding {len(T)} duplicated datalines\n')
+                sys.stderr.write(f'Warning: discarding {len(T)} duplicated datalines in {filename}\n')
                 T = []
                 D = []
                 ts = 0
@@ -78,11 +78,11 @@ def plot_data(X, Y, M = math.nan):
         Plot data as a function of time, if M is specified, add horizontal line
     """
     Xinf = math.floor(min(X)/100)*100
-    Xsup = math.ceil(max(X)/100)*100
+    Xsup = 8000#math.ceil(max(X)/100)*100
     Yinf = 0.2
     Ysup = math.ceil(max(Y))
     fig, axes = plt.subplots(figsize=(6, 4.5))
-    axes.plot(X, Y, label='Nematic Order', marker='o', markersize=mks, color=(0,0,1))
+    axes.plot(X, Y, label='Nematic Order', marker='o', markersize=mks, color=(1,0,1))
     if not math.isnan(M):
         axes.plot([Xinf, Xsup], [M, M], linewidth=1.0)
     plt.xlim(Xinf, Xsup)
@@ -120,6 +120,7 @@ def process(dirpath):
             print(f"plot_nematic_order.py makes {dirpath}/order.txt");
             args = ["report3", "fiber:nematic", "verbose=0"]
             subprocess.call(args, stdout=open(filename, 'w'))
+    print(f'{dirpath}', end=' ')
     T, D = retreive_data(filename)
     if T:
         #print(T, D)
@@ -127,9 +128,11 @@ def process(dirpath):
         val = [ x for t,x in zip(T,D) if t > cutoff ]
         if val:
             avg = sum(val) / len(val)
+        else:
+            avg = math.nan
         plot_data(T, D, avg)
         save_plot(output);
-    print(f'{dirpath} {avg:6.3f}')
+        print(f' {avg:6.3f} {max(T):9.0f}')
     return (T, D)
 
 
