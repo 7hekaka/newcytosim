@@ -46,6 +46,7 @@ unsigned long frame_pid = 0;
 double frame_time = 0;
 double time_added = 0;
 
+/** Open a C-style File */
 FILE * openFile(char name[], char const* mode)
 {
     FILE * file = fopen(name, mode);
@@ -71,7 +72,7 @@ FILE * openFile(char name[], char const* mode)
  read a line, and send every characters to 'out', and returns a code
  indicating if this line was the start or the end of a cytosim frame
  */
-int whatline(FILE* in, FILE* out)
+int whatLine(FILE* in, FILE* out)
 {
     char *const end = buf + buf_size - 1;
     char * ptr = buf;
@@ -195,14 +196,23 @@ public:
 
 void countFrame(const char str[], FILE* in)
 {
+    double time = -1;
     size_t frm = 0;
     int code = 0;
     do {
-        code = whatline(in, nullptr);
-        frm += ( code == FRAME_END );
+        code = whatLine(in, nullptr);
+        if ( code == FRAME_END )
+        {
+            time = frame_time;
+            ++frm;
+        }
     } while ( code != EOF );
     
-    printf("%40s: %lu frames\n", str, frm);
+    printf("%40s: %lu frames, time: %10.3f", str, frm, time);
+    if ( frame_time != time )
+        printf(" + incomplete frame at %10.3f\n", frame_time);
+    else
+        printf("\n");
 }
 
 
@@ -214,7 +224,7 @@ void sizeFrame(FILE* in, int details)
 
     while ( !ferror(in) )
     {
-        switch(whatline(in, nullptr))
+        switch(whatLine(in, nullptr))
         {
             case FRAME_SECTION:
                 if ( details ) {
@@ -263,7 +273,7 @@ void extract(FILE* in, FILE* file, Slice sli)
 
     while ( !ferror(in) )
     {
-        switch(whatline(in, out))
+        switch(whatLine(in, out))
         {
             case FRAME_START:
                 if ( frm > sli.last() )
@@ -282,13 +292,13 @@ void extract(FILE* in, FILE* file, Slice sli)
 }
 
 
-void extract_pid(FILE* in, unsigned long pid)
+void extractPID(FILE* in, unsigned long pid)
 {
     FILE* out = nullptr;
     
     while ( !ferror(in) )
     {
-        switch(whatline(in, nullptr))
+        switch(whatLine(in, nullptr))
         {
             case FRAME_START:
             case FRAME_END:
@@ -312,7 +322,7 @@ void extractLast(FILE* in)
     int code = 0;
     while ( code != EOF )
     {
-        code = whatline(in, nullptr);
+        code = whatLine(in, nullptr);
         if ( code == FRAME_END )
         {
             start = pos;
@@ -345,7 +355,7 @@ void separateFrames(FILE * in)
     
     while ( !ferror(in) )
     {
-        switch(whatline(in, out))
+        switch(whatLine(in, out))
         {
             case FRAME_START:
                 snprintf(name, sizeof(name), "objects%04lu.cmo", frm);
@@ -542,7 +552,7 @@ int main(int argc, char* argv[])
                 else if ( mode == LAST )
                     extractLast(file);
                 else if ( mode == EPID )
-                    extract_pid(file, pid);
+                    extractPID(file, pid);
                 else if ( mode == SPLIT )
                     separateFrames(file);
             }
