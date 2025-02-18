@@ -6,9 +6,9 @@
 #include "interface.h"
 
 
-/// Parser to read and execute Cytosim config files
+/// the Parser reads and executes Cytosim config files
 /**
- This is where the syntax of the config file is defined
+ This is also where the syntax of the config file is defined
  */
 class Parser : public Interface
 {
@@ -61,7 +61,7 @@ protected:
     /// parse command `cut`
     void parse_cut(std::istream&);
     
-    /// parse command `cut`
+    /// parse command `connect`
     void parse_connect(std::istream&);
 
     /// parse command `run`

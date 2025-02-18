@@ -23,7 +23,7 @@
 
 //------------------------------------------------------------------------------
 /**
- The permission of the parser are set by a number of variables:
+ The permission of the parser are set by member variables:
  - do_set: can create new Properties
  - do_change: can modify existing Property or Object
  - do_new: can create new Object
@@ -38,7 +38,8 @@ Parser::Parser(Simul* sim, bool c, bool s, bool n, bool r, bool w, int v)
     restart_ = 0;
 }
 
-/// check for unused values in Glossary and issue a warning
+
+/// issue a warning if unused values are found in Glossary
 static void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos, size_t cnt = 1)
 {
     if ( ! Cytosim::log.is_silent() )
@@ -1371,9 +1372,9 @@ int Parser::evaluate_one(std::istream& is)
         parse_report(is);
     else if ( tok == "write" )
         parse_write(is);
-    else if ( tok == "load" || tok == "import" )
+    else if ( tok == "import" || tok == "load" )
         parse_import(is);
-    else if ( tok == "save" || tok == "export" )
+    else if ( tok == "export" || tok == "save" )
         parse_export(is);
     else if ( tok == "call" )
         parse_call(is);

@@ -220,10 +220,13 @@ public:
     /// distribute all Couple on the fibers to approximate an equilibrated state
     void equilibrate();
 
-    /// distribute Couples on filament intersections
-    void bindToIntersections(FiberSet const&, CoupleStock&, PropertyList const&);
+    /// max `binding_range` of all known Couple
+    real maxBindingRange() const;
     
-    /// distribute Couples on filament intersections
+    /// distribute given Couples on filament intersections
+    void bindToIntersections(FiberSet const&, CoupleStock&, real range);
+    
+    /// distribute Couples of a certain type on filament intersections
     void bindToIntersections(CoupleProp const*);
     
     /// distribute all free Couples on filament intersections

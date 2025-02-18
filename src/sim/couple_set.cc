@@ -1291,27 +1291,34 @@ void CoupleSet::equilibrate()
 
 
 /**
- This takes all the Free Couple and attach them at the intersection points of the network of filaments
+ Calculate maximum range of Hands from all know Couple types
  */
-void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleStock& can, PropertyList const& properties)
+real CoupleSet::maxBindingRange() const
 {
-    // calculate maximum range of Hands
-    real range = 0;
-    for ( Property const* i : properties.find_all("couple") )
+    real res = 0;
+    for ( Property const* i : simul_.properties.find_all("couple") )
     {
         CoupleProp const* P = static_cast<CoupleProp const*>(i);
-        range = std::max(range, P->hand1_prop->binding_range);
-        range = std::max(range, P->hand2_prop->binding_range);
+        res = std::max(res, P->hand1_prop->binding_range);
+        res = std::max(res, P->hand2_prop->binding_range);
     }
-    
-    if ( range <= 0 )
-        throw InvalidParameter("cannot connect network!");
+    return res;
+}
+
+
+/**
+ Attach couples in given stock at the intersection points of given fiber set
+ */
+void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleStock& can, real rge)
+{
+    if ( rge <= 0 )
+        throw InvalidParameter("cannot connect fibers, with null range!");
     
     // get all crosspoints within this range:
     FiberSiteList loc1(1024), loc2(1024);
-    fibers.allIntersections(loc1, loc2, range);
+    fibers.allIntersections(loc1, loc2, rge);
     
-    Cytosim::log << "Connect on " << loc1.size() << " intersections within range " << range << "\n";
+    Cytosim::log << "Connect " << loc1.size() << " intersections within range " << rge << "\n";
     
     uniAttach12(loc1, loc2, can, can.size());
 }
@@ -1333,7 +1340,8 @@ void CoupleSet::bindToIntersections(CoupleProp const* cop)
         C = nxt;
     }
 
-    bindToIntersections(simul_.fibers, can, simul_.properties);
+    const real rge = maxBindingRange();
+    bindToIntersections(simul_.fibers, can, rge);
 }
 
 
@@ -1349,6 +1357,7 @@ void CoupleSet::bindToIntersections()
         can.push(C);
         C = nxt;
     }
-
-    bindToIntersections(simul_.fibers, can, simul_.properties);
+    
+    const real rge = maxBindingRange();
+    bindToIntersections(simul_.fibers, can, rge);
 }
