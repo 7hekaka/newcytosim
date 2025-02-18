@@ -61,8 +61,8 @@ protected:
     /// parse command `cut`
     void parse_cut(std::istream&);
     
-    /// parse command `connect`
-    void parse_connect(std::istream&);
+    /// parse command `equilibrate`
+    void parse_equilibrate(std::istream&);
 
     /// parse command `run`
     void parse_run(std::istream&);

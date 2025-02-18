@@ -111,7 +111,7 @@ public:
     void execute_cut(std::string const& name, Glossary&, size_t cnt);
     
     /// cut fibers of type `name`, following different options in Glossary
-    void execute_connect(std::string const& name, Glossary&);
+    void execute_equilibrate(std::string const& name, Glossary&);
 
     /// import objects (or `what`) from a file
     void execute_import(std::string const& filename, std::string const& what, Glossary&);

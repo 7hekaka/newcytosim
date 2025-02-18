@@ -787,7 +787,7 @@ void Parser::parse_cut(std::istream& is)
         
      }
  */
-void Parser::parse_connect(std::istream& is)
+void Parser::parse_equilibrate(std::istream& is)
 {
     std::streampos ipos = is.tellg();
     std::string name = Tokenizer::get_symbol(is);
@@ -796,7 +796,7 @@ void Parser::parse_connect(std::istream& is)
     if ( do_run )
     {
         Glossary opt(blok);
-        execute_connect(name, opt);
+        execute_equilibrate(name, opt);
         if ( do_warn )
             check_warnings(opt, is, ipos);
     }
@@ -1384,8 +1384,8 @@ int Parser::evaluate_one(std::istream& is)
         parse_for(is);
     else if ( tok == "cut" )
         parse_cut(is);
-    else if ( tok == "connect" )
-        parse_connect(is);
+    else if ( tok == "equilibrate" )
+        parse_equilibrate(is);
     else if ( tok == "restart" )
     {
         size_t cnt = 1;

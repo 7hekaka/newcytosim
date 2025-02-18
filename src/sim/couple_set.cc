@@ -1286,7 +1286,6 @@ void CoupleSet::equilibrate()
         equilibrate(simul_.fibers, static_cast<CoupleProp*>(P));
     }
     printf("Couple::equilibrate    FF %lu FA %lu AF %lu AA %lu\n", sizeFF(), sizeFA(), sizeAF(), sizeAA());
-
 }
 
 

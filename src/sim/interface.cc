@@ -999,20 +999,38 @@ void Interface::execute_cut(std::string const& name, Glossary& opt, size_t cnt)
 }
 
 
-void Interface::execute_connect(std::string const& name, Glossary& opt)
+void Interface::execute_equilibrate(std::string const& name, Glossary& opt)
 {
-    ObjectList objs;
-
-    if ( name == "couple" )
+    int only_intersections = 0;
+    opt.set(only_intersections, "only_intersections");
+    
+    if ( only_intersections )
     {
-        sim_->couples.bindToIntersections();
+        if ( name == "couple" )
+            sim_->couples.bindToIntersections();
+        else
+        {
+            Property * pp = sim_->properties.find_or_die(name);
+            if ( pp->category() == "couple" )
+                sim_->couples.bindToIntersections(static_cast<CoupleProp*>(pp));
+            else
+                throw InvalidSyntax("can only equilibrate (only_intersections=1) `couple' or a class name");
+        }
     }
     else
     {
-        Property * pp = sim_->properties.find_or_die(name);
-        if ( pp->category() != "couple" )
-            throw InvalidSyntax("only `bind couple' or `bind couple_class' is supported");
-        sim_->couples.bindToIntersections(static_cast<CoupleProp*>(pp));
+        if ( name == "single" )
+            sim_->singles.equilibrate();
+        else if ( name == "couple" )
+            sim_->couples.equilibrate();
+        else
+        {
+            Property * pp = sim_->properties.find_or_die(name);
+            if ( pp->category() == "couple" )
+                sim_->couples.bindToIntersections(static_cast<CoupleProp*>(pp));
+            else
+                throw InvalidSyntax("can only equilibrate `single', `couple' or a class name");
+        }
     }
     
     VLOG("-CONNECT (" << name << ")");
@@ -1391,13 +1409,7 @@ void Interface::execute_report(std::string const& name, std::string const& what,
 
 void Interface::execute_call(std::string& str, Glossary& opt)
 {
-    if ( str == "couple:equilibrate" )
-        sim_->couples.equilibrate();
-    else if ( str == "couple:connect" )
-        sim_->couples.bindToIntersections();
-    else if ( str == "single:equilibrate" )
-        sim_->singles.equilibrate();
-    else if ( str == "custom0" )
+    if ( str == "custom0" )
         sim_->custom0(opt);
     else if ( str == "custom1" )
         sim_->custom1(opt);
