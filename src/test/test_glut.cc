@@ -26,8 +26,8 @@ g++ test_glut.cc -lglut -lGL
   #include <GL/glut.h>    //use this on Linux & PC
 #endif
 
-///------------ state of the simulated point
-//size of point drawn:
+///------------ size of the blinking point
+
 int pointSize = 1;
 
 //------------- size of the display window:
@@ -164,20 +164,20 @@ enum { MOUSE_PASSIVE, MOUSE_ZOOM, MOUSE_MOVE, MOUSE_CLICK };
 //this is called when the mouse button is pressed or released:
 void processMouse(int button, int state, int x, int y)
 {
-#if 0
+#if 1
     static int mx, my;
     if ( state == GLUT_DOWN )
     {
+        printf("  mouse %i down ( %4i %4i ) ", button, x, y);
         mx = x;
         my = y;
-        printf("  mouse %i %i (%4i %4i) ", button, state, x, y);
     }
     else
     {
         if ( mx == x && my == y )
             printf("  ---- %i %i\n", button, state);
         else
-            printf("  ---- %i %i (%4i %4i)\n", button, state, x, y);
+            printf("  ---- %i %i ( %+4i %+4i )\n", button, state, x-mx, y-my);
     }
 #endif
     // for a button release event, do nothing:
