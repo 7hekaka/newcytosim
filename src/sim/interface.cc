@@ -1026,8 +1026,10 @@ void Interface::execute_equilibrate(std::string const& name, Glossary& opt)
         else
         {
             Property * pp = sim_->properties.find_or_die(name);
-            if ( pp->category() == "couple" )
-                sim_->couples.bindToIntersections(static_cast<CoupleProp*>(pp));
+            if ( pp->category() == "single" )
+                sim_->singles.equilibrate();
+            else if ( pp->category() == "couple" )
+                sim_->singles.equilibrate();
             else
                 throw InvalidSyntax("can only equilibrate `single', `couple' or a class name");
         }
@@ -1409,6 +1411,15 @@ void Interface::execute_report(std::string const& name, std::string const& what,
 
 void Interface::execute_call(std::string& str, Glossary& opt)
 {
+#if BACKWARD_COMPATIBILITY <= 50
+    if ( str == "couple:equilibrate" )
+        sim_->couples.equilibrate();
+    else if ( str == "couple:connect" )
+        sim_->couples.bindToIntersections();
+    else if ( str == "single:equilibrate" )
+        sim_->singles.equilibrate();
+    else
+#endif
     if ( str == "custom0" )
         sim_->custom0(opt);
     else if ( str == "custom1" )

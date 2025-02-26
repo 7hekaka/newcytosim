@@ -402,17 +402,15 @@ void FiberSet::allIntersections0(FiberSiteList& res1, FiberSiteList& res2,
 void FiberSet::allIntersections(FiberSiteList& res1, FiberSiteList& res2,
                                 const real max_distance) const
 {
-    FiberGrid & grid = simul_.fiberGrid;
+    FiberGrid grid;
+    Space const* spc = simul_.spaces.master();
 
-    if ( ! grid.hasGrid() )
-    {
-        Space const* spc = simul_.spaces.master();
-        if ( spc )
-            simul_.setFiberGrid(spc, simul_.prop.binding_grid_step);
-        else
-            return allIntersections0(res1, res2, max_distance);
-    }
-    
+    if ( !spc )
+        return allIntersections0(res1, res2, max_distance);
+
+    real grid_step = 1;
+    Simul::setFiberGrid(grid, spc, grid_step);
+
 #if ( 0 )
     // check what other method gives:
     allIntersections0(res1, res2, max_distance);

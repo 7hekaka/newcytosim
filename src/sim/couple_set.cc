@@ -15,9 +15,9 @@
 
 //------------------------------------------------------------------------------
 
-void CoupleSet::prepare(PropertyList const& properties)
+void CoupleSet::prepare()
 {
-    uniPrepare(properties);
+    uniPrepare(simul_.properties);
 }
 
 

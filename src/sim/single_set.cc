@@ -15,9 +15,9 @@
 
 //------------------------------------------------------------------------------
 
-void SingleSet::prepare(PropertyList const& properties)
+void SingleSet::prepare()
 {
-    uniPrepare(properties);
+    uniPrepare(simul_.properties);
 }
 
 
@@ -894,56 +894,68 @@ void SingleSet::uniRelax()
  Attach all unbound Single to nearby Fibers, to approximate an equilibrated state,
  as defined by the ratio of binding to unbinding rates of the Hand
  */
-void SingleSet::equilibrate()
+void SingleSet::equilibrate(FiberSet const& fibers, SingleProp const* sip)
 {
-    // distribute Fibers over a grid preparing for binding of Hands:
-    FiberSet const& fibers = simul_.fibers;
-    const real range = simul_.maxBindingRange();
+    Space const* spc = sip->confine_space;
+    if ( !spc )
+        throw InvalidSyntax(sip->name()+":space must be defined first!");
+    HandProp const* HP = sip->hand_prop;
+    const real rge = HP->binding_range;
+    const real sup = square(rge);
+    // probability of finding hand in the bound state at equilibrium:
+    const real prob = HP->binding_rate / ( HP->binding_rate + HP->unbinding_rate );
 
-    // initialize Grid
-    FiberGrid & grid = simul_.fiberGrid;
-    if ( ! grid.hasGrid() )
-    {
-        Space const* spc = simul_.spaces.master();
-        if ( spc )
-            simul_.setFiberGrid(spc, simul_.prop.binding_grid_step);
-        else
-            throw InvalidSyntax("A space must be defined first!");
-    }
-    grid.paintGrid(fibers.first(), nullptr, range);
+    FiberGrid grid;
+    real grid_step = 1;
+    Simul::setFiberGrid(grid, spc, grid_step);
+    grid.paintGrid(fibers.first(), nullptr, rge);
 
-    FiberGrid::SegmentList list;
     // equilibrate unattached Singles:
     Single *nxt, *obj = firstF();
     
     while ( obj )
     {
         nxt = obj->next();
-        Vector pos = obj->position();
-        Hand * ha = obj->hand();
-        HandProp const* hp = ha->property();
-        real sup = square(hp->binding_range);
-        // probability of finding hand in the bound state at equilibrium:
-        const real prob = hp->binding_rate / ( hp->binding_rate + hp->unbinding_rate );
-        
-        // check all segments within grid cell
-        for ( FiberSegment const& seg : grid.nearbySegments(pos) )
+        if ( !sip || obj->property() == sip )
         {
-            real dis = INFINITY;
-            real abs = seg.projectPoint(pos, dis);
-            if ( dis < sup && RNG.test(prob) )
+            Vector pos = obj->position();
+            Hand * ha = obj->hand();
+            
+            // check all segments within grid cell
+            for ( FiberSegment const& seg : grid.nearbySegments(pos) )
             {
-                // ATTENTION: convert `abs` relative to the segment to Fiber's abscissa
-                FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
-                if ( ha->attachmentAllowed(sit) )
+                real dis = INFINITY;
+                real abs = seg.projectPoint(pos, dis);
+                if ( dis < sup && RNG.test(prob) )
                 {
-                    ha->attach(sit);
-                    //std::clog << "   bind " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
-                    break;
+                    // ATTENTION: convert `abs` relative to the segment to Fiber's abscissa
+                    FiberSite sit(seg.fiber(), seg.abscissa1()+abs);
+                    if ( ha->attachmentAllowed(sit) )
+                    {
+                        ha->attach(sit);
+                        //std::clog << "   bind " << sit << " at " << 1000*std::sqrt(dis) << " nm\n";
+                        break;
+                    }
                 }
             }
         }
         obj = nxt;
+    }
+}
+
+
+void SingleSet::equilibrate(SingleProp const* P)
+{
+    equilibrate(simul_.fibers, P);
+}
+
+
+void SingleSet::equilibrate()
+{
+    for ( Property const* i : simul_.properties.find_all("single") )
+    {
+        SingleProp const* P = static_cast<SingleProp const*>(i);
+        equilibrate(simul_.fibers, P);
     }
 }
 

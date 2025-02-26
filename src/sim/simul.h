@@ -258,7 +258,7 @@ public:
     void addExperimentalInteractions(Meca&) const;
     
     /// set FiberGrid and StericGrid over the given space
-    void setFiberGrid(Space const*, real& grid_step) const;
+    static void setFiberGrid(FiberGrid&, Space const*, real& grid_step);
     
     /// a Map to be displayed
     Map<DIM> const& visibleMap() const { return sMeca.locusGrid.map(); }

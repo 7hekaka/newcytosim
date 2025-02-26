@@ -7,7 +7,7 @@
 /**
  The `freezer` list is built using `Object::next()` and thus can only hold
  objects that are not linked in SingleSet/CoupleSet already (see below).
- The single-linked list permits addition/removal at end only, the head.
+ The single-linked list permits addition/removal at one end only: the head.
  These lists are used to buffer creation/deletion of Single/Couple.
  */
 template < typename OBJECT >

@@ -159,7 +159,7 @@ public:
     void shuffle();
     
     /// prepare for steps()
-    void prepare(PropertyList const& properties);
+    void prepare();
     
     /// Monte-Carlo step
     void steps();

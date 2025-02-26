@@ -89,8 +89,7 @@ real Simul::maxBindingRange() const
 
 
 /**
- @returns the largest segmentation of all existing FiberProp, multiplied by 0.5
- @returns -1.0 if no FiberProp is defined
+ @returns the largest segmentation of all known FiberProp, or -1.0 if none is defined
  */
 real Simul::estimateFiberGridStep() const
 {
@@ -116,22 +115,18 @@ real Simul::estimateFiberGridStep() const
  Note: if no FiberProp is defined, there cannot be any fiber,
  and the grid is not needed. In this case, the grid is initialized with step=1
  */
-void Simul::setFiberGrid(Space const* spc, real& grid_step) const
+void Simul::setFiberGrid(FiberGrid& grid, Space const* spc, real& grid_step)
 {
     assert_true(spc);
     real res = grid_step;
-
-    // try to find cell size from the filaments characteristics
-    if ( res <= 0 )
-        res = estimateFiberGridStep();
 
     /* initialize the Grid to cover 'spc' entirely, increasing the
      cell size until we get acceptable memory requirements */
     Vector inf, sup;
     spc->boundaries(inf, sup);
 
-    const size_t top = 1 << 17;
-    while ( fiberGrid.setGrid(inf, sup, abs_real(res)) > top )
+    const size_t too_much = 1 << 17;
+    while ( grid.setGrid(inf, sup, abs_real(res)) > too_much )
         res *= M_SQRT2;
 
     if ( res > 0 && res != grid_step )
@@ -141,7 +136,7 @@ void Simul::setFiberGrid(Space const* spc, real& grid_step) const
     }
 
     // create the grid cells:
-    fiberGrid.createCells();
+    grid.createCells();
 }
 
 
@@ -165,8 +160,12 @@ void Simul::prepare()
     // make sure properties are ready for simulations:
     prop.complete(*this);
     
+    // try to determine cell size from the filaments characteristics
+    if ( prop.binding_grid_step <= 0 )
+        prop.binding_grid_step = estimateFiberGridStep();
+
     // prepare grid for attachments:
-    setFiberGrid(spaces.master(), prop.binding_grid_step);
+    setFiberGrid(fiberGrid, spaces.master(), prop.binding_grid_step);
     
     // this will allocate Fiber::Lattice
     fibers.updateFibers();
@@ -174,8 +173,8 @@ void Simul::prepare()
     fields.prepare();
     
     // this prepares for 'fast_diffusion':
-    singles.prepare(properties);
-    couples.prepare(properties);
+    singles.prepare();
+    couples.prepare();
     
     primed_ = 2;
 }

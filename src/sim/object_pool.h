@@ -61,6 +61,12 @@ public:
     /// Last Object in list
     Object * back() const { return backO; }
     
+    /// pointer to first element
+    Object * begin() const { return frontO; }
+    
+    /// pointer to a position just past the last element
+    Object * end() const { return nullptr; }
+
     /// set first Object in list
     void front(Object * o) { frontO = o; }
     

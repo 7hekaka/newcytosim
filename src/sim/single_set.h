@@ -156,7 +156,7 @@ public:
     void shuffle();
     
     /// prepare for steps()
-    void prepare(PropertyList const& properties);
+    void prepare();
     
     /// Monte-Carlo step
     void steps();
@@ -167,6 +167,12 @@ public:
     /// cleanup at end of simulation period
     void relax() { uniRelax(); }
     
+    /// attach Single to nearby fibers to approximate an equilibrated state
+    void equilibrate(FiberSet const&, SingleProp const*);
+
+    /// attach Single to nearby fibers to approximate an equilibrated state
+    void equilibrate(SingleProp const*);
+
     /// attach Single to nearby fibers to approximate an equilibrated state
     void equilibrate();
 

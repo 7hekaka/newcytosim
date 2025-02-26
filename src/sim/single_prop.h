@@ -16,7 +16,7 @@ class Space;
 #define NEW_MOBILE_SINGLE 0
 #define NEW_ANCHOR_STIFFNESS 1
 
-/// to hold unused Couples
+/// to hold unused Singles
 typedef Freezer<Single> SingleStock;
 
 /// Property for Single
@@ -125,10 +125,10 @@ public:
     /// a list to hold Couple made with this Property
     mutable SingleStock stocks;
 
-protected:
-    
     /// pointer to actual confinement Space, derived from `confine_spec`
     Space const* confine_space;
+
+protected:
 
     /// displacement in one time step
     real diffusion_dt;

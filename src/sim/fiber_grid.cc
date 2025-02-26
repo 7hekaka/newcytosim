@@ -194,7 +194,7 @@ paintGrid(first_fiber, last_fiber) links all segments found in 'fiber' and its
  
      H = grid::range + fGrid.cellRadius();
  
- Note: H is calculated by paintGrid() and grid::range by setFiberGrid().
+ Note: H is calculated by paintGrid() and grid::range by estimateFiberGridStep().
  
  Linking all segments is done in an inverse way:
  for each segment, we cover all points of the grid inside a volume obtained

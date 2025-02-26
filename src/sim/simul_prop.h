@@ -265,17 +265,16 @@ public:
     /// Grid size used to determine the attachment of Hand to Fiber
     /**
      Cytosim uses a divide-and-conquer approach to detect which Fibers are near
-     a given point, witout testing every Fiber. This is necessary to determine
+     a given point, without testing every Fiber. This is necessary to determine
      to which Fiber a Hand may bind. The algorithm is based on partitionning Space
      with a grid of rectangular cells of size `binding_grid_step` (see FiberGrid).
 
      `binding_grid_step` affects the performance of the algorithm, but not its result.
-     Smaller values of binding_grid_step reduce the number of false positives, 
-     but requires more memory and housekeeping calculations. 
-     Memory requirements also increase with the physical dimensions of the system, 
-     to the power DIM (the dimensionality, set at compilation time).
+     Smaller values reduce the number of false positives, but requires more memory
+     and housekeeping calculations. These requirements also increase with the physical
+     dimensions of the system, to the power DIM (the dimensionality).
      
-     If the parameter is not set, cytosim attempts to set it automatically.
+     If the parameter is not set, cytosim attempts to determine it automatically.
      */
     real binding_grid_step;
     

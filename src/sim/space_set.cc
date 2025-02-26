@@ -192,5 +192,4 @@ void SpaceSet::report(std::ostream& os) const
         if ( plist.size() > 1 )
             os << '\n' << std::setw(10) << size() << " total";
     }
-
 }
