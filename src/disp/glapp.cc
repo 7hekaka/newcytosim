@@ -147,32 +147,48 @@ void glApp::toggleFullScreen()
 #endif
 
 /**
- Adjust the size of window to maximize the vertical or horizontal dimension,
+ Adjust the size of window to maximize its dimension within the screen,
  without changing the aspect ratio of the window.
  */
 void glApp::toggleWindowSize()
 {
-    int menuBar = 53;
-    int X = glutGet(GLUT_WINDOW_X);
+#if defined(__APPLE__)    /* For OSX */
+    int Y = 53; // size of menubar on macs
+#else
+    int Y = 0;
+#endif
     int W = glutGet(GLUT_WINDOW_WIDTH);
     int H = glutGet(GLUT_WINDOW_HEIGHT);
-    
+    int X = glutGet(GLUT_WINDOW_X) + W/2;
+
     /// using addition by Renaud Blanch to handle Retina display:
     float S = 1; //std::max(1, glutGet(GLUT_WINDOW_SCALE));
 
-    int winW = glutGet(GLUT_SCREEN_WIDTH);
-    int winH = glutGet(GLUT_SCREEN_HEIGHT) - menuBar;
+    int maxW = glutGet(GLUT_SCREEN_WIDTH);
+    int maxH = glutGet(GLUT_SCREEN_HEIGHT) - Y;
 
-    if ( H >= winH || W >= winW ) S = 0.5;
+    if ( H >= maxH || W >= maxW )
+        S = 0.5;
     
-    float zW((winW*S)/(float)W);
-    float zH((winH*S)/(float)H);
+    float zW(S*maxW/(float)W);
+    float zH(S*maxH/(float)H);
     
-    glutPositionWindow(X, menuBar);
     if ( zW < zH )
-        glutReshapeWindow(winW*S, int(zW*H));
+    {
+        W = S * maxW;
+        H = H * zW;
+    }
     else
-        glutReshapeWindow(int(zH*W), winH*S);
+    {
+        W = W * zH;
+        H = S * maxH;
+    }
+    // keep window within the edges:
+    X = std::min(X - W/2, maxW-W);
+    X = std::max(X, 0);
+    
+    glutReshapeWindow(W, H);
+    glutPositionWindow(X, Y);
 }
 
 //------------------------------------------------------------------------------
