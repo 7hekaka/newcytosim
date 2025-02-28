@@ -1,0 +1,69 @@
+% An aster with Dynein anchores to the core solid
+% F. Nedelec, 28.02.2024 @ Cambridge
+
+set simul system
+{
+    time_step = 0.001
+    viscosity = 0.01
+    verbose = 0
+}
+
+set space cell
+{
+    shape = sphere
+}
+
+new cell
+{
+    radius = 10
+}
+
+set fiber microtubule
+{
+    rigidity = 30
+    segmentation = 0.5
+    confine = inside, 100
+
+    display = ( line_width=3; )
+}
+
+set hand dynein
+{
+    binding = 10, 0.05
+    unbinding = 0, 3
+    activity = motor
+    unloaded_speed = -1
+    stall_force = 5
+    display = ( size=8; color=green, green; )
+}
+
+set single simplex
+{
+    hand = dynein
+    stiffness = 100
+}
+
+set solid core
+{
+    display = ( style=3; color=red; )
+}
+
+set aster star
+{
+    stiffness = 1000, 500
+}
+
+new star
+{
+    solid = core
+    radius = 0.5
+    sphere1 = center, 0.5, 50 simplex
+    fibers = 32, microtubule, ( length = 11; )
+}
+
+
+run system
+{
+    nb_steps = 10000
+    nb_frames = 10
+}
