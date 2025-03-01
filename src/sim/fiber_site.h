@@ -87,11 +87,11 @@ public:
     /// set abscissa
     void setAbscissa(real a) { hAbs = a; }
 
-    /// set FiberSite at index `s` with an abscissa `off` within the site
-    void engageLattice(lati_t s, real off)
+    /// set FiberSite at index `s` and abscissa `abs`
+    void engageLattice(lati_t s, real abs)
     {
         hSite = s;
-        hAbs = hLattice->unit() * s + off;
+        hAbs = abs;
         assert_true(hFiber->abscissaM() < hAbs + REAL_EPSILON);
         assert_true(hAbs < hFiber->abscissaP() + REAL_EPSILON);
     }

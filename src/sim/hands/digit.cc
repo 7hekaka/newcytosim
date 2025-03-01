@@ -37,14 +37,24 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
         if ( s < lat->entry() )
         {
             if ( prop()->bind_also_end & MINUS_END )
-                s = lat->entry();
+            {
+                const real abs = sit.fiber()->abscissaM();
+                while ( abscissa_(s) < abs )
+                    ++s;
+                //printf("plus-end binding at %i (%i)\n", lat->entry(), s);
+             }
             else
                 return false;
         }
         else if ( lat->fence() < s )
         {
             if ( prop()->bind_also_end & PLUS_END )
-                s = lat->fence();
+            {
+                const real abs = sit.fiber()->abscissaP();
+                while ( abscissa_(s) > abs )
+                    --s;
+                //printf("minus-end binding at (%i) %i\n", lat->fence(), s);
+          }
             else
                 return false;
         }
@@ -53,7 +63,7 @@ bool Digit::attachmentAllowed(FiberSite& sit) const
             return false;
         
         // adjust to match selected lattice site:
-        sit.engageLattice(s, prop()->site_shift);
+        sit.engageLattice(s, abscissa_(s));
 #endif
         return true;
     }
@@ -70,7 +80,7 @@ void Digit::attach(FiberSite const& sit)
 #if FIBER_HAS_LATTICE
     hSite = sit.site();
     hLattice = sit.lattice();
-    //std::clog << "offset " << sit.abscissa() - hLattice->unit()*hSite - prop()->site_shift << "\n";
+    //std::clog << "offset " << sit.abscissa() - abscissa_(hSite) << "\n";
 #endif
     Hand::attach(sit);
 }
@@ -127,7 +137,7 @@ void Digit::crawlM(const int n)
 #pragma mark -
 
 /**
- The Digit normally does not move by itself
+ A Digit with ( hold_shrinking_end[1] > 0 ) may hop to the nearest site if empty
  */
 void Digit::handleDisassemblyM()
 {
@@ -135,9 +145,15 @@ void Digit::handleDisassemblyM()
     
     if ( RNG.test(prop()->hold_shrinking_end[1]) )
     {
-        // do not detach:
-        jumpToEndM();
-        if ( site() < lattice()->entry() )
+        // find last site near minus-end with available space:
+        lati_t s = site();
+        const real abs = fiber()->abscissaM();
+        while ( abscissa_(s) < abs )
+            ++s;
+        
+        if ( !valLattice(s) )
+            hopLattice(s);
+        else
             detach();
     }
     else
@@ -146,7 +162,7 @@ void Digit::handleDisassemblyM()
 
 
 /**
- The Digit normally does not move by itself
+ A Digit with ( hold_shrinking_end[0] > 0 ) may hop to the nearest site if empty
  */
 void Digit::handleDisassemblyP()
 {
@@ -154,9 +170,15 @@ void Digit::handleDisassemblyP()
     
     if ( RNG.test(prop()->hold_shrinking_end[0]) )
     {
-        // do not detach:
-        jumpToEndP();
-        if ( site() > lattice()->fence() )
+        // find last site near plus-end with available space:
+        lati_t s = site();
+        const real abs = fiber()->abscissaP();
+        while ( abscissa_(s) > abs )
+            --s;
+        
+        if ( !valLattice(s) )
+            hopLattice(s);
+        else
             detach();
     }
     else

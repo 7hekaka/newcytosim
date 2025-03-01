@@ -37,9 +37,6 @@ void FiberSite::relocateM()
     assert_true(hFiber);
     hAbs = hFiber->abscissaM();
     reinterpolate(hFiber->interpolateEndM());
-#if FIBER_HAS_LATTICE
-    assert_true(!hLattice);
-#endif
 }
 
 
@@ -48,9 +45,6 @@ void FiberSite::relocateP()
     assert_true(hFiber);
     hAbs = hFiber->abscissaP();
     reinterpolate(hFiber->interpolateEndP());
-#if FIBER_HAS_LATTICE
-    assert_true(!hLattice);
-#endif
 }
 
 

@@ -36,6 +36,9 @@ public:
     Digit(DigitProp const*, HandMonitor*);
     
     //--------------------------------------------------------------------------
+    
+    /// converting site to abscissa when there is no lattice
+    real abscissa_(lati_t s) const { return s * prop()->step_size + prop()->site_shift; }
 
 #if FIBER_HAS_LATTICE
 
@@ -52,9 +55,6 @@ public:
     
     /// ersatz function converting to site when there is no lattice
     lati_t site() const { return (lati_t)std::nearbyint(hAbs/prop()->step_size); }
-    
-    /// converting site to abscissa when there is no lattice
-    real abscissa_(lati_t s) const { return s * prop()->step_size + prop()->site_shift; }
 
     int outsideMP(lati_t s) const { return hFiber->outsideMP(abscissa_(s)); }
     
@@ -78,12 +78,6 @@ public:
 
     /// transfer to given site if it is vacant
     void jumpTo(lati_t p) { if ( !valLattice(p) ) hopLattice(p); }
-    
-    /// relocate without checking intermediate sites
-    void jumpToEndM() { jumpTo(lattice()->entry()); }
-
-    /// relocate without checking intermediate sites
-    void jumpToEndP() { jumpTo(lattice()->fence()); }
 
     
     /// attempt one step towards the plus end
