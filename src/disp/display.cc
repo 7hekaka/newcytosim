@@ -1312,12 +1312,12 @@ void Display::drawFiberLattice2(Fiber const& fib, VisibleLattice const& lat, flo
 void Display::drawFiberLattice3(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
     drawFiberLattice2(fib, lat, rad);
-    drawFiberLatticeEdges(fib, lat, rad*0.5f);
+    drawFiberLatticeEdges(fib, lat, rad*0.25f);
 }
 
 
 /**
- Indicate the edges between sites with small dots
+ Indicate the edges between sites with round dots
  */
 void Display::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat, float rad) const
 {
@@ -1978,7 +1978,7 @@ void Display::drawFiber(Fiber const& fib)
                 case 1: drawFiberLattice1(fib, *lat, rad); break;
                 case 2: drawFiberLattice2(fib, *lat, rad); break;
                 case 3: drawFiberLattice3(fib, *lat, rad); break;
-                case 4: drawFiberLatticeEdges(fib, *lat, rad); break;
+                case 4: drawFiberLatticeEdges(fib, *lat, 0.75f*dis->point_size); break;
             }
             style = 0;
         }
