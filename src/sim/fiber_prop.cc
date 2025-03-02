@@ -159,7 +159,8 @@ real FiberProp::newFiberLength(Glossary& opt) const
 Fiber* FiberProp::newFiber(Glossary& opt) const
 {
     Fiber * fib = newFiber();
-    
+    const real len = newFiberLength(opt);
+
 #if ( 1 )
     // specify the vertices directly:
     if ( opt.has_key("points") )
@@ -174,7 +175,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
             fib->setPoint(p, vec);
         }
         if ( opt.has_key("length") )
-            fib->imposeLength(newFiberLength(opt));
+            fib->imposeLength(len);
     }
     else
 #endif
@@ -187,7 +188,6 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
             opt.set(rad, "shape", 1);
             opt.set(dir, "shape", 2);
             opt.set(off, "shape", 3);
-            const real len = newFiberLength(opt);
             fib->setCurved(dir, rad, len, off);
         }
         else
@@ -212,7 +212,6 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     }
     else
     {
-        const real len = newFiberLength(opt);
         real pl = 0; // persistence length
         // place fiber horizontally with center at the origin:
         if ( opt.set(pl, "equilibrate") && pl > 0 )

@@ -16,6 +16,32 @@ Fiber* DynamicFiberProp::newFiber() const
     return new DynamicFiber(this);
 }
 
+/**
+ This rounds up the value given by FiberProp::newFiberLength()
+ to a multiple of the unit_length
+ */
+real DynamicFiberProp::newFiberLength(Glossary& opt) const
+{
+    const real uni = unit_length;
+    const real len = FiberProp::newFiberLength(opt);
+    
+    index_t i = std::round( len / uni );
+
+    while ( i * uni > max_length)
+        --i;
+
+    while ( i * uni < min_length)
+        ++i;
+    
+    real dif = len - i * uni;
+    //printf("length adjusted by: %.6e\n", dif);
+
+    if ( abs_real(dif) > 0.001 )
+        std::cerr << name() << ":length rounded up to " << i << " x " << uni << " = " << i*uni << "\n";
+    
+    return i * uni;
+}
+
 
 void DynamicFiberProp::clear()
 {

@@ -143,6 +143,9 @@ public:
     /// return a Fiber with this property
     Fiber* newFiber() const;
     
+    /// return a length that is a multiple of the unit_length
+    real newFiberLength(Glossary& opt) const;
+
     /// set default values
     void clear();
        

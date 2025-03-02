@@ -24,9 +24,10 @@
  The index of a site can be positive or negative, but always corresponds
  to the abscissa taken along the Fiber:
  
-     index = (lati_t) std::floor( abscissa / unit );
+     index = (int) std::floor( abscissa / unit );
  
- The Lattice may hold different types of information at each site, eg. a 'number of molecule'.
+ The Lattice may hold different types of information at each site, 
+ eg. a 'number of molecule' or the concentration of something.
  The linear density can be derived by dividing by the unit length:
  
      density = value(index) / unit();
@@ -60,7 +61,7 @@ private:
     
     
     /// Array of sites, of valid range [laInf, laSup[
-    /** This is a pointer with offset : laCell = laPtr - laInf */
+    /** This pointer uses an offset to match its range : laCell = laPtr - laInf */
     cell_t * laCell;
     
     /// Pointer to allocated memory for cell (not used for access)
@@ -69,10 +70,10 @@ private:
     /// distance between adjacent sites
     real     laUnit;
     
-    /// index of first cell entirely within minus end and plus end
+    /// index of first cell entirely within minus and plus ends
     lati_t   laEntry;
     
-    /// index of last cell entirely within minus end and plus end
+    /// index of last cell entirely within minus and plus ends
     lati_t   laFence;
 
 #pragma mark - Allocation
@@ -237,7 +238,6 @@ public:
     void setRange(real a, real b)
     {
         assert_true( laUnit > REAL_EPSILON );
-        //std::clog << this << " Lattice::setRange(" << a << ", " << b << ") " << laUnit << "\n";
 #if 0
         if ( !std::is_same<real, cell_t>::value && laCell )
             markEdges(0);
@@ -247,13 +247,14 @@ public:
 
         laEntry = index_sup(a);
         laFence = index(b) - 1;
-        
+
         /* allocate with a safety margin of 8 cells */
         allocate(laIndexM, laIndexP+1, 8);
 #if 0
         if ( !std::is_same<real, cell_t>::value )
             markEdges(~0);
 #endif
+        //std::clog << this << ":setRange(" << a << ", " << b << ") [" << laEntry << ", " << laFence << "]\n";
     }
 
     /// index of site containing the minus end
