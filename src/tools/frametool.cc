@@ -33,7 +33,7 @@
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
+#include "slice.h"
 
 enum { COUNT, COPY, LAST, SIZE, EPID, SPLIT };
 enum { UNKNOWN, FRAME_START, FRAME_SECTION, FRAME_END, TIME_LINE };
@@ -121,77 +121,6 @@ int whatLine(FILE* in, FILE* out)
     return UNKNOWN;
 }
 
-
-//=============================================================================
-
-
-/// Slice represents a regular subset of indices
-class Slice
-{
-    size_t s; ///< start
-    size_t i; ///< increment
-    size_t e; ///< end
-    
-public:
-    
-    Slice()
-    {
-        s = 0;
-        i = 1;
-        e = ~0UL;
-    }
-    
-    Slice(const char arg[])
-    {
-        s = 0;
-        i = 1;
-        e = ~0UL;
-
-        char * str = nullptr;
-        errno = 0;
-        s = strtoul(arg, &str, 10);
-        if ( errno ) goto finish;
-        if ( *str != ':' )
-            e = s;
-        else {
-            ++str;
-            if ( *str == 0 ) return;
-            i = strtoul(str, &str, 10);
-            if ( errno ) goto finish;
-            if ( *str != ':' )
-            {
-                e = i;
-                i = 1;
-            } else {
-                ++str;
-                if ( *str == 0 ) return;
-                e = strtoul(str, &str, 10);
-                if ( errno ) goto finish;
-            }
-        }
-        if ( *str ) goto finish;
-        //fprintf(stderr, "frametool slice %lu:%lu:%lu\n", s, i, e);
-        return;
-    finish:
-        fprintf(stderr, "syntax error in `%s', expected START:INCREMENT:END\n", arg);
-        exit(EXIT_FAILURE);
-    }
-    
-    bool match(size_t n)
-    {
-        if ( n < s )
-            return false;
-        if ( e < n )
-            return false;
-        return 0 == ( n - s ) % i;
-    }
-    
-    size_t last()
-    {
-        return e;
-    }
-};
-
 //=============================================================================
 
 void countFrame(const char str[], FILE* in)
@@ -266,7 +195,7 @@ void sizeFrame(FILE* in, int details)
 }
 
 
-void extract(FILE* in, FILE* file, Slice sli)
+void extract(FILE* in, FILE* file, Slice const& sli)
 {
     size_t frm = 0;
     FILE * out = sli.match(0) ? file : nullptr;
@@ -448,12 +377,26 @@ int main(int argc, char* argv[])
         }
         if ( is_file(arg) )
         {
-            if ( has_file++ )
+            if ( 0 == has_file++ )
+                strncpy(filename, arg, sizeof(filename));
+            else
             {
-                fprintf(stderr, "error: only one input file can be specified\n");
+                if ( outputname[0] )
+                {
+                    fprintf(stderr, "error: only one input file can be specified\n");
+                    return EXIT_SUCCESS;
+                }
+                strncpy(outputname, arg, sizeof(outputname));
+            }
+        }
+        else if ( is_dir(arg) )
+        {
+            snprintf(filename, sizeof(filename), "%s/objects.cmo", arg);
+            if ( ! is_file(filename) )
+            {
+                fprintf(stderr, "error: missing file %s/objects.cmo\n", arg);
                 return EXIT_SUCCESS;
             }
-            strncpy(filename, arg, sizeof(filename));
         }
         else if ( dot && 0==memcmp(dot, ".cmo", 5) )
         {
@@ -464,11 +407,9 @@ int main(int argc, char* argv[])
             }
             strncpy(outputname, arg, sizeof(outputname));
         }
-        else if ( is_dir(arg) )
-            snprintf(filename, sizeof(filename), "%s/objects.cmo", arg);
         else
         {
-            if ( isdigit(*arg) )
+            if ( isdigit(*arg) || *arg == ':' )
             {
                 mode = COPY;
                 strncpy(slice, argv[i], sizeof(slice));
@@ -541,23 +482,21 @@ int main(int argc, char* argv[])
             }
         }
         
-        if ( output == stdout )
-        {
-            if ( isatty(1) )
-                fprintf(stderr, "Error: cannot send output to terminal!\n");
-            else
-            {
-                if ( mode == COPY )
-                    extract(file, output, Slice(slice));
-                else if ( mode == LAST )
-                    extractLast(file);
-                else if ( mode == EPID )
-                    extractPID(file, pid);
-                else if ( mode == SPLIT )
-                    separateFrames(file);
-            }
-        }
+        if ( output == stdout && isatty(1) )
+            fprintf(stderr, "Error: cannot send output to terminal!\n");
         else
+        {
+            if ( mode == COPY )
+                extract(file, output, Slice(slice));
+            else if ( mode == LAST )
+                extractLast(file);
+            else if ( mode == EPID )
+                extractPID(file, pid);
+            else if ( mode == SPLIT )
+                separateFrames(file);
+        }
+        
+        if ( output != stdout )
         {
             fprintf(stderr, "> %s\n", outputname);
             fclose(output);
