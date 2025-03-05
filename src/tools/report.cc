@@ -16,7 +16,10 @@
 #include "splash.h"
 #include "parser.h"
 #include "simul.h"
+#include "slice.h"
 
+Simul simul;
+FrameReader reader;
 int prefix = 0;
 
 
@@ -31,7 +34,7 @@ void help(std::ostream& os)
     os << "       column=INTEGER\n";
     os << "       verbose=0\n";
     os << "       frame=INTEGER[,INTEGER[,INTEGER[,INTEGER]]]\n";
-    os << "       period=INTEGER\n";
+    os << "       frame=INTEGER:INTEGER:INTEGER\n";
     os << "       input=FILE_NAME\n";
     os << "       output=FILE_NAME\n\n";
     os << "  This tool must be invoked in a directory containing the simulation output,\n";
@@ -71,19 +74,24 @@ void report_prefix(std::ostream& os, Simul const& sim, std::string const& what, 
 }
 
 
-void report(std::ostream& os, Simul const& sim, std::string const& what, Glossary& opt, size_t frm)
+int report(std::ostream& os, std::string const& what, Glossary& opt, size_t frm)
 {
     try
     {
-        if ( prefix )
-            report_prefix(os, sim, what, opt, frm);
-        else
-            sim.poly_report(os, what, opt, frm);
+        if ( 0 == reader.loadFrame(simul, frm) )
+        {
+            if ( prefix )
+                report_prefix(os, simul, what, opt, frm);
+            else
+                simul.poly_report(os, what, opt, frm);
+            return 0;
+        }
+        return 1;
     }
     catch( Exception & e )
     {
-        std::cerr << e.brief() << '\n';
-        exit(EXIT_FAILURE);
+        std::cerr << e.brief() << "\n";
+        return 2;
     }
 }
 
@@ -106,9 +114,7 @@ int main(int argc, char* argv[])
         return EXIT_SUCCESS;
     }
     
-    Simul simul;
     Glossary arg;
-    FrameReader reader;
 
     std::string input = Simul::TRAJECTORY;
     std::string str, what;
@@ -144,22 +150,15 @@ int main(int argc, char* argv[])
         prefix = 1;
 #endif
     
-    size_t frame = 0;
-    size_t period = 1;
-
     arg.set(input, ".cmo") || arg.set(input, "input");
     if ( arg.use_key("-") ) arg.define("verbose", "0");
 
     RNG.seed();
-
+    
     try
     {
         simul.loadProperties();
         reader.openFile(input);
-        
-        if ( arg.set(frame, "frame") )
-            period = ~0UL;
-        arg.set(period, "period");
 
         if ( arg.set(str, "output") )
         {
@@ -180,11 +179,13 @@ int main(int argc, char* argv[])
     }
     
     Cytosim::silent();
-    
-    // process first record, at index 'frame':
-    if ( reader.loadFrame(simul, frame) )
+    Slice slice(arg.value("frame").c_str());
+
+    // process first record, and check things:
+    size_t frm = slice.first();
+    if ( reader.loadFrame(simul, frm) )
     {
-        std::cerr << "Error: missing frame " << frame << '\n';
+        std::cerr << "Error: missing frame " << frm << '\n';
         return EXIT_FAILURE;
     }
     if ( DIM != reader.vectorSize() )
@@ -193,38 +194,18 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    report(out, simul, what, arg, frame);
-    size_t cnt = 1;
-
-    if ( arg.num_values("frame") > 1 )
+    size_t cnt = 0;
+    // multiple ranges of indices can be specified:
+    size_t inp = 0;
+    while ( arg.set(str, "frame", inp++) )
     {
-        // multiple record indices were specified:
-        size_t s = 1;
-        while ( arg.set(frame, "frame", s) )
+        slice.parse(str.c_str());
+        for ( frm = slice.first(); frm <= slice.last(); frm += slice.increment() )
         {
-            // try to load the specified frame:
-            if ( 0 == reader.loadFrame(simul, frame) )
-            {
-                report(out, simul, what, arg, frame);
+            if ( 0 == report(out, what, arg, frm) )
                 ++cnt;
-            }
             else
-            {
-                std::cerr << "Error: missing frame " << frame << '\n';
-                return EXIT_FAILURE;
-            }
-            ++s;
-        }
-    }
-    else if ( period != ~0UL )
-    {
-        // process every 'period' record:
-        frame += period;
-        while ( 0 == reader.loadFrame(simul, frame)  )
-        {
-            report(out, simul, what, arg, frame);
-            frame += period;
-            ++cnt;
+                break;
         }
     }
     

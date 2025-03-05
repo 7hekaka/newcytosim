@@ -30,8 +30,8 @@ public:
         e = ~0UL;
     }
     
-    /// constructor from string INTEGER:INTEGER:INTEGER
-    Slice(const char arg[], const char sep = ':')
+    /// read string specification with given separator
+    void parse(const char arg[], const char sep = ':')
     {
         s = 0;
         i = 1;
@@ -43,7 +43,7 @@ public:
             s = 0;
             e = strtoul(arg+1, &str, 10);
             if ( errno ) goto finish;
-        } else {
+        } else if ( *arg ) {
             s = strtoul(arg, &str, 10);
             if ( errno ) goto finish;
             if ( *str == sep ) {
@@ -52,7 +52,7 @@ public:
             }
             else
                 e = s;
-        }
+        } else return;
         if ( *str == sep )
         {
             i = e;
@@ -67,19 +67,16 @@ public:
         }
         if ( e < s )
             fprintf(stderr, "empty slice `%s'\n", arg);
-        fprintf(stderr, "Slice(%lu:%lu:%lu)\n", s, i, e);
+        //fprintf(stderr, "Slice(%lu:%lu:%lu)\n", s, i, e);
         return;
     finish:
         fprintf(stderr, "syntax error in `%s', expected START:INCREMENT:END\n", arg);
     }
     
-    bool match(size_t n) const
+    /// constructor from string
+    Slice(const char arg[], const char sep = ':')
     {
-        if ( n < s )
-            return false;
-        if ( e < n )
-            return false;
-        return 0 == ( n - s ) % i;
+        parse(arg, sep);
     }
     
     size_t first() const
@@ -96,5 +93,23 @@ public:
     {
         return i;
     }
+    
+    size_t count() const
+    {
+        size_t res = 0;
+        for ( size_t x = s; x <= e; x += i )
+            ++res;
+        return res;
+    }
+        
+    bool match(size_t n) const
+    {
+        if ( n < s )
+            return false;
+        if ( e < n )
+            return false;
+        return 0 == ( n - s ) % i;
+    }
+
 };
 

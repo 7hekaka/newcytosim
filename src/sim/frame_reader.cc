@@ -230,7 +230,7 @@ int FrameReader::seekFrame(size_t frm)
 
 //------------------------------------------------------------------------------
 /**
- returns 0 for success, an error code, or throws an exception
+ returns 0 for success, an error code, and may throw an exception
  */
 int FrameReader::loadFrame(Simul& sim, size_t frm, const bool reload)
 {
