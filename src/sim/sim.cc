@@ -137,6 +137,4 @@ int main(int argc, char* argv[])
         print_red(stderr, "Error: an exception occurred\n");
         return 5;
     }
-    
-    Cytosim::out.close();
 }

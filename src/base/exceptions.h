@@ -65,7 +65,7 @@ public:
     {
         if ( info_.size() > 0 )
              return ": " + info_;
-        return "";
+        return "\n";
     }
 
     /// return C-string pointer to message

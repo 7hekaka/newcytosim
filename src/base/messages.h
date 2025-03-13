@@ -53,6 +53,12 @@ namespace Cytosim
             nul_.open("/dev/null");
         }
         
+        /// destructor closes the file
+        ~Output()
+        {
+            close();
+        }
+
         /// redirect output to given file
         void open(std::string const& filename)
         {

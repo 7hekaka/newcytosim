@@ -1495,14 +1495,11 @@ void Parser::readConfig(std::istream& is, std::string const& filename)
 void Parser::readConfig(std::string const& filename)
 {
     std::ifstream is(filename.c_str(), std::ifstream::in);
-    if ( !is.good() )
-    {
-        if ( !is.is_open() )
-            throw InvalidIO("could not open `"+filename+"'");
-        throw InvalidIO("could not find or read `"+filename+"'");
-    }
+    if ( !is.is_open() )
+        throw InvalidIO(filename+" : No such file");
+    else if ( !is.good() )
+        throw InvalidIO("could not read `"+filename+"'");
     readConfig(is, filename);
-    is.close();
 }
 
 
