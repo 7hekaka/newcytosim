@@ -4,12 +4,11 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2025
-# This is PRECONFIG version 1.7, last modified on 1.3.2025
+# This is PRECONFIG version 1.7, last modified on 14.3.2025
 
 """
 # SYNOPSIS
 
-   Preconfig generates files from a template by evaluating doubly-bracketed Python code.
    Preconfig generates files from a template by evaluating doubly-bracketed Python code.
    
 # Article:
@@ -640,7 +639,7 @@ class Preconfig:
                 k, v = self.try_assignment(arg)
                 values[k] = v
             elif arg:
-                sys.stderr.write("Preconfig does not understand argument `%s'\n" % arg)
+                sys.stderr.write("Preconfig failed to understand argument `%s'\n" % arg)
                 sys.exit(4)
         
         # path argument may define the pattern:
@@ -673,7 +672,7 @@ def parse(name, values, repeat=1, path=''):
         with open(name, 'r') as file:
             return Preconfig().parse(name, file, values, repeat, path)
     except FileNotFoundError:
-        print("No such file `%s`" % name)
+        print(name, ": No such file")
     return []
 
 
