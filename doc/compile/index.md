@@ -7,7 +7,7 @@ Compilation is started from a terminal, with a program called [`make`](http://ww
 
 ### Dimensionality
 
-The dimensionality is baked into the executable during compilation. It can be querried by running `sim info`.
+The dimensionality is set during compilation. It can be querried by running `sim info`.
 It is necessary to recompile to change dimensionality, [following these instructions](dimensionality.md).
 
 ### Mathematical libraries
@@ -58,11 +58,9 @@ One option is to [compile](https://www.glfw.org/docs/latest/compile_guide.html) 
 
 ### MacOS
 
-On MacOS, install [Xcode](https://developer.apple.com/technologies/tools/), which is available on the Mac App Store. After installing Xcode, install the Xcode 'Command-Line Tools', which is an optional package providing 'make'. All necessary libraries are already included in MacOS.
+Install [Xcode](https://developer.apple.com/technologies/tools/), available on the Mac App Store. After installing Xcode, install the Xcode 'Command-Line Tools', an optional package providing 'make'. All necessary libraries are then installed.
 
 We provide the Xcode project file for cytosim, which is a convenient way to access the code.
-
-Optionally, Cytosim can use the mouse wheel to zoom in and out, if you use FreeGLUT, instead of Apple's GLUT, or [Renaud Blanch's GLUT patch](http://iihm.imag.fr/blanch/howtos/MacOSXGLUTMouseWheel.html).
 
 
 ### Linux

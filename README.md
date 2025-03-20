@@ -1,12 +1,14 @@
 # Cytosim
 
-Cytosim is an [open-source](LICENSE.txt) cytoskeleton simulation suite designed to handle large systems of flexible filaments with associated proteins such as molecular motors. It is a versatile base that has been extensively to study actin and microtubule systems in 1D, 2D and 3D. It is built around an optimized C++ core engine running on UNIX, Mac OSX, GNU/Linux and within the WSL on Windows. This code is modular and extensible, making Cytosim a convenient base that can be customized to meet particular tasks. The standard pipeline encountered during a simulation project is implemented in a versatile set of Python programs.
+Cytosim is an [open-source](LICENSE.txt) cytoskeleton simulation suite designed to model large systems of flexible filaments and their associated proteins, such as molecular motors. It has been extensively used to study actin and microtubule dynamics in 1D, 2D, and 3D.
 
-Cytosim has been used for about 100 research articles from the [Nedelec](doc/publications/index.md) and [other groups](doc/publications/biblio.md).
+Built around an optimized C++ core engine, Cytosim runs on UNIX, macOS, GNU/Linux, and within the Windows Subsystem for Linux (WSL). Its modular and extensible design makes it highly adaptable, allowing customization for specific research needs. Additionally, a versatile set of Python programs streamlines the standard simulation workflow.
+
+Cytosim has been used in approximately 100 research articles from the [Nedelec](doc/publications/index.md) and [other research groups](doc/publications/biblio.md).
 
 ![Cytosim](doc/data/cytosim.png)
 
-Cytosim is a suite of command-line tools with simulation and display capabilities. The simulation is specified in a [configuration file](doc/sim/config.md), defining objects with their parameters and a suite of operations, such as advancing time, saving frames or [generating reports](doc/sim/report.md). Here is a basic example, with parameters specified in [units of seconds, micrometers and pico-Newtons](doc/sim/units.md).
+Cytosim offers command-line tools with simulation and display capabilities. Simulations are defined using a [configuration file](doc/sim/config.md) which specifies objects, their parameters, and a sequence of operations such as advancing time, saving frames, or [generating reports](doc/sim/report.md). Below is a basic example, where parameters are expressed in [seconds, micrometers and pico-Newtons](doc/sim/units.md).
 
 	set simul system
 	{
@@ -48,11 +50,14 @@ Cytosim is a suite of command-line tools with simulation and display capabilitie
 The Brownian dynamics approach was described in:  
 [Collective Langevin Dynamics of Flexible Cytoskeletal Fibers](http://iopscience.iop.org/article/10.1088/1367-2630/9/11/427/meta)
 
+A recent protocol demonstrating the use of Cytosim is:
+[A Typical Workflow to Simulate Cytoskeletal Systems](https://dx.doi.org/10.3791/64125)
+
 The documentation source files use [Markdown](https://en.wikipedia.org/wiki/Markdown) and are best viewed with [MacDown (Mac OSX only)](https://macdown.uranusjr.com) or [Typora (Cross platform)](https://typora.io) 
 
 # Installation
 
-Cytosim is distributed as source code and [must be compiled](doc/compile/index.md) before use. On Mac OS X and Linux this should be uncomplicated even if you are not familiar with program development. Compiling natively on Windows would require changes to the code, but Cytosim should [compile within Cygwin](doc/compile/cygwin.md).
+Cytosim is distributed as source code and [must be compiled](doc/compile/index.md) before use. On Mac OS X and Linux this should be uncomplicated using a standard compiler. Compiling natively on Windows would require changes to the code. For Windows 10 and later, use the [Windows Subsystem for Linux](doc/compile/wsl.md). For older Windows systems, [use Cygwin](doc/compile/cygwin.md).
 
 To download the source code, enter these commands in a terminal window:
 
@@ -72,8 +77,9 @@ Altermatively, it is possible to use [cmake](https://cmake.org) to configure `ma
 	make
 
 For troubleshooting, please check [the compile instructions](doc/compile/index.md).
-Once *cytosim* is running on your machine, proceed with the [tutorials](doc/tutorials/index.md), the page on [running simulations](doc/main/runs.md), and the examples contained in the folder `cym`. 
-Inspect in particular the short configuration files (e.g. fiber.cym, self.cym). 
+Once *cytosim* is running on your machine, proceed with the [tutorials](doc/tutorials/index.md), the page on [running simulations](doc/main/runs.md), and the examples contained in the folder `cym`. You can run them by specifying the paths:
+
+	bin/play cym/self.cym
 
 # Contributors
 

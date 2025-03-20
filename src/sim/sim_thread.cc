@@ -120,15 +120,17 @@ void SimThread::run()
     while ( 1 )
     {
         sim_->initCytosim();
-        std::string filename = simulProp().config_file;
+        // read configuration file:
+        std::string filename = sim_->prop.config_file;
         if ( config_code )
         {
-            // with code provided as string, we do not open/read a file
+            // code was provided as string:
             std::stringstream iss(config_code);
             readConfig(iss, filename);
         }
         else
         {
+            // read code from a file:
             std::ifstream ifs(filename.c_str(), std::ifstream::in);
             readConfig(ifs, filename);
         }
