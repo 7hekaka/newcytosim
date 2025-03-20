@@ -896,6 +896,7 @@
 		BBB1E480126DC70B00B19D26 /* actor.h in Headers */ = {isa = PBXBuildFile; fileRef = BBB1E47C126DC70B00B19D26 /* actor.h */; };
 		BBB22114267B25E200B7DE26 /* libcytodisp.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB4DB5950C69D5A2001E5E4F /* libcytodisp.a */; };
 		BBB22115267B260400B7DE26 /* print_color.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB61B7F119B7626A00B1F4F6 /* print_color.cc */; };
+		BBBC13922D78CFA000D55BB6 /* slice.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBC13912D78CFA000D55BB6 /* slice.h */; };
 		BBBD34E01AABA5BE00819326 /* map.h in Headers */ = {isa = PBXBuildFile; fileRef = BBBD34DF1AABA5BE00819326 /* map.h */; };
 		BBBF3BEA260DEA2100079BE3 /* grid_display.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB3092292164BAC300C6DEE4 /* grid_display.cc */; };
 		BBBF3BEB260DEA4F00079BE3 /* grid_display.h in Headers */ = {isa = PBXBuildFile; fileRef = BB3092282164BAC300C6DEE4 /* grid_display.h */; };
@@ -2180,6 +2181,7 @@
 		BBB89ED80BE3DED10054838A /* vector3.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = vector3.h; path = src/math/vector3.h; sourceTree = SOURCE_ROOT; };
 		BBB9BAC40B4590D500E9FCD3 /* test_simd.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_simd.cc; path = src/test/test_simd.cc; sourceTree = SOURCE_ROOT; };
 		BBB9BB870B45AFDD00E9FCD3 /* test_project.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_project.cc; path = src/test/test_project.cc; sourceTree = SOURCE_ROOT; };
+		BBBC13912D78CFA000D55BB6 /* slice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = slice.h; sourceTree = "<group>"; };
 		BBBD34DF1AABA5BE00819326 /* map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = map.h; path = src/math/map.h; sourceTree = SOURCE_ROOT; };
 		BBC0E57110CABBBB008139D1 /* point_disp.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = point_disp.cc; sourceTree = "<group>"; };
 		BBC0E57210CABBBB008139D1 /* point_disp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = point_disp.h; sourceTree = "<group>"; };
@@ -3420,6 +3422,7 @@
 			children = (
 				BB2BF8D40E085C110024546A /* makefile.inc */,
 				BB72EA6A2662268200FF7352 /* CMakeLists.txt */,
+				BBBC13912D78CFA000D55BB6 /* slice.h */,
 				BB9BEB9C1C774BB30085E19F /* analyse.cc */,
 				BB9771601F52D98200EB8C92 /* cymart.cc */,
 				BB67498F27F756E600165E14 /* cymwiz.cc */,
@@ -4421,6 +4424,7 @@
 				BB7191960EF1CD9900CED9E2 /* vector.h in Headers */,
 				BBD1B1F018FFD97800E5D80A /* project_ellipse.h in Headers */,
 				BB0E4BD81002698100A96B34 /* random_vector.h in Headers */,
+				BBBC13922D78CFA000D55BB6 /* slice.h in Headers */,
 				BB89134E29B3662000423319 /* modulo.h in Headers */,
 				BB74F41A231C334D0019D68E /* sparmatblk.h in Headers */,
 				BBD14D462820826C00B55817 /* signal_handlers.h in Headers */,
