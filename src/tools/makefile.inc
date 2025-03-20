@@ -1,7 +1,7 @@
 # Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
 
-TOOLS:=frametool sieve reader report reportF analyse sweet
+TOOLS:=frametool sieve reader report reportF analyse
 
 .PHONY: tools
 tools: $(TOOLS)
@@ -52,11 +52,6 @@ reader: reader.cc $(TOOL_LIBS) | bin
 	$(DONE)
 vpath reader bin
 
-cympack: cympack.cc $(TOOL_LIBS) | bin
-	$(TOOL_MAKE)
-	$(DONE)
-vpath cympack bin
-
 
 report: report.cc $(TOOL_LIBS) | bin
 	$(COMPILE) $(TOOL_INC) $(OBJECTS) $(LINK) -o bin/$@
@@ -101,12 +96,6 @@ cymwiz: cymwiz.cc | bin
 	$(TOOL_MAKE)
 	$(DONE)
 vpath cymwiz bin
-
-
-sweet: sweet.cc $(TOOL_LIBS) | bin
-	$(TOOL_MAKE)
-	$(DONE)
-vpath sweet bin
 
 
 micimage: micimage.cc save_image.cc save_image_gl.cc glossary.o filepath.o tokenizer.o
