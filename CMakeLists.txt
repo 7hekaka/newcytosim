@@ -5,7 +5,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_BUILD_TYPE Release)
 
 project("cytosim" C CXX)
-#set(CMAKE_VERBOSE_MAKEFILE ON)
+set(CMAKE_VERBOSE_MAKEFILE OFF)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tar)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -95,6 +95,7 @@ if(MAKE_PLAY)
     endif()
 endif()
 
+#--------------------------- COMPILATION FLAGS ---------------------------------
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
     set(FAST_FLAGS -Wno-deprecated-declarations -ffp-contract=fast -funroll-loops)
