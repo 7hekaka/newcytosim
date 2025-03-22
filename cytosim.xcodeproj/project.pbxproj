@@ -1809,7 +1809,6 @@
 		BB50045E126A332E005E925C /* tracker_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tracker_prop.h; path = hands/tracker_prop.h; sourceTree = "<group>"; };
 		BB50045F126A332E005E925C /* tracker.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = tracker.cc; path = hands/tracker.cc; sourceTree = "<group>"; };
 		BB500460126A332E005E925C /* tracker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = tracker.h; path = hands/tracker.h; sourceTree = "<group>"; };
-		BB5020D51576514C007DCAA5 /* bash */ = {isa = PBXFileReference; lastKnownFileType = folder; path = bash; sourceTree = "<group>"; };
 		BB50CEF00FFA0AAD00278580 /* sphere_prop.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = sphere_prop.cc; path = src/sim/sphere_prop.cc; sourceTree = SOURCE_ROOT; };
 		BB50CEF10FFA0AAD00278580 /* sphere_prop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = sphere_prop.h; path = src/sim/sphere_prop.h; sourceTree = SOURCE_ROOT; };
 		BB50D0D60FFA30CD00278580 /* property.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = property.h; path = src/base/property.h; sourceTree = SOURCE_ROOT; };
@@ -3220,7 +3219,6 @@
 				BB73590605B98DA3006956D5 /* tests */,
 				BB73591805B98DA3006956D5 /* tools */,
 				BB0AB41E201BBA41004739CE /* doc */,
-				BB5020D51576514C007DCAA5 /* bash */,
 				BB568CCA0BFCEAA300CB5335 /* cym */,
 				BBAD0F610BF712D8005BFFFA /* python */,
 				BB893BB7228B016C00A24F16 /* misc */,
