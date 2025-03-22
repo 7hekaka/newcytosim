@@ -229,7 +229,7 @@ void run(sfmt_t& sfmt, size_t rep, const char str[], REAL* (*FUNC)(REAL*, size_t
             sfmt_gen_rand_all(&sfmt);
             vec = FUNC(vec, SFMT_N32, (uint32_t*)sfmt.state);
         }
-        printf("\n%-12s %5.2f :", str, tock());
+        printf("\n%-12s %7.2f :", str, tock());
         check_gaussian(vec-mem, mem, off);
         
         size_t n = std::min(vec-mem, 8L);
@@ -278,7 +278,7 @@ void scan(size_t chunk, size_t rep, REAL* (*FUNC)(REAL*, size_t, const uint32_t*
 
 int main(int argc, char* argv[])
 {
-    const size_t CNT = 1024*256;
+    const size_t CNT = 1024*64;
     printf("test_gaussian --- %lu bytes real --- %s", sizeof(real), __VERSION__);
     sfmt_t sfmt alignas(32);
     sfmt_init_gen_rand(&sfmt, device());
@@ -286,10 +286,10 @@ int main(int argc, char* argv[])
     tick();
     for ( size_t i = 0; i < CNT; ++i )
         sfmt_gen_rand_all(&sfmt);
-    printf("\nsfmt.refill  %5.2f", tock(CNT>>10));
+    printf("\nsfmt.refill  %7.2f", tock());
     //print(vec, end);
     
-    //run(sfmt, CNT, "Gauss.STD", makeGaussians_std);
+    run(sfmt, CNT, "Gauss.STD", makeGaussians_std);
     run(sfmt, CNT, "Gauss", makeGaussians_);
 #if USE_SIMD
     run(sfmt, CNT, "Gauss.SIMD", makeGaussians_SIMD);
