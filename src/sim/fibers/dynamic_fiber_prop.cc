@@ -37,7 +37,7 @@ real DynamicFiberProp::newFiberLength(Glossary& opt) const
     //printf("length adjusted by: %.6e\n", dif);
 
     if ( abs_real(dif) > 0.001 )
-        std::cerr << name() << ":length rounded up to " << i << " x " << uni << " = " << i*uni << "\n";
+        Cytosim::log(name(), ":length rounded up to ", i, " x ", uni, " = ", i*uni, "\n");
     
     return i * uni;
 }

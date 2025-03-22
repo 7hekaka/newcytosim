@@ -988,7 +988,7 @@ void Chain::getPoints(real const* ptr)
         real mov = std::sqrt(sum_square(DIM*nPoints, pPos, ptr)) / nPoints;
         reshape_global(nbSegments(), ptr, pPos, fnCut);
 #if ( DIM > 1 )
-        std::cerr << " wild motion for " << doc << " disp. " << mov << '\n';
+        Cytosim::log(" wild motion for ", doc, " displacement ", mov, '\n');
         //copy_real(DIM*nPoints, ptr, pPos);
 #endif
     }

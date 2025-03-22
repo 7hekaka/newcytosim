@@ -155,13 +155,40 @@ namespace Cytosim
         
         /// write `s` followed by `a`, `b`, `c`, `d` and `e`
         template <typename A, typename B, typename C, typename D, typename E>
-        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const D& e)
+        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e)
         {
             std::ostringstream oss;
             oss << s << a << b << c << d << e;
             operator<<(oss.str());
         }
         
+        /// write `s` followed by `a`, `b`, `c`, `d`, `e` and `f`
+        template <typename A, typename B, typename C, typename D, typename E, typename F>
+        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f)
+        {
+            std::ostringstream oss;
+            oss << s << a << b << c << d << e << f;
+            operator<<(oss.str());
+        }
+        
+        /// write `s` followed by `a`, `b`, `c`, `d`, `e`, `f` and `g`
+        template <typename A, typename B, typename C, typename D, typename E, typename F, typename G>
+        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g)
+        {
+            std::ostringstream oss;
+            oss << s << a << b << c << d << e << f << g;
+            operator<<(oss.str());
+        }
+        
+        /// write `s` followed by `a`, `b`, `c`, `d`, `e`, `f`, `g` and `h`
+        template <typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
+        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g, const H& h)
+        {
+            std::ostringstream oss;
+            oss << s << a << b << c << d << e << f << g << h;
+            operator<<(oss.str());
+        }
+
         /// C-style `printf()` syntax followed by flush
         template < typename Arg1, typename... Args >
         void print(const char* fmt, Arg1 arg1, Args&&... args)
