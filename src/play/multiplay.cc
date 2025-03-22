@@ -20,8 +20,8 @@
 #include "gym_draw.h"
 #include "gym_view.h"
 #include "gym_flat.h"
-#include "gle.h"
 #include "glfw.h"
+#include "gle.h"
 
 #include "random_pcg.h"
 #include "random_seed.h"
@@ -184,7 +184,7 @@ void charCallback(GLFWwindow* win, unsigned int k, int mods)
 }
 
 /* change window size, adjust display to maintain isometric axes */
-void reshape(GLFWwindow* win, int W, int H)
+void reshapeCallback(GLFWwindow* win, int W, int H)
 {
     glfwGetWindowSize(win, &winW, &winH);
     bugW = W / tileX;
@@ -226,7 +226,7 @@ GLFWwindow * initWindow(int W, int H)
     // Set callback functions
     glfwSetKeyCallback(win, keyCallback);
     glfwSetCharModsCallback(win, charCallback);
-    glfwSetFramebufferSizeCallback(win, reshape);
+    glfwSetFramebufferSizeCallback(win, reshapeCallback);
     glfwSetCursorPosCallback(win, mouseMotionCallback);
     glfwSetMouseButtonCallback(win, mouseButtonCallback);
     glfwSetScrollCallback(win, scrollCallback);
@@ -243,7 +243,7 @@ GLFWwindow * initWindow(int W, int H)
     // canvas size in pixels is not necessarily the window size (in screen coordinates)
     glfwGetFramebufferSize(win, &W, &H);
     gle::initialize();
-    reshape(win, W, H);
+    reshapeCallback(win, W, H);
     view.initGL();
     return win;
 }
@@ -283,6 +283,9 @@ void prepareDisplay(Simul const& sim)
     
     display.setParameters(pix, mag, view.depthAxis());
     display.setStencil(view.stencil);
+    
+    for ( Property * p : mPointDisp )
+        static_cast<PointDisp*>(p)->setPixels(pix, mag, disp.style==2);
     display.prepareDrawing(sim, mFiberDisp, mPointDisp);
 }
 
