@@ -59,6 +59,9 @@ namespace FilePath
     std::string full_name(std::string const& path, std::string const& file);
 
     /// read entire file to memory
+    void read_file(FILE *, char*& data, size_t& size);
+
+    /// read entire file to memory
     char* read_file(const char filename[], char*& data, size_t& size);
 
 }
