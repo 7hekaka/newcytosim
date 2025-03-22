@@ -280,12 +280,14 @@ public:
     {
         assert_true( nextDetach >= 0 );
         /*
-         A bit of math simplification here:
+         Mathematically:
              unbinding_rate_dt * exp( force / unbinding_force )
          is equivalent to
+             exp( force / unbinding_force + log(unbinding_rate_dt) )
+         and with precalculations:
              exp( force * unbinding_force_inv + log(unbinding_rate_dt) )
          */
-        real x = force * prop->unbinding_force_inv[0] + prop->unbinding_force_inv[1];
+        real x = force * prop->unbinding_force_inv + prop->unbinding_rate_log;
         //std::clog << prop->name() << " " << x << "   " << std::exp(x) << "\n";
         nextDetach -= (float)std::exp(x);
         

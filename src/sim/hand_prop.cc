@@ -154,8 +154,8 @@ void HandProp::clear()
 #endif
     unbinding_rate  = 0;
     unbinding_force = INFINITY;
-    unbinding_force_inv[0] = 0;
-    unbinding_force_inv[1] = 0;
+    unbinding_force_inv = 0;
+    unbinding_rate_log = 0;
 
     bind_also_end  = NO_END;
     bind_only_end  = NO_END;
@@ -294,20 +294,16 @@ void HandProp::complete(Simul const& sim)
     if ( unbinding_force <= 0 )
         throw InvalidParameter(name()+":unbinding_force must be > 0");
 
-    /*
-     A bit of math simplification here:
-         unbinding_rate_dt * exp( force / unbinding_force )
-     is equivalent to
-         exp( force * unbinding_force_inv + log(unbinding_rate_dt) )
-     */
-    unbinding_force_inv[0] = 1.0 / unbinding_force;
+    // Precalculate quantities used in Hand::checkKramersDetachment()
+    unbinding_force_inv = 1.0 / unbinding_force;
     
     if ( unbinding_rate <= 0 )
-        unbinding_force_inv[1] = -INFINITY;
+        unbinding_rate_log = -INFINITY;
     else
-        unbinding_force_inv[1] = std::log(unbinding_rate_dt);
+        unbinding_rate_log = std::log(unbinding_rate_dt);
 
-    //std::clog << name() << ":unbinding_force_inv = " << unbinding_force_inv[0] << '\n';
+    //std::clog << name() << ":unbinding_force_inv = " << unbinding_force_inv << '\n';
+    //std::clog << name() << ":unbinding_rate_log = " << unbinding_rate_log << '\n';
 }
 
 
@@ -328,7 +324,7 @@ void HandProp::checkStiffness(real stiff, real len, real, real kT) const
         //Cytosim::warn << "you could decrease stiffness or binding_range\n";
     }
     
-    real ap = std::exp( stiff * dis * unbinding_force_inv[0] );
+    real ap = std::exp( stiff * dis * unbinding_force_inv );
     
     if ( ap > 10.0 )
     {

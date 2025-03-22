@@ -226,9 +226,12 @@ public:
 
 public:
 
-    /// derived variable: log(unbinding_rate * time_step) / unbinding_force
-    real unbinding_force_inv[2];
+    /// derived variable: 1.0 / unbinding_force
+    real unbinding_force_inv;
     
+    /// derived variable: log(unbinding_rate * time_step)
+    real unbinding_rate_log;
+
     /// derived variable = probability to bind in one time step;
     real binding_prob;
     
