@@ -5,9 +5,11 @@
 # Copyright F. Nedelec, March 19 2011 --- 05.10.2024
 
 """
-battery_test.py:
+ Description:
 
-    run a battery of .cym files to validate cytosim and discover basic errors
+    `battery_test.py` runs a series of .cym files
+    
+    This is useful to validate cytosim and discover basic errors
 
 Live mode:
 
@@ -16,13 +18,15 @@ Live mode:
 Batch mode:
 
     battery_test.py bin/sim cym/*.cym > test.md
-    make_image.py 'play frame=100 window_size=512,512' *_cym
+    
+    scan.py 'play image frame=1000' run_*
 
-F. Nedelec, March-June 2011 - 02.2013 - 01.2020 - 07.2021 - 11.2024
+F. Nedelec, March-June 2011; 02.2013; 01.2020; 07.2021; 11.2024; 03.2025
 """
 
 import shutil, sys, os, subprocess, time
 
+timeout = 600  # in seconds
 home = os.getcwd()
 
 #------------------------------------------------------------------------
@@ -37,7 +41,7 @@ def live(tool, file):
 
 
 def execute(tool, file, verbose):
-    """run test in a new separate directory"""
+    """run file in a new separate directory, return collected output"""
     name = os.path.split(file)[1]
     wdir = 'run_'+name.partition('.')[0];
     try:
@@ -50,14 +54,19 @@ def execute(tool, file, verbose):
     out = open("out.txt", 'w')
     err = open("err.txt", 'w')
     sec = time.time()
-    val = subprocess.call(tool, stdout=out, stderr=err)
-    sec = time.time() - sec
+    try:
+        val = subprocess.call(tool, stdout=out, stderr=err, timeout=timeout)
+        if val:
+            msg = f'error {val}'
+        else:
+            msg = 'success'
+    except subprocess.TimeoutExpired as e:
+        msg = str(e)
+        pass
     err.close()
     out.close()
-    if val:
-        res += f': {sec:6.2f} sec : returned {val}\n'
-    else:
-        res += f': {sec:6.2f} sec\n'
+    sec = time.time() - sec
+    res += f': {sec:6.2f} sec : {msg}\n'
     if verbose:
         # copy standard-error:
         res += "\t\n"
@@ -99,7 +108,7 @@ def main(args):
         err.write("Error: you must specify an executable as first argument\n")
         sys.exit()
 
-    njobs = 1
+    njobs = 8
     files = []
     live = False
     for arg in args[1:]:
@@ -119,7 +128,10 @@ def main(args):
 
     njobs = min(njobs, len(files))
     
-    if njobs > 1:
+    if live:
+        for f in files:
+            live(tool, f)
+    elif njobs > 1:
         try:
             from multiprocessing import Process, Queue, Lock
         except ImportError:
@@ -137,12 +149,9 @@ def main(args):
         # wait for completion of all jobs:
         for j in jobs:
             j.join()
-        return 0
-    #process sequentially:
-    if live:
-        for f in files:
-            live(tool, f)
+            j.close()
     else:
+        #process sequentially:
         for f in files:
             os.chdir(home)
             res = execute(tool, f, 1)

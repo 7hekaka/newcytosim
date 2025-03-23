@@ -30,7 +30,7 @@ private:
     /// usually create one object, following options in Glossary
     ObjectList new_object(ObjectSet*, Property const*, Glossary&);
     
-    /// read the specification of position and orientation of an object
+    /// read specifications of position and orientation for an object
     bool read_placement(Isometry&, Glossary&);
     
     /// set position and orientation of an object, according to 'placement'

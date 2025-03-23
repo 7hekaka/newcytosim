@@ -182,7 +182,7 @@ void Interface::execute_change_all(std::string const& cat, Glossary& def)
 #pragma mark -
 
 /**
- Define a placement = ( position, orientation ) from the parameters set in `opt'
+ Define a placement = ( position, orientation ) from parameters in `opt'
  */
 bool Interface::read_placement(Isometry& iso, Glossary& opt)
 {
@@ -1441,7 +1441,7 @@ void Interface::execute_call(std::string& str, Glossary& opt)
     else if ( str == "custom9" )
         sim_->custom9(opt);
     else
-        throw InvalidSyntax("called unknown command");
+        throw InvalidSyntax("unknown command `"+str+"' called");
 }
 
 

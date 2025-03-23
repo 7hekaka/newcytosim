@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
 
+#include "messages.h"
 #include "random_vector.h"
 #include "vector1.h"
 #include "vector4.h"
@@ -412,7 +413,7 @@ size_t tossPointsCap(std::vector<Vector3>& pts, real cap, real sep, size_t max_t
 size_t distributePointsSphere(std::vector<Vector3>& pts, real sep, size_t max_trials)
 {
     /*
-     Estimate max separation by dividing area, given densest packing possible:
+     Estimate max separation by dividing area, given highest packing possible:
      Each hexagon covers 3 discs of diameter D has surface area 3/4*PI*D*D,
      Since sphere surface is 4 * PI, the surface of hexagon = 3*4*PI/nb_points
      Hence 1/4 * D*D = 4 / nb_points
@@ -432,6 +433,6 @@ size_t distributePointsSphere(std::vector<Vector3>& pts, real sep, size_t max_tr
         }
     }
     if ( dis < sep )
-        std::clog << "distributePointsSphere " << sep << " --> " << dis << "\n";
+        Cytosim::log("distributePointsSphere separation: ", sep, " --> ", dis, "\n");
     return res;
 }
