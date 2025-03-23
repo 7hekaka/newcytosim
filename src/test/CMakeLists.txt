@@ -36,7 +36,7 @@ foreach(TEST ${TEST_LIST})
     target_link_libraries(${TEST} PUBLIC "${TEST_LIBS}")
 endforeach()
 
-if(OPENGL_LIBS)
+if(MOREGL_LIBS)
 
 set(TEST_GL_LIBS
     rasterizerGL
@@ -47,7 +47,9 @@ set(TEST_GL_LIBS
     "${LAPACK_BLAS}"
     "${CURSES_LIBRARY}"
     Threads::Threads
-    "${OPENGL_LIBS}"
+    "${GLUT_LIBRARIES}"
+    "${OPENGL_LIBRARIES}"
+    "${MOREGL_LIBS}"
 )
 
 set(GL_TEST_LIST

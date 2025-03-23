@@ -1,3 +1,5 @@
+#----------------------------- TOP CMAKE config --------------------------------
+
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -5,7 +7,7 @@ set(CMAKE_CXX_EXTENSIONS ON)
 set(CMAKE_BUILD_TYPE Release)
 
 project("cytosim" C CXX)
-set(CMAKE_VERBOSE_MAKEFILE OFF)
+set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/tar)
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/lib)
@@ -34,7 +36,7 @@ option(MAKE_TESTS "build all cytosim/test executables" OFF)
 set(SIM_TARGET "sim")
 set(PLAY_TARGET "play")
 
-#-------------------------------- Libraries ------------------------------------
+#-------------------------------- LIBRARIES ------------------------------------
 
 if(NOT UNIX)
     message(FATAL_ERROR "CMake File currently only setup to build on Linux/macOS")
@@ -68,32 +70,6 @@ find_package(Threads REQUIRED)
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})
-
-#-------------------------- Graphical Libraries --------------------------------
-
-if(MAKE_PLAY)
-    if(UNIX AND NOT APPLE)
-        find_package(OpenGL)
-        find_package(GLEW)
-        find_package(GLUT)
-        find_package(X11)
-        find_package(Xt)
-        set(OPENGL_LIBS
-            OpenGL::GL
-            GLEW
-            glut
-            X11
-            Xt
-        )
-    elseif(UNIX AND APPLE)
-        set(OPENGL_LIBS
-            "-framework Accelerate"
-            "-framework GLUT"
-            "-framework OpenGL"
-            "-framework AGL"
-        )
-    endif()
-endif()
 
 #--------------------------- COMPILATION FLAGS ---------------------------------
 
