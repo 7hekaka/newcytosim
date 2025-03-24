@@ -164,7 +164,7 @@ public:
     /// set array of indices that define the edges
     void setEdges();
     /// sort faces
-    void sortFaces();
+    void sortFaces(unsigned);
     /// sort vertices in Z and update faces
     void sortVertices();
 
@@ -181,7 +181,7 @@ public:
     void store_vertices(double* vec) const;
 
     /** Scale all 3D points by (X, Y, Z) */
-    static void scale(size_t num, float* ptr, float X, float Y, float Z);
+    static void scale3D(size_t num, float* ptr, float X, float Y, float Z);
 
     /// number of derived vertices
     unsigned max_vertices() const { return max_vertices_; }
@@ -189,6 +189,8 @@ public:
     /// number of faces (each face is a triangle of 3 vertices)
     unsigned max_faces() const { return max_faces_; }
 
+    /// number of subdivisions
+    unsigned rank() const { return rank_; }
     
     /// number of derived vertices
     unsigned num_vertices() const { return num_vertices_; }
@@ -208,8 +210,11 @@ public:
     /// number of faces (each face is a triangle of 3 vertices)
     unsigned num_faces() const { return num_faces_; }
     
+    /// return threshold for triangles belonging to the hexagons of the football
+    unsigned foot_rank() const { return rint(rank_*0.3333); }
+    
     /// number of faces to be drawn if you want to display a football
-    unsigned num_faces_third() const { unsigned R = rint(rank_*0.33333); return num_faces_ - 60*(R*R); }
+    unsigned num_foot_faces() const { unsigned R = foot_rank(); return 60*(R*R); }
 
     /// array of indices to the vertices in each face (3 vertices per face)
     INDEX * face_data() const { return faces_; }

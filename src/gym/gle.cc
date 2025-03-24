@@ -1690,20 +1690,21 @@ namespace gle
         // the normal in each vertex is equal to the vertex!
         gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)inx);
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*inx));
         gym::unbind2();
         gym::cleanupVN();
     }
     
-    void drawIcoBuffer(GLsizei pts, size_t inx, GLsizei cnt, gym_color col, GLsizei mid)
+    /** Assuming faces of the icosahedron have been properly sorted */
+    void drawFootball(GLsizei pts, size_t inx, GLsizei cnt, gym_color col, GLsizei mid)
     {
         assert_true(buf_[0]); assert_true(buf_[1]);
         // the normal in each vertex is equal to the vertex!
         gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
-        glDrawElements(GL_TRIANGLES, mid, GL_UNSIGNED_SHORT, (void*)inx);
+        glDrawElements(GL_TRIANGLES, mid, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*inx));
         gym::color_both(col);
-        glDrawElements(GL_TRIANGLES, cnt-mid, GL_UNSIGNED_SHORT, (void*)(inx+2*mid));
+        glDrawElements(GL_TRIANGLES, cnt-mid, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*(inx+mid)));
         gym::unbind2();
         gym::cleanupVN();
     }
@@ -1717,9 +1718,9 @@ namespace gle
         gym::bindBufferV3N0(buf_[0], pts);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
         gym::switchCullFace(GL_FRONT);
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)inx);
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*inx));
         gym::switchCullFace(GL_BACK);
-        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)inx);
+        glDrawElements(GL_TRIANGLES, cnt, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*inx));
         gym::unbind2();
         gym::cleanupVN();
     }
@@ -1756,12 +1757,12 @@ namespace gle
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
     void dualPassSphere8() { dualPassIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
 
-    void football() { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0], gym_color(0,0,0), ico_mid_[0]); }
+    void football() { drawFootball(ico_pts_[0], ico_idx_[0], ico_cnt_[0], gym_color(0,0,0), ico_mid_[0]); }
 
-    void football1(gym_color col) { drawIcoBuffer(ico_pts_[0], ico_idx_[0], ico_cnt_[0], col, ico_mid_[0]); }
-    void football2(gym_color col) { drawIcoBuffer(ico_pts_[1], ico_idx_[1], ico_cnt_[1], col, ico_mid_[1]); }
-    void football4(gym_color col) { drawIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2], col, ico_mid_[2]); }
-    void football8(gym_color col) { drawIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3], col, ico_mid_[3]); }
+    void football1(gym_color col) { drawFootball(ico_pts_[0], ico_idx_[0], ico_cnt_[0], col, ico_mid_[0]); }
+    void football2(gym_color col) { drawFootball(ico_pts_[1], ico_idx_[1], ico_cnt_[1], col, ico_mid_[1]); }
+    void football4(gym_color col) { drawFootball(ico_pts_[2], ico_idx_[2], ico_cnt_[2], col, ico_mid_[2]); }
+    void football8(gym_color col) { drawFootball(ico_pts_[3], ico_idx_[3], ico_cnt_[3], col, ico_mid_[3]); }
 
     void icoid() { drawStripBuffer(ico_pts_[ICOID], ico_idx_[ICOID], ico_cnt_[ICOID]); }
     // this draws without loading/initializing the buffer
@@ -1825,29 +1826,29 @@ namespace gle
         for ( int i = 0; i < 9; ++i )
         {
             ico_pts_[i] = ptr - ptr0;
-            ico_idx_[i] = ( idx - idx0 ) * sizeof(GLushort);
+            ico_idx_[i] = idx - idx0;
             unsigned cnt = setIcoBuffer(ico[i], ptr, idx);
             ico_cnt_[i] = cnt;
-            ico_mid_[i] = 3*ico[i].num_faces_third();
+            ico_mid_[i] = cnt - 3 * ico[i].num_foot_faces();
         }
 
         assert_true(DOME >= 9);
         float * dome = ptr;
         ico_pts_[DOME] = ptr - ptr0;
-        ico_idx_[DOME] = ( idx - idx0 ) * sizeof(GLushort);
+        ico_idx_[DOME] = idx - idx0;
         ico_cnt_[DOME] = setIcoBuffer(ico[DOME_ICO], ptr, idx);
-        Tesselator::scale(ico_cnt_[DOME], dome, 1.f, 1.f, 0.5f);
+        Tesselator::scale3D(ico_cnt_[DOME], dome, 1.f, 1.f, 0.5f);
         
-        assert_true(ROOF >= 10);
+        assert_true(ROOF >= DOME);
         float * roof = ptr;
         ico_pts_[ROOF] = ptr - ptr0;
-        ico_idx_[ROOF] = ( idx - idx0 ) * sizeof(GLushort);
+        ico_idx_[ROOF] = idx - idx0;
         ico_cnt_[ROOF] = setIcoBuffer(ico[DOME_ICO], ptr, idx);
-        Tesselator::scale(ico_cnt_[ROOF], roof, 1.f, 1.f, 0.33f);
+        Tesselator::scale3D(ico_cnt_[ROOF], roof, 1.f, 1.f, 0.33f);
 
-        assert_true(ICOID >= 11);
+        assert_true(ICOID >= ROOF);
         ico_pts_[ICOID] = ptr - ptr0;
-        ico_idx_[ICOID] = ( idx - idx0 ) * sizeof(GLushort);
+        ico_idx_[ICOID] = idx - idx0;
         ico_cnt_[ICOID] = setIcoidBuffer((flute3*)ptr, idx);
         ptr += 3*12;
         idx += ico_cnt_[ICOID];

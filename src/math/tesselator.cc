@@ -174,13 +174,13 @@ void Tesselator::setVertexCoordinates()
 
 
 /** This scales the 3D points by (X, Y, Z) */
-void Tesselator::scale(size_t num, float* ptr, float X, float Y, float Z)
+void Tesselator::scale3D(size_t num, float* ptr, float X, float Y, float Z)
 {
-    for ( unsigned n = 0; n < num; ++n )
+    for ( unsigned n = 0; n < num; n += 3 )
     {
-        ptr[3*n  ] *= X;
-        ptr[3*n+1] *= Y;
-        ptr[3*n+2] *= Z;
+        ptr[n  ] *= X;
+        ptr[n+1] *= Y;
+        ptr[n+2] *= Z;
     }
 }
 
@@ -267,12 +267,17 @@ static int compareFaceIW(const void * A, const void * B)
 {
     unsigned a = static_cast<FaceIW const*>(A)->val;
     unsigned b = static_cast<FaceIW const*>(B)->val;
+    if ( a != b )
+        return ( a > b ) - ( a < b );
+    // keep existing order:
+    a = static_cast<FaceIW const*>(A)->inx;
+    b = static_cast<FaceIW const*>(B)->inx;
     return ( a > b ) - ( a < b );
 }
 
 
 /** Sort faces according to distance to primary vertex */
-void Tesselator::sortFaces()
+void Tesselator::sortFaces(unsigned cut)
 {
     FaceIW * map = new FaceIW[num_faces_];
 
@@ -282,11 +287,12 @@ void Tesselator::sortFaces()
         unsigned b = faces_[3*i+1];
         unsigned c = faces_[3*i+2];
         
-        unsigned wa = vertices_[a].weight_[0];
-        unsigned wb = vertices_[b].weight_[0];
-        unsigned wc = vertices_[c].weight_[0];
+        // weight_[0] should be the highest, and close to rank_ when near a primary vertex
+        unsigned wa = vertices_[a].weight_[0] > cut;
+        unsigned wb = vertices_[b].weight_[0] > cut;
+        unsigned wc = vertices_[c].weight_[0] > cut;
         
-        map[i] = { i, std::min(wa, std::min(wb, wc)) };
+        map[i] = { i, std::max(wa, std::max(wb, wc)) };
     }
 
     qsort(map, num_faces_, sizeof(FaceIW), &compareFaceIW);
@@ -489,7 +495,7 @@ void Tesselator::cutQuad(unsigned quad[4], unsigned div, unsigned* line)
     }
 }
 
-
+/** Refine a short linear strip made of 4 triangles, with 6 vertices */
 void Tesselator::cutStrip(unsigned inx[6], unsigned div, unsigned * line)
 {
     unsigned A = inx[0];
@@ -800,7 +806,7 @@ void Tesselator::buildIcosahedron(unsigned div)
         cutStrip(strip[i], div, line);
     delete[] line;
     
-    sortFaces();
+    sortFaces(div-foot_rank());
 }
 
 

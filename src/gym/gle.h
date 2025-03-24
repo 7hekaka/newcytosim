@@ -20,7 +20,7 @@ namespace gle
 {
     /// `finesse` sets the number of triangles used to draw shapes such as cylinders
     /** Higher values are better: 2 is okay, 4 is good, 8 is nice and 16 is very nice */
-    constexpr unsigned finesse = 2;
+    constexpr unsigned finesse = 6;
     
     /// number of circle points stored in buffer
     /** We use multiples of 5 to match circles and the icosahedron */
