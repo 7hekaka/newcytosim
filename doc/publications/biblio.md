@@ -8,7 +8,7 @@
 
 *Please, let us know of any citation we could add. This is important for our funders!*
 
-- [Microtubule stiffening by doublecor-n-domain protein ZYG-8 contributes to spindle orienta-on during C. elegans zygote division](https://doi.org/10.1101/2024.11.29.624795)
+- [Microtubule stiffening by doublecortin-domain protein ZYG-8 contributes to spindle orienta-on during C. elegans zygote division](https://doi.org/10.1101/2024.11.29.624795)
 - [Cofilin promotes actin turnover and flexibility to drive coordinated cell movements in vivo](https://doi.org/10.1101/2024.12.17.628979)
 - [Microscopic Control of Cortical Flows in Polarized C. elegans Zygotes](https://www.biorxiv.org/content/10.1101/2025.01.12.632635v1)
 - [Multi-kinesin clusters impart mechanical stress that reveals mechanisms of microtubule breakage in cells](https://doi.org/10.1101/2025.01.31.635950)
