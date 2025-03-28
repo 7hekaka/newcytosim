@@ -91,7 +91,7 @@ public:
     /// put a C++ string plus a new line character
     void put_line(const std::string&);
 
-    /// read until character `end` is found and set `line`, including terminating character
+    /// read until `\n` is found, return string with terminating character
     std::string get_line();
 
     /// put `cnt` characters from str

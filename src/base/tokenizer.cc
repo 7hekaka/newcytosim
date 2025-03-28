@@ -34,6 +34,16 @@ std::string Tokenizer::get_line(std::istream& is)
 }
 
 
+int Tokenizer::skip_line(std::istream& is)
+{
+    int c;
+    do {
+        c = is.get();
+    } while ( c != '\n' && c != EOF );
+    return is.peek();
+}
+
+
 int Tokenizer::skip_space(std::istream& is, bool eat_line)
 {
     int c = is.peek();
@@ -55,14 +65,6 @@ int Tokenizer::get_character(std::istream& is, bool eat_space, bool eat_line)
         c = is.get();
         if ( c == EOF )
             return EOF;
-#if ( 0 )
-        if ( c == COMMENT_START )
-        {
-            std::string line;
-            std::getline(is, line);
-            c = '\n';
-        }
-#endif
         if (( c == '\n' ) & ! eat_line )
             break;
     } while ( eat_space && isspace(c) );
@@ -648,14 +650,6 @@ std::string Tokenizer::get_block_text(std::istream& is, char c_in, const char c_
             res.append( get_block_text(is, c, block_delimiter(c)) );
         else if (( c == ')' ) | ( c == '}' ))
             throw InvalidSyntax("unclosed delimiter '"+std::string(1,c_in)+"'");
-#if ( 0 )
-        else if ( c == COMMENT_START )
-        {
-            // Read comments as lines, to inactivate symbols within: ')' and '}'
-            std::string line;
-            std::getline(is, line);
-        }
-#endif
         else
             res.push_back(c);
         is.get(c);
@@ -701,6 +695,9 @@ std::string Tokenizer::get_block(std::istream& is, char c_in, bool or_die)
     assert_true(c_in);
     
     int c = skip_space(is, true);
+    
+    if ( c == '%' )
+        c = skip_line(is);
     
     if ( c == c_in )
     {

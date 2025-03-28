@@ -72,7 +72,7 @@ static void skip_comments(std::istream& is)
     if ( is.get() == '{' )
         Tokenizer::get_block_text(is, 0, '}');
     else
-        Tokenizer::get_line(is);
+        Tokenizer::skip_line(is);
 }
 
 //------------------------------------------------------------------------------
@@ -1442,7 +1442,7 @@ void Parser::evaluate(std::istream& is, std::streampos& ipos)
             is.get();
             c = is.get();
             if ( '/' == c )
-                Tokenizer::get_line(is);
+                Tokenizer::skip_line(is);
             else if ( '*' == c )
                 Tokenizer::get_until(is, "*/");
             else

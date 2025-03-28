@@ -447,7 +447,7 @@ int Glossary::read_rhs(Glossary::key_type const& key, Glossary::rec_type& rec, s
     {
         if ( k.size() || delimited )
             add_rhs_value(key, rec, k, true);
-        Tokenizer::get_line(is);
+        Tokenizer::skip_line(is);
         return 0;
     }
     
@@ -633,7 +633,6 @@ std::ostream& operator << (std::ostream& os, Glossary const& arg)
 void Glossary::read_entry(std::istream& is, int no_overwrite)
 {
     int c = Tokenizer::skip_space(is, true);
-    std::streampos isp = is.tellg();
 
     if ( c == EOF )
         return;
@@ -641,11 +640,11 @@ void Glossary::read_entry(std::istream& is, int no_overwrite)
     // skip comments:
     if ( c == '%' )
     {
-        std::string skip;
-        std::getline(is, skip);
+        Tokenizer::skip_line(is);
         return;
     }
     
+    std::streampos isp = is.tellg();
     pair_type pair;
     try
     {

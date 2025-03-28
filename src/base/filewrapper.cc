@@ -114,8 +114,8 @@ std::string FileWrapper::get_line()
 {
     std::string res;
     char * line = nullptr;
-    size_t line_len = 0;
-    ssize_t read = getline(&line, &line_len, mFile);
+    size_t size = 0;
+    ssize_t read = getline(&line, &size, mFile);
     if ( read > 0 )
     {
         if ( read > 1 && line[read-1] == '\n' )
