@@ -18,8 +18,7 @@
 /// a minimal math expression evaluator
 /**
  This can evaluate boolean expressions like `X^2 + (Y-3)^3 < 4'
- To support more fancy expressions, we could link here `tinyexpr`:
- https://codeplea.com/tinyexpr
+ We could use instead [tinyexpr](https://codeplea.com/tinyexpr)
 */
 class Evaluator
 {
@@ -35,7 +34,7 @@ private:
     mutable char const* ptr;
     
     /// list of variables
-    const variable_list variables_;
+    variable_list variables_;
 
     static void print_variables(std::ostream& os, variable_list const& list)
     {
@@ -125,8 +124,6 @@ private:
             if ( var == v.first )
                 return v.second;
         }
-        if ( var == "pi" )
-            return M_PI;
         print_variables(std::clog, variables_);
         throw InvalidSyntax("unknown variable '"+var+"'");
         return 0;
@@ -269,6 +266,7 @@ public:
     
     Evaluator(std::initializer_list<variable> const& v) : variables_(v)
     {
+        variables_.push_back({"pi", M_PI});
         //print_variables(std::clog, variables_);
     }
     
