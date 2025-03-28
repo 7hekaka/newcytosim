@@ -337,8 +337,9 @@ void speed_test_vector(size_t cnt)
         sum += Vector3::randU();
         sum += Vector3::randU();
     }
+    sum /= 4 * cnt;
     printf("Unit vector %5.2f  ", tock(cnt>>17));
-    printf("( %5.2f %5.2f %5.2f )\n", sum.XX, sum.YY, sum.ZZ);
+    printf("( %5.4f %5.4f %5.4f )\n", sum.XX, sum.YY, sum.ZZ);
 }
 
 

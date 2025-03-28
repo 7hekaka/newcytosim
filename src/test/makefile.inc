@@ -21,7 +21,7 @@ vpath %.cc src/test
 
 GLTEST_MAKE = $(COMPILE) $(addprefix -Isrc/, math base sim gym disp) $(OBJECTS) $(LINK) $(GRAFIX) $(IMAGES) -o bin/$@
 
-TEST_OBJ = $(addprefix build/, random_vector.o random.o random_seed.o SFMT.o backtrace.o exceptions.o)
+TEST_OBJ = $(addprefix build/, random_vector.o random.o random_seed.o SFMT.o backtrace.o exceptions.o messages.o)
 
 #----------------------------Targets--------------------------------------------
 

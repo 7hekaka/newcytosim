@@ -93,7 +93,7 @@ protected:
     uint64_t URAND64()
     {
         // consume data from the 'start_' to preserve alignment
-        if ( finish_ <= 1 + start_ )
+        if ( finish_ < 2 + start_ )
             refill();
         uint64_t const* p = reinterpret_cast<uint64_t const*>(start_);
         start_ += 2;
@@ -104,7 +104,7 @@ protected:
     int64_t SRAND64()
     {
         // consume data from the 'start_' to preserve alignment
-        if ( finish_ <= 1 + start_ )
+        if ( finish_ < 2 + start_ )
             refill();
         int64_t const* p = reinterpret_cast<int64_t const*>(start_);
         start_ += 2;

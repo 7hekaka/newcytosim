@@ -111,7 +111,7 @@ void Random::add_srand1(real dst[1], const real ptr[1], real mag)
 void Random::add_srand2(real dst[2], const real ptr[2], real mag)
 {
     mag *= TWO_POWER_MINUS_31;
-    if ( finish_ <= 1 + start_ )
+    if ( finish_ < 2 + start_ )
         refill();
     finish_ -= 2;
     dst[0] = ptr[0] + mag * static_cast<real>(finish_[0]);
@@ -121,7 +121,7 @@ void Random::add_srand2(real dst[2], const real ptr[2], real mag)
 void Random::add_srand3(real dst[3], const real ptr[3], real mag)
 {
     mag *= TWO_POWER_MINUS_31;
-    if ( finish_ <= 2 + start_ )
+    if ( finish_ < 3 + start_ )
         refill();
     finish_ -= 3;
     dst[0] = ptr[0] + mag * static_cast<real>(finish_[0]);
@@ -131,7 +131,7 @@ void Random::add_srand3(real dst[3], const real ptr[3], real mag)
 
 void Random::sreal2(real& a, real& b)
 {
-    if ( finish_ <= 1 + start_ )
+    if ( finish_ < 2 + start_ )
         refill();
     finish_ -= 2;
     int32_t const * ptr = reinterpret_cast<int32_t const *>(finish_);
@@ -141,9 +141,9 @@ void Random::sreal2(real& a, real& b)
 
 void Random::sreal4(real& a, real& b, real& c, real& d)
 {
-    if ( finish_ <= 3 + start_ )
+    if ( finish_ < 4 + start_ )
         refill();
-    finish_ -= 3;
+    finish_ -= 4;
     int32_t const * ptr = reinterpret_cast<int32_t const *>(finish_);
     a = TWO_POWER_MINUS_31 * static_cast<real>(ptr[0]);
     b = TWO_POWER_MINUS_31 * static_cast<real>(ptr[1]);
