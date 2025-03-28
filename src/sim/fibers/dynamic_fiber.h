@@ -9,7 +9,7 @@
 #include "dynamic_fiber_prop.h"
 
 
-/// A Fiber with discrete growth and dynamic instability at the plus end
+/// A Fiber with discrete growth and dynamic instability
 /**
  This implements the microtubule dynamic instability model proposed by
  Brun, Rupp et al. with a 'hard-coded' coupling parameter N=2.
@@ -21,18 +21,18 @@
  
  The growth speed is reduced under antagonistic force by an exponential factor:
  
-***Measurement of the Force-Velocity Relation for Growing Microtubules***
-Marileen Dogterom and Bernard Yurke
-Science Vol 278 pp 856-860; 1997
-http://www.sciencemag.org/content/278/5339/856.abstract
+    ***Measurement of the Force-Velocity Relation for Growing Microtubules***
+    Marileen Dogterom and Bernard Yurke
+    Science Vol 278 pp 856-860; 1997
+    http://www.sciencemag.org/content/278/5339/856.abstract
  
 ...and this will increase the catastrophe rate:
  
-***Dynamic instability of MTs is regulated by force***
-M.Janson, M. de Dood, M. Dogterom.
-Journal of Cell Biology Vol 161, Nb 6, 2003
-Figure 2 C
-http://www.jcb.org/cgi/doi/10.1083/jcb.200301147
+    ***Dynamic instability of MTs is regulated by force***
+    M.Janson, M. de Dood, M. Dogterom.
+    Journal of Cell Biology Vol 161, Nb 6, 2003
+    Figure 2 C
+    http://www.jcb.org/cgi/doi/10.1083/jcb.200301147
  
  
  If you use this model, please cite:

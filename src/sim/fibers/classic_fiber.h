@@ -9,45 +9,55 @@
 #include "classic_fiber_prop.h"
 
 
-/// A Fiber with a standard two-state model of dynamic instability at the plus end
+/// A Fiber following a standard two-state model of dynamic instability
 /**
- This implements the 'classical' two-state model of dynamic instability:
- - a growing state, affected by force,
- - stochastic catastrophes, affected by force,
- - a shrinking state characterized by a constant speed,
- - stochastic rescues.
+ This implements the 'classical' two-state model of dynamic instability proposed
+ by Mitchison and Kirschner:
+ - Growing and Shrinking states persist over multiple monomer addition/removal
+ - Transitions between these two states, catastrophes and rescues, are stochastic
  .
  
- Both ends may grow/shrink and do so smoothly:
- The length is incremented at each time step by `timestep * timestep`.
+      Dynamic instability of microtubule growth\n
+      T. Mitchison and M. Kirschner\n
+      https://www.nature.com/articles/312237a0\n
+      https://doi.org/10.1073/pnas.82.2.431
  
- The speed of the tip `tip_speed` is a fraction of `prop->growing_speed`,
- because the growth speed is reduced under antagonistic force by an exponential factor:
+ For the analysis, see:
+ 
+      Physical aspects of the growth and regulation of microtubule structures\n
+      M. Dogterom and S. Leibler\n
+      https://doi.org/10.1103/PhysRevLett.70.1347
+ 
+ In this class, both ends may undergo dynamic instability and do so continuously:
+ The length is incremented at each time step by `time_step * speed`.
+ 
+ Moreover,
+ - the growth speed is linearly proportional to free tubulin concentration.
+ - the growing speed is decreased by antagonistic force,
+ - the rate of catastrophes is also affected by force,
+ - the shrinking speed is constant.
+ 
+ Growth is reduced under antagonistic force exponentially:
  
      Measurement of the Force-Velocity Relation for Growing Microtubules\n
-     Marileen Dogterom and Bernard Yurke\n
-     Science Vol 278 pp 856-860; 1997\n
+     M. Dogterom and B. Yurke\n
      http://dx.doi.org/10.1126/science.278.5339.856 \n
      http://www.sciencemag.org/content/278/5339/856.abstract
  
  ...and this increases the catastrophe rate:
 
      Dynamic instability of MTs is regulated by force\n
-     M.Janson, M. de Dood, M. Dogterom.\n
-     Journal of Cell Biology Vol 161, Nb 6, 2003\n
+     M. Janson, M. de Dood, M. Dogterom.\n
      Figure 2 C\n
-     http://dx.doi.org/10.1083/jcb.200301147 \n
+     http://dx.doi.org/10.1083/jcb.200301147\n
      http://jcb.rupress.org/content/161/6/1029
- 
- The growth speed is linearly proportional to free tubulin concentration.
 
  See the @ref ClassicFiberPar.
 
- This class is not fully tested (17. Feb 2011).
  @ingroup FiberGroup
  */
 class ClassicFiber : public Fiber
-{   
+{
 private:
     
     /// state of minus end
@@ -82,10 +92,10 @@ public:
     /// change state of plus end
     void setEndStateP(state_t s);
 
-    ///
+    /// sub simulation step
     real stepMinusEnd();
     
-    ///
+    /// sub simulation step
     real stepPlusEnd();
     
     /// Stochastic simulation
