@@ -25,6 +25,8 @@ void SpaceDice::resize(Glossary& opt)
     opt.set(edg, "edge");
     if ( edg < 0 )
         throw InvalidParameter("dice:edge must be >= 0");
+    if ( edg == 0 )
+        std::clog << "Warning: dice:edge is unset or null";
 
     for ( unsigned d = 0; d < DIM; ++d )
     {

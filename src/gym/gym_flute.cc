@@ -8,6 +8,7 @@
 
 namespace gym
 {
+    /// size of floating point data type
     constexpr size_t Q = sizeof(float);
 
     /// number of buffers used to stream data to GPU

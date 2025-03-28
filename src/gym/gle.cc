@@ -611,7 +611,7 @@ namespace gle
     }
     
     /// this only sets vertices, skipping normals
-    size_t setIcoidBuffer(flute3* flu, GLushort* idx)
+    size_t setIcoidBuffer(flute3* flu, Tesselator::INDEX* idx)
     {
         const float U = 1.0;
         const float Z = std::sqrt(0.2);
@@ -636,8 +636,9 @@ namespace gle
         flu[11] = { 0,  0,  H};
 
         const size_t F = 30; // number of points in the triangle strip
-        GLushort strip[F] = {0,1,2,6,7,11, 11,8,7,3,2,0, 0,3,4,8,9,11, 11,10,9,5,4,0, 0,5,1,10,6,11};
-        memcpy(idx, strip, F*sizeof(GLushort));
+        Tesselator::INDEX strip[F] = {0,1,2,6,7,11,
+            11,8,7,3,2,0, 0,3,4,8,9,11, 11,10,9,5,4,0, 0,5,1,10,6,11};
+        memcpy(idx, strip, sizeof(strip));
         return F;
     }
     
@@ -1670,16 +1671,15 @@ namespace gle
 #pragma mark - Spheres made from refined Icosahedrons
     
     /// using icosahedrons to render the sphere:
-    static unsigned setIcoBuffer(Tesselator& ico, float*& ptr, GLushort*& idx)
+    static unsigned setIcoBuffer(Tesselator& ico, float*& ptr, Tesselator::INDEX*& idx)
     {
         //fprintf(stderr, "setIcoBuffer %i: %u %u\n", i, ico.max_vertices(), ico.num_vertices());
-        static_assert(std::is_same<Tesselator::INDEX, GLushort>::value, "Index type mismatch");
         assert_true(ico.num_vertices() <= 65535);
         ico.store_vertices(ptr);
         ptr += 3 * ico.num_vertices();
         
         unsigned cnt = 3 * ico.num_faces();
-        memcpy(idx, ico.face_data(), cnt*sizeof(Tesselator::INDEX));
+        memcpy(idx, ico.face_data(), ico.face_data_size());
         idx += cnt;
         return cnt;
     }
@@ -1811,6 +1811,7 @@ namespace gle
         // request buffer for index data:
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, F*sizeof(GLushort), nullptr, GL_STATIC_DRAW);
         GLushort* idx = (GLushort*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+        static_assert(std::is_same<Tesselator::INDEX, GLushort>::value, "Index type mismatch");
 
         float*const ptr0 = ptr;
         GLushort*const idx0 = idx;

@@ -219,6 +219,9 @@ public:
     /// array of indices to the vertices in each face (3 vertices per face)
     INDEX * face_data() const { return faces_; }
     
+    /// number of faces (each face is a triangle of 3 vertices)
+    size_t face_data_size() const { return num_faces_ * 3 * sizeof(INDEX); }
+
     /// export ascii PLY format
     void exportPLY(FILE *) const;
     
