@@ -198,35 +198,7 @@ Vector3 Vector3::randU(const real n)
         d = 1.0 - x*x - y*y;
     } while ( d <= 0 );
     real h = ( n + n ) * std::sqrt(d);
-    return Vector3(x*h, y*h, n-2.0*d*n);
-}
-
-#else
-
-
-/**
- From Cook (1957)
- http://mathworld.wolfram.com/SpherePointPicking.html
- This uses 4 random-numbers, but avoids the square-root
- */
-Vector3 Vector3::randU()
-{
-    real x, y, z, t, d;
-    do {
-        RNG.sreal4(x, y, z, t);
-        d = ( x*x + y*y ) + ( z*z + t*t );
-    } while ( d > 1.0 );
-    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), (x*x-y*y)+(t*t-z*z)) / d;
-}
-
-Vector3 Vector3::randU(const real n)
-{
-    real x, y, z, t, d;
-    do {
-        RNG.sreal4(x, y, z, t);
-        d = ( x*x + y*y ) + ( z*z + t*t );
-    } while ( d > 1.0 );
-    return Vector3(2*(y*t+x*z), 2*(z*t-x*y), (x*x-y*y)+(t*t-z*z)) * (n/d);
+    return Vector3(x*h, y*h, n*(1.0-2.0*d));
 }
 
 #endif
