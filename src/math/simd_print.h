@@ -32,11 +32,13 @@ LOCAL void dump(vec2f v, char const* s)
     printf("%16s f( %5.2f %5.2f )\n", s, v[1], v[0]);
 }
 
+#if !defined(__SSE3__)
 /// print SIMD vector of 4 floats
 LOCAL void dump(vec4f v, char const* s)
 {
     printf("%16s f( %5.2f %5.2f %5.2f %5.2f )\n", s, v[3], v[2], v[1], v[0]);
 }
+#endif
 
 /// print two SIMD vector of 4 floats
 LOCAL void dump(vec4f x, vec4f y, char const* s)
