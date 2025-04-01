@@ -2,7 +2,7 @@
 
 Cytosim is an [open-source](LICENSE.txt) cytoskeleton simulation suite designed to model large systems of flexible filaments and their associated proteins, such as molecular motors. It has been extensively used to study actin and microtubule dynamics in 1D, 2D, and 3D.
 
-Built around an optimized C++ core engine, Cytosim runs on UNIX, macOS, GNU/Linux, and within the Windows Subsystem for Linux (WSL). Its modular and extensible design makes it highly adaptable, allowing customization for specific research needs. Additionally, a versatile set of Python programs streamlines the standard simulation workflow.
+Built around an optimized C++ core engine, Cytosim runs on UNIX, macOS, GNU/Linux, and within the Windows Subsystem for Linux (WSL). The modular and extensible design makes it highly adaptable, allowing customization for specific research needs. Additionally, a versatile set of Python programs streamlines the standard simulation workflow.
 
 Cytosim has been used in approximately 100 research articles from [our](doc/publications/index.md) and [other research groups](doc/publications/biblio.md).
 
@@ -47,7 +47,7 @@ Cytosim offers command-line tools with simulation and display capabilities. Simu
 
 Cytosim uses the CPU and does not require any specific hardware. It is distributed as source code and [must be compiled](doc/compile/index.md) before use. 
 
-* On Mac OS X: install [xcode](https://developer.apple.com/xcode), free on the App Store.
+* On Mac OS X: install [Xcode](https://developer.apple.com/xcode), free on the App Store.
 * Linux: install [the GNU compiler](https://gcc.gnu.org) or another standard compiler. 
 * Compiling natively on Windows would require changes to the code. For Windows 10 and later, please use the [Windows Subsystem for Linux](doc/compile/wsl.md), and for older Windows versions, [use Cygwin](doc/compile/cygwin.md).
 
@@ -55,9 +55,9 @@ Cytosim uses the CPU and does not require any specific hardware. It is distribut
 
 * [BLAS](http://netlib.org/blas)
 * [LAPACK](http://netlib.org/lapack)
-- [OpenGL](http://www.opengl.org) 
-- [Ncurses](https://invisible-island.net/ncurses)
+* [Ncurses](https://invisible-island.net/ncurses)
 - [pthreads](http://en.wikipedia.org/wiki/POSIX_Threads)
+- [OpenGL](http://www.opengl.org) 
 - [GLUT](http://www.opengl.org/resources/libraries/glut) or [freeGLUT](http://freeglut.sourceforge.net).
 
 There are [different ways](doc/compile/index.md) to install these libraries.
@@ -66,7 +66,7 @@ There are [different ways](doc/compile/index.md) to install these libraries.
 
 To download the source code, enter these commands in a terminal window:
 
-	git clone https://gitlab.com/f.nedelec/cytosim
+	git clone https://gitlab.com/f-nedelec/cytosim
 	cd cytosim
 	
 To compile using [make](https://www.gnu.org/software/make), try:
