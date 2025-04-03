@@ -3,6 +3,8 @@
 - [Collective Langevin Dynamics of Flexible Cytoskeletal Fibers](http://dx.doi.org/10.1088/1367-2630/9/11/427)  
 - [Preconfig: A Versatile Configuration File Generator for Varying Parameters](http://doi.org/10.5334/jors.156)  
 - [Detailed protocol to use Cytosim](https://arxiv.org/abs/2205.13852)  
+- [Organizing hackatons with Cytosim](https://arxiv.org/abs/2503.23492)  
+
 
 # Cytosim used in other groups
 
@@ -16,6 +18,7 @@
 
 2024
 
+- [KnotResolver: tracking self-intersecting filaments in microscopy using directed graphs](https://doi.org/10.1093/bioinformatics/btae538)
 - [A role for cross-linking proteins in actin filament network
 organization and force generation](https://doi.org/10.1073/pnas.2407838121)
 - [Wave-like oscillations of clamped microtubules driven by collective dynein transport](https://doi.org/10.1016/j.bpj.2024.01.016)
@@ -27,12 +30,14 @@ organization and force generation](https://doi.org/10.1073/pnas.2407838121)
 
 2023
 
+- [Elucidating the Role of Filament Turnover in Cortical Flow using Simulations and Representation Learning](https://doi.org/10.1016/j.bpj.2023.11.3270)
 - [Kinetic trapping organizes actin filaments within liquid-like protein droplets](https://doi.org/10.1101/2023.05.26.542517)
 - [Liquid-like condensates mediate competition between actin branching and bundling](https://doi.org/10.1101/2023.06.23.546267)
 - [Nonaffine Mechanics of Entangled Networks Inspired by Intermediate Filaments](https://doi.org/10.1103/PhysRevLett.131.058101)
 - [Microtubule competition and cell growth recenter the nucleus after anaphase in fission yeast](https://doi.org/10.1091/mbc.E23-01-0034)
 - [Reduction of cortical pulling at mitotic entry facilitates aster centration](https://doi.org/10.1101/2023.03.21.533625)
 - [Self-organization of microtubules: complexity analysis of emergent patterns](https://arxiv.org/abs/2305.00539)
+- [Dynein-driven self-organizationofmicrotubules: An entropy-andnetwork-based analysis](https://doi.org/10.1016/j.chaos.2024.115053)
 
 2022
 
