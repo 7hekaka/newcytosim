@@ -2148,7 +2148,6 @@
 		BBCAA3E806B05D3C00638608 /* chain.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = chain.cc; path = src/sim/chain.cc; sourceTree = SOURCE_ROOT; };
 		BBCAA3E906B05D3C00638608 /* chain.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = chain.h; path = src/sim/chain.h; sourceTree = SOURCE_ROOT; };
 		BBCAA49D06B0655A00638608 /* mecafil_project.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = mecafil_project.cc; path = src/sim/mecafil_project.cc; sourceTree = SOURCE_ROOT; };
-		BBCAA49E06B0655A00638608 /* mecafil_projectmat.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = mecafil_projectmat.cc; path = src/sim/mecafil_projectmat.cc; sourceTree = SOURCE_ROOT; };
 		BBCB085C244C44AB004E7C32 /* mecafil_code.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mecafil_code.cc; sourceTree = "<group>"; };
 		BBCD0E910C5E84CC00B463EB /* test_sizeof.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_sizeof.cc; path = src/test/test_sizeof.cc; sourceTree = SOURCE_ROOT; };
 		BBCD6993126F818F00D19DDF /* sieve.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sieve.cc; sourceTree = "<group>"; };
@@ -3701,7 +3700,6 @@
 				BB9D992508D6281100DBD2BF /* mecafil.cc */,
 				BBCB085C244C44AB004E7C32 /* mecafil_code.cc */,
 				BBCAA49D06B0655A00638608 /* mecafil_project.cc */,
-				BBCAA49E06B0655A00638608 /* mecafil_projectmat.cc */,
 				BBC422F8247342CF007EA070 /* hand_list.h */,
 				BBC422F9247342CF007EA070 /* hand_list.cc */,
 				BB171C310B3DEBE700CFFC3B /* fiber.h */,

@@ -5,15 +5,6 @@
 #include "chain.h"
 #include "cymdef.h"  // needed for NEW_FIBER_LOOP
 
-/**
- Enable this option to build the projection matrix explicitly.
- Alternatively, the projection is calculated directly using vectors only.
- Having two methods is useful for cross-validation, but the matrix version is SLOWER
- 
- Conclusion : do not enable this normally
-*/
-#define OLD_PROJECT_WITH_MATRIX 0
-
 class Matrix;
 
 /// incompressible Filament with bending elasticity
@@ -40,30 +31,11 @@ private:
     
     /// work array allocated to hold `DIM*nbPoints` scalar values
     real * iLLG;
-
-#if OLD_PROJECT_WITH_MATRIX
-    
-    /* variables used for projecting with a matrix ( mecafil_projectmat.cc ) */
-    
-    /// projection matrix
-    real * iProj;
-    
-    /// differential of projection matrix
-    real * iDProj;
-    
-    /// part of the projection matrix
-    real * iJJtiJ;
-    
-    /// intermediate of calculus
-    real * iTMP;
-
-#else
     
     /// J*J' is a tridiagonal symmetric matrix of size (nbPoints-1).
     /** iJJt[] holds the diagonal elements and iJJtU[] the off-diagonal ones. */
     real * iJJt, * iJJtU;
 
-#endif
 #if ADD_PROJECTION_DIFF
     /// vector for the correction to the projection of size (nbPoints-1)
     real * iJJtJF;

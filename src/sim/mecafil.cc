@@ -128,12 +128,7 @@ void Mecafil::storeDirections()
 
 #if ( DIM > 1 )
 
-#  if OLD_PROJECT_WITH_MATRIX
-#     include "mecafil_projectmat.cc"
-#     warning "projection matrices are built explicitly"
-#  else
-#     include "mecafil_project.cc"
-#  endif
+#include "mecafil_project.cc"
 
 #else
 
