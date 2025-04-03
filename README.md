@@ -139,8 +139,15 @@ The documentation source files use [Markdown](https://en.wikipedia.org/wiki/Mark
 *  Serge Dmitrieff         2013-
 *  Julio Belmonte          2014-
 
+# History
+
+Older versions of the project:
+
+* [Cytosim-2017](https://github.com/nedelec/cytosim-2017)
+* [Cytosim-2023](https://gitlab.com/f-nedelec/cytosim-2023)
+
 # Contact
 
-Email: cytosim@cytosim.org
+F.J. Nedelec
 
 
