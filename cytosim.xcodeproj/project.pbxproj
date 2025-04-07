@@ -686,7 +686,6 @@
 		BB846BE5116FDEB900A0CD0E /* space_set.h in Headers */ = {isa = PBXBuildFile; fileRef = BB955C4C116FBF4C000E70A6 /* space_set.h */; };
 		BB8481B2158348E80076C8C2 /* couple_long.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB8481B0158348E80076C8C2 /* couple_long.cc */; };
 		BB8481B3158348E80076C8C2 /* couple_long.h in Headers */ = {isa = PBXBuildFile; fileRef = BB8481B1158348E80076C8C2 /* couple_long.h */; };
-		BB855B77266A0CC400621C09 /* cympack.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB855B752667D2C700621C09 /* cympack.cc */; };
 		BB882AF80EE82C8B00E29E5C /* libcytobase.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BB51BC5C05FA559800D4869F /* libcytobase.a */; };
 		BB882B1B0EE82C9700E29E5C /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BB7C2B8D05FA4AC9002C69A9 /* OpenGL.framework */; };
 		BB88388F10B48EC400A4028F /* space_prop.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB88388910B48EC400A4028F /* space_prop.cc */; };
@@ -1980,7 +1979,6 @@
 		BB845E002864411D003254EF /* simul_part.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simul_part.h; sourceTree = "<group>"; };
 		BB8481B0158348E80076C8C2 /* couple_long.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = couple_long.cc; path = couples/couple_long.cc; sourceTree = "<group>"; };
 		BB8481B1158348E80076C8C2 /* couple_long.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = couple_long.h; path = couples/couple_long.h; sourceTree = "<group>"; };
-		BB855B752667D2C700621C09 /* cympack.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = cympack.cc; sourceTree = "<group>"; };
 		BB882B400EE82D6A00E29E5C /* test_bits.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = test_bits.cc; path = src/test/test_bits.cc; sourceTree = SOURCE_ROOT; };
 		BB88388910B48EC400A4028F /* space_prop.cc */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = space_prop.cc; path = src/sim/space_prop.cc; sourceTree = SOURCE_ROOT; };
 		BB88388A10B48EC400A4028F /* space_prop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = space_prop.h; path = src/sim/space_prop.h; sourceTree = SOURCE_ROOT; };
@@ -2227,7 +2225,6 @@
 		BBE0993E0869D87F005FF210 /* libcytospace.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libcytospace.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE13B800CD535DE008C212D /* test_thread.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = test_thread.cc; path = src/test/test_thread.cc; sourceTree = SOURCE_ROOT; };
 		BBE151DF05E574F300F782A8 /* test_space.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = test_space.cc; path = src/test/test_space.cc; sourceTree = SOURCE_ROOT; };
-		BBE2FB8825680C3500EB88EA /* sweet.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sweet.cc; sourceTree = "<group>"; };
 		BBE2FB8E25680D5800EB88EA /* cympack */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = cympack; sourceTree = BUILT_PRODUCTS_DIR; };
 		BBE4269614437BA4003795C4 /* treadmilling_fiber_prop.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = treadmilling_fiber_prop.cc; path = fibers/treadmilling_fiber_prop.cc; sourceTree = "<group>"; };
 		BBE4269714437BA4003795C4 /* treadmilling_fiber_prop.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = treadmilling_fiber_prop.h; path = fibers/treadmilling_fiber_prop.h; sourceTree = "<group>"; };
@@ -2252,7 +2249,6 @@
 		BBEAA3EF283B633B0091DFA9 /* multiplay.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; name = multiplay.cc; path = src/play/multiplay.cc; sourceTree = SOURCE_ROOT; };
 		BBEB846212FF339500F9D717 /* fork.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = fork.cc; path = couples/fork.cc; sourceTree = "<group>"; };
 		BBEB846312FF339500F9D717 /* fork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = fork.h; path = couples/fork.h; sourceTree = "<group>"; };
-		BBEEC85B16E5D891006C1C6E /* micimage.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = micimage.cc; sourceTree = "<group>"; };
 		BBEEF5D62B542550005E29EA /* random_seed.cc */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = random_seed.cc; sourceTree = "<group>"; };
 		BBEF3A85118318AE000F2EED /* backtrace.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = backtrace.h; sourceTree = "<group>"; };
 		BBEF3A86118318AE000F2EED /* backtrace.cc */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = backtrace.cc; sourceTree = "<group>"; };
@@ -3351,13 +3347,10 @@
 				BB9771601F52D98200EB8C92 /* cymart.cc */,
 				BB67498F27F756E600165E14 /* cymwiz.cc */,
 				BB77D6FB05F12F16001C0596 /* frametool.cc */,
-				BBEEC85B16E5D891006C1C6E /* micimage.cc */,
 				BBAB0D36138FAEC6006DEAF9 /* reader.cc */,
 				BBA721BB1462C3B900ACF26D /* report.cc */,
 				BB30391F16FB42C700CDF586 /* reportF.cc */,
-				BB855B752667D2C700621C09 /* cympack.cc */,
 				BBCD6993126F818F00D19DDF /* sieve.cc */,
-				BBE2FB8825680C3500EB88EA /* sweet.cc */,
 			);
 			name = tools;
 			path = src/tools;
@@ -5867,7 +5860,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BB855B77266A0CC400621C09 /* cympack.cc in Sources */,
 				BB227D4D2568154500A42E98 /* frame_reader.cc in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
