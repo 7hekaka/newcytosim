@@ -787,11 +787,13 @@ void Outputter::writeFloatsBinary(const float* a, const size_t n)
 void Outputter::writeFloatsBinary(const double* a, const size_t n)
 {
     assert_true( binary_ );
-    float f[n];
+    float * f = new float[n];
     for ( size_t i = 0; i < n; ++i )
         f[i] = static_cast<float>(a[i]);
-    if ( n != fwrite(f, 4, n, mFile) )
-        throw InvalidIO("writeFloat() failed");
+    size_t res = fwrite(f, 4, n, mFile);
+    delete[] f;
+    if ( res != n )
+        throw InvalidIO("writeFloatsBinary(double*) failed");
 }
 
 
