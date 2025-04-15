@@ -2488,7 +2488,8 @@ void Display::drawBead(Bead const& obj)
 {
     PointDisp const* dis = obj.prop->disp;
     gym_color col = bodyColorF(obj);
-    
+    gym::enableLighting();
+
     // display center:
     if ( dis->style & 2 )
     {
@@ -2500,31 +2501,18 @@ void Display::drawBead(Bead const& obj)
     if ( obj.clampStiffness() > 0 )
     {
         gym::color_both(col);
-        gym::enableLighting();
         drawObject(obj.clampPosition(), pixscale(dis->size), gle::star);
     }
 #endif
 
-    if ( dis->style & 4 )
+#if ( DIM > 2 )
+    if (( dis->style & 4 ) && obj.mark() )
     {
-#if ( DIM <= 2 )
-        // display outline:
-        if ( obj.radius() > pixelSize )
-        {
-            gym::disableLighting();
-            gym::color(col);
-            gym::transScale(obj.position(), obj.radius());
-            gle::circle1(dis->width);
-        }
-#else
-        if ( obj.mark() )
-        {
-            col = gym::get_color(obj.mark());
-            gym::color_both(col);
-            drawObject(obj.position(), pixscale(dis->size), gle::cube);
-        }
-#endif
+        col = gym::get_color(obj.mark());
+        gym::color_both(col);
+        drawObject(obj.position(), pixscale(dis->size), gle::cube);
     }
+#endif
 }
 
 
@@ -2534,18 +2522,31 @@ void Display::drawBead(Bead const& obj)
 void Display::drawBeadT(Bead const& obj) const
 {
     PointDisp const* dis = obj.prop->disp;
-    
-    assert_true( dis->style & 1 );
-    {
-        gym_color col = bodyColorF(obj).match_a(dis->color);
+    gym_color col = bodyColorF(obj).match_a(dis->color);
 #if ( DIM > 2 )
-        gym::color_both(col);
-        drawBeadS(obj.position(), obj.radius(), obj.mark());
+    gym::color_both(col);
 #else
-        gym::color(col);
+    gym::disableLighting();
+    gym::color(col);
+#endif
+
+    if ( dis->style & 1 )
+    {
+#if ( DIM <= 2 )
         drawDiscT(obj.position(), obj.radius());
+#else
+        drawBeadS(obj.position(), obj.radius(), obj.mark());
 #endif
     }
+    
+#if ( DIM <= 2 )
+    if (( dis->style & 4 ) && obj.radius() > pixelSize )
+    {
+        // display outline circle:
+        gym::transScale(obj.position(), obj.radius());
+        gle::circle1(dis->width);
+    }
+#endif
 }
 
 
@@ -2558,7 +2559,7 @@ void Display::drawBeads(BeadSet const& set)
         if ( dis->visible && dis->style )
         {
             drawBead(*obj);
-            if ( dis->style & 1 )
+            if ( dis->style & 5 )
             {
 #if ( DIM >= 3 )
                 if ( dis->color.transparent() )
@@ -2747,7 +2748,7 @@ void zObject::calculate_depth(Vector const& axis)
 
 #if ( DIM >= 3 )
 
-/// display sub-part `inx` of object `obj`
+/// display the element associated with a vertex of a zObject
 void zObject::draw(Display const* dis) const
 {
     assert_false( point_.invalid() );
