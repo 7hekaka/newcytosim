@@ -21,10 +21,10 @@
 #include "grid_display.h"
 
 // grid definitions:
-const int range = 3;
+const int range = 2;
 real inf[] = {-range,-range, 0 };
 real sup[] = { range, range, 1 };
-index_t num[] = { 7*range, 5*range, 3 };
+index_t num[] = { 5, 3, 1 };
 
 
 Grid<real, DIM> grid;
@@ -36,7 +36,7 @@ Vector3 node(0,0,0);
 
 
 bool roundRegions = false;
-real regionRadius = 2.0;
+real regionRadius = 1;
 
 //------------------------------------------------------------------------------
 void throwMarbles(int cnt)
@@ -91,13 +91,17 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
         case 's':
             grid.createSideRegions(regionRadius);
             break;
-            
+
+        case 'S':
+            grid.createSideRegions(1);
+            break;
+
         case 'h':
             printf("Shift-click to position test-point\n");
             return;
 
         case ' ': 
-            throwMarbles(32);
+            throwMarbles(6);
             glApp::currentView().reset();
             break;
 
@@ -331,7 +335,7 @@ int main(int argc, char* argv[])
     grid.createCells();
     //grid.setPeriodic(0, true);
     //grid.setPeriodic(1, true);
-    throwMarbles(8*(1<<DIM));
+    throwMarbles(1<<DIM);
 
     glutInit(&argc, argv);
     glApp::setDimensionality(DIM);
