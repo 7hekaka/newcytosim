@@ -259,7 +259,7 @@ public:
  - `LocusGrid::setSterics()` checks all pairs of Point/Locus that may overlap,
     calculating their distance, and calling Meca::addLink() if they are interacting
  .
- Compared to PointGrid, LocusGrid only supports repulsive interactions.
+ LocusGrid is meant to be faster than PointGrid, but only supports repulsive interactions.
  For periodic boundary conditions, this follows the [Periodic wrapping] method.
  
  Check the [general introduction on Cell Lists](https://en.wikipedia.org/wiki/Cell_lists)

@@ -1,16 +1,17 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University.
 
 /**
- Calculate the minimum grid cell size, given the segmentation of Fibers that
- is within a certain range because their length may vary, and taking into
- account the radius of Bead, Sphere and Solid.
+ Estimate the minimum value of the `grid cell size`, from the segmentation
+ parameter of fibers, and the radius of Bead, Sphere and Solid.
  
- This function is used to estimate SimulProp::steric_max_range, when it is
- not specified by the user.
+ This function is used to set SimulProp::steric_max_range, when this parameter
+ is not specified by the user.
  
  It assumes that Fiber::adjustSegmentation() is used, such that at any time:
      actual_segmentation <  4/3 * FiberProp::segmentation
- If no fiber is dynamic, the real segmentation can be used.
+ 
+ In the particular case where the fiber have a fixed length, the real segmentation
+ can be used, and it is recommended in that case to set steric_max_range in the config.
  */
 real Simul::minimumStericRange() const
 {
@@ -374,7 +375,7 @@ void Simul::solve_separate()
 #endif
     
     sMeca.importParameters(prop);
-    sMeca.selectStericEngine(*this);
+    sMeca.selectStericEngine(*this, prop);
     //std::clog << "Separating " << cnt << " fibers\n";
     for ( ObjectFlag f = 0; f <= sup; ++f )
     {

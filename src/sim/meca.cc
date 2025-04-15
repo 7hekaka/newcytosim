@@ -457,7 +457,7 @@ void Meca::getReady(Simul const& sim)
      */
 #endif
     importParameters(sim.prop);
-    selectStericEngine(sim);
+    selectStericEngine(sim, sim.prop);
     readyMecables();
 }
 

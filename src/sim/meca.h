@@ -716,7 +716,7 @@ public:
     //-------------------------- COMPUTING METHODS -----------------------------
 
     /// select which engine will be used, and ready it
-    void selectStericEngine(Simul const&);
+    void selectStericEngine(Simul const&, SimulProp const&);
 
     /// add steric interactions between spheres, solids and fibers to Meca
     static void addStericInteractions(PointGrid&, Simul const&);

@@ -170,10 +170,10 @@ class PointGridCell
     
 #if ( NUM_STERIC_PANES == 1 )
     
-    /// unique steric pane
+    /// list holding points involved in steric
     FatPointList point_pane;
     
-    /// unique steric pane
+    /// list holding locuses involved in steric
     FatLocusList locus_pane;
     
 #else

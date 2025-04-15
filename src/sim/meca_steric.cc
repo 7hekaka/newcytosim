@@ -32,10 +32,10 @@ static void setStericGrid(GRID& grid, Vector const& inf, Vector const& sup, real
 }
 
 
-void Meca::selectStericEngine(Simul const& sim)
+void Meca::selectStericEngine(Simul const& sim, SimulProp const& prop)
 {
     steric_ = 0;
-    if ( sim.prop.steric_mode )
+    if ( prop.steric_mode )
     {
         Space const* spc = sim.spaces.master();
         if ( ! spc )
@@ -47,32 +47,31 @@ void Meca::selectStericEngine(Simul const& sim)
         spc->boundaries(inf, sup);
 
         // the steric area can be restricted by parameters:
-        inf = inf.e_max(sim.prop.steric_region[0]);
-        sup = sup.e_min(sim.prop.steric_region[1]);
+        inf = inf.e_max(prop.steric_region[0]);
+        sup = sup.e_min(prop.steric_region[1]);
         
-        // without attractive forces, the simpler LocusGrid will be used:
-        steric_ = 1 + ( sim.prop.steric_stiff_pull[0] <= 0 );
+        // without attractive forces, LocusGrid will be used:
+        steric_ = 1 + ( prop.steric_stiff_pull[0] <= 0 );
         
         // the grid size can be specified as a parameter, or computed automatically:
-        if ( sim.prop.steric_max_range <= REAL_EPSILON )
-            sim.prop.steric_max_range = sim.minimumStericRange();
+        if ( prop.steric_max_range <= REAL_EPSILON )
+            prop.steric_max_range = sim.minimumStericRange();
         
-        if ( sim.prop.steric_max_range <= REAL_EPSILON )
+        if ( prop.steric_max_range <= REAL_EPSILON )
             throw InvalidParameter("simul:steric_max_range must be defined");
 
-        
         switch ( steric_ )
         {
             case 1:
-                pointGrid.stiffness(sim.prop.steric_stiff_push[0], sim.prop.steric_stiff_pull[0]);
+                pointGrid.stiffness(prop.steric_stiff_push[0], prop.steric_stiff_pull[0]);
                 //if ( !pointGrid.hasGrid() )
-                setStericGrid(pointGrid, inf, sup, sim.prop.steric_max_range);
+                setStericGrid(pointGrid, inf, sup, prop.steric_max_range);
                 break;
                 
             case 2:
-                locusGrid.stiffness(sim.prop.steric_stiff_push[0]);
+                locusGrid.stiffness(prop.steric_stiff_push[0]);
                 //if ( !locusGrid.hasGrid() )
-                setStericGrid(locusGrid, inf, sup, sim.prop.steric_max_range);
+                setStericGrid(locusGrid, inf, sup, prop.steric_max_range);
                 break;
         }
     }
@@ -125,7 +124,7 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
         if ( has_steric(F, grid.nbPanes()) )
         {
             const real rad = F->prop->steric_radius; // equilibrium radius
-            const real rge = rad + F->prop->steric_range; // extended range of interaction
+            const real rge = rad + F->prop->steric_range; // range of interaction
             const real sup = rge + 0.5 * F->segmentation();
 
             // include segments, in the cell associated with their center
@@ -138,14 +137,20 @@ void Meca::addStericInteractions(PointGrid& grid, Simul const& sim)
     for ( Sphere const* O=sim.spheres.first(); O; O=O->next() )
     {
         if ( has_steric(O, grid.nbPanes()) )
-            grid.add(O, 0, O->radius(), O->radius()+O->prop->steric_range);
+        {
+            real R = O->radius();
+            grid.add(O, 0, R, R+O->prop->steric_range);
+        }
     }
     
     // include Beads
     for ( Bead const* B=sim.beads.first(); B; B=B->next() )
     {
         if ( has_steric(B, grid.nbPanes()) )
-            grid.add(B, 0, B->radius(), B->radius()+B->prop->steric_range);
+        {
+            real R = B->radius();
+            grid.add(B, 0, R, R+B->prop->steric_range);
+        }
     }
     
     // from Solids, include Points with radius > 0

@@ -82,10 +82,9 @@ static inline bool below(const real dd, const real L) { return ( dd < L*L ) && (
  */
 void PointGrid::checkPP(FatPoint const& aa, FatPoint const& bb) const
 {
-    //std::clog << "   PP- " << bb.pnt_ << " " << aa.pnt_ << '\n';
     Vector vab = bb.cen() - aa.cen();
     const real len = aa.rad_ + bb.rad_;
-    const real ran = std::max(aa.rge_ + bb.rad_, aa.rad_ + bb.rge_);
+    const real ran = std::max(aa.rge_+bb.rad_, aa.rad_+bb.rge_);
     if ( modulo )
         modulo->fold(vab);
     real ab2 = vab.normSqr();
@@ -95,6 +94,7 @@ void PointGrid::checkPP(FatPoint const& aa, FatPoint const& bb) const
         meca_.addLongLink(aa.pnt_, bb.pnt_, len, stiff);
         //meca_.addLongLink1(aa.pnt_, bb.pnt_, vab, ab2, len, push_);
     }
+    //std::clog << "   PP- " << bb.pnt_ << " " << aa.pnt_ << "  " << std::sqrt(ab2) << '\n';
 }
 
 
@@ -162,7 +162,7 @@ void PointGrid::checkPL(FatPoint const& aa, FatLocus const& bb) const
 void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
 {
     //std::clog << "   LL1 " << aa.seg_ << " " << bb.vertex1() << '\n';
-    const real ran = aa.rge_ + bb.rad_;
+    const real ran = std::max(aa.rge_+bb.rad_, aa.rad_+bb.rge_);
     
     // get position of bb.vertex1() with respect to segment 'aa'
     real dis2 = INFINITY;
@@ -228,7 +228,7 @@ void PointGrid::checkLL1(FatLocus const& aa, FatLocus const& bb) const
 void PointGrid::checkLL2(FatLocus const& aa, FatLocus const& bb) const
 {
     //std::clog << "   LL2 " << aa.seg_ << " " << bb.vertex2() << '\n';
-    const real ran = aa.rge_ + bb.rad_;
+    const real ran = std::max(aa.rge_+bb.rad_, aa.rad_+bb.rge_);
     
     // get position of bb.vertex2() with respect to segment 'aa'
     real dis2 = INFINITY;
@@ -583,6 +583,17 @@ void PointGrid::setStericsT() const
 
 void PointGrid::setSterics() const
 {
+#if 0
+    // printouts for debugging session, 15/04/2025
+    pGrid.printRegions(std::clog, "PointGrid");
+    for ( index_t i = 0; i < pGrid.nbCells(); ++i )
+    {
+        size_t nP = point_list(i).size();
+        size_t nL = locus_list(i).size();
+        std::clog << i << "  P " << nP << " L " << nL << "\n";
+    }
+#endif
+
     //std::clog << "----" << '\n';
     if ( pGrid.isPeriodic() )
         setSterics0();
