@@ -25,7 +25,9 @@ using namespace PCG32;
 #include "gym_flute_dim.h"
 #include "gym_check.h"
 #include "gym_flat.h"
+
 #include "fg_font.h"
+#include "fg_stroke.h"
 
 #include "point_disp.h"
 #include "fiber_disp.h"
@@ -2201,6 +2203,7 @@ void Display::drawSolid(Solid const& obj)
 {
     PointDisp const* dis = obj.prop->disp;
     gym_color col = bodyColorF(obj);
+    const float rad = pixscale(dis->size);
 #if NEW_SOLID_HAS_TWIN
     if ( obj.elder_twin() )
         col = bodyColorF(*obj.twin()).tweak(obj.signature());
@@ -2209,7 +2212,6 @@ void Display::drawSolid(Solid const& obj)
     //display points:
     if (( dis->style & 2 ) && dis->perceptible )
     {
-        const float rad = pixscale(dis->size);
         gym::color_both(col);
         gym::enableLighting();
         for ( index_t i = 0; i < obj.nbPoints(); ++i )
@@ -2237,7 +2239,7 @@ void Display::drawSolid(Solid const& obj)
     {
         gym::color_both(col);
         gym::enableLighting();
-        drawObject(obj.clampPosition(), pixscale(dis->size), gle::star);
+        drawObject(obj.clampPosition(), rad, gle::star);
     }
 #endif
     
@@ -2247,7 +2249,7 @@ void Display::drawSolid(Solid const& obj)
     {
         Solid const* twi = obj.twin();
         gym_color lor = bodyColorF(*twi).mix(col);
-        real rad = M_SQRT2 * pixscale(dis->size);
+        const float wid = M_SQRT2 * rad;
         gym::ref_view();
         gym::enableLighting();
         gym::disableCullFace();
@@ -2255,7 +2257,7 @@ void Display::drawSolid(Solid const& obj)
         const index_t sup = std::min(obj.lastPoint(), index_t(2*off+1)); // last to be linked
         for ( index_t inx = off; inx <= sup; inx += off+1 )
         {
-            gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), rad);
+            gym::stretchAlignZ(obj.posPoint(inx), twi->posPoint(inx), wid);
             gym::color_back(lor.darken(0.5));
             gym::color_front(lor, 1);
             gle::helix();
@@ -2271,7 +2273,7 @@ void Display::drawSolid(Solid const& obj)
         Solid const* twi = obj.twin();
         gym_color lor = bodyColorF(*twi);
         // draw links between 'obj' and its Twin
-        real rad = M_SQRT2 * pixscale(dis->size);
+        const float wid = M_SQRT2 * rad;
         const index_t inx = 0;
         // three points are expected:
         if ( obj.radius(inx) > 0 && obj.nbPoints() > inx+4 )
@@ -2297,15 +2299,15 @@ void Display::drawSolid(Solid const& obj)
             if ( obj.prop->twin_stiffness > 0 )
             {
                 gym::color_both(col.mix(lor), 1);
-                gym::stretchAlignZ(S3, T3, rad);
+                gym::stretchAlignZ(S3, T3, wid);
                 gle::hexTube();
 #if ( DIM >= 4 )
                 gle::paintSpikyPrism(dX, dY, dZ, X, dA, dB, dC, A);
                 gle::paintSpikyPrism(dX, dY, dZ, Y, dA, dB, dC, B);
                 gle::paintSpikyPrism(dX, dY, dZ, Z, dA, dB, dC, C);
 #elif ( DIM == 2 )
-                gle::drawSpikyBand(A, X, rad);
-                gle::drawSpikyBand(B, Y, rad);
+                gle::drawSpikyBand(A, X, wid);
+                gle::drawSpikyBand(B, Y, wid);
 #endif
             }
             else
@@ -2323,11 +2325,11 @@ void Display::drawSolid(Solid const& obj)
                 gle::paintTetrahedron(dX, dY, dZ, Z);
 #elif ( DIM == 2 )
                 Vector2 N = 2 * S - ( A + B );
-                gym::transAlignZ(A, rad, N); gle::pyramid();
-                gym::transAlignZ(B, rad, N); gle::pyramid();
+                gym::transAlignZ(A, wid, N); gle::pyramid();
+                gym::transAlignZ(B, wid, N); gle::pyramid();
                 Vector2 D = 2 * T - ( A + B );
-                gym::transAlignZ(X, rad, D); gle::pyramid();
-                gym::transAlignZ(Y, rad, D); gle::pyramid();
+                gym::transAlignZ(X, wid, D); gle::pyramid();
+                gym::transAlignZ(Y, wid, D); gle::pyramid();
 #endif
             }
         }
@@ -2488,20 +2490,21 @@ void Display::drawBead(Bead const& obj)
 {
     PointDisp const* dis = obj.prop->disp;
     gym_color col = bodyColorF(obj);
+    const float rad = pixscale(dis->size);
     gym::enableLighting();
 
     // display center:
     if ( dis->style & 2 )
     {
         gym::color_both(col, 1);
-        drawObject(obj.position(), pixscale(dis->size), gle::tetrahedron);
+        drawObject(obj.position(), rad, gle::tetrahedron);
     }
-    
+
 #if NEW_SOLID_CLAMP
     if ( obj.clampStiffness() > 0 )
     {
         gym::color_both(col);
-        drawObject(obj.clampPosition(), pixscale(dis->size), gle::star);
+        drawObject(obj.clampPosition(), rad, gle::star);
     }
 #endif
 
@@ -2510,7 +2513,7 @@ void Display::drawBead(Bead const& obj)
     {
         col = gym::get_color(obj.mark());
         gym::color_both(col);
-        drawObject(obj.position(), pixscale(dis->size), gle::cube);
+        drawObject(obj.position(), rad, gle::cube);
     }
 #endif
 }
@@ -2540,11 +2543,20 @@ void Display::drawBeadT(Bead const& obj) const
     }
     
 #if ( DIM <= 2 )
-    if (( dis->style & 4 ) && obj.radius() > pixelSize )
+    if ( obj.radius() > pixelSize )
     {
-        // display outline circle:
-        gym::transScale(obj.position(), obj.radius());
-        gle::circle1(dis->width);
+        if ( dis->style & 4 )
+        {
+            // display outline circle:
+            gym::transScale(obj.position(), obj.radius());
+            gle::circle1(dis->width);
+        }
+        if ( dis->style & 8 )
+        {
+            char str[32] = { 0 };
+            snprintf(str, sizeof(str), "%u", obj.identity());
+            fgStrokeString(-0.25, -0.25, 0.05, 1, str, 3);
+        }
     }
 #endif
 }

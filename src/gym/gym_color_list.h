@@ -14,7 +14,7 @@ namespace gym
     /// color used to select a 'bright_color()'
     extern gym_color background_color;
 
-    /// a small set of contrasted colors that can be changed
+    /// return one color amongs a small set of contrasted colors
     gym_color get_color(unsigned indx);
   
     /// change indx-th color
