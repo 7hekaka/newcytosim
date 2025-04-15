@@ -694,7 +694,7 @@ private:
             }
         }
         assert_true(res <= sup);
-        printf("initRectangularGrid %i found %i neighbors\n", sup, res);
+        //printf("initRectangularGrid %i found %i neighbors\n", sup, res);
         return res;
     }
     
@@ -719,7 +719,7 @@ private:
                 ++cnt;
             }
         }
-        printf("keepPositiveOffsets kept %i offset\n", cnt);
+        //printf("keepPositiveOffsets kept %i offset\n", cnt);
         return cnt;
     }
 
