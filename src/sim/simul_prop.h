@@ -79,12 +79,6 @@ public:
      .
      */
     double time_step;
-    
-    /// the time at which the current run will halt
-    double stop_time;
-    
-    /// the time at which the simulation is terminated
-    double end_time;
 
     /// Ambient viscosity
     /**
@@ -259,7 +253,7 @@ public:
 
      If the parameter is not set, cytosim attempts to set it automatically.
      */
-    real steric_max_range;
+    mutable real steric_max_range;
     
     
     /// Grid size used to determine the attachment of Hand to Fiber
@@ -318,6 +312,12 @@ public:
     std::string display;
 
     /// @}
+    
+    /// the time at which the current run will halt
+    mutable double stop_time;
+    
+    /// the time at which the simulation is terminated
+    mutable double end_time;
 
     /// last message from splash()
     mutable std::string splashed;
