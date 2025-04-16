@@ -2496,8 +2496,16 @@ void Display::drawBead(Bead const& obj)
     // display center:
     if ( dis->style & 2 )
     {
-        gym::color_both(col, 1);
-        drawObject(obj.position(), rad, gle::tetrahedron);
+        if ( obj.mark() )
+        {
+            gym::color_both(gym::get_color(obj.mark()));
+            drawObject(obj.position(), rad, gle::cube);
+        }
+        else
+        {
+            gym::color_both(col, 1);
+            drawObject(obj.position(), rad, gle::tetrahedron);
+        }
     }
 
 #if NEW_SOLID_CLAMP
@@ -2505,15 +2513,6 @@ void Display::drawBead(Bead const& obj)
     {
         gym::color_both(col);
         drawObject(obj.clampPosition(), rad, gle::star);
-    }
-#endif
-
-#if ( DIM > 2 )
-    if (( dis->style & 4 ) && obj.mark() )
-    {
-        col = gym::get_color(obj.mark());
-        gym::color_both(col);
-        drawObject(obj.position(), rad, gle::cube);
     }
 #endif
 }
