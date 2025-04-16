@@ -642,9 +642,8 @@ std::string Tokenizer::get_block_text(std::istream& is, char c_in, const char c_
         if ( c == c_out )
         {
             if ( c_in )
-                return res+c;
-            else
-                return res;
+                res.push_back(c_out);
+            return res;
         }
         else if ( block_delimiter(c) )
             res.append( get_block_text(is, c, block_delimiter(c)) );

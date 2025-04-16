@@ -69,8 +69,8 @@ static void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos,
 static void skip_comments(std::istream& is)
 {
     is.get();
-    if ( is.get() == '{' )
-        Tokenizer::get_block_text(is, 0, '}');
+    if ( is.peek() == '{' )
+        Tokenizer::get_block_text(is, is.get(), '}');
     else
         Tokenizer::skip_line(is);
 }
