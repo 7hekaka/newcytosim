@@ -302,7 +302,7 @@ void View::drawText(float X, float Y, float Z, const float color[4], const char 
     fgBitmapString(offset, -H/3, pixelSize(), font, color, str, H);
 #else
     gym::color(color);
-    fgStrokeString(0, 0, 1.5*pixelSize(), 1, str, 1.5);
+    fgStrokeString(offset, 0, pixelSize(), 1, str, 1);
 #endif
     gym::restoreDepthTest();
     gym::restoreAlphaTest();
