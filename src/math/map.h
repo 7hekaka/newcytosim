@@ -847,7 +847,7 @@ private:
         return true;
     }
     
-    void checkEdgeTypeRange(size_t arg)
+    static void checkEdgeTypeRange(size_t arg)
     {
         if ( arg != (edge_type)arg )
         {
