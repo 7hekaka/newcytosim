@@ -801,9 +801,9 @@ private:
             {
                 // calculate the region for this new edge-characteristic
                 calculateOffsets(reg, ccc, regSize, ori, i);
-                printf("cell %i with edge type %i has %i neighbors\n", i, e, reg[0]);
+                //printf("cell %i with edge type %i has %i neighbors\n", i, e, reg[0]);
             }
-#if ( 1 )
+#if ( 0 )
             else
             {
                 printf("checking cell %i with edge type %i\n", i, e);
@@ -830,29 +830,31 @@ private:
     }
     
     /// accept within a certain diameter
-    bool reject_disc(const int c[ORD], real radius)
+    bool in_disc(const int c[ORD], real radius)
     {
         real dsq = 0;
         for ( int d = 0; d < ORD; ++d ) 
             dsq += square(cWidth[d] * c[d]);
-        return ( dsq > square(radius) );
+        return ( dsq <= square(radius) );
     }
     
     /// accept within a certain diameter
-    bool reject_square(const int c[ORD], real radius)
+    bool in_square(const int c[ORD], real radius)
     {
         for ( int d = 0; d < ORD; ++d ) 
             if ( abs_real( cWidth[d] * c[d] ) > radius )
-                return true;
-        return false;
+                return false;
+        return true;
     }
     
-    /// used to remove ORD coordinates in array `ccc`
-    void remove_entry(int * ccc, const index_t s, index_t& cmx)
+    void checkEdgeTypeRange(size_t arg)
     {
-        --cmx;
-        for ( index_t x = ORD*s; x < ORD*cmx; ++x )
-            ccc[x] = ccc[x+ORD];
+        if ( arg != (edge_type)arg )
+        {
+            // if this error occurs, recompile using a larger type for edge_type
+            fprintf(stderr, "FATAL ERROR: edge_type cannot hold %lu values\n", arg);
+            throw InvalidParameter("Region size exceeds edge_type capacity");
+        }
     }
     
 public:
@@ -873,17 +875,21 @@ public:
             cmx *= ( 2 * R + 1 );
             range[d] = R;
         }
-        if ( cmx != (edge_type)cmx )
-            throw InvalidParameter("Region size exceeds edge_type capacity");
-
+        checkEdgeTypeRange(cmx);
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range);
         
-        for ( index_t s = cmx; s-- > 0 ; )
-            if ( reject_square(ccc+ORD*s, radius) )
-                remove_entry(ccc, s, cmx);
-        
-        createRegions(ccc, cmx, range);
+        int cnt = 0;
+        for ( index_t s = 0; s < cmx; ++s )
+        {
+            if ( in_square(ccc+ORD*s, radius) )
+            {
+                for ( int d = 0; d < ORD; ++d )
+                    ccc[ORD*cnt+d] = ccc[ORD*s+d];
+                ++cnt;
+            }
+        }
+        createRegions(ccc, cnt, range);
         delete[] ccc;
     }
     
@@ -903,17 +909,21 @@ public:
             cmx *= ( 2 * R + 1 );
             range[d] = R;
         }
-        if ( cmx != (edge_type)cmx )
-            throw InvalidParameter("Region size exceeds edge_type capacity");
-
+        checkEdgeTypeRange(cmx);
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range);
 
-        for ( index_t s = cmx; s-- > 0 ; )
-            if ( reject_disc(ccc+ORD*s, radius) )
-                remove_entry(ccc, s, cmx);
-        
-        createRegions(ccc, cmx, range);
+        int cnt = 0;
+        for ( index_t s = 0; s < cmx; ++s )
+        {
+            if ( in_disc(ccc+ORD*s, radius) )
+            {
+                for ( int d = 0; d < ORD; ++d )
+                    ccc[ORD*cnt+d] = ccc[ORD*s+d];
+                ++cnt;
+            }
+        }
+        createRegions(ccc, cnt, range);
         delete[] ccc;
     }
 
@@ -934,8 +944,7 @@ public:
             cmx *= ( 2 * num_cells_radius + 1 );
             range[d] = num_cells_radius;
         }
-        if ( cmx != (edge_type)cmx )
-            throw InvalidParameter("Region size exceeds edge_type capacity");
+        checkEdgeTypeRange(cmx);
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range);
         cmx = keepPositiveOffsets(ccc, cmx);

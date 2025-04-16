@@ -21,10 +21,10 @@
 #include "grid_display.h"
 
 // grid definitions:
-const int range = 2;
+const int range = 1;
 real inf[] = {-range,-range, 0 };
 real sup[] = { range, range, 1 };
-index_t num[] = { 5, 3, 1 };
+index_t num[] = { 10, 7, 1 };
 
 
 Grid<real, DIM> grid;
@@ -36,7 +36,7 @@ Vector3 node(0,0,0);
 
 
 bool roundRegions = false;
-real regionRadius = 1;
+real regionRadius = 0.125;
 
 //------------------------------------------------------------------------------
 void throwMarbles(int cnt)
@@ -84,7 +84,10 @@ void processNormalKey(unsigned char c, int x=0, int y=0)
             break;
 
         case 'r':
-            grid.createRoundRegions(regionRadius);
+            if ( roundRegions )
+                grid.createRoundRegions(regionRadius);
+            else
+                grid.createSquareRegions(regionRadius);
             glApp::flashText("radius = %f", regionRadius);
             break;
 
@@ -219,10 +222,10 @@ int display(View& view)
         size_t nR = grid.getRegion(offset, cell_indx);
         for ( size_t j = 0; j < nR; ++j )
         {
-            Vector x;
-            grid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
-            snprintf(str, sizeof(str), "%u", offset[j]);
-            view.drawText(x, white, str, 0., View::BITMAP_TIMES_ROMAN_24);
+            Vector pos;
+            grid.setPositionFromIndex(pos, cell_indx+offset[j], 0.4);
+            snprintf(str, sizeof(str), "%d", offset[j]);
+            view.drawText(pos, white, str, 0);
         }
     }
     if ( 1 )
