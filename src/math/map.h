@@ -236,8 +236,9 @@ public:
     Map() : mDim{0}, mInf{0}, mSup{0}, cWidth{0}, cDelta{0}, mStart{0}, mPeriodic{false}
     {
         mNbCells = 0;
-        eRegion = nullptr;
+        chunk_ = 0;
         region_ = nullptr;
+        border_ = nullptr;
         cVolume = 0;
     }
     
@@ -621,10 +622,13 @@ public:
 private:
     
     /// array of index offset to neighbors, for each edge type
-    int * eRegion;
+    int * region_;
     
-    /// index into eRegion[], as a function of cell index
-    edge_type * region_;
+    /// the edge type, as a function of cell index
+    edge_type * border_;
+    
+    /// size of a chunk of data in region_
+    size_t chunk_;
     
 private:
     
@@ -634,12 +638,10 @@ private:
         /* the characteristic is positive, and given that 0 <= c <= s-1,
          if will be in [ 0, 2*r+1 ], with 0 far away from any edge.
          For example with r = 2, we get characteristics as follows:
-         [ 4, 2, 0, 0 ... 0, 1, 3 ]
+         [ 3, 1, 0, 0 ... 0, 2, 4 ]
          */
-        int L = std::max(0, 2 * ( r - c ) - 1);
-        int R = std::max(0, 2 * ( r + c - s + 1 ));
-        //printf("cell %i : %i %i\n", c, L, R);
-        return std::max(L, R);
+        if ( c < r ) return 2 * ( r - c ) - 1;
+        return std::max(0, 2 * ( r + c - s + 1 ));
     }
     
     static edge_type numberEdgeTypes(const index_t range[ORD])
@@ -779,36 +781,41 @@ private:
         deleteRegions();
         
         edge_type edgeMax = numberEdgeTypes(range);
-        //std::clog << "edgeMax " << (int)edgeMax << "\n";
-        region_ = new edge_type[mNbCells]{0};
-        eRegion = new int[regSize*edgeMax]{0};
+        //printf("edgeMax %i regSize %i\n", edgeMax, regSize);
 
+        chunk_ = regSize;
+        border_ = new edge_type[mNbCells]{0};
+        region_ = new int[regSize*edgeMax]{0};
+        
         int ori[ORD]{0};
         for ( index_t i = 0; i < mNbCells; ++i )
         {
             setCoordinatesFromIndex(ori, i);
             edge_type e = edgeFromCoordinates(ori, range);
-
             assert_true( e < edgeMax );
-            edge_type off = e * regSize;
-            region_[i] = off;
-            int * reg = eRegion + off;
-            if ( reg[0] == 0 )
+            border_[i] = e;
+            int * reg = region_ + chunk_ * (size_t)e;
+            if ( reg[0] <= 0 )
             {
                 // calculate the region for this new edge-characteristic
                 calculateOffsets(reg, ccc, regSize-1, ori, i);
                 //printf("cell %i with edge type %i has %i neighbors\n", i, e, reg[0]);
+                assert_true(reg[1]==0);
             }
 #if ( 0 )
-            // compare result for a different cell with the same edge-characteristic
-            int * rig = new int[regSize];
-            rig[0] = calculateOffsets(rig, ccc, regSize-1, ori, i);
-            if ( rig[0] != reg[0] )
-                ABORT_NOW("inconsistent region size");
-            for ( int s = 1; s < rig[0]+1; ++s )
-                if ( rig[s] != reg[s] )
-                    ABORT_NOW("inconsistent region offsets");
-            delete[] rig;
+            else
+            {
+                printf("checking cell %i with edge type %i\n", i, e);
+                // compare result for a different cell with the same edge-characteristic
+                int * rig = new int[regSize];
+                calculateOffsets(rig, ccc, regSize-1, ori, i);
+                if ( rig[0] != reg[0] )
+                    ABORT_NOW("inconsistent region size");
+                for ( int s = 1; s < rig[0]+1; ++s )
+                    if ( rig[s] != reg[s] )
+                        ABORT_NOW("inconsistent region offsets");
+                delete[] rig;
+            }
 #endif
         }
     }
@@ -932,7 +939,7 @@ public:
     /// true if createRegions() or createRoundRegions() was called
     bool hasRegions() const
     {
-        return ( region_ && eRegion );
+        return ( region_ && border_ );
     }
     
     /// set region array 'offsets' for given cell index
@@ -955,7 +962,7 @@ public:
     int getRegion(int const*& offsets, const index_t indx) const
     {
         assert_true( hasRegions() );
-        int * R = eRegion + region_[indx];
+        int const * R = region_ + chunk_ * (size_t)border_[indx];
         offsets = R + 1;
         assert_true( offsets[0] == 0 );
         return R[0];
@@ -967,8 +974,8 @@ public:
         delete[] region_;
         region_ = nullptr;
         
-        delete[] eRegion;
-        eRegion = nullptr;
+        delete[] border_;
+        border_ = nullptr;
     }
 
 #pragma mark -
