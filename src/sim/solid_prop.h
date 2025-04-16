@@ -19,9 +19,6 @@ class Space;
 /// new option to immobilize Solid by attaching one point
 #define NEW_SOLID_CLAMP 0
 
-/// new option to create Couple from Solid's spheres
-#define NEW_SOLID_MAKE_COUPLE 0
-
 /// Property for Bead and Solid
 /*
  @ingroup Properties
@@ -89,14 +86,6 @@ public:
     Vector      flow_center;
 #endif
     
-#if NEW_SOLID_MAKE_COUPLE
-    /// rate
-    real        source_rate;
-    
-    /// type
-    std::string source_type;
-#endif
-    
     /// display string (see @ref PointDispPar)
     std::string display;
     
@@ -108,16 +97,6 @@ public:
     
     /// parameters derived from string `display`
     PointDisp * disp;
-    
-#if NEW_SOLID_MAKE_COUPLE
-    /// rate
-    real source_rate_dt;
-    
-    /// type
-    CoupleProp * source_couple;
-    /// type
-    SingleProp * source_single;
-#endif
 
 private:
     

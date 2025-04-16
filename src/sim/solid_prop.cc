@@ -25,13 +25,6 @@ void SolidProp::clear()
     flow_time[1] = 0;
     flow_center.reset();
 #endif
-#if NEW_SOLID_MAKE_COUPLE
-    source_rate = 0;
-    source_type = "none";
-    source_couple = nullptr;
-    source_single = nullptr;
-    source_rate_dt = 0;
-#endif
     display = "";
     display_fresh = false;
 }
@@ -79,10 +72,6 @@ void SolidProp::read(Glossary& glos)
     if ( flow_time[0] > flow_time[1] )
         throw InvalidParameter("flow_time[0] should be lower than flow_time[1]");
 #endif
-#if NEW_SOLID_MAKE_COUPLE
-    glos.set(source_rate, "source");
-    glos.set(source_type, "source", 1);
-#endif
 
     if ( glos.set(display, "display") )
         display_fresh = true;
@@ -119,22 +108,6 @@ void SolidProp::complete(Simul const& sim)
     if ( primed(sim) && steric_key && !sim.prop.steric_mode )
         Cytosim::warn(name(), ":steric is set but simul:steric = 0\n");
     
-#if NEW_SOLID_MAKE_COUPLE
-    if ( source_type == "none" )
-    {
-        source_couple = nullptr;
-        source_single = nullptr;
-    }
-    else {
-        source_single = static_cast<SingleProp*>(sim.properties.find("single", source_type));
-        source_couple = static_cast<CoupleProp*>(sim.properties.find("couple", source_type));
-        if ( !source_single && !source_couple )
-            throw InvalidParameter("could not find single/couple `"+source_type+"' specified as source[1]");
-    }
-    if ( source_rate < 0 )
-        throw InvalidParameter(name()+":source_rate must be >= 0");
-    source_rate_dt = source_rate * time_step(sim);
-#endif
 }
 
 
@@ -147,9 +120,6 @@ void SolidProp::write_values(std::ostream& os) const
 #if NEW_RADIAL_FLOW
     write_value(os, "flow_center", flow_center);
     write_value(os, "flow_time",   flow_time, 2);
-#endif
-#if NEW_SOLID_MAKE_COUPLE
-    write_value(os, "source", source_rate, source_type);
 #endif
     write_value(os, "display",   "("+display+")");
 }

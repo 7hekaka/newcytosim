@@ -18,28 +18,6 @@ void SolidSet::steps()
         obj = nxt;
     }
 #endif
-#if NEW_SOLID_MAKE_COUPLE
-    static float nextCreation = RNG.exponential();
-    for ( Solid * S = first(); S; S = S->next() )
-    {
-        nextCreation -= S->prop->source_rate_dt;
-        while ( nextCreation <= 0 )
-        {
-            nextCreation += RNG.exponential();
-            // we only consider creation on the first point!
-            Vector pos = S->posPoint(0) + Vector::randU(S->radius(0));
-            if ( S->prop->source_couple )
-            {
-                Couple * C = simul_.couples.addFreeCouple(S->prop->source_couple, pos);
-                C->activate();
-            }
-            else
-            {
-                simul_.singles.addFreeSingle(S->prop->source_single, pos);
-            }
-        }
-    }
-#endif
     if ( size() > 1 ) shuffle();
 }
 

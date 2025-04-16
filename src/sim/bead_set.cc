@@ -19,27 +19,6 @@ void BeadSet::steps()
         obj = nxt;
     }
 #endif
-#if NEW_SOLID_MAKE_COUPLE
-    static float nextCreation = RNG.exponential();
-    for ( Bead * B = first(); B; B = B->next() )
-    {
-        nextCreation -= B->prop->source_rate_dt;
-        while ( nextCreation <= 0 )
-        {
-            nextCreation += RNG.exponential();
-            Vector pos = B->position() + Vector::randU(B->radius());
-            if ( B->prop->source_couple )
-            {
-                Couple * C = simul_.couples.addFreeCouple(B->prop->source_couple, pos);
-                C->activate();
-            }
-            else
-            {
-                simul_.singles.addFreeSingle(B->prop->source_single, pos);
-            }
-        }
-    }
-#endif
     if ( size() > 1 ) shuffle();
 }
 
