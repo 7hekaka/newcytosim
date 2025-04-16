@@ -1223,13 +1223,12 @@ void LocusGrid::setSterics0() const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         BigLocusList& base = cell_list(inx);
         setSterics0(base);
         
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
             setSterics0(base, cell_list(inx+region[reg]));
     }
 }
@@ -1241,15 +1240,14 @@ void LocusGrid::setSterics() const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         BigLocusList& base = cell_list(inx);
         if ( base.size() > 0 )
         {
             setSterics0(base);
 #if ( DIM == 3 ) && USE_SIMD
-            for ( int reg = 1; reg < nr; ++reg )
+            for ( int reg = 0; reg < nR; ++reg )
             {
                 BigLocusList& side = cell_list(inx+region[reg]);
                 if ( base.size() < side.size() )
@@ -1261,7 +1259,7 @@ void LocusGrid::setSterics() const
                 }
             }
 #else
-            for ( int reg = 1; reg < nr; ++reg )
+            for ( int reg = 0; reg < nR; ++reg )
             {
                 BigLocusList& side = cell_list(inx+region[reg]);
                 if ( side.size() > 0 )
@@ -1294,13 +1292,12 @@ void LocusGrid::setSterics0(index_t pan) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
        
         BigLocusList& base = cell_list(inx, pan);
         setSterics0(base);
         
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
             setSterics0(base, cell_list(inx+region[reg], pan));
     }
 }
@@ -1312,13 +1309,12 @@ void LocusGrid::setStericsT(index_t pan) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
          int const* region;
-         int nr = pGrid.getRegion(region, inx);
-         assert_true(region[0] == 0);
+         int nR = pGrid.getRegion(region, inx);
         
          BigLocusList& base = cell_list(inx, pan);
          setStericsT(base);
          
-         for ( int reg = 1; reg < nr; ++reg )
+         for ( int reg = 0; reg < nR; ++reg )
              setStericsT(base, cell_list(inx+region[reg], pan));
     }
 }
@@ -1334,15 +1330,14 @@ void LocusGrid::setSterics0(index_t pan, index_t bim) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         BigLocusList& base1 = cell_list(inx, pan);
         BigLocusList& base2 = cell_list(inx, bim);
 
         setSterics0(base1, base2);
 
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
         {
             setSterics0(base1, cell_list(inx+region[reg], bim));
             setSterics0(base2, cell_list(inx+region[reg], pan));
@@ -1358,15 +1353,14 @@ void LocusGrid::setStericsT(index_t pan, index_t bim) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         BigLocusList& base1 = cell_list(inx, pan);
         BigLocusList& base2 = cell_list(inx, bim);
 
         setStericsT(base1, base2);
 
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 1; reg < nR; ++reg )
         {
             setStericsT(base1, cell_list(inx+region[reg], bim));
             setStericsT(base2, cell_list(inx+region[reg], pan));

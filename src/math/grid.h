@@ -457,11 +457,11 @@ public:
     /// the sum of the values in the region around cell referred by 'inx'
     CELL sumValuesInRegion(const index_t inx) const
     {
-        CELL result = 0;
         int const* offsets = nullptr;
         const CELL * ce = gCell + inx;
-        int nb = MAP::getRegion(offsets, inx);
-        for ( int c = 0; c < nb; ++c )
+        int nR = MAP::getRegion(offsets, inx);
+        CELL result = ce[0];
+        for ( int c = 0; c < nR; ++c )
             result += ce[ offsets[c] ];
         return result;
     }
@@ -469,26 +469,25 @@ public:
     /// the sum of the values in the region around cell referred by 'inx'
     CELL avgValueInRegion(const index_t inx) const
     {
-        CELL result = 0;
         int const* offsets = nullptr;
         const CELL * ce = gCell + inx;
-        int nb = MAP::getRegion(offsets, inx);
-        for ( int c = 0; c < nb; ++c )
+        int nR = MAP::getRegion(offsets, inx);
+        CELL result = ce[0];
+        for ( int c = 0; c < nR; ++c )
             result += ce[ offsets[c] ];
-        return result / (real)nb;
+        return result / (real)(nR+1);
     }
     
     /// the maximum of the values in the region around cell referred by 'inx'
     CELL maxValueInRegion(const index_t inx) const
     {
         assert_true( MAP::mNbCells <= gAllocated );
-        CELL result = gCell[inx];
         int const* offsets = nullptr;
         const CELL * ce = gCell + inx;
-        int nb = MAP::getRegion(offsets, inx);
-        for ( int c = 0; c < nb; ++c )
-            if ( result < ce[ offsets[c] ] )
-                result = ce[ offsets[c] ];
+        int nR = MAP::getRegion(offsets, inx);
+        CELL result = gCell[inx];
+        for ( int c = 0; c < nR; ++c )
+            result = std::max(result, ce[ offsets[c] ]);
         return result;
     }
     

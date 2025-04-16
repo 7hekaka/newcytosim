@@ -74,21 +74,22 @@ The class also provides information on which cells surround each cell:
 .
 After calling one of the above function, getRegion(offsets, index) will set 'offsets'
 to point to an array of 'index offsets' for the cell referred by 'index'.
-A zero offset value (0) is always first in the list and refers to self.
 In the example above:
-    - for index = 0 it would return { 0 1 4 5 }
-    - for index = 5 it would return { 0 -1 1 -5 -4 -3 3 4 5 }
+    - for index = 0 it would return { 1 4 5 }
+    - for index = 5 it would return { -1 1 -5 -4 -3 3 4 5 }
 .
-You obtain the cell-indices of the neighboring cells by adding offsets[n] to 'index':
+Note that, as of 16.04.2025, ** the zero offset for self is not included anymore. **
+
+The indices of the neighboring cells are calculated by adding offsets[n] to 'index':
 Example:
 
-    CELL * cell = & map.icell(indx);
-    int n_neighbors = map.getRegion(region, indx);
-    for ( int n = 1; n < n_neighbors; ++n )
-    {
-        Cell & neighbor = cell[region[n]];
-        ...
-    }
+        CELL * cell = & map.icell(indx);
+        int cnt = map.getRegion(region, indx);
+        for ( int n = 0; n < cnt; ++n )
+        {
+            Cell & neighbor = cell[region[n]];
+            ...
+        }
 
 */
 
@@ -752,7 +753,7 @@ private:
             {
                 //check that cell was not already included:
                 bool add = true;
-                for ( int n = 1; n <= res; ++n )
+                for ( int n = 0; n < res; ++n )
                 {
                     if ( offsets[n] == off )
                     {
@@ -761,13 +762,14 @@ private:
                     }
                 }
                 if ( add )
-                    offsets[++res] = off;
+                    offsets[res++] = off;
             }
             else if ( inside(cc) )
-                offsets[++res] = off;
+                offsets[res++] = off;
         }
         assert_true(res <= cnt);
-        offsets[0] = res;
+        assert_true(offsets[0] == 0);
+        offsets[0] = res - 1;
     }
     
    
@@ -798,22 +800,29 @@ private:
             if ( reg[0] <= 0 )
             {
                 // calculate the region for this new edge-characteristic
-                calculateOffsets(reg, ccc, regSize-1, ori, i);
-                //printf("cell %i with edge type %i has %i neighbors\n", i, e, reg[0]);
-                assert_true(reg[1]==0);
+                calculateOffsets(reg, ccc, regSize, ori, i);
+                printf("cell %i with edge type %i has %i neighbors\n", i, e, reg[0]);
             }
-#if ( 0 )
+#if ( 1 )
             else
             {
                 printf("checking cell %i with edge type %i\n", i, e);
                 // compare result for a different cell with the same edge-characteristic
                 int * rig = new int[regSize];
-                calculateOffsets(rig, ccc, regSize-1, ori, i);
-                if ( rig[0] != reg[0] )
-                    ABORT_NOW("inconsistent region size");
-                for ( int s = 1; s < rig[0]+1; ++s )
-                    if ( rig[s] != reg[s] )
-                        ABORT_NOW("inconsistent region offsets");
+                calculateOffsets(rig, ccc, regSize, ori, i);
+                bool different = false;
+                for ( int s = 0; s < regSize; ++s )
+                    if ( rig[s] != reg[s] ) different = true;
+                if ( different )
+                {
+                    for ( int s = 0; s < regSize; ++s )
+                        printf(" %2i", reg[s]);
+                    printf("\n");
+                    for ( int s = 0; s < regSize; ++s )
+                        printf(" %2i", rig[s]);
+                    printf("\n");
+                    ABORT_NOW("inconsistent regions");
+                }
                 delete[] rig;
             }
 #endif
@@ -874,7 +883,7 @@ public:
             if ( reject_square(ccc+ORD*s, radius) )
                 remove_entry(ccc, s, cmx);
         
-        createRegions(ccc, cmx+1, range);
+        createRegions(ccc, cmx, range);
         delete[] ccc;
     }
     
@@ -904,7 +913,7 @@ public:
             if ( reject_disc(ccc+ORD*s, radius) )
                 remove_entry(ccc, s, cmx);
         
-        createRegions(ccc, cmx+1, range);
+        createRegions(ccc, cmx, range);
         delete[] ccc;
     }
 
@@ -930,8 +939,9 @@ public:
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range);
         cmx = keepPositiveOffsets(ccc, cmx);
-        //printGrid(std::clog, ccc, cmx);
-        createRegions(ccc, cmx+1, range);
+        printGrid(std::clog, ccc, cmx);
+        createRegions(ccc, cmx, range);
+        printRegions(std::clog, "SideRegions");
         delete[] ccc;
     }
     
@@ -950,8 +960,8 @@ public:
      \par Example:
 
          CELL * cell = & map.icell(indx);
-         n_offset = map.getRegion(offset, indx);
-         for ( int n = 1; n < n_offset; ++n )
+         int n_offset = map.getRegion(offset, indx);
+         for ( int n = 0; n < n_offset; ++n )
          {
              Cell & neighbor = cell[offset[n]];
              ...
@@ -964,7 +974,6 @@ public:
         assert_true( hasRegions() );
         int const * R = region_ + chunk_ * (size_t)border_[indx];
         offsets = R + 1;
-        assert_true( offsets[0] == 0 );
         return R[0];
     }
     

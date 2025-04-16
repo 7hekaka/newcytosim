@@ -538,14 +538,13 @@ void PointGrid::setSterics0() const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         FatPointList & baseP = point_list(inx);
         FatLocusList & baseL = locus_list(inx);
         setSterics0(baseP, baseL);
         
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg]);
             FatLocusList & sideL = locus_list(inx+region[reg]);
@@ -563,15 +562,14 @@ void PointGrid::setStericsT() const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         FatPointList & baseP = point_list(inx);
         FatLocusList & baseL = locus_list(inx);
         
         setStericsT(baseP, baseL);
         
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg]);
             FatLocusList & sideL = locus_list(inx+region[reg]);
@@ -612,15 +610,14 @@ void PointGrid::setSterics0(const index_t pan) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         FatPointList & baseP = point_list(inx, pan);
         FatLocusList & baseL = locus_list(inx, pan);
         
         setSterics0(baseP, baseL);
         
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan);
             FatLocusList & sideL = locus_list(inx+region[reg], pan);
@@ -637,15 +634,14 @@ void PointGrid::setStericsT(const index_t pan) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         FatPointList & baseP = point_list(inx, pan);
         FatLocusList & baseL = locus_list(inx, pan);
         
         setStericsT(baseP, baseL);
         
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan);
             FatLocusList & sideL = locus_list(inx+region[reg], pan);
@@ -667,23 +663,24 @@ void PointGrid::setSterics0(const index_t pan1, const index_t pan2) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         FatPointList & baseP = point_list(inx, pan1);
         FatLocusList & baseL = locus_list(inx, pan1);
         
-        for ( int reg = 0; reg < nr; ++reg )
+        FatPointList & baseP2 = point_list(inx, pan2);
+        FatLocusList & baseL2 = locus_list(inx, pan2);
+
+        setSterics0(baseP, baseL, baseP2, baseL2);
+
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan2);
             FatLocusList & sideL = locus_list(inx+region[reg], pan2);
             setSterics0(baseP, baseL, sideP, sideL);
         }
         
-        FatPointList & baseP2 = point_list(inx, pan2);
-        FatLocusList & baseL2 = locus_list(inx, pan2);
-        
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan1);
             FatLocusList & sideL = locus_list(inx+region[reg], pan1);
@@ -701,23 +698,24 @@ void PointGrid::setStericsT(const index_t pan1, const index_t pan2) const
     for ( index_t inx = 0; inx < pGrid.nbCells(); ++inx )
     {
         int const* region;
-        int nr = pGrid.getRegion(region, inx);
-        assert_true(region[0] == 0);
+        int nR = pGrid.getRegion(region, inx);
         
         FatPointList & baseP = point_list(inx, pan1);
         FatLocusList & baseL = locus_list(inx, pan1);
         
-        for ( int reg = 0; reg < nr; ++reg )
+        FatPointList & baseP2 = point_list(inx, pan2);
+        FatLocusList & baseL2 = locus_list(inx, pan2);
+
+        setStericsT(baseP, baseL, baseP2, baseL2);
+
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan2);
             FatLocusList & sideL = locus_list(inx+region[reg], pan2);
             setStericsT(baseP, baseL, sideP, sideL);
         }
         
-        FatPointList & baseP2 = point_list(inx, pan2);
-        FatLocusList & baseL2 = locus_list(inx, pan2);
-        
-        for ( int reg = 1; reg < nr; ++reg )
+        for ( int reg = 0; reg < nR; ++reg )
         {
             FatPointList & sideP = point_list(inx+region[reg], pan1);
             FatLocusList & sideL = locus_list(inx+region[reg], pan1);

@@ -216,13 +216,13 @@ int display(View& view)
     {
         char str[32];
         int const* offset = nullptr;
-        size_t nb = grid.getRegion(offset, cell_indx);
-        for ( size_t j = 0; j < nb; ++j )
+        size_t nR = grid.getRegion(offset, cell_indx);
+        for ( size_t j = 0; j < nR; ++j )
         {
             Vector x;
             grid.setPositionFromIndex(x, cell_indx+offset[j], 0.4);
-            snprintf(str, sizeof(str), "%lu", j);
-            view.drawText(x, white, str, 0);
+            snprintf(str, sizeof(str), "%u", offset[j]);
+            view.drawText(x, white, str, 0., View::BITMAP_TIMES_ROMAN_24);
         }
     }
     if ( 1 )
