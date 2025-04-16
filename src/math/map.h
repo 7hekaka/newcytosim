@@ -948,9 +948,9 @@ public:
         int * ccc = new int[ORD*cmx]{0};
         initRectangularGrid(ccc, cmx, range);
         cmx = keepPositiveOffsets(ccc, cmx);
-        printGrid(std::clog, ccc, cmx);
+        //printGrid(std::clog, ccc, cmx);
         createRegions(ccc, cmx, range);
-        printRegions(std::clog, "SideRegions");
+        //printRegions(std::clog, "SideRegions");
         delete[] ccc;
     }
     
