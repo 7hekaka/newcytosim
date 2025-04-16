@@ -288,7 +288,7 @@ void View::frameText(int position, FontType font, const float color[4],
 }
 
 /**
- draw text at position `vec`
+ draw text at position `{X, Y, Z}`
  */
 void View::drawText(float X, float Y, float Z, const float color[4], const char str[], const float offset, FontType) const
 {
@@ -302,7 +302,7 @@ void View::drawText(float X, float Y, float Z, const float color[4], const char 
     fgBitmapString(offset, -H/3, pixelSize(), font, color, str, H);
 #else
     gym::color(color);
-    fgStrokeString(0, 0, pixelSize(), 1, str, 1);
+    fgStrokeString(0, 0, 1.5*pixelSize(), 1, str, 1.5);
 #endif
     gym::restoreDepthTest();
     gym::restoreAlphaTest();
