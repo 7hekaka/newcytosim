@@ -843,7 +843,11 @@ void Parser::parse_run(std::istream& is)
     if ( do_run )
     {
         if ( name != "*"  &&  name != simulProp().name() )
-            throw InvalidSyntax("unknown simul name `"+name+"'");
+        {
+            InvalidSyntax e("unknown Simul name `"+name+"'");
+            e << "(use `" + simulProp().name() + "')";
+            throw e;
+        }
 
         Glossary opt(blok);
 

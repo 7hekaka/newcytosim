@@ -273,7 +273,9 @@ index_t Solid::makePoint(ObjectList& objs, Glossary& opt, std::string const& var
     return nbp;
 }
 
-
+/**
+ single? = SINGLE, POINT1, POINT2, COEFFICIENT
+ */
 void Solid::makeWrist(ObjectList& objs, Glossary& opt, std::string const& var, Simul& sim)
 {
     index_t num = 1;
