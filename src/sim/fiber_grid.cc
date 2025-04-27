@@ -466,7 +466,7 @@ FiberSegment FiberGrid::closestSegment(Vector const& place) const
 
 
 /// used for debugging
-unsigned mingle(FiberSegment const& seg)
+index_t mingle(FiberSegment const& seg)
 {
     return ( seg.fiber()->identity() << 16 ) | seg.point();
 }
@@ -543,8 +543,8 @@ void FiberGrid::testAttach(FILE* out, const Vector pos, FiberSet const& set, Han
         //report for all the segments that were targeted:
         for ( auto const& hit : hits )
         {
-            ObjectID id = hit.first >> 16;    // opposite of mingle()
-            unsigned pt = hit.first & 65535;  // opposite of mingle()
+            ObjectID id = hit.first >> 16;   // undo mingle()
+            index_t pt = hit.first & 65535;  // undo mingle()
             Fiber const* fib = set.identifyObject(id);
             FiberSegment seg(fib, pt);
             real dis = INFINITY;

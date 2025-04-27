@@ -81,7 +81,7 @@ void Wrist::setInteractions(Meca& meca) const
          to the 'south-north' axis of the kinetochore.
          To keep the angular stiffness constant, we scale `weight` by the distance.
          */
-        unsigned j = i.lightest_point();
+        index_t j = i.lightest_point();
         base_.addAlignedOffsetLink(meca, seg, Mecapoint(i.mecable(), j), prop->anchor_stiff/seg);
     }
 #endif

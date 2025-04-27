@@ -2995,7 +2995,7 @@ void Meca::testSideLink(Interpolation const& ptA,
     }
     
     real alpha = 0;
-    unsigned P = ptB.point();
+    index_t P = ptB.point();
     if ( P > 0 ) {
         alpha = 1;
         P -= 1;
