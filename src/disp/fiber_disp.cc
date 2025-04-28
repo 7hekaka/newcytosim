@@ -20,6 +20,7 @@ void FiberDisp::clear()
     line_style = 1;
     line_width = 2;
     line_caps  = 1;
+    outline_width = 0;
     
     point_style = 0;
     point_size  = 5;
@@ -89,6 +90,7 @@ void FiberDisp::read(Glossary& glos)
                                         {"rainbow_tension", 3}, {"curvature", 4}, {"orientation", 5},
                                         {"minus_end", 6}, {"plus_end", 7}, {"height", 8}, {"grid", 9}});
     glos.set(line_caps, "line_caps", 0, key, 2);
+    glos.set(outline_width, "outlines");
     
     glos.set(point_size, "point_size", 0, "size", 0);
     key = glos.has_key("point") ? "point" : "points";
@@ -182,6 +184,7 @@ void FiberDisp::write_values(std::ostream& os) const
     
     write_value(os, "points",       point_size, point_style, point_gap);
     write_value(os, "lines",        line_width, line_style, line_caps);
+    write_value(os, "outlines",     outline_width);
     write_value(os, "plus_end",     end_size[0], end_style[0]);
     write_value(os, "minus_end",    end_size[1], end_style[1]);
     write_value(os, "end_color",    end_colors, 6);

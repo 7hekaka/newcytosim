@@ -111,6 +111,9 @@ public:
      */
     int line_caps;
     
+    /// if set, draw fiber's outline with the background color (supported only for DIM==3)
+    float outline_width;
+
     /// diameter of points (also known as `point[0]` or `size`)
     /**
      `point_size` and `line_width` are normally set in pixels, 

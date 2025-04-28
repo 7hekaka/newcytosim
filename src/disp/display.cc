@@ -2050,10 +2050,12 @@ void Display::drawFiber(Fiber const& fib)
 
     if ( style && dis->line_width > 0 )
     {
-        /*
-        if ( style == 1 ) // adding a black outline to filaments
-            drawFiberBackbone(fib, gym::background_color, 2*dis->line_width);
-         */
+#if ( DIM >= 3 )
+        /* outlining the filaments using the background color,
+         will highlight the filaments that are above other ones */
+        if ( dis->outline_width > 0 )
+            drawFiberBackbone(fib, gym::background_color, dis->outline_width);
+#endif
         drawFiberLines(fib, style, dis->line_width);
     }
     
