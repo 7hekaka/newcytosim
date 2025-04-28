@@ -210,10 +210,10 @@ public:
     /// number of faces (each face is a triangle of 3 vertices)
     unsigned num_faces() const { return num_faces_; }
     
-    /// return threshold for triangles belonging to the hexagons of the football
+    /// return threshold for triangles belonging to the football's pentagons
     unsigned foot_rank() const { return rint(rank_*0.3333); }
     
-    /// number of faces to be drawn if you want to display a football
+    /// number of faces making up the football's pentagons
     unsigned num_foot_faces() const { unsigned R = foot_rank(); return 60*(R*R); }
 
     /// array of indices to the vertices in each face (3 vertices per face)

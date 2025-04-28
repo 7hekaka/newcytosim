@@ -274,12 +274,16 @@ namespace gle
 
     /// draw a sphere decorated with 12 black pentagons
     void football();
-    /// draw a sphere decorated with 12 pentagons
+    /// draw a fine sphere decorated with 12 pentagons
     void football1(gym_color);
-    /// draw a sphere decorated with 12 pentagons
+    /// draw a fine sphere decorated with 12 outlined pentagons
+    void footballT(gym_color);
+    /// draw a nice sphere decorated with 12 pentagons
     void football2(gym_color);
     /// draw a sphere decorated with 12 pentagons
     void football4(gym_color);
+    /// draw a coarse sphere decorated with 12 pentagons
+    void football8(gym_color);
 
     /// draw a line on the sphere
     void baseballSeamCurve(float R, float W);

@@ -1708,6 +1708,23 @@ namespace gle
         gym::unbind2();
         gym::cleanupVN();
     }
+    
+    /** Assuming faces of the icosahedron have been properly sorted */
+    void drawFootballT(GLsizei pts, size_t inx, GLsizei cnt, gym_color col, GLsizei mid)
+    {
+        assert_true(buf_[0]); assert_true(buf_[1]);
+        // the normal in each vertex is equal to the vertex!
+        gym::bindBufferV3N0(buf_[0], pts);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buf_[1]);
+        glDrawElements(GL_TRIANGLES, mid, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*inx));
+        size_t edg = std::ceil(0.33*std::sqrt((cnt-mid)/180));
+        edg = 180 * edg * edg;
+        glDrawElements(GL_TRIANGLES, edg, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*(inx+cnt-edg)));
+        gym::color_both(col);
+        glDrawElements(GL_TRIANGLES, cnt-mid-edg, GL_UNSIGNED_SHORT, (void*)(sizeof(GLushort)*(inx+mid)));
+        gym::unbind2();
+        gym::cleanupVN();
+    }
 
     void dualPassIcoBuffer(GLsizei pts, size_t inx, GLsizei cnt)
     {
@@ -1760,6 +1777,7 @@ namespace gle
     void football() { drawFootball(ico_pts_[0], ico_idx_[0], ico_cnt_[0], gym_color(0,0,0), ico_mid_[0]); }
 
     void football1(gym_color col) { drawFootball(ico_pts_[0], ico_idx_[0], ico_cnt_[0], col, ico_mid_[0]); }
+    void footballT(gym_color col) { drawFootballT(ico_pts_[0], ico_idx_[0], ico_cnt_[0], col, ico_mid_[0]); }
     void football2(gym_color col) { drawFootball(ico_pts_[1], ico_idx_[1], ico_cnt_[1], col, ico_mid_[1]); }
     void football4(gym_color col) { drawFootball(ico_pts_[2], ico_idx_[2], ico_cnt_[2], col, ico_mid_[2]); }
     void football8(gym_color col) { drawFootball(ico_pts_[3], ico_idx_[3], ico_cnt_[3], col, ico_mid_[3]); }
@@ -1782,8 +1800,6 @@ namespace gle
         ico[7].buildDroplet(finesse*3);
         ico[8].buildDroplet(finesse);
 
-        const int DOME_ICO = 5;
-        
         size_t F = 32; // reserve for ICOID (30)
         size_t S = 12;
         for ( int i = 0; i < 9; ++i )
@@ -1791,6 +1807,7 @@ namespace gle
             F += 3 * ico[i].max_faces();
             S += 3 * ico[i].max_vertices();
         }
+        const int DOME_ICO = 5;
         // reserve for DOME
         F += 3 * ico[DOME_ICO].max_faces();
         S += 3 * ico[DOME_ICO].max_vertices();

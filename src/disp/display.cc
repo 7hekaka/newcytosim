@@ -131,7 +131,7 @@ inline void drawMonomer(Vector3 const& pos, float rad)
     gle::sphere2();
 }
 
-static void drawFootball(Solid const& obj, index_t inx, gym_color col, gym_color bak, bool flip)
+static void drawFootball(Solid const& obj, index_t inx, gym_color col, gym_color lor, bool flip)
 {
     assert_true(inx+DIM < obj.nbPoints());
     Vector X = obj.posP(inx);
@@ -144,11 +144,17 @@ static void drawFootball(Solid const& obj, index_t inx, gym_color col, gym_color
 #else
     gym::transScale(X, obj.radius(inx));
 #endif
-    if ( flip ) glFrontFace(GL_CW);
     gym::color_front(col, 1.0);
-    gle::football1(bak);
-    //gle::baseball();
-    if ( flip ) glFrontFace(GL_CCW);
+    if ( flip )
+    {
+        glFrontFace(GL_CW);
+        gle::football1(lor);
+        glFrontFace(GL_CCW);
+    }
+    else
+    {
+        gle::footballT(lor);
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -2451,10 +2457,9 @@ void Display::drawSolids(SolidSet const& set)
                     {
                         gym::enableLighting();
                         gym_color black(0,0,0,1);
-                        gym_color tcol = bodyColorF(*twi);
-                        gym_color scol = tcol.tweak(obj->signature());
-                        drawFootball(*obj, inx, scol, black, true);
-                        drawFootball(*twi, inx, tcol, black, false);
+                        gym_color col = bodyColorF(*twi);
+                        drawFootball(*obj, inx, col, black, true); // elder twin
+                        drawFootball(*twi, inx, col, black, false); // younger twin
                     }
                 } else
 #endif

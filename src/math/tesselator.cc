@@ -288,11 +288,11 @@ void Tesselator::sortFaces(unsigned cut)
         unsigned c = faces_[3*i+2];
         
         // weight_[0] should be the highest, and close to rank_ when near a primary vertex
-        unsigned wa = vertices_[a].weight_[0] > cut;
-        unsigned wb = vertices_[b].weight_[0] > cut;
-        unsigned wc = vertices_[c].weight_[0] > cut;
+        unsigned wa = vertices_[a].weight_[0];
+        unsigned wb = vertices_[b].weight_[0];
+        unsigned wc = vertices_[c].weight_[0];
         
-        map[i] = { i, std::max(wa, std::max(wb, wc)) };
+        map[i] = { i, std::max(std::max(cut, wa), std::max(wb, wc)) };
     }
 
     qsort(map, num_faces_, sizeof(FaceIW), &compareFaceIW);
