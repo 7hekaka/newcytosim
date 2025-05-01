@@ -33,7 +33,7 @@ public:
 
     /// starting shapes
     enum Polyhedra { UNSET=0, TETRAHEDRON, OCTAHEDRON, ICOSAHEDRON, 
-        ICOSAHEDRONX, HEMISPHERE, CYLINDER, DICE, DROPLET, PIN };
+        ICOSAHEDRONX, HEMISPHERE, FOOTBALL, CYLINDER, DICE, DROPLET, PIN };
     
     /// One of the vertex of the unrefined template model
     struct Apex
@@ -136,8 +136,9 @@ private:
     void destroy();
     void setGeometry(int K, unsigned V, unsigned E, unsigned F, unsigned div);
 
-    template < typename REAL > void interpolate(REAL vec[3], Vertex const&) const;
-    template < typename REAL > void projectVertices(REAL*) const;
+    template <typename REAL> void interpolateVertex(REAL vec[3], Vertex const&) const;
+    template <typename REAL> void projectFootball(REAL vec[3], Vertex const&) const;
+    template <typename REAL> void projectVertices(REAL*) const;
 
 public:
 
@@ -158,6 +159,7 @@ public:
     void buildCylinder(unsigned div);
     void buildHemisphere(unsigned div);
     void buildDice(FLOAT X, FLOAT Y, FLOAT Z, FLOAT R, unsigned div, unsigned vid);
+    void buildFootball(unsigned div);
     void buildDroplet(unsigned div);
     void buildPin(unsigned div);
 

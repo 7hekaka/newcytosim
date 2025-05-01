@@ -40,19 +40,20 @@ namespace gle
     unsigned discs_[8] = { 0 };
 
     /// offset of first vertex coordinate in buffer object
-    unsigned ico_pts_[12] = { 0 };
+    unsigned ico_pts_[14] = { 0 };
     /// offset, in bytes, of first index in buffer object
-    unsigned ico_idx_[12] = { 0 };
+    unsigned ico_idx_[14] = { 0 };
     /// number of triangles making up the faces in icosahedrons
-    unsigned ico_cnt_[12] = { 0 };
+    unsigned ico_cnt_[14] = { 0 };
     /// another number of faces
-    unsigned ico_mid_[12] = { 0 };
+    unsigned ico_mid_[14] = { 0 };
 
+    const unsigned FOOT = 9;
     /// index used for the dome:
-    const unsigned DOME = 9;
-    const unsigned ROOF = 10;
+    const unsigned DOME = 10;
+    const unsigned ROOF = 11;
     /// index used for the icoid object:
-    const unsigned ICOID = 11;
+    const unsigned ICOID = 12;
     
     //-----------------------------------------------------------------------
     #pragma mark - Compute Arc and Circle
@@ -1774,10 +1775,10 @@ namespace gle
     void dualPassSphere4() { dualPassIcoBuffer(ico_pts_[2], ico_idx_[2], ico_cnt_[2]); }
     void dualPassSphere8() { dualPassIcoBuffer(ico_pts_[3], ico_idx_[3], ico_cnt_[3]); }
 
-    void football() { drawFootball(ico_pts_[0], ico_idx_[0], ico_cnt_[0], gym_color(0,0,0), ico_mid_[0]); }
+    void football() { drawFootball(ico_pts_[FOOT], ico_idx_[FOOT], ico_cnt_[FOOT], gym_color(0,0,0), ico_mid_[FOOT]); }
 
-    void football1(gym_color col) { drawFootball(ico_pts_[0], ico_idx_[0], ico_cnt_[0], col, ico_mid_[0]); }
-    void footballT(gym_color col) { drawFootballT(ico_pts_[0], ico_idx_[0], ico_cnt_[0], col, ico_mid_[0]); }
+    void football1(gym_color col) { drawFootball(ico_pts_[FOOT], ico_idx_[FOOT], ico_cnt_[FOOT], col, ico_mid_[FOOT]); }
+    void footballT(gym_color col) { drawFootballT(ico_pts_[FOOT], ico_idx_[FOOT], ico_cnt_[FOOT], col, ico_mid_[FOOT]); }
     void football2(gym_color col) { drawFootball(ico_pts_[1], ico_idx_[1], ico_cnt_[1], col, ico_mid_[1]); }
     void football4(gym_color col) { drawFootball(ico_pts_[2], ico_idx_[2], ico_cnt_[2], col, ico_mid_[2]); }
     void football8(gym_color col) { drawFootball(ico_pts_[3], ico_idx_[3], ico_cnt_[3], col, ico_mid_[3]); }
@@ -1799,10 +1800,11 @@ namespace gle
         ico[6].buildPin(finesse*3);
         ico[7].buildDroplet(finesse*3);
         ico[8].buildDroplet(finesse);
+        ico[FOOT].buildFootball(finesse*9);
 
         size_t F = 32; // reserve for ICOID (30)
         size_t S = 12;
-        for ( int i = 0; i < 9; ++i )
+        for ( int i = 0; i < 10; ++i )
         {
             F += 3 * ico[i].max_faces();
             S += 3 * ico[i].max_vertices();
@@ -1841,7 +1843,7 @@ namespace gle
         //fprintf(stderr, "setCubeBuffer : %li %li\n", ptr-sub, c); sub=ptr;
         assert_true( ptr <= ptr0 + C + T );
 
-        for ( int i = 0; i < 9; ++i )
+        for ( int i = 0; i < 10; ++i )
         {
             ico_pts_[i] = ptr - ptr0;
             ico_idx_[i] = idx - idx0;
@@ -1850,7 +1852,7 @@ namespace gle
             ico_mid_[i] = cnt - 3 * ico[i].num_foot_faces();
         }
 
-        assert_true(DOME >= 9);
+        assert_true(DOME >= 10);
         float * dome = ptr;
         ico_pts_[DOME] = ptr - ptr0;
         ico_idx_[DOME] = idx - idx0;

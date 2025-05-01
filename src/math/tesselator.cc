@@ -608,6 +608,7 @@ void Tesselator::construct(Tesselator::Polyhedra kind, unsigned div, int make)
         case ICOSAHEDRON: buildIcosahedron(div); break;
         case ICOSAHEDRONX: buildIcosahedronX(div); break;
         case HEMISPHERE: buildHemisphere(div); break;
+        case FOOTBALL: buildFootball(div); break;
         case CYLINDER: buildCylinder(div); break;
         case DICE: buildDice(0.7, 0.5, 0.5, 0.3, div, div); break;
         case DROPLET: buildDroplet(div); break;
@@ -809,6 +810,22 @@ void Tesselator::buildIcosahedron(unsigned div)
     sortFaces(div-foot_rank());
 }
 
+void Tesselator::buildFootball(unsigned div)
+{
+    div = std::max(div, 1U);
+    buildIcosahedron(div);
+    kind_ = FOOTBALL;
+}
+
+void Tesselator::buildDroplet(unsigned div)
+{
+    div = std::max(div, 1U);
+    buildIcosahedron(div);
+    kind_ = DROPLET;
+}
+
+//------------------------------------------------------------------------------
+#pragma mark -
 
 static void triangle(unsigned i[3], unsigned a, unsigned b, unsigned c)
 {
@@ -904,13 +921,6 @@ void Tesselator::buildPin(unsigned div)
     div = std::max(div, 1U);
     buildCylinder(div);
     kind_ = PIN;
-}
-
-void Tesselator::buildDroplet(unsigned div)
-{
-    div = std::max(div, 1U);
-    buildIcosahedron(div);
-    kind_ = DROPLET;
 }
 
 
@@ -1131,12 +1141,15 @@ static void projectDice(REAL* X, const REAL len[4])
 
 
 template < typename REAL >
-void Tesselator::interpolate(REAL ptr[3], Vertex const& vex) const
+void Tesselator::interpolateVertex(REAL ptr[3], Vertex const& vex) const
 {
-    REAL S = 1.0 / ( vex.weight_[0] + vex.weight_[1] + vex.weight_[2] );
-    REAL a = (float)vex.weight_[0] * S;
-    REAL b = (float)vex.weight_[1] * S;
-    REAL c = (float)vex.weight_[2] * S;
+    REAL a = vex.weight_[0];
+    REAL b = vex.weight_[1];
+    REAL c = vex.weight_[2];
+    REAL S = 1.0 / ( a + b + c );
+    a *= S;
+    b *= S;
+    c *= S;
     auto pA = apices_[vex.index_[0]].pos_;
     auto pB = apices_[vex.index_[1]].pos_;
     auto pC = apices_[vex.index_[2]].pos_;
@@ -1145,6 +1158,25 @@ void Tesselator::interpolate(REAL ptr[3], Vertex const& vex) const
     ptr[2] = a * pA[2] + b * pB[2] + c * pC[2];
 }
 
+
+/** Vertices next to the edges of the pentagons/hexagons are pushed inside
+ to represent the stitching pattern of a leather football. 1.05.2025*/
+template < typename REAL >
+void Tesselator::projectFootball(REAL ptr[3], Vertex const& vex) const
+{
+    REAL a = vex.weight_[0];
+    REAL b = vex.weight_[1];
+    REAL c = vex.weight_[2];
+    REAL x = b + c - foot_rank();
+    if ( x >= 0 )
+        x = std::min(x, c);
+    REAL R = 1.0 - 0.05 * std::exp(-7*std::abs(x)/foot_rank());
+    REAL n = ptr[0]*ptr[0] + ptr[1]*ptr[1] + ptr[2]*ptr[2];
+    REAL S = R / std::sqrt(n);
+    ptr[0] *= S;
+    ptr[1] *= S;
+    ptr[2] *= S;
+}
 
 template < typename REAL >
 void Tesselator::projectVertices(REAL * vec) const
@@ -1168,6 +1200,11 @@ void Tesselator::projectVertices(REAL * vec) const
             projectSphere(vec+3*n);
         dropletify_(num_vertices_, vec, REAL(0.75));
     }
+    else if ( kind_ == FOOTBALL )
+    {
+        for ( unsigned n = 0; n < num_vertices_; ++n )
+            projectFootball(vec+3*n, vertices_[n]);
+    }
     else
     {
         for ( unsigned n = 0; n < num_vertices_; ++n )
@@ -1175,19 +1212,20 @@ void Tesselator::projectVertices(REAL * vec) const
     }
 }
 
+
 void Tesselator::store_vertices(float * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        interpolate(vec+3*n, vertices_[n]);
-
+        interpolateVertex(vec+3*n, vertices_[n]);
+        
     projectVertices(vec);
 }
 
 void Tesselator::store_vertices(double * vec) const
 {
     for ( unsigned n = 0; n < num_vertices_; ++n )
-        interpolate(vec+3*n, vertices_[n]);
-
+        interpolateVertex(vec+3*n, vertices_[n]);
+    
     projectVertices(vec);
 }
 
