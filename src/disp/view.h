@@ -295,7 +295,7 @@ public:
     void strokeString(const char[], float width) const;
 
     /// stroke text at given position
-    void strokeString(float X, float Y, float Z, const char str[]) const;
+    void strokeString(float X, float Y, float Z, const char str[], float scale=1.f) const;
     
     /// draw `text` at position `pos`
     void drawText(float X, float Y, float Z, const float color[4], const char text[], float offset=0.5, FontType = BITMAP_9_BY_15) const;

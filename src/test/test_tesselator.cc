@@ -186,17 +186,18 @@ void namePoints(View& view)
     char tmp[128];
     for ( unsigned i=0; i < ico->num_vertices(); ++i )
     {
+        float scale = 1.f;
         Tesselator::Vertex & dv = ico->vertex(i);
         float col[4] = {1.f, 0.f, 0.f, 1.f};
-        if ( dv.weight(1) == 0 )
-            col[2] = 1;
         if ( dv.weight(2) == 0 )
-            col[1] = 1;
+        { col[1] = 1; scale = 1.4142f; }
+        if ( dv.weight(1) == 0 )
+        { col[2] = 1; scale = 2.f; }
         
         gym::color(col);
         const float* ptr = ico->vertex_data(i);
         snprintf(tmp, sizeof(tmp), "%u", i);
-        view.strokeString(S*ptr[0], S*ptr[1], S*ptr[2], tmp);
+        view.strokeString(S*ptr[0], S*ptr[1], S*ptr[2], tmp, scale);
     }
     gym::restoreAlphaTest();
     gym::restoreLighting();

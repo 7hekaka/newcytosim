@@ -200,10 +200,10 @@ void View::strokeString(const char str[], float size) const
 }
 
 
-void View::strokeString(float X, float Y, float Z, const char str[]) const
+void View::strokeString(float X, float Y, float Z, const char str[], float scale) const
 {
     gym::translate_ref(X, Y, Z);
-    fgStrokeString(0, 0, pixelSize(), 1, str, 2);
+    fgStrokeString(0, 0, scale*pixelSize(), 1, str, 2*scale, 2*scale);
 }
 
 

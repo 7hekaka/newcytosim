@@ -297,7 +297,7 @@ void Tesselator::sortFaces(unsigned cut)
 
     qsort(map, num_faces_, sizeof(FaceIW), &compareFaceIW);
     
-    // copy vertices according to the new order
+    // copy face indices according to the new order
     INDEX * fac = new INDEX[3*max_faces_];
     for ( unsigned i = 0; i < num_faces_; ++i )
     {
@@ -1149,9 +1149,6 @@ void Tesselator::interpolate(REAL ptr[3], Vertex const& vex) const
 template < typename REAL >
 void Tesselator::projectVertices(REAL * vec) const
 {
-    for ( unsigned n = 0; n < num_vertices_; ++n )
-        interpolate(vec+3*n, vertices_[n]);
-    
     if ( kind_ == DICE )
     {
         REAL len[4] = { dim_[0], dim_[1], dim_[2], dim_[3] };
