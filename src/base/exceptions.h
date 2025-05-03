@@ -86,39 +86,25 @@ public:
         msg_ = m;
     }
     
-    /// concatenate `s` and `a` to build message
-    template <typename A>
-    Exception(const std::string& s, const A& a)
-    {
-        std::ostringstream oss;
-        oss << s << a;
-        msg_ = oss.str();
-    }
     
-    /// concatenate `s`, `a` and `b` to build message
-    template <typename A, typename B>
-    Exception(const std::string& s, const A& a, const B& b)
+    template <typename Arg1>
+    void stringify(std::ostringstream& oss, Arg1 arg1)
     {
-        std::ostringstream oss;
-        oss << s << a << b;
-        msg_ = oss.str();
+        oss << arg1;
     }
 
-    /// concatenate `s`, `a`, `b` and `c` to build message
-    template <typename A, typename B, typename C>
-    Exception(const std::string& s, const A& a, const B& b, const C& c)
+    template <typename Arg1, typename... Args>
+    void stringify(std::ostringstream& oss, Arg1 arg1, Args... args)
     {
-        std::ostringstream oss;
-        oss << s << a << b << c;
-        msg_ = oss.str();
+        oss << arg1;
+        stringify(oss, args...);
     }
 
-    /// concatenate `s`, `a`, `b`, `c` and `d` to build message
-    template <typename A, typename B, typename C, typename D>
-    Exception(const std::string& s, const A& a, const B& b, const C& c, const D& d)
+    template <typename... Args>
+    Exception(const std::string& s, Args... args)
     {
-        std::ostringstream oss;
-        oss << s << a << b << c << d;
+        std::ostringstream oss(s);
+        stringify(oss, args...);
         msg_ = oss.str();
     }
     
@@ -172,22 +158,9 @@ public:
     {
         //printf("new InvalidParameter [%s]\n", m.c_str());
     }
-
-    /// concatenate all arguments to build message
-    template <typename A>
-    InvalidParameter(const std::string& s, const A& a) : Exception(s, a) {}
     
-    /// concatenate all arguments to build message
-    template <typename A, typename B>
-    InvalidParameter(const std::string& s, const A& a, const B& b) : Exception(s,a,b) {}
- 
-    /// concatenate all arguments to build message
-    template <typename A, typename B, typename C>
-    InvalidParameter(const std::string& s, const A& a, const B& b, const C&c) : Exception(s,a,b,c) {}
-
-    /// concatenate all arguments to build message
-    template <typename A, typename B, typename C, typename D>
-    InvalidParameter(const std::string& s, const A& a, const B& b, const C& c, const D& d) : Exception(s,a,b,c,d) {}
+    template <typename... Args>
+    InvalidParameter(const std::string& s, Args... args) : Exception(s, args...) {}
 };
 
 
