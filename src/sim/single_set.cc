@@ -106,7 +106,7 @@ void SingleSet::steps()
     {
         uniRelax();
         inventory_.reassign();
-        Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+        Cytosim::log("Single::reassign(", h, " ---> ", inventory_.highest(), ")\n");
     }
 #endif
     if ( aList.size() > 1 ) aList.shuffle();

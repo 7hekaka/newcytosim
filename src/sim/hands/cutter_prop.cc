@@ -78,7 +78,7 @@ void CutterProp::complete(Simul const& sim)
     movability_dt = movability * time_step(sim);
     
     if ( line_diffusion > 0 && primed(sim) )
-        Cytosim::log << " Cutter `" << name() << "' has mobility = " << movability << " um/s\n";
+        Cytosim::log("   Cutter `", name(), "' has mobility = ", movability, " um/s\n");
 
     if ( cutting_rate < 0 )
         throw InvalidParameter(name()+"cutting_rate must be >= 0");

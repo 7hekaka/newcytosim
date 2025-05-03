@@ -60,7 +60,7 @@ void ChewerProp::complete(Simul const& sim)
     movability_dt = movability * time_step(sim);
     
     if ( primed(sim) )
-        Cytosim::log << "   Chewer `" << name() << "' has mobility = " << movability << " um/s\n";
+        Cytosim::log("   Chewer `", name(), "' has mobility = ", movability, " um/s\n");
 }
 
 

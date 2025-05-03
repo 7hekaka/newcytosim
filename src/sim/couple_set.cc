@@ -129,7 +129,7 @@ void CoupleSet::steps()
     {
         uniRelax();
         inventory_.reassign();
-        Cytosim::log << "Single::reassign(" << h << " ---> " << inventory_.highest() << ")\n";
+        Cytosim::log("Single::reassign(", h, " ---> ", inventory_.highest(), ")\n");
     }
 #endif
     //printf(" couples: %lu %lu [ %u %u ]\n", size(), inventory_.count(), inventory_.lowest(), inventory_.highest());
@@ -1317,7 +1317,7 @@ void CoupleSet::bindToIntersections(FiberSet const& fibers, CoupleStock& can, re
     FiberSiteList loc1(1024), loc2(1024);
     fibers.allIntersections(loc1, loc2, rge);
     
-    Cytosim::log << "Connect " << loc1.size() << " intersections within range " << rge << "\n";
+    Cytosim::log("Connect ", loc1.size(), " intersections within range ", rge, "\n");
     
     uniAttach12(loc1, loc2, can, can.size());
 }

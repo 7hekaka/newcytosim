@@ -221,7 +221,7 @@ Fiber::Fiber(FiberProp const* p)
 #if FIBER_HAS_LATTICE
             if ( prop->lattice_unit < REAL_EPSILON )
                 throw InvalidParameter("the Lattice unit (lattice[1]) must be > 0");
-            //Cytosim::log << reference() <<  " new Lattice" << '\n';
+            //Cytosim::log(reference(),  " new Lattice", '\n');
             fLattice.setUnit(prop->lattice_unit);
 #else
             //throw InvalidParameter("Cytosim does not support fiber:lattice");
@@ -232,7 +232,7 @@ Fiber::Fiber(FiberProp const* p)
         {
             if ( prop->mesh_unit < REAL_EPSILON )
                 throw InvalidParameter("the Mesh unit (mesh[1]) must be > 0");
-            //Cytosim::log << reference() <<  " new Mesh" << '\n';
+            //Cytosim::log(reference(),  " new Mesh", '\n');
             fMesh.setUnit(prop->mesh_unit);
         }
 #endif
@@ -612,10 +612,10 @@ void Fiber::severNow(const real abs1, const real abs2, const real min_len,
         //add new fragment to simulation:
         objset()->add(frag);
 #if 0
-        Cytosim::log << reference() << " cut at [ " << abs1 << " " << abs2 << " ] ";
-        Cytosim::log << " creating " << frag->reference() << " len " << frag->length();
-        Cytosim::log << " remaining " << length() << "\n";
-        //Cytosim::log << " at X = " << frag->posEndM().XX << '\n';
+        Cytosim::log(reference(), " cut at [ ", abs1, " ", abs2, " ] ");
+        Cytosim::log(" creating ", frag->reference(), " len ", frag->length());
+        Cytosim::log(" remaining ", length(), "\n");
+        //Cytosim::log(" at X = ", frag->posEndM().XX, '\n');
 #endif
     }
 }
@@ -950,7 +950,7 @@ void Fiber::setDragCoefficient()
         drag = dragCoefficientSurface(len, prop);
 #if ( 0 )
         real d = dragCoefficientCylinder(len, prop);
-        Cytosim::log << "Drag of Fiber near a planar surface amplified by " << drag/d << '\n';
+        Cytosim::log("Drag of Fiber near a planar surface amplified by ", drag/d, '\n');
 #endif
     }
     else
@@ -1305,12 +1305,12 @@ void Fiber::updateRange(Field* field)
             // release Lattice substance located outside the valid abscissa range
             fMesh.collectM(sumM);
             field->cell(posEndM()) += sumM;
-            //Cytosim::log << " Fiber::MINUS_END releases " << sumM << '\n';
+            //Cytosim::log(" Fiber::MINUS_END releases ", sumM, '\n');
             
             real sumP;
             fMesh.collectP(sumP);
             field->cell(posEndP()) += sumP;
-            //Cytosim::log << " Fiber::PLUS_END releases " << sumP << '\n';
+            //Cytosim::log(" Fiber::PLUS_END releases ", sumP, '\n');
         }
     }
 #endif
@@ -1346,8 +1346,7 @@ void Fiber::updateFiber()
 {
     needUpdate = false;
 #if ( 0 )
-    Cytosim::log << reference() << " update [ "  << std::setw(9) << std::left << abscissaM();
-    Cytosim::log << " "  << std::setw(9) << std::left << abscissaP() << " ]" << '\n';
+    Cytosim::log(reference(), " update [ ", abscissaM(), "  ", abscissaP(), " ]", '\n');
 #endif
     
     updateRange(prop->field_ptr);
@@ -1850,7 +1849,7 @@ void Fiber::makeGlue(Single*& glue)
         if ( s->hand()->fiber() == this  &&  s->mark() == identity() )
         {
             glue = s;
-            //Cytosim::log << "found Fiber:glue for " << reference() << '\n';
+            //Cytosim::log("found Fiber:glue for ", reference(), '\n');
             return;
         }
     }
@@ -2031,7 +2030,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
         in.readFloat();
     }
     else
-        Cytosim::log << "unknown Fiber TAG `" << (char)tag << "'\n";
+        Cytosim::log("unknown Fiber TAG `", (char)tag, "'\n");
 }
 
 

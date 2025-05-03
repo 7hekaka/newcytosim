@@ -48,7 +48,7 @@ static void check_warnings(Glossary& opt, std::istream& is, std::streampos ipos,
         if ( opt.has_warning(war, cnt) )
         {
             size_t L;
-            Cytosim::log << war << " in `" << StreamFunc::extract_line(is, ipos, L) << "' (line " << L << ")\n";
+            Cytosim::log(war, " in `", StreamFunc::extract_line(is, ipos, L), "' (line ", L, ")\n");
             if ( 1 )
             {
                 // also report to standard error:

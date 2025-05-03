@@ -310,7 +310,7 @@ void Simul::solve_auto()
                     ptr += snprintf(ptr, end-ptr, " | %u %6.1f %6.0f", u, N, T);
                 }
                 snprintf(ptr, end-ptr, " |  -----> %i", autoPrecond);
-                Cytosim::log << str << '\n';
+                Cytosim::log(str, '\n');
             }
             for ( unsigned u = 0; u < 8; ++u )
             {

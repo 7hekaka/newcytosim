@@ -2176,7 +2176,7 @@ void Chain::write(Outputter& out) const
  */
 void Chain::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
-    //Cytosim::log << "  reading Chain at " << in.pos() << '\n';
+    //Cytosim::log(" Chain::read at ", in.pos(), '\n');
     ObjectSignature s = in.readUInt32();
     if ( s ) signature(s);
     
@@ -2285,7 +2285,7 @@ void Chain::writeAngles(Outputter& out) const
  */
 void Chain::readAngles(Inputter& in, Simul&, ObjectTag)
 {
-    //Cytosim::log << "  reading Chain at " << in.pos() << '\n';
+    //Cytosim::log(" Chain::readAngles at ", in.pos(), '\n');
     float len = in.readFloatBinary();
 
     if ( len <= 0 )

@@ -120,7 +120,7 @@ void NucleatorProp::complete(Simul const& sim)
     if ( nucleate_in_plane == "1" )
     {
         nucleate_in_plane = sim.spaces.nameObject(fiber_class->confine_space);
-        Cytosim::log << name() << ":nucleate_in_plane <---- " << nucleate_in_plane << "\n";
+        Cytosim::log(name(), ":nucleate_in_plane <---- ", nucleate_in_plane, "\n");
     }
 #endif
 

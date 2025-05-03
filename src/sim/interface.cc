@@ -459,7 +459,7 @@ ObjectList Interface::new_object(ObjectSet* set, Property const* prp, Glossary& 
     {
         std::string name = prp ? prp->name() : "object";
         if ( max_trials > 1 )
-            Cytosim::log << "could not place `" << name << "' after " << max_trials << " trials\n";
+            Cytosim::log("could not place `", name, "' after ", max_trials, " trials\n");
         return objs;
     }
 
@@ -1468,5 +1468,5 @@ void Interface::execute_dump(std::string const& path, unsigned mode)
     if ( mode & 16 ) sim_->sMeca.saveConnectivityBitmap();
 
     FilePath::change_dir(cwd);
-    Cytosim::log << "done\n";
+    Cytosim::log("done\n");
 }
