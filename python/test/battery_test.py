@@ -26,7 +26,7 @@ F. Nedelec, March-June 2011; 02.2013; 01.2020; 07.2021; 11.2024; 03.2025
 
 import shutil, sys, os, subprocess, time
 
-timeout = 600  # in seconds
+timeout = 1200  # in seconds
 home = os.getcwd()
 
 #------------------------------------------------------------------------
@@ -94,7 +94,7 @@ def worker(queue, lock):
             break;
         res = execute(t, f, 1)
         with lock:
-            print(res)
+            print(res, flush=True)
 
 #------------------------------------------------------------------------
 
@@ -155,7 +155,7 @@ def main(args):
         for f in files:
             os.chdir(home)
             res = execute(tool, f, 1)
-            print(res)
+            print(res, flush=True)
 
 
 #------------------------------------------------------------------------
