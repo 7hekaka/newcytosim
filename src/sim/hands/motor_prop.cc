@@ -42,7 +42,7 @@ void MotorProp::read(Glossary& glos)
     glos.set(unloaded_speed, "unloaded_speed", "speed");
 #if BACKWARD_COMPATIBILITY < 100
     if ( glos.set(unloaded_speed, "max_speed") )
-        Cytosim::warn << "'max_speed' is deprecated: use 'unloaded_speed'\n";
+        Cytosim::warn("'max_speed' is deprecated: use 'unloaded_speed'\n");
 #endif
 #if NEW_VARIABLE_SPEED
     glos.set(variable_speed, "variable_speed");
@@ -105,9 +105,9 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
     real ef = abs_real(set_speed_dt) * stiff * mul / stall_force;
     if ( unloaded_speed != 0  &&  ef > 0.5 )
     {
-        Cytosim::warn << "simulating `" << name() << "' may fail as:\n"\
-        << PREF << "time_step * stiffness * unloaded_speed / stall_force = " << ef << '\n'\
-        << PREF << "-> reduce time_step (really!)\n";
+        Cytosim::warn("simulating `", name(), "' may fail as:\n",
+                      PREF, "time_step * stiffness * unloaded_speed / stall_force = ", ef, "\n",
+                      PREF, "-> reduce time_step (really!)\n");
         //throw InvalidParameter(oss.str());
     }
     
@@ -118,9 +118,9 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
      */
     if ( std::sqrt( DIM * kT * stiff ) > stall_force )
     {
-        Cytosim::warn << name() << ":stall_force is too small:\n"\
-        << PREF << "DIM * kT * stiffness > stall_force\n"\
-        << PREF << "-> reduce stiffness or increase stall_force\n";
+        Cytosim::warn(name(), ":stall_force is too small:\n",
+                      PREF, "DIM * kT * stiffness > stall_force\n",
+                      PREF, "-> reduce stiffness or increase stall_force\n");
     }
     
     /*
@@ -130,16 +130,16 @@ void MotorProp::checkStiffness(real stiff, real len, real mul, real kT) const
     ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
     if ( unbinding_rate != 0  &&  unloaded_speed != 0  &&  ef < 1 )
     {
-        Cytosim::warn << "Motor `" << name() << "' is inefficient since\n"\
-        << PREF << "stiffness * unloaded_speed / unbinding_rate << stall_force"\
-        << "; ratio = " << ef << "\n";
+        Cytosim::warn("Motor `", name(), "' is inefficient since\n",
+                      PREF, "stiffness * unloaded_speed / unbinding_rate << stall_force",
+                      "; ratio = ", ef, "\n");
     }
     
     /*
      Compare detachment rate at stall-force, with detachment rate at rest
      */
     if ( std::exp( stall_force * unbinding_force_inv ) > 100 )
-        Cytosim::warn << name() << ":exp( stall_force / unbinding_force ) is greater than 1!\n";
+        Cytosim::warn(name(), ":exp( stall_force / unbinding_force ) is greater than 1!\n");
 }
 
 

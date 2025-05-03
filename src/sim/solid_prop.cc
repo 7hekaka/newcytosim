@@ -125,7 +125,7 @@ void SolidProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":confine_stiff must be >= 0");
     
     if ( primed(sim) && steric_key && !sim.prop.steric_mode )
-        Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
+        Cytosim::warn(name(), ":steric is set but simul:steric = 0\n");
     
 #if NEW_SOLID_MAKE_COUPLE
     if ( source_type == "none" )

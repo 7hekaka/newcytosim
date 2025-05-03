@@ -91,8 +91,8 @@ private:
             real dif = abs_real( step - mGrid.cellWidth(d) );
             if ( abs_real(dif) > 1e-3 )
             {
-                Cytosim::warn << "Field:step[" << d << "] is not as expected:\n";
-                Cytosim::warn << "  field: " << mGrid.cellWidth(d) << "  prop: " << step << "\n";
+                Cytosim::warn("Field:step[", d, "] is not as expected:\n",
+                              "  field: ", mGrid.cellWidth(d), "  prop: ", step, "\n");
             }
         }
     }
@@ -334,8 +334,8 @@ public:
                 real dif = abs_real( prop->step - mGrid.cellWidth(d) );
                 if ( abs_real(dif) > 1e-3 )
                 {
-                    Cytosim::warn << "Field:step["<<d<<"] has changed:\n";
-                    Cytosim::warn << "  file: " << mGrid.cellWidth(d) << " prop: " << prop->step << "\n";
+                    Cytosim::warn("Field:step[", d, "] has changed:\n",
+                                  "  file: ", mGrid.cellWidth(d), " prop: ", prop->step, "\n");
                 }
             }
             

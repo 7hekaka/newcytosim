@@ -44,7 +44,7 @@ Vector Space::place() const
         if ( ++ouf > max_trials )
         {
             throw InvalidParameter("random placement failed for space `"+prop->name()+"'");
-            //Cytosim::warn << "random placement failed for space `"+prop->name()+"'\n";
+            //Cytosim::warn("random placement failed for space `",prop->name(),"'\n");
             return Vector(0,0,0);
         }
     } while ( ! inside(res) );

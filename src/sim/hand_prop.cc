@@ -225,7 +225,7 @@ void HandProp::read(Glossary& glos)
 #if NEW_BIND_ONLY_FREE_END
     glos.set(bind_only_free_end, "bind_only_free_end");
     if ( bind_only_free_end && ! bind_only_end )
-        Cytosim::warn << "hand:bind_only_free_end is only effective if bind_only_end is set!\n";
+        Cytosim::warn("hand:bind_only_free_end is only effective if bind_only_end is set!\n");
 #endif
     
     glos.set(activity, "activity");
@@ -234,7 +234,7 @@ void HandProp::read(Glossary& glos)
 
 #if BACKWARD_COMPATIBILITY < 50
     if ( glos.set(hold_growing_end, 2, "hold_growing_ends") )
-        Cytosim::warn << "hand:hold_growing_ends was renamed hold_growing_end\n";
+        Cytosim::warn("hand:hold_growing_ends was renamed hold_growing_end\n");
 #endif
 }
 
@@ -273,20 +273,20 @@ void HandProp::complete(Simul const& sim)
         if ( binding_prob > sim.prop.acceptable_prob )
         {
 #if ( POOL_UNATTACHED > 1 )
-            Cytosim::warn << name() << ":binding_rate (" << BR << ") is too high: decrease POOL_UNATTACHED\n";
+            Cytosim::warn(name(),":binding_rate (", BR, ") is too high: decrease POOL_UNATTACHED\n");
 #else
-            Cytosim::warn << name() << ":binding_rate (" << BR << ") is too high: decrease time_step\n";
+            Cytosim::warn(name(),":binding_rate (", BR, ") is too high: decrease time_step\n");
 #endif
         }
     
         if ( unbinding_rate_dt > sim.prop.acceptable_prob )
-            Cytosim::warn << name() << ":unbinding_rate is too high: decrease time_step\n";
+            Cytosim::warn(name(), ":unbinding_rate is too high: decrease time_step\n");
     }
     
 #if BACKWARD_COMPATIBILITY < 100
     if ( unbinding_force == 0 )
     {
-        Cytosim::warn << "assuming that hand:unbinding_force=+inf, since the set value was zero\n";
+        Cytosim::warn("assuming that hand:unbinding_force=+inf, since the set value was zero\n");
         unbinding_force = INFINITY;
     }
 #endif
@@ -321,15 +321,15 @@ void HandProp::checkStiffness(real stiff, real len, real, real kT) const
     if ( en > 10.0 && binding_rate > 0 )
     {
         Cytosim::warn("binding of `",name_str(),"' is thermodynamically unfavorable: stiffness * binding_range^2 = ",en," kT\n");
-        //Cytosim::warn << "you could decrease stiffness or binding_range\n";
+        //Cytosim::warn("you could decrease stiffness or binding_range\n");
     }
     
     real ap = std::exp( stiff * dis * unbinding_force_inv );
     
     if ( ap > 10.0 )
     {
-        Cytosim::warn << "`" << name() << "' may unbind immediately, "\
-        << "time_step * binding_rate * exp(stiffness*binding_range/unbinding_force) = " << ap << "\n";
+        Cytosim::warn("`", name(), "' may unbind immediately: ",
+                      "time_step * binding_rate * exp(stiffness*binding_range/unbinding_force) = ", ap, "\n");
         //<< PREF << "you could decrease stiffness or binding_range\n";
     }
 }

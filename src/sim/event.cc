@@ -114,7 +114,7 @@ void Event::step(Simul& sim)
                 sim.perform(activity);
             }
             catch( Exception & e ) {
-                std::cerr << "Buggy event:code `" + activity + "' : " + e.message() << '\n';
+                Cytosim::warn("Buggy event:code `", activity, "' : ", e.message(), "\n");
             }
             reload(nextTime);
         } while ( multiplexed && sim.time() >= nextTime );

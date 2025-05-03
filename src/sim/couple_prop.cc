@@ -160,14 +160,14 @@ void CoupleProp::complete(Simul const& sim)
          In most cases, this is not desirable and physically inconsistent.
          */
         if ( length > hand1_prop->binding_range && hand1_prop->binding_rate > 0 && !trans_activated )
-            Cytosim::warn << hand1_prop->name() << ":binding_range should probably be >= " << name() << ":length\n";
+            Cytosim::warn(hand1_prop->name(), ":binding_range should probably be >= ", name(), ":length\n");
 
         if ( hand2_prop != hand1_prop )
         {
             hand2_prop->checkStiffness(stiffness, length, 2, boltzmann(sim));
         
             if ( length > hand2_prop->binding_range && hand2_prop->binding_rate > 0 )
-                Cytosim::warn << hand2_prop->name() << ":binding_range should probably be >= " << name() << ":length\n";
+                Cytosim::warn(hand2_prop->name(), ":binding_range should probably be >= ", name(), ":length\n");
         }
     }
 }

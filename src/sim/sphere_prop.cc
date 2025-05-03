@@ -96,7 +96,7 @@ void SphereProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":confine_stiff must be >= 0");
     
     if ( primed(sim) && steric_key && !sim.prop.steric_mode )
-        Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
+        Cytosim::warn(name(), ":steric is set but simul:steric = 0\n");
 
     if ( point_mobility < 0 )
         throw InvalidParameter("sphere:point_mobility must be specified and >= 0");

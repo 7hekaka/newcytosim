@@ -678,7 +678,7 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
         if ( tok == "dim" )
         {
             if ( in.vectorSize() != d )
-                Cytosim::warn << "mismatch between file ("<<d<<"D) and executable ("<<DIM<<"D)\n";
+                Cytosim::warn("mismatch between file (", d, "D) and executable (", DIM, "D)\n");
             in.vectorSize(d);
         }
         return 1;
@@ -697,7 +697,7 @@ int Simul::readMetaData(Inputter& in, std::string& section, ObjectSet*& objset, 
             {
                 in.vectorSize(i);
                 if ( i != DIM )
-                    Cytosim::warn << "mismatch between file ("<<i<<"D) and executable ("<<DIM<<"D)\n";
+                    Cytosim::warn("mismatch between file (", i, "D) and executable (", DIM, "D)\n");
             }
             if ( iss.get() == ',' )
             {

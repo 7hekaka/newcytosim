@@ -251,9 +251,9 @@ void FiberSet::steps()
         if ( fp->free_polymer < 0 )
         {
             // this may happen with a fast grow_speed / large time_step
-            Cytosim::warn << "Inconsistent monomer pool for " + fp->name()\
-            << ": total_polymer=" + std::to_string(fp->total_polymer)\
-            << ", used_polymer= " + std::to_string(fp->used_polymer) + "\n";
+            Cytosim::warn("Inconsistent monomer pool for ", fp->name(),
+                          ": total_polymer=", fp->total_polymer,
+                          ", used_polymer= ", fp->used_polymer, "\n");
             fp->free_polymer = 0;
         }
     }

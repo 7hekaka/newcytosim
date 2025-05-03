@@ -825,7 +825,7 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
             if ( objs.size() > 0 )
                 set->eraseObjects(objs);
             else
-                Cytosim::warn << "found no `" << name << "' to delete\n";
+                Cytosim::warn("found no `", name, "' to delete\n");
         }
     }
     else
@@ -933,7 +933,7 @@ void Interface::execute_mark(std::string const& name, Glossary& opt, size_t cnt)
         if ( objs.size() > 0 )
             ObjectSet::markObjects(objs, mk);
         else
-            Cytosim::warn << "found no `" << name << "' to mark\n";
+            Cytosim::warn("found no `", name, "' to mark\n");
     }
     else
     {

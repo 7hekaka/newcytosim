@@ -273,7 +273,7 @@ void Tubule::setInteractions(Meca& meca) const
     {
         if ( fil_[n]->nbSegments() != e )
         {
-            Cytosim::warn << "unequal Tubule filaments\n";
+            Cytosim::warn("unequal Tubule filaments\n");
             return;
         }
     }
@@ -397,7 +397,7 @@ void Tubule::setInteractionsD(Meca& meca) const
 
         if ( fib->nbSegments() != e )
         {
-            Cytosim::warn << "unequal Tubule filaments\n";
+            Cytosim::warn("unequal Tubule filaments\n");
             return;
         }
         

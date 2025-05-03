@@ -38,9 +38,9 @@ void DigitProp::read(Glossary& glos)
             throw InvalidParameter("out of range `footprint` value");
 #if FIBER_HAS_LATTICE
         if ( std::is_same<real, FiberLattice::cell_t>::value )
-            Cytosim::warn << "`footprint` is only valid with Integer-based fiber:lattice\n";
+            Cytosim::warn("`footprint` is only valid with Integer-based fiber:lattice\n");
 #else
-        Cytosim::warn << "with no fiber:lattice support, `footprint` is ignored\n";
+        Cytosim::warn("with no fiber:lattice support, `footprint` is ignored\n");
 #endif
     }
 

@@ -117,6 +117,12 @@ namespace Cytosim
             return out_;
         }
         
+        /// write `s`
+        void operator()(const std::string& arg)
+        {
+            operator<<(arg);
+        }
+
         /// write `s` followed by `a`
         template <typename A>
         void operator()(const std::string& s, const A& a)

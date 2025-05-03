@@ -1967,7 +1967,7 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
 #endif
         if ( length() + 128*FLT_EPSILON < prop->min_length )
         {
-            Cytosim::warn << "fiber:length < min_length ( " << length() << " < " << prop->min_length << " )\n";
+            Cytosim::warn("fiber:length < min_length ( ", length(), " < ", prop->min_length, " )\n");
         }
 #if FIBER_HAS_GLUE
         fGlue = nullptr;

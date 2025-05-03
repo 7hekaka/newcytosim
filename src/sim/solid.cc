@@ -377,8 +377,8 @@ index_t Solid::makeBall(ObjectList& objs, Glossary& opt, std::string const& var,
         index_t nbp = tossPointsBall(pts, std::min(sep/rad, sup), 128);
         if ( nbp < nbs )
         {
-            Cytosim::warn << " Could only fit " << nbp << "/" << nbs << " points in Sphere at separation " << sep << "\n";
-            Cytosim::warn << " Target separation for " << nbs << " points is " << sup * rad << "\n";
+            Cytosim::warn("Could only fit ", nbp, "/", nbs, " points in Sphere at separation ", sep, "\n");
+            Cytosim::warn(" Target separation for ", nbs, " points is ", sup * rad, "\n");
         }
         nbs = 0;
         inx = 2;

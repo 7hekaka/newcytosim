@@ -247,7 +247,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     if ( opt.set(p, "plus_end_state") )
     {
         fib->setEndStateP(p);
-        Cytosim::warn << "use `plus_end = STATE` instead of `plus_end_state = STATE`\n";
+        Cytosim::warn("use `plus_end = STATE` instead of `plus_end_state = STATE`\n");
     }
 #endif
     if ( opt.set(p, "plus_end", keys) || opt.set(p, "end_state", keys) )
@@ -258,7 +258,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 #if BACKWARD_COMPATIBILITY < 50
     if ( opt.set(m, "minus_end_state") )
     {
-        Cytosim::warn << "use `minus_end = STATE` instead of `minus_end_state = STATE`\n";
+        Cytosim::warn("use `minus_end = STATE` instead of `minus_end_state = STATE`\n");
         fib->setEndStateM(m);
     }
 #endif
@@ -267,7 +267,7 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
 
 #if BACKWARD_COMPATIBILITY < 100
     if ( fib->prop->activity != "none" && m == 0 && p == 0 )
-        Cytosim::warn << "`" << fib->prop->name() << "' may not grow since both ends are in state `white`\n";
+        Cytosim::warn("`", fib->prop->name(), "' may not grow since both ends are in state `white`\n");
 #endif
     
     fib->updateFiber();
@@ -406,7 +406,7 @@ void FiberProp::read(Glossary& glos)
     if ( glos.set(ds, "delete_stub") )
     {
         persistent = !ds;
-        Cytosim::warn << "use `persistent="<<!ds<<"' instead of `delete_stub="<<ds<<"'\n";
+        Cytosim::warn(use `persistent=", !ds, "' instead of `delete_stub="<<ds<<"'\n");
     }
 #endif
     
@@ -613,7 +613,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     
     if ( primed(sim) && steric_key && !sim.prop.steric_mode )
-        Cytosim::warn << name()+":steric is set but simul:steric = 0\n";
+        Cytosim::warn(name(), ":steric is set but simul:steric = 0\n");
 
     if ( min_length < 0 )
         throw InvalidParameter("fiber:min_length should be >= 0");

@@ -283,7 +283,7 @@ void Sphere::setDragCoefficient()
         if ( prop->confine_space )
             setDragCoefficientPiston(prop->confine_space->thickness());
         else
-            Cytosim::warn << "Piston effect ignored for lack of confine space\n";
+            Cytosim::warn("Piston effect ignored for lack of confine space\n");
     }
 }
 

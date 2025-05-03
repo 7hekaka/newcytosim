@@ -39,7 +39,7 @@ void WalkerProp::read(Glossary& glos)
     glos.set(unloaded_speed, "unloaded_speed", "speed");
 #if BACKWARD_COMPATIBILITY < 100
     if ( glos.set(unloaded_speed, "max_speed") )
-        Cytosim::warn << "'max_speed' is deprecated: use 'unloaded_speed'\n";
+        Cytosim::warn("'max_speed' is deprecated: use 'unloaded_speed'\n");
 #endif
     glos.set(unbinding_chance, "unbinding_chance", 0, "unbinding", 2);
     
@@ -48,11 +48,11 @@ void WalkerProp::read(Glossary& glos)
 #endif
 
     if ( glos.has_key("dangling_chance") )
-        Cytosim::warn << "use `hold_growing_end` instead of `dangling_chance`\n";
+        Cytosim::warn ("use `hold_growing_end` instead of `dangling_chance`\n");
     
 #if BACKWARD_COMPATIBILITY < 100
     if ( glos.set(hold_growing_end, 2, "hold_fiber") )
-        Cytosim::warn << "you should use hand:hold_growing_end instead of hand:hold_fiber\n";
+        Cytosim::warn("use hand:hold_growing_end instead of hand:hold_fiber\n");
 #endif
 }
 
@@ -93,9 +93,9 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     real ef = abs_real(set_speed_dt) * stiff * mul / stall_force;
     if ( unloaded_speed  &&  ef > 0.5 )
     {
-        Cytosim::warn << "simulating `" << name() << "' may fail as:\n"\
-        << PREF << "time_step * stiffness * unloaded_speed / stall_force = " << ef << '\n'\
-        << PREF << "-> reduce time_step (really!)\n";
+        Cytosim::warn("simulating `", name(), "' may fail as:\n",
+                      PREF, "time_step * stiffness * unloaded_speed / stall_force = ", ef, '\n',
+                      PREF, "-> reduce time_step (really!)\n";
         //throw InvalidParameter(oss.str());
     }
     
@@ -106,9 +106,9 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
      */
     if ( std::sqrt( DIM * kT * stiff ) > stall_force )
     {
-        Cytosim::warn << "The stall force of `" << name() << "' is too small:\n"\
-        << PREF << "DIM * kT * stiffness > stall_force\n"\
-        << PREF << "-> reduce stiffness or increase stall_force\n";
+        Cytosim::warn("The stall force of `", name(), "' is too small:\n",
+                      PREF, "DIM * kT * stiffness > stall_force\n",
+                      PREF, "-> reduce stiffness or increase stall_force\n");
     }
     
     /*
@@ -118,9 +118,9 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
     ef = abs_real( stiff * unloaded_speed / ( unbinding_rate * stall_force ));
     if ( unbinding_rate && unloaded_speed  &&  ef < 1 )
     {
-        Cytosim::warn << "Walker `" << name() << "' is inefficient since\n"\
-        << PREF << "stiffness * unloaded_speed / unbinding_rate << stall_force"\
-        << "; ratio = " << ef << "\n";
+        Cytosim::warn("Walker `", name(), "' is inefficient since\n", PREF,
+                      "stiffness * unloaded_speed / unbinding_rate << stall_force",
+                      "; ratio = ", ef, "\n");
     }
     
     
@@ -128,7 +128,7 @@ void WalkerProp::checkStiffness(real stiff, real len, real mul, real kT) const
      Compare the force reached in one step with the stall force
      */
     if ( abs_real( step_size * stiff ) > 0.5 * stall_force )
-        Cytosim::warn << "attention:  stiffness * digit:step > stall_force / 2\n";
+        Cytosim::warn("attention:  stiffness * digit:step > stall_force / 2\n");
 #endif
 }
 
