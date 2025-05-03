@@ -58,7 +58,7 @@ void ClassicFiber::setEndStateP(state_t s)
  */
 real ClassicFiber::stepMinusEnd()
 {
-    constexpr size_t M = 1;
+    constexpr unsigned M = 1;
     real add = 0;
 
     if ( mStateM == STATE_GREEN )
@@ -100,7 +100,7 @@ real ClassicFiber::stepMinusEnd()
 
 real ClassicFiber::stepPlusEnd()
 {
-    constexpr size_t P = 0;
+    constexpr unsigned P = 0;
     real add = 0;
 
     if ( mStateP == STATE_GREEN )
@@ -168,7 +168,7 @@ real ClassicFiber::stepPlusEnd()
 void ClassicFiber::step()
 {
     real addM = 0;
-    constexpr size_t M = 1;
+    constexpr unsigned M = 1;
     // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
     if ( mStateM == STATE_WHITE )
     {
@@ -179,7 +179,7 @@ void ClassicFiber::step()
         addM = stepMinusEnd();
     
     real addP = 0;
-    constexpr size_t P = 0;
+    constexpr unsigned P = 0;
     // STATE_WHITE is a dormant state from which you can exit by 'rebirth'
     if ( mStateP == STATE_WHITE )
     {

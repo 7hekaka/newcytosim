@@ -386,7 +386,7 @@ void Rasterizer::paintPolygon3D(void (*paint)(int, int, int, int, void*), void *
     
     //we can normally only cross four sides of a parallelogram in 3D
     //but in some degenerate cases, it can be more
-    constexpr size_t TOP = 8;
+    constexpr unsigned TOP = 8;
     Vertex2dZ xydz[TOP];
     
     int above = 0;

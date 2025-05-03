@@ -115,7 +115,7 @@ void DynamicFiber::removeUnitM()
  */
 int DynamicFiber::stepMinusEnd()
 {
-    constexpr size_t M = 1;
+    constexpr unsigned M = 1;
     int res = 0;
     
 #if ( NEW_FIBER_END_CHEW & 2 )
@@ -293,7 +293,7 @@ void DynamicFiber::removeUnitP()
  */
 int DynamicFiber::stepPlusEnd()
 {
-    constexpr size_t P = 0;
+    constexpr unsigned P = 0;
     int res = 0;
     
 #if ( NEW_FIBER_END_CHEW & 1 )
@@ -407,7 +407,7 @@ int DynamicFiber::stepPlusEnd()
 */
 int DynamicFiber::stepPlusEndStabilized(real factor)
 {
-    constexpr size_t P = 0;
+    constexpr unsigned P = 0;
     int res = 0;
 
     // get growth rate scaled to account for available monomers, time_step included:
@@ -466,7 +466,7 @@ void DynamicFiber::findSeverEdges(real& a, real& b)
 void DynamicFiber::step()
 {
     real addM = 0;
-    constexpr size_t M = 1;
+    constexpr unsigned M = 1;
     if ( mStateM == STATE_WHITE )
     {
 #if ( NEW_FIBER_END_CHEW & 2 )
@@ -488,7 +488,7 @@ void DynamicFiber::step()
         addM = stepMinusEnd();
     
     real addP = 0;
-    constexpr size_t P = 0;
+    constexpr unsigned P = 0;
     if ( mStateP == STATE_WHITE )
     {
 #if ( NEW_FIBER_END_CHEW & 1 )
