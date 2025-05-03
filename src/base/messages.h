@@ -117,81 +117,31 @@ namespace Cytosim
             return out_;
         }
         
+        template <typename Arg1>
+        void stringify(std::ostringstream& oss, Arg1 arg1)
+        {
+            oss << arg1;
+        }
+
+        template <typename Arg1, typename... Args>
+        void stringify(std::ostringstream& oss, Arg1 arg1, Args... args)
+        {
+            oss << arg1;
+            stringify(oss, args...);
+        }
+
+        
         /// write `s`
         void operator()(const std::string& arg)
         {
             operator<<(arg);
         }
 
-        /// write `s` followed by `a`
-        template <typename A>
-        void operator()(const std::string& s, const A& a)
+        template <typename Arg1, typename... Args>
+        void operator()(Arg1 arg1, Args... args)
         {
             std::ostringstream oss;
-            oss << s << a;
-            operator<<(oss.str());
-        }
-        
-        /// write `s` followed by `a` and `b`
-        template <typename A, typename B>
-        void operator()(const std::string& s, const A& a, const B& b)
-        {
-            std::ostringstream oss;
-            oss << s << a << b;
-            operator<<(oss.str());
-        }
-        
-        /// write `s` followed by `a`, `b` and `c`
-        template <typename A, typename B, typename C>
-        void operator()(const std::string& s, const A& a, const B& b, const C& c)
-        {
-            std::ostringstream oss;
-            oss << s << a << b << c;
-            operator<<(oss.str());
-        }
-        
-        /// write `s` followed by `a`, `b`, `c` and `d`
-        template <typename A, typename B, typename C, typename D>
-        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d)
-        {
-            std::ostringstream oss;
-            oss << s << a << b << c << d;
-            operator<<(oss.str());
-        }
-        
-        /// write `s` followed by `a`, `b`, `c`, `d` and `e`
-        template <typename A, typename B, typename C, typename D, typename E>
-        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e)
-        {
-            std::ostringstream oss;
-            oss << s << a << b << c << d << e;
-            operator<<(oss.str());
-        }
-        
-        /// write `s` followed by `a`, `b`, `c`, `d`, `e` and `f`
-        template <typename A, typename B, typename C, typename D, typename E, typename F>
-        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f)
-        {
-            std::ostringstream oss;
-            oss << s << a << b << c << d << e << f;
-            operator<<(oss.str());
-        }
-        
-        /// write `s` followed by `a`, `b`, `c`, `d`, `e`, `f` and `g`
-        template <typename A, typename B, typename C, typename D, typename E, typename F, typename G>
-        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g)
-        {
-            std::ostringstream oss;
-            oss << s << a << b << c << d << e << f << g;
-            operator<<(oss.str());
-        }
-        
-        /// write `s` followed by `a`, `b`, `c`, `d`, `e`, `f`, `g` and `h`
-        template <typename A, typename B, typename C, typename D, typename E, typename F, typename G, typename H>
-        void operator()(const std::string& s, const A& a, const B& b, const C& c, const D& d, const E& e, const F& f, const G& g, const H& h)
-        {
-            std::ostringstream oss;
-            oss << s << a << b << c << d << e << f << g << h;
+            stringify(oss, arg1, args...);
             operator<<(oss.str());
         }
 
