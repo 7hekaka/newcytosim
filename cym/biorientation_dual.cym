@@ -54,6 +54,7 @@ set fiber microtubule
     shrinking_speed = -0.42, -0.04
     hydrolysis_rate = 1.0
     growing_force = 10
+    stabilized_growing_force = 3.53
     total_polymer = 300
     display = ( color=0xFFFFFF88; line_width=2.5; style=2; coloring=2; )
 }

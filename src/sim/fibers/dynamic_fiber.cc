@@ -438,7 +438,11 @@ int DynamicFiber::stepPlusEndStabilized(real factor)
         while ( nextGrowthP < 0 )
         {
             if ( scale == 0 )
-                std::clog << "WARNING: stabilized_growing_force was not set (use "<<prop()->growing_force[0]/M_SQRT2<<") ?\n";
+            {
+                real F = prop()->growing_force[0] / M_SQRT2;
+                std::clog << "ERROR: for compatibility, use "+prop()->name()+":stabilized_growing_force = "<<F<<"\n";
+                ABORT_NOW("DynamicFiber:stabilized_growing_force was not set");
+            }
             addUnitP();
             ++res;
         }
