@@ -120,7 +120,7 @@ public:
 private:
 
     /// This number affects convergence speed but not the result
-    static constexpr size_t SEVEN = 7U;
+    static constexpr unsigned SEVEN = 7U;
     
     /// number of point on the sphere
     size_t num_points_;

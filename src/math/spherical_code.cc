@@ -419,8 +419,9 @@ size_t SphericalCode::refinePoints(real precision, size_t mx_iterations)
     real * coord = new_real(3*num_points_);
     real * force = new_real(3*num_points_);
     
-    //make an initial guess for the step size:
+
     unsigned history = 0;
+    //make an initial guess for the step size:
     energy_ = coulombEnergy(num_points_, coord_);
 
     size_t step = 0;
