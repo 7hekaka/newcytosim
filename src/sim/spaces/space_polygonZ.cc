@@ -214,9 +214,9 @@ void SpacePolygonZ::draw3D() const
         
         if (( R1 >= 0 ) & ( R2 >= 0 ))
         {
-            flute6 * flu = gym::mapBufferV3N3(2+2*gle::pi_twice);
+            flute6 * flu = gym::mapBufferV3N3(2+2*gle::pi_4half);
             flute6 * ptr = flu;
-            for ( unsigned j = 0; j <= gle::pi_twice; j += inc )
+            for ( unsigned j = 0; j <= gle::pi_4half; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 ptr[0] = {R2*C, R2*S, Z2, nX*C, nX*S, nY};
@@ -245,14 +245,14 @@ void SpacePolygonZ::drawRings(float width) const
         if ( R > 0 )
         {
             float nX(pts[n].dy), nY(-pts[n].dx);
-            flute6 * flu = gym::mapBufferV3N3(2+gle::pi_twice);
-            for ( unsigned j = 0; j <= gle::pi_twice; j += inc )
+            flute6 * flu = gym::mapBufferV3N3(2+gle::pi_4half);
+            for ( unsigned j = 0; j <= gle::pi_4half; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 flu[j] = {R*C, R*S, Z, nX*C, nX*S, nY};
             }
             gym::unmapBufferV3N3();
-            gym::drawLineStrip(width, 0, gle::pi_twice+1);
+            gym::drawLineStrip(width, 0, gle::pi_4half+1);
         }
     }
     gym::cleanupVN();

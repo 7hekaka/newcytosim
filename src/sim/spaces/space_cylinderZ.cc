@@ -563,9 +563,9 @@ void SpaceCylinderZ::draw3D() const
     const float E(edge_);
     
     const unsigned inc = 1;
-    unsigned cnt = 2 * ( gle::pi_once + 3 );
+    unsigned cnt = 2 * ( gle::pi_2half + 3 );
     
-    for ( unsigned u = 0; u < gle::pi_twice; u += inc )
+    for ( unsigned u = 0; u < gle::pi_4half; u += inc )
     {
         flute6 * flu = gym::mapBufferV3N3(cnt);
         flute6 * ptr = flu;
@@ -577,7 +577,7 @@ void SpaceCylinderZ::draw3D() const
         if ( edge_ > 0 )
         {
             //draw top arc
-            for ( unsigned j = 0; j <= gle::pi_half; j += inc )
+            for ( unsigned j = 0; j <= gle::pi_1half; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;
@@ -587,7 +587,7 @@ void SpaceCylinderZ::draw3D() const
             }
             if ( 0 )
             {
-                // at pi_half, C = 0 and S = 1
+                // at pi_1half, C = 0 and S = 1
                 ptr[0] = {CU*R, SU*R, TE, CU, SU, 0};
                 ptr[1] = {CL*R, SL*R, TE, CL, SL, 0};
                 ptr[2] = {CU*R, SU*R, BE, CU, SU, 0};
@@ -595,7 +595,7 @@ void SpaceCylinderZ::draw3D() const
                 ptr += 4;
             }
             //draw bottom arc
-            for ( unsigned j = gle::pi_half; j <= gle::pi_once; j += inc )
+            for ( unsigned j = gle::pi_1half; j <= gle::pi_2half; j += inc )
             {
                 float C = gle::cos_(j), S = gle::sin_(j);
                 float RS = RE + E*S;

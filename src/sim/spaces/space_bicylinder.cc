@@ -243,8 +243,8 @@ void SpaceBicylinder::draw3D() const
     const float R(radius_);
     const unsigned inc = 1;
     unsigned i = 0;
-    flute6* flu = gym::mapBufferV3N3(2*gle::pi_twice+4);
-    for ( unsigned n = gle::pi_half; n < gle::pi_3half; n += inc )
+    flute6* flu = gym::mapBufferV3N3(2*gle::pi_4half+4);
+    for ( unsigned n = gle::pi_1half; n < gle::pi_3half; n += inc )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
         flu[i++] = {R*C, +R*C, R*S, C, 0, S };
@@ -259,8 +259,8 @@ void SpaceBicylinder::draw3D() const
     gym::unmapBufferV3N3();
     gym::drawTriangleStrip(0, i);
     i = 0;
-    flu = gym::mapBufferV3N3(2*gle::pi_twice+4);
-    for ( unsigned n = gle::pi_half; n < gle::pi_3half; n += inc )
+    flu = gym::mapBufferV3N3(2*gle::pi_4half+4);
+    for ( unsigned n = gle::pi_1half; n < gle::pi_3half; n += inc )
     {
         float C = gle::cos_(n), S = gle::sin_(n);
         flu[i++] = {-R*C, R*C, R*S, 0, C, S };

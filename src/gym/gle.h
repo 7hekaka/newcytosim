@@ -26,13 +26,13 @@ namespace gle
     /** We use multiples of 5 to match circles and the icosahedron */
     constexpr unsigned pi_6half = finesse * 30;
     constexpr unsigned pi_5half = finesse * 25;
-    constexpr unsigned pi_twice = finesse * 20;
+    constexpr unsigned pi_4half = finesse * 20;
     constexpr unsigned pi_3half = finesse * 15;
-    constexpr unsigned pi_once = finesse * 10;
-    constexpr unsigned pi_half = finesse * 5;
+    constexpr unsigned pi_2half = finesse * 10;
+    constexpr unsigned pi_1half = finesse * 5;
 
     /// values of cosine, sine over two full circonvolutions
-    extern float circle_[4*pi_twice+8];
+    extern float circle_[4*pi_4half+8];
 
     /// access to precomputed cosine
     inline float cos_(unsigned n) { return circle_[2*n]; }
