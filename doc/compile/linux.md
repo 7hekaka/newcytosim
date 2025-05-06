@@ -4,10 +4,16 @@ On Linux, you need to install the GNU compiler collection, BLAS and LApack. This
 
 # Prerequisite
 
+Update your linux and packages:
+
+	sudo apt update
+
 To install the required tools and libraries with `Ubuntu`:
 
 	sudo apt-get install make g++ 
-	sudo apt-get install libblas.dev liblapack.dev freeglut3-dev libxi-dev libxmu-dev libglew-dev
+	sudo apt-get install libblas.dev liblapack.dev
+	sudo apt-get install libncurses-dev 
+	sudo apt-get install freeglut3-dev libxi-dev libxmu-dev libglew-dev
 
 # Docker
 

@@ -5,6 +5,7 @@
 
 #include <string>
 #include <iostream>
+#include <cstdint>
 
 /**
  gym_color implements colors with 4-components:
