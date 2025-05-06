@@ -237,36 +237,44 @@ void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 }
 
 /*
- This is an optimized implementation, but it does not work for 'nbt < 2'!
+ This is a different implementation
  */
 inline void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
-    assert_true(nbt > 1);
-    const real R2 = R1 * 2;
-    const real R4 = R1 * 4;
     const real six = 6.0;
-    
+    const real R4 = R1 * 4.0;
+    const real R2 = R1 * 2.0;
+
     const size_t end = DIM * nbt;
-    // in the general case all values can be computed independently:
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-        Y[i] = Y[i] + R4 * ((X-DIM)[i]+(X+DIM)[i]) - R1 * (six*X[i] + ((X-DIM*2)[i]+(X+DIM*2)[i]));
-
-    // special cases at the edges:
-    real      * Z = Y + end;
-    real const* E = X + end;
-    X += DIM;
-    #pragma omp simd
-    for ( size_t d = 0; d < DIM; ++d )
+        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (six*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
+    
+    // special cases near the edges:
+    real      * Z = Y + DIM * ( nbt + 1 );
+    real const* E = X + DIM * ( nbt + 1 );
+    if ( nbt > 1 )
     {
-        Y[d+DIM] -= R1 * (X[d]+(X+DIM*2)[d]) + R4 * (X[d]-(X+DIM)[d]) - R2 * (X-DIM)[d];
-        Z[d    ] -= R1 * (E[d]+(E-DIM*2)[d]) + R4 * (E[d]-(E-DIM)[d]) - R2 * (E+DIM)[d];
-        Y[d    ] -= R1 * ((X+DIM)[d]+(X-DIM)[d]) - R2 * X[d];
-        Z[d+DIM] -= R1 * ((E-DIM)[d]+(E+DIM)[d]) - R2 * E[d];
+        #pragma omp simd
+        for ( int d = 0; d < DIM; ++d )
+        {
+            Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
+            Z[d-DIM] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
+        }
+    }
+    else
+    {
+        for ( int d = 0; d < DIM; ++d )
+            Y[d+DIM] += R2 * (X[d+DIM*2]+X[d]) - R4 * X[d+DIM];
+    }
+    for ( int d = 0; d < DIM; ++d )
+    {
+        Y[d] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+        Z[d] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
     }
 }
 
-/// In this version for 2D, the loop has dependencies preventing unrolling
+/// In works in 2D, but the loop has dependencies preventing unrolling
 inline void add_rigidity2D(const int nbp, const real* X, const real R1, real* Y)
 {
     real fx = 0;
@@ -296,7 +304,7 @@ inline void add_rigidity2D(const int nbp, const real* X, const real R1, real* Y)
     Y[3] -= R1 * fy;
 }
 
-/// In this version for 3D, the loop has dependencies preventing unrolling
+/// In works in 3D, but the loop has dependencies preventing unrolling
 inline void add_rigidity3D(const int nbp, const real* X, const real R1, real* Y)
 {
     real fx = 0;

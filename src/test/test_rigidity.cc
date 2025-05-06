@@ -76,19 +76,19 @@ void free_reals(real* p, real* x, real* y, real* z)
 #pragma mark - RIGIDITY
 
 /*
- This is the simple implementation
+ This is the reference implementation
  */
 void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 {
     const real R2 = 2.0 * R1;
     const real two = 2.0;
     #pragma omp simd
-    for ( size_t jj = 0; jj < DIM*nbt; ++jj )
+    for ( size_t i = 0; i < DIM*nbt; ++i )
     {
-        real f = ( X[jj+DIM*2] + X[jj] ) - two * X[jj+DIM];
-        Y[jj      ] -= f * R1;
-        Y[jj+DIM  ] += f * R2;
-        Y[jj+DIM*2] -= f * R1;
+        real f = ( X[i+DIM*2] + X[i] ) - two * X[i+DIM];
+        Y[i      ] -= f * R1;
+        Y[i+DIM  ] += f * R2;
+        Y[i+DIM*2] -= f * R1;
     }
 }
 
@@ -292,90 +292,37 @@ void add_rigidity2D_AVX(const size_t nbt, const real* X, const real rigid, real*
 void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
 {
     const real six = 6.0;
-    const real R4 = R1 * 4;
-    const real R2 = R1 * 2;
-/*
-    if ( nbt == 1 )
-    {
-        for ( size_t d = 0; d < DIM; ++d )
-        {
-            real x = 2 * X[d+DIM] - ( X[d+DIM*2] + X[d] );
-            Y[d      ] += R1 * x;
-            Y[d+DIM  ] -= R2 * x;
-            Y[d+DIM*2] += R1 * x;
-        }
-        return;
-    }
-*/
-    const int end = DIM * nbt;
-    #pragma omp simd
-    for ( int i = DIM*2; i < end; ++i )
-        Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (six*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
-    
-    // special cases near the edges:
-    real      * Z = Y + DIM * nbt;
-    real const* E = X + DIM * nbt + DIM;
-    #pragma omp simd
-    for ( int d = 0; d < DIM; ++d )
-    {
-        Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
-        Z[d    ] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
-        Y[d    ] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
-        Z[d+DIM] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
-    }
-}
-
-/// only valid if ( nbt > DIM )
-void add_rigidityG(const size_t nbt, const real* X, const real R1, real* Y)
-{
-    const real six = 6.0;
-    const real R4 = R1 * 4;
-    const real R2 = R1 * 2;
+    const real R4 = R1 * 4.0;
+    const real R2 = R1 * 2.0;
 
     const size_t end = DIM * nbt;
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
-    {
         Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (six*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
-    }
     
     // special cases near the edges:
-    real      * Z = Y + DIM * nbt;
-    real const* E = X + DIM * (nbt + 1);
-
-    #pragma omp simd
-    for ( size_t d = 0; d < DIM; ++d )
+    real      * Z = Y + DIM * ( nbt + 1 );
+    real const* E = X + DIM * ( nbt + 1 );
+    if ( nbt > 1 )
     {
-        Y[d+DIM] -= R1 * ((X+DIM)[d]+(X+DIM*3)[d]) + R4 * ((X+DIM)[d]-(X+DIM*2)[d]) - R2 * X[d];
-        Z[d    ] -= R1 * ((E-DIM)[d]+(E-DIM*3)[d]) + R4 * ((E-DIM)[d]-(E-DIM*2)[d]) - R2 * E[d];
-        Y[d    ] -= R1 * ((X+DIM*2)[d]+X[d]) - R2 * (X+DIM)[d];
-        Z[d+DIM] -= R1 * ((E-DIM*2)[d]+E[d]) - R2 * (E-DIM)[d];
+        #pragma omp simd
+        for ( int d = 0; d < DIM; ++d )
+        {
+            Y[d+DIM] -= R1 * (X[d+DIM]+X[d+DIM*3]) + R4 * (X[d+DIM]-X[d+DIM*2]) - R2 * X[d];
+            Z[d-DIM] -= R1 * (E[d-DIM]+E[d-DIM*3]) + R4 * (E[d-DIM]-E[d-DIM*2]) - R2 * E[d];
+        }
     }
-}
-
-/// only valid if ( nbt > DIM )
-void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
-{
-    const real R6 = R1 * 6;
-    const real R4 = R1 * 4;
-    const real R2 = R1 * 2;
-    
-    const size_t end = FOR * nbt;
-    #pragma omp simd
-    for ( size_t i = FOR*2; i < end; ++i )
-        Y[i] += R4 * ((X-FOR)[i]+(X+FOR)[i]) - R1 * ((X-FOR*2)[i]+(X+FOR*2)[i]) - R6 * X[i];
-    
-    // special cases near the edges:
-    real      * Z = Y + DIM * nbt;
-    real const* E = X + DIM * nbt + FOR;
-    
-    #pragma omp simd
-    for ( size_t d = 0; d < FOR; ++d )
+    else
     {
-        Y[d+FOR] -= R1 * ((X+FOR)[d]+(X+FOR*3)[d]) + R4 * ((X+FOR)[d]-(X+FOR*2)[d]) - R2 * X[d];
-        Z[d    ] -= R1 * ((E-FOR)[d]+(E-FOR*3)[d]) + R4 * ((E-FOR)[d]-(E-FOR*2)[d]) - R2 * E[d];
-        Y[d    ] -= R1 * ((X+FOR*2)[d]+X[d]) - R2 * (X+FOR)[d];
-        Z[d+FOR] -= R1 * ((E-FOR*2)[d]+E[d]) - R2 * (E-FOR)[d];
+#pragma omp simd
+        for ( int d = 0; d < DIM; ++d )
+            Y[d+DIM] += R2 * (X[d+DIM*2]+X[d]) - R4 * X[d+DIM];
+    }
+    #pragma omp simd
+    for ( int d = 0; d < DIM; ++d )
+    {
+        Y[d] -= R1 * (X[d+DIM*2]+X[d]) - R2 * X[d+DIM];
+        Z[d] -= R1 * (E[d-DIM*2]+E[d]) - R2 * E[d-DIM];
     }
 }
 
@@ -383,9 +330,8 @@ void add_rigidity4(const size_t nbt, const real* X, const real R1, real* Y)
 #pragma mark - TEST Rigidity
 
 template < void (*FUNC)(const size_t, const real*, real, real*) >
-void testRigidity(size_t nbp, size_t cnt, char const* str)
+void testRigidity(size_t nbt, size_t cnt, char const* str)
 {
-    const size_t nbt = nbp - 2;
     const real alpha = 64.0;
     
     zero_real(ALOC, vX);
@@ -393,9 +339,9 @@ void testRigidity(size_t nbp, size_t cnt, char const* str)
     zero_real(ALOC, vZ);
     
     FUNC(nbt, vP, alpha, vX);
-    VecPrint::edges(DIM*nbt, vX);
+    VecPrint::edges(DIM*(nbt+2), vX);
     fprintf(stderr, " |");
-    VecPrint::print(DIM, vX+DIM*nbp);
+    VecPrint::print(DIM, vX+DIM*(nbt+2));
     add_rigidity0(nbt, vP, alpha, vY);
     real err = blas::difference(DIM*(nbt+2), vX, vY);
     fprintf(stderr, " |");
@@ -415,23 +361,21 @@ void testRigidity(size_t nbp, size_t cnt, char const* str)
 }
 
 
-void test(size_t nbp, size_t cnt)
+void test(size_t num, size_t cnt)
 {
-    testRigidity<add_rigidity0>(nbp, cnt, "0  ");
+    testRigidity<add_rigidity0>(num, cnt, "0  ");
 #if ( DIM == 2 )
-    testRigidity<add_rigidity2D>(nbp, cnt, "2D ");
+    testRigidity<add_rigidity2D>(num, cnt, "2D ");
 #else
-    testRigidity<add_rigidity3D>(nbp, cnt, "3D ");
+    testRigidity<add_rigidity3D>(num, cnt, "3D ");
 #endif
-    testRigidity<add_rigidityF>(nbp, cnt, "F  ");
-    //testRigidity<add_rigidityG>(nbp, cnt, "G  ");
-    //testRigidity<add_rigidity4>(nbp, cnt, "4  ");
+    testRigidity<add_rigidityF>(num, cnt, "F  ");
 #if USE_SIMD & ( DIM == 2 ) & REAL_IS_DOUBLE
-    testRigidity<add_rigidity2D_SSO>(nbp, cnt, "SSO");
-    testRigidity<add_rigidity2D_SSE>(nbp, cnt, "SSE");
+    testRigidity<add_rigidity2D_SSO>(num, cnt, "SSO");
+    testRigidity<add_rigidity2D_SSE>(num, cnt, "SSE");
 #endif
 #if defined(__AVX__) & ( DIM == 2 ) & REAL_IS_DOUBLE
-    testRigidity<add_rigidity2D_AVX>(nbp, cnt, "AVX");
+    testRigidity<add_rigidity2D_AVX>(num, cnt, "AVX");
 #endif
 }
 
@@ -443,11 +387,11 @@ int main(int argc, char* argv[])
 {
     RNG.seed();
     new_reals(vP, vX, vY, vZ, 1.0);
-    for ( int i : { 2, 3, 5, 7, 10, 12, 15, 30, 45 } )
+    for ( int i : { 0, 1, 2, 3, 5, 7, 10, 12, 17, 31, 47 } )
     {
         setFilament(i, vP, 0.1, 17.0);
-        std::cout << "addRigidity " << DIM << "D,  ";
-        std::cout << i << " segments,   " << __VERSION__ << "\n";
+        std::cout << "addRigidity" << DIM << "D,  ";
+        std::cout << i+1 << " segments,   " << __VERSION__ << "\n";
         test(i, 1<<21);
     }
     free_reals(vP, vX, vY, vZ);
