@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University.
 
-#include <stdint.h>
+#include <cstdint>
 
 template <typename T> void byteswap16(T) = delete;
 template <typename T> void byteswap32(T) = delete;

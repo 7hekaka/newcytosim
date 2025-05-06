@@ -10,7 +10,7 @@
 #include "real.h"
 #include <cmath>
 #include <sstream>
-#include <stdint.h>
+#include <cstdint>
 #include <iomanip>
 
 

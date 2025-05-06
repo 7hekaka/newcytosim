@@ -3,7 +3,7 @@
 #define SAVE_IMAGE_H
 
 #include <cstdio>
-#include <stdint.h>
+#include <cstdint>
 
 /// Can save pixel array to files in PNG, TARGA or PPM format
 /**

@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2024 Cambridge University.
 
-#include <stdint.h>
+#include <cstdint>
 
 namespace PCG32
 {

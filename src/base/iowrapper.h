@@ -4,7 +4,7 @@
 #define  IOWRAPPER_H
 
 #include <cstdio>
-#include <stdint.h>
+#include <cstdint>
 #include "filewrapper.h"
 
 

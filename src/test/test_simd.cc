@@ -9,7 +9,7 @@
 
 #include <cstdio>
 #include "timer.h"
-#include <stdint.h>
+#include <cstdint>
 #include "vecprint.h"
 #include "simd.h"
 #include "simd_float.h"

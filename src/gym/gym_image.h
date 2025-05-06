@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2022 Cambridge University
 
 #include <cstdio>
-#include <stdint.h>
+#include <cstdint>
 #include "gym_flute.h"
 
 namespace gym

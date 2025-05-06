@@ -4,7 +4,7 @@
 #ifndef RANDOM_PCG
 #define RANDOM_PCG
 
-#include <stdint.h>
+#include <cstdint>
 
 /**
  Cytosim's simulation engine uses `RNG`, which exists independently for each thread.

@@ -18,8 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>
-#include <cstring>
-
+#include <string.h>
 
 #if 0
 /** BMP file header structure **/
@@ -195,7 +194,7 @@ public:
     
     void clear()
     {
-        std::memset(bytes, 0, height*BPR);
+        memset(bytes, 0, height*BPR);
     }
     
     // matrix convention: i = line, with 0 at the top of the image

@@ -4,7 +4,7 @@
 #define FIBER_H
 
 #include <set>
-#include <stdint.h>
+#include <cstdint>
 #include "mecafil.h"
 #include "fiber_prop.h"
 #include "hand_list.h"
