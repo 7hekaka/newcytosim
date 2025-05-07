@@ -5,8 +5,8 @@
 
 /// Helper class to calculate moments of a cloud of points
 /**
-This calculated the mean and the variance of a set of given Vector
- @todo update to non-naive method that work work with large samples
+This calculates the mean and the variance of a set of 3D points
+ @todo update to non-naive method that also work with large samples
  https://en.wikipedia.org/wiki/Unbiased_estimation_of_standard_deviation
  */
 class Accumulator
@@ -70,18 +70,19 @@ public:
     /// transform the second-order acumulators into variance
     void subtract_mean()
     {
+        const double scale = 1.0 / ( sum - 1 );
         avg[0] /= sum;
-        var[0] = var[0]/(sum-1) - avg[0] * avg[0];
+        var[0] = var[0]*scale - avg[0] * avg[0];
 #if ( DIM > 1 )
         avg[1] /= sum;
-        var[1] = var[1]/(sum-1) - avg[1] * avg[0];
-        var[4] = var[4]/(sum-1) - avg[1] * avg[1];
+        var[1] = var[1]*scale - avg[1] * avg[0];
+        var[4] = var[4]*scale - avg[1] * avg[1];
 #endif
 #if ( DIM > 2 )
         avg[2] /= sum;
-        var[2] = var[2]/(sum-1) - avg[2] * avg[0];
-        var[5] = var[5]/(sum-1) - avg[2] * avg[1];
-        var[8] = var[8]/(sum-1) - avg[2] * avg[2];
+        var[2] = var[2]*scale - avg[2] * avg[0];
+        var[5] = var[5]*scale - avg[2] * avg[1];
+        var[8] = var[8]*scale - avg[2] * avg[2];
 #endif
     }
     
