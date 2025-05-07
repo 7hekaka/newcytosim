@@ -261,9 +261,7 @@ Copy vertex coordinates to given array, converting to single precision.
 */
 void Mecable::putPoints(float ptr[], index_t sup) const
 {
-    index_t end = DIM * nbPoints();
-    if ( sup < end )
-        sup = end;
+    sup = std::min(DIM * nbPoints(), sup);
     for ( index_t i = 0; i < sup; ++i )
         ptr[i] = pPos[i];
 }

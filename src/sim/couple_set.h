@@ -68,7 +68,7 @@ private:
     void uniAttach2(FiberSiteList& loc, CoupleStock& can);
     
     /// attach both Hands of `nb` Couple at crossing points specified by arguments 1 & 2
-    void uniAttach12(FiberSiteList&, FiberSiteList&, CoupleStock&, size_t nb);
+    void uniAttach12(FiberSiteList&, FiberSiteList&, CoupleStock&, unsigned nb);
 
     /// `fast_diffusion` attachment assuming that free Couples are uniformly distributed
     void uniAttach(FiberSet const&);

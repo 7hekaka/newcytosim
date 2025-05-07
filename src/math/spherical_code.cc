@@ -31,7 +31,7 @@ SphericalCode::~SphericalCode()
 
 //------------------------------------------------------------------------------
 
-void SphericalCode::putPoint(real ptr[3], const size_t i)
+void SphericalCode::putPoint(real ptr[3], const size_t i) const
 {
     if ( i < num_points_ )
     {
@@ -42,7 +42,7 @@ void SphericalCode::putPoint(real ptr[3], const size_t i)
 }
 
 
-void SphericalCode::putPoint(double* x, double* y, double* z, const size_t i)
+void SphericalCode::putPoint(double* x, double* y, double* z, const size_t i) const
 {
     if ( i < num_points_ )
     {
@@ -52,7 +52,7 @@ void SphericalCode::putPoint(double* x, double* y, double* z, const size_t i)
     }
 }
 
-void SphericalCode::putPoint(float* x, float* y, float* z, const size_t i)
+void SphericalCode::putPoint(float* x, float* y, float* z, const size_t i) const
 {
     if ( i < num_points_ )
     {
@@ -63,10 +63,10 @@ void SphericalCode::putPoint(float* x, float* y, float* z, const size_t i)
 }
 
 
-void SphericalCode::putPoints(real ptr[], const size_t sup)
+void SphericalCode::putPoints(real ptr[], size_t sup) const
 {
-    size_t end = std::min(3*num_points_, sup);
-    for ( size_t i = 0; i < end; ++i )
+    sup = std::min(3*num_points_, sup);
+    for ( size_t i = 0; i < sup; ++i )
         ptr[i] = coord_[i];
 }
 

@@ -940,17 +940,17 @@ void CoupleSet::uniAttach2(FiberSiteList& loc, CoupleStock& can)
  The Couples are distributed randomly on the crosspoints
  */
 void CoupleSet::uniAttach12(FiberSiteList& loc1, FiberSiteList& loc2,
-                            CoupleStock& can, size_t count)
+                            CoupleStock& can, unsigned sup)
 {
-    const size_t nbc = loc1.size();
+    const unsigned nbc = loc1.size();
     assert_true(nbc == loc2.size());
     
     if ( nbc < 1 )
         return;
     
-    const size_t sup = std::min(count, can.size());
+    sup = std::min(sup, (unsigned)can.size());
 
-    for ( size_t n = 0; n < sup; ++n )
+    for ( unsigned n = 0; n < sup; ++n )
     {
         Couple * C = can.head();
         can.pop();

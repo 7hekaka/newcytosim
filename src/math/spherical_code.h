@@ -106,16 +106,16 @@ public:
     const real* addr(const size_t inx) const { return &coord_[3 * inx]; }
     
     /// copy the coordinates from point `inx` onto the given 3-dim array ptr
-    void putPoint(real ptr[3], size_t inx);
+    void putPoint(real ptr[3], size_t inx) const;
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void putPoint(double* x, double* y, double* z, size_t inx);
+    void putPoint(double* x, double* y, double* z, size_t inx) const;
     
     /// copy the coordinates from point `inx` onto x,y,z
-    void putPoint(float* x, float* y, float* z, size_t inx);
+    void putPoint(float* x, float* y, float* z, size_t inx) const;
     
     /// copy the points coordinates onto `x[]`, allocated to hold `sup` elements
-    void putPoints(real ptr[], const size_t sup);
+    void putPoints(real ptr[], size_t sup) const;
     
 private:
 
