@@ -8,17 +8,6 @@
 #include <fstream>
 
 
-/// create std::string using the C-style `printf()` syntax
-template < typename Arg1, typename... Args >
-std::string format(const char* fmt, Arg1 arg1, Args&&... args)
-{
-    char tmp[1024] = { 0 };
-    static_assert(std::is_trivial<Arg1>::value, "non-trivial type");
-    snprintf(tmp, sizeof(tmp), fmt, arg1, args...);
-    return (tmp);
-}
-
-
 /// Different Output instances provide some control over output
 namespace Cytosim
 {
