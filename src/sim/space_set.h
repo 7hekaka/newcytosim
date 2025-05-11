@@ -72,6 +72,9 @@ public:
     /// return pointer to the Object of given ID, or zero if not found
     Space * identifyObject(ObjectID n) const { return static_cast<Space*>(inventory_.get(n)); }
 
+    /// return max extension over all Spaces
+    real maxExtension() const;
+    
 };
 
 

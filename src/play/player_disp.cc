@@ -225,19 +225,6 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
 }
 
 
-/**
- Adjust to see the biggest Space in simul
- */
-void Player::autoScale(View& view, SpaceSet const& spaces) const
-{
-    real rad = 0;
-    for ( Space const* spc = spaces.first(); spc; spc=spc->next() )
-        rad = std::max(rad, spc->max_extension());
-    if ( rad > 0 )
-        view.set_scale(2*rad);
-}
-
-
 //set pixel size, unit-size and direction:
 void Player::setPixelSize(View& view)
 {
@@ -264,8 +251,8 @@ void Player::prepareDisplay(View& view)
     //-------- automatic adjustment of viewing area:
 
     if ( view.auto_scale > 0 )
-        autoScale(view, simul.spaces);
-    
+        view.set_scale(2*simul.spaces.maxExtension());
+
     //-------- auto-track:
     
     if ( view.track_fibers )

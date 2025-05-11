@@ -264,6 +264,9 @@ void prepareView()
 //set pixel size, unit-size and direction:
 void prepareDisplay(Simul const& sim)
 {
+    if ( view.auto_scale > 0 )
+        view.set_scale(2*sim.spaces.maxExtension());
+
     if ( sim.prop.display_fresh )
     {
         Glossary glos(sim.prop.display);

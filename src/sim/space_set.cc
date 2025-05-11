@@ -36,6 +36,14 @@ void SpaceSet::setMaster(Space const* spc)
 }
 
 
+real SpaceSet::maxExtension() const
+{
+    real rad = 0;
+    for ( Space const* s = first(); s; s=s->next() )
+        rad = std::max(rad, s->max_extension());
+    return rad;
+}
+
 //------------------------------------------------------------------------------
 
 Property * SpaceSet::newProperty(const std::string& cat, const std::string& nom, Glossary& opt) const

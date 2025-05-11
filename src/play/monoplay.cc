@@ -214,22 +214,12 @@ GLFWwindow * initWindow(int W, int H)
 }
 
 
-/**
- Adjust to see the biggest Space in simul
- */
-void autoScale(SpaceSet const& spaces)
-{
-    real rad = 0;
-    for ( Space const* spc = spaces.first(); spc; spc=spc->next() )
-        rad = std::max(rad, spc->max_extension());
-    if ( rad > 0 )
-        view.set_scale(2*rad);
-}
-
-
 //set pixel size, unit-size and direction:
 void prepareDisplay(Simul const& sim)
 {
+    if ( view.auto_scale > 0 )
+        view.set_scale(2*sim.spaces.maxExtension());
+
     if ( sim.prop.display_fresh )
     {
         Glossary glos(sim.prop.display);

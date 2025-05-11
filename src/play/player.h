@@ -148,9 +148,6 @@ public:
     /// set View::focus and rotation to track objects in the simulation
     void autoFocus(View&, Simul const&, unsigned) const;
     
-    /// adjust the viewing area
-    void autoScale(View&, SpaceSet const&) const;
-    
     /// adjust the model view and load frame if asked
     void setPixelSize(View&);
 
