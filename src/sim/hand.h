@@ -15,11 +15,10 @@ class Simul;
 
 /// Simulates the stochastic binding/unbinding of a FiberSite
 /**
- A Hand is always part of a larger construct, for example Single or Couple.
- 
- Hand is the parent to many class that implement different fiber-related activities.
- Hand provides binding/unbinding capacity to these derived classes.
- 
+ The class Hand provides binding/unbinding capacity to Fiber.
+ It is the parent to many classes that implement different fiber-related activities, such as motors, cutters, etc..
+ A Hand is always part of a larger construct, particularly Single or Couple.
+
  Attachment occurs with constant rate @ref HandPar "binding_rate" to any fiber located
  at distance  @ref HandPar "binding_range" or less.
  If attachment occurs, it happens on the closest point of the fiber,
@@ -35,6 +34,7 @@ class Simul;
 
  See @ref HandPar
  @ingroup HandGroup
+ But the parameter `unbinding_force` is by default `+inf`, meaning that unbinding is not force-sensitive.
  
  @todo Include FiberSite site as member variable, instead of derivation
  */
