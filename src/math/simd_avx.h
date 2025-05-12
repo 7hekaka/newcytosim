@@ -1,6 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
 // Started on Monday 5 June 2018, which was a very nice day in Strasbourg
-
+#include <cstdint>
 
 /// Vector holding 4 double precision floats
 typedef __m256d vec4;

@@ -406,7 +406,7 @@ void FiberProp::read(Glossary& glos)
     if ( glos.set(ds, "delete_stub") )
     {
         persistent = !ds;
-        Cytosim::warn(use `persistent=", !ds, "' instead of `delete_stub="<<ds<<"'\n");
+        Cytosim::warn("use `persistent=", !ds, "' instead of `delete_stub="<<ds<<"'\n");
     }
 #endif
     

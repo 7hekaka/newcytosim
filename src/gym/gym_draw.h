@@ -143,7 +143,7 @@ namespace gym
     inline void color_back(const float col[])
     {
         //glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col_);
-        float blk[4] = { 0, 0, 0, 1 };
+        //float blk[4] = { 0, 0, 0, 1 };
         glMaterialfv(GL_BACK, GL_AMBIENT_AND_DIFFUSE, col);
         no_emission(GL_BACK);
     }
