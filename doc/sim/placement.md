@@ -73,8 +73,31 @@ Most primitives describe a certain area in Space, and the returned position is
  `to X Y Z`             | Interpolate with the previously specified position
  `or POSITION`          | flip randomly between two specified positions
  
- If a position is specified directly using a primitive and `placement` remains unspeficied, the default value `inside` will imply that the object will only be created if its vertices are inside the current Space.
+ If a position is specified directly using a primitive, the object will only be created if its center is inside the current Space. 
+ This can be changed by setting parameter `placement` (see below).
  
+ ### Initial position of Fibers
+ 
+ In the case of Fibers, the position refers to the middle of the fiber (center of gravity).  
+ It is also possible to specify one of the end instead:
+ 
+  `reference`    | Meaning
+ ----------------|----------------------------------------------------------
+ `center`        | The position refers to the middle of the fibers (default)
+ `minus_end`     | Place the minus end at the specified position
+ `plus_end`      | Place the plus end of the fiber, by flipping the fiber around
+
+
+ It is also possible to specify the positions of both ends:
+ 
+     new [POSITIVE_INTEGER] FIBER_NAME
+     {
+         position_ends = VECTOR, VECTOR
+        ...
+     }
+
+ The fiber will be set straight between the two points, with a length equal to the distance between the points.
+
  
 # ROTATION
 
