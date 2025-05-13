@@ -950,7 +950,8 @@ unsigned Meca::solve()
 #endif
         oss << " " << mFUL.what();
         //oss << " noise " << noiseLevel << "  " << blas::nrm8(dim, vRND);
-        oss << " precond " << precond_ << " (" << preconditionnerSize() << ")" << CHOUCROUTE;
+        if ( precond_ )
+            oss << " precond " << precond_ << " (" << preconditionnerSize() << ")" << CHOUCROUTE;
         oss << " count " << std::setw(4) << monitor.count();
         oss << " residual " << std::setw(11) << std::left << monitor.residual();
         if ( verbose_ & 4 )
