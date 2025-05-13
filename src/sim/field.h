@@ -74,7 +74,7 @@ private:
         const real extra = tight ? 0 : 1;
         
         index_t n_cell[3] = { 0, 0, 0 };
-        // we use square cells:
+        // we use square voxels:
         for ( int d = 0; d < DIM; ++d )
         {
             n_cell[d] = (index_t)std::ceil( (sup[d]-inf[d]+extra) / step );

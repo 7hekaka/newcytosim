@@ -79,7 +79,7 @@ static bool extract(std::string const& arg, size_t& sci, real& var)
 }
 
 
-/** Specialized version for Vector: `var` is unchanged upon failure. */
+/** Specialized version for Vector: `vec` is unchanged upon failure. */
 static bool extract(std::string const& arg, size_t& sci, Vector& vec)
 {
     if ( extract(arg, sci, vec.XX) )

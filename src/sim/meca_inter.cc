@@ -4280,12 +4280,14 @@ void Meca::addPointClampXY(Mecapoint const& ptA,
 void Meca::addPointClampToAll(Vector const& pos, const real weight)
 {
     ABORT_NOW("Unfinished");
+    /*
     Vector vec = weight * pos;
     for ( index_t p = 0; p < nbVertices(); ++p )
     {
-        //sub_iso_diag(p, weight);
-        //add_base(p, vec);
+        sub_iso_diag(p, weight);
+        add_base(p, vec);
     }
+     */
 }
 
 //------------------------------------------------------------------------------

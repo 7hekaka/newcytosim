@@ -900,8 +900,9 @@ void Simul::loadProperties()
 {
     const char * def = prop.property_file.c_str();
 #if BACKWARD_COMPATIBILITY < 57
-    if ( ! FilePath::is_file(def) )
-        loadProperties("properties.cmo", 0);
+    const char * old = "properties.cmo";
+    if ( ! FilePath::is_file(def) && FilePath::is_file(old) )
+        loadProperties(old, 0);
     else
 #endif
     loadProperties(def, 0);

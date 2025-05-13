@@ -1001,7 +1001,7 @@ public:
     /// write total number of cells and number of subdivision in each dimension
     void printSummary(std::ostream& os, const char arg[]) const
     {
-        os << arg << " of dim " << ORD << " has " << mNbCells << " cells: ";
+        os << arg << " of dim " << ORD << " has " << mNbCells << " voxels: ";
         for ( int d = 0; d < ORD; ++d )
         {
             char o = '[', c = ']';
@@ -1016,7 +1016,7 @@ public:
     /// write the list of neigboring cells for each cell
     void printRegions(std::ostream& os, const char arg[]) const
     {
-        os << arg << " of dim " << ORD << " has " << mNbCells << " cells";
+        os << arg << " of dim " << ORD << " has " << mNbCells << " voxels";
         if ( hasRegions() )
         {
             int const* region;

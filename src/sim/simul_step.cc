@@ -135,7 +135,7 @@ void Simul::setFiberGrid(FiberGrid& grid, Space const* spc, real& grid_step)
         grid_step = res;
     }
 
-    // create the grid cells:
+    // create the grid voxels:
     grid.createCells();
 }
 

@@ -1164,7 +1164,7 @@ void Tesselator::interpolateVertex(REAL ptr[3], Vertex const& vex) const
 template < typename REAL >
 void Tesselator::projectFootball(REAL ptr[3], Vertex const& vex) const
 {
-    REAL a = vex.weight_[0];
+    //REAL a = vex.weight_[0];
     REAL b = vex.weight_[1];
     REAL c = vex.weight_[2];
     REAL x = b + c - foot_rank();
