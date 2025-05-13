@@ -396,20 +396,22 @@ Examples:
  
 # `for` 
 
- Repeat specified code.
+ Repeat specified code, with variable substitution
  
      for VAR=INTEGER:INTEGER { CODE }
  
- The two integers are the first and last iterations counters.
- Any occurence of VAR is replaced before the code is executed.
+ The two integers are the first and last values being tried.
+ It is possible to specify an increment different to 1:
  
+     for VAR=INTEGER:POSITIVE_INTEGER:INTEGER { CODE }
+
  Example:
  
-     for CNT=1:10 {
-       new 10 filament { length = CNT }
+     for X=1:10 {
+       new filament { length = [0.5*X+2] }
      }
- 
- NOTE: This code is a hack, and can be improved vastly!
+
+ Any bracketed section appearing in the code will be replaced using the current value of the variable, so in this case `[0.5*X+2]` will be calculated using `X = 1, 2, ... 10`.
 
 # `cut`
 
