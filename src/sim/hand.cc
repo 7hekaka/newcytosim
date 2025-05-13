@@ -167,7 +167,7 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
             return false;
     }
     
-    FiberEnd end = NO_END;
+    [[maybe_unused]] FiberEnd end = NO_END;
 
     switch ( prop->bind_only_end )
     {

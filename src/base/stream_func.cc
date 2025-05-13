@@ -156,6 +156,7 @@ static void print_last_line(std::ostream& os, size_t num, std::string const& lin
 }
 
 
+[[ maybe_unused ]]
 static void print_other_line(std::ostream& os, const char prefix[], std::string const& line)
 {
     if ( prefix && *prefix )

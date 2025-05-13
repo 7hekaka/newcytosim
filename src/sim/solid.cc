@@ -1747,7 +1747,7 @@ void Solid::read(Inputter& in, Simul& sim, ObjectTag tag)
     }
     else if ( tag == SOLID_TAG )
     {
-        ObjectID id = in.readUInt32();
+        [[maybe_unused]] ObjectID id = in.readUInt32();
         in.readFloat();
 #if NEW_SOLID_HAS_TWIN
         if ( id == identity() )

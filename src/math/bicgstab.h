@@ -11,6 +11,7 @@
 
 
 #ifndef __FAST_MATH__
+[[ maybe_unused ]]
 static void check_numbers(real const* vec, size_t len, size_t cnt)
 {
     size_t nan = 0;

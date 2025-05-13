@@ -84,7 +84,7 @@ static bool extract(std::string const& arg, size_t& sci, Vector& vec)
 {
     if ( extract(arg, sci, vec.XX) )
     {
-        size_t pos = sci;
+        [[maybe_unused]] size_t pos = sci;
         real v;
         if ( extract(arg, sci, v) )
         {

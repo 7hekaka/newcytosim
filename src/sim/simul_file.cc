@@ -244,6 +244,7 @@ static bool isAlpha(int i)
 
 
 /** Compatibility function for formats < 50 */
+[[ maybe_unused ]]
 static ObjectID readObjectID_old(Inputter& in, ObjectTag& tag)
 {
     int c;
