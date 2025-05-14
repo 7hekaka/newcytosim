@@ -39,31 +39,33 @@ Bundle::~Bundle()
 
 
 /*
- Parallel connection near the 'prop->pole' end of the fibers
+ Parallel connection near the 'pole' end of the fibers
 */
-void Bundle::linkParallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
+void Bundle::linkParallelFibers(Meca& meca, Fiber * mt1, Fiber * mt2) const
 {
     const real stiff = prop->stiffness;
     const real dis = prop->overlap;
     
-    meca.addLink(mt1->interpolateFrom(dis, prop->pole), mt2->interpolateFrom(dis, prop->pole), stiff);
-    meca.addLink(mt1->exactEnd(prop->pole), mt2->exactEnd(prop->pole), stiff);
+    const FiberEnd pole = prop->pole;
+    meca.addLink(mt1->interpolateFrom(dis, pole), mt2->interpolateFrom(dis, pole), stiff);
+    meca.addLink(mt1->exactEnd(pole), mt2->exactEnd(pole), stiff);
 }
 
 
 /**
- Antiparallel connection near the 'prop->pole' end of the fibers
+ Antiparallel connection near the 'pole' end of the fibers
 */
-void Bundle::linkAntiparallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
+void Bundle::linkAntiparallelFibers(Meca& meca, Fiber * mt1, Fiber * mt2) const
 {
     const real stiff = prop->stiffness;
     const real dis = prop->overlap;
 
+    const FiberEnd pole = prop->pole;
     if ( dis < REAL_EPSILON )
-        meca.addLink(mt1->exactEnd(prop->pole), mt2->exactEnd(prop->pole), stiff+stiff);
+        meca.addLink(mt1->exactEnd(pole), mt2->exactEnd(pole), stiff+stiff);
     else {
-        meca.addLink(mt2->exactEnd(prop->pole), mt1->interpolateFrom(dis, prop->pole), stiff);
-        meca.addLink(mt1->exactEnd(prop->pole), mt2->interpolateFrom(dis, prop->pole), stiff);
+        meca.addLink(mt2->exactEnd(pole), mt1->interpolateFrom(dis, pole), stiff);
+        meca.addLink(mt1->exactEnd(pole), mt2->interpolateFrom(dis, pole), stiff);
     }
 }
 
@@ -75,28 +77,26 @@ void Bundle::linkAntiparallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
  */
 void Bundle::setInteractions(Meca& meca) const
 {
-    if ( nbOrganized() > 0 )
+    if ( nbOrganized() > 1 )
     {
         Fiber * mt0 = Fiber::toFiber(organized(0));
         Fiber * mt1 = mt0, * mt2 = nullptr;
         
-        for ( size_t i = 1 ; i < nbOrganized(); ++i )
+        for ( size_t i = 1; i < nbOrganized(); ++i )
         {
             mt2 = Fiber::toFiber(organized(i));
             if ( mt1 && mt2 )
-                linkAntiparallel(meca, mt1, mt2);
+                linkAntiparallelFibers(meca, mt1, mt2);
             mt1 = mt2;
         }
         
         // connect first and last fibers:
-        mt1 = mt0;
-        
-        if ( mt1 && mt2 )
+        if ( mt1 && mt0 )
         {
             if ( nbOrganized() & 1 )
-                linkParallel(meca, mt1, mt2);
+                linkParallelFibers(meca, mt0, mt1);
             else
-                linkAntiparallel(meca, mt1, mt2);
+                linkAntiparallelFibers(meca, mt0, mt1);
         }
     }
 }
@@ -142,6 +142,7 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
     
     nbOrganized(cnt);
     
+    const FiberEnd pole = prop->pole;
     for ( size_t inx = 0; inx < cnt; ++inx )
     {
         ObjectList list;
@@ -153,11 +154,11 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
             ObjectSet::rotateObjects(list, Rotation::rotation180());
         
         // translate to adjust the overlap:
-        ObjectSet::translateObjects(list, fib->posMiddle()-fib->posFrom(0.5*prop->overlap, prop->pole));
+        ObjectSet::translateObjects(list, fib->posMiddle()-fib->posFrom(0.5*prop->overlap, pole));
         
         real len;
         if ( opt.set(len, "length", inx) )
-            fib->adjustLength(len, prop->pole== PLUS_END?MINUS_END:PLUS_END);
+            fib->adjustLength(len, pole== PLUS_END?MINUS_END:PLUS_END);
         
         grasp(fib, inx);
     }

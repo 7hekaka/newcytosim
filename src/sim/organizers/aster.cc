@@ -68,20 +68,21 @@ void Aster::setInteractions(Meca& meca) const
         if ( fib )
         {
             AsterLink const& link = asLinks[n];
-            
+            const FiberEnd pole = prop->pole;
+
             const index_t off = sol->matIndex() + link.prime_;
 
 #if BACKWARD_COMPATIBILITY < 47
             if ( link.alt_ > 0 )
             {
-                meca.addLink(Mecapoint(sol, link.prime_), fib->exactEnd(prop->pole), prop->stiffness[0]);
+                meca.addLink(Mecapoint(sol, link.prime_), fib->exactEnd(pole), prop->stiffness[0]);
                 if ( fib->length() > link.len_ )
                 {
-                    meca.addLink(Mecapoint(sol, link.alt_), fib->interpolateFrom(link.len_, prop->pole), prop->stiffness[1]);
+                    meca.addLink(Mecapoint(sol, link.alt_), fib->interpolateFrom(link.len_, pole), prop->stiffness[1]);
                 }
                 else
                 {
-                    FiberEnd tip = ( prop->pole == PLUS_END ? MINUS_END : PLUS_END );
+                    FiberEnd tip = ( pole == PLUS_END ? MINUS_END : PLUS_END );
                     // link the opposite end to an interpolation of the two solid-points:
                     real c = fib->length() / link.len_;
                     meca.addLink(fib->exactEnd(tip), Interpolation(sol, c, link.prime_, link.alt_), prop->stiffness[1]);
@@ -90,9 +91,9 @@ void Aster::setInteractions(Meca& meca) const
             }
 #endif
             if ( link.rank_ == 1 )
-                meca.addLink(fib->exactEnd(prop->pole), Mecapoint(sol, link.prime_), prop->stiffness[0]);
+                meca.addLink(fib->exactEnd(pole), Mecapoint(sol, link.prime_), prop->stiffness[0]);
             else
-                meca.ADDLINK(fib->exactEnd(prop->pole), off, link.coef1_, prop->stiffness[0]);
+                meca.ADDLINK(fib->exactEnd(pole), off, link.coef1_, prop->stiffness[0]);
             
             
             // make second type of link:
@@ -101,9 +102,9 @@ void Aster::setInteractions(Meca& meca) const
             if ( fib->length() >= len )
             {
                 if ( len > 0 )
-                    meca.ADDLINK(fib->interpolateFrom(len, prop->pole), off, link.coef2_, prop->stiffness[1]);
+                    meca.ADDLINK(fib->interpolateFrom(len, pole), off, link.coef2_, prop->stiffness[1]);
                 else
-                    meca.ADDLINK(fib->exactEnd(prop->pole), off, link.coef2_, prop->stiffness[1]);
+                    meca.ADDLINK(fib->exactEnd(pole), off, link.coef2_, prop->stiffness[1]);
             }
             else
             {

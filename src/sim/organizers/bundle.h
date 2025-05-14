@@ -28,10 +28,10 @@ class Bundle : public Organizer
 private:
     
     /// add interactions to a Meca
-    void linkAntiparallel(Meca&, Fiber *, Fiber *) const;
+    void linkAntiparallelFibers(Meca&, Fiber *, Fiber *) const;
     
     /// add interactions to a Meca
-    void linkParallel(Meca&, Fiber *, Fiber *) const;
+    void linkParallelFibers(Meca&, Fiber *, Fiber *) const;
 
 public:
 
