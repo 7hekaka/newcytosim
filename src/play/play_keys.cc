@@ -46,6 +46,7 @@ static void changeColoring(PointDisp* p, int)
     flashText("%s:coloring = %i", p->name_str(), p->coloring);
 }
 
+[[maybe_unused]]
 static void setSize(PointDisp * p, float s)
 {
     if ( s >= 0.5 )
@@ -55,6 +56,7 @@ static void setSize(PointDisp * p, float s)
     }
 }
 
+[[maybe_unused]]
 static void setWidth(PointDisp * p, float s)
 {
     if ( s > 0.5 )
@@ -454,6 +456,7 @@ static void invertScale(FiberDisp* p, int)
     }
 }
 
+[[maybe_unused]]
 static void setColoring(FiberDisp* p, int val)
 {
     p->coloring = ( p->coloring ? 0 : val );
@@ -650,6 +653,7 @@ static void setFiberDisp(PropertyList const& plist, void(*func)(FiberDisp*, int)
         func(toFiberDisp(i), val);
 }
 
+[[maybe_unused]]
 static PointDisp * findVisibleFiberDisp(PropertyList const& plist, int& cnt)
 {
     PointDisp * one = nullptr;
