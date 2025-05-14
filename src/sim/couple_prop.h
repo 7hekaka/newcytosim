@@ -41,7 +41,9 @@ public:
         BIND_NOT_PARALLEL,     ///< link two fibers only if `cosine(angle) < 0.5`
         BIND_ANTIPARALLEL,     ///< link two fibers only if `cosine(angle) < -0.5`
         BIND_NOT_ANTIPARALLEL, ///< link two fibers only if `cosine(angle) > -0.5`
-        BIND_ORTHOGONAL        ///< link two fibers only if `abs(angle) > 45 deg`
+        BIND_ORTHOGONAL,       ///< link two fibers only if `abs(angle) > 45 deg`
+        BIND_BIPOLAR,          ///< specific case for bipolar myosin minifilaments
+        BIND_ANTIBIPOLAR       ///< specific case for bipolar myosin minifilaments
     };
     
     /**
@@ -156,6 +158,8 @@ public:
      - `not_parallel`    : anti-parallel filaments with an angle below 120 degrees
      - `not_antiparallel`: parallel filaments with an angle below 120 degrees
      - `orthogonal`      : filaments with an angle between 60 and 120 degrees
+     - `bipolar`            : Hand's position must be towards the plus end of the target filament
+     - `antibipolar`   : Hand's position must be towards the minus end of the target filament
      .
      This limit the attachment of a Hand when the other Hand is already attached,
      as a function of the angle that is defined by the already bound filament,

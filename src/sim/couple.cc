@@ -382,6 +382,20 @@ bool Couple::permitAttachment(FiberSite const& sit, Hand const* h) const
                 return false;
             break;
             
+        case CoupleProp::BIND_BIPOLAR: {
+            Vector dir = normalize(that->pos() - fox->posMiddle());
+            sit.reinterpolate();
+            if ( dot(sit.dirFiber(), dir) < 0.5 )
+                return false;
+        } break;
+            
+        case CoupleProp::BIND_ANTIBIPOLAR: {
+            Vector dir = normalize(that->pos() - fox->posMiddle());
+            sit.reinterpolate();
+            if ( dot(sit.dirFiber(), dir) > -0.5 )
+                return false;
+        } break;
+
         default:
             throw InvalidParameter("unknown couple:specificity");
     }

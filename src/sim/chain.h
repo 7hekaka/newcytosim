@@ -321,7 +321,7 @@ public:
     Vector posFrom(real ab, FiberEnd ref) const { return pos(abscissaFrom(ab, ref)); }
 
     /// position of the point taken mid-way along the curve
-    Vector posMiddle() const { if ( nPoints&1 ) return posPoint(nPoints/2); return midPoint((nPoints-1)/2, 0.5); }
+    Vector posMiddle() const { if ( nPoints&1 ) return posPoint(nPoints/2); return midPoint(nPoints/2-1, 0.5); }
     
     /// position of a FiberEnd
     Vector posEnd(FiberEnd) const;

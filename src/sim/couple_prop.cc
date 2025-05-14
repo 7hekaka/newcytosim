@@ -39,7 +39,7 @@ void CoupleProp::clear()
     diffusion      = 0;
     fast_diffusion = 0;
     fast_reservoir = 0;
-    save_unbound  = ~0U;
+    save_unbound   = ~0U;
     trans_activated = 0;
     min_loop       = 1;
     specificity    = BIND_ALWAYS;
@@ -67,11 +67,11 @@ void CoupleProp::read(Glossary& glos)
     glos.set(fast_diffusion, "fast_diffusion");
     glos.set(fast_reservoir, "fast_diffusion", 1);
     glos.set(save_unbound, "save_unbound");
-
+    
     glos.set(trans_activated, "trans_activated");
     // changed 'stiff' to 'min_loop' on 26.04.2020
     glos.set(min_loop, "min_loop", "stiff");
-
+    
     glos.set(specificity, "specificity", {{"off",          BIND_ALWAYS},
 #if BACKWARD_COMPATIBILITY < 50
                                           {"none",         BIND_ALWAYS},
@@ -80,8 +80,10 @@ void CoupleProp::read(Glossary& glos)
                                           {"parallel",     BIND_PARALLEL},
                                           {"not_parallel", BIND_NOT_PARALLEL},
                                           {"antiparallel", BIND_ANTIPARALLEL},
-                                          {"not_antiparallel", BIND_NOT_ANTIPARALLEL}});
-    
+                                          {"not_antiparallel", BIND_NOT_ANTIPARALLEL},
+                                          {"bipolar",      BIND_BIPOLAR},
+                                          {"antibipolar",  BIND_ANTIBIPOLAR}});
+
     glos.set(activity,        "activity");
     
     glos.set(confine,         "confine", {{"off",     CONFINE_OFF},

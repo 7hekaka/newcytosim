@@ -70,6 +70,7 @@ set single holder
 
 set couple myosin
 {
+    specificity = bipolar
     hand1 = binder
     hand2 = motor
     stiffness = 400
