@@ -23,7 +23,7 @@ void Bundle::step()
             ObjectList objs;
             FiberProp const* fip = sim.findProperty<FiberProp>("fiber", prop->fiber_type);
             Fiber * F = sim.fibers.newFiber(objs, fip, prop->fiber_spec);
-            F->adjustLength(prop->overlap, prop->joint);
+            F->adjustLength(prop->overlap, prop->pole);
             ///\todo: we should orient the new Fiber in bundle direction
             sim.add(objs);
             grasp(F, ii);
@@ -39,20 +39,20 @@ Bundle::~Bundle()
 
 
 /*
- Parallel connection near the 'prop->joint' end of the fibers
+ Parallel connection near the 'prop->pole' end of the fibers
 */
 void Bundle::linkParallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
 {
     const real stiff = prop->stiffness;
     const real dis = prop->overlap;
     
-    meca.addLink(mt1->interpolateFrom(dis, prop->joint), mt2->interpolateFrom(dis, prop->joint), stiff);
-    meca.addLink(mt1->exactEnd(prop->joint), mt2->exactEnd(prop->joint), stiff);
+    meca.addLink(mt1->interpolateFrom(dis, prop->pole), mt2->interpolateFrom(dis, prop->pole), stiff);
+    meca.addLink(mt1->exactEnd(prop->pole), mt2->exactEnd(prop->pole), stiff);
 }
 
 
 /**
- Antiparallel connection near the 'prop->joint' end of the fibers
+ Antiparallel connection near the 'prop->pole' end of the fibers
 */
 void Bundle::linkAntiparallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
 {
@@ -60,10 +60,10 @@ void Bundle::linkAntiparallel(Meca& meca, Fiber * mt1, Fiber * mt2) const
     const real dis = prop->overlap;
 
     if ( dis < REAL_EPSILON )
-        meca.addLink(mt1->exactEnd(prop->joint), mt2->exactEnd(prop->joint), stiff+stiff);
+        meca.addLink(mt1->exactEnd(prop->pole), mt2->exactEnd(prop->pole), stiff+stiff);
     else {
-        meca.addLink(mt2->exactEnd(prop->joint), mt1->interpolateFrom(dis, prop->joint), stiff);
-        meca.addLink(mt1->exactEnd(prop->joint), mt2->interpolateFrom(dis, prop->joint), stiff);
+        meca.addLink(mt2->exactEnd(prop->pole), mt1->interpolateFrom(dis, prop->pole), stiff);
+        meca.addLink(mt1->exactEnd(prop->pole), mt2->interpolateFrom(dis, prop->pole), stiff);
     }
 }
 
@@ -110,7 +110,7 @@ Vector Bundle::position() const
     for ( size_t i = 1 ; i < nbOrganized(); ++i )
     {
         Fiber const* fib = Fiber::toFiber(organized(i));
-        res += fib->posEnd(prop->joint);
+        res += fib->posEnd(prop->pole);
     }
     return res / (real)nbOrganized();
 }
@@ -153,11 +153,11 @@ ObjectList Bundle::build(Glossary& opt, Simul& sim)
             ObjectSet::rotateObjects(list, Rotation::rotation180());
         
         // translate to adjust the overlap:
-        ObjectSet::translateObjects(list, fib->posMiddle()-fib->posFrom(0.5*prop->overlap, prop->joint));
+        ObjectSet::translateObjects(list, fib->posMiddle()-fib->posFrom(0.5*prop->overlap, prop->pole));
         
         real len;
         if ( opt.set(len, "length", inx) )
-            fib->adjustLength(len, prop->joint== PLUS_END?MINUS_END:PLUS_END);
+            fib->adjustLength(len, prop->pole== PLUS_END?MINUS_END:PLUS_END);
         
         grasp(fib, inx);
     }

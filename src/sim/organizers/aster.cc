@@ -74,14 +74,14 @@ void Aster::setInteractions(Meca& meca) const
 #if BACKWARD_COMPATIBILITY < 47
             if ( link.alt_ > 0 )
             {
-                meca.addLink(Mecapoint(sol, link.prime_), fib->exactEnd(prop->joint), prop->stiffness[0]);
+                meca.addLink(Mecapoint(sol, link.prime_), fib->exactEnd(prop->pole), prop->stiffness[0]);
                 if ( fib->length() > link.len_ )
                 {
-                    meca.addLink(Mecapoint(sol, link.alt_), fib->interpolateFrom(link.len_, prop->joint), prop->stiffness[1]);
+                    meca.addLink(Mecapoint(sol, link.alt_), fib->interpolateFrom(link.len_, prop->pole), prop->stiffness[1]);
                 }
                 else
                 {
-                    FiberEnd tip = ( prop->joint == PLUS_END ? MINUS_END : PLUS_END );
+                    FiberEnd tip = ( prop->pole == PLUS_END ? MINUS_END : PLUS_END );
                     // link the opposite end to an interpolation of the two solid-points:
                     real c = fib->length() / link.len_;
                     meca.addLink(fib->exactEnd(tip), Interpolation(sol, c, link.prime_, link.alt_), prop->stiffness[1]);
@@ -90,9 +90,9 @@ void Aster::setInteractions(Meca& meca) const
             }
 #endif
             if ( link.rank_ == 1 )
-                meca.addLink(fib->exactEnd(prop->joint), Mecapoint(sol, link.prime_), prop->stiffness[0]);
+                meca.addLink(fib->exactEnd(prop->pole), Mecapoint(sol, link.prime_), prop->stiffness[0]);
             else
-                meca.ADDLINK(fib->exactEnd(prop->joint), off, link.coef1_, prop->stiffness[0]);
+                meca.ADDLINK(fib->exactEnd(prop->pole), off, link.coef1_, prop->stiffness[0]);
             
             
             // make second type of link:
@@ -101,14 +101,14 @@ void Aster::setInteractions(Meca& meca) const
             if ( fib->length() >= len )
             {
                 if ( len > 0 )
-                    meca.ADDLINK(fib->interpolateFrom(len, prop->joint), off, link.coef2_, prop->stiffness[1]);
+                    meca.ADDLINK(fib->interpolateFrom(len, prop->pole), off, link.coef2_, prop->stiffness[1]);
                 else
-                    meca.ADDLINK(fib->exactEnd(prop->joint), off, link.coef2_, prop->stiffness[1]);
+                    meca.ADDLINK(fib->exactEnd(prop->pole), off, link.coef2_, prop->stiffness[1]);
             }
             else
             {
                 // link the opposite fiber end to a new interpolation:
-                FiberEnd end = ( prop->joint == PLUS_END ? MINUS_END : PLUS_END );
+                FiberEnd end = ( prop->pole == PLUS_END ? MINUS_END : PLUS_END );
                 real c = fib->length() / len;
                 real u = 1.0 - c;
                 real alp[4];
@@ -231,7 +231,7 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
     else
         dir = Vector::randU();
     
-    if ( prop->joint == PLUS_END )
+    if ( prop->pole == PLUS_END )
         dir.negate();
     
     Fiber * F = nullptr;
@@ -241,7 +241,7 @@ Fiber * Aster::makeFiber(ObjectList& objs, Simul& sim, const Vector pos, Vector 
         F = sim.fibers.newFiber(list, fip, fos);
         //std::clog << "new aster:fiber " << pos << " and " << dir << "\n";
         ObjectSet::rotateObjects(list, Rotation::rotationToVector(dir));
-        ObjectSet::translateObjects(list, pos - F->posEnd(prop->joint));
+        ObjectSet::translateObjects(list, pos - F->posEnd(prop->pole));
         objs.append(list);
     }
     return F;
@@ -670,12 +670,12 @@ Vector Aster::posFiber2(size_t inx) const
     
     if ( fib->length() >= len )
     {
-        return fib->posFrom(len, prop->joint);
+        return fib->posFrom(len, prop->pole);
     }
     else
     {
         // link the opposite end to an interpolation of the two solid-points:
-        return fib->posEnd( prop->joint == PLUS_END ? MINUS_END : PLUS_END );
+        return fib->posEnd( prop->pole == PLUS_END ? MINUS_END : PLUS_END );
     }
 }
 

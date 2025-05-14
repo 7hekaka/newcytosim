@@ -33,7 +33,7 @@ public:
     real overlap;
     
     /// designates which end of the fiber is towards the center
-    FiberEnd joint;
+    FiberEnd pole;
     
     /// rate for creating fiber in empty slots
     real fiber_rate;

@@ -39,7 +39,7 @@ public:
     real stiffness[2];
     
     /// designates which end of the fiber is towards the center
-    FiberEnd joint;
+    FiberEnd pole;
     
     /// rate at which a new fiber is created at an unoccupied site (known as nucleate)
     real fiber_rate;

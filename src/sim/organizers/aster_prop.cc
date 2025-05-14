@@ -11,7 +11,7 @@ void AsterProp::clear()
 {
     stiffness[0] = -1;
     stiffness[1] = -1;
-    joint = MINUS_END;
+    pole = MINUS_END;
     fiber_rate = 0;
     fiber_type = "";
     fiber_spec = "";
@@ -21,8 +21,8 @@ void AsterProp::clear()
 void AsterProp::read(Glossary& glos)
 {
     glos.set(stiffness, 2, "stiffness");
-    glos.set(joint, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
-    glos.set(joint, "joint", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(pole, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(pole, "pole", {{"plus", PLUS_END}, {"minus", MINUS_END}});
 
     glos.set(fiber_rate, "nucleate", 0);
     glos.set(fiber_type, "nucleate", 1);
@@ -64,6 +64,6 @@ void AsterProp::write_values(std::ostream& os) const
 {
     write_value(os, "nucleate", fiber_rate, fiber_type, "("+fiber_spec+")");
     write_value(os, "stiffness", stiffness[0], stiffness[1]);
-    write_value(os, "joint", joint);
+    write_value(os, "pole", pole);
 }
 

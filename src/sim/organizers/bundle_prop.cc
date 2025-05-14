@@ -9,7 +9,7 @@ void BundleProp::clear()
 {
     stiffness  = -1;
     overlap    = -1;
-    joint      = MINUS_END;
+    pole       = MINUS_END;
     fiber_rate = 0.0;
     fiber_type = "";
     fiber_spec = "";
@@ -20,8 +20,8 @@ void BundleProp::read(Glossary& glos)
 {
     glos.set(stiffness, "stiffness");
     glos.set(overlap, "overlap");
-    glos.set(joint, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
-    glos.set(joint, "joint", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(pole, "focus", {{"plus_end", PLUS_END}, {"minus_end", MINUS_END}});
+    glos.set(pole, "pole", {{"plus", PLUS_END}, {"minus", MINUS_END}});
     glos.set(fiber_rate, "nucleate");
     glos.set(fiber_type, "nucleate", 1);
     glos.set(fiber_spec, "nucleate", 2);
@@ -56,7 +56,7 @@ void BundleProp::write_values(std::ostream& os) const
 {
     write_value(os, "stiffness", stiffness);
     write_value(os, "overlap",   overlap);
-    write_value(os, "joint",     joint);
+    write_value(os, "pole",      pole);
     write_value(os, "nucleate",  fiber_rate, fiber_type, "("+fiber_spec+")");
 }
 
