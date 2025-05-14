@@ -179,7 +179,7 @@ int main(int argc, char* argv[])
     }
     
     Cytosim::silent();
-    Slice slice(arg.value("frame").c_str());
+    Slice slice;
 
     // process first record, and check things:
     size_t frm = slice.first();
@@ -194,12 +194,29 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    size_t cnt = 0;
+    int cnt = 0;
     // multiple ranges of indices can be specified:
-    size_t inp = 0;
-    while ( arg.set(str, "frame", inp++) )
+    if ( arg.num_values("frame") > 1 )
     {
-        slice.parse(str.c_str());
+        int inp = 0;
+        while ( arg.set(str, "frame", inp++) )
+        {
+            slice.parse(str.c_str());
+            for ( frm = slice.first(); frm <= slice.last(); frm += slice.increment() )
+            {
+                if ( 0 == report(out, what, arg, frm) )
+                    ++cnt;
+                else
+                    break;
+            }
+        }
+    }
+    else
+    {
+        // if 'frame' is not specified, a 'period' can still be specified
+        int p = 1;
+        if ( arg.set(p, "period") )
+            slice.increment(p);
         for ( frm = slice.first(); frm <= slice.last(); frm += slice.increment() )
         {
             if ( 0 == report(out, what, arg, frm) )
@@ -208,7 +225,6 @@ int main(int argc, char* argv[])
                 break;
         }
     }
-    
     out << '\n';
     arg.print_warnings(stderr, cnt, "\n");
 }

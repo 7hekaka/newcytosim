@@ -3,7 +3,7 @@
 #include <cstdio>
 #include <cstring>
 
-/// Slice represents a regular subset of indices
+/// Slice represents a regular subset of positive indices
 /**
  A slice can be constructed from a string,
  where A, B and S are positive integers:
@@ -65,9 +65,6 @@ public:
                 if ( *str ) goto finish;
             }
         }
-        if ( e < s )
-            fprintf(stderr, "empty slice `%s'\n", arg);
-        //fprintf(stderr, "Slice(%lu:%lu:%lu)\n", s, i, e);
         return;
     finish:
         fprintf(stderr, "syntax error in `%s', expected START:INCREMENT:END\n", arg);
@@ -94,6 +91,21 @@ public:
         return i;
     }
     
+    void first(size_t x)
+    {
+        s = x;
+    }
+
+    void last(size_t x)
+    {
+        e = x;
+    }
+
+    void increment(size_t x)
+    {
+        i = x;
+    }
+
     size_t count() const
     {
         size_t res = 0;
@@ -111,5 +123,11 @@ public:
         return 0 == ( n - s ) % i;
     }
 
+    void print(FILE * file = stderr) const
+    {
+        if ( e < s )
+            fprintf(file, "empty ");
+        fprintf(file, "Slice(%lu:%lu:%lu)\n", s, i, e);
+    }
 };
 
