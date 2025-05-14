@@ -1,4 +1,4 @@
-// Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
+// Cytosim was created by Francois Nedelec. Copyright 2025 NC State University.
 
 #include "dim.h"
 #include "assert_macro.h"
@@ -79,21 +79,30 @@ void Bundle::setInteractions(Meca& meca) const
 {
     if ( nbOrganized() > 1 )
     {
+        const int S = ( prop->bipolar ? -1 : 1 );
         Fiber * mt0 = Fiber::toFiber(organized(0));
-        Fiber * mt1 = mt0, * mt2 = nullptr;
+        Fiber * mt1 = mt0;
         
+        int osi = 1, side = 1;
         for ( size_t i = 1; i < nbOrganized(); ++i )
         {
-            mt2 = Fiber::toFiber(organized(i));
-            if ( mt1 && mt2 )
-                linkAntiparallelFibers(meca, mt1, mt2);
-            mt1 = mt2;
+            Fiber * mt2 = Fiber::toFiber(organized(i));
+            side *= S;
+            if ( mt2 )
+            {
+                if ( side == osi )
+                    linkParallelFibers(meca, mt1, mt2);
+                else
+                    linkAntiparallelFibers(meca, mt1, mt2);
+                mt1 = mt2;
+                osi = side;
+            }
         }
         
         // connect first and last fibers:
         if ( mt1 && mt0 )
         {
-            if ( nbOrganized() & 1 )
+            if ( side == osi )
                 linkParallelFibers(meca, mt0, mt1);
             else
                 linkAntiparallelFibers(meca, mt0, mt1);

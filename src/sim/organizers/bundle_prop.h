@@ -35,6 +35,9 @@ public:
     /// designates which end of the fiber is towards the center
     FiberEnd pole;
     
+    /// if true, the bundle is made of filaments alternating in polarity
+    bool bipolar;
+
     /// rate for creating fiber in empty slots
     real fiber_rate;
     

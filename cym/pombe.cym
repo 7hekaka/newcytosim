@@ -50,6 +50,7 @@ set bundle bunch
 {
     overlap   = 0.5
     stiffness = 1000
+    bipolar = 1
 }
 
 set nucleus kern
