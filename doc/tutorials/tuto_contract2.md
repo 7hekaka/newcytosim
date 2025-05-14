@@ -22,7 +22,9 @@ This tutorial assumes that you have already completed the first tutorial on cont
 
 # Introduction
 
-In this tutorial we will focus on a different contraction mechanism: polarity sorting. Here contraction relies on the presence of molecular motors that dwells at the end of the filament instead of automatically detaching. Because of this property, end-dwelling motors end up bring the same end of filaments together, thus contracting cytoskeletal networks into asters
+In this tutorial we will focus on a different contraction mechanism: polarity sorting. 
+Here contraction relies on the presence of molecular motors that dwells at the end of the filament instead of immediately detaching. 
+Because of this property, end-dwelling motors can bring the ends of filaments together, thus contracting cytoskeletal networks into asters
 
 ![polarity_sorting](data/polarity_sorting.png)
 
@@ -57,7 +59,7 @@ Lets create a small simulation space with radius 2 um and add single actin filam
     new 1 fiber actin
     {
         length = 4
-        position = 0,0
+        position = 0 0
     }
     
     run 5000 system
