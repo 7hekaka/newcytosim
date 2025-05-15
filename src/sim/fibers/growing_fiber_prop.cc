@@ -6,7 +6,8 @@
 #include "exceptions.h"
 #include "glossary.h"
 #include "simul_part.h"
-
+#include "couple_prop.h"
+#include "simul.h"
 
 Fiber* GrowingFiberProp::newFiber() const
 {
@@ -27,6 +28,8 @@ void GrowingFiberProp::clear()
         shrinking_speed[i]   = 0;
     }
     divide = INFINITY;
+    divide_type = "none";
+    divide_couple = nullptr;
 }
 
 
@@ -41,6 +44,7 @@ void GrowingFiberProp::read(Glossary& glos)
     glos.set(shrinking_speed,   2, "shrinking_speed");
     
     glos.set(divide, "divide");
+    glos.set(divide_type, "divide", 1);
 }
 
 
@@ -63,6 +67,11 @@ void GrowingFiberProp::complete(Simul const& sim)
         growing_force_inv[i] = 1.0 / growing_force[i];
         shrinking_speed_dt[i] = shrinking_speed[i] * time_step(sim);
     }
+    
+    if ( divide_type == "none" )
+        divide_couple = nullptr;
+    else
+        divide_couple = sim.findProperty<CoupleProp>("couple", divide_type);
 }
 
 
@@ -75,6 +84,6 @@ void GrowingFiberProp::write_values(std::ostream& os) const
     write_value(os, "shrink_outside",    shrink_outside, 2);
     write_value(os, "shrinking_speed",   shrinking_speed, 2);
     
-    write_value(os, "divide", divide);
+    write_value(os, "divide", divide, divide_type);
 }
 

@@ -7,7 +7,9 @@
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "simul_part.h"
+#include "couple.h"
 #include "space.h"
+#include "simul.h"
 
 
 //------------------------------------------------------------------------------
@@ -101,6 +103,13 @@ void GrowingFiber::step()
             real L = 0.5 * length();
             Fiber * frag = severSegment(L, L);
             objset()->add(frag);
+            if ( prop()->divide_couple )
+            {
+                Couple * C = prop()->divide_couple->newCouple();
+                C->attachEnd1(this, PLUS_END);
+                C->attachEnd2(frag, MINUS_END);
+                simul().add(C);
+            }
         }
     }
 }

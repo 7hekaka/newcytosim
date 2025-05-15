@@ -74,6 +74,9 @@ public:
     /// length at which the filament is split into two
     real divide;
     
+    /// name of Couple added upon divison
+    std::string divide_type;
+    
     /// @}
     
 private:
@@ -90,6 +93,9 @@ private:
     /// shrinking_speed * time_step
     real shrinking_speed_dt[2];
 
+    /// Type of Couple to be added at division
+    CoupleProp * divide_couple;
+    
 public:
     
     /// constructor
