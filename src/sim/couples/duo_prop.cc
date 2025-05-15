@@ -59,7 +59,7 @@ void DuoProp::read(Glossary& glos)
     else
     {
         glos.set(angular_stiffness, "angular_stiffness");
-        glos.set(rest_angle, "angle", 0);
+        glos.set(rest_angle, "rest_angle", "angle");
     }
     glos.set(flip, "flip");
 #endif
