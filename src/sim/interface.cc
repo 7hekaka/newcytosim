@@ -547,10 +547,15 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
     }
 
     // syntax sugar: distribute objects regularly between two points
-    if ( opt.has_key("range") )
+    std::string var = "position_range";
+#if BACKWARD_COMPATIBILITY < 60
+    if ( !opt.has_key(var) )
+        var = "range";
+#endif
+    if ( opt.has_key(var) )
     {
         Vector A, B;
-        if ( !opt.set(A, "range") || !opt.set(B, "range", 1) )
+        if ( !opt.set(A, var) || !opt.set(B, var, 1) )
             throw InvalidParameter("two vectors need to be defined by `range'");
         if ( opt.has_key("position") )
             throw InvalidParameter("cannot specify `position' if `range' is defined");
