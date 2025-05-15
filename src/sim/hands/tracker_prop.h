@@ -21,19 +21,19 @@ public:
      @{
      */
     
-    /// if set, always follow specified end `[minus-end, plus_end, nearest_end]`
+    /// if set, always follow specified end `[minus-end, plus_end, both_ends]`
     /**
      The hand will stay always positionned at the given fiber end, 
      even if this end is growing or shrinking. Possible values are:
         - plus_end
         - minus_end
-        - nearest_end
+        - both_ends
         .
      */
-    FiberEnd   track_end;
+    FiberEnd track_end;
     
     /// if true, bind only to growing fiber ends
-    bool       bind_only_growing_end;
+    bool bind_only_growing_end;
 
     /// @}
 
