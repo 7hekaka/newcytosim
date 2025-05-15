@@ -162,22 +162,24 @@ public:
     real drag_gap;
 
     
-    /// can be set to control which Hands may bind
+    /// A bitfield controlling which Hands may bind
     /**
      This option limits the binding of Hands to this class of Fiber. To decide
-     if a Hand may bind or not, the `binding_keys` of the Hand is compared to
-     the `binding_key` of the Fiber, using a BITWISE AND:
+     if a Hand may bind or not, the `binding_key` of the Hand is compared to
+     the `binding_key` of the Fiber, using a *BITWISE AND* operation:
 
          allowed = ( fiber:binding_key BITWISE_AND hand:binding_key )
 
-     Hence attachement if the two `binding_key` do not share any common digit
-     in base 2. For most usage, one can thus use powers of 2 to distinguish fibers:
+     Hence attachement is disallowed if the two `binding_key` do not share any common digit
+     in base 2. For most models, one can use powers of 2 to distinguish fibers:
      - microtubule: `binding_key = 1`,
      - actin: `binding_key = 2`,
+     - DNA: `binding_key = 4`,
      - etc.
      .
-     However, more complex combinations can be created by using all the bits of binding_key.
-     With the example above, a Hand with `binding_key=3` can bind to both type of fibers.
+     However, more complex combinations can be created by using all the bits of `binding_key`.
+     With the example above, a Hand with `binding_key=3` can bind to both `actin` and `microtubule`,
+     but not to `DNA`.
      */
     unsigned binding_key;
     

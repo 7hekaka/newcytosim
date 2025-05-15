@@ -72,23 +72,23 @@ public:
     real binding_limits[2];
 #endif
     
-    /// can be set to restrict binding to certain type of Fiber
+    /// This bitfield can be set to restrict binding to certain type of Fiber
     /**
      The binding to a fiber is allowed only if the keys of the Hand and Fiber match.
-     The test uses a BITWISE-AND of the two keys:
+     The test uses a BITWISE_AND operation of the two keys:
 
-         if ( fiber:binding_key & hand:binding_key )
+         if ( fiber:binding_key BITWISE_AND hand:binding_key )
              allowed = true;
          else
              allowed = false;
 
-     Thus, with `binding_key==0' attachment is completely disabled, and in general
-     one needs to look at the bit-pattern of the number in base 2. For example
-     `1` can bind to `3` but not to `2`.
+     Thus, with `binding_key = 0` attachment is completely disabled, and in general
+     one needs to look at the bit-pattern of the keys in base 2, to determine if two keys are compatible.
+     For example, `1` [binary: 01] can bind to `3` [binary: 11]  but not to `2` [binary: 10].
      
      <em>default value = all-bits-at-1</em>
      */
-    unsigned int binding_key;
+    unsigned binding_key;
     
     
     /// detachment rate in the absence of load (also known as `unbinding[0]`)
