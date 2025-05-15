@@ -26,6 +26,7 @@ void GrowingFiberProp::clear()
         shrink_outside[i]    = false;
         shrinking_speed[i]   = 0;
     }
+    divide = INFINITY;
 }
 
 
@@ -38,6 +39,8 @@ void GrowingFiberProp::read(Glossary& glos)
     glos.set(growing_off_speed, 2, "growing_off_speed");
     glos.set(shrink_outside,    2, "shrink_outside");
     glos.set(shrinking_speed,   2, "shrinking_speed");
+    
+    glos.set(divide, "divide");
 }
 
 
@@ -71,5 +74,7 @@ void GrowingFiberProp::write_values(std::ostream& os) const
     write_value(os, "growing_force",     growing_force, 2);
     write_value(os, "shrink_outside",    shrink_outside, 2);
     write_value(os, "shrinking_speed",   shrinking_speed, 2);
+    
+    write_value(os, "divide", divide);
 }
 

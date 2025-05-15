@@ -3,6 +3,7 @@
 #include "assert_macro.h"
 #include "growing_fiber.h"
 #include "growing_fiber_prop.h"
+#include "object_set.h"
 #include "exceptions.h"
 #include "iowrapper.h"
 #include "simul_part.h"
@@ -92,7 +93,16 @@ void GrowingFiber::step()
     }
 
     if ( Fiber::updateLength(addM, addP) )
+    {
         Fiber::step();
+        
+        if ( length() > prop()->divide )
+        {
+            real L = 0.5 * length();
+            Fiber * frag = severSegment(L, L);
+            objset()->add(frag);
+        }
+    }
 }
 
 

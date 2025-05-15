@@ -71,6 +71,9 @@ public:
     /// Shrinking speed of end that are outside, for option 'shrink_outside'
     real shrinking_speed[2];
 
+    /// length at which the filament is split into two
+    real divide;
+    
     /// @}
     
 private:
