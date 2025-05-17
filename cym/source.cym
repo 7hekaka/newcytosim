@@ -1,0 +1,76 @@
+% test creation/deletion of Single/Couple around other objects
+% FJN, Raleigh 17.05.2025
+
+set simul system
+{
+    time_step = 0.005
+    viscosity = 1
+}
+
+set space cell
+{
+    shape = capsule
+}
+
+new cell
+{
+	length = 15
+    radius = 5
+}
+
+set bead blob
+{
+    display = ( style=5; coloring=1; )
+}
+
+new 2 blob
+{
+    radius = 0.3
+	position_range = -4 0 0, 4 0 0 
+}
+
+set hand blue
+{
+	display = (color=cyan, cyan;)
+}
+
+set hand green
+{
+	display = (color=green, green;)
+}
+
+set single blue_dot
+{
+	hand = blue
+	diffusion = 1
+}
+
+set single green_dot
+{
+	hand = green
+	diffusion = 2
+}
+
+new event
+{
+    rate = 20
+    code = ( new blue_dot { position=[blob1]; } )
+}
+
+new event
+{
+    rate = 20
+    code = ( new green_dot { position=[blob2]; } )
+}
+
+new event
+{
+    rate = 2
+    code = ( delete single { rate = 1 } )
+}
+
+run 10000 system
+{
+    nb_frames = 10
+}
+

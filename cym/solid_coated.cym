@@ -1,0 +1,77 @@
+% 
+% FJN in Raleigh, 16.05.2025
+
+set simul system
+{
+    time_step = 0.001
+    viscosity = 1.0
+}
+
+set space cell
+{
+    shape = cylinder
+}
+
+set fiber microtubule
+{
+    steric = 1, 0.025
+    rigidity = 20
+    segmentation = 0.25
+    display = ( color=white; width=2.5; )
+}
+
+set hand binder
+{
+    binding_rate = 10
+    binding_range = 0.1
+    unbinding_rate = 0
+    display = ( color=green; size=7; )
+}
+
+set single anchor
+{
+    hand = binder
+    stiffness = 300
+    activity = fixed
+}
+
+set single grafted
+{
+    hand = binder
+    stiffness = 100
+}
+
+set solid particle
+{
+    steric = 1
+	confine = 1
+    display = ( style=7; color=dark_gray )
+}
+
+new cell
+{
+    radius = 5
+	bottom = 0
+	top = 2
+}
+
+new microtubule
+{
+    length = 5
+    position = center
+    direction = 1 0 0
+    attach1 = anchor, 0, minus_end
+    attach2 = anchor, 0, plus_end
+}
+
+new particle
+{
+    sphere1 = 0 0 0, 0.5, 34 grafted
+    position = 0 0 0.5
+    orientation = none
+}
+
+run 50000 system
+{
+    nb_frames = 100
+}
