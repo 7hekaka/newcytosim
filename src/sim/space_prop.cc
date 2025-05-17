@@ -50,32 +50,35 @@
         PARAMETER = DIMENSIONS
      }
  
- PARAMETER is usually 'length' or 'radius', but also 'height' or 'width'
- DIMENSIONS is a single REAL or a comma-separated list of REAL.
+ PARAMETER are specific to each shape but usually include 'length' or 'radius'.
+ The last columun in the  list below gives the parameters associated with each shape.
+ It is often possible to specify the radius or the diameter (but not both).
+ 
+ The parameter values (DIMENSIONS) is a single REAL or a comma-separated list of REAL.
  
  List of known `shape`:
  
- SHAPE         | Class                | PARAMETER
+ SHAPE         | Class                | PARAMETERS
  --------------|----------------------|-------------------------------------
- `rectangle`   | SpaceSquare          | sizeX sizeY sizeZ
- `sphere`      | SpaceSphere          | radius
- `polygon`     | SpacePolygon         | file_name height
- `polygonZ`    | SpacePolygonZ        | file_name
- `capsule`     | SpaceCapsule         | length radius
- `torus`       | SpaceTorus           | radius width
- `banana`      | SpaceBanana          | length width radius (for curvature)
- `dice`        | SpaceDice            | sizeX sizeY sizeZ radius
- `strip`       | SpaceStrip           | sizeX sizeY sizeZ
- `periodic`    | SpacePeriodic        | sizeX sizeY sizeZ
- `ellipse`     | SpaceEllipse         | sizeX sizeY sizeZ
- `cylinder`    | SpaceCylinder        | length radius
- `cylinderZ`   | SpaceCylinderZ       | radius bottom top
- `cylinderP`   | SpaceCylinderP       | length radius
- `bicylinder`  | SpaceBicylinder      | radius
- `ring`        | SpaceRing            | length radius
- `disc`        | SpaceDisc            | radius bottom top
- `tee`         | SpaceTee             | length radius junction arm
- `mesh`        | SpaceMesh            | file_name
+ `rectangle`   | SpaceSquare          | length = REAL, REAL, REAL;
+ `sphere`      | SpaceSphere          | radius = REAL or diameter = REAL;
+ `polygon`     | SpacePolygon         | file=FILE; height=REAL;
+ `polygonZ`    | SpacePolygonZ        | file=FILE;
+ `capsule`     | SpaceCapsule         | length=REAL; radius=REAL;
+ `torus`       | SpaceTorus           | radius=REAL; width=REAL;
+ `banana`      | SpaceBanana          | length=REAL; radius=REAL; curvature=REAL;
+ `dice`        | SpaceDice            | length = REAL, REAL, REAL; edge=REAL
+ `strip`       | SpaceStrip           | length = REAL, REAL, REAL;
+ `periodic`    | SpacePeriodic        | length=REAL, REAL, REAL
+ `ellipse`     | SpaceEllipse         | radius=REAL, REAL, REAL;
+ `cylinder`    | SpaceCylinder        | length=REAL; radius=REAL;
+ `cylinderZ`   | SpaceCylinderZ       | radius=REAL; bottom=REAL; top=REAL; edge=REAL
+ `cylinderP`   | SpaceCylinderP       | length=REAL radius=REAL;
+ `bicylinder`  | SpaceBicylinder      | radius=REAL;
+ `ring`        | SpaceRing            | length=REAL; radius=REAL;
+ `disc`        | SpaceDisc            | radius=REAL; bottom=REAL; top=REAL;
+ `tee`         | SpaceTee             | length=REAL; radius=REAL; junction=REAL; arm=REAL;
+ `mesh`        | SpaceMesh            | file=FILE
  
  Example:
  

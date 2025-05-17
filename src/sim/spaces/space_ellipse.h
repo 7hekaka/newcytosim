@@ -36,10 +36,10 @@ protected:
 
 #if ELLIPSE_HAS_SPHEROID
     /// indicates that two axes are equal
-    int mSpheroid;
+    int spheroid_;
 #endif
     
-    /// amount added to radius for display
+    /// amount added to radius in DISPLAY
     real thickness_;
     
     /// update derived lengths

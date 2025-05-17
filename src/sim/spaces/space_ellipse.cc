@@ -10,7 +10,7 @@ SpaceEllipse::SpaceEllipse(SpaceProp const* p)
 : Space(p)
 {
 #if ELLIPSE_HAS_SPHEROID
-    mSpheroid = -1;
+    spheroid_ = -1;
 #endif
     for ( int d = 0; d < 3; ++d )
         radius_[d] = 0;
@@ -24,7 +24,7 @@ void SpaceEllipse::update()
         radiusSqr_[d] = square(radius_[d]);
     
 #if ( DIM > 2 ) && ELLIPSE_HAS_SPHEROID
-    mSpheroid = -1;
+    spheroid_ = -1;
     
     // if any two dimensions are similar, then the ellipsoid is a spheroid
     for ( int zz = 0; zz < DIM; ++zz )
@@ -32,7 +32,7 @@ void SpaceEllipse::update()
         int xx = ( zz + 1 ) % DIM;
         int yy = ( zz + 2 ) % DIM;
         if ( abs_real(radius_[xx]-radius_[yy]) < REAL_EPSILON*(radius_[xx]+radius_[yy]) )
-            mSpheroid = zz;
+            spheroid_ = zz;
     }
 #endif
 }
@@ -153,16 +153,16 @@ Vector3 SpaceEllipse::project3D(Vector3 const& W) const
     /*
      If the ellipsoid has two equal axes, we can reduce the problem to 2D,
      because it is symmetric by rotation around the remaining axis, which
-     is here indicated by 'mSpheroid'.
+     is here indicated by 'spheroid_'.
      */
-    if ( mSpheroid >= 0 )
+    if ( spheroid_ >= 0 )
     {
-        const int zz = mSpheroid;
+        const int zz = spheroid_;
         const int xx = ( zz + 1 ) % DIM;
         const int yy = ( zz + 2 ) % DIM;
         
         if ( radius_[xx] != radius_[yy] )
-            throw InvalidParameter("Inconsistent mSpheroid dimensions");
+            throw InvalidParameter("Inconsistent spheroid_ dimensions");
         
         //rotate point around the xx axis to bring it into the yy-zz plane:
         real pR, rr = std::sqrt( W[xx]*W[xx] + W[yy]*W[yy] );
