@@ -94,7 +94,7 @@ void SpacePolygonZ::update()
         poly_.flip();
     }
 
-    if ( poly_.complete(REAL_EPSILON) )
+    if ( poly_.complete(1e-6) )
         throw InvalidParameter("unfit polygon: consecutive points may overlap");
 
     real box[4];

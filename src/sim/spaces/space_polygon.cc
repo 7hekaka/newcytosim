@@ -96,7 +96,7 @@ void SpacePolygon::update()
     }
     assert_true( surface_ > 0 );
     
-    if ( poly_.complete(REAL_EPSILON) )
+    if ( poly_.complete(1e-6) )
         throw InvalidParameter("unfit polygon: consecutive points may overlap");
 
     real box[4];

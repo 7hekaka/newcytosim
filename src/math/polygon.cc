@@ -74,10 +74,9 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
     while ( in.good() )
     {
         in.getline(str, sizeof(str));
-        //std::clog << "polygone file " << in.gcount() << " " << str << "\n";
 
         if ( in.fail() && in.gcount() )
-            throw InvalidIO("Could not read polygon coordinate files");
+            throw InvalidIO("Could not read polygon coordinate file");
        
         char const* ptr = str;
         char * end = nullptr;
@@ -106,6 +105,7 @@ size_t Polygon::read(std::istream& in, Point2D* pts, size_t pts_size)
         
         if ( i < pts_size )
         {
+            //std::clog << "polygon["<<i<<"]: "<<str<<"| "<<x<<" "<<y<<" "<<k<<"\n";
             pts[i].xx = x;
             pts[i].yy = y;
             pts[i].spot = k;
@@ -141,7 +141,7 @@ void Polygon::read(std::string const& file)
     if ( ! in.good() )
         throw InvalidParameter("polygon file `"+file+"' not found");
     
-    //std::clog << "reading polygon from " << file << '\n';
+    //std::clog << "Reading polygon from " << file << '\n';
     
     read(in);
     in.close();
@@ -285,49 +285,50 @@ void Polygon::wrap()
 /**
  pre-calculate offset of successive points,
  and length of segments, used in project for efficiency.
- Also copy two points to simplify the calculations:
- - point[nbpts  ] <- point[0]
- - point[nbpts+1] <- point[1]
+ Also duplicate first two points to simplify some later calculations:
+ - point[L  ] <- point[0]
+ - point[L+1] <- point[1]
  .
  
  The array should be allocated to hold (npts+2) Point2D
  */
-int Polygon::complete(real epsilon)
+int Polygon::complete(const real epsilon)
 {
-    int res = 0;
+    //std::clog << "Polygon::complete(" << epsilon << ")\n";
     if ( npts_ > 1 )
     {
         unsigned i = 0, n = 0, p = 0;
         do {
-            real dx = 0, dy = 0, d = 1;
+            real dx = 0, dy = 0;
             // skip consecutive points that are too close from each other:
             do {
-                if ( ++p > npts_ )
+                if ( ++n > npts_ )
                     goto finish;
-                dx = pts_[p].xx - pts_[n].xx;
-                dy = pts_[p].yy - pts_[n].yy;
-                d = std::sqrt( dx * dx + dy * dy );
-            } while ( d < epsilon );
-            //normalize the vector:
+                dx = pts_[n].xx - pts_[p].xx;
+                dy = pts_[n].yy - pts_[p].yy;
+                //std::clog << "poly  " << n << "   " << dx << " " << dy << "\n";
+            } while ( std::max(abs_real(dx), abs_real(dy)) < epsilon );
+            real d = std::sqrt( dx * dx + dy * dy );
+            // normalize the vector:
             pts_[i]     = pts_[n];
             pts_[i].dx  = dx / d;
             pts_[i].dy  = dy / d;
             pts_[i].len = d;
-            n = p;
+            p = n;
             ++i;
-        } while ( n <= npts_ );
-    
+        } while ( p <= npts_ );
+
 finish:
         if ( i < npts_ )
         {
             std::clog << "Polygon had " << npts_-i << " degenerate vertices\n";
             npts_ = i;
-            res = 1;
+            return 1;
         }
         wrap();
     }
 
-    return res;
+    return 0;
 }
 
     
