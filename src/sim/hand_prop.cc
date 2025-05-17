@@ -201,8 +201,9 @@ void HandProp::read(Glossary& glos)
     glos.set(bind_only_end, "bind_only_end", {{"off",       NO_END},
                                               {"plus_end",  PLUS_END},
                                               {"minus_end", MINUS_END},
-                                              {"both_ends", BOTH_ENDS}});
-    
+                                              {"both_ends", BOTH_ENDS},
+                                              {"center", CENTER}});
+
     glos.set(bind_end_range, "bind_end_range", 0, "bind_only_end", 1);
 
 #if BACKWARD_COMPATIBILITY < 100

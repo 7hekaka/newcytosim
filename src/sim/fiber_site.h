@@ -174,6 +174,9 @@ public:
     /// abscissa, counted from the minus end
     real abscissaFromM() const { return hAbs - hFiber->abscissaM(); }
 
+    /// abscissa, counted from the center of the fiber
+    real abscissaFromC() const { return hAbs - hFiber->abscissaC(); }
+
     /// inverted abscissa counted from the plus end, positive if ( abscissa < abscissa(plus end) )
     real abscissaFromP() const { return hFiber->abscissaP() - hAbs; }
 

@@ -151,7 +151,7 @@ public:
     /// if true, the Hand can bind only near the tips of the fibers
     /**
      This determines that a Hand can only bind near the ends of the fiber.
-     This parameter can be 'none', 'plus_end', 'minus_end' or 'both_ends'.
+     This parameter can be 'none', 'plus_end', 'minus_end' , 'center' or 'both_ends'.
      Binding is allowed on positions located within a distance 'bind_end_range'
      from the specified end ('bind_end_range' is specified as `bind_only_end[1]`).
      
@@ -160,7 +160,7 @@ public:
     FiberEnd bind_only_end;
     
     
-    /// cutoff associated with `bind_only_end` where hand may bind (set as `bind_only_end[1]`)
+    /// length cutoff associated with `bind_only_end` where hand may bind (set as `bind_only_end[1]`)
     real bind_end_range;
 
 #if NEW_BIND_ONLY_FREE_END
@@ -172,8 +172,8 @@ public:
     /**
      A Hand may reach the tip of the fiber on which it is bound, because it has moved,
      and `hold_growing_end` will determine the probability of detachment in this case.
-     - if `hold_growing_end == 0`, the hand will detach,
-     - if `hold_growing_end == 1`, the hand will be placed exactly at the fiber's end.
+     - if `hold_growing_end = 0`, the hand will detach,
+     - if `hold_growing_end = 1`, the hand will be placed exactly at the fiber's end.
      `hold_growing_end` is a probability that must be in [0, 1].
      There are two values: [0] applies to the plus end, and [1] is for the minus end
      
@@ -185,8 +185,8 @@ public:
     /// detachment parameter, for cases when the Hand is reached by a shrinking fiber end
     /**
      This determines detachment/no-detachment if a Hand is reached by a shrinking fiber end:
-     - if `hold_shrinking_end == 0`, the hand will detach,
-     - if `hold_shrinking_end == 1`, the hand will be relocated to track the end.
+     - if `hold_shrinking_end = 0`, the hand will detach,
+     - if `hold_shrinking_end = 1`, the hand will be relocated to track the end.
      `hold_shrinking_end` is a probability that must be in [0, 1].
      There are two values: [0] applies to the plus end, and [1] is for the minus end
      To set the hand to track shrinking minus end, use `hold_shrinking_end == 0, 1`

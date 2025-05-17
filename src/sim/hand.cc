@@ -201,6 +201,10 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
                     end = RNG.choice(MINUS_END, PLUS_END);
             }
         } break;
+        case CENTER:
+            if ( abs_real(sit.abscissaFromC()) > 0.5 * prop->bind_end_range )
+                return false;       // too far from fiber center
+            break;
         default:
             throw Exception("Illegal value of hand:bind_only_end");
     }
