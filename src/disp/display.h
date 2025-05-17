@@ -169,7 +169,7 @@ public:
 #elif ( DIM == 2 )
         return dir.orthogonal(rad);
 #else
-        return Vector(0, 0, 0);
+        return Vector(0, 1, 0);
 #endif
     }
     
@@ -212,7 +212,7 @@ public:
     virtual void drawFiberSegmentT(Fiber const&, unsigned) const;
     
     /// Using triangles to draw a broken line with width `2*rad`
-    void drawFiberWide(Fiber const& fib, float rad) const;
+    void drawFiberWidePath(Fiber const& fib, float rad) const;
 
     /// draw stripes of alternating colors from segments of length `inc`, in [abs, sup]
     void drawFiberStriped2D(Fiber const&, float rad, real inc, gym_color, real onk, gym_color) const;
@@ -235,6 +235,9 @@ public:
     /// microtubule-like rendering using a sphere to represent each monomer
     void drawMicrotubule(Fiber const& fib, gym_color, gym_color, gym_color) const;
     
+    /// draw beads along the backbone of the fiber
+    void drawFiberChevrons(Fiber const&, real rad, real gap) const;
+
     /// draw Fiber point-like features, eg. vertices
     virtual void drawFiberPoints(Fiber const&) const;
     

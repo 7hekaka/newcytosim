@@ -1115,6 +1115,31 @@ void Display::drawFiberSpeckles(Fiber const& fib) const
 }
 
 
+void Display::drawFiberChevrons(Fiber const& fib, const real rad, const real gap) const
+{
+    real beta = fib.segmentationInv() * rad;
+    index_t cnt = 4 * fib.length() / gap + 8;
+    fluteD* flu = gym::mapBufferVD(cnt);
+    fluteD* ptr = flu;
+    real a = std::ceil(fib.abscissaM()/gap) * gap - fib.abscissaM();
+    for ( ; a <= fib.length(); a += gap )
+    {
+        Interpolation i = fib.interpolateM(a);
+        Vector pos = i.pos();
+        Vector dir = i.diff() * beta;
+        Vector off = inViewPlane(dir, rad);
+        ptr[0] = pos + dir - off;
+        ptr[1] = pos - dir;
+        ptr[2] = pos - dir;
+        ptr[3] = pos + dir + off;
+        ptr += 4;
+    }
+    assert_true( ptr <= flu+cnt );
+    gym::unmapBufferVD();
+    gym::drawLines(pixwidth(1), 0, ptr-flu);
+}
+
+
 void Display::drawFiberPoints(Fiber const& fib) const
 {
     FiberDisp const*const dis = fib.prop->disp;
@@ -1142,32 +1167,10 @@ void Display::drawFiberPoints(Fiber const& fib) const
     }
     else if ( style == 3 )
     {
-        // display chevrons along the fiber:
-        const real gap = dis->point_gap;
-        const real rad = pixscale(dis->point_size);
-        real beta = fib.segmentationInv() * rad;
-        index_t cnt = 4 * fib.length() / gap + 8;
-        fluteD* flu = gym::mapBufferVD(cnt);
-        fluteD* ptr = flu;
-        real a = std::ceil(fib.abscissaM()/gap) * gap - fib.abscissaM();
-        for ( ; a <= fib.length(); a += gap )
-        {
-            Interpolation i = fib.interpolateM(a);
-            Vector pos = i.pos();
-            Vector dir = i.diff() * beta;
-            Vector off = inViewPlane(dir, rad);
-            ptr[0] = pos + dir - off;
-            ptr[1] = pos - dir;
-            ptr[2] = pos - dir;
-            ptr[3] = pos + dir + off;
-            ptr += 4;
-        }
-        assert_true( ptr <= flu+cnt );
-        gym::unmapBufferVD();
         gym::ref_view();
         gym::disableLighting();
         gym::color(fib.disp->color);
-        gym::drawLines(pixwidth(1), 0, ptr-flu);
+        drawFiberChevrons(fib, pixscale(dis->point_size), dis->point_gap);
     }
     else if ( style == 4 )
     {
@@ -1480,7 +1483,7 @@ void Display::drawFiberForces(Fiber const& fib, real mag, float size) const
 
 
 /** Using triangles to draw a broken line of thickness `2*rad` */
-void Display::drawFiberWide(Fiber const& fib, float rad) const
+void Display::drawFiberWidePath(Fiber const& fib, float rad) const
 {
     fluteD* flu = gym::mapBufferVD(2*fib.nbPoints()+4);
     fluteD* ptr = flu;
@@ -2019,9 +2022,13 @@ void Display::drawFiber(Fiber const& fib)
             case 7: {
                 float w = pixscale(dis->line_width);
                 float l = std::max(w, 0.008f);
+                gym::color_load(fib.disp->color);
                 drawFiberArrowed2D(fib, w, 4*l, col1, l, col2);
-                //drawFiberWide(fib, w);
             } break;
+            case 8:
+                gym::color_load(fib.disp->color);
+                drawFiberWidePath(fib, pixscale(dis->line_width));
+                break;
         }
         style = 0;
     }
