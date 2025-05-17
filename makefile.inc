@@ -172,7 +172,7 @@ ifeq ($(MACHINE),mac)
     FlagsP := -O2 -fno-devirtualize $(ALIGN) -fno-inline
     FlagsF := $(FAST) $(ALIGN)
 
-    LINK   := -framework Accelerate $(OMPLIB) $(LIBRARIES)
+    LINK   := -framework Accelerate -framework QuartzCore $(OMPLIB) $(LIBRARIES)
 
     GRAFIX := -framework GLUT -framework OpenGL -framework AGL
     # Using brew's freeGLUT:
