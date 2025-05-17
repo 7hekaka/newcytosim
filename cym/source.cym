@@ -48,29 +48,36 @@ set single blue_dot
 set single green_dot
 {
 	hand = green
-	diffusion = 2
+	diffusion = 0.25
 }
 
 new event
 {
-    rate = 20
+    rate = 10
     code = ( new blue_dot { position=[blob1]; } )
 }
 
 new event
 {
-    rate = 20
+    rate = 50
     code = ( new green_dot { position=[blob2]; } )
 }
 
+% This even should fire at every time step, for the rate to be accurate,
+% and this is the case if 'rate' is not defined.
 new event
 {
-    rate = 2
-    code = ( delete single { rate = 1 } )
+    code = ( delete blue_dot { rate_each = 1 } )
+}
+
+% This even should fire at every time step, for the rate to be accurate
+new event
+{
+    code = ( delete green_dot { rate_each = 2 } )
 }
 
 run 10000 system
 {
-    nb_frames = 10
+    nb_frames = 100
 }
 

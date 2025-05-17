@@ -817,10 +817,36 @@ void Interface::execute_delete(std::string const& name, Glossary& opt, size_t cn
     ObjectSet * set = findClass(name, pp);
     if ( set )
     {
+        real rate = 0;
         if ( !pp && opt.empty() )
         {
             // all objects from a class are deleted:
             set->erase();
+        }
+        else if ( opt.set(rate, "rate_each") )
+        {
+            if ( cnt != ~0UL )
+                throw InvalidParameter("an object count should not be specified with `rate_each'");
+            ObjectList objs;
+            if ( opt.num_keys() == 1 )
+            {
+                if ( pp )
+                    objs = set->collect(match_property, pp);
+                else
+                    objs = set->collect();
+            }
+            else
+            {
+                Filter filter(sim_, pp, opt);
+                objs = set->collect(pass_filter, &filter);
+            }
+            cnt = RNG.poisson(objs.size()*rate*sim_->time_step());
+            if ( cnt > 0 )
+            {
+                //std::clog << "deleting " << cnt << " of " << objs.size() << " " << name << "\n";
+                objs.shuffle_truncate(cnt);
+                set->eraseObjects(objs);
+            }
         }
         else
         {

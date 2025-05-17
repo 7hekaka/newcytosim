@@ -19,20 +19,23 @@ void Event::clear()
 }
 
 
+/** This will make the event fire once, after 'time' */
 void Event::fire_once_at(double time)
 {
     nextTime = time;
     recurrent = false;
     multiplexed = false;
+    delay = INFINITY;
 }
 
 
+/** This will make the event fire once at every time step, after 'time' */
 void Event::fire_always_after(double time)
 {
     nextTime = time;
     recurrent = true;
     multiplexed = false;
-    delay = INFINITY;
+    delay = 0;
 }
 
 
@@ -91,7 +94,7 @@ Event::Event(double now, Glossary& opt)
 
 Event::~Event()
 {
-    //Cytosim::log("destroying Event ", this, "\n");
+    //Cytosim::log("destroying Event (", activity, ")\n");
 }
 
 
@@ -111,6 +114,7 @@ void Event::step(Simul& sim)
         // if 'multiplexed', the event can fire multiple times within a time step
         do {
             try {
+                //std::clog << "firing Event (" << activity << ")\n";
                 sim.perform(activity);
             }
             catch( Exception & e ) {
