@@ -26,7 +26,7 @@ void Fiber::step()
     //assert_false(hasKink(0));
 #if ( 0 )
     // Cut kinked filaments
-    size_t p = hasKink(0);
+    index_t p = hasKink(0);
     if ( p )
     {
         LOG_ONCE("SEVER_KINKED_FIBERS\n");

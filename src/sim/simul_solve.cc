@@ -15,10 +15,41 @@
  */
 real Simul::minimumStericRange() const
 {
-    real ran = 0;
-    real len = 0;
+    /*
+     For a spherical object, the steric range must be at least 2 * radius
+     */
+    real dia = 0;
+    
+    for ( Sphere const* O=spheres.first(); O; O=O->next() )
+    {
+        if ( O->prop->steric_key )
+            dia = max_real(dia, 2 * O->radius() + O->prop->steric_range);
+    }
+    
+    for ( Bead const* B=beads.first(); B; B=B->next() )
+    {
+        if ( B->prop->steric_key )
+            dia = max_real(dia, 2 * B->radius() + B->prop->steric_range);
+    }
+    
+    for ( Solid const* S=solids.first(); S; S=S->next() )
+    {
+        if ( S->prop->steric_key )
+        {
+            for ( index_t p = 0; p < S->nbPoints(); ++p )
+                dia = max_real(dia, 2 * S->radius(p) + S->prop->steric_range);
+        }
+    }
     
     // check all FiberProp with enabled steric:
+    /*
+     Given that two fibers can be aligned end-on, we must add the distances:
+         `2 * steric_radius + steric_range + 2 * ( len / 2 )`
+     since `len/2` is the distance between the center of a segment and
+     any point on the segment that may be considered for interaction.
+     */
+    real ran = 0;
+    real len = 0;
     for ( Property const* i : properties.find_all("fiber") )
     {
         FiberProp const* fp = static_cast<FiberProp const*>(i);
@@ -38,39 +69,14 @@ real Simul::minimumStericRange() const
         if ( F->prop->steric_key )
             len = max_real(len, F->segmentation());
     }
-
-    /*
-     Since two fibers can be aligned end-on, we must add the distances:
-     `2 * steric_radius + steric_range + 2 * ( len / 2 )`
-     since `len/2` is the distance between the center of a segment
-     and any of its point that may be considered for interaction.
-     */
-    ran = ran + len;
-
-    for ( Sphere const* O=spheres.first(); O; O=O->next() )
-    {
-        if ( O->prop->steric_key )
-            ran = max_real(ran, 2 * O->radius() + O->prop->steric_range);
-    }
     
-    for ( Bead const* B=beads.first(); B; B=B->next() )
-    {
-        if ( B->prop->steric_key )
-            ran = max_real(ran, 2 * B->radius() + B->prop->steric_range);
-    }
-    
-    for ( Solid const* S=solids.first(); S; S=S->next() )
-    {
-        if ( S->prop->steric_key )
-        {
-            for ( index_t p = 0; p < S->nbPoints(); ++p )
-                ran = max_real(ran, 2 * S->radius(p) + S->prop->steric_range);
-        }
-    }
+    // finally compute the minimum range, all objects considered:
+    ran = std::max(dia, ran+len);
     
     if ( ran < REAL_EPSILON )
         Cytosim::warn("could not estimate simul:steric_max_range automatically!\n");
     
+    //std::clog << "simul:minimumStericRange = " << ran << "\n";
     return ran;
 }
 

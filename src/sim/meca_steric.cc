@@ -53,7 +53,7 @@ void Meca::selectStericEngine(Simul const& sim, SimulProp const& prop)
         // without attractive forces, LocusGrid will be used:
         steric_ = 1 + ( prop.steric_stiff_pull[0] <= 0 );
         
-        // the grid size can be specified as a parameter, or computed automatically:
+        // the grid size can be specified, but otherwise will be computed automatically:
         if ( prop.steric_max_range <= REAL_EPSILON )
             prop.steric_max_range = sim.minimumStericRange();
         
