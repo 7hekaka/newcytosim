@@ -96,9 +96,6 @@ void SingleProp::clear()
     hand           = "";
     hand_prop      = nullptr;
     stiffness      = 0;
-#if NEW_ANCHOR_STIFFNESS
-    anchor_stiff = 0;
-#endif
     length         = 0;
     diffusion      = 0;
     fast_diffusion = 0;
@@ -120,9 +117,6 @@ void SingleProp::read(Glossary& glos)
 {
     glos.set(hand,           "hand");
     glos.set(stiffness,      "stiffness");
-#if NEW_ANCHOR_STIFFNESS
-    glos.set(anchor_stiff, "anchor_stiffness") || glos.set(anchor_stiff, "stiffness", 1);
-#endif
     glos.set(length,         "length");
     if ( glos.value_is("diffusion", 0, "fast") )
     {
@@ -238,9 +232,6 @@ void SingleProp::write_values(std::ostream& os) const
 {
     write_value(os, "hand",           hand);
     write_value(os, "stiffness",      stiffness);
-#if NEW_ANCHOR_STIFFNESS
-    write_value(os, "anchor_stiffness", anchor_stiff);
-#endif
     write_value(os, "length",         length);
     write_value(os, "diffusion",      diffusion);
     write_value(os, "fast_diffusion", fast_diffusion, fast_reservoir);
