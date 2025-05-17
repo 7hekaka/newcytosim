@@ -349,7 +349,7 @@ Vector Cytosim::readPositionPrimitive(std::string const& arg, size_t& sci, Space
                  
                 if ( tok == "equator" )
                 {
-                    real R = 0, T = 0;
+                    real R = 1, T = 0;
                     if ( extract(arg, sci, R) && R < 0 )
                         throw InvalidParameter("radius R must be >= 0 in `equator R T`");
                     if ( extract(arg, sci, T) && T < 0 )

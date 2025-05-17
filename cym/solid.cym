@@ -20,16 +20,24 @@ new cell
 }
 
 
-set hand binder
+set hand blue
 {
-    binding = 10, 0.05
-    unbinding = 0, 3
+    display = ( size=10; color=cyan, cyan; )
+}
+set hand green
+{
     display = ( size=10; color=green, green; )
 }
 
-set single grafted
+set single gGreen
 {
-    hand = binder
+    hand = green
+    stiffness = 100
+}
+
+set single gBlue
+{
+    hand = blue
     stiffness = 100
 }
 
@@ -37,49 +45,53 @@ set solid blob
 {
     steric = 1
     confine = all_inside, 100
-    display = ( style=7; coloring=1; color=0xFFFFFF88; )
+    display = ( style=1; coloring=1; color=0xFFFFFF88; )
 }
 
-new 5 blob
+new 1 blob
 {
     point1 = center, 0.7
-    point2 = 4, sphere 0.7, 0, 1 grafted each
+    point2 = 4, sphere 0.7, 0, 1 gGreen each
 }
 
-new 4 blob
+new 1 blob
 {
-    point1 = center, 1.0
-    point2 = 10, sphere 1.0, 0.0, grafted each
+    sphere1 = center, 1.0, 64 gGreen equator 1 0.2
 }
 
-new 3 blob
+new 1 blob
+{
+	sphere1 = center, 1.0, 64 gGreen sphere 1 if ( Z > 0.1 ), 64 gBlue sphere 1 if ( Z < 0.1 )
+}
+
+new 1 blob
 {
     point1 = 0 0 0, 1
-    point2 = 0.99  0.14 0, 0, 2 grafted
-    point3 = 0.99 -0.14 0, 0, 2 grafted
-}
-
-new 2 blob
-{
-    point1 = -1 0 0, 1.0
-    point2 =  0 0 0, 0.5
-    point3 =  1 0 0, 1.0
-    point4 =  0 -0.5 0, 0, grafted
-    point5 =  0  0.5 0, 0, grafted
+    point2 = 0.99  0.14 0, 0, 2 gGreen
+    point3 = 0.99 -0.14 0, 0, 2 gBlue
 }
 
 new 1 blob
 {
-    sphere1 = 0 0 0, 0.5, 50 grafted
-    sphere2 = 1 0 0, 0.5, 50 grafted
-    sphere3 = 2 0 0, 0.5, 50 grafted
+    point1 = 0 0 -1.1, 1.0
+    sphere2 =  0 0 0, 0.5, 50 gBlue equator 1 0.25
+    point3 = 0 0 +1.1, 1.0
+    point4 =  0 -0.5 0, 0, gGreen
+    point5 =  0  0.5 0, 0, gBlue
 }
 
 new 1 blob
 {
-    separation = 1.6
-    deviation = 0.1
-    sphere1 = 0 0 0, 1.0, 16 grafted, 16 grafted, 16 grafted, 16 grafted
+    sphere1 = 0 0 0, 0.5, 50 gGreen
+    sphere2 = 1 0 0, 0.6, 50 gBlue
+    sphere3 = 2 0 0, 0.7, 50 gGreen
+}
+
+new 1 blob
+{
+    separation = 1.7
+    deviation = 0.2
+    sphere1 = 0 0 0, 1.0, 16 gGreen, 16 gBlue, 16 gGreen, 16 gBlue
 }
 
 run system
