@@ -120,6 +120,7 @@ namespace gym
         {"light_red",     0xFF4444FF},
         {"lime",          0x00FF00FF},
         {"magenta",       0xFF00FFFF},
+        {"marengo",       0x4C5866FF},
         {"maroon",        0x810541FF},
         {"mauve",         0xCC3366FF},
         {"midnight",      0x003366FF},
