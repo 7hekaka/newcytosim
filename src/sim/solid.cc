@@ -452,7 +452,7 @@ index_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& va
         if ( dev > rad )
             throw InvalidParameter("solid:deviation should be <= radius");
         // attach Single on the surface of this sphere:
-        index_t nbs = opt.num_values(var) - 2;
+        size_t nbs = opt.num_values(var) - 2;
         std::vector<Vector> pts(nbs, Vector(0,0,0));
         distributePointsSphere(pts, sep/rad, 128);
         index_t inx = 2;
@@ -512,15 +512,15 @@ index_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& va
             if ( nam.empty() )
                 throw InvalidParameter("the name of a single should be specified in `"+str+"'");
             SingleProp const* sip = sim.findProperty<SingleProp>("single", nam);
-#if ( DIM > 1 )
-            if ( str == "cap" )
+#if ( DIM > 1 ) && NEW_SOLID_HAS_TWIN
+            if ( str == "cap111" )
             {
-                Rotation rot = Rotation::align111();
-                real cap = 0.18;
                 // distribute points randomly over a portion of the unit sphere:
+                const real cap = 0.18;
+                Rotation rot = Rotation::align111();
                 std::vector<Vector> pts(num, Vector(0,0,0));
-                index_t cnt = tossPointsCap(pts, cap, 1024);
-                for ( index_t i = 0; i < cnt; ++i )
+                size_t cnt = tossPointsCap(pts, cap, 1024);
+                for ( size_t i = 0; i < cnt; ++i )
                 {
                     Wrist * w = sip->newWrist(this, ref, -rot.trans_vecmul(pts[i]));
                     objs.push_back(w);
@@ -528,7 +528,7 @@ index_t Solid::makeSphere(ObjectList& objs, Glossary& opt, std::string const& va
             }
             else
 #endif
-                if ( str.size() )
+            if ( str.size() )
                 addWrists(objs, num, sip, ref, str);
             else
             {
