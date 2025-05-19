@@ -478,7 +478,7 @@ public:
                        val[2] * R[0] + val[4] * R[1] + val[5] * R[2]);
     }
     
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul_(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[1] * V.YY + val[2] * V.ZZ,
@@ -486,7 +486,7 @@ public:
                        val[2] * V.XX + val[4] * V.YY + val[5] * V.ZZ);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul_(real const* R) const
     {
         return Vector3(val[0] * R[0] + val[1] * R[1] + val[2] * R[2],
@@ -520,7 +520,7 @@ public:
         return mat.vecmul(vec);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX33SYM_USES_SSE && VECTOR3_USES_AVX

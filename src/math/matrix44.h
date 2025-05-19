@@ -427,7 +427,7 @@ public:
         return fmadd4(load4(val+8), zzzz, add4(xxxx, yyyy));
     }
 
-    /// multiplication by a 3-components vector: transpose(M) * V
+    /// transpose-multiplication by a 3-components vector: transpose(M) * V
     const vec4 trans_vecmul3_avx(double const* V) const
     {
         vec4 vec = loadu4(V); // { x, y, z, garbage }
@@ -440,7 +440,7 @@ public:
         return add4(catshift2(s0, s2), blend22(s0, s2));
     }
 
-    /// multiplication by a 4-components vector: this * V
+    /// transpose-multiplication by a 4-components vector: this * V
     const vec4 vecmul4_avx(vec4 const& vec) const
     {
         vec4 p = swap2f128(vec);
@@ -453,7 +453,7 @@ public:
         return add4(x, y);
     }
     
-    /// multiplication by a 4-components vector: transpose(this) * V
+    /// transpose-multiplication by a 4-components vector: transpose(this) * V
     const vec4 trans_vecmul4_avx(vec4 const& vec) const
     {
         vec4 s0 = mul4(load4(val   ), vec);
@@ -474,7 +474,7 @@ public:
                     val[0x2] * R[0] + val[0x6] * R[1] + val[0xA] * R[2], 0};
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     const vec4 trans_vecmul3_avx(real const* R) const
     {
         return vec4{val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2],
@@ -491,7 +491,7 @@ public:
                     val[0x3] * R[0] + val[0x7] * R[1] + val[0xB] * R[2] + val[0xF] * R[3]};
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     const vec4 trans_vecmul4_avx(real const* R) const
     {
         return vec4{val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2] + val[0x3] * R[3],
@@ -518,7 +518,7 @@ public:
                        val[0x2] * R[0] + val[0x6] * R[1] + val[0xA] * R[2]);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul3_(Vector3 const& V) const
     {
         return Vector3(val[0x0] * V.XX + val[0x1] * V.YY + val[0x2] * V.ZZ,
@@ -526,7 +526,7 @@ public:
                        val[0x8] * V.XX + val[0x9] * V.YY + val[0xA] * V.ZZ);
     }
     
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul3_(real const* R) const
     {
         return Vector3(val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2],
@@ -546,7 +546,7 @@ public:
 #endif
     }
 
-    /// multiplication by a vector: this * V
+    /// transpose-multiplication by a vector: transpose(this) * V
     Vector3 trans_vecmul3(Vector3 const& vec) const
     {
 #if MATRIX44_USES_AVX
@@ -573,7 +573,7 @@ public:
                        val[0x3] * V.XX + val[0x7] * V.YY + val[0xB] * V.ZZ + val[0xF] * V.TT);
     }
     
-    /// multiplication by a vector: transpose(this) * V
+    /// multiplication by a vector: this * V
     Vector4 vecmul4_(real const* R) const
     {
         return Vector4(val[0x0] * R[0] + val[0x4] * R[1] + val[0x8] * R[2] + val[0xC] * R[3],
@@ -582,7 +582,7 @@ public:
                        val[0x3] * R[0] + val[0x7] * R[1] + val[0xB] * R[2] + val[0xF] * R[3]);
     }
     
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector4 trans_vecmul4_(Vector4 const& V) const
     {
         return Vector4(val[0x0] * V.XX + val[0x1] * V.YY + val[0x2] * V.ZZ + val[0x3] * V.TT,
@@ -591,7 +591,7 @@ public:
                        val[0xC] * V.XX + val[0xD] * V.YY + val[0xE] * V.ZZ + val[0xF] * V.TT);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector4 trans_vecmul4_(real const* R) const
     {
         return Vector4(val[0x0] * R[0] + val[0x1] * R[1] + val[0x2] * R[2] + val[0x3] * R[3],
@@ -612,7 +612,7 @@ public:
 #endif
     }
 
-    /// multiplication by a vector: this * V
+    /// transpose-multiplication by a vector: this * V
     Vector4 trans_vecmul(Vector4 const& vec) const
     {
 #if MATRIX44_USES_AVX && VECTOR3_USES_AVX

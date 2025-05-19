@@ -454,7 +454,7 @@ public:
 #endif
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     static const vec2 trans_vecmul2_avx(vec4 const& mat, real const* V)
     {
 #if 0
@@ -548,21 +548,21 @@ public:
         return mat.vecmul(vec);
     }
 
-    /// multiplication by a vector: this * V
+    /// transpose-multiplication by a vector: transpose(this) * V
     Vector2 trans_vecmul_(Vector2 const& V) const
     {
         return Vector2(val[0] * V.XX + val[1] * V.YY,
                        val[2] * V.XX + val[3] * V.YY);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(this) * V
     Vector2 trans_vecmul_(real const* R) const
     {
         return Vector2(val[0] * R[0] + val[1] * R[1],
                        val[2] * R[0] + val[3] * R[1]);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector2 trans_vecmul(real const* ptr) const
     {
 #if MATRIX22_USES_AVX

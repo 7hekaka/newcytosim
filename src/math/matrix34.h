@@ -560,7 +560,7 @@ public:
         return add4(catshift2(s0, s2), blend22(s0, s2));
     }
     
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     const vec4 trans_vecmul3_avx(double const* V) const
     {
         vec4 xyxy = broadcast2(V);
@@ -589,7 +589,7 @@ public:
                        val[LVD*2] * R[0] + val[1+LVD*2] * R[1] + val[2+LVD*2] * R[2]);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul_(Vector3 const& V) const
     {
         return Vector3(val[0] * V.XX + val[  LVD] * V.YY + val[  LVD*2] * V.ZZ,
@@ -597,7 +597,7 @@ public:
                        val[2] * V.XX + val[2+LVD] * V.YY + val[2+LVD*2] * V.ZZ);
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul_(real const* R) const
     {
         return Vector3(val[0] * R[0] + val[  LVD] * R[1] + val[  LVD*2] * R[2],
@@ -627,7 +627,7 @@ public:
 #endif
     }
 
-    /// multiplication by a vector: transpose(M) * V
+    /// transpose-multiplication by a vector: transpose(M) * V
     Vector3 trans_vecmul(real const* V) const
     {
 #if MATRIX34_USES_AVX
