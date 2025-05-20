@@ -10,7 +10,7 @@ set simul system
 {
     time_step = 0.01
     viscosity = 0.2
-    display = ( delay=4; )
+    display = ( delay=4; window_size=1280,512; point_size=12; )
 }
 
 set space cell
@@ -20,7 +20,7 @@ set space cell
 
 new cell
 {
-    length = 40, 40, 2
+    length = 60, 20, 2
 }
 
 set fiber microtubule
@@ -29,19 +29,23 @@ set fiber microtubule
     segmentation = 1
     max_length = 20
 
-    activity = grow
+    activity = classic
     growing_speed = 0.18
     growing_force = 1.7
+    catastrophe_rate = 0.02
+    shrinking_speed = -0.36
 
-    display = ( lines=4,2; points=4,0; plus_end=8, 2; )
+    display = ( lines=1; plus_end=8, 2; )
 }
 
 set hand regulator
 {
     binding = 10, 0.05
     unbinding = 0, inf
-    bind_only_end = plus_end, 0.1
+    bind_only_end = plus_end, 0.200
     activity = regulate
+    
+    display = ( size=12; color=green; )
 }
 
 set single simplex
@@ -50,7 +54,7 @@ set single simplex
     diffusion = 1
 }
 
-new 100 simplex
+new 200 simplex
 
 new 0 microtubule
 {
