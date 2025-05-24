@@ -697,6 +697,7 @@ void Display3::drawFiberLatticeEdges(Fiber const& fib, VisibleLattice const& lat
  - 5: arrow-head in reverse direction
  - 6: cube
  - 7: cylinder placed backward so as to overlap with the fiber
+ - 8: hemisphere at the tip
  .
  with 3D objects
  */
@@ -727,6 +728,7 @@ void Display3::drawFiberEndMinus(Fiber const& fib, int style, float size) const
  - 5: arrow-head in reverse direction
  - 6: cube
  - 7: cylinder placed backward so as to overlap with the fiber
+ - 8: hemisphere at the tip
  .
  with 3D objects
  */
