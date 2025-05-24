@@ -905,12 +905,12 @@ void processKey(unsigned char key, int modifiers = 0)
             if ( worker.goodFile() )
                 player.rewind();
             else
-                player.restart();
+                player.restart(0);
             break;
             
         case 'Z':
             worker.cancel_join();
-            player.restart();
+            player.restart(1);
             break;
             
         case 'a':

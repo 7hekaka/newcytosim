@@ -59,8 +59,8 @@ public:
     /// initialize display
     void initialize();
   
-    /// cleanup
-    void clear();
+    /// release memory
+    void destroy();
 
     /// ask to redraw the scene
     void refresh();
@@ -116,7 +116,7 @@ public:
     void startstop();
     
     /// reset the sim-state and timer
-    void restart();
+    void restart(int);
 
     /// load previous frame
     void previousFrame();

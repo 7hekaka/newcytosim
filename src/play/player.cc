@@ -21,17 +21,16 @@ Player::Player()
 
 Player::~Player()
 {
-    clear();
+    destroy();
 }
 
-void Player::clear()
+void Player::destroy()
 {
     worker.stop();
     worker.eraseSimul(1);
     mFiberDisp.erase();
     mPointDisp.erase();
-    if ( mDisplay )
-        delete(mDisplay);
+    delete(mDisplay);
     mDisplay = nullptr;
 }
 
@@ -196,14 +195,18 @@ void Player::extendLive()
 }
 
 
-void Player::restart()
+void Player::restart(int clear_disp)
 {
     try
     {
         worker.stop();
         worker.eraseSimul(1);
-        mFiberDisp.erase();
-        mPointDisp.erase();
+        if ( clear_disp )
+        {
+            // this will reset the display parameters of all objects:
+            mFiberDisp.erase();
+            mPointDisp.erase();
+        }
         worker.start();
     }
     catch( Exception & e ) {

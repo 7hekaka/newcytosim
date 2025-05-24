@@ -144,7 +144,7 @@ public:
     /// true if child thread is not running
     bool alone() const { return status_ != 0; }
 
-    /// true if child thread is running
+    /// true if child thread is (apparently) running
     bool alive() const { return status_ == 0; }
     
     /// return status of child process, which is 0 if alive and healthy
@@ -171,7 +171,7 @@ public:
     /// stop the simulation and wait for cleaning operations
     void cancel_join();
     
-    /// restart engine
+    /// gently restart the simulation engine
     void restart() { repeat_ = 1; signal(); };
 
     /// clear the simulation world
