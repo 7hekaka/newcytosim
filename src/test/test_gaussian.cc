@@ -16,7 +16,6 @@
 #include "simd.h"
 #include "simd_float.h"
 #include "simd_math.h"
-#include "../math/random_simd.cc"
 
 std::random_device device;
 
@@ -291,10 +290,6 @@ int main(int argc, char* argv[])
     
     run(sfmt, CNT, "Gauss.STD", makeGaussians_std);
     run(sfmt, CNT, "Gauss", makeGaussians_);
-#if USE_SIMD
-    run(sfmt, CNT, "Gauss.SIMD", makeGaussians_SIMD);
-    run(sfmt, CNT, "GauBM.SIMD", makeGaussiansBM_SIMD);
-#endif
 
 #if defined(__AVX__)
     run(sfmt, CNT, "GauBM.AVX", makeGaussiansBM_AVX);
@@ -304,11 +299,6 @@ int main(int argc, char* argv[])
     double one(1);
     run(sfmt, CNT, "Exponential", makeExponentials, one);
     run(sfmt, CNT, "Exponential_", makeExponentials_, one);
-#if USE_SIMD
-    run(sfmt, CNT, "Expon.SIMD", makeExponentials_SIMD, one);
-    //printf("\nSCAN makeExponentials_SIMD:\n");
-    //scan(16, 64, makeExponentials_SIMD);
-#endif
     //printf("\nSCAN makeExponentials_:\n");
     //scan(16, 64, makeExponentials_);
     printf("\n");

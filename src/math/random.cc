@@ -13,17 +13,6 @@
 thread_local Random RNG;
 
 
-/// use Vectorized makeGaussians(), if available (requires NEON/SSE3)
-#if  defined(__ARM_NEON__) || defined(__SSE4_1__)
-#  define RANDOM_USES_SIMD 0
-#  include "simd.h"
-#  include "simd_float.h"
-#  include "simd_math.h"
-#  include "random_simd.cc"
-#else
-#  define RANDOM_USES_SIMD 0
-#endif
-
 
 /// the most significant bit in a 32-bits integer
 [[maybe_unused]] constexpr uint32_t BIT31 = 1U << 31;
@@ -270,11 +259,7 @@ real * makeGaussians(real dst[], size_t cnt, const int32_t src[])
  */
 void Random::refill_gaussians()
 {
-#if ( RANDOM_USES_SIMD )
-    next_gaussian_ = makeGaussiansBM_SIMD(gaussians_, SFMT_N32, (uint32_t*)twister_.state);
-#else
     next_gaussian_ = makeGaussians(gaussians_, SFMT_N32, (int32_t*)twister_.state);
-#endif
     sfmt_gen_rand_all(&twister_);
 }
 
@@ -384,11 +369,7 @@ float * makeExponentials(float dst[], size_t cnt, const uint32_t src[])
 
 void Random::refill_exponentials()
 {
-#if ( RANDOM_USES_SIMD ) && defined(__ARM_NEON__)
-    float * ptr = makeExponentials_SIMD(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
-#else
     float * ptr = makeExponentials(exponentials_, SFMT_N32, (uint32_t*)twister_.state);
-#endif
     //assert_true( ptr == exponentials_ + SFMT_N32 );
     next_exponential_ = ptr;
     //printf("refill_exponentials\n");
