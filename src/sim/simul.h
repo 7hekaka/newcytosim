@@ -521,11 +521,11 @@ public:
     /// print summary of Fiber's lattice quantities
     void reportFiberLattice(std::ostream&, std::ostream&, Property const*) const;
     
-    /// print summary of Fiber's lattice quantities
-    void reportFiberMeshAverage(std::ostream&, std::ostream&, bool density, Property const*) const;
+    /// print values of Fiber's densities
+    void reportFiberDensityTotal(std::ostream&, std::ostream&, bool density, Property const*) const;
     
-    /// print summary of Fiber's lattice quantities
-    void reportFiberMesh(std::ostream&, std::ostream&, bool density, Property const*) const;
+    /// print summary of Fiber's densities
+    void reportFiberDensity(std::ostream&, std::ostream&, bool density, Property const*) const;
     
     
     /// print position of hands bound to fibers

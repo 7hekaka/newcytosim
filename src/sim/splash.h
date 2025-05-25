@@ -27,7 +27,7 @@ inline void print_version(std::ostream& os)
     os << "  Precision " << sizeof(real) << "\n";
 
     os << "   Fiber has lattice " << FIBER_HAS_LATTICE;
-    os << " mesh " << FIBER_HAS_MESH;
+    os << " density " << FIBER_HAS_DENSITY;
     os << " family " << FIBER_HAS_FAMILY;
     os << " glue " << FIBER_HAS_GLUE;
     os << " bind_closest " << BIND_CLOSEST_FIBER << "\n";

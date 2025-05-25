@@ -1977,7 +1977,7 @@ void Display::drawFiber(Fiber const& fib)
     FiberDisp const*const dis = fib.prop->disp;
     int style = dis->line_style;
     
-#if FIBER_HAS_LATTICE || FIBER_HAS_MESH
+#if FIBER_HAS_LATTICE || FIBER_HAS_DENSITY
     if ( dis->lattice_style )
     {
         VisibleLattice const* lat = fib.visibleLattice();
@@ -2132,7 +2132,7 @@ void Display::drawFiberTexts(FiberSet const& set)
         if ( fib->disp && fib->disp->visible > 0 )
         {
             FiberDisp const*const dis = fib->prop->disp;
-#if FIBER_HAS_LATTICE || FIBER_HAS_MESH
+#if FIBER_HAS_LATTICE || FIBER_HAS_DENSITY
             if ( dis->lattice_style == 5 )
             {
                 VisibleLattice const* lat = fib->visibleLattice();

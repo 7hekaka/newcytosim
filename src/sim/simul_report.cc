@@ -367,12 +367,12 @@ void Simul::report_one(std::ostream& out, std::ostream& com, std::string const& 
             return reportFiberLinks(out, com);
         if ( what == "lattice" )
             return reportFiberLattice(out, com, sel);
-        if ( what == "mesh" )
-            return reportFiberMeshAverage(out, com, false, sel);
-        if ( what == "mesh_density" )
-            return reportFiberMeshAverage(out, com, true, sel);
-        if ( what == "mesh_all" )
-            return reportFiberMesh(out, com, false, sel);
+        if ( what == "density" )
+            return reportFiberDensityTotal(out, com, false, sel);
+        if ( what == "density_avg" )
+            return reportFiberDensityTotal(out, com, true, sel);
+        if ( what == "density_all" )
+            return reportFiberDensity(out, com, false, sel);
         if ( what == "connector" )
             return reportFiberConnectors(out, com, opt);
         if ( what == "collision" )
@@ -851,7 +851,7 @@ void Simul::reportFiberNematic(std::ostream& out, std::ostream& com, Glossary& o
 
 
 //------------------------------------------------------------------------------
-#pragma mark - Fiber Lattice & Mesh
+#pragma mark - Fiber Lattice & Density
 
 
 /**
@@ -885,9 +885,9 @@ void Simul::reportFiberLattice(std::ostream& out, std::ostream& com, Property co
 
 
 /**
- Report quantity of substance in the fiber's Mesh
+ Report quantity of substance in the fiber's Density
  */
-void Simul::reportFiberMeshAverage(std::ostream& out, std::ostream& com, bool density, Property const* sel) const
+void Simul::reportFiberDensityTotal(std::ostream& out, std::ostream& com, bool density, Property const* sel) const
 {
     com << COM << ljust("class", 2, 2) << SEP << "total";
     com << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
@@ -898,7 +898,7 @@ void Simul::reportFiberMeshAverage(std::ostream& out, std::ostream& com, bool de
     for ( Fiber const* fib = fibers.first(); fib; fib = fib->next() )
     {
         if ( !sel || sel == fib->prop )
-            fib->infoMesh(len, cnt, vac, sum, mn, mx, density);
+            fib->infoDensity(len, cnt, vac, sum, mn, mx, density);
     }
     
     std::streamsize p = out.precision(4);
@@ -913,9 +913,9 @@ void Simul::reportFiberMeshAverage(std::ostream& out, std::ostream& com, bool de
 }
 
 /**
- Report quantity of substance in the fiber's Mesh
+ Report quantity of substance in the fiber's Density
  */
-void Simul::reportFiberMesh(std::ostream& out, std::ostream& com, bool density, Property const* sel) const
+void Simul::reportFiberDensity(std::ostream& out, std::ostream& com, bool density, Property const* sel) const
 {
     com << COM << ljust("fiber", 2, 2) << SEP << "total";
     com << SEP << "avg" << SEP << "min" << SEP << "max" << SEP << "length";
@@ -926,7 +926,7 @@ void Simul::reportFiberMesh(std::ostream& out, std::ostream& com, bool density, 
         real len = 0, sum = 0, mn = INFINITY, mx = -INFINITY;
         if ( !sel || sel == fib->prop )
         {
-            fib->infoMesh(len, cnt, vac, sum, mn, mx, density);
+            fib->infoDensity(len, cnt, vac, sum, mn, mx, density);
             std::streamsize p = out.precision(4);
             out << LIN << ljust(fib->reference(), 2);
             out << SEP << sum;

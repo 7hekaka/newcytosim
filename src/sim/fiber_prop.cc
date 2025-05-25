@@ -272,13 +272,13 @@ Fiber* FiberProp::newFiber(Glossary& opt) const
     
     fib->updateFiber();
     
-#if FIBER_HAS_MESH
-    if ( fib->mesh().ready() )
+#if FIBER_HAS_DENSITY
+    if ( fib->densityField().ready() )
     {
-        // enable mesh initialization
+        // enable density initialization
         real val = 0;
         if ( opt.set(val, "mesh_value") )
-            fib->mesh().clear(val);
+            fib->densityField().clear(val);
     }
 #endif
 #if NEW_FIBER_SILHOUETTE
@@ -315,15 +315,15 @@ void FiberProp::clear()
     lattice      = 0;
     lattice_unit = 0;
     save_lattice = 0;
-#if FIBER_HAS_MESH
-    mesh                = 0;
-    mesh_unit           = 0;
-    mesh_cut_fiber      = 0;
-    mesh_flux_speed     = 0;
-    mesh_binding_rate   = 0;
-    mesh_unbinding_rate = 0;
-    mesh_aging_rate     = 0;
-    mesh_aging_limit    = 1;
+#if FIBER_HAS_DENSITY
+    density                = 0;
+    density_unit           = 0;
+    density_cut_fiber      = 0;
+    density_flux_speed     = 0;
+    density_binding_rate   = 0;
+    density_unbinding_rate = 0;
+    density_aging_rate     = 0;
+    density_aging_limit    = 1;
 #endif
     confine = CONFINE_OFF;
     confine_stiff[0] = 0;
@@ -425,34 +425,36 @@ void FiberProp::read(Glossary& glos)
     glos.set(binding_key,  "binding_key");
     
     glos.set(lattice,      "lattice");
-    glos.set(lattice_unit, "lattice_unit") || glos.set(lattice_unit, "lattice", 1);
+    glos.set(lattice_unit, "lattice", 1, "lattice_unit", 1);
     glos.set(save_lattice, "save_lattice");
     
-#if FIBER_HAS_MESH
-    // the analog lattice containing 'real' values was named 'mesh' on 28.11.2019
-    glos.set(mesh,         "mesh");
-    glos.set(mesh_unit,    "mesh", 1, "mesh_unit", 0);
-
-#if FIBER_HAS_MESH
+#if FIBER_HAS_DENSITY
+    if ( glos.set(density, "density") )
+    {
+        glos.set(density_unit, "density", 1, "density_unit", 0);
+        glos.set(density_cut_fiber, "density_cut_fiber");
+        glos.set(density_flux_speed, "density_flux_speed");
+        glos.set(density_binding_rate, "density_binding_rate");
+        glos.set(density_unbinding_rate, "density_unbinding_rate");
+        glos.set(density_aging_rate, "density_aging_rate");
+        glos.set(density_aging_rate, "density_aging");
+        glos.set(density_aging_limit, "density_aging", 1);
+        glos.set(density_aging_limit, "density_aging_limit");
+    }
 #  ifdef BACKWARD_COMPATIBILITY
-    // parameters `lattice_*' were renamed `mesh_*' on 28.11.2019
-    glos.set(mesh_cut_fiber, "mesh_cut_fiber", "lattice_cut_fiber");
-    glos.set(mesh_flux_speed, "mesh_flux_speed", "lattice_flux_speed");
-    glos.set(mesh_binding_rate, "mesh_binding_rate", "lattice_binding_rate");
-    glos.set(mesh_unbinding_rate, "mesh_unbinding_rate", "lattice_unbinding_rate");
-    glos.set(mesh_aging_rate, "mesh_aging_rate", "lattice_aging_rate");
-#  else
-    glos.set(mesh_cut_fiber, "mesh_cut_fiber");
-    glos.set(mesh_flux_speed, "mesh_flux_speed");
-    glos.set(mesh_binding_rate, "mesh_binding_rate");
-    glos.set(mesh_unbinding_rate, "mesh_unbinding_rate");
-    glos.set(mesh_aging_rate, "mesh_aging_rate");
+    // parameters `lattice_*' were renamed `mesh_*' on 28.11.2019 and `density_*' on 25.05.2025
+    else if ( glos.set(density, "mesh") )
+    {
+        glos.set(density_unit, "mesh", 1, "mesh_unit", 0);
+        glos.set(density_cut_fiber, "mesh_cut_fiber");
+        glos.set(density_flux_speed, "mesh_flux_speed");
+        glos.set(density_binding_rate, "mesh_binding_rate");
+        glos.set(density_unbinding_rate, "mesh_unbinding_rate");
+        glos.set(density_aging_rate, "mesh_aging_rate");
+    }
 #  endif
-    glos.set(mesh_aging_rate, "mesh_aging");
-    glos.set(mesh_aging_limit, "mesh_aging", 1);
-    glos.set(mesh_aging_limit, "mesh_aging_limit");
 #endif
-#endif
+    
     glos.set(confine, "confine", {{"off",       CONFINE_OFF},
                                   {"on",        CONFINE_ON},
                                   {"inside",    CONFINE_INSIDE},
@@ -650,13 +652,13 @@ void FiberProp::complete(Simul const& sim)
 #endif
     }
 
-#if FIBER_HAS_MESH
-    if ( mesh && primed(sim) )
+#if FIBER_HAS_DENSITY
+    if ( density && primed(sim) )
     {
-        if ( mesh_unit <= 0 )
-            throw InvalidParameter("fiber:mesh_unit (known as mesh[1]) must be specified and > 0");
+        if ( density_unit <= 0 )
+            throw InvalidParameter("fiber:density_unit (known as mesh[1]) must be specified and > 0");
         
-        if ( mesh_flux_speed != 0 || mesh_binding_rate != 0 || mesh_unbinding_rate != 0 )
+        if ( density_flux_speed != 0 || density_binding_rate != 0 || density_unbinding_rate != 0 )
         {
             if ( field.empty() )
                 throw InvalidParameter("fiber:mesh features require fiber:field to be specified");
@@ -665,16 +667,16 @@ void FiberProp::complete(Simul const& sim)
                 throw InvalidParameter("fiber:field not found");
         }
         
-        if ( mesh_aging_rate < 0 )
-            throw InvalidParameter("fiber:mesh_aging_rate must be >= 0");
-        if ( mesh_aging_limit < 0 )
-            throw InvalidParameter("fiber:mesh_aging_limit must be >= 0");
-        if ( mesh_aging_rate * time_step(sim) > 1 )
-            throw InvalidParameter("fiber:mesh_aging_rate is too high (unstable)");
+        if ( density_aging_rate < 0 )
+            throw InvalidParameter("fiber:density_aging_rate must be >= 0");
+        if ( density_aging_limit < 0 )
+            throw InvalidParameter("fiber:density_aging_limit must be >= 0");
+        if ( density_aging_rate * time_step(sim) > 1 )
+            throw InvalidParameter("fiber:density_aging_rate is too high (unstable)");
     }
 
-    if ( mesh_aging_rate > 0 && !mesh && primed(sim) )
-        throw InvalidParameter("for `mesh_aging_rate', the mesh must be defined");
+    if ( density_aging_rate > 0 && !density && primed(sim) )
+        throw InvalidParameter("for `density_aging_rate', the mesh must be defined");
 #endif
 
     if ( rigidity < 0 )
@@ -758,13 +760,13 @@ void FiberProp::write_values(std::ostream& os) const
 #endif
     write_value(os, "binding_key",         binding_key);
     write_value(os, "lattice",             lattice, lattice_unit);
-#if FIBER_HAS_MESH
-    write_value(os, "mesh",                mesh, mesh_unit);
-    write_value(os, "mesh_cut_fiber",      mesh_cut_fiber);
-    write_value(os, "mesh_flux_speed",     mesh_flux_speed);
-    write_value(os, "mesh_binding_rate",   mesh_binding_rate);
-    write_value(os, "mesh_unbinding_rate", mesh_unbinding_rate);
-    write_value(os, "mesh_aging", mesh_aging_rate, mesh_aging_limit);
+#if FIBER_HAS_DENSITY
+    write_value(os, "density",                density, density_unit);
+    write_value(os, "density_cut_fiber",      density_cut_fiber);
+    write_value(os, "density_flux_speed",     density_flux_speed);
+    write_value(os, "density_binding_rate",   density_binding_rate);
+    write_value(os, "density_unbinding_rate", density_unbinding_rate);
+    write_value(os, "density_aging", density_aging_rate, density_aging_limit);
 #endif
     write_value(os, "confine", confine, confine_stiff[0], confine_stiff[1], confine_spec);
 #if NEW_FIBER_CONFINE2

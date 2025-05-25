@@ -538,7 +538,7 @@ static void changeSpeckleSize(FiberDisp* p, int inc)
 
 static void changeLatticeStyle(FiberDisp* p, int)
 {
-#if FIBER_HAS_LATTICE || FIBER_HAS_MESH
+#if FIBER_HAS_LATTICE || FIBER_HAS_DENSITY
     p->lattice_style = ( 1 + p->lattice_style ) % 5;
     flashText("%s: lattice_style=%i", p->name_str(), p->lattice_style);
 #else

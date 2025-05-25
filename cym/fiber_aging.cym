@@ -2,7 +2,7 @@
 % FJN, Strasbourg 19.09.2018
 
 % Cytosim should be compiled specifically with:
-% #define FIBER_HAS_MESH  1
+% #define FIBER_HAS_DENSITY  1
 
 set simul system
 {

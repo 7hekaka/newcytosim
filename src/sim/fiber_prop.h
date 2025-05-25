@@ -28,8 +28,8 @@ class Space;
 #define NEW_FIBER_SILHOUETTE 0
 #define NEW_FIBER_MAKE_COUPLE 0
 
-/// Flag to add a Lattice of reals to each Fiber {0, 1}
-#define FIBER_HAS_MESH 0
+/// Flag to add a line field of reals to each Fiber {0, 1}
+#define FIBER_HAS_DENSITY 1
 
 /// Property for a Fiber
 /**
@@ -192,33 +192,33 @@ public:
     /// save lattice in files
     bool save_lattice;
     
-#if FIBER_HAS_MESH
+#if FIBER_HAS_DENSITY
     /// if true, associate an analog lattice
-    int mesh;
+    int density;
     
     /// unit length associated with the analog Lattice
-    real mesh_unit;
+    real density_unit;
     
     /// if true, the quantities in the lattice can cut the fiber
-    int mesh_cut_fiber;
+    int density_cut_fiber;
 
     /// flux speed of substance on Lattice (speed<0 is minus end directed)
-    real mesh_flux_speed;
+    real density_flux_speed;
     
     /// loading rate of substance from Field to Lattice
     /**
      This is a binding rate per unit time and per unit length of Fiber.
      Binding is proportional to the concentration of substance in the field.
      */
-    real mesh_binding_rate;
+    real density_binding_rate;
 
     /// unloading rate of substance from Lattice to Field (unit is 1/second)
-    real mesh_unbinding_rate;
+    real density_unbinding_rate;
     
-    real mesh_aging_rate;
+    real density_aging_rate;
     
     /// set mesh to evolve from 0 towards equilibrium at 1, with given rate
-    real mesh_aging_limit;
+    real density_aging_limit;
 #endif
     
     /// flag controlling the forces exerted by Space on fiber points

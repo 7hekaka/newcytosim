@@ -4,7 +4,7 @@
 
 % Compile to support necessary features:
 % #define NEW_VARIABLE_SPEED 1
-% #define FIBER_HAS_MESH 1
+% #define FIBER_HAS_DENSITY 1
 
 set simul system
 {

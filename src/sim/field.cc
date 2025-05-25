@@ -515,7 +515,7 @@ void Field::step(FiberSet& fibers)
     }
     
     // direct cutting of fiber
-    // this is deprecated in favor of fiber:mesh_cut_fiber
+    // this is deprecated in favor of fiber:density_cut_fiber
     if ( prop->cut_fibers )
     {
         LOG_ONCE("!!!! Field severs fibers\n");

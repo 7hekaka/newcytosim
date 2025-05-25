@@ -71,37 +71,37 @@ void Fiber::step()
         updateHands();
     assert_false(needUpdate);
     
-#if FIBER_HAS_MESH
-    //std::clog << reference() << " mesh " << std::fixed << fMesh->data(0) << '\n';
-    //std::clog << reference() << " mesh sum = " << fMesh->sum() << "     ";
+#if FIBER_HAS_DENSITY
+    //std::clog << reference() << " mesh " << std::fixed << fDensity->data(0) << '\n';
+    //std::clog << reference() << " mesh sum = " << fDensity->sum() << "     ";
     const real tau = time_step(simul());
     
-    if ( prop->mesh_binding_rate > 0 || prop->mesh_unbinding_rate > 0 )
+    if ( prop->density_binding_rate > 0 || prop->density_unbinding_rate > 0 )
     {
-        real on  = prop->mesh_binding_rate * tau;
-        real off = -std::expm1( -prop->mesh_unbinding_rate * tau );
-        equilibrateMesh(fMesh, prop->field_ptr, on, off);
+        real on  = prop->density_binding_rate * tau;
+        real off = -std::expm1( -prop->density_unbinding_rate * tau );
+        equilibrateDensity(fDensity, prop->field_ptr, on, off);
     }
     
-    if ( prop->mesh_flux_speed != 0 )
-        fluxMesh(fMesh, prop->field_ptr, prop->mesh_flux_speed);
+    if ( prop->density_flux_speed != 0 )
+        fluxDensity(fDensity, prop->field_ptr, prop->density_flux_speed);
     
-    if ( prop->mesh_cut_fiber )
-        cutFiberMesh(fMesh);
+    if ( prop->density_cut_fiber )
+        cutFiberByDensity(fDensity);
     
-    if ( prop->mesh_aging_rate > 0 )
+    if ( prop->density_aging_rate > 0 )
     {
         /*
          This implements an evolution toward equilibrium,
          starting from a value of 0, and reached for a value of 1,
-         with a time-scale given by 'mesh_aging_rate'.
+         with a time-scale given by 'density_aging_rate'.
          */
-        real cst = prop->mesh_aging_rate * tau;
-        real fac = 1 - cst / prop->mesh_aging_limit;
-        evolveMeshValues(fMesh, cst, fac);
-        //std::clog << reference() << " lattice avg = " << fMesh->sum()*fMesh->unit()/length() << '\n';
+        real cst = prop->density_aging_rate * tau;
+        real fac = 1 - cst / prop->density_aging_limit;
+        evolveDensity(fDensity, cst, fac);
+        //std::clog << reference() << " lattice avg = " << fDensity->sum()*fDensity->unit()/length() << '\n';
     }
-    //std::clog << fMesh->sum() << '\n';
+    //std::clog << fDensity->sum() << '\n';
 #endif
 }
 
@@ -227,13 +227,13 @@ Fiber::Fiber(FiberProp const* p)
             //throw InvalidParameter("Cytosim does not support fiber:lattice");
 #endif
         }
-#if FIBER_HAS_MESH
-        if ( prop->mesh )
+#if FIBER_HAS_DENSITY
+        if ( prop->density )
         {
-            if ( prop->mesh_unit < REAL_EPSILON )
-                throw InvalidParameter("the Mesh unit (mesh[1]) must be > 0");
-            //Cytosim::log(reference(),  " new Mesh", '\n');
-            fMesh.setUnit(prop->mesh_unit);
+            if ( prop->density_unit < REAL_EPSILON )
+                throw InvalidParameter("the density unit length (density[1]) must be > 0");
+            //Cytosim::log(reference(),  " new Density", '\n');
+            fDensity.setUnit(prop->density_unit);
         }
 #endif
     }
@@ -279,9 +279,9 @@ void Fiber::adieu()
     //std::clog << reference() << " deleted\n";
     fHands.detachAll();
     
-#if FIBER_HAS_MESH
-    if ( fMesh.data() && prop->field_ptr )
-        releaseMeshValues(fMesh, prop->field_ptr);
+#if FIBER_HAS_DENSITY
+    if ( fDensity.data() && prop->field_ptr )
+        releaseDensity(fDensity, prop->field_ptr);
 #endif
 
 #if FIBER_HAS_GLUE
@@ -436,12 +436,12 @@ Fiber* Fiber::severJoint(index_t pti)
     assert_true(fib->abscissaM() == abs);
     fib->updateRange(nullptr);
 
-#if FIBER_HAS_MESH
-    if ( fMesh.data() )
+#if FIBER_HAS_DENSITY
+    if ( fDensity.data() )
     {
-        assert_true( fMesh.unit() == fib->fMesh.unit() );
+        assert_true( fDensity.unit() == fib->fDensity.unit() );
         // transfer Lattice values located above the cut
-        fib->fMesh.takeP(fMesh, fMesh.index_round(abs));
+        fib->fDensity.takeP(fDensity, fDensity.index_round(abs));
     }
 #endif
 
@@ -501,12 +501,12 @@ Fiber* Fiber::severSegment(real dis1, real dis2)
     // initialize Lattice on new piece
     fib->updateRange(nullptr);
 
-#if FIBER_HAS_MESH
-    if ( fMesh.data() )
+#if FIBER_HAS_DENSITY
+    if ( fDensity.data() )
     {
-        assert_true( fMesh.unit() == fib->fMesh.unit() );
+        assert_true( fDensity.unit() == fib->fDensity.unit() );
         // transfer Lattice values located above the cut:
-        fib->fMesh.takeP(fMesh, fMesh.index_round(abscissaM()+dis2));
+        fib->fDensity.takeP(fDensity, fDensity.index_round(abscissaM()+dis2));
     }
 #endif
     
@@ -735,12 +735,12 @@ void Fiber::join(Fiber * fib)
     //transfer dynamic state of plus end:
     setEndStateP(fib->endStateP());
 
-#if FIBER_HAS_MESH
-    if ( fMesh.data() )
+#if FIBER_HAS_DENSITY
+    if ( fDensity.data() )
     {
-        assert_true( fMesh.unit() == fib->fMesh.unit() );
+        assert_true( fDensity.unit() == fib->fDensity.unit() );
         // transfer Lattice values from other fiber
-        fMesh.takeP(fib->fMesh, fMesh.indexM());
+        fDensity.takeP(fib->fDensity, fDensity.indexM());
     }
 #endif
 
@@ -1293,22 +1293,22 @@ void Fiber::updateRange(Field* field)
         fLattice.setRange(abscissaM(), abscissaP());
     }
 #endif
-#if FIBER_HAS_MESH
+#if FIBER_HAS_DENSITY
     // this will allocate the Lattice's site to cover the range of Abscissa:
-    if ( fMesh.ready() )
+    if ( fDensity.ready() )
     {
-        fMesh.setRange(abscissaM(), abscissaP());
+        fDensity.setRange(abscissaM(), abscissaP());
         
         if ( field )
         {
             real sumM;
             // release Lattice substance located outside the valid abscissa range
-            fMesh.collectM(sumM);
+            fDensity.collectM(sumM);
             field->cell(posEndM()) += sumM;
             //Cytosim::log(" Fiber::MINUS_END releases ", sumM, '\n');
             
             real sumP;
-            fMesh.collectP(sumP);
+            fDensity.collectP(sumP);
             field->cell(posEndP()) += sumP;
             //Cytosim::log(" Fiber::PLUS_END releases ", sumP, '\n');
         }
@@ -1417,9 +1417,9 @@ void Fiber::infoLattice(size_t& cnt, size_t& vac, real& sum, real& mn, real& mx)
 
 VisibleLattice const* Fiber::visibleLattice() const
 {
-#if FIBER_HAS_MESH
-    if ( fMesh.data() )
-        return &fMesh;
+#if FIBER_HAS_DENSITY
+    if ( fDensity.data() )
+        return &fDensity;
 #elif FIBER_HAS_LATTICE
     if ( fLattice.data() )
         return &fLattice;
@@ -1428,13 +1428,13 @@ VisibleLattice const* Fiber::visibleLattice() const
 }
 
 //------------------------------------------------------------------------------
-#pragma mark - Mesh
+#pragma mark - Density line field
 
-#if FIBER_HAS_MESH
+#if FIBER_HAS_DENSITY
 
 /**
  */
-void Fiber::setMeshValues(Lattice<real>& lat, real density) const
+void Fiber::setDensity(Lattice<real>& lat, real density) const
 {
     const real uni = lat.unit();
     assert_true( uni > 0 );
@@ -1463,12 +1463,12 @@ void Fiber::setMeshValues(Lattice<real>& lat, real density) const
 }
 
 /**
-Update all Mesh values according to:
+Update all density values according to:
 
     site[i] <- cst + fac * site[i]
 
  */
-void Fiber::evolveMeshValues(Lattice<real>& lat, real cst, real fac) const
+void Fiber::evolveDensity(Lattice<real>& lat, real cst, real fac) const
 {
     assert_false(lat.bad());
     const auto inf = lat.indexM();
@@ -1482,7 +1482,7 @@ void Fiber::evolveMeshValues(Lattice<real>& lat, real cst, real fac) const
 }
 
 
-void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real bind_rate) const
+void Fiber::bindDensity(Lattice<real>& lat, Field * fld, real bind_rate) const
 {
     assert_false(lat.bad());
     // we want roughly one point per cell:
@@ -1516,12 +1516,12 @@ void Fiber::bindMesh(Lattice<real>& lat, Field * fld, real bind_rate) const
 
 
 /**
- Release a fraction 'frac' of the Mesh substance into the Field.
+ Release a fraction 'frac' of the density substance into the Field.
  The substance in each Lattice site is released in a cell
  corresponding to a random position within this site.
  The factor `frac` must be between 0 and 1.
  */
-void Fiber::equilibrateMesh(Lattice<real>& lat, Field * fld, real on, real off) const
+void Fiber::equilibrateDensity(Lattice<real>& lat, Field * fld, real on, real off) const
 {
     const real uni = lat.unit();
     assert_true( uni > 0 );
@@ -1567,7 +1567,7 @@ void Fiber::equilibrateMesh(Lattice<real>& lat, Field * fld, real on, real off) 
 }
 
 
-void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
+void Fiber::fluxDensity(Lattice<real>& lat, Field * fld, real speed) const
 {
     assert_false(lat.bad());
     const auto inf = lat.indexM();
@@ -1578,7 +1578,7 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
     const real fac = speed * time_step(simul()) / lat.unit();
     
     if ( abs_real(fac) > 1 )
-        throw InvalidParameter("mesh_flux_speed * time_step / lattice_unit is too high");
+        throw InvalidParameter("density_flux_speed * time_step / lattice_unit is too high");
 
     if ( fac < 0 )
     {
@@ -1604,11 +1604,11 @@ void Fiber::fluxMesh(Lattice<real>& lat, Field * fld, real speed) const
 
 
 /**
- Release all Mesh substance into the Field.
+ Release all Density substance into the Field.
  The substance in each Lattice site is released in a cell
  corresponding to a random position within this site.
  */
-void Fiber::releaseMeshValues(Lattice<real>& lat, Field * fld) const
+void Fiber::releaseDensity(Lattice<real>& lat, Field * fld) const
 {
     const real uni = lat.unit();
     assert_true( uni > 0 );
@@ -1626,7 +1626,7 @@ void Fiber::releaseMeshValues(Lattice<real>& lat, Field * fld) const
 }
 
 
-void Fiber::cutFiberMesh(Lattice<real>& lat)
+void Fiber::cutFiberByDensity(Lattice<real>& lat)
 {
     const real uni = lat.unit();
     assert_true( uni > 0 );
@@ -1682,10 +1682,10 @@ void Fiber::cutFiberMesh(Lattice<real>& lat)
 
 #endif
 
-void Fiber::infoMesh(real& len, size_t& cnt, size_t& vac, real& sm, real& mn, real& mx, bool density) const
+void Fiber::infoDensity(real& len, size_t& cnt, size_t& vac, real& sm, real& mn, real& mx, bool density) const
 {
-#if FIBER_HAS_MESH
-    Lattice<real> const& lat = fMesh;
+#if FIBER_HAS_DENSITY
+    Lattice<real> const& lat = fDensity;
     if ( lat.data() )
     {
         len += length();
@@ -1933,13 +1933,13 @@ void Fiber::write(Outputter& out) const
         fLattice.write(out, fLattice.indexM(), fLattice.indexP()+1);
     }
 #endif
-#if FIBER_HAS_MESH
-    if ( fMesh.data() )
+#if FIBER_HAS_DENSITY
+    if ( fDensity.data() )
     {
         writeMarker(out, FIBMESH_TAG);
-        // fMesh.write(out);
+        // fDensity.write(out);
         // only write information corresponding to actual Fiber abscissa range:
-        fMesh.write(out, fMesh.indexM(), fMesh.indexP()+1);
+        fDensity.write(out, fDensity.indexM(), fDensity.indexP()+1);
     }
 #endif
 }
@@ -1993,9 +1993,9 @@ void Fiber::read(Inputter& in, Simul& sim, ObjectTag tag)
     }
     else if ( tag == FIBMESH_TAG )
     {
-#if FIBER_HAS_MESH
-        fMesh.read(in);
-        //real S = fMesh.sum();
+#if FIBER_HAS_DENSITY
+        fDensity.read(in);
+        //real S = fDensity.sum();
         //if ( S ) std::cerr << reference() << " sum(mesh) = " << S << "\n";
 #else
         Lattice<real> dummy;

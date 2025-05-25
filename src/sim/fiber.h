@@ -49,7 +49,7 @@ typedef Lattice<real> FiberLattice;
 
 
 /// type of lattice that will be displayed in play:
-#if FIBER_HAS_MESH
+#if FIBER_HAS_DENSITY
 typedef Lattice<real> VisibleLattice;
 #else
 typedef FiberLattice VisibleLattice;
@@ -106,9 +106,9 @@ private:
     /// Associated Lattice used for occupancy of Digit
     mutable FiberLattice fLattice;
 #endif
-#if FIBER_HAS_MESH
+#if FIBER_HAS_DENSITY
     /// Associated Lattice of reals
-    mutable Lattice<real> fMesh;
+    mutable Lattice<real> fDensity;
 #endif
 #if FIBER_HAS_GLUE
     /// a grafted used to immobilize the Fiber
@@ -241,7 +241,7 @@ public:
     /// implements some growth/shrinkage at the ends as part of a simulation step
     bool updateLength(real, real, bool split = true);
     
-    /// update Lattice and Mesh ranges
+    /// update Lattice and Density ranges
     void updateRange(Field*);
 
     /// should be called if any Fiber tip has elongated or shortened
@@ -379,39 +379,39 @@ public:
     /// print Lattice data (for debugging purpose)
     void printLattice(std::ostream&) const;
 
-#if FIBER_HAS_MESH
+#if FIBER_HAS_DENSITY
 
-    /// modifiable reference to Fiber's mesh
-    Lattice<real>& mesh() { return fMesh; }
+    /// modifiable reference to Fiber's density object
+    Lattice<real>& densityField() { return fDensity; }
 
-    /// value of the fMesh at given abscissa
-    real meshValue(real a) const { if ( fMesh.ready() ) return fMesh.cell(a); return 0; }
+    /// value of the density at given abscissa
+    real density(real a) const { if ( fDensity.ready() ) return fDensity.cell(a); return 0; }
 
 #endif
     
     /// initialize lattice sites to represent a constant linear density
-    void setMeshValues(Lattice<real>&, real density) const;
+    void setDensity(Lattice<real>&, real density) const;
 
     /// transfer all lattice substance to the Field
-    void releaseMeshValues(Lattice<real>&, Field*) const;
+    void releaseDensity(Lattice<real>&, Field*) const;
 
     /// update lattice values as `value <- cst + fac * value`
-    void evolveMeshValues(Lattice<real>&, real cst, real fac) const;
+    void evolveDensity(Lattice<real>&, real cst, real fac) const;
 
     /// transfer from Field to Lattice at rate `on` and back at rate `off`
-    void equilibrateMesh(Lattice<real>&, Field*, real on, real off) const;
+    void equilibrateDensity(Lattice<real>&, Field*, real on, real off) const;
     
     /// transfer from Field to Lattice at rate `on`
-    void bindMesh(Lattice<real>&, Field*, real rate) const;
+    void bindDensity(Lattice<real>&, Field*, real rate) const;
     
     /// transfer from Field to Lattice at rate `on`
-    void fluxMesh(Lattice<real>&, Field*, real speed) const;
+    void fluxDensity(Lattice<real>&, Field*, real speed) const;
     
     /// sever fiber proportionally to the quantity stored in the Lattice
-    void cutFiberMesh(Lattice<real>&);
+    void cutFiberByDensity(Lattice<real>&);
 
-    /// find minium, maximum and sum of mesh values
-    void infoMesh(real& len, size_t&, size_t&, real& sm, real& mn, real& mx, bool density) const;
+    /// find minium, maximum and sum of density values
+    void infoDensity(real& len, size_t&, size_t&, real& sm, real& mn, real& mx, bool density) const;
 
     /// lattice to be displayed
     VisibleLattice const* visibleLattice() const;

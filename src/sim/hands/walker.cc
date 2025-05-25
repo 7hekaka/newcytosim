@@ -45,7 +45,7 @@ void Walker::stepUnloaded()
 
 #if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
-    R += prop()->variable_walking_rate_dt * fiber()->meshValue(abscissa());
+    R += prop()->variable_walking_rate_dt * fiber()->density(abscissa());
 #endif
     
     nextAct -= max_float(0, R);
@@ -86,7 +86,7 @@ void Walker::stepLoaded(Vector const& force)
 
 #if NEW_VARIABLE_WALK
     LOG_ONCE("Walker's speed is affected by Fiber's Lattice\n");
-    R += prop()->variable_walking_rate_dt * fiber()->meshValue(abscissa());
+    R += prop()->variable_walking_rate_dt * fiber()->density(abscissa());
 #endif
 
     nextAct -= max_float(0, R);
