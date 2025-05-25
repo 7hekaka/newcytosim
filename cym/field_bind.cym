@@ -36,9 +36,9 @@ set fiber filament
     segmentation = 0.5
 
     field = blue
-    mesh = 2, 0.05
-    mesh_binding_rate = 1
-    mesh_cut_fiber = 1
+    density = 2, 0.05
+    density_binding_rate = 1
+    density_cut_fiber = 1
 
     display = ( color=green; line_style=0; lattice=1, 0.1; line_width=8; )
 }

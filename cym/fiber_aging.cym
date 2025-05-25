@@ -1,4 +1,4 @@
-% Example illustrating mesh aging
+% Example illustrating aging of the fiber density 
 % FJN, Strasbourg 19.09.2018
 
 % Cytosim should be compiled specifically with:
@@ -24,8 +24,8 @@ new cell
 
 set fiber microtubule
 {
-    mesh = 1, 0.01
-    mesh_aging_rate = 0.1
+    density = 1, 0.01
+    density_aging_rate = 0.1
 
     rigidity = 20
     segmentation = 0.5

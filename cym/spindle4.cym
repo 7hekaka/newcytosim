@@ -62,8 +62,8 @@ set fiber filament
     steric = 1, 0.025
     squeeze = 1, 0.05, 1
     
-    mesh = 2, 0.05
-    mesh_cut_fiber = 1
+    density = 2, 0.05
+    density_cut_fiber = 1
 
     activity = dynamic
     growing_speed = 0.18

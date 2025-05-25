@@ -1,4 +1,4 @@
-% Test Motor's 'variable_speed' in combination with aging mesh
+% Test Motor's 'variable_speed' in combination with aging density
 %
 % FJN, Strasbourg 19.09.2018
 
@@ -24,8 +24,8 @@ set fiber microtubule
     segmentation = 0.128
     confine = inside, 200, cell
 
-    mesh = 1, 0.016
-    mesh_aging_rate = 0.01;
+    density = 1, 0.016
+    density_aging_rate = 0.01;
 
     min_length = 0.032
 
