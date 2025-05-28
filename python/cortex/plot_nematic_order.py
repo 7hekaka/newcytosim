@@ -117,7 +117,7 @@ def process(dirpath):
             return
         else:
             # attempt to generate report file:
-            print(f"plot_nematic_order.py makes {dirpath}/order.txt");
+            sys.stderr.write(f"plot_nematic_order.py makes {dirpath}/order.txt");
             args = ["report3", "fiber:nematic", "verbose=0"]
             subprocess.call(args, stdout=open(filename, 'w'))
     print(f'{dirpath}', end=' ')
