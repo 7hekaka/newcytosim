@@ -1058,9 +1058,9 @@ void Interface::execute_equilibrate(std::string const& name, Glossary& opt)
         {
             Property * pp = sim_->properties.find_or_die(name);
             if ( pp->category() == "single" )
-                sim_->singles.equilibrate();
+                sim_->singles.equilibrate(sim_->fibers, static_cast<SingleProp const*>(pp));
             else if ( pp->category() == "couple" )
-                sim_->singles.equilibrate();
+                sim_->couples.equilibrate(sim_->fibers, static_cast<CoupleProp const*>(pp));
             else
                 throw InvalidSyntax("can only equilibrate `single', `couple' or a class name");
         }

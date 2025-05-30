@@ -782,10 +782,20 @@ void Parser::parse_cut(std::istream& is)
 /**
  Attach Couple or Single to position on fibers
  
-     connect COUPLE_NAME
+     equilibrate COUPLE_NAME
      {
         
      }
+ 
+ or
+ 
+     equilibrate SINGLE_NAME
+     {
+        
+     }
+
+ This will call SingleSet::equilibrate() or CoupleSet::equilibrate
+ Attention: unfinished
  */
 void Parser::parse_equilibrate(std::istream& is)
 {
