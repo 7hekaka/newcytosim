@@ -19,8 +19,9 @@ from itertools import accumulate
 import statistics
 
 
-do_fit = 4 # number of coefficients for the fit
+do_fit = 3 # number of coefficients for the fit
 do_var = 1 # add variance
+do_count = 1 # add count on top of columns
 n_bins = 9 # number of angular bins within [0, 90]
 half_range = 1 # range is [0, 90] or [0, 180]
 output = 'swangle' # name of output image file
@@ -118,7 +119,7 @@ def plot_histogram(A, rK, rX, rZ):
                 kx, xz, z = bar_chart_deviation([round(k), round(x), round(z)], 512)
                 plt.errorbar(d, k/t, kx, color=col, capsize=3)
                 plt.errorbar(d, (k+x)/t, xz, color=col, capsize=3)
-    if 1:
+    if do_count:
         # add count of events in each bin:
         top = ax.bar(D, [0.02]*len(A), W, bottom=1, color='white')
         for rec, cnt in zip(top, T):
@@ -132,17 +133,22 @@ def plot_histogram(A, rK, rX, rZ):
             mA = A + list(reversed([ math.pi-x for x in A ]))
             mK = K + list(reversed(K))
             mX = X + list(reversed(X))
-            manyA = [ x * math.pi / 180 for x in range(0,90) ]
+            fineA = [ x * math.pi / 180 for x in range(0,90) ]
         else:
             mA = A
             mK = K
             mX = X
-            manyA = [ x * math.pi / 180 for x in range(0,180) ]
+            fineA = [ x * math.pi / 180 for x in range(0,180) ]
         C, S = fourier_coefficients(mA, mK, do_fit)
-        off = fourier_plot(ax, manyA, C, S, do_fit)
+        off = fourier_plot(ax, fineA, C, S, do_fit)
         print(fourier_format(' K', C, S))
+        if 1:
+            K90 = C[0] * 0.5
+            for i in range(1, do_fit):
+                K90 = K90 + C[i] * cos(i*math.pi)
+            print(f' K(PI/2) = {K90:.3}')
         C, S = fourier_coefficients(mA, mX, do_fit)
-        fourier_plot(ax, manyA, C, S, do_fit, off)
+        fourier_plot(ax, fineA, C, S, do_fit, off)
         print(fourier_format(' X', C, S))
     if 0:
         pink = [1,0,1]
@@ -151,21 +157,21 @@ def plot_histogram(A, rK, rX, rZ):
         M = C[0] - 2 * ( C[1] - C[2] + C[3] - C[4] + C[5] - C[6] + C[7] )
         N = C[2] + C[4] + C[6]
         print(M, N)
-        off = fourier_plot(ax, manyA, [ M-2*N, -0.5*M, N ], [0, 0, 0], 3, [], pink)
+        off = fourier_plot(ax, fineA, [ M-2*N, -0.5*M, N ], [0, 0, 0], 3, [], pink)
         C, S = fourier_coefficients(A, X, 8)
         M = C[0] - 2 * ( C[1] - C[2] + C[3] - C[4] + C[5] - C[6] + C[7] )
         N = C[2] + C[4] + C[6]
         print(M, N)
-        fourier_plot(ax, manyA, [ M-2*N, -0.5*M, N ], [0, 0, 0], 3, off, pink)
+        fourier_plot(ax, fineA, [ M-2*N, -0.5*M, N ], [0, 0, 0], 3, off, pink)
     if 0:
         pink = [1,0,1]
         # 2-coefficient fit with preset coefficients:
         K1 = 0.075
         K2 = 0.030
-        off = fourier_plot(ax, manyA, [ 2*(K1+K2), -K1, -K2 ], [0, 0, 0], 3, [], pink)
+        off = fourier_plot(ax, fineA, [ 2*(K1+K2), -K1, -K2 ], [0, 0, 0], 3, [], pink)
         X1 = 0.41
         X2 = 0.12
-        fourier_plot(ax, manyA, [ 2*(X1+X2), -X1, -X2 ], [0, 0, 0], 3, off, pink)
+        fourier_plot(ax, fineA, [ 2*(X1+X2), -X1, -X2 ], [0, 0, 0], 3, off, pink)
     if 0:
         # renomalize Xrossings without counting Katastrophes:
         N = [ 0 for i in A ]
@@ -224,7 +230,7 @@ def plot_file_histogram(file):
 
 def main(args):
     """scan through directories"""
-    global half_range, do_var, do_fit, output, format, n_bins
+    global half_range, do_var, do_fit, do_count, output, format, n_bins, fts
     do_all = 0
     paths = []
     files = []
@@ -234,6 +240,7 @@ def main(args):
         if arg == '180':
             half_range = 0
             n_bins = 18
+            fts = 28
         elif arg == '90':
             half_range = 1
         elif arg in ('png', 'svg' ):
@@ -245,6 +252,8 @@ def main(args):
             title = value
         elif key == 'fit':
             do_fit = int(value)
+        elif key == 'count':
+            do_count = int(value)
         elif key == 'var':
             do_var = int(value)
         elif key == 'all':
