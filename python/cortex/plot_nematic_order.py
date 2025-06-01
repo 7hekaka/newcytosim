@@ -175,7 +175,7 @@ def main(args):
             format = arg
         else:
             [key, _, val] = arg.partition('=')
-            if key = 'cutoff':
+            if key == 'cutoff':
                 cutoff = float(val)
             else:
                 sys.stderr.write(f"Error: unexpected argument `{arg}`\n")
