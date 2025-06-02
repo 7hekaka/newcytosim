@@ -430,11 +430,11 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
 }
 
 /**
- Find the closest point on the polygon to (x, y)
+ Find the closest point on the polygon to (xx, yy)
  
  @return
- 0 : projects on an edge
- 1 : projects on a vertex
+ 1 : projects on an edge
+ 0 : projects on a vertex
  .
  The function will also set `hit` to be the index of the point,
  or the segment where the projection landed
@@ -451,7 +451,7 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, unsigned& hit) const
     pX = pts_[0].xx;
     pY = pts_[0].yy;
     
-    real dd = square(xx-pX) + square(yy-pY);
+    real best = square(xx-pX) + square(yy-pY);
     
     for ( unsigned i = 0; i < npts_; ++i )
     {
@@ -466,12 +466,12 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, unsigned& hit) const
         {
             if ( a < pts_[i].len )
             {
-                // distance from segment to point:
+                // distance from (xx, yy) to segment:
                 real da = d - a * a;
                 
-                if ( da < dd )
+                if ( da < best )
                 {
-                    dd = da;
+                    best = da;
                     pX = pts_[i].xx + a * pts_[i].dx;
                     pY = pts_[i].yy + a * pts_[i].dy;
                     hit = i;
@@ -479,9 +479,9 @@ int Polygon::project(real xx, real yy, real& pX, real& pY, unsigned& hit) const
                 }
             }
         }
-        else if ( d < dd )
+        else if ( d < best )
         {
-            dd = d;
+            best = d;
             pX = pts_[i].xx;
             pY = pts_[i].yy;
             hit = i;

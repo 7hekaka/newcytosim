@@ -44,7 +44,7 @@ public:
     /// list of points. The array is allocated to hold index = 2+npts_
     Point2D* pts_;
     
-    /// allocated size of arra
+    /// allocated size of array
     unsigned maxp_;
     
     /// number of points
