@@ -128,7 +128,7 @@ public:
     //--------------- FUNCTIONS THAT CAN BE CALCULATED--------------------------
     
     /// returns the maximum absolute value of any coordinate
-    real max_extension() const;
+    real maxExtension() const;
 
     /// true if `point` is outside this Space ( defined as !inside(point) )
     bool outside(Vector const& pos)  const { return ! inside(pos); }

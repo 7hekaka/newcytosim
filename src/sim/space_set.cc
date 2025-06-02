@@ -40,7 +40,7 @@ real SpaceSet::maxExtension() const
 {
     real rad = 0;
     for ( Space const* s = first(); s; s=s->next() )
-        rad = std::max(rad, s->max_extension());
+        rad = std::max(rad, s->maxExtension());
     return rad;
 }
 

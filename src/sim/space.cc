@@ -171,7 +171,7 @@ Vector Space::projectDeflated(Vector const& pos, const real rad) const
 #pragma mark - Misc
 
 
-real Space::max_extension() const
+real Space::maxExtension() const
 {
     Vector inf, sup;
     boundaries(inf, sup);
