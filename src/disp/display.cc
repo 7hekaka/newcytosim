@@ -322,8 +322,6 @@ void Display::initFiberDisp(FiberProp* fp, PropertyList& depot, gym_color col)
     if ( fp->display_fresh )
     {
         dis->read_string(fp->display, fp->name()+":display");
-        if ( dis->mask && !dis->mask_bitfield )
-            dis->mask_bitfield = distribute_bits(dis->mask, pcg32_state);
         fp->display_fresh = false;
     }
     

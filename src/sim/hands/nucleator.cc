@@ -79,7 +79,7 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
     ObjectList objs;
     Rotation rot(0, 1);
     Fiber * fib = sim.fibers.newFiber(objs, fip, opt);
-
+    
     // select rotation to align with direction of nucleation:
 #if ( DIM >= 3 )
     Space const* spc = prop()->nucleate_space;
@@ -114,6 +114,13 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
         ++mk;
     else opt.set(mk, "mark");
     fib->mark(mk);
+
+    // set signature of fiber:
+    ObjectSignature S = 0;
+    if ( opt.value_is("signature", 0, "base") )
+        fib->signature(hMonitor->baseSignature());
+    else if ( opt.set(S, "signature") )
+        fib->signature(S);
 
     ObjectSet::rotateObjects(objs, rot);
     /*

@@ -5,6 +5,7 @@
 
 #include "real.h"
 #include "vector.h"
+#include "inventoried.h"
 
 class Hand;
 class Simul;
@@ -58,6 +59,9 @@ public:
     
     /// stiffness of the link involving this Hand
     virtual real linkStiffness() const { return 0; }
+    
+    /// signature of the Solid underlying the Single
+    virtual ObjectSignature baseSignature() const { return 0; }
 
 };
 

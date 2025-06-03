@@ -60,6 +60,9 @@ public:
     void rebase(Mecable const* mec, unsigned ref, Vector pos) { base_.set(mec, ref, pos); }
     
     
+    /// signature of the Solid underlying the Single
+    ObjectSignature baseSignature() const { return base()->signature(); }
+
     /// true if Single creates a link
     bool hasLink() const { return true; }
 
