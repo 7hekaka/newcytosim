@@ -61,6 +61,9 @@ public:
     /// number of points
     unsigned nbPoints() const { return npts_; }
     
+    /// number of points
+    void nbPoints(unsigned n) { npts_ = n; }
+
     /// access to vertex coordinates
     Point2D const* data() const { return pts_; }
     

@@ -52,6 +52,8 @@ void Polygon::setPoint(unsigned i, real x, real y, long c)
         pts_[i].yy = y;
         pts_[i].spot = c;
     }
+    else
+        throw InvalidParameter("invalid index in Polygon::setPoint()");
 }
 
 
@@ -304,7 +306,7 @@ int Polygon::complete(const real epsilon)
     //std::clog << "Polygon::complete(" << epsilon << ")\n";
     if ( npts_ > 1 )
     {
-        unsigned i = 0, n = 0, p = 0;
+        unsigned i = 1, n = 0, p = 0;
         do {
             real dx = 0, dy = 0;
             // skip consecutive points that are too close from each other:
@@ -315,9 +317,10 @@ int Polygon::complete(const real epsilon)
                 dy = pts_[n].yy - pts_[p].yy;
                 //std::clog << "poly  " << n << "   " << dx << " " << dy << "\n";
             } while ( std::max(abs_real(dx), abs_real(dy)) < epsilon );
-            real d = std::sqrt( dx * dx + dy * dy );
+            //std::clog << i << " <-- " << n << "\n";
+            pts_[i] = pts_[n];
             // normalize the vector:
-            pts_[i]     = pts_[n];
+            real d = std::sqrt( dx * dx + dy * dy );
             pts_[i].dx  = dx / d;
             pts_[i].dy  = dy / d;
             pts_[i].len = d;
@@ -450,7 +453,7 @@ int Polygon::inside(real xx, real yy, int edge, real threshold) const
 int Polygon::project(real xx, real yy, real& pX, real& pY, unsigned& hit) const
 {
     if ( npts_ < 1 )
-        throw InvalidParameter("Cannot project on uninitialized polygon");
+        throw InvalidParameter("cannot project on uninitialized polygon");
     int res = 0;
     
     //initialize with first point:
