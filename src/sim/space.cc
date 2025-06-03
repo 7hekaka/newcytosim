@@ -84,7 +84,8 @@ Vector Space::placeNearEdge(real rad, size_t max_trials) const
 Vector Space::onSurface(real rad, size_t max_trials) const
 {
     size_t ouf = 0;
-    real D = abs_real(rad), RR = rad * rad;
+    real D = abs_real(rad);
+    real RR = rad * rad;
     Vector pos, res, inf, dif;
     
     boundaries(inf, dif);

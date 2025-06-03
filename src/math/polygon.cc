@@ -265,6 +265,13 @@ void Polygon::find_extremes(real box[4]) const
         box[2] = pts_[0].yy;
         box[3] = pts_[0].yy;
     }
+    else
+    {
+        box[0] = 0;
+        box[1] = 0;
+        box[2] = 0;
+        box[3] = 0;
+    }
     
     for ( unsigned i = 1; i < npts_; ++i )
     {

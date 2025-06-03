@@ -88,11 +88,11 @@ public:
 
     /// return the bounds for the coordinates of the points inside the Space
     /**
-     set inf as [ min(X), min(Y), min(Z) ]
-     and sup as [ max(X), max(Y), max(Z) ]
-     for any point (X, Y, Z) contained inside the Space.
-     
-     It thus defines a cuboid aligned with the main axes, and containing the entire volume.
+     By setting values for its two arguments:
+         `inf` as [ min(X), min(Y), min(Z) ]
+         `sup` as [ max(X), max(Y), max(Z) ]
+     for any point (X, Y, Z) contained inside the Space, the function will define
+     a cuboid aligned with the main axes, containing the entire volume.
      */
     virtual void boundaries(Vector& inf, Vector& sup) const { inf.set(-1,-1,-1); sup.set(1,1,1); }
     

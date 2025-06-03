@@ -426,7 +426,7 @@ void PointDisp::setPixels(float ps, float uv, bool make_maps)
 {
     float sw = size + width;
     // object is 'perceptible' if it covers more than half a pixel:
-    perceptible = visible && ( uv*sw > 0.5 );
+    perceptible = visible && ( uv*sw > 0.25 );
     
     sizeX = std::max(size * uv, 0.25f);
     widthX = std::max(width * uv, 0.25f);
