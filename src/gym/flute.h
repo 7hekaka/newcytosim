@@ -107,6 +107,7 @@ struct flute5
     flute5(float const c[4], const float d[1]) : xyz{c[0], c[1], c[2], c[3], d[0], 0.f} {}
     flute5(float const c[4], const double d[1]) : xyz{c[0], c[1], c[2], c[3], float(d[0]), 0.f} {}
     void setY(float y) { xyz[5] = y; }
+    void scale(float S) { xyz[4] *= S; }
 };
 
 
@@ -131,6 +132,7 @@ struct flute6
     flute6(Vector3 const& v, Vector3 const& w) : xyz{float(v.XX), float(v.YY), float(v.ZZ), float(w.XX), float(w.YY), float(w.ZZ)} {}
 #endif
     void setY(float y) { xyz[5] = y; }
+    void scale(float S) { xyz[4] *= S; xyz[5] *= S; }
 };
 
 
@@ -150,6 +152,7 @@ struct flute8
     flute8(const float c[4], Vector3 const& v) : xyz{c[0], c[1], c[2], c[3], float(v.XX), float(v.YY), float(v.ZZ), 1.f} {}
 #endif
     void setY(float y) { xyz[5] = y; }
+    void scale(float S) { xyz[4] *= S; xyz[5] *= S; xyz[6] *= S; }
 };
 
 

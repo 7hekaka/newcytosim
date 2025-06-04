@@ -35,6 +35,9 @@ namespace gym
     
     /// replace reference modelview matrix by `mat` translated by (X, Y, Z)
     inline void set_view(const float mat[16], float X, float Y, float Z) { gym::mat_copytrans(ref_, mat, X, Y, Z); gym::mat_copy(mvp_, ref_); load_ref(); }
+    
+    /// replace reference modelview matrix by `mat` scaled by (S, S, S)
+    inline void set_view(const float mat[16], float S) { gym::mat_copy(ref_, mat); gym::mat_scale(ref_, S, S, S); load_ref(); }
 
     /// make reference matrix current and loaded
     inline void ref_view() { pull_ref(); load_ref(); }
