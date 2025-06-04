@@ -429,8 +429,11 @@ static void changeScale(FiberDisp* p, int d)
         changeScale(p->length_scale, d);
         flashText("fiber:length_scale = %.5f", p->length_scale);
     }
-    else if ( disp.style == 2 )
-        flipExplode(p);
+    else if ( disp.style == 1 && p->explode_style )
+    {
+        changeScale(p->explode_range, d);
+        flashText("fiber:explode_range = %.5f", p->explode_range);
+    }
 }
 
 

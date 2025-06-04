@@ -306,7 +306,7 @@ public:
     int explode_style;
     
     /// amount of lateral shift to separate fibers when display is exploded (known as `explode[1]`)
-    float explode_range;
+    real explode_range;
     
     
     /// if true, display the average fiber
