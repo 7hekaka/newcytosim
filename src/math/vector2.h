@@ -692,17 +692,22 @@ public:
     void print(std::ostream& os) const
     {
         const int w = (int)os.width();
-        os << std::showpos << XX << " ";
-        os << std::setw(w) << YY << std::noshowpos;
+        std::ios_base::fmtflags f = os.flags();
+        os.setf(std::ios::showpos);
+        os << std::left << XX << " ";
+        os << std::left << std::setw(w) << YY;
+        os.flags(f);
     }
     
     /// output using width 'w' and precision 'p'
     void print(std::ostream& os, int w, int p) const
     {
         os.precision(p);
+        std::ios_base::fmtflags f = os.flags();
         os.setf(std::ios::showpos);
-        os << std::setw(w) << XX << " ";
-        os << std::setw(w) << YY;
+        os << std::left << std::setw(w) << XX << " ";
+        os << std::left << std::setw(w) << YY;
+        os.flags(f);
     }
     
     /// conversion to a string
