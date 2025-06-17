@@ -344,7 +344,7 @@ inline void add_rigidity3D(const int nbp, const real* X, const real R1, real* Y)
 }
 
 /**
- Add rigidity terms between three points {A, B, C}
+ Add bending elasticity terms between three points {A, B, C}
  Done with Serge DMITRIEFF, 2015
  */
 void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
@@ -412,7 +412,7 @@ void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, r
 
 /**
  calculates the second-derivative of point's coordinates,
- scale by the rigidity term, and add to vector Y
+ scale by the bending elasticity scalar, and add to vector Y
 */
 void Mecafil::addRigidity(const real* X, real* Y) const
 {
@@ -425,17 +425,17 @@ void Mecafil::addRigidity(const real* X, real* Y) const
 #endif
     
 #if NEW_FIBER_LOOP
-        if ( iRigidityLoop && ( nPoints > 3 ))
-        {
-            /*
-             With Serge DMITRIEFF:
-             Link fiber end points in the same way as consecutive points triplets,
-             making the fiber mechanically homogeneous for bending elasticity
-             */
-            const index_t L = nbPoints() - 2;
-            add_rigidity(L+1, 0, 1, X, iRigidity, Y);
-            add_rigidity(L, L+1, 0, X, iRigidity, Y);
-        }
+    if ( iRigidityLoop && ( nPoints > 3 ))
+    {
+        /*
+         With Serge DMITRIEFF:
+         Link fiber end points in the same way as consecutive points triplets,
+         making the fiber mechanically homogeneous for bending elasticity
+         */
+        const index_t L = nbPoints() - 2;
+        add_rigidity(L+1, 0, 1, X, iRigidity, Y);
+        add_rigidity(L, L+1, 0, X, iRigidity, Y);
+    }
 #endif
 }
 

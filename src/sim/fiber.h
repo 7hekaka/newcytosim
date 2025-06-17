@@ -255,7 +255,7 @@ public:
 
     //--------------------------------------------------------------------------
 
-    /// the energy due to bending rigidity: 1/2 * rigidity * sum( curvature(s)^2 ds ),
+    /// the energy due to bending elasticity: 1/2 * rigidity * sum( curvature(s)^2 ds ),
     real bendingEnergy() const { return bendingEnergy0() * prop->rigidity; }
     
     /// return abscissa of the closest point to `w`, and set `dis2` to the square of the distance

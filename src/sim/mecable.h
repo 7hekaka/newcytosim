@@ -251,7 +251,7 @@ public:
     /// prepare the Mecable to solve the mechanics in Meca
     /**
      This should prepare necessary variables to solve the system:
-     - set rigidity coefficients, for addRigidity() to work properly
+     - set bending elasticity coefficients, for addRigidity() to work properly
      - set drag mobility, for projectForces() to work,
      - set matrix/variables necessary for constrained dynamics
      .
@@ -335,11 +335,11 @@ public:
     /// return coefficient for filament's bending elasticity
     virtual real jointRigidity() const { return 0; }
 
-    /// Add rigidity terms Y <- Y + Rigidity * X
+    /// Add bending elasticity terms Y <- Y + Rigidity * X
     /**
         Rigidity can be any force acting internally to the objects
-     for example, the bending rigidity of Fibers.
-     This version is used to calculate the Matrix * Vector in Meca.
+     in particular, the bending elasticity of Fibers.
+     This function is used in Meca to calculate force from positions.
      */
     virtual void addRigidity(const real* X, real* Y) const {}
 
@@ -358,7 +358,7 @@ public:
      The default implementation ( Y <- 0 ) makes the object immobile
      */
     virtual void projectForces(const real* X, real* Y) const { zero_real(DIM*nPoints, Y); }
-    
+
     /// Return drag coefficient that was not applied by projectForces()
     virtual real leftoverMobility() const { return 1.0; }
 

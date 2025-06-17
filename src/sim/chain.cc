@@ -678,7 +678,7 @@ int Chain::reshape_calculate(const index_t ns, real target, index_t max_iter,
             // the solution is worse than before...
             //VecPrint::head("> mul", ns, mul, 3);
             //fprintf(stderr, "\n         %20.16f", tol);
-            return ( err > 128 * tol );
+            if ( err > 128 * tol ) return 1;
         }
         err0 = err;
 #if ( 0 )
@@ -993,7 +993,7 @@ void Chain::getPoints(real const* ptr)
 #endif
     }
     //document(std::clog, ptr);
-    //fprintf(stderr, "\n %u  >pos ", identity()); VecPrint::print(nPoints, pPos, 3);
+    //fprintf(stderr, "\n%3u >pos ", identity()); VecPrint::print(DIM*nPoints, pPos, 6, DIM);
 }
 
 

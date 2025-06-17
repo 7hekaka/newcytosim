@@ -87,7 +87,7 @@ protected:
     /// mobility of the points (all points have the same drag coefficient)
     real iPointMobility;
     
-    /// rigidity scaling factor used in addRigidity()
+    /// bending elasticity scalar used in addRigidity()
     real iRigidity;
     
 #if NEW_FIBER_LOOP
@@ -198,10 +198,10 @@ public:
 
     //--------------------- Rigidity
 
-    /// return fiber rigidity
+    /// return fiber bending elasticity scalar
     real jointRigidity() const { return ( nPoints > 2 ) ? iRigidity : 0; }
 
-    /// add the rigidity force corresponding to configuration X into vector Y
+    /// add the bending elasticity force corresponding to configuration X into vector Y
     void addRigidity(const real* X, real* Y) const;
 
 };

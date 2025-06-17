@@ -718,7 +718,7 @@ void FiberProp::complete(Simul const& sim)
 #endif
     
 #if ( 0 )
-    //print some information on the 'stiffness' of the system
+    //print information relating to the 'numerical stiffness' of the system
     Fiber fib(this);
     fib.setStraight(Vector(-5,0,0), Vector(1,0,0), 10);
     

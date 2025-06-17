@@ -364,6 +364,8 @@ void Mecafil::computeTensions(const real* force)
     
     // determine the multipliers: iLag <- inv( J * Jt ) * iLag
     DPTTS2(nbs, 1, iJJt, iJJtU, iLag, nbs);
+    
+    //fprintf(stderr, "\nmul "); VecPrint::print(stderr, nbs, iLag, 6);
 }
 
 

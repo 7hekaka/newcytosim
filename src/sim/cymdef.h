@@ -22,7 +22,7 @@
 /// Option to not use constraints on the fiber's segment lengths
 #define NEW_UNCONSTRAINED_LENGTH 0
 
-/// Option to enable rigidity terms to link the two ends of a fiber
+/// Option to enable bending elasticity terms to link the two ends of a fiber
 #define NEW_FIBER_LOOP 0
 
 

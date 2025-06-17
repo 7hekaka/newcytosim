@@ -2,7 +2,7 @@
 
 
 /**
- Set rigidity terms with modulus 'R1' in diagonal and lower parts of `mat`,
+ Set bending elasticity terms with modulus 'R1' in diagonal and lower parts of `mat`,
  for a filament with 'cnt' points.
  */
 template < typename MATRIX >
@@ -27,7 +27,7 @@ void addBendingRigidityMatrix0(MATRIX& mat, const size_t inx, const size_t cnt, 
 
 
 /**
- Set rigidity terms on the diagonal and lower triangle of `mat`,
+ Set bending elasticity terms on the diagonal and lower triangle of `mat`,
  for a filament with 'cnt' points and bending modulus 'R'.
  */
 template < typename MATRIX >
@@ -218,7 +218,7 @@ void addBendingRigidityLower(real* mat, size_t ldd, size_t cnt, const real R)
 
 
 /*
- set lower triangle of `mat' to give bending rigidity with parameter R
+ set lower triangle of `mat' corresponding to bending elasticity with parameter R
  */
 template < size_t ORD >
 void setBendingRigidity(real* mat, size_t ldd, size_t cnt, const real R)

@@ -402,7 +402,7 @@ void Meca::getIsoBandedBlock(const Mecable * mec, real* res, index_t kd, index_t
     else
         zero_real(ldd*nbp, res);
     
-    //PRINT_MAT("rigidity band", 3, nbp, res, ldd);
+    //PRINT_MAT("bending elasticity band", 3, nbp, res, ldd);
 
     /*
      The matrix `res` is stored in 'packed symmetric banded storage':
