@@ -719,11 +719,11 @@ int Chain::reshape_calculate(const index_t ns, real target, index_t max_iter,
  Apply correction of magnitude 'mul' along the segment directions:
  
  except for the edges, this is:
- P[i] <- P[i] + sca[i] * ( P[i+1] - P[i] ) - sca[i-1] * ( P[i] - P[i-1] )
+ P[i] <- P[i] + mul[i] * ( P[i+1] - P[i] ) - mul[i-1] * ( P[i] - P[i-1] )
  
- src[] and dst[] should be arrays of size `DIM*(nbs+1)`
- sca[] should be an array of size `nbs`
- 
+ Source `src[]` and destination `dst[]` should be arrays of size `DIM*(nbs+1)`
+ Array `mul[]` should be of size `nbs` containing the scalar multipliers
+  
  The code is similar to projectForcesD(), with an additional difference
  
  Note that if 'src == dst', the result are still correct

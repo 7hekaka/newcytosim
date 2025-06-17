@@ -314,7 +314,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
     }
 #endif
     
-    const size_t nbs = nbSegments();
+    const index_t nbs = nbSegments();
     //VecPrint::print("X", DIM*nbPoints(), X);
 
 // using the fused projectForces if possible, since this is fastest
@@ -334,10 +334,10 @@ void Mecafil::projectForces(const real* X, real* Y) const
     projectForcesU(nbs, iDir, X, iLLG);
 #endif
     
-    // Lagrange multipliers <- inv( J * Jt ) * iLLG
+    // Calculate Lagrange multipliers: iLLG <- inv( J * Jt ) * iLLG
     DPTTS2(nbs, 1, iJJt, iJJtU, iLLG, nbs);
 
-    // set Y, using values in X and iLLG
+    // set Y, using values in X and multipliers in iLLG
     projectForcesD(nbs, iDir, X, iLLG, Y);
 
 #if NEW_ANISOTROPIC_FIBER_DRAG
@@ -352,7 +352,7 @@ void Mecafil::projectForces(const real* X, real* Y) const
  */
 void Mecafil::computeTensions(const real* force)
 {
-    const unsigned nbs = nbSegments();
+    const index_t nbs = nbSegments();
     
 #if NEW_ANISOTROPIC_FIBER_DRAG
     // iLLG is used as a temporary space to store nPoints * DIM scalars:
@@ -403,11 +403,11 @@ void Mecafil::printProjection(FILE * file) const
 /** This assumes that the Lagrange multipliers in 'iLLG' can be used */
 void Mecafil::setProjectionDiff(const real threshold)
 {
-    const size_t nbs = nbSegments();
+    const index_t nbs = nbSegments();
 
     // use Lagrange multipliers computed from the last projectForces() in iLLG
     // check for extensile ( positive ) multipliers
-    for ( size_t i = 0; i < nbs; ++i )
+    for ( index_t i = 0; i < nbs; ++i )
     {
         if ( iLLG[i] > threshold )
         {
@@ -456,15 +456,15 @@ inline void addProjectionDiff_(const size_t nbs, const real* mul, const real* X,
 /// Add projection-diff matrix
 void Mecafil::addProjectionDiff(real* mat) const
 {
-    unsigned nbs = nbSegments();
-    unsigned bks = DIM * nPoints;
+    index_t nbs = nbSegments();
+    index_t bks = DIM * nPoints;
 #if CHECK_PROJECTION_DIFF
     real * dup = new_real(bks*bks);
     real * tmp = new_real(bks*bks);
     copy_real(bks*bks, mat, dup);
     zero_real(bks*bks, tmp);
     // use addProjectionDiff() to add all column vectors:
-    for ( size_t i = 0; i < bks; ++i )
+    for ( index_t i = 0; i < bks; ++i )
     {
         tmp[i] = 1;
         addProjectionDiff(tmp, dup+bks*i);

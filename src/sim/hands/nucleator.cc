@@ -97,7 +97,10 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
     else
 #endif
     {
-        rot = Rotation::randomRotationToVector(dir);
+        if ( dir.normSqr() > 0.01 )
+            rot = Rotation::randomRotationToVector(dir);
+        else
+            rot = Rotation::randomRotation();
 #if ( DIM == 2 )
         rot = rot * Rotation::rotation(std::cos(A), F*std::sin(A));
 #elif ( DIM == 3 )
