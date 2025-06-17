@@ -308,8 +308,18 @@ static void flashLineStyle(FiberDisp const* p)
     {
         case 0: flashText("%s: no lines", n); break;
         case 1: flashText("%s: lines", n); break;
-        case 2: flashText("%s: color by axial tensions", n); break;
-        case 3: flashText("%s: jet color by axial tensions", n); break;
+        case 2:
+            if ( p->tension_scale > 0 )
+                flashText("%s: color by axial tensions (pulling)", n);
+            else
+                flashText("%s: color by axial tensions (pushing)", n);
+            break;
+        case 3:
+            if ( p->tension_scale > 0 )
+                flashText("%s: jet color by axial tensions (pulling)", n);
+            else
+                flashText("%s: jet color by axial tensions (pushing)", n);
+            break;
         case 4: flashText("%s: color by orientation", n); break;
         case 5: flashText("%s: color by curvature", n); break;
         case 6: flashText("%s: gradient from minus-end", n); break;
@@ -448,9 +458,9 @@ static void invertScale(FiberDisp* p, int)
     {
         p->tension_scale = -p->tension_scale;
         if ( p->tension_scale > 0 )
-            flashText("fiber:tension_scale: pulling");
+            flashText("fiber:tension_scale > 0: pulling");
         else
-            flashText("fiber:tension_scale: pushing");
+            flashText("fiber:tension_scale < 0: pushing");
     }
     else if ( p->line_style > 4 )
     {
