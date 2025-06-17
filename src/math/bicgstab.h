@@ -338,7 +338,7 @@ namespace LinearSolvers
     
     
     /**
-     This is an alternative implementation adapted from the CUPS project
+     This is an alternative implementation adapted from the CUSP project
      https://cusplibrary.github.io/index.html
      */
     template < typename LinearOperator, typename Monitor, typename Allocator >

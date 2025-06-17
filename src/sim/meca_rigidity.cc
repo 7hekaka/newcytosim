@@ -36,8 +36,8 @@ void addBendingRigidityMatrix(MATRIX& mat, const size_t inx, const size_t cnt, c
     assert_true( cnt > 2 );
 
     const real R1 = -1 * R;
-    const real R2 =  2 * R;
-    const real R4 =  4 * R;
+    const real R2 = +2 * R;
+    const real R4 = +4 * R;
     const real R6 = -6 * R;
 
     const size_t s = inx;
@@ -78,8 +78,8 @@ void addBendingRigidityBlockMatrix(MATRIX& mat, const size_t inx, const size_t c
     assert_true( cnt > 2 );
 
     const real R1 = -1 * R;
-    const real R2 =  2 * R;
-    const real R4 =  4 * R;
+    const real R2 = +2 * R;
+    const real R4 = +4 * R;
     const real R6 = -6 * R;
     
     constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
@@ -126,8 +126,8 @@ void addBendingRigidity(real* mat, size_t ldd, size_t cnt, const real R)
     assert_true( cnt > 2 );
 
     const real R1 = -1 * R;
-    const real R2 =  2 * R;
-    const real R4 =  4 * R;
+    const real R2 = +2 * R;
+    const real R4 = +4 * R;
     const real R6 = -6 * R;
 
     constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
@@ -180,8 +180,8 @@ void addBendingRigidityLower(real* mat, size_t ldd, size_t cnt, const real R)
 {
     assert_true( cnt > 2 );
 
-    const real R2 =  2 * R;
-    const real R4 =  4 * R;
+    const real R2 = +2 * R;
+    const real R4 = +4 * R;
     const real R6 = -6 * R;
 
     constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
@@ -227,8 +227,8 @@ void setBendingRigidity(real* mat, size_t ldd, size_t cnt, const real R)
     constexpr size_t U = ORD, D = ORD*2, T = ORD*3;
 
     const real R1 = -1 * R;
-    const real R2 =  2 * R;
-    const real R4 =  4 * R;
+    const real R2 = +2 * R;
+    const real R4 = +4 * R;
     const real R6 = -6 * R;
 
     const size_t e = ORD * ( cnt - 2 );
