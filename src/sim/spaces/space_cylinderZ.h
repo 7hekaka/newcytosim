@@ -13,7 +13,8 @@
      - radius = radius of cylinder
      - bottom = lower limit in Z
      - top    = upper limit in Z
-     - edge   = smoothing radius of the edges
+     - top_edge = smoothing radius at the top edge
+     - bottom_edge = smoothing radius at the bottom edge
      .
 
  Added edge smoothing 09.12.2019
@@ -24,7 +25,7 @@ class SpaceCylinderZ : public Space
     /// apply a force directed towards the edge of the Space
     static void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff, real, real, real);
     /// apply a force directed towards the edge of the Space
-    static void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff, real, real, real, real);
+    static void setConfinement(Vector const& pos, Mecapoint const&, Meca&, real stiff, real, real, real, real, real);
 
 private:
     
@@ -38,13 +39,16 @@ private:
     real top_;
     
     /// the radius of smoothing of the edges
-    real edge_;
+    real top_edge_;
     
-    /// square of edge_
-    real edgeSqr_;
+    /// the radius of smoothing of the edges
+    real bot_edge_;
     
-    /// calculate radiusSqr
-    void update() { edgeSqr_ = square(edge_); }
+    /// mid height in Z:
+    real mid_;
+    
+    /// calculate derived parameters
+    void update() { mid_ = 0.5 * ( top_ + bot_ ); }
 
 public:
         
