@@ -67,10 +67,10 @@ public:
     void setPosition(Vector const& X) { translate( X - position() ); }
 
     /// move Object ( position += given vector )
-    virtual void translate(Vector const&) { ABORT_NOW("Movable::translate() called for immobile Object"); }
+    virtual void translate(Vector const&) { ABORT_NOW("undefined Movable::translate() called"); }
     
     /// rotate Object around the Origin
-    virtual void rotate(Rotation const&) { ABORT_NOW("Movable::rotate() called for immobile Object"); }
+    virtual void rotate(Rotation const&) { ABORT_NOW("undefined Movable::rotate() called"); }
 
     /// return translation derived from applying rotation around the Origin
     Vector translation(Rotation const& R) const
