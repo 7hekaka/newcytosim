@@ -222,12 +222,14 @@ void Mecafil::getForces(const real* ptr)
 /*
  This is the reference implementation
  */
-void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
+void add_rigidity0(const int nbp, const real* X, const real R1, real* Y)
 {
+    assert_true(R1 >= 0);
     const real R2 = 2.0 * R1;
     const real two = 2.0;
+    const unsigned end = DIM * ( nbp - 2 );
     #pragma omp simd
-    for ( size_t jj = 0; jj < DIM*nbt; ++jj )
+    for ( unsigned jj = 0; jj < end; ++jj )
     {
         real f = ( X[jj] + X[jj+DIM*2] ) - two * X[jj+DIM];
         Y[jj      ] -= f * R1;
@@ -239,21 +241,22 @@ void add_rigidity0(const size_t nbt, const real* X, const real R1, real* Y)
 /*
  This is a different implementation
  */
-inline void add_rigidityF(const size_t nbt, const real* X, const real R1, real* Y)
+inline void add_rigidityF(const int nbp, const real* X, const real R1, real* Y)
 {
+    assert_true(R1 >= 0);
     const real six = 6.0;
     const real R4 = R1 * 4.0;
     const real R2 = R1 * 2.0;
 
-    const size_t end = DIM * nbt;
+    const size_t end = DIM * ( nbp - 2 );
     #pragma omp simd
     for ( size_t i = DIM*2; i < end; ++i )
         Y[i] = Y[i] + R4 * (X[i-DIM]+X[i+DIM]) - R1 * (six*X[i]+(X[i-DIM*2]+X[i+DIM*2]));
     
     // special cases near the edges:
-    real      * Z = Y + DIM * ( nbt + 1 );
-    real const* E = X + DIM * ( nbt + 1 );
-    if ( nbt > 1 )
+    real      * Z = Y + DIM * ( nbp - 1 );
+    real const* E = X + DIM * ( nbp - 1 );
+    if ( nbp > 3 )
     {
         #pragma omp simd
         for ( int d = 0; d < DIM; ++d )
@@ -277,6 +280,7 @@ inline void add_rigidityF(const size_t nbt, const real* X, const real R1, real* 
 /// In works in 2D, but the loop has dependencies preventing unrolling
 inline void add_rigidity2D(const int nbp, const real* X, const real R1, real* Y)
 {
+    assert_true(R1 >= 0);
     real fx = 0;
     real fy = 0;
     real y0 = Y[0];
@@ -307,6 +311,7 @@ inline void add_rigidity2D(const int nbp, const real* X, const real R1, real* Y)
 /// In works in 3D, but the loop has dependencies preventing unrolling
 inline void add_rigidity3D(const int nbp, const real* X, const real R1, real* Y)
 {
+    assert_true(R1 >= 0);
     real fx = 0;
     real fy = 0;
     real fz = 0;
@@ -347,11 +352,12 @@ inline void add_rigidity3D(const int nbp, const real* X, const real R1, real* Y)
  Add bending elasticity terms between three points {A, B, C}
  Done with Serge DMITRIEFF, 2015
  */
-void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, real* Y)
+void add_rigidityP(const int A, const int B, const int C, const real* X, const real R1, real* Y)
 {
+    assert_true(R1 >= 0);
 #if ( DIM > 1 )
     const real R2 = 2 * R1;
-    for ( size_t d = 0; d < DIM; ++ d )
+    for ( int d = 0; d < DIM; ++ d )
     {
         real f = 2 * X[B*DIM+d] - ( X[A*DIM+d] + X[C*DIM+d] );
         Y[A*DIM+d] += f * R1;
@@ -363,8 +369,8 @@ void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, re
 
 
 /**
- This is the bending elasticity terms, as obtained by derivation of the
- Hamiltonian representing bending elasticity.
+ This adds bending elasticity terms, as obtained by derivation of the
+ Hamiltonian representing bending elasticity:
 
      F1 = k * ( t1 * dot(t1, t2) - t2 )
      F3 = k * ( t1 - dot(t1, t2) * t2 )
@@ -389,18 +395,20 @@ void add_rigidity(size_t A, size_t B, size_t C, const real* X, const real R1, re
  segments. Thus there is no advantage in using these (more exact) formula.
  It makes no difference.
  */
-void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, real const* dir)
+void add_rigidityN(const int nbp, const real* X, const real R1, real* Y, real const* dir)
 {
+    assert_true(R1 >= 0);
     assert_true( X != Y );
-    for ( size_t jj = 0; jj < DIM*nbt; jj+=DIM )
+    const int end = DIM * ( nbp - 2 );
+    for ( int jj = 0; jj < end; jj += DIM )
     {
         // cosine of the angle between two consecutive segments:
         const real C = dot(Vector(dir+jj), Vector(dir+jj+DIM));
-        for ( size_t d = 0; d < DIM; ++d )
+        for ( int d = 0; d < DIM; ++d )
         {
-            size_t i = jj + d;
-            real f1 = rigid * (C * ( X[i+DIM] - X[i] ) - ( X[i+DIM*2] - X[i+DIM] ));
-            real f3 = rigid * (( X[i+DIM] - X[i] ) - C * ( X[i+DIM*2] - X[i+DIM] ));
+            int i = jj + d;
+            real f1 = R1 * (C * ( X[i+DIM] - X[i] ) - ( X[i+DIM*2] - X[i+DIM] ));
+            real f3 = R1 * (( X[i+DIM] - X[i] ) - C * ( X[i+DIM*2] - X[i+DIM] ));
             Y[i      ] += f1;
             Y[i+DIM  ] -= f1+f3;
             Y[i+DIM*2] += f3;
@@ -417,10 +425,10 @@ void add_rigidityN(const size_t nbt, const real* X, const real rigid, real* Y, r
 void Mecafil::addRigidity(const real* X, real* Y) const
 {
 #if ( DIM >= 3 )
-    //add_rigidityF(nPoints-2, X, iRigidity, Y);
+    //add_rigidityF(nPoints, X, iRigidity, Y);
     add_rigidity3D(nPoints, X, iRigidity, Y);
 #elif ( DIM == 2 )
-    //add_rigidity0(nPoints-2, X, iRigidity, Y);
+    //add_rigidity0(nPoints, X, iRigidity, Y);
     add_rigidity2D(nPoints, X, iRigidity, Y);
 #endif
     
@@ -433,8 +441,8 @@ void Mecafil::addRigidity(const real* X, real* Y) const
          making the fiber mechanically homogeneous for bending elasticity
          */
         const index_t L = nbPoints() - 2;
-        add_rigidity(L+1, 0, 1, X, iRigidity, Y);
-        add_rigidity(L, L+1, 0, X, iRigidity, Y);
+        add_rigidityP(L+1, 0, 1, X, iRigidity, Y);
+        add_rigidityP(L, L+1, 0, X, iRigidity, Y);
     }
 #endif
 }
