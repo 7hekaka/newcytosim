@@ -904,6 +904,11 @@
 		BBC422FA247342CF007EA070 /* hand_list.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC422F8247342CF007EA070 /* hand_list.h */; };
 		BBC422FB247342CF007EA070 /* hand_list.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC422F9247342CF007EA070 /* hand_list.cc */; };
 		BBC4C39724D1CA5800DB5187 /* fp_exceptions.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */; };
+		BBC85ABE2E02B3A800E69DB4 /* messages.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587905B98DA3006956D5 /* messages.cc */; };
+		BBC85ABF2E02B3BC00E69DB4 /* messages.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587905B98DA3006956D5 /* messages.cc */; };
+		BBC85AC02E02B3F000E69DB4 /* messages.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587905B98DA3006956D5 /* messages.cc */; };
+		BBC85AC12E02B40400E69DB4 /* messages.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587905B98DA3006956D5 /* messages.cc */; };
+		BBC85AC22E02B43800E69DB4 /* messages.cc in Sources */ = {isa = PBXBuildFile; fileRef = BB73587905B98DA3006956D5 /* messages.cc */; };
 		BBC96C5624A8A9CD00864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
 		BBC96C5724A8A9CD00864F9B /* sparmatsymblkdiag.h in Headers */ = {isa = PBXBuildFile; fileRef = BBC96C5524A8A9CD00864F9B /* sparmatsymblkdiag.h */; };
 		BBC96C5824A8B56900864F9B /* sparmatsymblkdiag.cc in Sources */ = {isa = PBXBuildFile; fileRef = BBC96C5424A8A9CD00864F9B /* sparmatsymblkdiag.cc */; };
@@ -5312,6 +5317,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC85ABF2E02B3BC00E69DB4 /* messages.cc in Sources */,
 				BB201E1124ABDCD900A8CA82 /* operator_new.cc in Sources */,
 				BB201E1F24ABDD9F00A8CA82 /* test_xtbsv.cc in Sources */,
 				BB201E1324ABDCD900A8CA82 /* SFMT.c in Sources */,
@@ -5720,6 +5726,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC85ABE2E02B3A800E69DB4 /* messages.cc in Sources */,
 				BB31698124A0F3F1008DFDB3 /* operator_new.cc in Sources */,
 				BB7086582449CC3000C73273 /* test_xpttrs.cc in Sources */,
 				BB70863C2449CBE900C73273 /* SFMT.c in Sources */,
@@ -5733,6 +5740,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC85AC02E02B3F000E69DB4 /* messages.cc in Sources */,
 				BB31698224A0F3F1008DFDB3 /* operator_new.cc in Sources */,
 				BB7086572449CC2500C73273 /* test_rigidity.cc in Sources */,
 				BB70864B2449CBF300C73273 /* SFMT.c in Sources */,
@@ -5790,6 +5798,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC85AC12E02B40400E69DB4 /* messages.cc in Sources */,
 				BBD49F372781C63B00F31EB2 /* property.cc in Sources */,
 				BB31698924A0F3F5008DFDB3 /* operator_new.cc in Sources */,
 				BBD49F302781C5E400F31EB2 /* print_color.cc in Sources */,
@@ -5895,6 +5904,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BBC85AC22E02B43800E69DB4 /* messages.cc in Sources */,
 				BBA9B6A5245714A700F0EF47 /* time_date.cc in Sources */,
 				BBA9B6A42456C2D300F0EF47 /* matfull.cc in Sources */,
 				BBAA7E8E2455DEED00C924DB /* vector2.cc in Sources */,
@@ -6324,7 +6334,7 @@
 				CLANG_WARN_SUSPICIOUS_MOVE = NO;
 				CLANG_X86_VECTOR_INSTRUCTIONS = default;
 				DEAD_CODE_STRIPPING = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = NO;
 				ENABLE_TESTABILITY = YES;
 				FP_TRAP = "-fp-trap-all=divzero,invalid";
