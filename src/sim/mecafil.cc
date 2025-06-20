@@ -131,7 +131,7 @@ void Mecafil::storeDirections()
     for ( size_t i = 0; i < end; ++i )
         iDir[i] = alpha * ( pPos[i+DIM] - pPos[i] );
 #else
-    for ( size_t p = 0; p < lastPoint(); ++p )
+    for ( index_t p = 0; p < lastPoint(); ++p )
         normalize(diffPoints(p)).store(iDir+DIM*p);
 #endif
     //VecPrint::print("iDir", end, iDir);

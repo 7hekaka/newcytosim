@@ -126,11 +126,16 @@ void Bead::setDragCoefficient()
     }
     
 #if ( 0 )
-    static bool virgin = true;
-    if ( paRadius > 0  &&  virgin )
+    if ( paRadius > 0 )
     {
-        std::clog << "Bead `" << prop->name() << "' (radius " << paRadius << ") has drag " << paDrag << '\n';
-        virgin = false;
+        static std::string msg;
+        std::ostringstream oss;
+        oss << "Bead `" << prop->name() << "' (radius " << paRadius << ") has drag " << paDrag << '\n';
+        if ( msg != oss.str() )
+        {
+            msg = oss.str();
+            std::clog << msg;
+        }
     }
 #endif
 }

@@ -61,10 +61,11 @@ static std::set<void*> allocations;
 
 
 /// return a number greater or equal to 's' that is a multiple of 4
-inline static size_t chunk_real(size_t cnt)
+template < typename INTEGER >
+inline static INTEGER chunk_real(INTEGER cnt)
 {
     // align to 4 doubles (of size 8 bytes), hence 32 bytes
-    constexpr size_t chunk = 32 / sizeof(real);
+    constexpr INTEGER chunk = 32 / sizeof(real);
     // return a multiple of chunk greater than 's'
     // this bit trickery works if chunk is a pure power of 2
     return ( cnt + chunk - 1 ) & ~( chunk - 1 );
