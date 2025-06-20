@@ -24,6 +24,7 @@ public:
     {
         BRANCH_PARALLEL = 0,
         BRANCH_MOSTLY_PARALLEL,
+        BRANCH_ANTI_PARALLEL,
         BRANCH_RANDOM,
         BRANCH_SPECIFIED
     };
@@ -50,7 +51,7 @@ public:
      */
     std::string fiber_spec;
     
-    /// angle of newly made fiber, relative to mother filament
+    /// angle, in radian, of newly made fiber, relative to mother filament
     real branch_angle;
     
     /// if specified, the space on the surface of which new fiber will be created

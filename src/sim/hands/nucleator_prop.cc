@@ -47,28 +47,28 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(nucleation_rate, "nucleate", 0);
     glos.set(fiber_type, "nucleate", 1);
     glos.set(fiber_spec, "nucleate", 2);
-
+    
     glos.set(branch_angle, "branch_angle", "nucleation_angle");
     glos.set(nucleation_limit, "nucleation_limit");
     glos.set(nucleate_in_plane, "nucleate_in_plane");
-
+    
 #if BACKWARD_COMPATIBILITY < 100
     glos.set(fiber_spec, "nucleation_spec");
     glos.set(fiber_spec, "spec");
 #endif
-
+    
     // possible dynamic states of the ends
     Glossary::dict_type<state_t> keys{{"white",     STATE_WHITE},
-                                      {"green",     STATE_GREEN},
-                                      {"yellow",    STATE_YELLOW},
-                                      {"orange",    STATE_ORANGE},
-                                      {"red",       STATE_RED},
-                                      {"static",    STATE_WHITE},
-                                      {"grow",      STATE_GREEN},
-                                      {"growing",   STATE_GREEN},
-                                      {"shrink",    STATE_RED},
-                                      {"shrinking", STATE_RED}};
-
+        {"green",     STATE_GREEN},
+        {"yellow",    STATE_YELLOW},
+        {"orange",    STATE_ORANGE},
+        {"red",       STATE_RED},
+        {"static",    STATE_WHITE},
+        {"grow",      STATE_GREEN},
+        {"growing",   STATE_GREEN},
+        {"shrink",    STATE_RED},
+        {"shrinking", STATE_RED}};
+    
     glos.set(addictive, "addictive");
     glos.set(addictive_state, "addictive", 1, keys);
     glos.set(stabilize, "stabilize");
@@ -76,7 +76,7 @@ void NucleatorProp::read(Glossary& glos)
     if ( glos.set(track_end, "track_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}}) )
         hold_end = track_end;
-
+    
     glos.set(hold_end, "hold_end", {{"off", NO_END},
         {"minus_end", MINUS_END}, {"plus_end", PLUS_END}});
     
@@ -87,11 +87,11 @@ void NucleatorProp::read(Glossary& glos)
 #endif
     
     glos.set(branch_direction, "branch_direction", {
-        {"specified", BRANCH_SPECIFIED},
         {"parallel", BRANCH_PARALLEL},
+        {"mostly_parallel", BRANCH_MOSTLY_PARALLEL},
+        {"anti_parallel", BRANCH_ANTI_PARALLEL},
         {"random", BRANCH_RANDOM},
-        {"mostly_parallel", BRANCH_MOSTLY_PARALLEL}});
-    
+        {"specified", BRANCH_SPECIFIED}} );
 }
 
 

@@ -307,6 +307,7 @@ void Meca::multiply(const real* X, real* Y) const
     for ( Mecable * mec : mecables )
     {
         const size_t inx = DIM * mec->matIndex();
+        const size_t cnt = DIM * mec->nbPoints();
 #if SEPARATE_RIGIDITY_TERMS
         mec->addRigidity(X+inx, Y+inx);
 #endif
@@ -317,7 +318,7 @@ void Meca::multiply(const real* X, real* Y) const
         mec->projectForces(Y+inx, Y+inx);
         // Y <- X + beta * Y
         const real beta = -tau_ * mec->leftoverMobility();
-        blas::xpay(DIM*mec->nbPoints(), X+inx, beta, Y+inx);
+        blas::xpay(cnt, X+inx, beta, Y+inx);
     }
 }
 
