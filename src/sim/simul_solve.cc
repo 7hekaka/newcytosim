@@ -89,7 +89,7 @@ real Simul::minimumStericRange() const
  */
 void Simul::setAllInteractions(Meca& meca) const
 {
-#if 1
+#if 0
     for ( Mecable const* mec : meca.mecables )
         mec->setInteractions(meca);
 #else
@@ -343,21 +343,23 @@ void Simul::solve_auto()
 
 void Simul::computeForces() const
 {
-    try {
-        // if the simulation is running live, the force should be available.
-        if ( !primed() )
-        {
+    // if the simulation is running live, the force should be available.
+    if ( !primed() )
+    {
+        primed_ = 1;
+        try {
             // we could use here a different Meca for safety
             prop.complete(*this);
             sMeca.getReady(*this);
             setAllInteractions(sMeca);
             sMeca.calculateForces();
         }
-    }
-    catch ( Exception & e )
-    {
-        std::cerr << "Error, Cytosim could not compute forces:\n";
-        std::cerr << "   " << e.message() << '\n';
+        catch ( Exception & e )
+        {
+            std::cerr << "Error, Cytosim could not compute forces: ";
+            std::cerr << e.message() << '\n';
+        }
+        primed_ = 0;
     }
 }
 

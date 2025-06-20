@@ -653,7 +653,8 @@ void ObjectSet::loadObject(Inputter& in, const ObjectTag tag, int bin)
         //std::clog << "- new " << Object::reference(tag, pid, id) << '\n';
         // create new object of required class, identified by property-id
         obj = newObject(tag, pid);
-        assert_true(obj);
+        if ( !obj )
+            throw InvalidIO("unknown Object referenced in file");
         obj->objset(this);
         obj->setIdentity(id);
         //inventory_.get(id);

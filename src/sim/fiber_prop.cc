@@ -579,13 +579,16 @@ void FiberProp::complete(Simul const& sim)
     if ( confine_space )
     {
         if ( confine_spec.empty() )
+        {
             confine_spec = sim.spaces.nameObject(confine_space);
+            //std::cerr << ":confine_spec <-- " << confine_spec << "\n";
+        }
     }
     else
     {
+        // this condition may occur when the Property is created before the Space
         if ( confine != CONFINE_OFF && primed(sim) )
             throw InvalidParameter(name()+":confine_space `"+confine_spec+"' was not found");
-        // this condition occur when the Property is created before the Space
     }
     
     if ( confine && confine_stiff[0] < 0 )

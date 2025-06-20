@@ -52,7 +52,7 @@ public:
 private:
     
     /// signals that Simul is ready to perform a Monte-Carlo step
-    int primed_;
+    mutable int primed_;
 
     /// current parser object
     Parser * parser_;
