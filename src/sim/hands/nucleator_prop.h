@@ -24,7 +24,7 @@ public:
     {
         BRANCH_PARALLEL = 0,
         BRANCH_MOSTLY_PARALLEL,
-        BRANCH_ANTI_PARALLEL,
+        BRANCH_ANTIPARALLEL,
         BRANCH_RANDOM,
         BRANCH_SPECIFIED
     };

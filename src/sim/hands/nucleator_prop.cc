@@ -89,7 +89,7 @@ void NucleatorProp::read(Glossary& glos)
     glos.set(branch_direction, "branch_direction", {
         {"parallel", BRANCH_PARALLEL},
         {"mostly_parallel", BRANCH_MOSTLY_PARALLEL},
-        {"anti_parallel", BRANCH_ANTI_PARALLEL},
+        {"antiparallel", BRANCH_ANTIPARALLEL},
         {"random", BRANCH_RANDOM},
         {"specified", BRANCH_SPECIFIED}} );
 }

@@ -48,7 +48,7 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
                 dir = h->dirFiber(); break;
             case NucleatorProp::BRANCH_MOSTLY_PARALLEL:
                 dir = h->dirFiber() * ( RNG.flip_8th() ? -1: +1 ); break;
-            case NucleatorProp::BRANCH_ANTI_PARALLEL:
+            case NucleatorProp::BRANCH_ANTIPARALLEL:
                 dir = -h->dirFiber(); break;
             case NucleatorProp::BRANCH_RANDOM:
                 dir = h->dirFiber(); A = M_PI * RNG.preal(); break;
