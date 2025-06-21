@@ -476,7 +476,7 @@ public:
     void reportFiberAge(std::ostream&, std::ostream&) const;
     
     /// print average length and standard deviation for each class of fiber
-    void reportMarkedFiberLengths(std::ostream&, std::ostream&, Property const*) const;
+    void reportFiberMarkedLengths(std::ostream&, std::ostream&, Property const*) const;
 
     /// print average length and standard deviation for each class of fiber
     void reportFiberLengths(std::ostream&, std::ostream&, Property const*) const;

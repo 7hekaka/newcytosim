@@ -325,7 +325,7 @@ void Simul::report_one(std::ostream& out, std::ostream& com, std::string const& 
         if ( what == "length" )
             return reportFiberLengths(out, com, sel);
         if ( what == "mark" )
-            return reportMarkedFiberLengths(out, com, sel);
+            return reportFiberMarkedLengths(out, com, sel);
         if ( what == "distribution" || what == "histogram" )
             return reportFiberLengthHistogram(out, com, opt);
         if ( what == "tension" )
@@ -607,7 +607,7 @@ void Simul::reportFiberLengths(std::ostream& out, std::ostream& com, Property co
 /**
  Export average length and variance for fibers grouped by mark
  */
-void Simul::reportMarkedFiberLengths(std::ostream& out, std::ostream& com, Property const*) const
+void Simul::reportFiberMarkedLengths(std::ostream& out, std::ostream& com, Property const*) const
 {
     com << COM << ljust("mark", 1, 2) << SEP << "count" << SEP << "avg_len" << SEP << "var_len";
     com << SEP << "min_len" << SEP << "max_len" << SEP << "total" << SEP << "off";
