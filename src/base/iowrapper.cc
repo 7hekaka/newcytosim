@@ -273,7 +273,7 @@ float Inputter::readFloatBinary()
     u.i[2] = get_char();
     u.i[3] = get_char();
 #else
-    if ( 1 != fread(&u, 4, 1, mFile) )
+    if ( 1 != fread(&u, sizeof(float), 1, mFile) )
         throw InvalidIO("readFloat failed");
 #endif
     if ( binary_ == 2 )
@@ -337,7 +337,7 @@ void Inputter::readFloats(float flt[], const unsigned dim)
     unsigned d = 0;
     if ( binary_ )
     {
-        if ( stop != fread(flt, 4, stop, mFile) )
+        if ( stop != fread(flt, sizeof(float), stop, mFile) )
             throw InvalidIO("readFloats(float) failed");
         if ( binary_ == 2 ) {
             for ( int i = 0; i < stop; ++i )
@@ -365,7 +365,7 @@ void Inputter::readFloats(double ptr[], const unsigned dim)
     if ( binary_ && dim < 4 )
     {
         float flt[4] = { 0 };
-        size_t cnt = fread(flt, 4, stop, mFile);
+        size_t cnt = fread(flt, sizeof(float), stop, mFile);
         if ( cnt < stop )
         {
             for ( size_t d = cnt; d < stop; ++d )
@@ -392,6 +392,25 @@ void Inputter::readFloats(double ptr[], const unsigned dim)
 }
 
 
+/// unpack and zero-out data to match dimensionality, eg { X, Y, 0 } if dim==2
+static void unpack_floats(int cnt, float flt[], const int vsz, const int dim)
+{
+    //printf("\n/"); for ( int i = 0; i < cnt*vsz; ++i ) printf(" %6.2f", flt[i]);
+    int u = cnt;
+    while ( u-- > 0 )
+    {
+        int i = dim-1;
+        do
+            flt[u*dim+i] = 0.f;
+        while ( --i > vsz );
+        do
+            flt[u*dim+i] = flt[u*vsz+i];
+        while ( --i >= 0 );
+    }
+    //printf("\nL"); for ( int i = 0; i < cnt*dim; ++i ) printf(" %6.2f", flt[i]);
+}
+
+
 /**
 This will read `n * vecsize_` floats, and store `n * dim` values in ptr[].
 */
@@ -407,7 +426,7 @@ void Inputter::readFloats(const unsigned cnt, float flt[], const unsigned dim)
 
     // read all values in one call to fread()
     unsigned n = cnt * vecsize_;
-    if ( n != fread(flt, 4, n, mFile) )
+    if ( n != fread(flt, sizeof(float), n, mFile) )
         throw InvalidIO("readFloats(D) failed");
 
     if ( binary_ == 2 )
@@ -417,16 +436,7 @@ void Inputter::readFloats(const unsigned cnt, float flt[], const unsigned dim)
     }
     if ( vecsize_ < dim )
     {
-        // pad data to match dimensionality
-        unsigned u = cnt;
-        while ( u-- > 0 )
-        {
-            unsigned i = dim;
-            while ( i-- > vecsize_ )
-                flt[u*dim+i] = 0.f;
-            while ( i-- > 0 )
-                flt[u*dim+i] = flt[u*vecsize_+i];
-        }
+        unpack_floats(cnt, flt, vecsize_, dim);
     }
 }
 
@@ -746,7 +756,7 @@ void Outputter::writeEulerAngles(const float a, const float b)
 void Outputter::writeFloatBinary(const float x)
 {
     assert_true( binary_ );
-    if ( 1 != fwrite(&x, 4, 1, mFile) )
+    if ( 1 != fwrite(&x, sizeof(float), 1, mFile) )
         throw InvalidIO("writeFloat() failed");
 }
 
@@ -755,7 +765,7 @@ void Outputter::writeFloat(const float x)
 {
     if ( binary_ )
     {
-        if ( 1 != fwrite(&x, 4, 1, mFile) )
+        if ( 1 != fwrite(&x, sizeof(float), 1, mFile) )
             throw InvalidIO("writeFloat() failed");
     }
     else
@@ -778,7 +788,7 @@ void Outputter::writeFloats(const float* a, const size_t n, char before)
 void Outputter::writeFloatsBinary(const float* a, const size_t n)
 {
     assert_true( binary_ );
-    if ( n != fwrite(a, 4, n, mFile) )
+    if ( n != fwrite(a, sizeof(float), n, mFile) )
         throw InvalidIO("writeFloat() failed");
     for ( size_t d = 0; d < n; ++d )
         writeFloat(a[d]);
@@ -790,7 +800,7 @@ void Outputter::writeFloatsBinary(const double* a, const size_t n)
     float * f = new float[n];
     for ( size_t i = 0; i < n; ++i )
         f[i] = static_cast<float>(a[i]);
-    size_t res = fwrite(f, 4, n, mFile);
+    size_t res = fwrite(f, sizeof(float), n, mFile);
     delete[] f;
     if ( res != n )
         throw InvalidIO("writeFloatsBinary(double*) failed");
