@@ -578,7 +578,7 @@ ObjectList Interface::execute_new(std::string const& cat, std::string const& nam
     }
     else if ( set == &sim_->singles && opt.has_key("multi_base") )
     {
-        // particular case: distribute Single onto beads (31.01.2023):
+        // particular case: distribute singles onto many beads (31.01.2023):
         SingleProp const* sp = static_cast<SingleProp const*>(prp);
         std::string str;
         if ( opt.set(str, "multi_base") )

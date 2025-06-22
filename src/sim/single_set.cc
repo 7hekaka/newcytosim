@@ -593,7 +593,7 @@ int SingleSet::bad() const
 
 /** Create Wrists anchored, and distributed to beads `name` */
 void SingleSet::distributeWrists(ObjectList& objs, SingleProp const* sp,
-                                 index_t cnt, std::string const& name) const
+                                 size_t cnt, std::string const& name) const
 {
     BeadProp * bip = simul_.findProperty<BeadProp>("bead", name);
     if ( !bip )
