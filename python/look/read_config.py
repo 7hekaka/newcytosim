@@ -450,15 +450,19 @@ def format_config(pile, mode=0, prefix=''):
 def matching(ins, keys):
     """
     """
-    j = 0
-    res = 1
-    for i in range(3):
-        w = ins.words_[j]
+    if ins.words_[0] != keys[0]:
+        return 0
+    i = 1
+    for k in range(1, 3):
+        w = ins.words_[k]
         if w.isdigit():
-            j += 1
-            w = ins.words_[j]
-        res &= ( keys[i]=='*' or w==keys[i] )
-    return res
+            k += 1
+            w = ins.words_[k]
+        #print("[",w,"  ",keys[i],"]")
+        if w != keys[i] and '*' != keys[i]:
+            return 0
+        i += 1
+    return 1
 
 
 def get_command(pile, keys):

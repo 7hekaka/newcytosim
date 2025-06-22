@@ -80,16 +80,16 @@ def plot_positions(xdata, xlim, xinfo):
 
 def parse(dirpath):
     """
-    Work in current directory
+    Extract data in current directory
     """
     pile = read_config.parse('config.cym')
-    shape = read_config.get_value(pile, ['set', 'space', 'cell', 'geometry'])
-
+    shape = read_config.get_value(pile, ['set', 'space', 'cell', 'shape'])
+    print("shape is [",shape,"]")
     if shape.startswith('wall'):
         subprocess.call(['reportW', 'space'], stdout=open('radius.txt', 'w'), stderr=None)
         rdata = load_data('radius.txt')
         if len(rdata) > 0:
-            cdata = get_data('/Users/nedelec/tmp/closure_diameter.txt')
+            cdata = load_data('/Users/nedelec/tmp/closure_diameter.txt')
             data = [ rdata[2], [ 2*x for x in rdata[3] ] ]
             plot_diameter(cdata, data)
             plt.savefig('diameter.png')
