@@ -83,7 +83,7 @@ def parse(dirpath):
     Work in current directory
     """
     pile = read_config.parse('config.cym')
-    shape = read_config.value(pile, ['set', 'space', 'cell', 'geometry'])
+    shape = read_config.get_value(pile, ['set', 'space', 'cell', 'geometry'])
 
     if shape.startswith('wall'):
         subprocess.call(['reportW', 'space'], stdout=open('radius.txt', 'w'), stderr=None)
@@ -131,7 +131,7 @@ def main(args):
         cdir = os.getcwd()
         for p in paths:
             os.chdir(p)
-            sys.stdout.write('- '*32+p"\n")
+            sys.stdout.write('- '*32+'\n')
             try:
                 parse(p)
             except Exception as e:
