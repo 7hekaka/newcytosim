@@ -196,7 +196,7 @@ int main(int argc, char* argv[])
 
     int cnt = 0;
     // multiple ranges of indices can be specified:
-    if ( arg.num_values("frame") > 1 )
+    if ( arg.num_values("frame") > 0 )
     {
         int inp = 0;
         while ( arg.set(str, "frame", inp++) )
