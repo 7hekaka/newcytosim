@@ -389,12 +389,12 @@ static void changeMarked(FiberDisp* p, int val)
 }
 
 
-static void flipExplode(FiberDisp* p)
+static void flipExplode(DisplayProp& p)
 {
-    p->explode_style = ! p->explode_style;
-    if ( p->explode_style && p->explode_range == 0 )
-        p->explode_range = 1;
-    flashText("fiber:explode = %i", p->explode_style);
+    p.explode_style = ! p.explode_style;
+    if ( p.explode_style && p.explode_range == 0 )
+        p.explode_range = 1;
+    flashText("display:explode = %i", p.explode_style);
 }
 
 
@@ -440,10 +440,10 @@ static void changeScale(FiberDisp* p, int d)
         changeScale(p->length_scale, d);
         flashText("fiber:length_scale = %.5f", p->length_scale);
     }
-    else if ( disp.style == 1 && p->explode_style )
+    else if ( disp.style == 1 && disp.explode_style )
     {
-        changeScale(p->explode_range, d);
-        flashText("fiber:explode_range = %.5f", p->explode_range);
+        changeScale(disp.explode_range, d);
+        flashText("fiber:explode_range = %.5f", disp.explode_range);
     }
 }
 
@@ -914,6 +914,12 @@ void processKey(unsigned char key, int modifiers = 0)
                 flashText("Error in config: %s", e.what());
             }
         } break;
+       
+#if ENABLE_EXPLODED_DISPLAY
+        case 'X':
+            flipExplode(disp);
+            break;
+#endif
             
         case 'z':
             if ( worker.goodFile() )

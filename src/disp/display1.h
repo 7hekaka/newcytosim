@@ -23,6 +23,18 @@ class Display1 : public Display
     /// global OpenGL point size
     float pointSize;
 
+    /// value of shift for EXPLODED_DISPLAY
+    template < typename OBJ >
+    float explodeShift(OBJ const* obj) const;
+
+    /// shift vertex for EXPLODED_DISPLAY
+    template < typename FLOATS, typename OBJ >
+    void shiftVertex(FLOATS *, OBJ const*) const;
+
+    /// shift two vertices for EXPLODED_DISPLAY
+    template < typename FLOATS >
+    void shiftVertex(FLOATS *, FLOATS *, Fiber const*) const;
+
 public:
     
     ///constructor

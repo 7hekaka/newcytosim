@@ -19,7 +19,7 @@ typedef flute2 fluteD;
 typedef flute6 flute4D;
 #else
 typedef flute1 fluteD;
-typedef flute5 flute4D;
+typedef flute6 flute4D;
 #endif
 
 namespace gym

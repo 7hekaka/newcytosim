@@ -90,6 +90,17 @@ public:
     /// flag to display Meca's links
     bool draw_links;
     
+    
+    /// the 'explosion' effect shift the fibers in space
+    /**
+     This can be useful to visualize dense regions,
+     but is only implemented for style=2
+     */
+    int explode_style;
+    
+    /// amount of lateral shift to separate fibers when display is exploded (known as `explode[1]`)
+    float explode_range;
+ 
     /// @}
 
 public:

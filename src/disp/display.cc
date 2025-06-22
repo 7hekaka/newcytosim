@@ -466,12 +466,6 @@ void Display::initLineDisp(const Fiber * fib, FiberDisp const* dis, LineDisp * s
     }
     else
         self->visible = 0;
-    
-    // set parameters for exploded display
-    if ( dis->explode_style )
-        self->explode_shift = ( fib->signature() * 0x1p-32 - 0.5 ) * dis->explode_range;
-    else
-        self->explode_shift = 0;
 }
 
 

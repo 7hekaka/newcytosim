@@ -33,9 +33,6 @@ public:
     
     /// scale to convert to color to display lines
     real color_scale;
-    
-    /// amount of lateral displacement added during display
-    float explode_shift;
 
     /// visibility flag
     int visible;

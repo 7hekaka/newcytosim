@@ -20,6 +20,9 @@ void DisplayProp::clear()
     point_size     = 5;
     link_width     = 4;
     line_width     = 2;
+
+    explode_style = 0;
+    explode_range = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -49,6 +52,14 @@ void DisplayProp::read(Glossary& glos)
     if ( glos.set(line_width, "line_width") )
         link_width = line_width;
     glos.set(link_width, "link_width", "link_size");
+    
+    glos.set(explode_style, "explode");
+    glos.set(explode_range, "explode", 1);
+    
+#if BACKWARD_COMPATIBLE
+    if ( glos.set(explode_range, "display_shift") )
+        explode_style = 1;
+#endif
 }
 
 
@@ -66,6 +77,7 @@ void DisplayProp::write_values(std::ostream& os) const
     write_value(os, "point_size",    point_size);
     write_value(os, "link_width",    link_width);
     write_value(os, "line_width",    line_width);
+    write_value(os, "explode",       explode_style, explode_range);
 }
 
 

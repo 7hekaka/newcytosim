@@ -101,7 +101,7 @@ void Display1::drawFibers(FiberSet const& set)
     {
         if ( fib->disp->visible )
         {
-            gym::set_view(ref, 0, fib->disp->explode_shift, 0);
+            gym::set_view(ref, 0, explodeShift(fib), 0);
             drawFiber(*fib);
         }
     }
@@ -118,36 +118,32 @@ void Display1::drawFibers(FiberSet const& set)
 //------------------------------------------------------------------------------
 #pragma mark - Methods to shift vertices vertically in exploded display
 
+#if ENABLE_EXPLODED_DISPLAY
+
 template < typename OBJ >
-inline void shiftVertex(flute4D * ptr, const OBJ* obj)
+inline float Display1::explodeShift(OBJ const* obj) const
 {
-#if ENABLE_EXPLODED_DISPLAY
-    constexpr float mag = 1.f/UINT32_MAX;
-    float shift = mag * float(obj->signature()) - 0.5f;
+    if ( prop->explode_style )
+        return prop->explode_range * ( obj->signature() * 0x1p-32 - 0.5 );
+    return 0;
+}
+
+
+template < typename FLOATS, typename OBJ >
+inline void Display1::shiftVertex(FLOATS * ptr, OBJ const* obj) const
+{
+    float shift = explodeShift(obj);
 #  if ( DIM == 1 )
     ptr->setY(shift);
 #  else
     ptr->setY(ptr->xyz[5]+shift);
 #  endif
-#endif
 }
 
-inline void shiftVertex(flute4D * ptr, const Fiber* fib)
+template < typename FLOATS >
+inline void Display1::shiftVertex(FLOATS * ptr, FLOATS * qrt, const Fiber* fib) const
 {
-#if ENABLE_EXPLODED_DISPLAY
-    float shift = fib->disp->explode_shift;
-#  if ( DIM == 1 )
-    ptr->setY(shift);
-#  else
-    ptr->setY(ptr->xyz[5]+shift);
-#  endif
-#endif
-}
-
-inline void shiftVertex(flute4D * ptr, flute4D * qrt, const Fiber* fib)
-{
-#if ENABLE_EXPLODED_DISPLAY
-    float shift = fib->disp->explode_shift;
+    float shift = explodeShift(fib);
 #  if ( DIM == 1 )
     ptr->setY(shift);
     qrt->setY(shift);
@@ -155,8 +151,21 @@ inline void shiftVertex(flute4D * ptr, flute4D * qrt, const Fiber* fib)
     ptr->setY(ptr->xyz[5]+shift);
     qrt->setY(ptr->xyz[5]+shift);
 #  endif
-#endif
 }
+
+#else
+
+template < typename FLOATS, typename OBJ >
+inline void Display1::shiftVertex(FLOATS *, OBJ const*) const
+{
+}
+
+template < typename FLOATS >
+inline void Display1::shiftVertex(FLOATS *, FLOATS *, Fiber const*) const
+{
+}
+
+#endif
 
 
 //------------------------------------------------------------------------------
