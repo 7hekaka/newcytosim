@@ -47,9 +47,6 @@ public:
     /// default width of links
     float link_width;
 
-    /// width of thinnest lines
-    float bone_width;
-
     /// if set > 0, this defines the unit scale used for `point_size` and `line_width`
     /**
      Set this parameter to specify the fiber radius and point size in length units.

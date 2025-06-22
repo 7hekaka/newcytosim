@@ -20,7 +20,6 @@ void DisplayProp::clear()
     point_size     = 5;
     link_width     = 4;
     line_width     = 2;
-    bone_width     = 1;
 }
 
 //------------------------------------------------------------------------------
@@ -50,7 +49,6 @@ void DisplayProp::read(Glossary& glos)
     if ( glos.set(line_width, "line_width") )
         link_width = line_width;
     glos.set(link_width, "link_width", "link_size");
-    glos.set(bone_width, "bone_width");
 }
 
 
@@ -68,7 +66,6 @@ void DisplayProp::write_values(std::ostream& os) const
     write_value(os, "point_size",    point_size);
     write_value(os, "link_width",    link_width);
     write_value(os, "line_width",    line_width);
-    write_value(os, "bone_width",    bone_width);
 }
 
 

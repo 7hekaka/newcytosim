@@ -111,6 +111,9 @@ public:
      */
     int line_caps;
     
+    /// width of lines used to draw backbone
+    float bone_width;
+
     /// if set, draw fiber's outline with the background color (supported only for DIM==3)
     float outline_width;
 

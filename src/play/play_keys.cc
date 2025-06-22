@@ -398,9 +398,10 @@ static void flipExplode(FiberDisp* p)
 }
 
 
-static void changeScale(real& scale, int d)
+template < typename REAL >
+static void changeScale(REAL& scale, int d)
 {
-    real s = std::log2(std::fabs(scale)) + d * 0.125;
+    REAL s = std::log2(std::fabs(scale)) + d * 0.125;
     if ( s < -14 ) s =  10;
     if ( s >  10 ) s = -14;
     scale = std::copysign(std::exp2(s), scale);
@@ -647,8 +648,8 @@ static void changeSize(FiberDisp* p, int inc)
     if ( p->speckle_style ) changeSpeckleSize(p, inc);
     if ( p->style == 1 )
     {
-        disp.bone_width = grained(disp.bone_width, inc);
-        flashText("display:bone_width=%0.2f", disp.bone_width);
+        p->bone_width = grained(p->bone_width, inc);
+        flashText("display:bone_width=%0.2f", p->bone_width);
     }
 }
 
@@ -715,7 +716,7 @@ static void shuffleFiberStyle(FiberDisp* p, int val)
     {
         p->speckle_style = 0;
         p->style = 1;
-        flashText("%s:style = %i, width = %.2f", n, p->style, disp.bone_width);
+        flashText("%s:style = %i, width = %.2f", n, p->style, p->bone_width);
     }
     else
     {

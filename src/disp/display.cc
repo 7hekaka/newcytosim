@@ -1995,7 +1995,7 @@ void Display::drawFiber(Fiber const& fib)
 #endif
 
     if ( dis->style == 1 )
-        drawFiberBackbone(fib, fib.disp->color, prop->bone_width);
+        drawFiberBackbone(fib, fib.disp->color, fib.prop->disp->bone_width);
     // if the Lattice was displayed, do not draw fancy styles:
     else if ( style && dis->style )
     {
