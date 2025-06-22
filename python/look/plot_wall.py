@@ -2,12 +2,11 @@
 #
 # Make a plot using matplotlib
 #
-# F. Nedelec, 13-15 November 2013
+# F. Nedelec, 13-15 November 2013, 22.06.2025
 #
 # How I installed matplotlib in Jan 2015 (Mac osx 10.10):
 #
 # brew install python3 --framework
-# pip3 install numpy
 # pip3 install nose
 # pip3 install matplotlib
 #
@@ -32,18 +31,35 @@ Description:
 """
 
 import sys, os, math, subprocess
-import numpy
 import matplotlib.pyplot as plt
 import read_config
 
 fts = 14
 out = sys.stderr
 
-def load_data(file):
-    try:
-        return numpy.loadtxt(file, comments='%', unpack=True)
-    except:
-        return []
+
+def load_data(filename):
+    """
+    read line-by-line and convert to numerical value is possible
+    """
+    res = []
+    with open(filename, 'r') as f:
+        for line in f:
+            if line and line[0] != '%':
+                L = []
+                for v in line.split():
+                    try:
+                        v = float(v)
+                        if v == int(v):
+                            v = int(v)
+                    except:
+                        pass
+                    L.append(v)
+                if L:
+                    res.append(L)
+    # reformat data in columns:
+    return list(zip(*res))
+
 
 def image(x, p):
 	while x > p:
@@ -53,10 +69,10 @@ def image(x, p):
 	return x
 
 
-def plot_diameter(cdata, rdata):
+def plot_diameter(exp, sim):
     plt.figure(figsize=(3.84, 2.56), dpi=100)
-    plt.plot(cdata[0], cdata[1], 'ko')
-    plt.plot(rdata[0], rdata[1], 'b-', linewidth=4)
+    plt.plot(exp[0], exp[1], 'ko')
+    plt.plot(sim[0], sim[1], 'b-', linewidth=4)
     plt.xlabel('Time (s)', fontsize=fts)
     plt.ylabel(r'Diameter ($\mu m$)', fontsize=fts)
     #plt.title('Closure', fontsize=fts)
@@ -67,7 +83,7 @@ def plot_diameter(cdata, rdata):
 
 def plot_positions(xdata, xlim, xinfo):
     plt.figure(figsize=(3.84, 2.56), dpi=100)
-    n, bins, patches = plt.hist(xdata, 20, normed=1)
+    n, bins, patches = plt.hist(xdata, 20)
     ax = plt.gca()
     ax.yaxis.set_visible(False)
     plt.xlabel('Position (%s)' % xinfo, fontsize=fts)
@@ -86,16 +102,19 @@ def parse(dirpath):
     shape = read_config.get_value(pile, ['set', 'space', 'cell', 'shape'])
     print("shape is [",shape,"]")
     if shape.startswith('wall'):
-        subprocess.call(['reportW', 'space'], stdout=open('radius.txt', 'w'), stderr=None)
-        rdata = load_data('radius.txt')
-        if len(rdata) > 0:
-            cdata = load_data('/Users/nedelec/tmp/closure_diameter.txt')
-            data = [ rdata[2], [ 2*x for x in rdata[3] ] ]
-            plot_diameter(cdata, data)
+        if not os.path.isfile('radius.txt'):
+            subprocess.call(['reportW', 'space'], stdout=open('radius.txt', 'w'), stderr=None)
+        data = load_data('radius.txt')
+        if len(data) > 0:
+            tim = data[3]
+            rad = [ 2*x for x in data[4] ]
+            exp = load_data('/Users/nedelec/tmp/closure_diameter.txt')
+            plot_diameter(exp, [tim, rad])
             plt.savefig('diameter.png')
             plt.close()
         #
-        subprocess.call(['reportW', 'bead:all', 'frame=1999'], stdout=open('beads.txt', 'w'), stderr=None)
+        if not os.path.isfile('beads.txt'):
+            subprocess.call(['reportW', 'bead', 'frame=1999'], stdout=open('beads.txt', 'w'), stderr=None)
         data = load_data('beads.txt')
         data = [ math.atan2(data[3][n], data[2][n]) for n in range(len(data[0])) ]
         if len(data) > 0:
@@ -104,7 +123,8 @@ def parse(dirpath):
             plt.close()
 
     if shape.startswith('strip'):
-        subprocess.call(['reportW', 'bead:all', 'frame=999'], stdout=open('beads.txt', 'w'), stderr=None)
+        if not os.path.isfile('beads.txt'):
+            subprocess.call(['reportW', 'bead', 'frame=999'], stdout=open('beads.txt', 'w'), stderr=None)
         data = load_data('beads.txt')
         if len(data) > 0:
             data = [ image(x, 5) for x in data[2] ]
@@ -132,10 +152,7 @@ def main(args):
         for p in paths:
             os.chdir(p)
             sys.stdout.write('- '*32+'\n')
-            try:
-                parse(p)
-            except Exception as e:
-                out.write("Error: %s\n" % repr(e))
+            parse(p)
             os.chdir(cdir)
 
 #------------------------------------------------------------------------
