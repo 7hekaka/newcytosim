@@ -365,12 +365,7 @@ void Mecable::read(Inputter& in, Simul&, ObjectTag)
 {
     index_t nb = in.readUInt16();
     setNbPoints(nb);
-#if !REAL_IS_DOUBLE
     in.readFloats(nb, pPos, DIM);
-#else
-    for ( index_t i = 0; i < nb ; ++i )
-        in.readFloats(pPos+DIM*i, DIM);
-#endif
 }
 
 

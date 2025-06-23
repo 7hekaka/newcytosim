@@ -392,9 +392,10 @@ void Inputter::readFloats(double ptr[], const unsigned dim)
 }
 
 
-/// unpack and zero-out data to match dimensionality, eg { X, Y, 0 } if dim==2
+/// unpack and zero-out data to match dimensionality, eg { X, Y, 0 } if vsz==2
 static void unpack_floats(int cnt, float flt[], const int vsz, const int dim)
 {
+    assert_true(vsz < dim);
     //printf("\n/"); for ( int i = 0; i < cnt*vsz; ++i ) printf(" %6.2f", flt[i]);
     int u = cnt;
     while ( u-- > 0 )
@@ -411,21 +412,88 @@ static void unpack_floats(int cnt, float flt[], const int vsz, const int dim)
 }
 
 
+/// unpack and zero-out data to match dimensionality, eg { X, Y, 0 } if vsz==2
+static void pack_floats(int cnt, float flt[], const int vsz, const int dim)
+{
+    assert_true(dim < vsz);
+    //printf("\n/"); for ( int i = 0; i < cnt*vsz; ++i ) printf(" %6.2f", flt[i]);
+    for ( int i = 0; i < cnt ; ++i )
+    {
+        for ( int d = 0; d < dim; ++d )
+            flt[i*dim+d] = flt[i*vsz+d];
+    }
+    //printf("\nL"); for ( int i = 0; i < cnt*dim; ++i ) printf(" %6.2f", flt[i]);
+}
+
+
 /**
 This will read `n * vecsize_` floats, and store `n * dim` values in ptr[].
 */
-void Inputter::readFloats(const unsigned cnt, float flt[], const unsigned dim)
+void Inputter::readFloats(const unsigned cnt, float ptr[], const unsigned dim)
 {
-    if ( dim < vecsize_ || ! binary_ )
+    if ( ! binary_ )
     {
-        // read values sequentially
         for ( unsigned i = 0; i < cnt ; ++i )
-            readFloats(flt+dim*i, dim);
+        {
+            for ( unsigned d = 0; d < vecsize_; ++d )
+            {
+                float f = 0.f;
+                if ( 1 != fscanf(mFile, " %f", &f) )
+                    throw InvalidIO("readFloat failed");
+                ptr[dim*i+d] = ( d < dim ? (double)f : 0.f );
+            }
+        }
         return;
     }
 
     // read all values in one call to fread()
     unsigned n = cnt * vecsize_;
+    if ( n != fread(ptr, sizeof(float), n, mFile) )
+        throw InvalidIO("readFloats(F) failed");
+
+    if ( binary_ == 2 )
+    {
+        for ( unsigned i = 0; i < n; ++i )
+            ptr[i] = byteswap32(ptr[i]);
+    }
+    if ( vecsize_ < dim )
+        unpack_floats(cnt, ptr, vecsize_, dim);
+    else if ( dim < vecsize_ )
+        pack_floats(cnt, ptr, vecsize_, dim);
+}
+
+
+
+/**
+This will read `n * vecsize_` floats, and store `n * dim` values in ptr[].
+*/
+void Inputter::readFloats(const unsigned cnt, double ptr[], const unsigned dim)
+{
+    if ( vecsize_ < dim )
+    {
+        for ( unsigned i = 0; i < cnt*dim; ++i )
+            ptr[i] = 0.0;
+    }
+
+    if ( ! binary_ )
+    {
+        for ( unsigned i = 0; i < cnt ; ++i )
+        {
+            for ( unsigned d = 0; d < vecsize_; ++d )
+            {
+                float f = 0.f;
+                if ( 1 != fscanf(mFile, " %f", &f) )
+                    throw InvalidIO("readFloat failed");
+                ptr[dim*i+d] = ( d < dim ? (double)f : 0.0 );
+            }
+        }
+        return;
+    }
+
+    size_t n = cnt * vecsize_;
+    float * flt = new float[n];
+    
+    // read all values in one call to fread()
     if ( n != fread(flt, sizeof(float), n, mFile) )
         throw InvalidIO("readFloats(D) failed");
 
@@ -434,10 +502,13 @@ void Inputter::readFloats(const unsigned cnt, float flt[], const unsigned dim)
         for ( unsigned i = 0; i < n; ++i )
             flt[i] = byteswap32(flt[i]);
     }
-    if ( vecsize_ < dim )
+    unsigned top = std::min(dim, vecsize_);
+    for ( unsigned i = 0; i < cnt; ++i )
     {
-        unpack_floats(cnt, flt, vecsize_, dim);
+        for ( unsigned d = 0; d < top; ++d )
+            ptr[i*dim+d] = (double)flt[i*vecsize_+d];
     }
+    delete[] flt;
 }
 
 
