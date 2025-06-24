@@ -1507,14 +1507,14 @@ namespace gle
 
     /**
      Set triangles for a surface of revolution around the Z-axis.
-     The surface goes from Z = [ B, T ] with increments dZ, and its radius is
-     given by the function `radius(Z)` provided as argument.
+     The surface goes from Z = B to Z = B+stp*dZ, with increments dZ,
+     and its radius is defined by the function `radius(Z)` provided as argument.
      */
-    unsigned setRevolution(flute6 * flu, float (*radius)(float), float B, const float T, float dZ)
+    unsigned setRevolution(flute6 * flu, float (*radius)(float), float B, float dZ, unsigned stp)
     {
         unsigned i = 0;
         float Z = B, R, Q = radius(B);
-        while ( B < T )
+        for ( unsigned u = 0; u < stp; ++u )
         {
             Z += dZ;
             R = radius(Z);
@@ -1534,7 +1534,6 @@ namespace gle
             B = Z;
             Q = R;
         }
-        assert_true( i == 2*(2+pi_4half)*(1+std::ceil((T-B)/dZ)) );
         return i;
     }
     
@@ -2064,10 +2063,10 @@ namespace gle
      */
     void drawRevolution(float (*radius)(float), float B, const float T, float dZ)
     {
-        unsigned cnt = 2*(2+pi_4half)*(1+std::ceil((T-B)/dZ));
+        unsigned stp = std::ceil( (T-B) / dZ );
+        unsigned cnt = 2 * ( 2 + pi_4half ) * stp;
         flute6 * flu = gym::mapBufferV3N3(cnt+4);
-        unsigned i = setRevolution(flu, radius, B, T, dZ);
-        assert_true( i <= cnt );
+        setRevolution(flu, radius, B, dZ, stp);
         gym::unmapBufferV3N3();
         gym::drawTriangleStrip(0, cnt);
         gym::cleanupVN();
