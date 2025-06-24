@@ -103,6 +103,7 @@ namespace gym
         {"forest_green",  0x808000FF},
         {"fuscia",        0xFF00FFFF},
         {"flesh",         0xF4D3B4FF},
+        {"ginger",        0xB06500FF},
         {"gold",          0xD4A017FF},
         {"grass_green",   0x408080FF},
         {"grey",          0x707070FF},
