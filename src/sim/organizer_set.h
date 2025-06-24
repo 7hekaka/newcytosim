@@ -6,6 +6,8 @@
 #include "object_set.h"
 #include "organizer.h"
 
+class Aster;
+
 /// a list of Organizer (Aster, Nucleus, Bundle)
 class OrganizerSet : public ObjectSet
 {
@@ -47,6 +49,11 @@ public:
 
     /// Monte-Carlo simulation step for every Object
     void steps();
+
+    //--------------------------
+
+    /// first Aster with this name
+    Aster * pickAster(std::string) const;
 
 };
 

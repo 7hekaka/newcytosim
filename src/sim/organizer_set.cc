@@ -112,6 +112,11 @@ ObjectID OrganizerSet::findOrganizerID(const Mecable * m) const
 }
 
 
+Aster * OrganizerSet::pickAster(std::string s) const
+{
+    return Aster::toAster(pickObject("aster", s));
+}
+
 //------------------------------------------------------------------------------
 
 void OrganizerSet::report(std::ostream& os) const

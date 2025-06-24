@@ -27,6 +27,7 @@
 
 class Meca1D;
 class Parser;
+class Aster;
 
 
 /// Simulator class containing all Objects
@@ -303,7 +304,7 @@ public:
     Sphere * pickSphere(std::string s) { return Sphere::toSphere(spheres.pickObject("sphere", s)); }
     
     /// first Space with this Property
-    Space * pickSpace(const Property * p) const { return static_cast<Space*>(spaces.pickObject(p)); }
+    Space * pickSpace(const Property * p) const { return Space::toSpace(spaces.pickObject(p)); }
 
     /// return first Space with given name, or return nullptr
     Space const* findSpace(std::string) const;

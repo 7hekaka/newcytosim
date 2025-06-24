@@ -214,6 +214,14 @@ public:
     /// get dimensions from array `len`
     virtual void setLengths(const real len[8]) {}
 
+    /// convert pointer to Space* if possible
+    static Space* toSpace(Object * obj)
+    {
+        if ( obj  &&  obj->tag() == TAG )
+            return static_cast<Space*>(obj);
+        return nullptr;
+    }
+
     //------------------------------ DISPLAY -----------------------------------
     
     /// Default 2D display, tracing the outline of a section of the Volume

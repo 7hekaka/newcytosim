@@ -41,7 +41,7 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
     // find the Aster specified:
     if ( opt.set(str, "aster1") )
     {
-        Aster * a = Aster::toAster(sim.organizers.pickObject("aster", str));
+        Aster * a = sim.organizers.pickAster(str);
         if ( !a)
             throw InvalidParameter("could not find Aster `"+str+"'");
         as = a->solid();
@@ -58,7 +58,7 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
     // find the Aster specified:
     if ( opt.set(str, "aster2") )
     {
-        Aster * a = Aster::toAster(sim.organizers.pickObject("aster", str));
+        Aster * a = sim.organizers.pickAster(str);
         if ( !a )
             throw InvalidParameter("could not find Aster `"+str+"'");
         bs = a->solid();
@@ -70,10 +70,10 @@ ObjectList Fake::build(Glossary& opt, Simul& sim)
             throw InvalidParameter("could not find Solid `"+str+"'");
     }
     else
-        throw InvalidParameter("fake:solid1 must be specified");
+        throw InvalidParameter("fake:solid2 must be specified");
     
     if ( as == bs )
-        throw InvalidParameter("fake cannot be made with only one Solid");
+        throw InvalidParameter("fake cannot be made from only one Solid");
     
     Solid * so = new Solid(as->prop);
     

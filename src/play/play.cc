@@ -212,7 +212,9 @@ int main(int argc, char* argv[])
     }
     else if ( arg.use_key("+") )
     {
-        simul.prop.verbose = 3;
+        simul.prop.verbose = 7;
+        Cytosim::log.redirect(std::cerr);
+        Cytosim::warn.redirect(std::cerr);
     }
     
     if ( arg.use_key("help") )
