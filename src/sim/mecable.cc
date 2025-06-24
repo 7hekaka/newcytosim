@@ -24,7 +24,7 @@ Mecable::Mecable()
     pBlockType = 0;
     pPos       = nullptr;
     pForce     = nullptr;
-    pIndex     = 0;
+    pIndex     = ~0;
 #if ADD_PROJECTION_DIFF
     useProjectionDiff = false;
 #endif

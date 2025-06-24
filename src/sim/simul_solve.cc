@@ -89,7 +89,7 @@ real Simul::minimumStericRange() const
  */
 void Simul::setAllInteractions(Meca& meca) const
 {
-#if 0
+#if 1
     for ( Mecable const* mec : meca.mecables )
         mec->setInteractions(meca);
 #else

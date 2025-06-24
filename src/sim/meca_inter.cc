@@ -101,10 +101,13 @@ static inline Vector modulo_offset(T const& A, U const& B)
 #pragma mark - Functions to set matrix elements
 //------------------------------------------------------------------------------
 
-#define CHECK_INDEX(I) ((void) 0)
-#define CHECK_INDICES(I,J,C) ((void) 0)
-//#define CHECK_INDEX(I) { assert_true(I<nPoints_); }
-//#define CHECK_INDICES(I,J,C) { if (J>I) printf(" wrong-sided %s %lu %lu\n",C,I,J); }
+#if 0
+#  define CHECK_INDEX(I) ((void) 0)
+#  define CHECK_INDICES(I,J,C) ((void) 0)
+#else
+#  define CHECK_INDEX(I) { assert_true(I<nPoints_); }
+#  define CHECK_INDICES(I,J,C) { if (J>I) printf(" wrong-sided %s %u %u\n",C,I,J); }
+#endif
 
 #define PRINT_BLOCK(I,J,B) ((void) 0)
 //#define PRINT_BLOCK(I,J,B) { std::clog<<std::setw(3)<<I<<" "<<std::setw(3)<<J<<" "<<std::setprecision(2)<<std::setw(10)<<B<<'\n'; }
