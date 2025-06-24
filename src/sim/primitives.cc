@@ -901,7 +901,7 @@ Vector Cytosim::readDirectionPrimitive(std::string const& arg, size_t& sci, Vect
         {
             Vector vec;
             if ( extract(arg, sci, vec) )
-                return vec.randOrthoU(1);
+                return vec.normalized().randOrthoU(1.0);
             throw InvalidParameter("expected vector after `orthogonal`");
         }
 
@@ -932,10 +932,10 @@ Vector Cytosim::readDirectionPrimitive(std::string const& arg, size_t& sci, Vect
             return -normalize(pos);
 
         if ( tok == "circular" )
-            return pos.randOrthoU(1.0);
+            return pos.normalized().randOrthoU(1.0);
         
         if ( tok == "orthoradial" )
-            return pos.randOrthoU(1.0);
+            return pos.normalized().randOrthoU(1.0);
         
         if ( tok == "inwardX" )
             return Vector(sign_real(pos.XX), 0, 0);

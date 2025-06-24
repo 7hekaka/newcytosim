@@ -608,19 +608,19 @@ public:
     
     /**
      Given: N = norm(this), (C, S) = random numbers in [-1, 1],
-     @return a vector orthogonal to *this, of norm `N * ( C^2 + S^2 )`
+     @return a vector orthogonal to *this, of norm `N * sqrt( C^2 + S^2 )`
      
      Derived from `Building an Orthonormal Basis, Revisited`,
      Tom Duff et al. Journal of Computer Graphics Techniques Vol. 6 N.1, 2017
      */
-    Vector3 orthogonal(real N, real C, real S) const
+    Vector3 orthogonalNCS(real N, real C, real S) const
     {
-        assert_small(norm()/N - 1.0);
-        N = std::copysign(N, ZZ);
-        real a = YY / ( ZZ + N );
-        real b = YY * a;
-        real c = XX * a;
-        return Vector3(S*c-C*(ZZ+b), S*(b-N)+C*c, S*YY+C*XX);
+        assert_small(normSqr()/N - N);
+        real n = std::copysign(N, ZZ);
+        real u = YY / ( ZZ + n );
+        real b = YY * u;
+        real c = XX * u;
+        return Vector3(S*c-C*(ZZ+b), S*(b-n)+C*c, S*YY+C*XX);
     }
 
     /**
@@ -704,7 +704,7 @@ public:
      */
     void orthonormal(real N, Vector3& E, Vector3& F) const
     {
-        assert_small(norm()/N - 1.0);
+        assert_small(normSqr()/N - N);
         real s = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
         real a = YY / ( ZZ + s * N );
@@ -726,7 +726,7 @@ public:
    */
     void orthonormal(real L, Vector3& E, Vector3& F, real NoL) const
     {
-        assert_small(norm()/L - 1.0);
+        assert_small(normSqr()/L - L);
         real s = std::copysign(real(1.0), ZZ);
         // optimized version by Marc B. Reynolds
         real nY = NoL * YY;

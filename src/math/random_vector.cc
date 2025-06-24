@@ -261,14 +261,14 @@ Vector3 Vector3::randOrthoU(const real len) const
 {
     real C, S;
     RNG.urand2(C, S, len);
-    return orthogonal(1.0, C, S);
+    return orthogonalNCS(1.0, C, S);
 }
 
 /** this assumes norm(*this) == 1 **/
 Vector3 Vector3::randOrthoB(const real len) const
 {
     const Vector2 V = Vector2::randB();
-    return orthogonal(1.0, len * V.XX, len * V.YY);
+    return orthogonalNCS(1.0, len * V.XX, len * V.YY);
 }
 
 //------------------------------------------------------------------------------
