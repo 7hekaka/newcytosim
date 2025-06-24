@@ -185,7 +185,7 @@ void Player::autoFocus(View& view, Simul const& sim, unsigned mode) const
             if ( goLive && ( mode & 16 ))
             {
                 // time-average the direction vector:
-                dir = ( dir * 20 + vec ).normalized();
+                dir = normalize( dir * 20 + vec );
                 if ( glApp::mouseS ) // only track if mouse button is up!
                     view.align_with(dir, false, 0.01);
             }

@@ -718,7 +718,7 @@ void View::align_with(const real dir[3], bool can_flip, real scale)
     //printf(" : %+9.3f %+9.3f %+9.3f : ", vec[0], vec[1], vec[2]);
     Quaternion<real> R;
     R.setRotationToVector(vec, scale);
-    rotation = ( R * rotation ).normalized();
+    rotation = normalize( R * rotation );
     //R.print(stdout, true); //rotation.print(stdout, true);
     setModelView();
 }
