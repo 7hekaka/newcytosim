@@ -949,21 +949,22 @@ void test_transpose4x4()
         printf("float\n"); dump(4, 4, src);
         printf("transpose\n"); dump(4, 4, dst);
     }
-    {
 #if defined(__ARM_NEON__)
+    {
         float dst[16] = { 0 };
         transpose4x4neon(src, dst);
         printf("Transpose\n"); dump(4, 4, dst);
-
-#endif
     }
+#endif
 #if defined(__AVX__)
-    double dst[16] = { 0 };
-    //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
-    const double src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
-    transpose4x4(src, dst);
-    printf("double\n"); dump(4, 4, src);
-    printf("transposen\"); dump(4, 4, dst);
+    {
+        double dst[16] = { 0 };
+        //const double src[16] = { 1.1, 1.2, 1.3, 1.4, 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.3, 3.4, 4.1, 4.2, 4.3, 4.4 };
+        const double src[16] = { 1.1, 2.1, 3.1, 4.1, 1.2, 2.2, 3.2, 4.2, 1.3, 2.3, 3.3, 4.3, 1.4, 2.4, 3.4, 4.4 };
+        transpose4x4(src, dst);
+        printf("double\n"); dump(4, 4, src);
+        printf("transpose\n"); dump(4, 4, dst);
+    }
 #endif
 }
 

@@ -235,7 +235,7 @@ ifeq ($(MACHINE),linux)
     FlagsD := -O0 $(DEBUG) $(WARN)
     FlagsP := -O0 -fno-inline -pg $(ALIGN) $(FAST)
     FlagsC := -O0 -fprofile-arcs -ftest-coverage
-    FlagsF := -O2 -fno-devirtualize -finline-functions $(ALIGN) $(FAST)
+    FlagsF := $(FAST) -fno-devirtualize -finline-functions $(ALIGN) -march=native
 
     # specify the library path:
     LIBDIR := /usr/lib

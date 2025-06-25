@@ -19,6 +19,7 @@
 #include "xtrsm.h"
 #include "xtbsv.h"
 
+#define UNFINISHED_PRECONDITIONNER 0
 
 /// convert doubles to floats
 void convert_to_floats(size_t cnt, double const* src, float* dst)
@@ -538,10 +539,12 @@ void testTBSV(int N, size_t rep)
 #if REAL_IS_DOUBLE && USE_SIMD
         check<uniLN4>(N, 1, S, AB, BLDD, B, "LNN6K_SSE", rep);
 #endif
+#if UNFINISHED_PRECONDITIONNER
         copy_real(N*BLDD, AB, MC);
         modify_matrix<3>(3, N, MC, BLDD);
         //VecPrint::full("modified", 3, N, MC, 3, 1);
         check<uniLN5>(N, 1, S, MC, BLDD, B, "LNN6K/3", rep);
+#endif
     }
     if ( 1 )
     {
@@ -557,9 +560,11 @@ void testTBSV(int N, size_t rep)
 #if REAL_IS_DOUBLE && USE_SIMD
         check<uniLT4>(N, 1, S, AB, BLDD, B, "LTN6K_SSE", rep);
 #endif
+#if UNFINISHED_PRECONDITIONNER
         copy_real(N*BLDD, AB, MC);
         modify_matrix<3>(3, N, MC, BLDD);
         check<uniLT5>(N, 1, S, MC, BLDD, B, "LTN6K/3", rep);
+#endif
     }
     free_real(B);
     free_real(S);
