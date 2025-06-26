@@ -53,6 +53,11 @@ LOCAL vec2 load1d(float const* a) { return vcvt_f64_f32(float32x2_t{a[0], 0}); }
 // load 2 floats and convert to double
 LOCAL vec2 load2d(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
 
+//LOCAL vec2 load1d(float const* a) { return vec2{a[0], 0}; }
+LOCAL vec2 load1(float const* a) { return vcvt_f64_f32(float32x2_t{a[0], 0}); }
+// load 2 floats and convert to double
+LOCAL vec2 loadu2(float const* a) { return vcvt_f64_f32(vld1_f32(a)); }
+
 //------ half-precision, float16
 LOCAL float load_half(__fp16 const* a) { float16x4_t h = vld1_f16(a); float32x4_t f = vcvt_f32_f16(h); return f[0]; }
 

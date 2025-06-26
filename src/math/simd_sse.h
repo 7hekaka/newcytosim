@@ -28,7 +28,12 @@ LOCAL vec2 cvtsd2(__m128 a) { return _mm_cvtps_pd(a); }
 // load 1 float and convert to double and zero
 LOCAL vec2 load1d(float const* a) { return _mm_cvtps_pd(_mm_load_ss(a)); }
 // load 2 floats and convert to double
-LOCAL vec2 load2d(float const* a) { return _mm_cvtps_pd(_mm_castsi128_ps(_mm_loadl_epi64((__m128i*)a))); }
+LOCAL vec2 load2d(float const* a) { return _mm_cvtps_pd(_mm_loadl_pi(_mm_setzero_ps(), (__m64*)a)); }
+
+// load 1 float and convert to double and zero
+LOCAL vec2 load1(float const* a) { return _mm_cvtps_pd(_mm_load_ss(a)); }
+// load 2 floats and convert to double
+LOCAL vec2 loadu2(float const* a) { return _mm_cvtps_pd(_mm_loadl_pi(_mm_setzero_ps(), (__m64*)a)); }
 
 LOCAL void store1(double* a, vec2 b)   { _mm_store_sd(a, b); }
 LOCAL void store2(double* a, vec2 b)   { _mm_store_pd(a, b); }
