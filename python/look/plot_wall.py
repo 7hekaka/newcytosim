@@ -38,6 +38,30 @@ fts = 14
 out = sys.stderr
 
 
+def read_metadata(filename, pattern = 'config.'):
+    """
+    extract lines with '%config.PARAMETER=VALUE' and
+    return dictionary linking parameters to values
+    """
+    res = dict()
+    with open(filename, 'r') as f:
+        for line in f:
+            s = line.find(pattern)
+            if s > 0:
+                s += len(pattern)
+                code = line[s:-1].rstrip(';')
+                [k, _, v] = code.partition('=')
+                try:
+                    v = float(v)
+                    if v == int(v):
+                        v = int(v)
+                except:
+                    pass
+                if k:
+                    res[k] = v
+    return res
+
+
 def load_data(filename):
     """
     read line-by-line and convert to numerical value is possible
@@ -141,6 +165,8 @@ def main(args):
     for arg in args:
         if os.path.isdir(arg):
             paths.append(arg)
+        elif os.path.isfile(arg):
+            paths.append(arg)
         else:
             out.write("  Error: unexpected argument `%s'\n" % arg)
             sys.exit()
@@ -150,10 +176,11 @@ def main(args):
     else:
         cdir = os.getcwd()
         for p in paths:
-            os.chdir(p)
+            #os.chdir(p)
             sys.stdout.write('- '*32+'\n')
-            parse(p)
-            os.chdir(cdir)
+            #parse(p)
+            read_metadata(p)
+            #os.chdir(cdir)
 
 #------------------------------------------------------------------------
 

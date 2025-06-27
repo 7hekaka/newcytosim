@@ -18,29 +18,28 @@ Syntax:
 import sys, os, subprocess
 
 
-def uncode(arg):
-    try:
-        return arg.decode('utf-8')
-    except:
-        return arg
-
-
-def process(dirpath):
+def read_metadata(filename, pattern = 'config.'):
     """
-        get parameter
+    extract lines with '%config.PARAMETER=VALUE' and
+    return dictionary linking parameters to values
     """
-    key = []
-    val = []
-    filename = os.path.join(dirpath, 'config.cym')
+    res = dict()
     with open(filename, 'r') as f:
         for line in f:
-            data = uncode(line)
-            if data.startswith('%preconfig.'):
-                s = data[11:].split('=')
-                key.append(s[0])
-                val.append(s[1].strip())
-    return key, val
-
+            s = line.find(pattern)
+            if s > 0:
+                s += len(pattern)
+                code = line[s:-1].rstrip(';')
+                [k, _, v] = code.partition('=')
+                try:
+                    v = float(v)
+                    if v == int(v):
+                        v = int(v)
+                except:
+                    pass
+                if k:
+                    res[k] = v
+    return res
 
 #------------------------------------------------------------------------
 
@@ -48,6 +47,8 @@ def main(args):
     paths = []
     for arg in args:
         if os.path.isdir(arg):
+            paths.append(arg+'/config.cym')
+        elif os.path.isfile(arg):
             paths.append(arg)
         else:
             sys.stderr.write("  Error: unexpected argument `%s'\n" % arg)
@@ -55,17 +56,9 @@ def main(args):
     if not paths:
             sys.stderr.write("  Error: paths must be specified\n" % arg)
             sys.exit()
-    keys = []
     for p in paths:
-        key, val = process(p)
-        if not keys:
-            keys = key
-            if len(paths) == 1:
-                print('% path', *keys)
-        if key == keys:
-            print(p, *val)
-        else:
-            sys.stderr.write(f'  Non-uniform parameters: {key} != {keys}\n')
+        dic = read_metadata(p)
+        print(p, dic)
 
 
 if __name__ == "__main__":

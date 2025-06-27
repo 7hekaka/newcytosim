@@ -23,46 +23,30 @@
     
 """
 
-import os, sys, re
+import os, sys
 
-PATTERN = '%preconfig.'
-
-
-def extract(file, path):
+def read_metadata(filename, pattern = 'config.'):
     """
-        Extract lines starting with PATTERN, removing '%'
+    extract lines with '%config.PARAMETER=VALUE' and
+    return dictionary linking parameters to values
     """
-    res = ''
-    with open(file, 'r') as f:
+    res = dict()
+    with open(filename, 'r') as f:
         for line in f:
-            if line.startswith(PATTERN):
-                res += line[len(PATTERN):];
-    return res
-
-
-def process(arg):
-    """
-        Read `arg` for parameter values and return dictionary
-    """
-    pam = {}
-    #print("postconfig::execute("+arg+")")
-    for str in arg.splitlines():
-        try:
-            res = re.match(r" *([a-zA-Z]\w*) *= *(.*)", str)
-            if res and len(res.groups()) == 2:
-                k = res.group(1)
-                v = res.group(2).split()[0]
+            s = line.find(pattern)
+            if s > 0:
+                s += len(pattern)
+                code = line[s:-1].rstrip(';')
+                [k, _, v] = code.partition('=')
                 try:
-                    pam[k] = float(v)
+                    v = float(v)
+                    if v == int(v):
+                        v = int(v)
                 except:
-                    pam[k] = v
-        except Exception as e:
-            sys.stderr.write("\033[95m")
-            sys.stderr.write("Error evaluating `%s':\n" % arg)
-            sys.stderr.write("\033[0m")
-            sys.stderr.write("    "+str(e)+'\n')
-            sys.exit(1)
-    return pam
+                    pass
+                if k:
+                    res[k] = v
+    return res
 
 
 def main(args):
@@ -74,7 +58,7 @@ def main(args):
     path = ''
     
     for arg in args:
-        #print("preconfig argument `%s'" % arg)
+        #print("postconfig argument `%s'" % arg)
         if os.path.isdir(arg):
             path = arg
         elif os.path.isfile(arg):
@@ -93,9 +77,9 @@ def main(args):
 
     for i in inputs:
         #out.write("Reading %s\n" % i)
-        str = extract(i, path)
-        res = process(str)
+        res = read_metadata(i)
         res['file'] = i
+        print(res)
     return res
 
 
@@ -107,6 +91,5 @@ if __name__ == "__main__":
     elif sys.argv[1].endswith("help"):
         print(__doc__)
     else:
-        res = main(sys.argv[1:])
-        print(res)
+        main(sys.argv[1:])
 

@@ -4,7 +4,7 @@
 #
 # Copyright Francois J. Nedelec and  Serge Dmitrieff, 
 # EMBL 2010--2017, Cambridge University 2019--2025
-# This is PRECONFIG version 1.7, last modified on 14.3.2025
+# This is PRECONFIG version 1.7, last modified on 27.5.2025
 
 """
 # SYNOPSIS
@@ -203,8 +203,26 @@
     One can recover the lines containing 'config.' with `grep` or `awk`:
         grep '^%config.' config0000.cym
         awk '/%config./{sub("%config.","");print}' config0000.cym
-    The same technique can be adapted using a dictionaryto Python:
-        ...
+    The same technique can be adapted to import the parameter into Python:
+        
+        def read_metadata(filename, pattern='config.'):
+        res = dict()
+        with open(filename, 'r') as f:
+            for line in f:
+                s = line.find(pattern)
+                if s > 0:
+                    s += len(pattern)
+                    code = line[s:-1].rstrip(';')
+                    [k, _, v] = code.partition('=')
+                    try:
+                        v = float(v)
+                        if v == int(v):
+                            v = int(v)
+                    except:
+                        pass
+                    if k:
+                        res[k] = v
+        return res
 
 ## Acknowledgments:
 
