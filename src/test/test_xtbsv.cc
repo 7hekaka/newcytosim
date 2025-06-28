@@ -611,15 +611,6 @@ void getrs4(int N, real const* B, int LDB, real* Y)
 
 void getrs5(int N, real const* B, int LDB, real* Y)
 {
-#if USE_SIMD
-    alsatian_xgetrsN_SSE(N, (float*)B, LDB, pivot, Y);
-#else
-    zero_real(N, Y);
-#endif
-}
-
-void getrs6(int N, real const* B, int LDB, real* Y)
-{
 #if ( DIM == 3 )
     // Apply row interchanges to the right hand side.
     xlaswp1(Y, 1, N, pivot);
@@ -630,17 +621,22 @@ void getrs6(int N, real const* B, int LDB, real* Y)
 #endif
 }
 
+#if USE_SIMD
+void getrs6(int N, real const* B, int LDB, real* Y)
+{
+    alsatian_xgetrsN_SSE(N, (float*)B, LDB, pivot, Y);
+}
+
 void getrs7(int N, real const* B, int LDB, real* Y)
 {
-#if USE_SIMD
     // Apply row interchanges to the right hand side.
     xlaswp1(Y, 1, N, pivot);
     // Solve L*X = B, overwriting B with X.
     alsatian_xtrsmLLN1U_3D_SSE(N, (float*)B, LDB, Y);
     // Solve U*X = B, overwriting B with X.
     alsatian_xtrsmLUN1C_3D_SSE(N, (float*)B, LDB, Y);
-#endif
 }
+#endif
 
 /* initialize a general matrix that would be inversible. */
 void setMatrix(size_t N, real* A, size_t LDA)
@@ -695,12 +691,13 @@ void testGETRS(int N, size_t rep)
             check<getrs2>(N, 1, S, A, LDA, Y, "alsa_getrsN<>", rep);
             check<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", rep);
             check<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", rep);
-            check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", rep);
             if ( DIM == 3 )
-            {
-                check<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", rep);
+                check<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", rep);
+#if USE_SIMD
+            check<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", rep);
+            if ( DIM == 3 )
                 check<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", rep);
-            }
+#endif
         }
     }
     if ( 1 )
@@ -728,12 +725,13 @@ void testGETRS(int N, size_t rep)
         }
         multi<getrs3>(N, 1, S, A, LDA, Y, "alsa_getrs", rep, MULTI);
         multi<getrs4>(N, 1, S, A, LDA, Y, "alsa_getrs_", rep, MULTI);
-        multi<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", rep, MULTI);
         if ( DIM == 3 )
-        {
-            multi<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", rep, MULTI);
+            multi<getrs5>(N, 1, S, A, LDA, Y, "alsa_getrs_3D", rep, MULTI);
+#if USE_SIMD
+        multi<getrs6>(N, 1, S, A, LDA, Y, "alsa_getrsSSE", rep, MULTI);
+        if ( DIM == 3 )
             multi<getrs7>(N, 1, S, A, LDA, Y, "alsa_getrs3SSE", rep, MULTI);
-        }
+#endif
     }
     
     free_real(Y);
