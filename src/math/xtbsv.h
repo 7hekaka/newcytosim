@@ -412,7 +412,7 @@ void alsatian_xpbtf2L(const int N, const int KD, real* AB, int LDAB, int* INFO)
     {
         //Compute L(J,J) and test for non-positive-definiteness.
         real dia = AB[0];
-        if ( dia <= 0 )
+        if ( dia <= REAL_EPSILON )
         {
             *INFO = J+1;
             return;

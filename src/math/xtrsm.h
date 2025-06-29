@@ -952,13 +952,13 @@ void alsatian_iso2_xtrsmLUN_SIMD(const int M, const double* A, const int lda, do
 
 
 /// specialized DTRSM('L','L','N', diag, M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
-template < char diag, typename FLOAT, typename REAL >
-void alsatian_xtrsmLLN1(const int M, const FLOAT* A, const int lda, REAL* B)
+template < char diag, typename FLOAT >
+void alsatian_xtrsmLLN1(const int M, const FLOAT* A, const int lda, real* B)
 {
     assert_true( M <= lda );
     for ( int K = 0; K < M; ++K )
     {
-        REAL tmp = B[K];
+        real tmp = B[K];
         if ( diag == 'N' ) {
             tmp /= A[K];
             B[K] = tmp;
@@ -975,15 +975,15 @@ void alsatian_xtrsmLLN1(const int M, const FLOAT* A, const int lda, REAL* B)
 
 
 /// specialized DTRSM('L','L','T', diag, M, N=1, ALPHA=1.0, A, LDA, B, LDB=UNUSED);
-template < char diag, typename FLOAT, typename REAL >
-void alsatian_xtrsmLLT1(const int M, const FLOAT* A, const int lda, REAL* B)
+template < char diag, typename FLOAT >
+void alsatian_xtrsmLLT1(const int M, const FLOAT* A, const int lda, real* B)
 {
     assert_true( M <= lda );
     A += M * lda;
     for ( int I = M-1; I >= 0; --I )
     {
         A -= lda;
-        REAL tmp = B[I];
+        real tmp = B[I];
         #pragma omp simd
         for ( int K = I + 1; K < M; ++K )
             tmp -= A[K] * B[K];
@@ -997,15 +997,15 @@ void alsatian_xtrsmLLT1(const int M, const FLOAT* A, const int lda, REAL* B)
 
 
 /// specialized version for ORD==1
-template < char diag, typename FLOAT, typename REAL >
-void alsatian_xtrsmLUN1(const int M, const FLOAT* A, const int lda, REAL* B)
+template < char diag, typename FLOAT >
+void alsatian_xtrsmLUN1(const int M, const FLOAT* A, const int lda, real* B)
 {
     assert_true( M <= lda );
     A += M * lda;
     for ( int K = M-1; K >= 0; --K )
     {
         A -= lda;
-        REAL tmp = B[K];
+        real tmp = B[K];
         if ( diag == 'N' ) {
             tmp /= A[K];
             B[K] = tmp;
@@ -1882,12 +1882,12 @@ void alsatian_xpotrsL(const int N, const float* A, const int LDA, real* B)
 {
 #if 1
     // Solve L*X = B, overwriting B with X
-    alsatian_xtrsmLLN1<'I'>(N, (float*)A, LDA, B);
+    alsatian_xtrsmLLN1<'I'>(N, A, LDA, B);
     // Solve U*X = B, overwriting B with X
-    alsatian_xtrsmLLT1<'I'>(N, (float*)A, LDA, B);
+    alsatian_xtrsmLLT1<'I'>(N, A, LDA, B);
 #else
-    iso_xtrsmLLN<1,'I'>(N, (float*)A, LDA, B);
-    iso_xtrsmLLT<1,'I'>(N, (float*)A, LDA, B);
+    iso_xtrsmLLN<1,'I'>(N, A, LDA, B);
+    iso_xtrsmLLT<1,'I'>(N, A, LDA, B);
 #endif
 }
 
