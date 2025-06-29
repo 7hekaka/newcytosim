@@ -23,6 +23,9 @@ class Display1 : public Display
     /// global OpenGL point size
     float pointSize;
 
+    /// size for small points
+    float smallSize;
+
     /// value of shift for EXPLODED_DISPLAY
     template < typename OBJ >
     float explodeShift(OBJ const* obj) const;
