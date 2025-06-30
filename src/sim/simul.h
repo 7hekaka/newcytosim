@@ -182,13 +182,13 @@ public:
     /// true if `SimulProp::time < SimulProp::stop_time`
     bool incomplete() const { return prop.time < prop.stop_time; }
 
-    /// ask to halt the current series of 'step' if time exceeds `t`
+    /// ask to halt the current series of 'step' once time exceeds `t`
     void stop_at(double t) const { prop.stop_time = std::min(t, prop.end_time); }
     
-    /// ask to stop the 'run' at the next recorded frame, if time exceeds 't'
+    /// ask to stop the `run` at the next recorded frame, once time exceeds 't'
     void end_at(double t) const { prop.end_time = std::min(t, prop.end_time); }
     
-    /// ask to stop the 'run' after t seconds
+    /// ask to stop the `run` after `t` seconds beyond current time
     void end_now(double t = 0.0) const { t += time(); end_at(t); if ( t < prop.stop_time ) stop_at(t); }
 
     /// true if `time >= end_time`

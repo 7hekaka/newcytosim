@@ -3345,7 +3345,8 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
     bool M = 0; // obstacle (fox) has moved
     bool P = 0; // fib tip is not deflected
     
-    if ( fib && fox )
+    // also discard conditions when fiber has reached its max length
+    if ( fox && fib && fib->length()+0.01 < fib->prop->max_length )
     {
         const real sup = 3 * fib->prop->steric_radius;
         
@@ -3470,6 +3471,7 @@ void Simul::reportFiberCollision(std::ostream& out, Fiber* fib, Fiber const* fox
         out << LIN << std::fixed << std::setprecision(5) << ang;
         out << SEP << std::fixed << std::setprecision(5) << std::sqrt(dis);
         out << SEP << K << SEP << X << SEP << Z << SEP << P << SEP << T << SEP << kat << " ";
+        out.flush();
     }
     if ( print & 1 )
     {
@@ -3511,12 +3513,8 @@ void Simul::reportFiberCollision(std::ostream& out, std::ostream& com, Property 
         else
             fox = f;
     }
-    // discard condition when fiber has reached its max length
-    if ( fib && fib->length()+0.01 > fib->prop->max_length )
-        return;
     
-    if ( fox && fib )
-        reportFiberCollision(out, fib, fox, print);
+    reportFiberCollision(out, fib, fox, print);
 }
 
 
