@@ -375,11 +375,11 @@ static void changeHide(FiberDisp* p, int val)
 }
 
 
-static void changeMarked(FiberDisp* p, int val)
+static void changeMarked(FiberDisp* p, int)
 {
     unsigned &n = p->show_marked;
     ++n;
-    if ( n == 4 )
+    if ( n >= 4 )
     {
         n = ~0U;
         flashText("%s: showing all marks", p->name_str());
@@ -467,6 +467,11 @@ static void invertScale(FiberDisp* p, int)
     {
         p->length_scale = -p->length_scale;
         flashText("fiber:length_scale = %.5f", p->length_scale);
+    }
+    else if ( disp.style == 1 && disp.explode_style )
+    {
+        disp.explode_range = - disp.explode_range;
+        flashText("fiber:explode_range = %.5f", disp.explode_range);
     }
 }
 

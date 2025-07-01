@@ -41,6 +41,8 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
         A = prop()->branch_angle;
         // get mark from mother fiber:
         mk = h->fiber()->mark();
+        if ( opt.value_is("mark", 0, "add") )
+            ++mk;
         // nucleating on the side of a 'mother' fiber:
         switch ( prop()->branch_direction )
         {
@@ -112,12 +114,11 @@ ObjectList Nucleator::createFiber(Simul& sim, Vector pos, FiberProp const* fip, 
         pos += rot * Vector(0, F*L, 0);
     }
 
-    // mark fiber to highlight mode of nucleation:
+    // the `mark' can be used to highlight the mode of nucleation:
     if ( opt.value_is("mark", 0, "random") )
         mk = RNG.pint32();
-    else if ( opt.value_is("mark", 0, "add") )
-        ++mk;
     else opt.set(mk, "mark");
+    // mark fiber:
     fib->mark(mk);
 
     // set signature of fiber:
