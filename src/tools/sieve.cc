@@ -19,13 +19,13 @@ void help(std::ostream& os)
     os << "Usage:\n";
     os << "    sieve input_file output_file [options]\n\n";
     os << "Options:\n";
-    os << "    dim=INT            process files with specified dimensionality\n";
-    os << "    binary=1           use binary format (default)\n";
-    os << "    binary=0           use text format (default if output ends with .txt\n";
-    os << "    skip=WHAT          remove all objects of class WHAT\n";
-    os << "    skip_free_single=1 remove unbound singles\n";
-    os << "    skip_free_couple=1 remove unbound couples\n";
-    os << "    frame=INDEX        process only specified frame\n\n";
+    os << "    dim=INT                  process files with specified dimensionality\n";
+    os << "    binary=1                 use binary format (default)\n";
+    os << "    binary=0                 use text format (default if output ends with .txt\n";
+    os << "    skip=WHAT                remove all objects of class WHAT\n";
+    os << "    simul.skip_free_single=1 do not read unbound singles\n";
+    os << "    simul.skip_free_couple=1 do not read unbound couples\n";
+    os << "    frame=INDEX              process only specified frame\n\n";
     os << "Examples:\n";
     os << "    sieve objects.cmo objects.txt\n";
     os << "    sieve objects.cmo objects.txt skip=couple\n";
@@ -37,10 +37,10 @@ int main(int argc, char* argv[])
 {
     int binary = 1;
     unsigned dim = DIM;
+    std::string skip;
     Simul simul;
     Glossary arg;
     ObjectSet * skip_set = nullptr;
-    std::string skip;
 
     if ( argc < 3 )
     {
@@ -58,16 +58,9 @@ int main(int argc, char* argv[])
     
     if ( arg.set(skip, "skip") )
        skip_set = simul.findSet(skip);
-    else if ( arg.has_key("skip") )
-    {
-        simul.prop.skip_free_single = 1;
-        simul.prop.skip_free_couple = 1;
-    }
     
     arg.set(dim, "dim");
     arg.set(binary, "binary");
-    arg.set(simul.prop.skip_free_single, "skip_free_single");
-    arg.set(simul.prop.skip_free_couple, "skip_free_couple");
 
     Inputter in(DIM);
     try {
@@ -83,10 +76,10 @@ int main(int argc, char* argv[])
     for ( int n = 3; n < argc; ++n )
     {
         if ( simul.readParameter(argv[n]) )
-            std::cerr << ">>>>>> " << argv[n] << "\n";
+            std::clog << ">>>>>> set " << argv[n] << "\n";
     }
     
-    std::clog << ">>>>>> Sieve `" << argv[1] << "' -> `" << argv[2];
+    std::clog << ">>>>>> Sieve `" << argv[1] << "' ---> `" << argv[2];
     std::clog << "'  binary: " << binary << "\n";
     
     size_t frm = 0, frame = ~0;

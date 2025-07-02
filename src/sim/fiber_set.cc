@@ -153,7 +153,7 @@ Fiber * FiberSet::newFiber(ObjectList& objs, FiberProp const* fip, std::string c
     std::string war;
     if ( opt.has_warning(war) )
     {
-        //print_yellow(std::cerr, war);
+        //print_yellow(stderr, war);
         std::cerr << war << " in `" << spec << "'\n";
     }
     return F;

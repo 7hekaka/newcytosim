@@ -36,7 +36,7 @@ void Property::read_string(std::string const& str, std::string const& msg)
             read(glos);
             if ( glos.has_warning(war) )
             {
-                //print_yellow(std::cerr, war);
+                //print_yellow(stderr, war);
                 std::cerr << war << " in `" << msg << "'\n";
             }
         } catch(Exception & e) {

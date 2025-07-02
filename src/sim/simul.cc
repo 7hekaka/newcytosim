@@ -559,23 +559,32 @@ Property* Simul::makeProperty(const std::string& cat, const std::string& nom, Gl
 
 /**
  read and set parameter for some object in the simulation,
- syntax is `CLASS:PARAMETER=VALUE`
+ syntax is `CLASS:PARAMETER=VALUE` or `CLASS.PARAMETER=VALUE`
+ Example:
+ `simul.viscosity=1`
+ `kinesin.stall_force=1` if `kinesin` is a defined class
 */
 bool Simul::readParameter(const char* arg) const
 {
-    char tmp[256];
+    char tmp[512] = { 0 };
     strncpy(tmp, arg, sizeof(tmp));
     char * val = tmp;
-    char * cls = strsep(&val, ":");
+    char * cls = strsep(&val, ":.");
     char * tok = strsep(&val, "=");
-    //printf("%s|%s|%s\n", cls, tok, val);
+    printf("Simul::readParameter(%s|%s|%s)\n", cls, tok, val);
     Property * P = findProperty(cls);
-    if ( P && val ) {
+    if ( P && val )
+    {
         Glossary glos(tok, val);
+        //P->write_values_diff(std::clog, true);
         P->read(glos);
         //std::cerr << " understood `" << argv[n] << "' :\n";
         //P->write_values_diff(std::clog, true);
-        return glos.num_reads(tok);
+        unsigned res = glos.num_reads(tok);
+        if ( ! res ) {
+            print_yellow(stderr, "Warning: could not read any value from `"+std::string(arg)+"'\n");
+        }
+        return res;
     }
     return 0;
 }
