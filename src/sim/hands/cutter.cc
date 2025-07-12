@@ -22,6 +22,7 @@ Cutter::Cutter(CutterProp const* p, HandMonitor* h)
 void Cutter::cut()
 {
     assert_true( attached() );
+    Fiber * fib = modifiableFiber();
 
     if ( prop()->selective == CUT_TOP_FIBER )
     {
@@ -30,7 +31,7 @@ void Cutter::cut()
         {
             Vector P = pos();
             Vector Q = h->pos();
-            Fiber const* fib = h->fiber();
+            Fiber const* fox = h->fiber();
             FiberProp const* FP = fib->prop;
 #if ( 0 )
             // This is old code: using Z works only for certain geometries
@@ -39,9 +40,9 @@ void Cutter::cut()
             std::clog << "Z ";
 #else
             Space const* spc = FP->confine_space;
-            Vector PQ = 0.5 * ( P + Q );
-            Vector prj = spc->project(PQ);  // on the edge
-            Vector dir = spc->normalToEdge(PQ); // directed outward
+            Vector mid = 0.5 * ( P + Q );
+            Vector prj = spc->project(mid);  // on the edge
+            Vector dir = spc->normalToEdge(mid); // directed outward
             // calculate distances to the edge:
             real PZ = dot(prj-P, dir);
             real QZ = dot(prj-Q, dir);
@@ -50,8 +51,9 @@ void Cutter::cut()
             // do not sever the fiber that is closest to the edge:
             if ( PZ < QZ + cutoff )
                 return;
-            std::clog << "cut " << fib->reference() << " crossing at ";
-            std::clog << Cymath::repr(PZ,8,4) << " over " << Cymath::repr(QZ,8,4) << "\n";
+            std::clog << "selective cut " << fib->reference() << " crossing at ";
+            std::clog << Cymath::repr(PZ,8,4) << " over " << fox->reference();
+            std::clog << " at " << Cymath::repr(QZ,8,4) << "\n";
         }
     }
     /**
@@ -62,7 +64,6 @@ void Cutter::cut()
      This is why severSoon() below will register the position of the cut,
      but the cut will only be performed later in Fiber::step()
      */
-    Fiber * fib = modifiableFiber();
     fib->severSoon(abscissa(), prop()->cut_width, prop()->new_end_state[0], prop()->new_end_state[1]);
     //std::clog << "cut " << fiber()->reference() << " @ " << abscissa() << "\n";
     
