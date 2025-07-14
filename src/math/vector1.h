@@ -378,7 +378,7 @@ public:
         return Vector1(a.XX-b.XX);
     }
     
-    /// unary + operator does nothing
+    /// unary + operator returns unmodified vector
     friend Vector1 operator +(Vector1 const& b)
     {
         return b;

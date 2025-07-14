@@ -524,7 +524,7 @@ public:
         return Vector4(a.XX-b.XX, a.YY-b.YY, a.ZZ-b.ZZ, a.TT-b.TT);
     }
     
-    /// unary + operator does nothing
+    /// unary + operator returns unmodified vector
     friend Vector4 operator +(Vector4 const& b)
     {
         return b;

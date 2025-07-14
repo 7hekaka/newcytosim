@@ -847,7 +847,7 @@ public:
 #endif
     }
     
-    /// unary + operator does nothing
+    /// unary + operator returns unmodified vector
     friend Vector3 operator +(Vector3 const& b)
     {
         return b;
