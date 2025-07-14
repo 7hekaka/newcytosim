@@ -1,5 +1,6 @@
 // Cytosim was created by Francois Nedelec. Copyright 2023 Cambridge University.
 
+#include "cymath.h"
 #include "cutter.h"
 #include "cutter_prop.h"
 #include "glossary.h"
@@ -8,7 +9,6 @@
 #include "simul_part.h"
 #include "hand_monitor.h"
 #include "space.h"
-#include "smath.h"
 
 //------------------------------------------------------------------------------
 

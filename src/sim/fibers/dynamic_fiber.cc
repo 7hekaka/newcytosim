@@ -1,7 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright Cambridge University 2021
 
 #include "dim.h"
-#include "smath.h"
+#include "cymath.h"
 #include "assert_macro.h"
 #include "dynamic_fiber.h"
 #include "dynamic_fiber_prop.h"

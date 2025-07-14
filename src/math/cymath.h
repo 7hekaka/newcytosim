@@ -1,11 +1,7 @@
 // Cytosim was created by Francois Nedelec. Copyright 2007-2017 EMBL.
-/**
- Some basic mathematical functions
- Francois Nedelec, 
-*/
 
-#ifndef SMATH_H
-#define SMATH_H
+#ifndef CYMMATH_H
+#define CYMMATH_H
 
 #include "real.h"
 #include <cmath>
@@ -256,7 +252,7 @@ namespace Cymath
         return std::sqrt(n);
     }
 
-    /// return the usual base-10 representation of a number
+    /// return the usual base-10 representation of number `x`
     template <typename T>
     std::string repr(T const& x, int width, unsigned precision)
     {

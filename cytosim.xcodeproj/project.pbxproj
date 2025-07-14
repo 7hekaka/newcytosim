@@ -615,7 +615,7 @@
 		BB7191760EF1CD9900CED9E2 /* rasterizer.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589F05B98DA3006956D5 /* rasterizer.h */; };
 		BB7191770EF1CD9900CED9E2 /* spherical_code.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589A05B98DA3006956D5 /* spherical_code.h */; };
 		BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73587205B98DA3006956D5 /* conjgradient.h */; };
-		BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358A505B98DA3006956D5 /* smath.h */; };
+		BB71917A0EF1CD9900CED9E2 /* cymath.h in Headers */ = {isa = PBXBuildFile; fileRef = BB7358A505B98DA3006956D5 /* cymath.h */; };
 		BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588405B98DA3006956D5 /* matfull.h */; };
 		BB71917F0EF1CD9900CED9E2 /* random.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73589D05B98DA3006956D5 /* random.h */; };
 		BB7191800EF1CD9900CED9E2 /* sparmat.h in Headers */ = {isa = PBXBuildFile; fileRef = BB73588A05B98DA3006956D5 /* sparmat.h */; };
@@ -1969,7 +1969,7 @@
 		BB73589D05B98DA3006956D5 /* random.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; path = random.h; sourceTree = "<group>"; };
 		BB73589E05B98DA3006956D5 /* rasterizer.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = rasterizer.cc; path = src/math/rasterizer.cc; sourceTree = SOURCE_ROOT; };
 		BB73589F05B98DA3006956D5 /* rasterizer.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = rasterizer.h; path = src/math/rasterizer.h; sourceTree = SOURCE_ROOT; };
-		BB7358A505B98DA3006956D5 /* smath.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = smath.h; path = src/math/smath.h; sourceTree = SOURCE_ROOT; };
+		BB7358A505B98DA3006956D5 /* cymath.h */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.h; fileEncoding = 30; name = cymath.h; path = src/math/cymath.h; sourceTree = SOURCE_ROOT; };
 		BB7358C305B98DA3006956D5 /* play.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = play.cc; path = src/play/play.cc; sourceTree = SOURCE_ROOT; };
 		BB7358C405B98DA3006956D5 /* player_disp.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = player_disp.cc; path = src/play/player_disp.cc; sourceTree = SOURCE_ROOT; };
 		BB7358C805B98DA3006956D5 /* player.cc */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 30; name = player.cc; path = src/play/player.cc; sourceTree = SOURCE_ROOT; };
@@ -3142,7 +3142,7 @@
 				BB5BE47F29DC25C900A32BBE /* heapsort.h */,
 				BB99CAEA2979EC9300172211 /* blinksort.h */,
 				BBC4C39624D1CA5800DB5187 /* fp_exceptions.cc */,
-				BB7358A505B98DA3006956D5 /* smath.h */,
+				BB7358A505B98DA3006956D5 /* cymath.h */,
 				BB3205EF220DB5930098C439 /* evaluator.h */,
 				BB4737BC2024B39300FE6CEC /* accumulator.h */,
 				BB94965A0933B75B003A32FE /* quaternion.h */,
@@ -4393,7 +4393,7 @@
 				BBA27AEB211EC31600A7E184 /* vector4.h in Headers */,
 				BB6D309620CA5B12009C5C7C /* matrix22.h in Headers */,
 				BB7191780EF1CD9900CED9E2 /* conjgradient.h in Headers */,
-				BB71917A0EF1CD9900CED9E2 /* smath.h in Headers */,
+				BB71917A0EF1CD9900CED9E2 /* cymath.h in Headers */,
 				BB71917D0EF1CD9900CED9E2 /* matfull.h in Headers */,
 				BB6CD588254ED31A00FB7547 /* real_print.h in Headers */,
 				BB0CB11B20C170C10016D73D /* qmr.h in Headers */,
