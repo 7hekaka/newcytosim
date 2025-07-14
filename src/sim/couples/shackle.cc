@@ -32,10 +32,10 @@ void Shackle::stepAA()
     real dis = INFINITY;
     
     // project the position of cHand2 to set abscissa of cHand1
-    real a = cHand1->fiber()->projectPoint(cHand2->pos(), dis);
+    real abs = cHand1->fiber()->projectPoint(cHand2->pos(), dis);
     
-    //std::clog << "Shackle " << proj.abscissa() - cHand1->abscissa() << '\n';
-    cHand1->moveTo(a);
+    //std::clog << "Shackle delta-abs = " << abs - cHand1->abscissa() << '\n';
+    cHand1->moveTo(abs);
     // need to update to calculate force:
     cHand1->reinterpolate();
     

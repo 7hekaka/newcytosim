@@ -258,6 +258,12 @@ void Couple::stepAA()
     else
         cHand1->stepLoaded( f);
     
+    /*
+     Note that at this point cHand1 may be detached, but we still call stepLoaded()
+      for cHand2 below, to keep the code symmetric for the Couple.
+     This should be suitable as long detachment is a rare event, during one time-step
+     */
+    
     if ( cHand2->checkKramersDetachment(mag) )
         cHand2->detach();
     else
