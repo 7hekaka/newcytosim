@@ -85,6 +85,9 @@ public:
     /// compute values derived from the parameters
     void complete(Simul const&);
     
+    /// perform additional tests for the validity of parameters, given the elasticity
+    void checkStiffness(real stiff, real len, real mul, real kT) const;
+
     /// return a carbon copy of object
     Property* clone() const { return new CutterProp(*this); }
 

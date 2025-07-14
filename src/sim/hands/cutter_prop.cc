@@ -93,6 +93,28 @@ void CutterProp::complete(Simul const& sim)
 }
 
 
+/**
+ Estimate numerical stability from mobility and stiffness
+ */
+void CutterProp::checkStiffness(real stiff, real len, real mul, real kT) const
+{
+    HandProp::checkStiffness(stiff, len, mul, kT);
+    
+    real e = movability_dt * stiff * mul;
+    if ( e > 2.0 )
+    {
+        std::ostringstream oss;
+        oss << "Diffusible cutter `" << name() << "' is unstable since:\n";
+        oss << PREF << "time_step * mobility * stiffness = " << e << '\n';
+        oss << PREF << "-> reduce diffusion or time_step\n";
+        throw InvalidParameter(oss.str());
+        //std::clog << oss.str();
+    }
+    else
+        Cytosim::log("   Slider `", name(), "' stability = ", e, "\n");
+}
+
+
 void CutterProp::write_values(std::ostream& os) const
 {
     HandProp::write_values(os);

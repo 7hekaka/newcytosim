@@ -64,24 +64,25 @@ void ChewerProp::complete(Simul const& sim)
 }
 
 
+/**
+ Estimate numerical stability from mobility and stiffness
+ */
 void ChewerProp::checkStiffness(real stiff, real len, real mul, real kT) const
 {
     HandProp::checkStiffness(stiff, len, mul, kT);
     
-    /*
-     Compare mobility with stiffness: this can induce instability
-     */
-    real a = movability_dt * stiff * mul;
-    if ( a > 1.0 )
+    real e = movability_dt * stiff * mul;
+    if ( e > 2.0 )
     {
-        InvalidParameter e("unstable chewer");
-        e << "simulating `" << name() << "' may fail as:\n";
-        e << PREF << "mobility = " << line_diffusion / kT << '\n';
-        e << PREF << "mobility * stiffness * time_step = " << a << '\n';
-        e << PREF << "-> reduce time_step (really)\n";
-        throw e;
+        std::ostringstream oss;
+        oss << "Diffusible chewer `" << name() << "' is unstable since:\n";
+        oss << PREF << "time_step * mobility * stiffness = " << e << '\n';
+        oss << PREF << "-> reduce diffusion or time_step\n";
+        throw InvalidParameter(oss.str());
+        //std::clog << oss.str();
     }
-    
+    else
+        Cytosim::log("   Slider `", name(), "' stability = ", e, "\n");
 }
 
 

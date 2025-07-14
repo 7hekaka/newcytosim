@@ -89,20 +89,20 @@ void SliderProp::complete(Simul const& sim)
 }
 
 
+/**
+ Estimate numerical stability from mobility and stiffness
+ */
 void SliderProp::checkStiffness(real stiff, real len, real mul, real kT) const
 {
     HandProp::checkStiffness(stiff, len, mul, kT);
     
-    /*
-     Estimate numerical stability from mobility and stiffness
-     */
     real e = movability_dt * stiff * mul;
-    if ( e > 2.0 + REAL_EPSILON )
+    if ( e > 2.0 )
     {
         std::ostringstream oss;
-        oss << "Slider `" << name() << "' is unstable since:\n";
+        oss << "Diffusible slider `" << name() << "' is unstable since:\n";
         oss << PREF << "time_step * mobility * stiffness = " << e << '\n';
-        oss << PREF << "-> reduce mobility or time_step\n";
+        oss << PREF << "-> reduce mobility/diffusion or time_step\n";
         throw InvalidParameter(oss.str());
         //std::clog << oss.str();
     }
