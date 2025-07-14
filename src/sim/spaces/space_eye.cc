@@ -3,7 +3,6 @@
 #include "assert_macro.h"
 #include "space_eye.h"
 #include "exceptions.h"
-#include "smath.h"
 
 
 SpaceEye::SpaceEye(const SpaceProp* p)
