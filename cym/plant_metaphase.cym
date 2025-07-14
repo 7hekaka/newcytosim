@@ -9,7 +9,6 @@ set simul system
     time_step = 0.005
     steric = 1, 555, 222
     display = ( size=2560,768; point_value=0.01; point_size=0.5; line_width=1; zoom=2; style=3;)
-    skip_free_couple = 1
     precondition = 6
 }
 
