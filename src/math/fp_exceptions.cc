@@ -4,15 +4,6 @@
 #include <signal.h>
 #include <stdio.h>
 
-
-#if defined(__APPLE__)
-
-/*
- Intel's OSX implementation adapted from the Corsika project
- https://gitlab.ikp.kit.edu/AirShowerPhysics/corsika
- by Lukas Nellen
-*/
-
 extern "C"
 {
     static void fpe_signal_handler(int sig)
@@ -21,6 +12,14 @@ extern "C"
         exit(sig);
     }
     
+#if defined(__APPLE__)
+
+/*
+ Intel's OSX implementation adapted from the Corsika project
+ https://gitlab.ikp.kit.edu/AirShowerPhysics/corsika
+ by Lukas Nellen
+*/
+
 #if defined(__arm64__)
     
     int enable_floating_point_exceptions()
@@ -105,6 +104,18 @@ extern "C"
         }
     }
 
-}
+#else
+
+    /** \todo implement on other OS */
+    int enable_floating_point_exceptions()
+    {
+    }
+
+    /** \todo implement on other OS */
+    void print_floating_point_exceptions(const char* str, FILE * out = stdout)
+    {
+    }
 
 #endif
+
+}

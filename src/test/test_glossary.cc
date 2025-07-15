@@ -7,18 +7,14 @@
 int main(int argc, char* argv[])
 {
     Glossary arg;
-    
+    std::string s;
+
     if ( arg.read_strings(argc-1, argv+1) )
         return EXIT_FAILURE;
 
     try {
         
-        int i = 0;
-        float f = 0;
-        std::string s;
-        
-        // read file if provided on command line:
-        // the file name is recognized by its extension
+        // read file (recognized by its extension) if provided on command line:
         if ( arg.set(s, ".cym") )
             arg.read_file(s);
         
@@ -27,9 +23,12 @@ int main(int argc, char* argv[])
         arg.print(std::cout, "    > ");
         
         // extract values from Glossary:
-        if ( arg.set(i, "integer") )  printf("integer : %i\n", i);
-        if ( arg.set(f, "float") )    printf("float : %f\n", f);
-        if ( arg.set(s, "string") )   printf("string : %s\n", s.c_str());
+        int i = 0;
+        float f = 0;
+
+        if ( arg.set(f, "f", "float") ) printf("float : %f\n", f);
+        if ( arg.set(s, "s", "string") ) printf("string : %s\n", s.c_str());
+        if ( arg.set(i, "i", "integer") ) printf("integer : %i\n", i);
     }
     catch ( Exception& e )
     {

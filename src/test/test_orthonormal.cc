@@ -34,7 +34,7 @@ void test_orthonormal()
     
     real A = RNG.sreal() * M_PI;
     real C = std::cos(A), S = std::sin(A);
-    Vector3 V = Z.orthogonal(N, C, S);
+    Vector3 V = Z.orthogonalNCS(N, C, S);
     printf("  %7.3f : %7.3f\n", N, norm(V));
 }
 
