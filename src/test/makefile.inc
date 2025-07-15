@@ -8,6 +8,9 @@ TESTS:=test_bits test_gillespie test_random test_math test_glossary\
 TESTS_GL:=test_solve test_opengl test_vbo test_glut test_glapp test_tesselator\
           test_rasterizer test_space test_grid test_sphere test_pipe
 
+.PHONY: test
+test: $(TESTS)
+
 .PHONY: test_gl
 tests_gl: $(TESTS_GL)
 

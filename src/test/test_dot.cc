@@ -106,7 +106,7 @@ real dot_AVX(const float* X, const float* Y)
 
 real dot_AVX(const double* X, const double* Y)
 {
-    vec4 s = mul4(load4(X), load4(Y);
+    vec4 s = mul4(load4(X), load4(Y));
     for ( size_t i = 4; i < CNT; i += 4 )
         s = fmadd4(load4(X+i), load4(Y+i), s);
     _mm_empty();
