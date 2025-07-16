@@ -196,6 +196,7 @@ Vector Cytosim::readPositionPrimitive(std::string const& arg, size_t& sci, Space
         std::string tok = Tokenizer::get_symbol(arg, sci);
         //StreamFunc::mark_line(std::cerr, is);
 
+        // primitives are alphabetically sorted in this switch:
         switch ( c )
         {
             case 'a':

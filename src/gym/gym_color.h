@@ -15,8 +15,7 @@
  - Alpha = transparency
  .
  
- This class implements the `RGBA` format using an 'unsigned integer'
- and an array of 4 floats.
+ This class implements the `RGBA` format using an array of 4 floats.
  
  F. Nedelec -- Merged two older color classes on 23.08.2015
  */
@@ -26,22 +25,22 @@ class gym_color
 #pragma mark - Static methods
 public:
 
-    /// type used to quantify color components
+    /// type used to quantify color components (should be float, normally)
     typedef float COLOF;
 
 private:
     
-    /// color components: Red, Green, Blue, Alpha
+    /// color components in [0, 1]: Red, Green, Blue, Alpha
     COLOF col_[4];
 
-    /// concatenate 4 bytes into an int
+    /// concatenate 4 bytes into a 32-bit integer
     static uint32_t combine(uint32_t R, uint32_t G, uint32_t B, uint32_t A)
     {
         constexpr uint32_t K = 0xFF;
         return (R&K) << 24 | (G&K) << 16 | (B&K) << 8 | (A&K);
     }
     
-    /// concatenate 4 bytes into an int
+    /// concatenate 4 bytes into an integer
     static uint32_t combine(COLOF R, COLOF G, COLOF B, COLOF A)
     {
         return combine(uint32_t(255*R), uint32_t(255*G), uint32_t(255*B), uint32_t(255*A));
@@ -230,13 +229,15 @@ public:
     
     COLOF transparency() const { return col_[3]; }
     COLOF normSqr()      const { return col_[0]*col_[0] + col_[1]*col_[1] + col_[2]*col_[2]; }
-    COLOF brightness()   const { return normSqr() * col_[3]; }
 
-    COLOF difference(gym_color back) const
+    /// Perceived brightness (Luminance), based on the ITU-R BT.601 standard
+    COLOF brightness()   const { return (0.299f*col_[0] + 0.587f*col_[1] + 0.114f*col_[2]) * col_[3]; }
+
+    COLOF difference(const gym_color& col) const
     {
-        COLOF x = col_[0] - back.col_[0];
-        COLOF y = col_[1] - back.col_[1];
-        COLOF z = col_[2] - back.col_[2];
+        COLOF x = col_[0] - col.col_[0];
+        COLOF y = col_[1] - col.col_[1];
+        COLOF z = col_[2] - col.col_[2];
         return x*x + y*y + z*z;
     }
 

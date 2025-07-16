@@ -1,4 +1,5 @@
 // Cytosim was created by Francois Nedelec. Copyright 2021 Cambridge University
+
 #include "view_prop.h"
 #include "glossary.h"
 
@@ -67,7 +68,12 @@ void ViewProp::invertColors()
     front_color = front_color.inverted();
     fog_color = fog_color.inverted();
     floor_color = floor_color.inverted();
+    if ( back_color.brightness() < 0.5 )
+        scalebar_color.set(1,1,1);
+    else
+        scalebar_color.set(0,0,0);
 }
+
 
 void ViewProp::blackAndWhite()
 {
@@ -75,11 +81,13 @@ void ViewProp::blackAndWhite()
     {
         back_color.set(0,0,0);
         front_color.set(1,1,1);
+        scalebar_color.set(1,1,1);
     }
     else
     {
         back_color.set(1,1,1);
         front_color.set(0,0,0);
+        scalebar_color.set(0,0,0);
     }
 }
 

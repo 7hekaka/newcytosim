@@ -230,7 +230,7 @@ public:
     /// invert front and back colors
     void invertColors();
     
-    /// use back and white for front/back colors
+    /// use black and white for front/back and scalebar colors
     void blackAndWhite();
 
 };
