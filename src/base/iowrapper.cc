@@ -846,16 +846,6 @@ void Outputter::writeFloat(const float x)
     }
 }
 
-
-void Outputter::writeFloats(const float* a, const size_t n, char before)
-{
-    if ( before && !binary_ )
-        putc(before, mFile);
-    
-    for ( size_t d = 0; d < n; ++d )
-        writeFloat(a[d]);
-}
-
 void Outputter::writeFloatsBinary(const float* a, const size_t n)
 {
     assert_true( binary_ );
@@ -878,13 +868,35 @@ void Outputter::writeFloatsBinary(const double* a, const size_t n)
 }
 
 
+void Outputter::writeFloats(const float* a, const size_t n, char before)
+{
+    if ( binary_ )
+    {
+        writeFloatsBinary(a, n);
+    }
+    else
+    {
+        if ( before )
+            putc(before, mFile);
+        for ( size_t d = 0; d < n; ++d )
+            writeFloat(a[d]);
+    }
+}
+
+
 void Outputter::writeFloats(const double* a, const size_t n, char before)
 {
-    if ( before && !binary_ )
-        putc(before, mFile);
-    
-    for ( size_t d = 0; d < n; ++d )
-        writeFloat(a[d]);
+    if ( binary_ )
+    {
+        writeFloatsBinary(a, n);
+    }
+    else
+    {
+        if ( before )
+            putc(before, mFile);
+        for ( size_t d = 0; d < n; ++d )
+            writeFloat(a[d]);
+    }
 }
 
 
