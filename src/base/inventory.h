@@ -66,10 +66,10 @@ public:
     ObjectID highest() const { return highest_; }
     
     /// lowest assigned ID strictly greater than `n`
-    ObjectID next_identity(ObjectID n) const;
+    ObjectID nextIdentity(ObjectID n) const;
     
     /// the smallest unassigned ID, or max if all are assigned
-    ObjectID first_unassigned() const;
+    ObjectID firstUnassigned() const;
 
     /// current size of array
     size_t capacity() const { return alloca_; }

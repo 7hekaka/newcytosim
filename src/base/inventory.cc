@@ -135,7 +135,7 @@ void Inventory::unassign(const Inventoried * obj)
  */
 void Inventory::reassign()
 {
-    ObjectID nxt = first_unassigned();
+    ObjectID nxt = firstUnassigned();
     ObjectID inf = nxt;
     ObjectID sup = highest_;
     assert_true(!record_[inf]);
@@ -164,7 +164,7 @@ void Inventory::reassign()
 
 
 /** This relies on the sentinel `nullptr` at [1+alloca_] */
-ObjectID Inventory::first_unassigned() const
+ObjectID Inventory::firstUnassigned() const
 {
     assert_true(!record_[1+alloca_]);
     ObjectID n = 1;
@@ -177,7 +177,7 @@ ObjectID Inventory::first_unassigned() const
 }
 
 
-ObjectID Inventory::next_identity(ObjectID n) const
+ObjectID Inventory::nextIdentity(ObjectID n) const
 {
     assert_true(n <= alloca_);
     assert_true(highest_ <= alloca_);
