@@ -23,6 +23,7 @@ set(SOURCES_SIM
 )
 
 set(SOURCES_SPACES
+    space_annulus.cc
     space_square.cc
     space_sphere.cc
     space_dice.cc
@@ -47,6 +48,7 @@ set(SOURCES_SPACES
     space_lid.cc
     space_ring.cc
     space_mesh.cc
+    
 )
 list(TRANSFORM SOURCES_SPACES PREPEND "spaces/")
 
@@ -138,6 +140,8 @@ list(TRANSFORM SIM_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 
 add_library(${SIM_LIBRARY} STATIC ${SOURCES_CYTOSIM})
 target_include_directories(${SIM_LIBRARY} PUBLIC "${SIM_INCLUDES}" )
+
+
 
 if(MAKE_SIM)
 

@@ -24,6 +24,8 @@
 #include "space_square.h"
 #include "space_strip.h"
 #include "space_torus.h"
+#include "space_annulus.h"
+
 
 #if NEW_SPACES
 #include "space_mesh.h"
@@ -77,6 +79,8 @@
  `ring`        | SpaceRing            | length=REAL; radius=REAL;
  `disc`        | SpaceDisc            | radius=REAL; bottom=REAL; top=REAL;
  `mesh`        | SpaceMesh            | file=FILE
+ `annulus`     | SpaceAnnulus         | outer=REAL; inner=REAL; [bottom=REAL; top=REAL]
+
  
  Example:
  
@@ -119,6 +123,8 @@ Space * SpaceProp::newSpace() const
     if ( s=="strip" )      return new SpaceStrip(this);
     if ( s=="periodic" )   return new SpacePeriodic(this);
     if ( s=="ellipse" )    return new SpaceEllipse(this);
+    if ( s=="annulus" )    return new SpaceAnnulus(this);
+
 #if ( DIM >= 3 )
     if ( s=="disc" )       return new SpaceDisc(this);
     if ( s=="cylinder" )   return new SpaceCylinder(this);

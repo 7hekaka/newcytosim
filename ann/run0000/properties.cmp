@@ -1,0 +1,121 @@
+% Wed Aug 20 01:27:23 2025
+% Cytosim property file, pid 4758
+
+set simul system
+{
+ time_step            = 0.002;
+ viscosity            = 0.1;
+ random_seed          = 1569620232;
+ steric               = 1, 500, 0;
+ steric_max_range     = 0.2108;
+ binding_grid_step    = 0.24;
+ display              = ( back_color=white );
+}
+
+set space stripbox
+{
+ identity             = 1;
+ shape                = annulus;
+ display              = (color = blue;);
+}
+
+set hand actin_binder
+{
+ identity             = 1;
+ binding              = 10, 0.3;
+ unbinding            = 0.08, 5;
+ display              = (color=cyan;);
+}
+
+set couple crosslinker
+{
+ identity             = 1;
+ hand1                = actin_binder;
+ hand2                = actin_binder;
+ stiffness            = 10;
+ diffusion            = 10;
+ specificity          = 1;
+}
+
+set fiber actin
+{
+ identity             = 1;
+ rigidity             = 0.075;
+ segmentation         = 0.12;
+ viscosity            = 0.1;
+ confine              = 1, 200, 200, first;
+ steric               = 1, 0.025, 0;
+ display              = (color = black;);
+}
+
+set hand motor
+{
+ identity             = 2;
+ binding              = 10, 0.05;
+ unbinding            = 0.1, 3;
+ display              = (color=red; size=2);
+ activity             = move;
+ stall_force          = 5;
+ unloaded_speed       = 2;
+}
+
+set single motor_on_surface
+{
+ identity             = 1;
+ hand                 = motor;
+ stiffness            = 10;
+ activity             = wrist;
+}
+
+set solid vacuole1
+{
+ identity             = 1;
+ viscosity            = 1;
+ steric               = 1, 0.025;
+ confine              = 1, 300, first;
+ display              = (color=blue);
+}
+
+set solid vacuole2
+{
+ identity             = 2;
+ viscosity            = 2;
+ display              = (color=green);
+}
+
+set solid vacuole3
+{
+ identity             = 3;
+ viscosity            = 0.1;
+ steric               = 1, 0.025;
+ confine              = 1, 300, first;
+ display              = (color=blue);
+}
+
+set solid vacuole4
+{
+ identity             = 4;
+ viscosity            = 0.1;
+ steric               = 1, 0.025;
+ confine              = 1, 300, first;
+ display              = (color=blue);
+}
+
+set solid vacuole5
+{
+ identity             = 5;
+ viscosity            = 0.1;
+ steric               = 1, 0.025;
+ confine              = 1, 300, first;
+ display              = (color=blue);
+}
+
+set solid vacuole6
+{
+ identity             = 6;
+ viscosity            = 0.1;
+ steric               = 1, 0.025;
+ confine              = 1, 300, first;
+ display              = (color=blue);
+}
+
