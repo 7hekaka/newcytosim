@@ -6,7 +6,7 @@ set simul system
     steric = 1, 500
     time_step = 0.002
     kT = 0.0042
-    viscosity = 0.1  
+    viscosity = 0.1 
     
 }
 set system display { back_color=white }
@@ -16,10 +16,10 @@ set space stripbox {
     display = ( color = blue; )
 }
 new stripbox {
-    outer = 3.5
-    inner =  3.0
-    top = 6.0
-    bottom = -6.0
+    outer = 3.8
+    inner =  2.8
+    top = 8.0
+    bottom = -8.0
 }
 
 %--- Crosslinker definition ---
@@ -27,7 +27,7 @@ new stripbox {
 set hand actin_binder
 {
     binding_rate = 10
-    binding_range = 0.30
+    binding_range = 0.060
     unbinding_rate = 0.08
     unbinding_force = 5
     display = ( color=cyan; )
@@ -71,45 +71,45 @@ set single motor_on_surface {
     stiffness = 10
 }
 
+[[v = [1, 10]]]
+
 %--- Solid (vacuole) with attached motors ---
-set solid vacuole1 { viscosity = 1; display = ( color=blue ); steric = 1, 0.025; confine = inside, 300 }
-set solid vacuole2 { viscosity = 2; display = ( color=green )}
-set solid vacuole3 { viscosity = 0.1; display = ( color=blue ); steric = 1, 0.025; confine = inside, 300 }
-set solid vacuole4 { viscosity = 0.1; display = ( color=blue ); steric = 1, 0.025; confine = inside, 300 }
-set solid vacuole5 { viscosity = 0.1; display = ( color=blue ); steric = 1, 0.025; confine = inside, 300 }
-set solid vacuole6 { viscosity = 0.1; display = ( color=blue ); steric = 1, 0.025; confine = inside, 300 }
+set solid vacuole1 { viscosity = [[v]]; display = ( color=blue ); steric = 1, 0.025; confine = inside, 300 }
 
 
 
+[[num = 128]]
+[[fil_len = [4, 8]]]
+[[xlink_r = 10]]
+[[num_fil = num if fil_len == 8 else num*2]]
 
+new [[num_fil]] actin { length = [[fil_len]]; position = inside;  }
 
-
-
-
-new 128 actin { length = 8; position = inside;  }
 
  
-run 50000 system
+run 150000 system
 {
-    nb_frames = 100
+    nb_frames = 300
 }
 
 
 
-new 1000 crosslinker { position = inside;  }
+new [[num_fil * xlink_r]] crosslinker { position = inside;  }
 
-run 50000 system
+run 100000 system
 {
-    nb_frames = 100
+    nb_frames = 200
 }
 
+[[motors = 16]]
+
+new 20 solid vacuole1 { sphere1 = center, 0.35, [[motors]] motor_on_surface; position = inside;}
 
 
-new 24 solid vacuole3 { sphere1 = center, 0.20, 8 motor_on_surface; position = inside;}
 
-
-
-run 50000 system
+run 200000 system
 {
-    nb_frames = 100
+    nb_frames = 400
 }
+
+% crosslink ratio = [[xlink_r]]
