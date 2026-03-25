@@ -9,6 +9,7 @@
 #include "simul_prop.h"
 #include "simul.h"
 #include "hand.h"
+#include <cmath>
 
 #include "motor_prop.h"
 #include "walker_prop.h"
@@ -31,6 +32,22 @@
 #include "dynein_prop.h"
 #include "myosin_prop.h"
 #endif
+
+namespace {
+
+char const* orientationModeName(HandProp::OrientationMode mode)
+{
+    switch ( mode )
+    {
+        case HandProp::ORIENTATION_FREE:
+            return "free";
+        case HandProp::ORIENTATION_FIXED_GLOBAL:
+            return "fixed_global";
+    }
+    return "free";
+}
+
+}
 
 
 /**
@@ -172,6 +189,14 @@ void HandProp::clear()
     step_size = 0;
     footprint = 1;
     site_shift = 0;
+
+    orientation_mode = ORIENTATION_FREE;
+    for ( int d = 0; d < DIM; ++d )
+        preferred_direction[d] = 0;
+    angular_tolerance = 0;
+    polarity_sensitive = false;
+    orientation_cos = 1;
+    preferred_direction_unit = Vector(preferred_direction);
 }
 
 
@@ -197,6 +222,12 @@ void HandProp::read(Glossary& glos)
                                               {"center", CENTER}});
 
     glos.set(bind_end_range, "bind_end_range", 0, "bind_only_end", 1);
+    glos.set(orientation_mode, "orientation_mode",
+             {{"free", ORIENTATION_FREE},
+              {"fixed_global", ORIENTATION_FIXED_GLOBAL}});
+    glos.set(preferred_direction, DIM, "preferred_direction");
+    glos.set(angular_tolerance, "angular_tolerance");
+    glos.set(polarity_sensitive, "polarity_sensitive");
 
 #if BACKWARD_COMPATIBILITY < 100
     glos.set(bind_also_end, "bind_also_ends", {{"off",       NO_END},
@@ -260,6 +291,32 @@ void HandProp::complete(Simul const& sim)
         throw InvalidParameter(name()+":hold_shrinking_end[0] must be in [0, 1]");
     if ( hold_shrinking_end[1] < 0 || 1 < hold_shrinking_end[1] )
         throw InvalidParameter(name()+":hold_shrinking_end[1] must be in [0, 1]");
+
+    orientation_cos = 1;
+    preferred_direction_unit = Vector(preferred_direction);
+
+    if ( orientation_mode == ORIENTATION_FIXED_GLOBAL )
+    {
+        if ( angular_tolerance < 0 )
+            throw InvalidParameter(name()+":angular_tolerance must be >= 0");
+
+        if ( polarity_sensitive )
+        {
+            if ( angular_tolerance > M_PI )
+                throw InvalidParameter(name()+":angular_tolerance must be <= pi when polarity_sensitive=1");
+        }
+        else
+        {
+            if ( angular_tolerance > 0.5 * M_PI )
+                throw InvalidParameter(name()+":angular_tolerance must be <= pi/2 when polarity_sensitive=0");
+        }
+
+        if ( normSqr(preferred_direction_unit) <= REAL_EPSILON )
+            throw InvalidParameter(name()+":preferred_direction must be non-zero when orientation_mode=fixed_global");
+
+        preferred_direction_unit = normalize(preferred_direction_unit);
+        orientation_cos = std::cos(angular_tolerance);
+    }
 
     if ( primed(sim) )
     {
@@ -338,6 +395,10 @@ void HandProp::write_values(std::ostream& os) const
     write_value(os, "hold_growing_end",   hold_growing_end, 2);
     write_value(os, "hold_shrinking_end", hold_shrinking_end, 2);
     write_value(os, "bind_only_end",      bind_only_end, bind_end_range);
+    write_value(os, "orientation_mode",   orientationModeName(orientation_mode));
+    write_value(os, "preferred_direction", preferred_direction, DIM);
+    write_value(os, "angular_tolerance",  angular_tolerance);
+    write_value(os, "polarity_sensitive", polarity_sensitive);
 #if NEW_BIND_ONLY_FREE_END
     write_value(os, "bind_only_free_end", bind_only_free_end);
 #endif

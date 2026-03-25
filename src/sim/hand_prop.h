@@ -5,6 +5,7 @@
 
 #include "cymdef.h"
 #include "real.h"
+#include "vector.h"
 #include "property.h"
 #include "fiber.h" // for FiberLattice
 
@@ -35,7 +36,13 @@ class HandProp : public Property
     friend class Hand;
     
 public:
-      
+    
+    enum OrientationMode
+    {
+        ORIENTATION_FREE = 0,
+        ORIENTATION_FIXED_GLOBAL
+    };
+    
     /// return one of the Property derived from HandProp
     static HandProp * newProperty(const std::string& n, Glossary&);
     
@@ -214,6 +221,18 @@ public:
     /// list of cell's bits covered upon binding to the lattice
     FiberLattice::cell_t footprint;
 
+    /// controls whether attachment is orientation-gated
+    OrientationMode orientation_mode;
+
+    /// preferred global direction used when orientation_mode == ORIENTATION_FIXED_GLOBAL
+    real preferred_direction[DIM];
+
+    /// angular tolerance for attachment, in radians
+    real angular_tolerance;
+
+    /// if true, use a polarity-sensitive gate; otherwise use the apolar gate
+    bool polarity_sensitive;
+
     /** @} */
 
 public:
@@ -229,6 +248,12 @@ public:
     
     /// derived variable = unbinding_rate * timestep;
     float unbinding_rate_dt;
+
+    /// derived variable = cos(angular_tolerance)
+    real orientation_cos;
+
+    /// derived variable = normalized preferred_direction
+    Vector preferred_direction_unit;
     
     /// flag to indicate that `display` has a new value
     bool display_fresh;

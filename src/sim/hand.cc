@@ -210,6 +210,25 @@ bool Hand::attachmentAllowed(FiberSite& sit) const
             return false;
     }
 #endif
+
+    if ( prop->orientation_mode == HandProp::ORIENTATION_FIXED_GLOBAL )
+    {
+        // FiberSite(fiber, abscissa) does not refresh interpolation on construction.
+        sit.reinterpolate();
+
+        real c = dot(sit.dirFiber(), prop->preferred_direction_unit);
+
+        if ( prop->polarity_sensitive )
+        {
+            if ( c < prop->orientation_cos )
+                return false;
+        }
+        else
+        {
+            if ( abs_real(c) < prop->orientation_cos )
+                return false;
+        }
+    }
     
     // finally check the Monitor's permission:
     return hMonitor->permitAttachment(sit, this);
