@@ -1,2 +1,60 @@
-# Created by venv; see https://docs.python.org/3/library/venv.html
+# Default-deny repo: only sync the code and small project files we intentionally share.
 *
+
+# Shared repo metadata and build files
+!/.gitignore
+!/.gitlab-ci.yml
+!/.mailmap
+!/CMakeLists.txt
+!/makefile
+!/makefile.inc
+!/README.md
+!/LICENSE.txt
+!/example.cym
+
+# Shared Cytosim source
+!/src/
+!/src/**
+!/include/
+!/include/**
+
+# Shared project files already versioned in this repo
+!/cym/
+!/cym/**
+!/ann/
+!/ann/**
+!/doc/
+!/doc/**
+!/python/
+!/python/**
+!/ext/
+!/ext/**
+!/analysis/
+!/analysis/**
+!/cytosim.xcodeproj/
+!/cytosim.xcodeproj/**
+
+# Keep machine-specific artifacts and simulation outputs local
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.swp
+*.swo
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.log
+*.tmp
+.venv/
+build/
+bin/
+sweeps/
+*.cmo
+*.cmp
+doc/compile/
+
+
