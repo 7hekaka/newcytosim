@@ -31,6 +31,10 @@
 !/ext/**
 !/analysis/
 !/analysis/**
+!/clu_init_minusz/
+!/clu_init_minusz/**
+!/clu_fixed_global_init_minusz/
+!/clu_fixed_global_init_minusz/**
 !/cytosim.xcodeproj/
 !/cytosim.xcodeproj/**
 

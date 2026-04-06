@@ -1,0 +1,405 @@
+
+% A classic fiber
+% K. K. Acheampong, 2025
+set simul system
+{
+    steric = 1, 500
+    time_step = 0.004
+    kT = 0.0042
+    viscosity = 0.1 
+    
+}
+set system display { back_color=white }
+
+set space stripbox {
+    shape = annulus
+    display = ( color = blue; )
+}
+new stripbox {
+    outer = 11
+    inner = 10.5
+    top = 20.0
+    bottom = -20.0
+}
+
+%--- Crosslinker definition ---
+
+set hand actin_binder
+{
+    binding_rate = 10
+    binding_range = 0.150
+    unbinding_rate = 0.08
+    unbinding_force = 5
+    display = ( color=cyan; )
+}
+set couple crosslinker
+{
+    hand1 = actin_binder
+    hand2 = actin_binder
+    stiffness = 10
+    diffusion = 10
+    specificity = parallel
+
+}
+
+%--- Filament definition ---
+set fiber actin1 {
+    rigidity = 0.075
+    segmentation = 0.18
+    steric          = 1, 0.025
+    confine = inside, 200
+    display = ( color=black; )
+
+    
+}
+
+
+    
+
+
+%--- Motor hand ---
+set hand motor {
+    activity = move
+    binding = 10, 0.05
+    unbinding = 0.1, 3
+    unloaded_speed = 2.0
+    stall_force = 5
+    display = ( color=red; size=2 )
+}
+
+%--- Wrist motor definition ---
+set single motor_on_surface {
+    activity = wrist
+    hand = motor
+    stiffness = 10
+}
+
+
+set hand motor1
+{
+    binding_rate = 10
+    binding_range = 0.02
+    unbinding_rate = 0.3
+    activity = move
+    unloaded_speed = 2.0
+    stall_force = 4
+    unbinding_force = 2.5
+    orientation_mode = fixed_global
+    preferred_direction = 0, 0, -1
+    angular_tolerance = 0.35
+    polarity_sensitive = 1
+
+    display = ( color=blue; size=4; )
+}
+
+set single myosin1
+{
+    hand = motor1
+    stiffness = 100
+    diffusion = 10
+    activity = fixed
+}
+
+
+%--- Solid (vacuole) with attached motors ---
+set solid vacuole1 { viscosity = 1; display = ( color=blue ); steric = 1, 0.025; confine = inside, 300 }
+
+
+
+
+
+
+
+
+
+new 256 actin1 { length = 15; position = inside; direction = 0 0 -1; }
+
+
+
+ 
+run 10000 system
+{
+    nb_frames = 40
+}
+
+
+
+new 1024 crosslinker { position = inside;  }
+
+run 25000 system
+{
+    nb_frames = 100
+}
+
+% --- BEGIN injected motor clusters ---
+% inner_radius=10.5 outer_radius=11.5 height=40.0 attach_offset=0.01
+% stationary surface clusters on INNER wall
+% n_clusters=20 (requested 20), cluster_radius=0.800 um
+% M_total=240 -> heads_per_cluster=[12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12, 12]
+% r_place=10.5100 um, overlap_factor~1.10, min_center_spacing=0.2 um
+% cluster 00: center(theta,z)=(4.207,5.019), heads=12
+new 1 myosin1 { position = -5.489 -8.963 4.555 }
+new 1 myosin1 { position = -5.615 -8.885 5.065 }
+new 1 myosin1 { position = -4.623 -9.439 5.517 }
+new 1 myosin1 { position = -5.398 -9.018 4.783 }
+new 1 myosin1 { position = -5.268 -9.094 4.783 }
+new 1 myosin1 { position = -4.864 -9.316 4.612 }
+new 1 myosin1 { position = -4.898 -9.299 4.663 }
+new 1 myosin1 { position = -5.221 -9.122 5.777 }
+new 1 myosin1 { position = -4.738 -9.382 5.099 }
+new 1 myosin1 { position = -5.096 -9.192 5.444 }
+new 1 myosin1 { position = -4.581 -9.459 4.942 }
+new 1 myosin1 { position = -5.164 -9.154 4.592 }
+% cluster 01: center(theta,z)=(3.662,-0.484), heads=12
+new 1 myosin1 { position = -9.403 -4.696 -0.591 }
+new 1 myosin1 { position = -9.097 -5.264 -1.009 }
+new 1 myosin1 { position = -8.951 -5.509 -0.084 }
+new 1 myosin1 { position = -8.801 -5.745 -0.300 }
+new 1 myosin1 { position = -9.229 -5.029 -1.251 }
+new 1 myosin1 { position = -9.089 -5.277 -0.312 }
+new 1 myosin1 { position = -9.030 -5.377 -1.251 }
+new 1 myosin1 { position = -9.369 -4.763 -0.133 }
+new 1 myosin1 { position = -9.051 -5.342 -1.195 }
+new 1 myosin1 { position = -9.111 -5.239 -0.698 }
+new 1 myosin1 { position = -9.103 -5.254 -0.890 }
+new 1 myosin1 { position = -9.103 -5.253 -0.621 }
+% cluster 02: center(theta,z)=(5.158,-15.173), heads=12
+new 1 myosin1 { position = 4.364 -9.561 -15.058 }
+new 1 myosin1 { position = 4.615 -9.443 -14.383 }
+new 1 myosin1 { position = 4.711 -9.395 -15.600 }
+new 1 myosin1 { position = 3.835 -9.785 -15.245 }
+new 1 myosin1 { position = 4.903 -9.296 -15.837 }
+new 1 myosin1 { position = 4.869 -9.314 -14.735 }
+new 1 myosin1 { position = 4.054 -9.697 -15.233 }
+new 1 myosin1 { position = 4.561 -9.469 -15.167 }
+new 1 myosin1 { position = 4.973 -9.259 -14.560 }
+new 1 myosin1 { position = 4.827 -9.336 -14.493 }
+new 1 myosin1 { position = 4.934 -9.280 -15.723 }
+new 1 myosin1 { position = 4.752 -9.374 -15.917 }
+% cluster 03: center(theta,z)=(1.778,3.731), heads=12
+new 1 myosin1 { position = -1.829 10.350 3.840 }
+new 1 myosin1 { position = -2.328 10.249 4.377 }
+new 1 myosin1 { position = -2.168 10.284 4.474 }
+new 1 myosin1 { position = -1.877 10.341 3.839 }
+new 1 myosin1 { position = -2.066 10.305 3.274 }
+new 1 myosin1 { position = -2.891 10.104 3.547 }
+new 1 myosin1 { position = -1.501 10.402 3.780 }
+new 1 myosin1 { position = -1.435 10.412 3.526 }
+new 1 myosin1 { position = -2.205 10.276 4.021 }
+new 1 myosin1 { position = -2.881 10.107 3.828 }
+new 1 myosin1 { position = -1.726 10.367 4.197 }
+new 1 myosin1 { position = -2.383 10.236 4.043 }
+% cluster 04: center(theta,z)=(0.958,5.451), heads=12
+new 1 myosin1 { position = 6.053 8.592 5.422 }
+new 1 myosin1 { position = 5.666 8.852 5.080 }
+new 1 myosin1 { position = 6.391 8.344 4.804 }
+new 1 myosin1 { position = 6.574 8.200 5.249 }
+new 1 myosin1 { position = 5.676 8.846 5.078 }
+new 1 myosin1 { position = 6.375 8.356 6.015 }
+new 1 myosin1 { position = 5.667 8.851 6.069 }
+new 1 myosin1 { position = 5.686 8.839 4.866 }
+new 1 myosin1 { position = 5.998 8.630 5.864 }
+new 1 myosin1 { position = 6.396 8.340 5.474 }
+new 1 myosin1 { position = 5.672 8.848 5.487 }
+new 1 myosin1 { position = 5.847 8.733 5.202 }
+% cluster 05: center(theta,z)=(2.269,13.574), heads=12
+new 1 myosin1 { position = -7.193 7.663 13.969 }
+new 1 myosin1 { position = -6.442 8.304 13.492 }
+new 1 myosin1 { position = -6.733 8.070 13.392 }
+new 1 myosin1 { position = -6.786 8.026 13.665 }
+new 1 myosin1 { position = -7.026 7.816 13.003 }
+new 1 myosin1 { position = -7.130 7.722 13.523 }
+new 1 myosin1 { position = -6.830 7.988 14.324 }
+new 1 myosin1 { position = -6.899 7.929 13.279 }
+new 1 myosin1 { position = -7.197 7.660 13.257 }
+new 1 myosin1 { position = -6.619 8.163 13.512 }
+new 1 myosin1 { position = -6.365 8.364 13.602 }
+new 1 myosin1 { position = -6.467 8.285 13.014 }
+% cluster 06: center(theta,z)=(1.708,13.499), heads=12
+new 1 myosin1 { position = -1.994 10.319 13.608 }
+new 1 myosin1 { position = -1.745 10.364 14.135 }
+new 1 myosin1 { position = -2.095 10.299 13.506 }
+new 1 myosin1 { position = -1.053 10.457 13.343 }
+new 1 myosin1 { position = -1.964 10.325 13.109 }
+new 1 myosin1 { position = -1.377 10.419 14.009 }
+new 1 myosin1 { position = -1.412 10.415 13.028 }
+new 1 myosin1 { position = -1.721 10.368 14.161 }
+new 1 myosin1 { position = -1.003 10.462 14.027 }
+new 1 myosin1 { position = -1.428 10.413 13.120 }
+new 1 myosin1 { position = -1.048 10.458 13.398 }
+new 1 myosin1 { position = -1.386 10.418 13.905 }
+% cluster 07: center(theta,z)=(5.863,-8.760), heads=12
+new 1 myosin1 { position = 9.487 -4.522 -9.312 }
+new 1 myosin1 { position = 9.356 -4.788 -8.711 }
+new 1 myosin1 { position = 9.690 -4.070 -9.166 }
+new 1 myosin1 { position = 9.728 -3.979 -8.523 }
+new 1 myosin1 { position = 9.465 -4.568 -8.877 }
+new 1 myosin1 { position = 9.277 -4.938 -8.932 }
+new 1 myosin1 { position = 9.596 -4.286 -8.602 }
+new 1 myosin1 { position = 9.555 -4.377 -8.528 }
+new 1 myosin1 { position = 9.746 -3.935 -9.015 }
+new 1 myosin1 { position = 9.689 -4.073 -9.265 }
+new 1 myosin1 { position = 9.798 -3.802 -8.269 }
+new 1 myosin1 { position = 9.705 -4.034 -8.864 }
+% cluster 08: center(theta,z)=(1.620,-18.740), heads=12
+new 1 myosin1 { position = -0.965 10.466 -19.352 }
+new 1 myosin1 { position = -0.539 10.496 -18.571 }
+new 1 myosin1 { position = -0.471 10.499 -19.133 }
+new 1 myosin1 { position = -0.007 10.510 -18.986 }
+new 1 myosin1 { position = 0.085 10.510 -19.101 }
+new 1 myosin1 { position = -1.106 10.452 -18.309 }
+new 1 myosin1 { position = -1.114 10.451 -18.900 }
+new 1 myosin1 { position = -0.995 10.463 -18.322 }
+new 1 myosin1 { position = -1.241 10.436 -18.883 }
+new 1 myosin1 { position = -0.093 10.510 -18.640 }
+new 1 myosin1 { position = -0.948 10.467 -18.450 }
+new 1 myosin1 { position = -0.244 10.507 -18.177 }
+% cluster 09: center(theta,z)=(1.778,-9.903), heads=12
+new 1 myosin1 { position = -1.662 10.378 -9.751 }
+new 1 myosin1 { position = -2.034 10.311 -10.668 }
+new 1 myosin1 { position = -2.762 10.141 -9.521 }
+new 1 myosin1 { position = -1.738 10.365 -10.171 }
+new 1 myosin1 { position = -2.522 10.203 -9.495 }
+new 1 myosin1 { position = -1.668 10.377 -9.799 }
+new 1 myosin1 { position = -2.752 10.143 -10.385 }
+new 1 myosin1 { position = -2.150 10.288 -10.307 }
+new 1 myosin1 { position = -1.845 10.347 -9.661 }
+new 1 myosin1 { position = -2.037 10.311 -9.711 }
+new 1 myosin1 { position = -2.026 10.313 -10.517 }
+new 1 myosin1 { position = -2.239 10.269 -10.516 }
+% cluster 10: center(theta,z)=(3.283,19.156), heads=12
+new 1 myosin1 { position = -10.365 -1.738 18.456 }
+new 1 myosin1 { position = -10.269 -2.236 19.164 }
+new 1 myosin1 { position = -10.412 -1.430 19.269 }
+new 1 myosin1 { position = -10.440 -1.209 18.499 }
+new 1 myosin1 { position = -10.298 -2.100 18.709 }
+new 1 myosin1 { position = -10.468 -0.940 19.118 }
+new 1 myosin1 { position = -10.386 -1.613 18.922 }
+new 1 myosin1 { position = -10.416 -1.404 19.335 }
+new 1 myosin1 { position = -10.455 -1.070 18.823 }
+new 1 myosin1 { position = -10.447 -1.146 19.405 }
+new 1 myosin1 { position = -10.425 -1.332 19.466 }
+new 1 myosin1 { position = -10.312 -2.033 19.291 }
+% cluster 11: center(theta,z)=(1.856,8.760), heads=12
+new 1 myosin1 { position = -2.753 10.143 8.555 }
+new 1 myosin1 { position = -3.567 9.886 9.040 }
+new 1 myosin1 { position = -3.414 9.940 8.402 }
+new 1 myosin1 { position = -3.390 9.948 8.876 }
+new 1 myosin1 { position = -2.298 10.256 9.167 }
+new 1 myosin1 { position = -2.770 10.138 8.072 }
+new 1 myosin1 { position = -3.448 9.928 8.694 }
+new 1 myosin1 { position = -3.612 9.870 9.107 }
+new 1 myosin1 { position = -3.082 10.048 8.678 }
+new 1 myosin1 { position = -3.451 9.927 8.868 }
+new 1 myosin1 { position = -2.828 10.122 7.991 }
+new 1 myosin1 { position = -3.185 10.016 9.421 }
+% cluster 12: center(theta,z)=(2.233,-6.297), heads=12
+new 1 myosin1 { position = -6.746 8.059 -5.796 }
+new 1 myosin1 { position = -5.873 8.716 -6.008 }
+new 1 myosin1 { position = -6.157 8.517 -6.678 }
+new 1 myosin1 { position = -6.633 8.153 -6.946 }
+new 1 myosin1 { position = -6.235 8.460 -5.615 }
+new 1 myosin1 { position = -6.340 8.382 -7.016 }
+new 1 myosin1 { position = -6.842 7.978 -6.068 }
+new 1 myosin1 { position = -6.220 8.472 -5.873 }
+new 1 myosin1 { position = -6.214 8.477 -6.647 }
+new 1 myosin1 { position = -6.481 8.274 -5.940 }
+new 1 myosin1 { position = -6.474 8.280 -6.494 }
+new 1 myosin1 { position = -6.931 7.901 -6.648 }
+% cluster 13: center(theta,z)=(1.444,13.757), heads=12
+new 1 myosin1 { position = 1.664 10.377 13.373 }
+new 1 myosin1 { position = 0.572 10.494 13.947 }
+new 1 myosin1 { position = 0.683 10.488 13.666 }
+new 1 myosin1 { position = 1.000 10.462 14.020 }
+new 1 myosin1 { position = 0.837 10.477 14.021 }
+new 1 myosin1 { position = 1.161 10.446 13.394 }
+new 1 myosin1 { position = 1.531 10.398 13.138 }
+new 1 myosin1 { position = 1.763 10.361 14.034 }
+new 1 myosin1 { position = 1.379 10.419 13.831 }
+new 1 myosin1 { position = 0.683 10.488 13.877 }
+new 1 myosin1 { position = 0.647 10.490 13.537 }
+new 1 myosin1 { position = 1.895 10.338 13.517 }
+% cluster 14: center(theta,z)=(6.079,-11.073), heads=12
+new 1 myosin1 { position = 10.290 -2.138 -10.860 }
+new 1 myosin1 { position = 10.344 -1.860 -10.972 }
+new 1 myosin1 { position = 10.144 -2.751 -11.411 }
+new 1 myosin1 { position = 10.376 -1.674 -10.883 }
+new 1 myosin1 { position = 10.343 -1.867 -10.409 }
+new 1 myosin1 { position = 10.243 -2.353 -10.878 }
+new 1 myosin1 { position = 10.234 -2.392 -10.895 }
+new 1 myosin1 { position = 10.388 -1.600 -11.158 }
+new 1 myosin1 { position = 10.218 -2.460 -11.464 }
+new 1 myosin1 { position = 10.277 -2.199 -10.774 }
+new 1 myosin1 { position = 10.376 -1.671 -11.166 }
+new 1 myosin1 { position = 10.315 -2.018 -10.744 }
+% cluster 15: center(theta,z)=(4.511,8.719), heads=12
+new 1 myosin1 { position = -1.533 -10.398 8.274 }
+new 1 myosin1 { position = -2.212 -10.274 9.046 }
+new 1 myosin1 { position = -1.817 -10.352 9.191 }
+new 1 myosin1 { position = -2.108 -10.296 8.477 }
+new 1 myosin1 { position = -2.127 -10.293 8.258 }
+new 1 myosin1 { position = -2.803 -10.129 8.989 }
+new 1 myosin1 { position = -1.451 -10.409 8.938 }
+new 1 myosin1 { position = -1.641 -10.381 9.277 }
+new 1 myosin1 { position = -2.808 -10.128 8.763 }
+new 1 myosin1 { position = -2.424 -10.227 8.014 }
+new 1 myosin1 { position = -1.721 -10.368 9.118 }
+new 1 myosin1 { position = -2.041 -10.310 8.539 }
+% cluster 16: center(theta,z)=(4.365,-4.440), heads=12
+new 1 myosin1 { position = -3.213 -10.007 -4.994 }
+new 1 myosin1 { position = -4.063 -9.693 -5.018 }
+new 1 myosin1 { position = -3.236 -9.999 -4.501 }
+new 1 myosin1 { position = -4.211 -9.630 -4.784 }
+new 1 myosin1 { position = -4.029 -9.707 -4.679 }
+new 1 myosin1 { position = -3.396 -9.946 -4.948 }
+new 1 myosin1 { position = -3.888 -9.764 -5.034 }
+new 1 myosin1 { position = -4.104 -9.676 -4.659 }
+new 1 myosin1 { position = -3.666 -9.850 -4.165 }
+new 1 myosin1 { position = -3.359 -9.959 -4.687 }
+new 1 myosin1 { position = -3.851 -9.779 -4.275 }
+new 1 myosin1 { position = -3.982 -9.726 -4.280 }
+% cluster 17: center(theta,z)=(0.740,8.747), heads=12
+new 1 myosin1 { position = 8.162 6.621 9.246 }
+new 1 myosin1 { position = 7.555 7.307 8.693 }
+new 1 myosin1 { position = 8.094 6.705 8.243 }
+new 1 myosin1 { position = 8.111 6.684 8.205 }
+new 1 myosin1 { position = 7.756 7.093 8.619 }
+new 1 myosin1 { position = 7.484 7.379 8.274 }
+new 1 myosin1 { position = 7.491 7.372 8.690 }
+new 1 myosin1 { position = 7.887 6.947 9.401 }
+new 1 myosin1 { position = 7.359 7.504 8.867 }
+new 1 myosin1 { position = 7.757 7.091 8.307 }
+new 1 myosin1 { position = 7.900 6.932 9.152 }
+new 1 myosin1 { position = 7.298 7.563 8.350 }
+% cluster 18: center(theta,z)=(2.972,-3.017), heads=12
+new 1 myosin1 { position = -10.455 1.073 -2.652 }
+new 1 myosin1 { position = -10.397 1.536 -3.345 }
+new 1 myosin1 { position = -10.219 2.455 -3.323 }
+new 1 myosin1 { position = -10.410 1.450 -3.540 }
+new 1 myosin1 { position = -10.443 1.185 -3.535 }
+new 1 myosin1 { position = -10.213 2.481 -3.068 }
+new 1 myosin1 { position = -10.315 2.017 -3.395 }
+new 1 myosin1 { position = -10.375 1.676 -3.770 }
+new 1 myosin1 { position = -10.397 1.538 -3.708 }
+new 1 myosin1 { position = -10.308 2.052 -3.454 }
+new 1 myosin1 { position = -10.296 2.108 -3.517 }
+new 1 myosin1 { position = -10.373 1.692 -2.626 }
+% cluster 19: center(theta,z)=(4.991,-13.550), heads=12
+new 1 myosin1 { position = 3.199 -10.011 -13.719 }
+new 1 myosin1 { position = 3.123 -10.035 -13.978 }
+new 1 myosin1 { position = 3.402 -9.944 -13.532 }
+new 1 myosin1 { position = 3.013 -10.069 -14.073 }
+new 1 myosin1 { position = 2.600 -10.183 -13.975 }
+new 1 myosin1 { position = 3.450 -9.928 -13.367 }
+new 1 myosin1 { position = 2.253 -10.266 -13.320 }
+new 1 myosin1 { position = 3.528 -9.900 -13.278 }
+new 1 myosin1 { position = 2.427 -10.226 -13.675 }
+new 1 myosin1 { position = 2.250 -10.266 -13.418 }
+new 1 myosin1 { position = 2.845 -10.118 -12.934 }
+new 1 myosin1 { position = 2.912 -10.098 -13.984 }
+% --- END injected motor clusters ---
+
+run 200000 system
+{
+    nb_frames = 400
+}
