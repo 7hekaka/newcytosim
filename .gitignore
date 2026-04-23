@@ -31,10 +31,14 @@
 !/ext/**
 !/analysis/
 !/analysis/**
+/analysis/results/
 !/clu_init_minusz/
 !/clu_init_minusz/**
 !/clu_fixed_global_init_minusz/
 !/clu_fixed_global_init_minusz/**
+!/vesicles/
+!/vesicles/*.py
+!/vesicles/*.md
 !/cytosim.xcodeproj/
 !/cytosim.xcodeproj/**
 
