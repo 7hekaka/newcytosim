@@ -21,6 +21,7 @@
 #include "space_polygonZ.h"
 #include "space_ring.h"
 #include "space_sphere.h"
+#include "space_shell.h"
 #include "space_square.h"
 #include "space_strip.h"
 #include "space_torus.h"
@@ -63,6 +64,7 @@
  --------------|----------------------|-------------------------------------
  `rectangle`   | SpaceSquare          | length = REAL, REAL, REAL;
  `sphere`      | SpaceSphere          | radius = REAL or diameter = REAL;
+ `spherical_shell` | SpaceShell       | outer=REAL; inner=REAL;
  `polygon`     | SpacePolygon         | file=FILE; height=REAL;
  `polygonZ`    | SpacePolygonZ        | file=FILE;
  `capsule`     | SpaceCapsule         | length=REAL; radius=REAL;
@@ -126,6 +128,7 @@ Space * SpaceProp::newSpace() const
     if ( s=="annulus" )    return new SpaceAnnulus(this);
 
 #if ( DIM >= 3 )
+    if ( s=="spherical_shell" || s=="shell" ) return new SpaceShell(this);
     if ( s=="disc" )       return new SpaceDisc(this);
     if ( s=="cylinder" )   return new SpaceCylinder(this);
     if ( s=="cylinderZ" )  return new SpaceCylinderZ(this);
@@ -231,4 +234,3 @@ void SpaceProp::write_values(std::ostream& os) const
     write_value(os, "dimensions", dimensions);
     write_value(os, "display", "("+display+")");
 }
-

@@ -2,7 +2,7 @@
 # Copyright 2018-- Francois J. Nedelec.
 
 
-OBJ_SPACE := space.o space_prop.o space_square.o space_sphere.o space_disc.o\
+OBJ_SPACE := space.o space_prop.o space_square.o space_sphere.o space_shell.o space_disc.o\
              space_capsule.o space_dice.o space_torus.o space_polygon.o\
              space_ellipse.o space_cylinder.o space_bicylinder.o space_ring.o space_mesh.o\
              space_cylinderZ.o space_polygonZ.o space_strip.o space_periodic.o\
@@ -196,4 +196,3 @@ $(OBJ_SIMDISP:%.o=build/%GD2.o): build/%GD2.o: %.cc %.h | build
 
 $(OBJ_SIMDISP:%.o=build/%GD3.o): build/%GD3.o: %.cc %.h | build
 	$(COMPILE) -DDIM=3 -DDISPLAY $(INC_BMSD) -c $< -o $@
-
