@@ -25,6 +25,7 @@
 #include "space_strip.h"
 #include "space_torus.h"
 #include "space_annulus.h"
+#include "space_rough_annulus.h"
 
 
 #if NEW_SPACES
@@ -80,6 +81,7 @@
  `disc`        | SpaceDisc            | radius=REAL; bottom=REAL; top=REAL;
  `mesh`        | SpaceMesh            | file=FILE
  `annulus`     | SpaceAnnulus         | outer=REAL; inner=REAL; [bottom=REAL; top=REAL]
+ `rough_annulus` | SpaceRoughAnnulus   | outer=REAL; inner=REAL; amplitude=REAL; theta_mode=REAL; z_mode=REAL; rough_seed=INT; rough_components=INT; [bottom=REAL; top=REAL]
 
  
  Example:
@@ -124,6 +126,8 @@ Space * SpaceProp::newSpace() const
     if ( s=="periodic" )   return new SpacePeriodic(this);
     if ( s=="ellipse" )    return new SpaceEllipse(this);
     if ( s=="annulus" )    return new SpaceAnnulus(this);
+    if ( s=="rough_annulus" || s=="imperfect_annulus" || s=="wavy_annulus" )
+        return new SpaceRoughAnnulus(this);
 
 #if ( DIM >= 3 )
     if ( s=="disc" )       return new SpaceDisc(this);
@@ -231,4 +235,3 @@ void SpaceProp::write_values(std::ostream& os) const
     write_value(os, "dimensions", dimensions);
     write_value(os, "display", "("+display+")");
 }
-
