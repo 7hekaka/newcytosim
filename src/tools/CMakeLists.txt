@@ -9,6 +9,7 @@ set(TOOL_LIBS
     "${LAPACK_BLAS}"
     "${CURSES_LIBRARY}"
     Threads::Threads
+    ${CYTOSIM_OPENMP_LIBS}
 )
 
 set(TOOL_LIST
@@ -31,4 +32,3 @@ foreach(TOOL ${TOOL_LIST})
     target_link_libraries(${TOOL} PUBLIC "${TOOL_LIBS}")
     target_include_directories(${TOOL} PUBLIC ${TOOL_INCLUDES})
 endforeach()
-

@@ -13,12 +13,15 @@ STAMP="$(date +%Y%m%d_%H%M%S)"
 LOG="${LOG:-$ROOT/compile_diagnostics_${STAMP}.log}"
 BUILD_DIR="${BUILD_DIR:-$ROOT/build_cluster}"
 JOBS="${JOBS:-${SLURM_CPUS_PER_TASK:-4}}"
-TARGETS="${TARGETS:-sim}"
+TARGETS="${TARGETS:-sim report}"
+FRESH_BUILD="${FRESH_BUILD:-1}"
 MAKE_PLAY="${MAKE_PLAY:-OFF}"
-MAKE_TOOLS="${MAKE_TOOLS:-OFF}"
+MAKE_TOOLS="${MAKE_TOOLS:-ON}"
 MAKE_TESTS="${MAKE_TESTS:-OFF}"
 CYTOSIM_NATIVE_ARCH="${CYTOSIM_NATIVE_ARCH:-OFF}"
 CYTOSIM_ARCH_FLAGS="${CYTOSIM_ARCH_FLAGS:-}"
+CYTOSIM_ENABLE_OPENMP="${CYTOSIM_ENABLE_OPENMP:-ON}"
+CHEW_MODE="${CHEW_MODE:-2}"
 MODULES="${MODULES:-netlib-lapack openblas}"
 CMAKE_MODULES="${CMAKE_MODULES:-cmake/3.30.5-gcc}"
 CMAKE_EXE="${CMAKE_EXE:-${CMAKE:-}}"
@@ -48,14 +51,32 @@ echo "hostname: $(hostname)"
 echo "build_dir: $BUILD_DIR"
 echo "targets: $TARGETS"
 echo "jobs: $JOBS"
+echo "fresh_build: $FRESH_BUILD"
 echo "native_arch: $CYTOSIM_NATIVE_ARCH"
 echo "arch_flags: ${CYTOSIM_ARCH_FLAGS:-<none>}"
+echo "openmp: $CYTOSIM_ENABLE_OPENMP"
+echo "chew_mode: $CHEW_MODE"
 echo "requested_modules: ${MODULES:-<none>}"
 echo "private_cmake: $PRIVATE_CMAKE"
 echo "legacy_private_cmake: $LEGACY_PRIVATE_CMAKE"
 echo "openblas_root: $OPENBLAS_ROOT"
 echo "local_lib_dir: $LOCAL_LIB_DIR"
 echo
+
+if [[ "$(hostname)" == login* && "${ALLOW_LOGIN_COMPILE:-0}" != "1" ]]; then
+    cat <<EOF
+This is a login node. Compile from an allocated compute shell instead:
+
+  salloc --account=ACF-UTK0049 --partition=condo-sabel1 --qos=condo \\
+    --nodes=1 --ntasks=1 --cpus-per-task=8 --time=03:00:00 \\
+    --nodelist=ber1528
+  srun --pty bash
+  ./python/run/compile_cytosim_cluster.sh
+
+Set ALLOW_LOGIN_COMPILE=1 only if you deliberately want to override this guard.
+EOF
+    exit 2
+fi
 
 echo "=== Node ==="
 uname -a || true
@@ -152,6 +173,20 @@ echo "LIBRARY_PATH=${LIBRARY_PATH:-<unset>}"
 echo "CMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH:-<unset>}"
 echo
 
+echo "=== Enable requested chewer mode ==="
+python3 - <<PY
+from pathlib import Path
+import re
+path = Path("src/sim/fiber_prop.h")
+text = path.read_text()
+new = re.sub(r"#define\\s+NEW_FIBER_END_CHEW\\s+\\d+", "#define NEW_FIBER_END_CHEW   ${CHEW_MODE}", text, count=1)
+if new == text:
+    raise SystemExit("could not find NEW_FIBER_END_CHEW in src/sim/fiber_prop.h")
+path.write_text(new)
+PY
+grep -n "NEW_FIBER_END_CHEW" src/sim/fiber_prop.h
+echo
+
 echo "=== Toolchain ==="
 if [[ -z "$CMAKE_EXE" ]]; then
     for candidate in "$PRIVATE_CMAKE" "$LEGACY_PRIVATE_CMAKE"; do
@@ -191,6 +226,11 @@ make --version | head -3 || true
 echo
 
 echo "=== Configure ==="
+if [[ "$FRESH_BUILD" == "1" ]]; then
+    echo "Removing old build directory: $BUILD_DIR"
+    rm -rf "$BUILD_DIR"
+fi
+
 cmake_args=(
     -S "$ROOT"
     -B "$BUILD_DIR"
@@ -200,6 +240,7 @@ cmake_args=(
     -DMAKE_TOOLS="$MAKE_TOOLS"
     -DMAKE_TESTS="$MAKE_TESTS"
     -DCYTOSIM_NATIVE_ARCH="$CYTOSIM_NATIVE_ARCH"
+    -DCYTOSIM_ENABLE_OPENMP="$CYTOSIM_ENABLE_OPENMP"
 )
 if [[ -n "$CYTOSIM_ARCH_FLAGS" ]]; then
     cmake_args+=("-DCYTOSIM_ARCH_FLAGS=$CYTOSIM_ARCH_FLAGS")

@@ -32,6 +32,7 @@ option(MAKE_PLAY "build the graphical OpenGL viewer" ON)
 option(MAKE_TOOLS "build all cytosim/tools executables" ON)
 option(MAKE_TESTS "build all cytosim/test executables" OFF)
 option(CYTOSIM_NATIVE_ARCH "compile with -march=native for this build host" ON)
+option(CYTOSIM_ENABLE_OPENMP "compile and link OpenMP-enabled mechanics loops" ON)
 set(CYTOSIM_ARCH_FLAGS "" CACHE STRING "explicit compiler architecture flags; overrides CYTOSIM_NATIVE_ARCH when non-empty")
 
 
@@ -69,6 +70,19 @@ set(LAPACK_BLAS "${LAPACK_LIB}" "${BLAS_LIB}")
 
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
+
+if(CYTOSIM_ENABLE_OPENMP)
+    find_package(OpenMP)
+    if(OpenMP_CXX_FOUND)
+        message(">>>>>> OpenMP: enabled")
+        set(CYTOSIM_OPENMP_LIBS OpenMP::OpenMP_CXX)
+    else()
+        message(WARNING "OpenMP requested but not found; continuing without OpenMP")
+        set(CYTOSIM_OPENMP_LIBS)
+    endif()
+else()
+    set(CYTOSIM_OPENMP_LIBS)
+endif()
 
 find_package(Curses REQUIRED)
 include_directories(${CURSES_INCLUDE_DIR})

@@ -142,6 +142,10 @@ list(TRANSFORM SIM_INCLUDES PREPEND "${PROJECT_SOURCE_DIR}/src/")
 add_library(${SIM_LIBRARY} STATIC ${SOURCES_CYTOSIM})
 target_include_directories(${SIM_LIBRARY} PUBLIC "${SIM_INCLUDES}" )
 
+if(CYTOSIM_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
+    target_link_libraries(${SIM_LIBRARY} PUBLIC ${CYTOSIM_OPENMP_LIBS})
+endif()
+
 
 
 if(MAKE_SIM)
@@ -155,6 +159,7 @@ if(MAKE_SIM)
         "${LAPACK_BLAS}"
         "${CURSES_LIBRARY}"
         Threads::Threads
+        ${CYTOSIM_OPENMP_LIBS}
     )
     
 endif(MAKE_SIM)
@@ -171,6 +176,10 @@ if(MAKE_PLAY)
 
     add_library(${SIMG_LIBRARY} STATIC ${SOURCES_CYTOSIM})
     target_include_directories(${SIMG_LIBRARY} PUBLIC "${SIMG_INCLUDES}")
+
+    if(CYTOSIM_ENABLE_OPENMP AND OpenMP_CXX_FOUND)
+        target_link_libraries(${SIMG_LIBRARY} PUBLIC ${CYTOSIM_OPENMP_LIBS})
+    endif()
 
     # It is only necessary to compile files in ${SOURCES_WITH_DISPLAY} with this flag
     # but I do not know how to specify this with CMake
