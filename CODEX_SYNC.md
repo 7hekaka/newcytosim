@@ -91,7 +91,18 @@ Next likely actions:
 
 ## Laptop Or New Work Computer Setup
 
-On a new machine:
+On the Mac laptop:
+
+```bash
+mkdir -p ~/project
+cd ~/project
+git clone git@github.com:7hekaka/newcytosim.git cytosim
+cd cytosim
+git fetch --all --prune
+git status --short --branch
+```
+
+On a Windows work computer, use WSL2 Ubuntu and clone inside WSL:
 
 ```bash
 mkdir -p ~/project
@@ -105,7 +116,7 @@ git status --short --branch
 Then tell the local Codex:
 
 ```text
-Read CODEX_SYNC.md and PROJECT_PLANNER.md first. Use /home/<user>/project/cytosim as the active workspace. Do not assume heavy job folders are present locally.
+Read CODEX_SYNC.md and PROJECT_PLANNER.md first. Use the cloned repo path on this machine as the active workspace. Do not assume heavy job folders are present locally.
 ```
 
 ## Logging Rule
