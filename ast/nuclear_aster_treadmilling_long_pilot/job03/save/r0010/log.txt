@@ -1,0 +1,11 @@
+host      ber1528
+user      kacheamp
+wdir      /tmp/kacheamp-42mf93_b
+exec      /lustre/isaac24/scratch/kacheamp/turnover_mini_chew/sim
+args      []
+conf      /lustre/isaac24/scratch/kacheamp/turnover_mini_chew/job03/todo/config0010.cym
+pid       2133869
+start     Wed Jun 17 22:22:31 2026
+status    0
+stop      Wed Jun 17 22:22:33 2026
+parked    Wed Jun 17 22:22:33 2026

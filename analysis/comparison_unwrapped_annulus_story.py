@@ -73,7 +73,12 @@ def build_run_lookup(path: Path) -> dict[tuple[str, str, str, str], dict]:
     rows = read_csv_rows(path)
     lookup = {}
     for row in rows:
-        if row.get('has_properties') == '0':
+        available = row.get('has_properties')
+        if available is None:
+            available = row.get('has_point')
+        if available is None:
+            available = row.get('has_outputs')
+        if str(available).strip().lower() not in {'1', 'true', 'yes'}:
             continue
         lookup[(row['group'], row['case'], row['xlink_regime'], row['run_dir'])] = row
     return lookup
@@ -297,7 +302,7 @@ def draw_line_panel(ax, panel: Panel | None) -> None:
         for s, z in frame_segments(panel.frame, panel.seam, panel.smax, r_mid):
             ax.plot(s, z, color='black', lw=0.50, alpha=0.30)
         ax.set_xlim(0.0, panel.smax)
-        ax.set_ylim(panel.zmin, panel.zmax)
+        ax.set_ylim(panel.zmax, panel.zmin)
     style(ax)
 
 
@@ -314,6 +319,7 @@ def draw_density_panel(ax, panel: Panel | None, *, vmax: float):
             vmax=vmax,
             interpolation='nearest',
         )
+        ax.set_ylim(panel.zmax, panel.zmin)
     style(ax)
     return im
 
@@ -349,9 +355,9 @@ def make_timeline_figure(family_spec: dict, regime: str, panels: list[Panel], *,
                 ax.set_xlabel('Unwrapped circumference (um)', fontsize=9.5)
             else:
                 ax.set_xticklabels([])
-    fig.text(0.5, 0.992, f'{family_spec["group"]}   xlink regime {regime}', ha='center', va='top', fontsize=15)
+    fig.text(0.5, 0.975, f'{family_spec["group"]}   xlink regime {regime}', ha='center', va='top', fontsize=15)
     right = 0.965 if mode == 'line' else 0.93
-    fig.subplots_adjust(left=0.10, right=right, bottom=0.04, top=0.965, wspace=0.06, hspace=0.10)
+    fig.subplots_adjust(left=0.10, right=right, bottom=0.04, top=0.92, wspace=0.06, hspace=0.10)
     return fig, im
 
 
@@ -440,3 +446,4 @@ def main() -> None:
 
 if __name__ == '__main__':
     main()
+

@@ -47,12 +47,14 @@ F. Nedelec
 # default parameters for submission:
 submit  = 'sbatch'
 queue   = 'icelake'
+nodelist = ''
 
 runtime = '12:00:00' # 12 hours
 memory  = 4048       # in MB
 ncpu    = 1          # nb of threads per job
 
 import sys, os, shutil, subprocess
+nodelist = os.environ.get('SBATCH_NODELIST', '')
 
 # output for error messages:
 out  = sys.stderr
@@ -120,6 +122,8 @@ def sub_script(exe):
         cmd += ['--cpus-per-task=%i' % ncpu]
     cmd += ['--job-name='+jdir]
     cmd += ['--partition='+queue] 
+    if nodelist:
+        cmd += ['--nodelist='+nodelist]
     cmd += ['--time='+runtime] 
     cmd += ['--mem='+repr(memory)]
     # define signals sent if time is exceeded:
@@ -142,6 +146,8 @@ def array_script(jobcnt):
     if ncpu > 1:
         cmd += ['--cpus-per-task=%i' % ncpu]
     cmd += ['#SBATCH --partition='+queue]
+    if nodelist:
+        cmd += ['#SBATCH --nodelist='+nodelist]
     cmd += ['#SBATCH --time='+runtime]
     cmd += ['#SBATCH --mem='+repr(memory)]
     # define signals sent if time is exceeded:
@@ -162,7 +168,7 @@ def array_script(jobcnt):
 
 def main(args):
     """submit jobs, depending on the arguments provided"""
-    global submit, memory, runtime, queue, jdir, ncpu
+    global submit, memory, runtime, queue, jdir, ncpu, nodelist
     
     #find submit command:
     proc = subprocess.Popen(['which', submit], stdout=subprocess.PIPE)
@@ -229,6 +235,8 @@ def main(args):
                 runtime = val
             elif key == 'queue':
                 queue = val
+            elif key == 'node' or key == 'nodes' or key == 'nodelist':
+                nodelist = val
             else:
                 out.write("Error: I do not understand argument `%s'\n" % arg)
                 sys.exit()
@@ -265,4 +273,3 @@ if __name__ == "__main__":
         print(__doc__)
     else:
         main(sys.argv[1:])
-

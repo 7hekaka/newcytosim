@@ -1,0 +1,13 @@
+Representative runs chosen as the replicate closest to the condition mean final nuclear/body pairwise distance.
+Use these first for visual inspection; then inspect outliers if the condition looks heterogeneous.
+
+large_system,01_actin_only_perinuclear_long: r0005 (r0005) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0005 final_pairwise=13.058
+large_system,03_growing_mt_uniform_actin_long: r0014 (r0004) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0014 final_pairwise=15.139
+large_system,07_division_growing_mt_perinuclear_actin_long: r0035 (r0005) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0035 final_pairwise=10.860
+small_system,01_actin_only_perinuclear_long: r0040 (r0005) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0040 final_pairwise=5.333
+small_system,02_fixed_mt_uniform_actin_long: r0045 (r0005) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0045 final_pairwise=3.375
+small_system,03_growing_mt_uniform_actin_long: r0048 (r0003) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0048 final_pairwise=9.297
+small_system,04_fixed_mt_perinuclear_actin_long: r0051 (r0001) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0051 final_pairwise=3.856
+small_system,05_growing_mt_perinuclear_actin_long: r0059 (r0004) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0059 final_pairwise=9.531
+small_system,06_division_fixed_mt_perinuclear_actin_long: r0061 (r0001) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0061 final_pairwise=3.151
+small_system,07_division_growing_mt_perinuclear_actin_long: r0070 (r0005) path=/home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save/r0070 final_pairwise=8.007

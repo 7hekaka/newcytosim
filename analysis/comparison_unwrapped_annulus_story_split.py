@@ -68,9 +68,9 @@ def make_timeline_figure(family_spec: dict, regime: str, panels: list, *, mode: 
             else:
                 ax.set_xticklabels([])
     pretty = 'low counts' if part_name == 'low_counts' else 'high counts'
-    fig.text(0.5, 0.992, f'{family_spec["group"]}   xlink regime {regime}   {pretty}', ha='center', va='top', fontsize=15)
+    fig.text(0.5, 0.975, f'{family_spec["group"]}   xlink regime {regime}   {pretty}', ha='center', va='top', fontsize=15)
     right = 0.965 if mode == 'line' else 0.93
-    fig.subplots_adjust(left=0.10, right=right, bottom=0.045, top=0.965, wspace=0.06, hspace=0.10)
+    fig.subplots_adjust(left=0.10, right=right, bottom=0.045, top=0.92, wspace=0.06, hspace=0.10)
     return fig, im
 
 
@@ -105,3 +105,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+

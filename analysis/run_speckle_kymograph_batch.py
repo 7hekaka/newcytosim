@@ -159,6 +159,7 @@ def plot_family_model(
                     t_edges = np.array([0.0, t[0] + 1e-6], dtype=float)
                 im = ax.pcolormesh(t_edges, z_edges, rho.T, shading='auto', cmap='viridis', vmin=vmin, vmax=vmax)
                 ax.set_xlim(t_edges[0], t_edges[-1])
+                ax.set_ylim(z_edges[-1], z_edges[0])
 
             if cidx == 0:
                 ax.text(

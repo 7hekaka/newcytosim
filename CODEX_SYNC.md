@@ -69,6 +69,13 @@ Avoid `git add .` in this repo because many output folders are large and easy to
 
 Date: 2026-06-28
 
+Portable branch scope:
+
+- Branch `codex/active-project-portable-20260628` is the lightweight cross-machine branch for the current active work.
+- It intentionally focuses on two lanes: central-cell continuous F-actin turnover and the current endosperm mechanism pilots.
+- It includes source/tool code, generator scripts, analysis scripts, manifests, selected configs, planner notes, and CSV/text summaries needed to redraw or continue analysis.
+- It intentionally excludes heavy returned job data, raw `objects.cmo`/`properties.cmp` output, movies, image frames, and large plot folders.
+
 Current major project state:
 
 - Paper/manuscript branch: metric-focused Results/Discussion draft and figures passed PI/user review. User is moving remaining edits to Overleaf, so local paper work is mostly paused.
@@ -78,6 +85,7 @@ Current major project state:
 - Campaign comparison: motor-free xlink controls versus rotatable motor-cluster cases, with 10 replicates each.
 - Key model ingredients: full annulus scale, top actin supply every 60 s, aggressive bottom chewers, 80 motor clusters x 12 motors per cluster for motor cases.
 - Heavy returned outputs should not be expected on laptop/Mac unless explicitly copied there.
+- Current endosperm lane included here: latest mechanism/pilot metadata under `ast/nuclear_propulsion_mechanism_mockups`, plus the immediately relevant treadmilling/one-sided/tethered-MT pilot metadata used to interpret it.
 
 Current Git caution:
 

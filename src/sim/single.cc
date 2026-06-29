@@ -10,6 +10,25 @@
 #include "space.h"
 #include "modulo.h"
 #include "meca.h"
+#include "random.h"  
+
+#include <unordered_map>
+
+struct ClusterState {
+    Vector C;     // center on inner surface
+    real   phi=0; // in-plane rotation angle
+    real   t_last = -1;
+    bool   init=false;
+};
+static std::unordered_map<const SingleProp*, ClusterState> g_cluster;
+
+static inline Vector radial_xy(const Vector& p) {
+    real r = std::sqrt(p.XX*p.XX + p.YY*p.YY);
+    if (r > REAL_EPSILON) return Vector(p.XX/r, p.YY/r, 0);
+    return Vector(1,0,0);
+}
+static inline Vector tan_azimuth(const Vector& n) { return Vector(-n.YY, n.XX, 0); } // φ_hat
+static inline Vector project_inner_annulus(const Space* S, Vector P); // forward (see below)
 
 //------------------------------------------------------------------------------
 Single::Single(SingleProp const* p, Vector const& w)
@@ -125,7 +144,55 @@ void Single::stepF()
     }
     
     sHand->stepUnattached(simul(), sPos);
+
+
+auto& sp = *prop;
+if ( sp.confine == CONFINE_ON && sp.confine_space ) {
+    auto& cs = g_cluster[prop];   // 'prop' is already a const SingleProp*
+
+    if (!cs.init) {
+        cs.C     = project_inner_annulus(sp.confine_space, sPos);
+        cs.phi   = 0;
+        cs.t_last = simul().time();
+        cs.init  = true;
+    }
+
+    real dt  = simul().prop.time_step;
+    if ( simul().time() > cs.t_last + 0.5*dt ) {
+        Vector n  = radial_xy(cs.C);
+        Vector et = tan_azimuth(n);
+        Vector ez = Vector(0,0,1);
+        real sigT = std::sqrt(2.0 * sp.cluster_D    * dt);
+        real sigR = std::sqrt(2.0 * sp.cluster_Drot * dt);
+
+        cs.C  += sigT * ( RNG.gauss() * et + RNG.gauss() * ez );
+        cs.C   = project_inner_annulus(sp.confine_space, cs.C);
+        if ( sp.cluster_Drot > 0 ) cs.phi += sigR * RNG.gauss();
+        cs.t_last = simul().time();
+    }
+
+    if ( !c_off_init_ ) {
+        Vector n  = radial_xy(cs.C);
+        Vector d  = sPos - cs.C;      // current displacement
+        d -= dot(d,n)*n;              // project to tangent plane
+        c_off_T_  = d;
+        c_off_init_ = true;
+    }
+
+    Vector n  = radial_xy(cs.C);
+    Vector et = tan_azimuth(n), ez = Vector(0,0,1);
+    real c = std::cos(cs.phi), s = std::sin(cs.phi);
+    real a = dot(c_off_T_, et);
+    real b = dot(c_off_T_, ez);
+    Vector off = ( c*a - s*b ) * et + ( s*a + c*b ) * ez;
+
+    Vector pos = cs.C + off;                  // desired position
+    sPos = sp.confine_space->project(pos);    // enforce surface now
 }
+     
+}
+    
+
 
 
 /**
@@ -171,7 +238,18 @@ void Single::write(Outputter& out) const
  */
 void Single::read(Inputter& in, Simul& sim, ObjectTag tag)
 {
+   
+    
     sHand->readHand(in, sim);
     in.readFloats(sPos, DIM);
 }
 
+// single.cc bottom (or space_annulus.cc if you prefer)
+
+static inline Vector project_inner_annulus(const Space* S, Vector P)
+{
+    // For now, just use the generic surface projection.
+    // If you later add explicit "inner-only" in the space class, call it here.
+    return S->project(P);
+}
+//------------------------------------------------------------------------------

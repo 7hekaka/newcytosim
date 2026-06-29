@@ -1,0 +1,4 @@
+line,movie_id,projected_tiff,pixel_size_um,frame_interval_s,z_start,z_stop,raw_file,frame_interval_source,notes
+Wild type,WT_1_0001,analysis/input/projected_tiffs/Wild_type/WT_1_0001_z5-7_maxproj.tif,0.10358,30,5,7,Kwaku and Berry/Wild type/1_0001_5ADVMLE.ims,collaborator confirmed,
+CA ROP9,CA_Image0004,analysis/input/projected_tiffs/CA_ROP9/CA_Image0004_z5-7_maxproj.tif,0.10300,30,5,7,Kwaku and Berry/CA ROP9/Image0004_5ADVMLE.oib.ims,collaborator confirmed,
+scar4-1,scar4_Image0001,analysis/input/projected_tiffs/scar4-1/scar4_Image0001_z5-7_maxproj.tif,0.10300,30,5,7,Kwaku and Berry/scar4-1/Image0001.oib,collaborator confirmed,

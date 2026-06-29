@@ -239,6 +239,8 @@ def draw_group_snapshot(group: str, group_label: str, snapshot_slug: str, snapsh
                     interpolation='nearest',
                 )
             ax.set_xlim(left=0.0)
+            if panel is not None:
+                ax.set_ylim(panel.zmax, panel.zmin)
             if i == 0:
                 title = '0' if case == 'c0_m0' else f'{force_value:g}'
                 ax.set_title(title, fontsize=15, pad=8)

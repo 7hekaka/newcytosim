@@ -1,0 +1,4 @@
+scenario,include_xlinks,threshold_vz_abs_matched
+full_height_aligned,1,0.01437023043571397
+top_two_thirds_aligned,1,0.013821836217748186
+top_two_thirds_mixed_polarity,1,0.011678178534967748

@@ -322,6 +322,55 @@ def discover_runs(case_dir: Path) -> list[Path]:
     return runs
 
 
+def parse_run_names(runs: str | None) -> set[str] | None:
+    if not runs:
+        return None
+    names = set()
+    for item in runs.split(","):
+        item = item.strip()
+        if not item:
+            continue
+        if item.startswith("r"):
+            names.add(item)
+        else:
+            names.add(f"r{int(item):04d}")
+    if not names:
+        raise RuntimeError("--runs did not contain any run names")
+    return names
+
+
+def filter_runs(
+    runs: list[Path],
+    run_start: int | None,
+    run_stop: int | None,
+    run_names: set[str] | None = None,
+) -> list[Path]:
+    if run_names:
+        available = {run_dir.name for run_dir in runs}
+        missing = sorted(run_names - available)
+        if missing:
+            raise RuntimeError(f"requested runs were not found: {', '.join(missing)}")
+        return [run_dir for run_dir in runs if run_dir.name in run_names]
+    if run_start is None and run_stop is None:
+        return runs
+    selected = []
+    for run_dir in runs:
+        run_id = int(run_dir.name[1:])
+        if run_start is not None and run_id < run_start:
+            continue
+        if run_stop is not None and run_id > run_stop:
+            continue
+        selected.append(run_dir)
+    if not selected:
+        bounds = []
+        if run_start is not None:
+            bounds.append(f">= r{run_start:04d}")
+        if run_stop is not None:
+            bounds.append(f"<= r{run_stop:04d}")
+        raise RuntimeError(f"no runs matched {' and '.join(bounds)}")
+    return selected
+
+
 def write_submit_script(out_dir: Path) -> None:
     script = """#!/usr/bin/env bash
 set -euo pipefail
@@ -367,13 +416,29 @@ def write_readme(
     rough_components: int,
     phase: float,
     source_subdir: Path,
+    run_start: int | None,
+    run_stop: int | None,
+    run_names: set[str] | None,
 ) -> None:
+    if run_names:
+        run_text = ", ".join(f"`{name}`" for name in sorted(run_names))
+    elif run_start is None and run_stop is None:
+        run_text = "all discovered runs"
+    elif run_start is None:
+        run_text = f"runs up to `r{run_stop:04d}`"
+    elif run_stop is None:
+        run_text = f"runs from `r{run_start:04d}` onward"
+    else:
+        run_text = f"`r{run_start:04d}` through `r{run_stop:04d}`"
+
     readme = f"""# Rough Inner Wall Initially Minus-Z Campaign
 
 This campaign is generated from the canonical initially minus-z flat-wall runs:
 
 - `rotatable`: `clu_init_minusz/{source_subdir.as_posix()}`
 - `fixed_global`: `clu_fixed_global_init_minusz/{source_subdir.as_posix()}`
+
+Included run range: {run_text}.
 
 Only the domain geometry and motor-head radial placement are changed. The outer wall is smooth,
 the inner wall is rigid and spatially imperfect, and motor heads are projected to the local rough
@@ -414,13 +479,17 @@ def main() -> None:
     parser.add_argument("--rough-components", type=int, default=DEFAULT_ROUGH_COMPONENTS)
     parser.add_argument("--phase", type=float, default=0.0)
     parser.add_argument("--attach-offset", type=float, default=DEFAULT_ATTACH_OFFSET)
+    parser.add_argument("--run-start", type=int, default=None, help="first run number to include, e.g. 11 for r0011")
+    parser.add_argument("--run-stop", type=int, default=None, help="last run number to include, e.g. 20 for r0020")
+    parser.add_argument("--runs", default=None, help="comma-separated explicit run list, e.g. r0002,r0005,r0008")
     args = parser.parse_args()
     out_subdir = args.out_subdir if args.out_subdir is not None else args.source_subdir
+    run_names = parse_run_names(args.runs)
 
     records: list[dict[str, object]] = []
     for label, source_root in SOURCE_ROOTS.items():
         source_dir = source_root / args.source_subdir
-        for run_dir in discover_runs(source_dir):
+        for run_dir in filter_runs(discover_runs(source_dir), args.run_start, args.run_stop, run_names):
             src = run_dir / "config.cym"
             dst = args.out / label / out_subdir / run_dir.name / "config.cym"
             records.append(
@@ -471,6 +540,9 @@ def main() -> None:
         rough_components=args.rough_components,
         phase=args.phase,
         source_subdir=args.source_subdir,
+        run_start=args.run_start,
+        run_stop=args.run_stop,
+        run_names=run_names,
     )
     print(f"Wrote {len(records)} configs to {args.out}")
 

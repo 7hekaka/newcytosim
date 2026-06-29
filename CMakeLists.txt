@@ -32,7 +32,7 @@ option(MAKE_PLAY "build the graphical OpenGL viewer" ON)
 option(MAKE_TOOLS "build all cytosim/tools executables" ON)
 option(MAKE_TESTS "build all cytosim/test executables" OFF)
 option(CYTOSIM_NATIVE_ARCH "compile with -march=native for this build host" ON)
-option(CYTOSIM_ENABLE_OPENMP "compile and link OpenMP-enabled mechanics loops" ON)
+option(CYTOSIM_ENABLE_OPENMP "compile OpenMP-enabled mechanics loops" ON)
 set(CYTOSIM_ARCH_FLAGS "" CACHE STRING "explicit compiler architecture flags; overrides CYTOSIM_NATIVE_ARCH when non-empty")
 
 

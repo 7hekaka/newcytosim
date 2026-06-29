@@ -49,6 +49,15 @@ public:
     /// diffusion coefficient
     real diffusion;
 
+    // ---- cluster-on-surface (no solids) ----
+    int  cluster_id       = -1;   // <0: not clustered
+    real cluster_D        = 0.0;  // µm^2/s (translational D of the cluster center on surface)
+    real cluster_Drot     = 0.0;  // rad^2/s (optional small in-plane rotation of the patch)
+
+    std::string anchor_mode = "fixed"; // "fixed" or "slide"
+    real anchor_D = 0.0;               // µm^2/s on solid surface (if slide)
+    
+
     /// if set > 0, assumes uniform concentration of diffusing Single
     /**
      The possible values for `fast_diffusion` are:

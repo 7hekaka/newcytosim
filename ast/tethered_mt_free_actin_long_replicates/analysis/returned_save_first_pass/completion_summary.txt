@@ -1,0 +1,13 @@
+save_dir: /home/thekaka/project/cytosim/ast/tethered_mt_free_actin_pilot/save
+completed_runs: 46
+
+large_system,01_actin_only_perinuclear_long: n=5 runs=r0001;r0002;r0003;r0004;r0005 reps=r0001;r0002;r0003;r0004;r0005
+large_system,03_growing_mt_uniform_actin_long: n=3 runs=r0013;r0014;r0015 reps=r0003;r0004;r0005
+large_system,07_division_growing_mt_perinuclear_actin_long: n=3 runs=r0033;r0034;r0035 reps=r0003;r0004;r0005
+small_system,01_actin_only_perinuclear_long: n=5 runs=r0036;r0037;r0038;r0039;r0040 reps=r0001;r0002;r0003;r0004;r0005
+small_system,02_fixed_mt_uniform_actin_long: n=5 runs=r0041;r0042;r0043;r0044;r0045 reps=r0001;r0002;r0003;r0004;r0005
+small_system,03_growing_mt_uniform_actin_long: n=5 runs=r0046;r0047;r0048;r0049;r0050 reps=r0001;r0002;r0003;r0004;r0005
+small_system,04_fixed_mt_perinuclear_actin_long: n=5 runs=r0051;r0052;r0053;r0054;r0055 reps=r0001;r0002;r0003;r0004;r0005
+small_system,05_growing_mt_perinuclear_actin_long: n=5 runs=r0056;r0057;r0058;r0059;r0060 reps=r0001;r0002;r0003;r0004;r0005
+small_system,06_division_fixed_mt_perinuclear_actin_long: n=5 runs=r0061;r0062;r0063;r0064;r0065 reps=r0001;r0002;r0003;r0004;r0005
+small_system,07_division_growing_mt_perinuclear_actin_long: n=5 runs=r0066;r0067;r0068;r0069;r0070 reps=r0001;r0002;r0003;r0004;r0005

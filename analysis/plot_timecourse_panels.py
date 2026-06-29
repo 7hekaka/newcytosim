@@ -193,7 +193,12 @@ def load_metadata(path: Path, model: str) -> list[dict]:
     for row in rows:
         row = dict(row)
         row["model"] = model
-        if row.get("has_point") != "1":
+        available = row.get("has_point")
+        if available is None:
+            available = row.get("has_properties")
+        if available is None:
+            available = row.get("has_outputs")
+        if str(available).strip().lower() not in {"1", "true", "yes"}:
             continue
         keep.append(row)
     return keep

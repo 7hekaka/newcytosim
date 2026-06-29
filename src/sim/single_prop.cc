@@ -25,8 +25,10 @@
  `diffuse` (default) | Single            | a single Hand that is mobile (default)
  `fixed`             | Picket PicketLong | a single Hand anchored at a fixed position
 
- The Single will actually move only if its diffusion coefficient is set and > 0.
- Another class Wrist is used automatically to anchor a Single to a Mecable.
+The Single will actually move only if its diffusion coefficient is set and > 0.
+For membrane-like mobile anchors, use `activity=fixed`, `anchor_mode=slide`,
+`anchor_D>0`, and `confine=surface, 0, SPACE_NAME`.
+Another class Wrist is used automatically to anchor a Single to a Mecable.
  
  Example:
 
@@ -115,6 +117,12 @@ void SingleProp::clear()
 
 void SingleProp::read(Glossary& glos)
 {
+
+    glos.set(anchor_mode, "anchor_mode");
+    glos.set(anchor_D,    "anchor_D");
+    glos.set(cluster_id,   "cluster_id");
+    glos.set(cluster_D,    "cluster_D");
+    glos.set(cluster_Drot, "cluster_Drot");
     glos.set(hand,           "hand");
     glos.set(stiffness,      "stiffness");
     glos.set(length,         "length");
@@ -167,7 +175,7 @@ void SingleProp::complete(Simul const& sim)
     confine_space = sim.findSpace(confine_spec);
     if ( confine != CONFINE_OFF )
     {
-        if ( activity=="fixed" )
+        if ( activity=="fixed" && anchor_mode != "slide" )
             throw InvalidParameter(name()+":confine is ignored since activity=fixed");
         if ( confine_space )
         {
@@ -191,6 +199,22 @@ void SingleProp::complete(Simul const& sim)
 
     if ( diffusion < 0 )
         throw InvalidParameter(name()+":diffusion must be >= 0");
+
+    if ( anchor_mode != "fixed" && anchor_mode != "slide" )
+        throw InvalidParameter(name()+":anchor_mode must be `fixed' or `slide'");
+
+    if ( anchor_D < 0 )
+        throw InvalidParameter(name()+":anchor_D must be >= 0");
+
+    if ( anchor_mode == "slide" )
+    {
+        if ( activity != "fixed" )
+            throw InvalidParameter(name()+":anchor_mode=slide requires activity=fixed");
+        if ( confine != CONFINE_ON )
+            throw InvalidParameter(name()+":anchor_mode=slide requires confine=surface, 0, SPACE_NAME");
+        if ( !confine_space && primed(sim) )
+            throw InvalidParameter(name()+":anchor_mode=slide requires a valid confine space");
+    }
 
     /**
      We want for one degree of freedom to fulfill `var(dx) = 2 D time_step`
@@ -234,6 +258,8 @@ void SingleProp::write_values(std::ostream& os) const
     write_value(os, "stiffness",      stiffness);
     write_value(os, "length",         length);
     write_value(os, "diffusion",      diffusion);
+    write_value(os, "anchor_mode",    anchor_mode);
+    write_value(os, "anchor_D",       anchor_D);
     write_value(os, "fast_diffusion", fast_diffusion, fast_reservoir);
 #if NEW_MOBILE_SINGLE
     write_value(os, "speed",          speed);

@@ -1,0 +1,1340 @@
+% Continuous supply full-comparable case: full_comparable / nomotor_xlink / r0010
+% Matches the older c80/m12 annulus scale: inner/outer 10.5/11, z -20 to 20.
+% Aggressive depolymerization variant: 2x diffuse bottom chewers and 2x per-chewer chewing speed.
+% Initial aligned network plus pulsed top actin supply and bottom minus-end chewing.
+% Endpoints are minus first, plus second; plus end is green/growing.
+set simul system
+{
+    steric = 1, 500
+    time_step = 0.004
+    kT = 0.0042
+    viscosity = 0.1
+}
+
+set system display
+{
+    back_color = white
+}
+
+set space stripbox
+{
+    shape = annulus
+    display = ( color = blue; )
+}
+
+new stripbox
+{
+    outer = 11.0
+    inner = 10.5
+    top = 20.0
+    bottom = -20.0
+}
+
+set space chewer_zone
+{
+    shape = annulus
+    display = ( visible = 0; color = red; )
+}
+
+new chewer_zone
+{
+    outer = 11.0
+    inner = 10.5
+    top = -8.0
+    bottom = -20.0
+}
+
+set hand actin_binder
+{
+    binding_rate = 10
+    binding_range = 0.150
+    unbinding_rate = 0.08
+    unbinding_force = 5
+    display = ( color = cyan; )
+}
+
+set couple crosslinker
+{
+    hand1 = actin_binder
+    hand2 = actin_binder
+    stiffness = 10
+    diffusion = 10
+    specificity = parallel
+}
+
+set fiber actin
+{
+    rigidity = 0.075
+    segmentation = 0.18
+    steric = 1, 0.025
+    confine = inside, 200
+
+    activity = grow
+    growing_speed = 0.3, 0
+    growing_force = inf, inf
+    total_polymer = 19008.0
+    min_length = 0.18
+    max_chewing_speed = 3.0
+
+    display = ( color = black; )
+}
+
+set hand chewer1
+{
+    binding_rate = 50.0
+    binding_range = 0.15
+    unbinding_rate = 0.2
+    activity = chew
+    bind_also_end = minus_end
+    bind_only_end = minus_end, 0.5
+    hold_growing_end = 0, 1
+    chewing_speed = 1.6
+    diffusion = 0.2
+    display = ( color = red; size = 4; )
+}
+
+set single cutter1
+{
+    hand = chewer1
+    stiffness = 1
+    activity = diffuse
+    diffusion = 10.0
+    confine = inside, 0, chewer_zone
+}
+
+set hand motor1
+{
+    binding_rate = 10
+    binding_range = 0.02
+    unbinding_rate = 0.3
+    activity = move
+    unloaded_speed = 2.0
+    stall_force = 4
+    unbinding_force = 2.5
+    display = ( color = blue; size = 4; )
+}
+
+set single myosin1
+{
+    hand = motor1
+    stiffness = 100
+    diffusion = 10
+    activity = fixed
+}
+
+% Initial full-height aligned filaments.
+new 1 actin { position_ends = -2.827 -10.273 -7.791, -2.827 -10.273 7.209; end_state = green, white; }
+new 1 actin { position_ends = 9.738 -4.142 -7.617, 9.738 -4.142 7.383; end_state = green, white; }
+new 1 actin { position_ends = 10.261 -2.530 -19.583, 10.261 -2.530 -4.583; end_state = green, white; }
+new 1 actin { position_ends = -6.965 8.332 -6.661, -6.965 8.332 8.339; end_state = green, white; }
+new 1 actin { position_ends = 5.526 -9.134 -4.885, 5.526 -9.134 10.115; end_state = green, white; }
+new 1 actin { position_ends = -10.318 -3.383 -3.312, -10.318 -3.383 11.688; end_state = green, white; }
+new 1 actin { position_ends = -8.643 6.301 2.199, -8.643 6.301 17.199; end_state = green, white; }
+new 1 actin { position_ends = -9.691 -4.292 -7.055, -9.691 -4.292 7.945; end_state = green, white; }
+new 1 actin { position_ends = -10.841 0.405 -16.177, -10.841 0.405 -1.177; end_state = green, white; }
+new 1 actin { position_ends = -10.603 -2.141 -7.656, -10.603 -2.141 7.344; end_state = green, white; }
+new 1 actin { position_ends = -9.447 -5.380 -5.858, -9.447 -5.380 9.142; end_state = green, white; }
+new 1 actin { position_ends = 9.099 5.358 -15.611, 9.099 5.358 -0.611; end_state = green, white; }
+new 1 actin { position_ends = 4.784 -9.780 -3.769, 4.784 -9.780 11.231; end_state = green, white; }
+new 1 actin { position_ends = 10.753 -0.277 -7.670, 10.753 -0.277 7.330; end_state = green, white; }
+new 1 actin { position_ends = 8.203 6.737 -6.152, 8.203 6.737 8.848; end_state = green, white; }
+new 1 actin { position_ends = 1.398 10.462 -7.347, 1.398 10.462 7.653; end_state = green, white; }
+new 1 actin { position_ends = 3.599 10.128 -13.982, 3.599 10.128 1.018; end_state = green, white; }
+new 1 actin { position_ends = 1.246 -10.824 -4.061, 1.246 -10.824 10.939; end_state = green, white; }
+new 1 actin { position_ends = 8.196 6.812 -13.412, 8.196 6.812 1.588; end_state = green, white; }
+new 1 actin { position_ends = -0.810 10.846 -16.805, -0.810 10.846 -1.805; end_state = green, white; }
+new 1 actin { position_ends = -0.013 10.574 -15.492, -0.013 10.574 -0.492; end_state = green, white; }
+new 1 actin { position_ends = -10.290 -2.851 0.827, -10.290 -2.851 15.827; end_state = green, white; }
+new 1 actin { position_ends = 7.059 -7.893 0.645, 7.059 -7.893 15.645; end_state = green, white; }
+new 1 actin { position_ends = 10.095 -3.213 1.264, 10.095 -3.213 16.264; end_state = green, white; }
+new 1 actin { position_ends = 4.850 -9.666 -12.717, 4.850 -9.666 2.283; end_state = green, white; }
+new 1 actin { position_ends = -8.330 6.551 -17.932, -8.330 6.551 -2.932; end_state = green, white; }
+new 1 actin { position_ends = -1.824 10.767 -15.789, -1.824 10.767 -0.789; end_state = green, white; }
+new 1 actin { position_ends = -10.548 -1.867 4.120, -10.548 -1.867 19.120; end_state = green, white; }
+new 1 actin { position_ends = 1.775 -10.566 -5.090, 1.775 -10.566 9.910; end_state = green, white; }
+new 1 actin { position_ends = -6.788 8.333 -10.389, -6.788 8.333 4.611; end_state = green, white; }
+new 1 actin { position_ends = -8.726 6.598 -1.417, -8.726 6.598 13.583; end_state = green, white; }
+new 1 actin { position_ends = -0.317 -10.659 -19.692, -0.317 -10.659 -4.692; end_state = green, white; }
+new 1 actin { position_ends = 4.682 9.598 -3.587, 4.682 9.598 11.413; end_state = green, white; }
+new 1 actin { position_ends = -7.763 -7.266 2.353, -7.763 -7.266 17.353; end_state = green, white; }
+new 1 actin { position_ends = -9.760 4.875 1.454, -9.760 4.875 16.454; end_state = green, white; }
+new 1 actin { position_ends = 9.842 -4.212 -19.037, 9.842 -4.212 -4.037; end_state = green, white; }
+new 1 actin { position_ends = -5.288 -9.468 -15.582, -5.288 -9.468 -0.582; end_state = green, white; }
+new 1 actin { position_ends = 9.514 4.558 -17.048, 9.514 4.558 -2.048; end_state = green, white; }
+new 1 actin { position_ends = -10.732 1.351 -4.039, -10.732 1.351 10.961; end_state = green, white; }
+new 1 actin { position_ends = -4.407 -9.946 -10.765, -4.407 -9.946 4.235; end_state = green, white; }
+new 1 actin { position_ends = 7.677 -7.642 -2.748, 7.677 -7.642 12.252; end_state = green, white; }
+new 1 actin { position_ends = -8.881 -5.741 -11.707, -8.881 -5.741 3.293; end_state = green, white; }
+new 1 actin { position_ends = -0.295 -10.828 -3.139, -0.295 -10.828 11.861; end_state = green, white; }
+new 1 actin { position_ends = -7.319 8.062 -15.373, -7.319 8.062 -0.373; end_state = green, white; }
+new 1 actin { position_ends = 9.948 -4.064 -5.703, 9.948 -4.064 9.297; end_state = green, white; }
+new 1 actin { position_ends = 0.987 -10.772 -15.040, 0.987 -10.772 -0.040; end_state = green, white; }
+new 1 actin { position_ends = -10.314 -3.649 -19.404, -10.314 -3.649 -4.404; end_state = green, white; }
+new 1 actin { position_ends = -7.996 -7.134 -18.870, -7.996 -7.134 -3.870; end_state = green, white; }
+new 1 actin { position_ends = 8.794 5.886 -12.643, 8.794 5.886 2.357; end_state = green, white; }
+new 1 actin { position_ends = -4.355 -9.615 -18.598, -4.355 -9.615 -3.598; end_state = green, white; }
+new 1 actin { position_ends = 9.306 -5.494 -4.711, 9.306 -5.494 10.289; end_state = green, white; }
+new 1 actin { position_ends = 8.423 -6.353 0.404, 8.423 -6.353 15.404; end_state = green, white; }
+new 1 actin { position_ends = 10.593 1.786 -8.321, 10.593 1.786 6.679; end_state = green, white; }
+new 1 actin { position_ends = 6.552 8.342 -7.139, 6.552 8.342 7.861; end_state = green, white; }
+new 1 actin { position_ends = 4.971 9.649 -13.841, 4.971 9.649 1.159; end_state = green, white; }
+new 1 actin { position_ends = 10.547 -1.196 -6.860, 10.547 -1.196 8.140; end_state = green, white; }
+new 1 actin { position_ends = 9.923 -4.219 -14.158, 9.923 -4.219 0.842; end_state = green, white; }
+new 1 actin { position_ends = 10.807 -0.496 -5.447, 10.807 -0.496 9.553; end_state = green, white; }
+new 1 actin { position_ends = 8.468 6.336 -2.128, 8.468 6.336 12.872; end_state = green, white; }
+new 1 actin { position_ends = -8.729 -6.116 -9.468, -8.729 -6.116 5.532; end_state = green, white; }
+new 1 actin { position_ends = -8.018 6.858 -10.461, -8.018 6.858 4.539; end_state = green, white; }
+new 1 actin { position_ends = -7.445 7.710 -13.406, -7.445 7.710 1.594; end_state = green, white; }
+new 1 actin { position_ends = 10.450 -1.861 -4.423, 10.450 -1.861 10.577; end_state = green, white; }
+new 1 actin { position_ends = -7.114 -7.939 -18.684, -7.114 -7.939 -3.684; end_state = green, white; }
+new 1 actin { position_ends = 10.683 -2.016 -9.719, 10.683 -2.016 5.281; end_state = green, white; }
+new 1 actin { position_ends = -10.771 -0.910 -18.484, -10.771 -0.910 -3.484; end_state = green, white; }
+new 1 actin { position_ends = 1.549 10.442 -0.545, 1.549 10.442 14.455; end_state = green, white; }
+new 1 actin { position_ends = -4.995 9.698 -3.364, -4.995 9.698 11.636; end_state = green, white; }
+new 1 actin { position_ends = -3.291 10.040 -17.202, -3.291 10.040 -2.202; end_state = green, white; }
+new 1 actin { position_ends = 4.977 -9.659 0.846, 4.977 -9.659 15.846; end_state = green, white; }
+new 1 actin { position_ends = -8.022 7.077 -4.732, -8.022 7.077 10.268; end_state = green, white; }
+new 1 actin { position_ends = 10.566 0.339 -16.582, 10.566 0.339 -1.582; end_state = green, white; }
+new 1 actin { position_ends = 0.834 -10.615 -11.958, 0.834 -10.615 3.042; end_state = green, white; }
+new 1 actin { position_ends = 6.644 -8.329 -11.419, 6.644 -8.329 3.581; end_state = green, white; }
+new 1 actin { position_ends = 4.913 -9.352 -8.258, 4.913 -9.352 6.742; end_state = green, white; }
+new 1 actin { position_ends = 7.938 7.242 -0.820, 7.938 7.242 14.180; end_state = green, white; }
+new 1 actin { position_ends = -6.017 -8.989 -11.010, -6.017 -8.989 3.990; end_state = green, white; }
+new 1 actin { position_ends = 1.114 -10.686 -12.905, 1.114 -10.686 2.095; end_state = green, white; }
+new 1 actin { position_ends = 4.499 -9.825 -11.879, 4.499 -9.825 3.121; end_state = green, white; }
+new 1 actin { position_ends = 2.081 10.580 3.679, 2.081 10.580 18.679; end_state = green, white; }
+new 1 actin { position_ends = 4.358 -9.681 -12.172, 4.358 -9.681 2.828; end_state = green, white; }
+new 1 actin { position_ends = 0.438 -10.669 -7.789, 0.438 -10.669 7.211; end_state = green, white; }
+new 1 actin { position_ends = 7.956 -7.434 -13.473, 7.956 -7.434 1.527; end_state = green, white; }
+new 1 actin { position_ends = 10.344 -3.020 -13.625, 10.344 -3.020 1.375; end_state = green, white; }
+new 1 actin { position_ends = 10.562 0.636 -16.596, 10.562 0.636 -1.596; end_state = green, white; }
+new 1 actin { position_ends = -10.579 -2.454 -7.579, -10.579 -2.454 7.421; end_state = green, white; }
+new 1 actin { position_ends = 1.488 10.621 1.968, 1.488 10.621 16.968; end_state = green, white; }
+new 1 actin { position_ends = 9.526 -4.810 -4.095, 9.526 -4.810 10.905; end_state = green, white; }
+new 1 actin { position_ends = -7.900 -7.172 -8.342, -7.900 -7.172 6.658; end_state = green, white; }
+new 1 actin { position_ends = -0.659 -10.801 -1.858, -0.659 -10.801 13.142; end_state = green, white; }
+new 1 actin { position_ends = 1.089 10.612 -13.620, 1.089 10.612 1.380; end_state = green, white; }
+new 1 actin { position_ends = 6.843 -8.034 -5.238, 6.843 -8.034 9.762; end_state = green, white; }
+new 1 actin { position_ends = 1.488 10.490 -5.718, 1.488 10.490 9.282; end_state = green, white; }
+new 1 actin { position_ends = -2.551 10.242 -18.632, -2.551 10.242 -3.632; end_state = green, white; }
+new 1 actin { position_ends = -9.867 4.089 -16.640, -9.867 4.089 -1.640; end_state = green, white; }
+new 1 actin { position_ends = 4.777 -9.608 -4.648, 4.777 -9.608 10.352; end_state = green, white; }
+new 1 actin { position_ends = -0.856 -10.825 -6.394, -0.856 -10.825 8.606; end_state = green, white; }
+new 1 actin { position_ends = -10.469 2.521 -9.880, -10.469 2.521 5.120; end_state = green, white; }
+new 1 actin { position_ends = -4.449 9.910 -15.070, -4.449 9.910 -0.070; end_state = green, white; }
+new 1 actin { position_ends = -3.619 10.088 -13.603, -3.619 10.088 1.397; end_state = green, white; }
+new 1 actin { position_ends = 10.751 0.547 2.866, 10.751 0.547 17.866; end_state = green, white; }
+new 1 actin { position_ends = 8.236 -7.034 -10.038, 8.236 -7.034 4.962; end_state = green, white; }
+new 1 actin { position_ends = -10.880 -0.971 -12.317, -10.880 -0.971 2.683; end_state = green, white; }
+new 1 actin { position_ends = 7.455 7.887 1.992, 7.455 7.887 16.992; end_state = green, white; }
+new 1 actin { position_ends = -5.934 -8.765 -19.759, -5.934 -8.765 -4.759; end_state = green, white; }
+new 1 actin { position_ends = 6.831 8.494 -11.855, 6.831 8.494 3.145; end_state = green, white; }
+new 1 actin { position_ends = 10.473 -2.345 -11.017, 10.473 -2.345 3.983; end_state = green, white; }
+new 1 actin { position_ends = -6.153 8.571 0.647, -6.153 8.571 15.647; end_state = green, white; }
+new 1 actin { position_ends = -10.087 -4.233 0.407, -10.087 -4.233 15.407; end_state = green, white; }
+new 1 actin { position_ends = -9.009 5.762 -10.926, -9.009 5.762 4.074; end_state = green, white; }
+new 1 actin { position_ends = -10.797 0.341 -0.868, -10.797 0.341 14.132; end_state = green, white; }
+new 1 actin { position_ends = -9.224 -5.448 -2.701, -9.224 -5.448 12.299; end_state = green, white; }
+new 1 actin { position_ends = 6.880 8.455 -2.780, 6.880 8.455 12.220; end_state = green, white; }
+new 1 actin { position_ends = 10.006 4.376 -14.278, 10.006 4.376 0.722; end_state = green, white; }
+new 1 actin { position_ends = 9.649 -4.435 -9.053, 9.649 -4.435 5.947; end_state = green, white; }
+new 1 actin { position_ends = 9.547 4.522 -3.919, 9.547 4.522 11.081; end_state = green, white; }
+new 1 actin { position_ends = -7.043 8.097 -11.968, -7.043 8.097 3.032; end_state = green, white; }
+new 1 actin { position_ends = 10.308 -2.667 -3.262, 10.308 -2.667 11.738; end_state = green, white; }
+new 1 actin { position_ends = -2.173 10.434 0.385, -2.173 10.434 15.385; end_state = green, white; }
+new 1 actin { position_ends = 9.076 -5.577 0.670, 9.076 -5.577 15.670; end_state = green, white; }
+new 1 actin { position_ends = 8.719 -6.612 -5.089, 8.719 -6.612 9.911; end_state = green, white; }
+new 1 actin { position_ends = -8.450 -6.688 1.118, -8.450 -6.688 16.118; end_state = green, white; }
+new 1 actin { position_ends = 0.775 -10.675 -6.132, 0.775 -10.675 8.868; end_state = green, white; }
+new 1 actin { position_ends = -8.894 5.676 -18.867, -8.894 5.676 -3.867; end_state = green, white; }
+new 1 actin { position_ends = -10.582 -0.546 -19.222, -10.582 -0.546 -4.222; end_state = green, white; }
+new 1 actin { position_ends = 10.125 3.311 -2.747, 10.125 3.311 12.253; end_state = green, white; }
+new 1 actin { position_ends = 6.279 8.888 -14.376, 6.279 8.888 0.624; end_state = green, white; }
+new 1 actin { position_ends = -8.335 6.541 -3.100, -8.335 6.541 11.900; end_state = green, white; }
+new 1 actin { position_ends = -6.267 -8.537 -4.976, -6.267 -8.537 10.024; end_state = green, white; }
+new 1 actin { position_ends = -4.777 9.798 -3.020, -4.777 9.798 11.980; end_state = green, white; }
+new 1 actin { position_ends = -8.494 6.398 4.014, -8.494 6.398 19.014; end_state = green, white; }
+new 1 actin { position_ends = 7.396 8.030 -7.583, 7.396 8.030 7.417; end_state = green, white; }
+new 1 actin { position_ends = -10.281 3.537 -3.058, -10.281 3.537 11.942; end_state = green, white; }
+new 1 actin { position_ends = -0.311 10.742 -15.939, -0.311 10.742 -0.939; end_state = green, white; }
+new 1 actin { position_ends = 8.109 -7.319 -12.535, 8.109 -7.319 2.465; end_state = green, white; }
+new 1 actin { position_ends = 6.246 -8.853 -9.226, 6.246 -8.853 5.774; end_state = green, white; }
+new 1 actin { position_ends = -9.519 -5.122 -11.023, -9.519 -5.122 3.977; end_state = green, white; }
+new 1 actin { position_ends = -3.969 9.857 -8.276, -3.969 9.857 6.724; end_state = green, white; }
+new 1 actin { position_ends = -2.970 -10.308 -8.169, -2.970 -10.308 6.831; end_state = green, white; }
+new 1 actin { position_ends = -2.870 10.560 -3.437, -2.870 10.560 11.563; end_state = green, white; }
+new 1 actin { position_ends = 3.711 -10.163 3.541, 3.711 -10.163 18.541; end_state = green, white; }
+new 1 actin { position_ends = 7.860 -7.096 -2.629, 7.860 -7.096 12.371; end_state = green, white; }
+new 1 actin { position_ends = 5.452 -9.437 1.207, 5.452 -9.437 16.207; end_state = green, white; }
+new 1 actin { position_ends = 1.703 -10.779 0.523, 1.703 -10.779 15.523; end_state = green, white; }
+new 1 actin { position_ends = -5.154 -9.405 -0.407, -5.154 -9.405 14.593; end_state = green, white; }
+new 1 actin { position_ends = 0.818 10.727 -7.040, 0.818 10.727 7.960; end_state = green, white; }
+new 1 actin { position_ends = 7.344 7.849 0.920, 7.344 7.849 15.920; end_state = green, white; }
+new 1 actin { position_ends = -10.269 -2.621 -7.396, -10.269 -2.621 7.604; end_state = green, white; }
+new 1 actin { position_ends = -4.039 -9.807 -3.268, -4.039 -9.807 11.732; end_state = green, white; }
+new 1 actin { position_ends = 5.181 -9.246 4.307, 5.181 -9.246 19.307; end_state = green, white; }
+new 1 actin { position_ends = 10.125 -3.195 -8.589, 10.125 -3.195 6.411; end_state = green, white; }
+new 1 actin { position_ends = -7.711 7.490 -6.397, -7.711 7.490 8.603; end_state = green, white; }
+new 1 actin { position_ends = 1.420 -10.499 -12.074, 1.420 -10.499 2.926; end_state = green, white; }
+new 1 actin { position_ends = -7.614 7.477 -3.998, -7.614 7.477 11.002; end_state = green, white; }
+new 1 actin { position_ends = -10.806 1.462 -8.470, -10.806 1.462 6.530; end_state = green, white; }
+new 1 actin { position_ends = 5.331 -9.449 3.358, 5.331 -9.449 18.358; end_state = green, white; }
+new 1 actin { position_ends = -5.406 9.061 -2.933, -5.406 9.061 12.067; end_state = green, white; }
+new 1 actin { position_ends = 10.610 -1.883 4.194, 10.610 -1.883 19.194; end_state = green, white; }
+new 1 actin { position_ends = 6.064 -8.642 -1.241, 6.064 -8.642 13.759; end_state = green, white; }
+new 1 actin { position_ends = 5.268 9.466 -19.737, 5.268 9.466 -4.737; end_state = green, white; }
+new 1 actin { position_ends = 7.483 7.671 3.539, 7.483 7.671 18.539; end_state = green, white; }
+new 1 actin { position_ends = 5.924 -9.076 -16.038, 5.924 -9.076 -1.038; end_state = green, white; }
+new 1 actin { position_ends = -6.126 -8.767 2.137, -6.126 -8.767 17.137; end_state = green, white; }
+new 1 actin { position_ends = 4.342 -9.825 0.607, 4.342 -9.825 15.607; end_state = green, white; }
+new 1 actin { position_ends = 3.736 10.108 -12.744, 3.736 10.108 2.256; end_state = green, white; }
+new 1 actin { position_ends = -0.268 10.738 -15.178, -0.268 10.738 -0.178; end_state = green, white; }
+new 1 actin { position_ends = 0.714 -10.836 3.185, 0.714 -10.836 18.185; end_state = green, white; }
+new 1 actin { position_ends = -1.352 -10.626 -0.818, -1.352 -10.626 14.182; end_state = green, white; }
+new 1 actin { position_ends = 7.978 6.975 -4.991, 7.978 6.975 10.009; end_state = green, white; }
+new 1 actin { position_ends = 3.317 10.411 -12.001, 3.317 10.411 2.999; end_state = green, white; }
+new 1 actin { position_ends = 8.840 6.097 -17.656, 8.840 6.097 -2.656; end_state = green, white; }
+new 1 actin { position_ends = -10.347 2.273 -18.141, -10.347 2.273 -3.141; end_state = green, white; }
+new 1 actin { position_ends = 6.584 -8.598 -19.083, 6.584 -8.598 -4.083; end_state = green, white; }
+new 1 actin { position_ends = -10.736 1.323 -12.175, -10.736 1.323 2.825; end_state = green, white; }
+new 1 actin { position_ends = -10.438 1.756 -16.497, -10.438 1.756 -1.497; end_state = green, white; }
+new 1 actin { position_ends = 10.659 -1.654 4.767, 10.659 -1.654 19.767; end_state = green, white; }
+new 1 actin { position_ends = 5.504 -9.054 -6.480, 5.504 -9.054 8.520; end_state = green, white; }
+new 1 actin { position_ends = 2.256 10.470 0.835, 2.256 10.470 15.835; end_state = green, white; }
+new 1 actin { position_ends = 10.012 3.563 -8.597, 10.012 3.563 6.403; end_state = green, white; }
+new 1 actin { position_ends = -10.363 2.881 -4.472, -10.363 2.881 10.528; end_state = green, white; }
+new 1 actin { position_ends = -5.849 9.248 0.471, -5.849 9.248 15.471; end_state = green, white; }
+new 1 actin { position_ends = -2.207 10.370 -18.760, -2.207 10.370 -3.760; end_state = green, white; }
+new 1 actin { position_ends = 0.126 -10.653 -17.519, 0.126 -10.653 -2.519; end_state = green, white; }
+new 1 actin { position_ends = 1.432 -10.657 0.738, 1.432 -10.657 15.738; end_state = green, white; }
+new 1 actin { position_ends = -9.694 4.942 -16.959, -9.694 4.942 -1.959; end_state = green, white; }
+new 1 actin { position_ends = 6.604 8.607 -2.385, 6.604 8.607 12.615; end_state = green, white; }
+new 1 actin { position_ends = 3.957 10.144 3.178, 3.957 10.144 18.178; end_state = green, white; }
+new 1 actin { position_ends = -3.956 -9.853 2.739, -3.956 -9.853 17.739; end_state = green, white; }
+new 1 actin { position_ends = -3.566 9.996 -13.856, -3.566 9.996 1.144; end_state = green, white; }
+new 1 actin { position_ends = -2.679 -10.377 -8.073, -2.679 -10.377 6.927; end_state = green, white; }
+new 1 actin { position_ends = 2.847 -10.331 -16.336, 2.847 -10.331 -1.336; end_state = green, white; }
+new 1 actin { position_ends = 5.495 -9.106 -18.803, 5.495 -9.106 -3.803; end_state = green, white; }
+new 1 actin { position_ends = 10.567 0.837 0.023, 10.567 0.837 15.023; end_state = green, white; }
+new 1 actin { position_ends = 3.410 9.997 -3.464, 3.410 9.997 11.536; end_state = green, white; }
+new 1 actin { position_ends = 7.166 -7.954 -7.428, 7.166 -7.954 7.572; end_state = green, white; }
+new 1 actin { position_ends = 10.566 0.647 -0.316, 10.566 0.647 14.684; end_state = green, white; }
+new 1 actin { position_ends = -7.284 8.003 -6.240, -7.284 8.003 8.760; end_state = green, white; }
+new 1 actin { position_ends = -2.561 -10.520 -8.718, -2.561 -10.520 6.282; end_state = green, white; }
+new 1 actin { position_ends = 10.741 -1.392 3.236, 10.741 -1.392 18.236; end_state = green, white; }
+new 1 actin { position_ends = -10.537 -1.531 -4.486, -10.537 -1.531 10.514; end_state = green, white; }
+new 1 actin { position_ends = -4.791 9.454 -5.641, -4.791 9.454 9.359; end_state = green, white; }
+new 1 actin { position_ends = 3.876 9.900 -10.345, 3.876 9.900 4.655; end_state = green, white; }
+new 1 actin { position_ends = 8.387 6.541 -17.717, 8.387 6.541 -2.717; end_state = green, white; }
+new 1 actin { position_ends = 9.765 -4.424 -10.545, 9.765 -4.424 4.455; end_state = green, white; }
+new 1 actin { position_ends = -10.110 3.789 0.983, -10.110 3.789 15.983; end_state = green, white; }
+new 1 actin { position_ends = 2.643 10.476 -6.898, 2.643 10.476 8.102; end_state = green, white; }
+new 1 actin { position_ends = 10.733 -2.084 2.937, 10.733 -2.084 17.937; end_state = green, white; }
+new 1 actin { position_ends = -6.916 7.996 -0.985, -6.916 7.996 14.015; end_state = green, white; }
+new 1 actin { position_ends = 1.152 -10.545 -5.862, 1.152 -10.545 9.138; end_state = green, white; }
+new 1 actin { position_ends = 7.557 7.835 1.093, 7.557 7.835 16.093; end_state = green, white; }
+new 1 actin { position_ends = -10.273 2.473 -15.817, -10.273 2.473 -0.817; end_state = green, white; }
+new 1 actin { position_ends = 3.173 10.444 -8.994, 3.173 10.444 6.006; end_state = green, white; }
+new 1 actin { position_ends = 3.793 10.004 1.817, 3.793 10.004 16.817; end_state = green, white; }
+new 1 actin { position_ends = -7.905 7.035 3.588, -7.905 7.035 18.588; end_state = green, white; }
+new 1 actin { position_ends = 8.959 -5.608 -19.363, 8.959 -5.608 -4.363; end_state = green, white; }
+new 1 actin { position_ends = 8.552 6.541 -4.436, 8.552 6.541 10.564; end_state = green, white; }
+new 1 actin { position_ends = 8.487 6.316 -13.979, 8.487 6.316 1.021; end_state = green, white; }
+new 1 actin { position_ends = -10.645 -2.171 -0.076, -10.645 -2.171 14.924; end_state = green, white; }
+new 1 actin { position_ends = 7.855 -7.256 -10.421, 7.855 -7.256 4.579; end_state = green, white; }
+new 1 actin { position_ends = -8.217 -6.850 0.513, -8.217 -6.850 15.513; end_state = green, white; }
+new 1 actin { position_ends = 8.606 6.393 -9.581, 8.606 6.393 5.419; end_state = green, white; }
+new 1 actin { position_ends = -7.462 -7.564 2.537, -7.462 -7.564 17.537; end_state = green, white; }
+new 1 actin { position_ends = -8.102 -7.174 -7.592, -8.102 -7.174 7.408; end_state = green, white; }
+new 1 actin { position_ends = -10.835 -1.222 0.731, -10.835 -1.222 15.731; end_state = green, white; }
+new 1 actin { position_ends = -1.266 10.868 3.687, -1.266 10.868 18.687; end_state = green, white; }
+new 1 actin { position_ends = 8.924 5.998 -16.205, 8.924 5.998 -1.205; end_state = green, white; }
+new 1 actin { position_ends = 6.633 8.632 -5.225, 6.633 8.632 9.775; end_state = green, white; }
+new 1 actin { position_ends = 3.261 -10.358 -0.752, 3.261 -10.358 14.248; end_state = green, white; }
+new 1 actin { position_ends = 4.204 9.752 -13.184, 4.204 9.752 1.816; end_state = green, white; }
+new 1 actin { position_ends = 6.173 8.964 -3.436, 6.173 8.964 11.564; end_state = green, white; }
+new 1 actin { position_ends = -5.622 -9.048 -11.992, -5.622 -9.048 3.008; end_state = green, white; }
+new 1 actin { position_ends = -10.165 -3.228 -3.377, -10.165 -3.228 11.623; end_state = green, white; }
+new 1 actin { position_ends = -1.270 10.599 0.621, -1.270 10.599 15.621; end_state = green, white; }
+new 1 actin { position_ends = 3.414 -10.365 3.038, 3.414 -10.365 18.038; end_state = green, white; }
+new 1 actin { position_ends = 9.929 4.606 -12.316, 9.929 4.606 2.684; end_state = green, white; }
+new 1 actin { position_ends = 10.113 -3.238 -7.393, 10.113 -3.238 7.607; end_state = green, white; }
+new 1 actin { position_ends = 3.766 10.241 -5.874, 3.766 10.241 9.126; end_state = green, white; }
+new 1 actin { position_ends = 8.758 6.256 2.364, 8.758 6.256 17.364; end_state = green, white; }
+new 1 actin { position_ends = 1.569 -10.622 -16.855, 1.569 -10.622 -1.855; end_state = green, white; }
+new 1 actin { position_ends = 9.289 5.074 -11.193, 9.289 5.074 3.807; end_state = green, white; }
+new 1 actin { position_ends = 4.032 9.803 -11.313, 4.032 9.803 3.687; end_state = green, white; }
+new 1 actin { position_ends = 0.479 -10.722 -4.717, 0.479 -10.722 10.283; end_state = green, white; }
+new 1 actin { position_ends = -1.367 -10.768 -2.791, -1.367 -10.768 12.209; end_state = green, white; }
+new 1 actin { position_ends = -1.619 -10.492 -15.426, -1.619 -10.492 -0.426; end_state = green, white; }
+new 1 actin { position_ends = 9.564 4.824 -18.387, 9.564 4.824 -3.387; end_state = green, white; }
+new 1 actin { position_ends = 10.473 -3.017 -1.990, 10.473 -3.017 13.010; end_state = green, white; }
+new 1 actin { position_ends = 3.041 10.301 -13.744, 3.041 10.301 1.256; end_state = green, white; }
+new 1 actin { position_ends = -10.687 -0.515 -1.632, -10.687 -0.515 13.368; end_state = green, white; }
+new 1 actin { position_ends = -7.388 7.919 -16.406, -7.388 7.919 -1.406; end_state = green, white; }
+new 1 actin { position_ends = 2.031 -10.528 2.322, 2.031 -10.528 17.322; end_state = green, white; }
+new 1 actin { position_ends = 10.781 -1.516 -14.815, 10.781 -1.516 0.185; end_state = green, white; }
+new 1 actin { position_ends = 7.002 8.367 -13.552, 7.002 8.367 1.448; end_state = green, white; }
+new 1 actin { position_ends = 9.634 5.099 -1.898, 9.634 5.099 13.102; end_state = green, white; }
+new 1 actin { position_ends = 10.907 -0.521 -11.291, 10.907 -0.521 3.709; end_state = green, white; }
+new 1 actin { position_ends = -0.736 10.793 1.272, -0.736 10.793 16.272; end_state = green, white; }
+new 1 actin { position_ends = -1.384 10.659 -16.329, -1.384 10.659 -1.329; end_state = green, white; }
+
+new 2048 cutter1 { position = inside, chewer_zone; }
+new 1024 crosslinker { position = inside; }
+
+% initial 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 01: +64 filaments ---
+new 1 actin { position_ends = -3.468 9.969 -0.743, -3.468 9.969 14.257; end_state = green, white; }
+new 1 actin { position_ends = 10.539 -0.989 -4.487, 10.539 -0.989 10.513; end_state = green, white; }
+new 1 actin { position_ends = -9.077 -5.858 1.255, -9.077 -5.858 16.255; end_state = green, white; }
+new 1 actin { position_ends = 10.376 3.492 -5.814, 10.376 3.492 9.186; end_state = green, white; }
+new 1 actin { position_ends = 6.264 8.933 4.332, 6.264 8.933 19.332; end_state = green, white; }
+new 1 actin { position_ends = -7.865 7.592 -2.934, -7.865 7.592 12.066; end_state = green, white; }
+new 1 actin { position_ends = 9.983 -3.711 1.682, 9.983 -3.711 16.682; end_state = green, white; }
+new 1 actin { position_ends = 10.676 -1.012 0.260, 10.676 -1.012 15.260; end_state = green, white; }
+new 1 actin { position_ends = -10.197 2.790 -10.172, -10.197 2.790 4.828; end_state = green, white; }
+new 1 actin { position_ends = -10.543 2.153 4.836, -10.543 2.153 19.836; end_state = green, white; }
+new 1 actin { position_ends = -9.918 4.559 3.325, -9.918 4.559 18.325; end_state = green, white; }
+new 1 actin { position_ends = -7.662 7.818 -5.107, -7.662 7.818 9.893; end_state = green, white; }
+new 1 actin { position_ends = 7.078 7.883 -1.699, 7.078 7.883 13.301; end_state = green, white; }
+new 1 actin { position_ends = -9.660 -5.002 -0.708, -9.660 -5.002 14.292; end_state = green, white; }
+new 1 actin { position_ends = -5.931 -9.189 -7.176, -5.931 -9.189 7.824; end_state = green, white; }
+new 1 actin { position_ends = -4.450 -9.921 2.472, -4.450 -9.921 17.472; end_state = green, white; }
+new 1 actin { position_ends = -6.738 8.446 1.774, -6.738 8.446 16.774; end_state = green, white; }
+new 1 actin { position_ends = -0.069 10.592 -1.633, -0.069 10.592 13.367; end_state = green, white; }
+new 1 actin { position_ends = 4.811 9.493 -6.775, 4.811 9.493 8.225; end_state = green, white; }
+new 1 actin { position_ends = 3.180 10.432 -0.334, 3.180 10.432 14.666; end_state = green, white; }
+new 1 actin { position_ends = 3.319 10.359 -6.561, 3.319 10.359 8.439; end_state = green, white; }
+new 1 actin { position_ends = 10.601 1.753 -5.710, 10.601 1.753 9.290; end_state = green, white; }
+new 1 actin { position_ends = 0.126 -10.572 0.568, 0.126 -10.572 15.568; end_state = green, white; }
+new 1 actin { position_ends = -10.902 -0.469 -4.881, -10.902 -0.469 10.119; end_state = green, white; }
+new 1 actin { position_ends = 7.780 -7.163 0.771, 7.780 -7.163 15.771; end_state = green, white; }
+new 1 actin { position_ends = -5.452 9.135 2.835, -5.452 9.135 17.835; end_state = green, white; }
+new 1 actin { position_ends = 1.902 -10.388 -1.681, 1.902 -10.388 13.319; end_state = green, white; }
+new 1 actin { position_ends = 6.537 -8.381 -7.508, 6.537 -8.381 7.492; end_state = green, white; }
+new 1 actin { position_ends = 10.116 -3.955 0.104, 10.116 -3.955 15.104; end_state = green, white; }
+new 1 actin { position_ends = 7.623 -7.656 -7.972, 7.623 -7.656 7.028; end_state = green, white; }
+new 1 actin { position_ends = -7.064 -8.211 3.052, -7.064 -8.211 18.052; end_state = green, white; }
+new 1 actin { position_ends = 5.963 9.140 -2.485, 5.963 9.140 12.515; end_state = green, white; }
+new 1 actin { position_ends = -0.082 10.909 1.273, -0.082 10.909 16.273; end_state = green, white; }
+new 1 actin { position_ends = -9.736 4.251 0.069, -9.736 4.251 15.069; end_state = green, white; }
+new 1 actin { position_ends = 10.861 -1.256 -1.501, 10.861 -1.256 13.499; end_state = green, white; }
+new 1 actin { position_ends = -10.338 2.841 0.256, -10.338 2.841 15.256; end_state = green, white; }
+new 1 actin { position_ends = -10.196 3.202 -0.093, -10.196 3.202 14.907; end_state = green, white; }
+new 1 actin { position_ends = 4.647 -9.578 -9.443, 4.647 -9.578 5.557; end_state = green, white; }
+new 1 actin { position_ends = 9.365 5.259 -6.831, 9.365 5.259 8.169; end_state = green, white; }
+new 1 actin { position_ends = 7.861 7.066 -3.784, 7.861 7.066 11.216; end_state = green, white; }
+new 1 actin { position_ends = -6.179 -8.691 -5.421, -6.179 -8.691 9.579; end_state = green, white; }
+new 1 actin { position_ends = 5.892 9.123 -4.875, 5.892 9.123 10.125; end_state = green, white; }
+new 1 actin { position_ends = 10.355 -2.049 4.047, 10.355 -2.049 19.047; end_state = green, white; }
+new 1 actin { position_ends = -0.170 -10.875 -2.906, -0.170 -10.875 12.094; end_state = green, white; }
+new 1 actin { position_ends = 3.519 10.281 -0.479, 3.519 10.281 14.521; end_state = green, white; }
+new 1 actin { position_ends = -3.605 -10.012 -2.771, -3.605 -10.012 12.229; end_state = green, white; }
+new 1 actin { position_ends = -8.136 7.062 3.021, -8.136 7.062 18.021; end_state = green, white; }
+new 1 actin { position_ends = -10.400 2.627 -4.283, -10.400 2.627 10.717; end_state = green, white; }
+new 1 actin { position_ends = 9.781 4.837 -7.527, 9.781 4.837 7.473; end_state = green, white; }
+new 1 actin { position_ends = 5.100 -9.583 -2.524, 5.100 -9.583 12.476; end_state = green, white; }
+new 1 actin { position_ends = -8.985 -5.881 -6.609, -8.985 -5.881 8.391; end_state = green, white; }
+new 1 actin { position_ends = 1.588 10.829 -2.547, 1.588 10.829 12.453; end_state = green, white; }
+new 1 actin { position_ends = 10.475 -1.431 4.817, 10.475 -1.431 19.817; end_state = green, white; }
+new 1 actin { position_ends = -10.426 2.494 -7.883, -10.426 2.494 7.117; end_state = green, white; }
+new 1 actin { position_ends = -8.873 -6.191 -6.619, -8.873 -6.191 8.381; end_state = green, white; }
+new 1 actin { position_ends = 9.515 4.762 0.867, 9.515 4.762 15.867; end_state = green, white; }
+new 1 actin { position_ends = 1.245 10.658 4.058, 1.245 10.658 19.058; end_state = green, white; }
+new 1 actin { position_ends = 10.605 0.645 3.424, 10.605 0.645 18.424; end_state = green, white; }
+new 1 actin { position_ends = 1.652 -10.439 3.186, 1.652 -10.439 18.186; end_state = green, white; }
+new 1 actin { position_ends = 2.744 10.347 2.044, 2.744 10.347 17.044; end_state = green, white; }
+new 1 actin { position_ends = -10.855 -0.935 -3.107, -10.855 -0.935 11.893; end_state = green, white; }
+new 1 actin { position_ends = 9.996 3.946 -8.790, 9.996 3.946 6.210; end_state = green, white; }
+new 1 actin { position_ends = -10.284 2.552 2.835, -10.284 2.552 17.835; end_state = green, white; }
+new 1 actin { position_ends = 1.428 -10.731 -4.285, 1.428 -10.731 10.715; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 01: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 02: +64 filaments ---
+new 1 actin { position_ends = 7.668 -7.652 4.841, 7.668 -7.652 19.841; end_state = green, white; }
+new 1 actin { position_ends = 6.344 8.485 4.693, 6.344 8.485 19.693; end_state = green, white; }
+new 1 actin { position_ends = -4.065 10.061 -4.278, -4.065 10.061 10.722; end_state = green, white; }
+new 1 actin { position_ends = -10.922 -0.452 3.951, -10.922 -0.452 18.951; end_state = green, white; }
+new 1 actin { position_ends = 6.917 -8.005 -5.649, 6.917 -8.005 9.351; end_state = green, white; }
+new 1 actin { position_ends = 7.453 8.018 -5.390, 7.453 8.018 9.610; end_state = green, white; }
+new 1 actin { position_ends = -8.084 -7.100 -0.582, -8.084 -7.100 14.418; end_state = green, white; }
+new 1 actin { position_ends = -4.583 -9.745 -3.518, -4.583 -9.745 11.482; end_state = green, white; }
+new 1 actin { position_ends = -8.970 -5.787 2.670, -8.970 -5.787 17.670; end_state = green, white; }
+new 1 actin { position_ends = 3.384 10.122 -5.390, 3.384 10.122 9.610; end_state = green, white; }
+new 1 actin { position_ends = 2.743 -10.309 -8.081, 2.743 -10.309 6.919; end_state = green, white; }
+new 1 actin { position_ends = -10.747 -0.194 4.757, -10.747 -0.194 19.757; end_state = green, white; }
+new 1 actin { position_ends = 9.898 4.061 -8.806, 9.898 4.061 6.194; end_state = green, white; }
+new 1 actin { position_ends = -3.246 -10.316 -7.203, -3.246 -10.316 7.797; end_state = green, white; }
+new 1 actin { position_ends = 7.283 7.838 -0.188, 7.283 7.838 14.812; end_state = green, white; }
+new 1 actin { position_ends = -10.197 -2.794 -4.912, -10.197 -2.794 10.088; end_state = green, white; }
+new 1 actin { position_ends = 7.717 7.535 0.441, 7.717 7.535 15.441; end_state = green, white; }
+new 1 actin { position_ends = 9.041 -6.034 -3.814, 9.041 -6.034 11.186; end_state = green, white; }
+new 1 actin { position_ends = 2.934 -10.356 -2.899, 2.934 -10.356 12.101; end_state = green, white; }
+new 1 actin { position_ends = 1.418 10.663 -5.410, 1.418 10.663 9.590; end_state = green, white; }
+new 1 actin { position_ends = -4.515 -9.565 -9.754, -4.515 -9.565 5.246; end_state = green, white; }
+new 1 actin { position_ends = 1.438 -10.529 2.886, 1.438 -10.529 17.886; end_state = green, white; }
+new 1 actin { position_ends = 1.564 -10.450 -3.702, 1.564 -10.450 11.298; end_state = green, white; }
+new 1 actin { position_ends = -2.834 10.318 -6.511, -2.834 10.318 8.489; end_state = green, white; }
+new 1 actin { position_ends = 10.117 -3.704 -3.931, 10.117 -3.704 11.069; end_state = green, white; }
+new 1 actin { position_ends = 2.334 -10.305 2.389, 2.334 -10.305 17.389; end_state = green, white; }
+new 1 actin { position_ends = 1.014 10.892 -1.543, 1.014 10.892 13.457; end_state = green, white; }
+new 1 actin { position_ends = -4.722 -9.642 -6.717, -4.722 -9.642 8.283; end_state = green, white; }
+new 1 actin { position_ends = 1.534 -10.459 -1.210, 1.534 -10.459 13.790; end_state = green, white; }
+new 1 actin { position_ends = 8.568 6.722 1.571, 8.568 6.722 16.571; end_state = green, white; }
+new 1 actin { position_ends = -10.644 1.733 -4.150, -10.644 1.733 10.850; end_state = green, white; }
+new 1 actin { position_ends = -7.115 7.970 1.634, -7.115 7.970 16.634; end_state = green, white; }
+new 1 actin { position_ends = 10.089 -3.589 -6.844, 10.089 -3.589 8.156; end_state = green, white; }
+new 1 actin { position_ends = -1.070 10.843 -2.318, -1.070 10.843 12.682; end_state = green, white; }
+new 1 actin { position_ends = 6.437 -8.665 4.681, 6.437 -8.665 19.681; end_state = green, white; }
+new 1 actin { position_ends = 10.788 -1.219 -0.576, 10.788 -1.219 14.424; end_state = green, white; }
+new 1 actin { position_ends = -5.965 8.928 3.632, -5.965 8.928 18.632; end_state = green, white; }
+new 1 actin { position_ends = 10.517 -2.300 3.356, 10.517 -2.300 18.356; end_state = green, white; }
+new 1 actin { position_ends = -3.091 -10.491 -3.700, -3.091 -10.491 11.300; end_state = green, white; }
+new 1 actin { position_ends = 10.519 2.400 0.832, 10.519 2.400 15.832; end_state = green, white; }
+new 1 actin { position_ends = 3.174 -10.191 -9.234, 3.174 -10.191 5.766; end_state = green, white; }
+new 1 actin { position_ends = -3.824 10.235 -9.672, -3.824 10.235 5.328; end_state = green, white; }
+new 1 actin { position_ends = 7.154 8.123 -0.330, 7.154 8.123 14.670; end_state = green, white; }
+new 1 actin { position_ends = 10.550 -0.618 -4.394, 10.550 -0.618 10.606; end_state = green, white; }
+new 1 actin { position_ends = -9.297 5.720 -1.587, -9.297 5.720 13.413; end_state = green, white; }
+new 1 actin { position_ends = 6.604 8.373 -2.160, 6.604 8.373 12.840; end_state = green, white; }
+new 1 actin { position_ends = -10.069 -3.331 -10.059, -10.069 -3.331 4.941; end_state = green, white; }
+new 1 actin { position_ends = -7.906 -7.470 4.001, -7.906 -7.470 19.001; end_state = green, white; }
+new 1 actin { position_ends = 10.806 -0.496 1.210, 10.806 -0.496 16.210; end_state = green, white; }
+new 1 actin { position_ends = -8.096 -6.872 -4.916, -8.096 -6.872 10.084; end_state = green, white; }
+new 1 actin { position_ends = -6.240 8.675 -7.853, -6.240 8.675 7.147; end_state = green, white; }
+new 1 actin { position_ends = -8.345 -6.925 -9.291, -8.345 -6.925 5.709; end_state = green, white; }
+new 1 actin { position_ends = -0.226 10.801 -5.880, -0.226 10.801 9.120; end_state = green, white; }
+new 1 actin { position_ends = -10.558 -2.463 -3.116, -10.558 -2.463 11.884; end_state = green, white; }
+new 1 actin { position_ends = 10.080 -3.666 -10.020, 10.080 -3.666 4.980; end_state = green, white; }
+new 1 actin { position_ends = -6.279 8.612 -7.149, -6.279 8.612 7.851; end_state = green, white; }
+new 1 actin { position_ends = -2.628 -10.527 -9.596, -2.628 -10.527 5.404; end_state = green, white; }
+new 1 actin { position_ends = -8.214 -6.764 -6.261, -8.214 -6.764 8.739; end_state = green, white; }
+new 1 actin { position_ends = -5.601 9.150 -8.830, -5.601 9.150 6.170; end_state = green, white; }
+new 1 actin { position_ends = -10.861 1.293 -3.711, -10.861 1.293 11.289; end_state = green, white; }
+new 1 actin { position_ends = -7.484 7.992 -4.486, -7.484 7.992 10.514; end_state = green, white; }
+new 1 actin { position_ends = -10.806 0.694 -0.957, -10.806 0.694 14.043; end_state = green, white; }
+new 1 actin { position_ends = -8.807 6.260 -1.895, -8.807 6.260 13.105; end_state = green, white; }
+new 1 actin { position_ends = -3.184 10.371 4.028, -3.184 10.371 19.028; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 02: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 03: +64 filaments ---
+new 1 actin { position_ends = 7.355 7.889 2.825, 7.355 7.889 17.825; end_state = green, white; }
+new 1 actin { position_ends = 8.450 6.757 -1.368, 8.450 6.757 13.632; end_state = green, white; }
+new 1 actin { position_ends = 6.260 8.764 -3.990, 6.260 8.764 11.010; end_state = green, white; }
+new 1 actin { position_ends = -0.402 -10.741 -2.946, -0.402 -10.741 12.054; end_state = green, white; }
+new 1 actin { position_ends = -9.974 3.447 -5.663, -9.974 3.447 9.337; end_state = green, white; }
+new 1 actin { position_ends = 10.557 -0.013 2.895, 10.557 -0.013 17.895; end_state = green, white; }
+new 1 actin { position_ends = -10.423 -3.118 -3.344, -10.423 -3.118 11.656; end_state = green, white; }
+new 1 actin { position_ends = -2.411 -10.594 -8.339, -2.411 -10.594 6.661; end_state = green, white; }
+new 1 actin { position_ends = 8.895 -5.677 -5.526, 8.895 -5.677 9.474; end_state = green, white; }
+new 1 actin { position_ends = -2.580 -10.440 -1.002, -2.580 -10.440 13.998; end_state = green, white; }
+new 1 actin { position_ends = 10.337 3.058 -6.868, 10.337 3.058 8.132; end_state = green, white; }
+new 1 actin { position_ends = -4.921 -9.676 -5.698, -4.921 -9.676 9.302; end_state = green, white; }
+new 1 actin { position_ends = 4.014 -9.799 -0.953, 4.014 -9.799 14.047; end_state = green, white; }
+new 1 actin { position_ends = 0.317 10.643 -6.168, 0.317 10.643 8.832; end_state = green, white; }
+new 1 actin { position_ends = 4.432 9.670 0.437, 4.432 9.670 15.437; end_state = green, white; }
+new 1 actin { position_ends = -7.172 7.819 -8.075, -7.172 7.819 6.925; end_state = green, white; }
+new 1 actin { position_ends = -1.748 -10.769 -9.014, -1.748 -10.769 5.986; end_state = green, white; }
+new 1 actin { position_ends = 4.123 -9.719 3.134, 4.123 -9.719 18.134; end_state = green, white; }
+new 1 actin { position_ends = 2.809 10.222 3.855, 2.809 10.222 18.855; end_state = green, white; }
+new 1 actin { position_ends = 6.217 8.693 1.112, 6.217 8.693 16.112; end_state = green, white; }
+new 1 actin { position_ends = 4.101 -9.808 1.953, 4.101 -9.808 16.953; end_state = green, white; }
+new 1 actin { position_ends = 4.224 -9.847 1.493, 4.224 -9.847 16.493; end_state = green, white; }
+new 1 actin { position_ends = -10.699 1.320 -7.546, -10.699 1.320 7.454; end_state = green, white; }
+new 1 actin { position_ends = 9.989 -4.443 4.820, 9.989 -4.443 19.820; end_state = green, white; }
+new 1 actin { position_ends = -8.495 6.854 -6.488, -8.495 6.854 8.512; end_state = green, white; }
+new 1 actin { position_ends = 5.639 8.952 -4.525, 5.639 8.952 10.475; end_state = green, white; }
+new 1 actin { position_ends = 0.437 10.713 -9.934, 0.437 10.713 5.066; end_state = green, white; }
+new 1 actin { position_ends = 8.674 -6.219 -8.955, 8.674 -6.219 6.045; end_state = green, white; }
+new 1 actin { position_ends = -10.711 0.351 -0.908, -10.711 0.351 14.092; end_state = green, white; }
+new 1 actin { position_ends = -10.899 -0.374 -4.119, -10.899 -0.374 10.881; end_state = green, white; }
+new 1 actin { position_ends = 1.696 -10.724 1.459, 1.696 -10.724 16.459; end_state = green, white; }
+new 1 actin { position_ends = -6.301 8.567 -2.000, -6.301 8.567 13.000; end_state = green, white; }
+new 1 actin { position_ends = 8.452 6.551 -2.106, 8.452 6.551 12.894; end_state = green, white; }
+new 1 actin { position_ends = 10.755 -0.563 0.303, 10.755 -0.563 15.303; end_state = green, white; }
+new 1 actin { position_ends = -10.898 -0.244 -9.270, -10.898 -0.244 5.730; end_state = green, white; }
+new 1 actin { position_ends = 9.003 -5.688 -2.950, 9.003 -5.688 12.050; end_state = green, white; }
+new 1 actin { position_ends = -3.728 -10.138 -1.952, -3.728 -10.138 13.048; end_state = green, white; }
+new 1 actin { position_ends = 8.316 -6.798 -4.409, 8.316 -6.798 10.591; end_state = green, white; }
+new 1 actin { position_ends = 9.446 5.008 4.545, 9.446 5.008 19.545; end_state = green, white; }
+new 1 actin { position_ends = -8.280 -7.078 -7.910, -8.280 -7.078 7.090; end_state = green, white; }
+new 1 actin { position_ends = -10.501 1.543 -5.336, -10.501 1.543 9.664; end_state = green, white; }
+new 1 actin { position_ends = -10.912 -0.892 -7.706, -10.912 -0.892 7.294; end_state = green, white; }
+new 1 actin { position_ends = 7.597 7.805 -1.761, 7.597 7.805 13.239; end_state = green, white; }
+new 1 actin { position_ends = -9.859 -3.855 -3.552, -9.859 -3.855 11.448; end_state = green, white; }
+new 1 actin { position_ends = -10.710 2.024 -1.614, -10.710 2.024 13.386; end_state = green, white; }
+new 1 actin { position_ends = -10.486 -1.688 -4.710, -10.486 -1.688 10.290; end_state = green, white; }
+new 1 actin { position_ends = -5.723 9.204 4.664, -5.723 9.204 19.664; end_state = green, white; }
+new 1 actin { position_ends = -0.178 -10.714 -1.906, -0.178 -10.714 13.094; end_state = green, white; }
+new 1 actin { position_ends = 9.075 5.992 -3.336, 9.075 5.992 11.664; end_state = green, white; }
+new 1 actin { position_ends = 2.822 -10.216 -10.133, 2.822 -10.216 4.867; end_state = green, white; }
+new 1 actin { position_ends = 8.452 -6.688 -4.939, 8.452 -6.688 10.061; end_state = green, white; }
+new 1 actin { position_ends = 9.578 4.842 -4.042, 9.578 4.842 10.958; end_state = green, white; }
+new 1 actin { position_ends = 10.598 -0.292 2.278, 10.598 -0.292 17.278; end_state = green, white; }
+new 1 actin { position_ends = -10.167 -3.132 -5.348, -10.167 -3.132 9.652; end_state = green, white; }
+new 1 actin { position_ends = -9.948 -4.057 -9.024, -9.948 -4.057 5.976; end_state = green, white; }
+new 1 actin { position_ends = 10.684 -2.385 -7.361, 10.684 -2.385 7.639; end_state = green, white; }
+new 1 actin { position_ends = -9.347 5.428 -10.095, -9.347 5.428 4.905; end_state = green, white; }
+new 1 actin { position_ends = 8.299 -6.761 -1.198, 8.299 -6.761 13.802; end_state = green, white; }
+new 1 actin { position_ends = 10.740 -1.133 -1.113, 10.740 -1.133 13.887; end_state = green, white; }
+new 1 actin { position_ends = -10.835 -1.375 -0.620, -10.835 -1.375 14.380; end_state = green, white; }
+new 1 actin { position_ends = -3.454 10.188 3.327, -3.454 10.188 18.327; end_state = green, white; }
+new 1 actin { position_ends = -7.104 -7.826 -1.867, -7.104 -7.826 13.133; end_state = green, white; }
+new 1 actin { position_ends = 7.715 -7.238 -2.198, 7.715 -7.238 12.802; end_state = green, white; }
+new 1 actin { position_ends = -9.271 -5.092 -5.501, -9.271 -5.092 9.499; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 03: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 04: +64 filaments ---
+new 1 actin { position_ends = 9.960 -3.756 -4.813, 9.960 -3.756 10.187; end_state = green, white; }
+new 1 actin { position_ends = -10.588 -0.591 1.278, -10.588 -0.591 16.278; end_state = green, white; }
+new 1 actin { position_ends = 7.214 8.000 -6.648, 7.214 8.000 8.352; end_state = green, white; }
+new 1 actin { position_ends = -8.646 6.598 1.075, -8.646 6.598 16.075; end_state = green, white; }
+new 1 actin { position_ends = -10.908 -0.187 -4.171, -10.908 -0.187 10.829; end_state = green, white; }
+new 1 actin { position_ends = 10.052 -3.369 4.406, 10.052 -3.369 19.406; end_state = green, white; }
+new 1 actin { position_ends = -6.995 -8.267 -5.737, -6.995 -8.267 9.263; end_state = green, white; }
+new 1 actin { position_ends = -7.382 7.866 -3.605, -7.382 7.866 11.395; end_state = green, white; }
+new 1 actin { position_ends = -0.582 -10.868 0.120, -0.582 -10.868 15.120; end_state = green, white; }
+new 1 actin { position_ends = 9.117 5.907 -4.720, 9.117 5.907 10.280; end_state = green, white; }
+new 1 actin { position_ends = 10.446 -2.570 -4.317, 10.446 -2.570 10.683; end_state = green, white; }
+new 1 actin { position_ends = 9.113 -5.353 3.693, 9.113 -5.353 18.693; end_state = green, white; }
+new 1 actin { position_ends = 3.847 -9.845 0.963, 3.847 -9.845 15.963; end_state = green, white; }
+new 1 actin { position_ends = 7.948 -7.251 -2.871, 7.948 -7.251 12.129; end_state = green, white; }
+new 1 actin { position_ends = -7.936 7.478 0.526, -7.936 7.478 15.526; end_state = green, white; }
+new 1 actin { position_ends = 8.055 7.067 -2.271, 8.055 7.067 12.729; end_state = green, white; }
+new 1 actin { position_ends = -0.789 -10.647 -8.841, -0.789 -10.647 6.159; end_state = green, white; }
+new 1 actin { position_ends = -10.658 -2.352 -4.358, -10.658 -2.352 10.642; end_state = green, white; }
+new 1 actin { position_ends = 4.422 -9.889 -4.046, 4.422 -9.889 10.954; end_state = green, white; }
+new 1 actin { position_ends = 4.226 -9.913 -2.012, 4.226 -9.913 12.988; end_state = green, white; }
+new 1 actin { position_ends = -10.807 0.038 -7.771, -10.807 0.038 7.229; end_state = green, white; }
+new 1 actin { position_ends = 9.371 -4.964 -4.578, 9.371 -4.964 10.422; end_state = green, white; }
+new 1 actin { position_ends = 10.792 1.019 -4.092, 10.792 1.019 10.908; end_state = green, white; }
+new 1 actin { position_ends = 10.382 2.198 -0.118, 10.382 2.198 14.882; end_state = green, white; }
+new 1 actin { position_ends = -5.464 -9.032 -6.560, -5.464 -9.032 8.440; end_state = green, white; }
+new 1 actin { position_ends = 10.794 1.713 -9.794, 10.794 1.713 5.206; end_state = green, white; }
+new 1 actin { position_ends = 4.913 -9.583 0.288, 4.913 -9.583 15.288; end_state = green, white; }
+new 1 actin { position_ends = 6.684 -8.341 -5.097, 6.684 -8.341 9.903; end_state = green, white; }
+new 1 actin { position_ends = -6.348 -8.743 -1.419, -6.348 -8.743 13.581; end_state = green, white; }
+new 1 actin { position_ends = 10.173 -3.904 -7.560, 10.173 -3.904 7.440; end_state = green, white; }
+new 1 actin { position_ends = -10.788 0.125 -0.295, -10.788 0.125 14.705; end_state = green, white; }
+new 1 actin { position_ends = -10.605 2.450 3.626, -10.605 2.450 18.626; end_state = green, white; }
+new 1 actin { position_ends = -3.847 9.874 -2.912, -3.847 9.874 12.088; end_state = green, white; }
+new 1 actin { position_ends = 10.088 -3.966 -7.263, 10.088 -3.966 7.737; end_state = green, white; }
+new 1 actin { position_ends = -5.805 -8.911 -2.570, -5.805 -8.911 12.430; end_state = green, white; }
+new 1 actin { position_ends = -10.872 0.137 -10.036, -10.872 0.137 4.964; end_state = green, white; }
+new 1 actin { position_ends = -3.354 10.198 -5.986, -3.354 10.198 9.014; end_state = green, white; }
+new 1 actin { position_ends = 8.580 -6.749 -4.497, 8.580 -6.749 10.503; end_state = green, white; }
+new 1 actin { position_ends = -9.011 5.957 -8.326, -9.011 5.957 6.674; end_state = green, white; }
+new 1 actin { position_ends = 6.071 -9.021 -5.045, 6.071 -9.021 9.955; end_state = green, white; }
+new 1 actin { position_ends = 0.226 10.784 1.646, 0.226 10.784 16.646; end_state = green, white; }
+new 1 actin { position_ends = -1.448 -10.465 4.911, -1.448 -10.465 19.911; end_state = green, white; }
+new 1 actin { position_ends = -9.745 4.617 4.135, -9.745 4.617 19.135; end_state = green, white; }
+new 1 actin { position_ends = 7.100 -7.866 -8.752, 7.100 -7.866 6.248; end_state = green, white; }
+new 1 actin { position_ends = 0.650 -10.915 0.069, 0.650 -10.915 15.069; end_state = green, white; }
+new 1 actin { position_ends = -1.682 -10.697 -5.589, -1.682 -10.697 9.411; end_state = green, white; }
+new 1 actin { position_ends = 5.303 9.414 3.413, 5.303 9.414 18.413; end_state = green, white; }
+new 1 actin { position_ends = 3.996 -9.981 1.028, 3.996 -9.981 16.028; end_state = green, white; }
+new 1 actin { position_ends = 10.810 -0.218 -7.765, 10.810 -0.218 7.235; end_state = green, white; }
+new 1 actin { position_ends = -5.233 9.584 -0.657, -5.233 9.584 14.343; end_state = green, white; }
+new 1 actin { position_ends = -5.208 9.544 -3.809, -5.208 9.544 11.191; end_state = green, white; }
+new 1 actin { position_ends = 4.412 -9.799 -4.345, 4.412 -9.799 10.655; end_state = green, white; }
+new 1 actin { position_ends = -4.914 -9.418 4.569, -4.914 -9.418 19.569; end_state = green, white; }
+new 1 actin { position_ends = -7.800 -7.265 -6.317, -7.800 -7.265 8.683; end_state = green, white; }
+new 1 actin { position_ends = -8.362 -6.479 -1.174, -8.362 -6.479 13.826; end_state = green, white; }
+new 1 actin { position_ends = -10.262 -3.683 0.025, -10.262 -3.683 15.025; end_state = green, white; }
+new 1 actin { position_ends = -7.324 -7.659 -3.120, -7.324 -7.659 11.880; end_state = green, white; }
+new 1 actin { position_ends = -6.607 8.452 -6.729, -6.607 8.452 8.271; end_state = green, white; }
+new 1 actin { position_ends = -10.684 1.219 -2.268, -10.684 1.219 12.732; end_state = green, white; }
+new 1 actin { position_ends = 2.640 10.545 -4.345, 2.640 10.545 10.655; end_state = green, white; }
+new 1 actin { position_ends = -3.714 -10.154 -2.282, -3.714 -10.154 12.718; end_state = green, white; }
+new 1 actin { position_ends = 10.812 1.046 4.486, 10.812 1.046 19.486; end_state = green, white; }
+new 1 actin { position_ends = -10.522 -1.858 -1.668, -10.522 -1.858 13.332; end_state = green, white; }
+new 1 actin { position_ends = -2.300 -10.576 -9.701, -2.300 -10.576 5.299; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 04: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 05: +64 filaments ---
+new 1 actin { position_ends = 5.349 9.238 -4.335, 5.349 9.238 10.665; end_state = green, white; }
+new 1 actin { position_ends = -9.140 5.470 1.261, -9.140 5.470 16.261; end_state = green, white; }
+new 1 actin { position_ends = 0.114 -10.851 -1.964, 0.114 -10.851 13.036; end_state = green, white; }
+new 1 actin { position_ends = -7.184 -8.110 -9.227, -7.184 -8.110 5.773; end_state = green, white; }
+new 1 actin { position_ends = 9.760 4.308 -0.260, 9.760 4.308 14.740; end_state = green, white; }
+new 1 actin { position_ends = -10.419 -3.051 1.851, -10.419 -3.051 16.851; end_state = green, white; }
+new 1 actin { position_ends = -10.155 -2.888 -5.187, -10.155 -2.888 9.813; end_state = green, white; }
+new 1 actin { position_ends = 5.332 9.305 3.481, 5.332 9.305 18.481; end_state = green, white; }
+new 1 actin { position_ends = -1.725 -10.619 3.703, -1.725 -10.619 18.703; end_state = green, white; }
+new 1 actin { position_ends = -9.668 -5.126 -7.530, -9.668 -5.126 7.470; end_state = green, white; }
+new 1 actin { position_ends = -10.595 1.485 -5.745, -10.595 1.485 9.255; end_state = green, white; }
+new 1 actin { position_ends = -8.043 -6.913 4.189, -8.043 -6.913 19.189; end_state = green, white; }
+new 1 actin { position_ends = -7.091 -8.015 -7.743, -7.091 -8.015 7.257; end_state = green, white; }
+new 1 actin { position_ends = -10.327 2.758 2.139, -10.327 2.758 17.139; end_state = green, white; }
+new 1 actin { position_ends = -9.520 -5.279 -10.138, -9.520 -5.279 4.862; end_state = green, white; }
+new 1 actin { position_ends = 2.869 -10.161 1.002, 2.869 -10.161 16.002; end_state = green, white; }
+new 1 actin { position_ends = -8.306 -6.776 -6.792, -8.306 -6.776 8.208; end_state = green, white; }
+new 1 actin { position_ends = 6.766 -8.129 1.809, 6.766 -8.129 16.809; end_state = green, white; }
+new 1 actin { position_ends = -5.279 9.538 -8.769, -5.279 9.538 6.231; end_state = green, white; }
+new 1 actin { position_ends = -3.481 10.175 -0.017, -3.481 10.175 14.983; end_state = green, white; }
+new 1 actin { position_ends = 0.504 10.596 -7.280, 0.504 10.596 7.720; end_state = green, white; }
+new 1 actin { position_ends = 10.602 -0.077 3.661, 10.602 -0.077 18.661; end_state = green, white; }
+new 1 actin { position_ends = 9.350 -5.667 1.612, 9.350 -5.667 16.612; end_state = green, white; }
+new 1 actin { position_ends = 7.709 7.740 -8.387, 7.709 7.740 6.613; end_state = green, white; }
+new 1 actin { position_ends = -10.832 -1.364 0.026, -10.832 -1.364 15.026; end_state = green, white; }
+new 1 actin { position_ends = -10.226 -3.466 -8.463, -10.226 -3.466 6.537; end_state = green, white; }
+new 1 actin { position_ends = -8.589 6.568 4.288, -8.589 6.568 19.288; end_state = green, white; }
+new 1 actin { position_ends = 2.287 10.636 -8.642, 2.287 10.636 6.358; end_state = green, white; }
+new 1 actin { position_ends = -9.621 -5.047 -5.696, -9.621 -5.047 9.304; end_state = green, white; }
+new 1 actin { position_ends = 10.350 -3.358 -3.201, 10.350 -3.358 11.799; end_state = green, white; }
+new 1 actin { position_ends = 5.352 -9.419 -8.594, 5.352 -9.419 6.406; end_state = green, white; }
+new 1 actin { position_ends = -1.292 10.497 0.827, -1.292 10.497 15.827; end_state = green, white; }
+new 1 actin { position_ends = 1.567 -10.737 3.835, 1.567 -10.737 18.835; end_state = green, white; }
+new 1 actin { position_ends = 2.623 10.268 0.126, 2.623 10.268 15.126; end_state = green, white; }
+new 1 actin { position_ends = -10.804 1.673 -2.692, -10.804 1.673 12.308; end_state = green, white; }
+new 1 actin { position_ends = 7.495 7.428 -2.802, 7.495 7.428 12.198; end_state = green, white; }
+new 1 actin { position_ends = -2.107 -10.360 3.500, -2.107 -10.360 18.500; end_state = green, white; }
+new 1 actin { position_ends = -4.320 -10.002 -1.733, -4.320 -10.002 13.267; end_state = green, white; }
+new 1 actin { position_ends = -1.450 10.660 4.926, -1.450 10.660 19.926; end_state = green, white; }
+new 1 actin { position_ends = 7.294 7.993 2.785, 7.294 7.993 17.785; end_state = green, white; }
+new 1 actin { position_ends = 9.441 4.776 -8.519, 9.441 4.776 6.481; end_state = green, white; }
+new 1 actin { position_ends = 10.182 3.941 4.618, 10.182 3.941 19.618; end_state = green, white; }
+new 1 actin { position_ends = 4.928 9.370 3.335, 4.928 9.370 18.335; end_state = green, white; }
+new 1 actin { position_ends = 5.312 9.171 1.475, 5.312 9.171 16.475; end_state = green, white; }
+new 1 actin { position_ends = -6.546 -8.392 -3.297, -6.546 -8.392 11.703; end_state = green, white; }
+new 1 actin { position_ends = 2.374 10.590 -8.821, 2.374 10.590 6.179; end_state = green, white; }
+new 1 actin { position_ends = 9.684 -5.001 -9.579, 9.684 -5.001 5.421; end_state = green, white; }
+new 1 actin { position_ends = -10.566 -1.855 4.694, -10.566 -1.855 19.694; end_state = green, white; }
+new 1 actin { position_ends = -2.295 10.657 4.664, -2.295 10.657 19.664; end_state = green, white; }
+new 1 actin { position_ends = 0.277 10.889 -8.871, 0.277 10.889 6.129; end_state = green, white; }
+new 1 actin { position_ends = 10.759 -0.740 -8.529, 10.759 -0.740 6.471; end_state = green, white; }
+new 1 actin { position_ends = -3.934 -9.821 0.438, -3.934 -9.821 15.438; end_state = green, white; }
+new 1 actin { position_ends = 0.834 10.531 4.611, 0.834 10.531 19.611; end_state = green, white; }
+new 1 actin { position_ends = -3.652 -10.197 -8.245, -3.652 -10.197 6.755; end_state = green, white; }
+new 1 actin { position_ends = -0.272 10.802 -2.709, -0.272 10.802 12.291; end_state = green, white; }
+new 1 actin { position_ends = -9.955 -3.697 2.865, -9.955 -3.697 17.865; end_state = green, white; }
+new 1 actin { position_ends = 8.393 -6.757 3.505, 8.393 -6.757 18.505; end_state = green, white; }
+new 1 actin { position_ends = -9.660 4.373 -3.109, -9.660 4.373 11.891; end_state = green, white; }
+new 1 actin { position_ends = 8.276 -6.559 -9.394, 8.276 -6.559 5.606; end_state = green, white; }
+new 1 actin { position_ends = -9.487 5.075 -5.411, -9.487 5.075 9.589; end_state = green, white; }
+new 1 actin { position_ends = 10.776 -0.496 -4.803, 10.776 -0.496 10.197; end_state = green, white; }
+new 1 actin { position_ends = 1.067 -10.654 0.182, 1.067 -10.654 15.182; end_state = green, white; }
+new 1 actin { position_ends = -9.884 -4.352 4.797, -9.884 -4.352 19.797; end_state = green, white; }
+new 1 actin { position_ends = -1.558 -10.734 -9.145, -1.558 -10.734 5.855; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 05: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 06: +64 filaments ---
+new 1 actin { position_ends = 8.782 5.952 -5.379, 8.782 5.952 9.621; end_state = green, white; }
+new 1 actin { position_ends = 7.789 7.692 -0.431, 7.789 7.692 14.569; end_state = green, white; }
+new 1 actin { position_ends = 10.494 1.772 -1.408, 10.494 1.772 13.592; end_state = green, white; }
+new 1 actin { position_ends = -1.374 10.579 2.335, -1.374 10.579 17.335; end_state = green, white; }
+new 1 actin { position_ends = 8.066 -7.132 3.499, 8.066 -7.132 18.499; end_state = green, white; }
+new 1 actin { position_ends = -6.325 -8.846 -5.625, -6.325 -8.846 9.375; end_state = green, white; }
+new 1 actin { position_ends = 10.294 -3.132 3.182, 10.294 -3.132 18.182; end_state = green, white; }
+new 1 actin { position_ends = 9.972 3.458 -3.464, 9.972 3.458 11.536; end_state = green, white; }
+new 1 actin { position_ends = 10.262 3.268 -1.050, 10.262 3.268 13.950; end_state = green, white; }
+new 1 actin { position_ends = -0.661 10.856 4.455, -0.661 10.856 19.455; end_state = green, white; }
+new 1 actin { position_ends = -9.953 -4.228 -6.708, -9.953 -4.228 8.292; end_state = green, white; }
+new 1 actin { position_ends = 9.539 -5.259 -3.170, 9.539 -5.259 11.830; end_state = green, white; }
+new 1 actin { position_ends = 10.114 -3.304 3.909, 10.114 -3.304 18.909; end_state = green, white; }
+new 1 actin { position_ends = -3.076 -10.180 3.851, -3.076 -10.180 18.851; end_state = green, white; }
+new 1 actin { position_ends = 5.142 9.562 4.891, 5.142 9.562 19.891; end_state = green, white; }
+new 1 actin { position_ends = 0.321 10.905 -1.612, 0.321 10.905 13.388; end_state = green, white; }
+new 1 actin { position_ends = -9.683 -4.459 -6.164, -9.683 -4.459 8.836; end_state = green, white; }
+new 1 actin { position_ends = 7.380 7.730 -4.709, 7.380 7.730 10.291; end_state = green, white; }
+new 1 actin { position_ends = 6.102 -8.850 -9.501, 6.102 -8.850 5.499; end_state = green, white; }
+new 1 actin { position_ends = 4.198 -9.695 -8.348, 4.198 -9.695 6.652; end_state = green, white; }
+new 1 actin { position_ends = 1.281 -10.613 -5.846, 1.281 -10.613 9.154; end_state = green, white; }
+new 1 actin { position_ends = 10.628 -0.234 -3.316, 10.628 -0.234 11.684; end_state = green, white; }
+new 1 actin { position_ends = 4.667 -9.777 1.058, 4.667 -9.777 16.058; end_state = green, white; }
+new 1 actin { position_ends = -0.418 -10.719 -0.863, -0.418 -10.719 14.137; end_state = green, white; }
+new 1 actin { position_ends = -9.686 4.367 -1.440, -9.686 4.367 13.560; end_state = green, white; }
+new 1 actin { position_ends = -5.765 -9.131 1.126, -5.765 -9.131 16.126; end_state = green, white; }
+new 1 actin { position_ends = -0.164 -10.927 -8.978, -0.164 -10.927 6.022; end_state = green, white; }
+new 1 actin { position_ends = -9.310 -5.420 1.009, -9.310 -5.420 16.009; end_state = green, white; }
+new 1 actin { position_ends = 7.998 -7.194 -8.361, 7.998 -7.194 6.639; end_state = green, white; }
+new 1 actin { position_ends = -10.678 2.169 -0.832, -10.678 2.169 14.168; end_state = green, white; }
+new 1 actin { position_ends = 2.289 -10.333 2.405, 2.289 -10.333 17.405; end_state = green, white; }
+new 1 actin { position_ends = 0.679 -10.849 -5.427, 0.679 -10.849 9.573; end_state = green, white; }
+new 1 actin { position_ends = 5.271 9.491 1.746, 5.271 9.491 16.746; end_state = green, white; }
+new 1 actin { position_ends = -4.597 9.735 0.007, -4.597 9.735 15.007; end_state = green, white; }
+new 1 actin { position_ends = -6.553 -8.728 -1.638, -6.553 -8.728 13.362; end_state = green, white; }
+new 1 actin { position_ends = -10.378 2.666 4.883, -10.378 2.666 19.883; end_state = green, white; }
+new 1 actin { position_ends = -9.871 4.127 2.196, -9.871 4.127 17.196; end_state = green, white; }
+new 1 actin { position_ends = -3.707 -9.953 -5.431, -3.707 -9.953 9.569; end_state = green, white; }
+new 1 actin { position_ends = 5.282 9.212 1.512, 5.282 9.212 16.512; end_state = green, white; }
+new 1 actin { position_ends = -2.964 -10.258 -1.653, -2.964 -10.258 13.347; end_state = green, white; }
+new 1 actin { position_ends = 6.574 8.514 -1.202, 6.574 8.514 13.798; end_state = green, white; }
+new 1 actin { position_ends = 10.218 3.141 -0.787, 10.218 3.141 14.213; end_state = green, white; }
+new 1 actin { position_ends = 9.888 4.004 -7.740, 9.888 4.004 7.260; end_state = green, white; }
+new 1 actin { position_ends = -10.210 2.823 -3.339, -10.210 2.823 11.661; end_state = green, white; }
+new 1 actin { position_ends = -10.773 -1.423 1.328, -10.773 -1.423 16.328; end_state = green, white; }
+new 1 actin { position_ends = 8.052 -7.408 0.341, 8.052 -7.408 15.341; end_state = green, white; }
+new 1 actin { position_ends = 10.490 -2.070 -3.774, 10.490 -2.070 11.226; end_state = green, white; }
+new 1 actin { position_ends = -10.756 1.946 -1.557, -10.756 1.946 13.443; end_state = green, white; }
+new 1 actin { position_ends = -10.460 -2.505 2.800, -10.460 -2.505 17.800; end_state = green, white; }
+new 1 actin { position_ends = -5.673 -9.122 -5.911, -5.673 -9.122 9.089; end_state = green, white; }
+new 1 actin { position_ends = -1.392 -10.849 -4.714, -1.392 -10.849 10.286; end_state = green, white; }
+new 1 actin { position_ends = -3.040 -10.347 -5.400, -3.040 -10.347 9.600; end_state = green, white; }
+new 1 actin { position_ends = -10.455 1.569 -7.159, -10.455 1.569 7.841; end_state = green, white; }
+new 1 actin { position_ends = -10.765 1.585 1.913, -10.765 1.585 16.913; end_state = green, white; }
+new 1 actin { position_ends = -2.400 10.489 4.523, -2.400 10.489 19.523; end_state = green, white; }
+new 1 actin { position_ends = -0.774 10.729 -9.437, -0.774 10.729 5.563; end_state = green, white; }
+new 1 actin { position_ends = -10.281 -2.450 0.584, -10.281 -2.450 15.584; end_state = green, white; }
+new 1 actin { position_ends = 9.671 4.460 -3.569, 9.671 4.460 11.431; end_state = green, white; }
+new 1 actin { position_ends = 0.806 10.633 -6.461, 0.806 10.633 8.539; end_state = green, white; }
+new 1 actin { position_ends = 3.305 -10.084 -3.694, 3.305 -10.084 11.306; end_state = green, white; }
+new 1 actin { position_ends = 1.147 -10.829 3.967, 1.147 -10.829 18.967; end_state = green, white; }
+new 1 actin { position_ends = -10.063 -3.724 -1.886, -10.063 -3.724 13.114; end_state = green, white; }
+new 1 actin { position_ends = -9.444 -5.366 -2.977, -9.444 -5.366 12.023; end_state = green, white; }
+new 1 actin { position_ends = -9.484 -5.013 -3.073, -9.484 -5.013 11.927; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 06: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 07: +64 filaments ---
+new 1 actin { position_ends = -2.434 10.374 2.365, -2.434 10.374 17.365; end_state = green, white; }
+new 1 actin { position_ends = -1.331 10.555 -9.214, -1.331 10.555 5.786; end_state = green, white; }
+new 1 actin { position_ends = -9.257 -5.804 -2.334, -9.257 -5.804 12.666; end_state = green, white; }
+new 1 actin { position_ends = 4.201 -9.772 -3.600, 4.201 -9.772 11.400; end_state = green, white; }
+new 1 actin { position_ends = -10.560 0.505 -4.065, -10.560 0.505 10.935; end_state = green, white; }
+new 1 actin { position_ends = 10.086 3.339 3.622, 10.086 3.339 18.622; end_state = green, white; }
+new 1 actin { position_ends = -4.178 9.741 -9.735, -4.178 9.741 5.265; end_state = green, white; }
+new 1 actin { position_ends = 5.154 -9.325 -1.560, 5.154 -9.325 13.440; end_state = green, white; }
+new 1 actin { position_ends = -8.967 6.237 -9.936, -8.967 6.237 5.064; end_state = green, white; }
+new 1 actin { position_ends = -10.738 -0.191 -1.783, -10.738 -0.191 13.217; end_state = green, white; }
+new 1 actin { position_ends = 10.880 -0.380 -5.549, 10.880 -0.380 9.451; end_state = green, white; }
+new 1 actin { position_ends = -6.288 8.753 4.309, -6.288 8.753 19.309; end_state = green, white; }
+new 1 actin { position_ends = -4.894 9.457 -9.556, -4.894 9.457 5.444; end_state = green, white; }
+new 1 actin { position_ends = 7.012 7.967 0.370, 7.012 7.967 15.370; end_state = green, white; }
+new 1 actin { position_ends = -9.438 4.810 -1.691, -9.438 4.810 13.309; end_state = green, white; }
+new 1 actin { position_ends = 10.565 -1.109 -1.087, 10.565 -1.109 13.913; end_state = green, white; }
+new 1 actin { position_ends = 9.208 5.596 -0.201, 9.208 5.596 14.799; end_state = green, white; }
+new 1 actin { position_ends = -10.946 -0.007 -2.264, -10.946 -0.007 12.736; end_state = green, white; }
+new 1 actin { position_ends = 0.841 10.789 -1.549, 0.841 10.789 13.451; end_state = green, white; }
+new 1 actin { position_ends = -8.722 6.149 -7.215, -8.722 6.149 7.785; end_state = green, white; }
+new 1 actin { position_ends = 10.472 1.752 -2.694, 10.472 1.752 12.306; end_state = green, white; }
+new 1 actin { position_ends = -6.922 8.120 3.589, -6.922 8.120 18.589; end_state = green, white; }
+new 1 actin { position_ends = -0.446 -10.837 -8.576, -0.446 -10.837 6.424; end_state = green, white; }
+new 1 actin { position_ends = 5.587 9.177 4.396, 5.587 9.177 19.396; end_state = green, white; }
+new 1 actin { position_ends = 10.232 3.140 -2.340, 10.232 3.140 12.660; end_state = green, white; }
+new 1 actin { position_ends = -10.653 0.357 -2.307, -10.653 0.357 12.693; end_state = green, white; }
+new 1 actin { position_ends = 10.025 3.330 -5.734, 10.025 3.330 9.266; end_state = green, white; }
+new 1 actin { position_ends = -9.415 4.770 -8.389, -9.415 4.770 6.611; end_state = green, white; }
+new 1 actin { position_ends = -9.224 -5.441 0.243, -9.224 -5.441 15.243; end_state = green, white; }
+new 1 actin { position_ends = 10.084 -3.440 -1.872, 10.084 -3.440 13.128; end_state = green, white; }
+new 1 actin { position_ends = -1.892 10.616 -7.387, -1.892 10.616 7.613; end_state = green, white; }
+new 1 actin { position_ends = -5.625 -9.253 4.291, -5.625 -9.253 19.291; end_state = green, white; }
+new 1 actin { position_ends = -8.046 -6.962 -1.867, -8.046 -6.962 13.133; end_state = green, white; }
+new 1 actin { position_ends = -4.389 -9.807 -4.131, -4.389 -9.807 10.869; end_state = green, white; }
+new 1 actin { position_ends = 10.473 -2.995 -6.331, 10.473 -2.995 8.669; end_state = green, white; }
+new 1 actin { position_ends = 1.942 10.770 -6.176, 1.942 10.770 8.824; end_state = green, white; }
+new 1 actin { position_ends = -2.063 -10.453 2.156, -2.063 -10.453 17.156; end_state = green, white; }
+new 1 actin { position_ends = -8.363 6.610 -3.616, -8.363 6.610 11.384; end_state = green, white; }
+new 1 actin { position_ends = -7.550 7.441 -6.303, -7.550 7.441 8.697; end_state = green, white; }
+new 1 actin { position_ends = 2.156 10.649 -5.296, 2.156 10.649 9.704; end_state = green, white; }
+new 1 actin { position_ends = -5.542 9.220 -4.539, -5.542 9.220 10.461; end_state = green, white; }
+new 1 actin { position_ends = 10.238 3.036 -1.728, 10.238 3.036 13.272; end_state = green, white; }
+new 1 actin { position_ends = 4.030 10.123 2.971, 4.030 10.123 17.971; end_state = green, white; }
+new 1 actin { position_ends = -9.705 4.667 -6.638, -9.705 4.667 8.362; end_state = green, white; }
+new 1 actin { position_ends = 0.596 -10.828 3.070, 0.596 -10.828 18.070; end_state = green, white; }
+new 1 actin { position_ends = 2.815 10.415 4.927, 2.815 10.415 19.927; end_state = green, white; }
+new 1 actin { position_ends = -7.097 -8.141 2.575, -7.097 -8.141 17.575; end_state = green, white; }
+new 1 actin { position_ends = 9.904 3.868 -2.533, 9.904 3.868 12.467; end_state = green, white; }
+new 1 actin { position_ends = -1.336 10.550 3.440, -1.336 10.550 18.440; end_state = green, white; }
+new 1 actin { position_ends = -3.727 -10.088 -3.480, -3.727 -10.088 11.520; end_state = green, white; }
+new 1 actin { position_ends = -9.874 -4.560 -10.226, -9.874 -4.560 4.774; end_state = green, white; }
+new 1 actin { position_ends = 5.222 9.240 -2.369, 5.222 9.240 12.631; end_state = green, white; }
+new 1 actin { position_ends = 8.756 -6.301 -8.173, 8.756 -6.301 6.827; end_state = green, white; }
+new 1 actin { position_ends = -1.119 10.685 3.938, -1.119 10.685 18.938; end_state = green, white; }
+new 1 actin { position_ends = 2.049 10.740 -0.472, 2.049 10.740 14.528; end_state = green, white; }
+new 1 actin { position_ends = -1.393 -10.720 1.256, -1.393 -10.720 16.256; end_state = green, white; }
+new 1 actin { position_ends = -9.808 4.711 -4.840, -9.808 4.711 10.160; end_state = green, white; }
+new 1 actin { position_ends = 3.723 -10.186 -1.608, 3.723 -10.186 13.392; end_state = green, white; }
+new 1 actin { position_ends = -1.671 -10.708 -9.054, -1.671 -10.708 5.946; end_state = green, white; }
+new 1 actin { position_ends = -8.774 -6.350 -9.957, -8.774 -6.350 5.043; end_state = green, white; }
+new 1 actin { position_ends = -8.471 -6.641 -0.644, -8.471 -6.641 14.356; end_state = green, white; }
+new 1 actin { position_ends = 9.362 5.182 -2.826, 9.362 5.182 12.174; end_state = green, white; }
+new 1 actin { position_ends = 2.637 -10.603 -0.561, 2.637 -10.603 14.439; end_state = green, white; }
+new 1 actin { position_ends = 10.102 -3.956 -5.154, 10.102 -3.956 9.846; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 07: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 08: +64 filaments ---
+new 1 actin { position_ends = -8.356 6.482 1.006, -8.356 6.482 16.006; end_state = green, white; }
+new 1 actin { position_ends = 10.565 0.659 2.307, 10.565 0.659 17.307; end_state = green, white; }
+new 1 actin { position_ends = 10.475 -3.067 0.952, 10.475 -3.067 15.952; end_state = green, white; }
+new 1 actin { position_ends = -4.201 -9.934 -9.748, -4.201 -9.934 5.252; end_state = green, white; }
+new 1 actin { position_ends = 4.396 9.616 -9.239, 4.396 9.616 5.761; end_state = green, white; }
+new 1 actin { position_ends = 10.843 -0.262 -2.776, 10.843 -0.262 12.224; end_state = green, white; }
+new 1 actin { position_ends = 3.431 -10.063 -3.126, 3.431 -10.063 11.874; end_state = green, white; }
+new 1 actin { position_ends = -10.397 2.702 0.391, -10.397 2.702 15.391; end_state = green, white; }
+new 1 actin { position_ends = 10.552 -2.791 -7.746, 10.552 -2.791 7.254; end_state = green, white; }
+new 1 actin { position_ends = 7.081 8.110 -6.882, 7.081 8.110 8.118; end_state = green, white; }
+new 1 actin { position_ends = 8.288 6.546 4.642, 8.288 6.546 19.642; end_state = green, white; }
+new 1 actin { position_ends = 1.706 -10.712 -0.839, 1.706 -10.712 14.161; end_state = green, white; }
+new 1 actin { position_ends = 1.388 10.465 1.568, 1.388 10.465 16.568; end_state = green, white; }
+new 1 actin { position_ends = 10.760 -1.312 -8.895, 10.760 -1.312 6.105; end_state = green, white; }
+new 1 actin { position_ends = -0.951 -10.608 1.865, -0.951 -10.608 16.865; end_state = green, white; }
+new 1 actin { position_ends = 10.262 3.708 -9.999, 10.262 3.708 5.001; end_state = green, white; }
+new 1 actin { position_ends = -10.217 -2.869 4.667, -10.217 -2.869 19.667; end_state = green, white; }
+new 1 actin { position_ends = -5.632 9.359 -8.051, -5.632 9.359 6.949; end_state = green, white; }
+new 1 actin { position_ends = -10.549 -0.272 0.559, -10.549 -0.272 15.559; end_state = green, white; }
+new 1 actin { position_ends = 9.370 -5.195 -6.929, 9.370 -5.195 8.071; end_state = green, white; }
+new 1 actin { position_ends = -6.027 8.921 -10.000, -6.027 8.921 5.000; end_state = green, white; }
+new 1 actin { position_ends = 2.331 10.354 -10.228, 2.331 10.354 4.772; end_state = green, white; }
+new 1 actin { position_ends = -6.278 -8.925 -2.727, -6.278 -8.925 12.273; end_state = green, white; }
+new 1 actin { position_ends = -10.646 -1.558 1.142, -10.646 -1.558 16.142; end_state = green, white; }
+new 1 actin { position_ends = 9.919 -3.599 -7.140, 9.919 -3.599 7.860; end_state = green, white; }
+new 1 actin { position_ends = -7.075 -8.179 -2.115, -7.075 -8.179 12.885; end_state = green, white; }
+new 1 actin { position_ends = 6.759 8.232 -6.510, 6.759 8.232 8.490; end_state = green, white; }
+new 1 actin { position_ends = 10.794 -1.114 0.512, 10.794 -1.114 15.512; end_state = green, white; }
+new 1 actin { position_ends = -6.643 8.674 -4.767, -6.643 8.674 10.233; end_state = green, white; }
+new 1 actin { position_ends = 3.424 10.063 -4.571, 3.424 10.063 10.429; end_state = green, white; }
+new 1 actin { position_ends = 9.714 -4.439 -4.096, 9.714 -4.439 10.904; end_state = green, white; }
+new 1 actin { position_ends = -5.498 -9.176 -1.104, -5.498 -9.176 13.896; end_state = green, white; }
+new 1 actin { position_ends = -3.705 -10.185 3.148, -3.705 -10.185 18.148; end_state = green, white; }
+new 1 actin { position_ends = -5.147 9.656 -2.152, -5.147 9.656 12.848; end_state = green, white; }
+new 1 actin { position_ends = -7.941 7.435 -5.393, -7.941 7.435 9.607; end_state = green, white; }
+new 1 actin { position_ends = -10.259 2.981 -0.758, -10.259 2.981 14.242; end_state = green, white; }
+new 1 actin { position_ends = -9.046 6.029 2.273, -9.046 6.029 17.273; end_state = green, white; }
+new 1 actin { position_ends = 10.378 -2.175 4.829, 10.378 -2.175 19.829; end_state = green, white; }
+new 1 actin { position_ends = 10.704 -1.507 3.846, 10.704 -1.507 18.846; end_state = green, white; }
+new 1 actin { position_ends = -1.604 -10.659 2.742, -1.604 -10.659 17.742; end_state = green, white; }
+new 1 actin { position_ends = -1.286 -10.861 -0.087, -1.286 -10.861 14.913; end_state = green, white; }
+new 1 actin { position_ends = 10.132 -3.849 -0.424, 10.132 -3.849 14.576; end_state = green, white; }
+new 1 actin { position_ends = 7.858 7.398 -6.492, 7.858 7.398 8.508; end_state = green, white; }
+new 1 actin { position_ends = -5.826 9.020 3.292, -5.826 9.020 18.292; end_state = green, white; }
+new 1 actin { position_ends = 2.457 10.338 -2.961, 2.457 10.338 12.039; end_state = green, white; }
+new 1 actin { position_ends = 6.497 -8.645 -0.865, 6.497 -8.645 14.135; end_state = green, white; }
+new 1 actin { position_ends = -10.728 2.054 -6.503, -10.728 2.054 8.497; end_state = green, white; }
+new 1 actin { position_ends = -9.608 4.358 1.344, -9.608 4.358 16.344; end_state = green, white; }
+new 1 actin { position_ends = 9.909 -4.076 -7.136, 9.909 -4.076 7.864; end_state = green, white; }
+new 1 actin { position_ends = 9.376 -5.573 -7.320, 9.376 -5.573 7.680; end_state = green, white; }
+new 1 actin { position_ends = 6.099 -8.872 -1.561, 6.099 -8.872 13.439; end_state = green, white; }
+new 1 actin { position_ends = -1.034 10.800 3.471, -1.034 10.800 18.471; end_state = green, white; }
+new 1 actin { position_ends = -6.136 8.676 -3.365, -6.136 8.676 11.635; end_state = green, white; }
+new 1 actin { position_ends = -7.875 7.515 3.719, -7.875 7.515 18.719; end_state = green, white; }
+new 1 actin { position_ends = -8.545 -6.340 -8.138, -8.545 -6.340 6.862; end_state = green, white; }
+new 1 actin { position_ends = -9.307 -5.061 -2.805, -9.307 -5.061 12.195; end_state = green, white; }
+new 1 actin { position_ends = -6.404 8.775 1.512, -6.404 8.775 16.512; end_state = green, white; }
+new 1 actin { position_ends = 1.868 10.495 -5.040, 1.868 10.495 9.960; end_state = green, white; }
+new 1 actin { position_ends = 2.172 -10.678 2.852, 2.172 -10.678 17.852; end_state = green, white; }
+new 1 actin { position_ends = 6.935 7.991 -4.714, 6.935 7.991 10.286; end_state = green, white; }
+new 1 actin { position_ends = 8.690 -6.080 -9.050, 8.690 -6.080 5.950; end_state = green, white; }
+new 1 actin { position_ends = 0.427 -10.711 -4.089, 0.427 -10.711 10.911; end_state = green, white; }
+new 1 actin { position_ends = -3.176 -10.068 -2.312, -3.176 -10.068 12.688; end_state = green, white; }
+new 1 actin { position_ends = 5.332 -9.128 -7.607, 5.332 -9.128 7.393; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 08: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 09: +64 filaments ---
+new 1 actin { position_ends = 6.986 8.428 -4.129, 6.986 8.428 10.871; end_state = green, white; }
+new 1 actin { position_ends = -10.859 0.148 -6.729, -10.859 0.148 8.271; end_state = green, white; }
+new 1 actin { position_ends = -6.055 8.839 -5.804, -6.055 8.839 9.196; end_state = green, white; }
+new 1 actin { position_ends = -0.639 10.633 -8.807, -0.639 10.633 6.193; end_state = green, white; }
+new 1 actin { position_ends = -8.301 6.736 -4.391, -8.301 6.736 10.609; end_state = green, white; }
+new 1 actin { position_ends = -6.391 -8.461 -6.762, -6.391 -8.461 8.238; end_state = green, white; }
+new 1 actin { position_ends = -9.644 4.627 -6.817, -9.644 4.627 8.183; end_state = green, white; }
+new 1 actin { position_ends = 7.813 -7.453 -0.603, 7.813 -7.453 14.397; end_state = green, white; }
+new 1 actin { position_ends = -9.947 -3.687 -3.700, -9.947 -3.687 11.300; end_state = green, white; }
+new 1 actin { position_ends = 2.439 -10.439 -4.429, 2.439 -10.439 10.571; end_state = green, white; }
+new 1 actin { position_ends = 4.948 9.682 -4.826, 4.948 9.682 10.174; end_state = green, white; }
+new 1 actin { position_ends = 4.607 9.852 1.880, 4.607 9.852 16.880; end_state = green, white; }
+new 1 actin { position_ends = 10.013 -3.587 -8.156, 10.013 -3.587 6.844; end_state = green, white; }
+new 1 actin { position_ends = 8.087 -7.125 2.009, 8.087 -7.125 17.009; end_state = green, white; }
+new 1 actin { position_ends = 5.170 9.271 -5.628, 5.170 9.271 9.372; end_state = green, white; }
+new 1 actin { position_ends = 8.722 6.346 -4.086, 8.722 6.346 10.914; end_state = green, white; }
+new 1 actin { position_ends = 10.829 0.230 2.057, 10.829 0.230 17.057; end_state = green, white; }
+new 1 actin { position_ends = 7.889 7.535 4.520, 7.889 7.535 19.520; end_state = green, white; }
+new 1 actin { position_ends = 6.653 8.512 -4.099, 6.653 8.512 10.901; end_state = green, white; }
+new 1 actin { position_ends = -0.786 -10.803 -2.784, -0.786 -10.803 12.216; end_state = green, white; }
+new 1 actin { position_ends = -9.224 5.444 -4.672, -9.224 5.444 10.328; end_state = green, white; }
+new 1 actin { position_ends = 2.475 -10.466 -9.108, 2.475 -10.466 5.892; end_state = green, white; }
+new 1 actin { position_ends = -9.433 4.782 -1.597, -9.433 4.782 13.403; end_state = green, white; }
+new 1 actin { position_ends = -1.006 -10.621 -1.798, -1.006 -10.621 13.202; end_state = green, white; }
+new 1 actin { position_ends = -10.696 -0.856 1.578, -10.696 -0.856 16.578; end_state = green, white; }
+new 1 actin { position_ends = 3.704 -10.245 -4.020, 3.704 -10.245 10.980; end_state = green, white; }
+new 1 actin { position_ends = -4.228 -9.714 0.116, -4.228 -9.714 15.116; end_state = green, white; }
+new 1 actin { position_ends = 0.077 -10.741 -4.729, 0.077 -10.741 10.271; end_state = green, white; }
+new 1 actin { position_ends = 8.832 5.837 4.497, 8.832 5.837 19.497; end_state = green, white; }
+new 1 actin { position_ends = -10.040 3.518 -5.164, -10.040 3.518 9.836; end_state = green, white; }
+new 1 actin { position_ends = 10.584 1.192 2.998, 10.584 1.192 17.998; end_state = green, white; }
+new 1 actin { position_ends = 4.282 9.972 -9.449, 4.282 9.972 5.551; end_state = green, white; }
+new 1 actin { position_ends = -7.159 -8.271 -1.109, -7.159 -8.271 13.891; end_state = green, white; }
+new 1 actin { position_ends = 10.760 0.559 -6.232, 10.760 0.559 8.768; end_state = green, white; }
+new 1 actin { position_ends = -10.158 -3.230 -1.601, -10.158 -3.230 13.399; end_state = green, white; }
+new 1 actin { position_ends = -4.520 -9.910 -7.027, -4.520 -9.910 7.973; end_state = green, white; }
+new 1 actin { position_ends = 8.984 -6.198 3.847, 8.984 -6.198 18.847; end_state = green, white; }
+new 1 actin { position_ends = -2.857 10.308 3.386, -2.857 10.308 18.386; end_state = green, white; }
+new 1 actin { position_ends = 2.154 -10.404 1.252, 2.154 -10.404 16.252; end_state = green, white; }
+new 1 actin { position_ends = 7.394 -7.999 3.012, 7.394 -7.999 18.012; end_state = green, white; }
+new 1 actin { position_ends = 6.494 -8.483 3.267, 6.494 -8.483 18.267; end_state = green, white; }
+new 1 actin { position_ends = -10.346 -3.367 -0.222, -10.346 -3.367 14.778; end_state = green, white; }
+new 1 actin { position_ends = 6.924 -8.013 -5.088, 6.924 -8.013 9.912; end_state = green, white; }
+new 1 actin { position_ends = -10.050 4.163 -9.728, -10.050 4.163 5.272; end_state = green, white; }
+new 1 actin { position_ends = -10.519 -2.550 -9.456, -10.519 -2.550 5.544; end_state = green, white; }
+new 1 actin { position_ends = -9.799 -4.603 -1.260, -9.799 -4.603 13.740; end_state = green, white; }
+new 1 actin { position_ends = -9.937 4.050 0.951, -9.937 4.050 15.951; end_state = green, white; }
+new 1 actin { position_ends = 4.504 9.564 -4.867, 4.504 9.564 10.133; end_state = green, white; }
+new 1 actin { position_ends = 8.023 6.941 -9.524, 8.023 6.941 5.476; end_state = green, white; }
+new 1 actin { position_ends = 5.592 9.315 4.405, 5.592 9.315 19.405; end_state = green, white; }
+new 1 actin { position_ends = -10.524 2.844 -7.243, -10.524 2.844 7.757; end_state = green, white; }
+new 1 actin { position_ends = -8.281 7.031 1.406, -8.281 7.031 16.406; end_state = green, white; }
+new 1 actin { position_ends = -10.379 -2.962 -5.856, -10.379 -2.962 9.144; end_state = green, white; }
+new 1 actin { position_ends = -8.869 -6.381 3.327, -8.869 -6.381 18.327; end_state = green, white; }
+new 1 actin { position_ends = 0.867 10.601 -1.288, 0.867 10.601 13.712; end_state = green, white; }
+new 1 actin { position_ends = 10.360 2.066 -2.224, 10.360 2.066 12.776; end_state = green, white; }
+new 1 actin { position_ends = 10.499 -2.474 -8.074, 10.499 -2.474 6.926; end_state = green, white; }
+new 1 actin { position_ends = -7.560 7.578 2.113, -7.560 7.578 17.113; end_state = green, white; }
+new 1 actin { position_ends = 10.211 -3.363 -3.580, 10.211 -3.363 11.420; end_state = green, white; }
+new 1 actin { position_ends = 1.746 10.590 2.108, 1.746 10.590 17.108; end_state = green, white; }
+new 1 actin { position_ends = -10.520 2.949 1.811, -10.520 2.949 16.811; end_state = green, white; }
+new 1 actin { position_ends = 2.648 10.420 -0.098, 2.648 10.420 14.902; end_state = green, white; }
+new 1 actin { position_ends = -10.745 -1.536 -2.014, -10.745 -1.536 12.986; end_state = green, white; }
+new 1 actin { position_ends = 8.383 -6.715 -6.341, 8.383 -6.715 8.659; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 09: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 10: +64 filaments ---
+new 1 actin { position_ends = -9.695 -4.614 -6.276, -9.695 -4.614 8.724; end_state = green, white; }
+new 1 actin { position_ends = -0.562 10.893 -5.502, -0.562 10.893 9.498; end_state = green, white; }
+new 1 actin { position_ends = -7.040 7.892 -7.266, -7.040 7.892 7.734; end_state = green, white; }
+new 1 actin { position_ends = 0.090 -10.706 2.121, 0.090 -10.706 17.121; end_state = green, white; }
+new 1 actin { position_ends = -10.154 3.856 -7.431, -10.154 3.856 7.569; end_state = green, white; }
+new 1 actin { position_ends = -10.253 3.064 0.834, -10.253 3.064 15.834; end_state = green, white; }
+new 1 actin { position_ends = -10.566 1.686 2.757, -10.566 1.686 17.757; end_state = green, white; }
+new 1 actin { position_ends = 2.524 10.559 -1.835, 2.524 10.559 13.165; end_state = green, white; }
+new 1 actin { position_ends = -9.067 -5.998 -8.714, -9.067 -5.998 6.286; end_state = green, white; }
+new 1 actin { position_ends = -8.033 7.038 -9.574, -8.033 7.038 5.426; end_state = green, white; }
+new 1 actin { position_ends = 1.649 10.636 -3.732, 1.649 10.636 11.268; end_state = green, white; }
+new 1 actin { position_ends = 6.772 -8.398 4.186, 6.772 -8.398 19.186; end_state = green, white; }
+new 1 actin { position_ends = -8.772 -6.413 2.281, -8.772 -6.413 17.281; end_state = green, white; }
+new 1 actin { position_ends = 1.838 10.597 -7.888, 1.838 10.597 7.112; end_state = green, white; }
+new 1 actin { position_ends = 2.396 -10.633 -3.076, 2.396 -10.633 11.924; end_state = green, white; }
+new 1 actin { position_ends = -2.622 -10.621 -2.302, -2.622 -10.621 12.698; end_state = green, white; }
+new 1 actin { position_ends = -10.776 0.754 3.463, -10.776 0.754 18.463; end_state = green, white; }
+new 1 actin { position_ends = 3.790 10.045 2.279, 3.790 10.045 17.279; end_state = green, white; }
+new 1 actin { position_ends = -9.256 -5.575 -9.070, -9.256 -5.575 5.930; end_state = green, white; }
+new 1 actin { position_ends = 10.115 -3.743 -6.407, 10.115 -3.743 8.593; end_state = green, white; }
+new 1 actin { position_ends = -10.180 -3.452 -3.519, -10.180 -3.452 11.481; end_state = green, white; }
+new 1 actin { position_ends = -9.433 5.028 -9.481, -9.433 5.028 5.519; end_state = green, white; }
+new 1 actin { position_ends = 1.810 -10.438 4.677, 1.810 -10.438 19.677; end_state = green, white; }
+new 1 actin { position_ends = -5.457 9.164 3.406, -5.457 9.164 18.406; end_state = green, white; }
+new 1 actin { position_ends = 6.668 8.534 -2.649, 6.668 8.534 12.351; end_state = green, white; }
+new 1 actin { position_ends = 8.996 -5.647 -6.707, 8.996 -5.647 8.293; end_state = green, white; }
+new 1 actin { position_ends = 8.719 -6.507 3.002, 8.719 -6.507 18.002; end_state = green, white; }
+new 1 actin { position_ends = -6.638 8.566 -0.462, -6.638 8.566 14.538; end_state = green, white; }
+new 1 actin { position_ends = -10.457 -2.586 -3.708, -10.457 -2.586 11.292; end_state = green, white; }
+new 1 actin { position_ends = -10.899 0.846 -5.427, -10.899 0.846 9.573; end_state = green, white; }
+new 1 actin { position_ends = -3.624 -10.324 -2.674, -3.624 -10.324 12.326; end_state = green, white; }
+new 1 actin { position_ends = -7.100 7.875 -0.309, -7.100 7.875 14.691; end_state = green, white; }
+new 1 actin { position_ends = 7.934 -7.129 -6.538, 7.934 -7.129 8.462; end_state = green, white; }
+new 1 actin { position_ends = -10.257 2.643 0.941, -10.257 2.643 15.941; end_state = green, white; }
+new 1 actin { position_ends = -10.754 -0.951 -10.160, -10.754 -0.951 4.840; end_state = green, white; }
+new 1 actin { position_ends = -9.621 -4.485 -7.602, -9.621 -4.485 7.398; end_state = green, white; }
+new 1 actin { position_ends = 5.123 -9.465 -8.598, 5.123 -9.465 6.402; end_state = green, white; }
+new 1 actin { position_ends = -7.269 -7.839 4.118, -7.269 -7.839 19.118; end_state = green, white; }
+new 1 actin { position_ends = 8.040 7.074 -7.161, 8.040 7.074 7.839; end_state = green, white; }
+new 1 actin { position_ends = -10.733 -1.505 3.516, -10.733 -1.505 18.516; end_state = green, white; }
+new 1 actin { position_ends = -4.502 9.654 -4.996, -4.502 9.654 10.004; end_state = green, white; }
+new 1 actin { position_ends = -1.602 10.579 -8.576, -1.602 10.579 6.424; end_state = green, white; }
+new 1 actin { position_ends = -9.603 -4.618 3.182, -9.603 -4.618 18.182; end_state = green, white; }
+new 1 actin { position_ends = 3.193 10.289 -9.205, 3.193 10.289 5.795; end_state = green, white; }
+new 1 actin { position_ends = 10.471 2.609 0.934, 10.471 2.609 15.934; end_state = green, white; }
+new 1 actin { position_ends = -7.496 -7.543 1.816, -7.496 -7.543 16.816; end_state = green, white; }
+new 1 actin { position_ends = -4.158 -9.787 2.268, -4.158 -9.787 17.268; end_state = green, white; }
+new 1 actin { position_ends = -5.101 -9.502 -7.982, -5.101 -9.502 7.018; end_state = green, white; }
+new 1 actin { position_ends = 1.727 -10.553 -9.615, 1.727 -10.553 5.385; end_state = green, white; }
+new 1 actin { position_ends = -10.297 2.540 -6.554, -10.297 2.540 8.446; end_state = green, white; }
+new 1 actin { position_ends = -10.433 -2.015 -2.572, -10.433 -2.015 12.428; end_state = green, white; }
+new 1 actin { position_ends = 4.665 9.577 4.157, 4.665 9.577 19.157; end_state = green, white; }
+new 1 actin { position_ends = -3.885 9.812 2.808, -3.885 9.812 17.808; end_state = green, white; }
+new 1 actin { position_ends = -1.155 10.700 2.080, -1.155 10.700 17.080; end_state = green, white; }
+new 1 actin { position_ends = -10.564 -1.435 -6.513, -10.564 -1.435 8.487; end_state = green, white; }
+new 1 actin { position_ends = 10.453 3.160 -1.104, 10.453 3.160 13.896; end_state = green, white; }
+new 1 actin { position_ends = 4.871 9.414 4.032, 4.871 9.414 19.032; end_state = green, white; }
+new 1 actin { position_ends = -8.233 -6.709 -6.661, -8.233 -6.709 8.339; end_state = green, white; }
+new 1 actin { position_ends = 1.850 10.466 -8.080, 1.850 10.466 6.920; end_state = green, white; }
+new 1 actin { position_ends = 10.913 -0.508 -5.647, 10.913 -0.508 9.353; end_state = green, white; }
+new 1 actin { position_ends = 5.404 -9.125 -4.779, 5.404 -9.125 10.221; end_state = green, white; }
+new 1 actin { position_ends = 9.847 -4.048 1.017, 9.847 -4.048 16.017; end_state = green, white; }
+new 1 actin { position_ends = 2.194 10.683 1.985, 2.194 10.683 16.985; end_state = green, white; }
+new 1 actin { position_ends = -10.551 0.232 -7.711, -10.551 0.232 7.289; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 10: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 11: +64 filaments ---
+new 1 actin { position_ends = 10.409 -2.471 3.059, 10.409 -2.471 18.059; end_state = green, white; }
+new 1 actin { position_ends = -10.938 -0.028 -9.649, -10.938 -0.028 5.351; end_state = green, white; }
+new 1 actin { position_ends = 9.437 -5.110 -1.285, 9.437 -5.110 13.715; end_state = green, white; }
+new 1 actin { position_ends = 6.445 8.474 -1.991, 6.445 8.474 13.009; end_state = green, white; }
+new 1 actin { position_ends = 6.467 -8.646 -7.855, 6.467 -8.646 7.145; end_state = green, white; }
+new 1 actin { position_ends = 6.472 8.419 2.841, 6.472 8.419 17.841; end_state = green, white; }
+new 1 actin { position_ends = 10.283 -3.388 -6.684, 10.283 -3.388 8.316; end_state = green, white; }
+new 1 actin { position_ends = -6.090 8.782 -8.828, -6.090 8.782 6.172; end_state = green, white; }
+new 1 actin { position_ends = -3.660 -9.978 -5.678, -3.660 -9.978 9.322; end_state = green, white; }
+new 1 actin { position_ends = -10.382 -2.785 -4.425, -10.382 -2.785 10.575; end_state = green, white; }
+new 1 actin { position_ends = -7.352 7.778 -5.705, -7.352 7.778 9.295; end_state = green, white; }
+new 1 actin { position_ends = 3.515 10.263 3.562, 3.515 10.263 18.562; end_state = green, white; }
+new 1 actin { position_ends = 9.995 -3.543 -2.055, 9.995 -3.543 12.945; end_state = green, white; }
+new 1 actin { position_ends = 5.020 9.685 1.077, 5.020 9.685 16.077; end_state = green, white; }
+new 1 actin { position_ends = -4.101 -10.017 2.268, -4.101 -10.017 17.268; end_state = green, white; }
+new 1 actin { position_ends = -10.487 1.972 0.588, -10.487 1.972 15.588; end_state = green, white; }
+new 1 actin { position_ends = -10.745 2.062 -6.195, -10.745 2.062 8.805; end_state = green, white; }
+new 1 actin { position_ends = -8.825 -5.872 4.816, -8.825 -5.872 19.816; end_state = green, white; }
+new 1 actin { position_ends = 6.140 8.772 2.369, 6.140 8.772 17.369; end_state = green, white; }
+new 1 actin { position_ends = 9.830 -4.061 4.518, 9.830 -4.061 19.518; end_state = green, white; }
+new 1 actin { position_ends = -9.713 -4.407 1.594, -9.713 -4.407 16.594; end_state = green, white; }
+new 1 actin { position_ends = -10.644 -1.511 -1.011, -10.644 -1.511 13.989; end_state = green, white; }
+new 1 actin { position_ends = -5.010 -9.599 -4.193, -5.010 -9.599 10.807; end_state = green, white; }
+new 1 actin { position_ends = -7.054 -7.920 -5.834, -7.054 -7.920 9.166; end_state = green, white; }
+new 1 actin { position_ends = -10.454 1.952 -7.814, -10.454 1.952 7.186; end_state = green, white; }
+new 1 actin { position_ends = -10.796 0.768 -8.045, -10.796 0.768 6.955; end_state = green, white; }
+new 1 actin { position_ends = -6.996 -8.116 3.406, -6.996 -8.116 18.406; end_state = green, white; }
+new 1 actin { position_ends = -8.176 -6.798 1.402, -8.176 -6.798 16.402; end_state = green, white; }
+new 1 actin { position_ends = -4.647 9.793 -4.088, -4.647 9.793 10.912; end_state = green, white; }
+new 1 actin { position_ends = 1.278 10.651 -0.663, 1.278 10.651 14.337; end_state = green, white; }
+new 1 actin { position_ends = 10.766 1.920 0.742, 10.766 1.920 15.742; end_state = green, white; }
+new 1 actin { position_ends = 8.154 7.133 -3.111, 8.154 7.133 11.889; end_state = green, white; }
+new 1 actin { position_ends = -9.982 -4.441 2.966, -9.982 -4.441 17.966; end_state = green, white; }
+new 1 actin { position_ends = -10.747 -0.558 1.209, -10.747 -0.558 16.209; end_state = green, white; }
+new 1 actin { position_ends = -1.525 10.593 -9.312, -1.525 10.593 5.688; end_state = green, white; }
+new 1 actin { position_ends = 3.689 9.900 -9.909, 3.689 9.900 5.091; end_state = green, white; }
+new 1 actin { position_ends = -10.606 2.404 -5.670, -10.606 2.404 9.330; end_state = green, white; }
+new 1 actin { position_ends = -2.705 -10.512 0.559, -2.705 -10.512 15.559; end_state = green, white; }
+new 1 actin { position_ends = -9.493 -5.404 -4.180, -9.493 -5.404 10.820; end_state = green, white; }
+new 1 actin { position_ends = -10.105 -3.182 -8.679, -10.105 -3.182 6.321; end_state = green, white; }
+new 1 actin { position_ends = 3.148 10.204 -3.205, 3.148 10.204 11.795; end_state = green, white; }
+new 1 actin { position_ends = 10.127 3.025 2.136, 10.127 3.025 17.136; end_state = green, white; }
+new 1 actin { position_ends = -10.457 2.363 4.763, -10.457 2.363 19.763; end_state = green, white; }
+new 1 actin { position_ends = -3.887 -10.137 1.662, -3.887 -10.137 16.662; end_state = green, white; }
+new 1 actin { position_ends = -3.253 10.285 -7.751, -3.253 10.285 7.249; end_state = green, white; }
+new 1 actin { position_ends = -4.796 -9.750 -9.697, -4.796 -9.750 5.303; end_state = green, white; }
+new 1 actin { position_ends = -2.457 -10.321 3.310, -2.457 -10.321 18.310; end_state = green, white; }
+new 1 actin { position_ends = 7.890 7.404 -3.409, 7.890 7.404 11.591; end_state = green, white; }
+new 1 actin { position_ends = -5.743 8.909 -1.385, -5.743 8.909 13.615; end_state = green, white; }
+new 1 actin { position_ends = 1.097 -10.583 0.977, 1.097 -10.583 15.977; end_state = green, white; }
+new 1 actin { position_ends = -1.258 -10.783 2.221, -1.258 -10.783 17.221; end_state = green, white; }
+new 1 actin { position_ends = -9.693 4.959 -8.517, -9.693 4.959 6.483; end_state = green, white; }
+new 1 actin { position_ends = 2.483 10.378 2.831, 2.483 10.378 17.831; end_state = green, white; }
+new 1 actin { position_ends = -0.066 10.622 -2.424, -0.066 10.622 12.576; end_state = green, white; }
+new 1 actin { position_ends = 5.908 -9.027 -7.321, 5.908 -9.027 7.679; end_state = green, white; }
+new 1 actin { position_ends = 10.799 -0.429 -3.779, 10.799 -0.429 11.221; end_state = green, white; }
+new 1 actin { position_ends = 3.162 10.371 3.839, 3.162 10.371 18.839; end_state = green, white; }
+new 1 actin { position_ends = -9.965 4.175 -4.232, -9.965 4.175 10.768; end_state = green, white; }
+new 1 actin { position_ends = -3.719 10.175 -4.543, -3.719 10.175 10.457; end_state = green, white; }
+new 1 actin { position_ends = -10.470 -2.239 -2.637, -10.470 -2.239 12.363; end_state = green, white; }
+new 1 actin { position_ends = -10.438 -3.083 -6.018, -10.438 -3.083 8.982; end_state = green, white; }
+new 1 actin { position_ends = -10.537 2.864 4.858, -10.537 2.864 19.858; end_state = green, white; }
+new 1 actin { position_ends = 10.621 -2.395 -10.067, 10.621 -2.395 4.933; end_state = green, white; }
+new 1 actin { position_ends = -10.910 -0.748 -9.556, -10.910 -0.748 5.444; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 11: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 12: +64 filaments ---
+new 1 actin { position_ends = 2.615 -10.548 -8.985, 2.615 -10.548 6.015; end_state = green, white; }
+new 1 actin { position_ends = -9.876 -3.722 1.340, -9.876 -3.722 16.340; end_state = green, white; }
+new 1 actin { position_ends = -9.853 -3.888 -7.594, -9.853 -3.888 7.406; end_state = green, white; }
+new 1 actin { position_ends = -4.900 -9.676 4.350, -4.900 -9.676 19.350; end_state = green, white; }
+new 1 actin { position_ends = 4.700 9.587 -9.820, 4.700 9.587 5.180; end_state = green, white; }
+new 1 actin { position_ends = -2.135 10.376 -9.571, -2.135 10.376 5.429; end_state = green, white; }
+new 1 actin { position_ends = 5.567 -9.180 4.321, 5.567 -9.180 19.321; end_state = green, white; }
+new 1 actin { position_ends = -8.912 -6.158 -9.391, -8.912 -6.158 5.609; end_state = green, white; }
+new 1 actin { position_ends = 7.459 -7.660 -0.616, 7.459 -7.660 14.384; end_state = green, white; }
+new 1 actin { position_ends = 6.303 -8.524 0.601, 6.303 -8.524 15.601; end_state = green, white; }
+new 1 actin { position_ends = -4.994 -9.613 0.040, -4.994 -9.613 15.040; end_state = green, white; }
+new 1 actin { position_ends = -9.748 -4.047 4.575, -9.748 -4.047 19.575; end_state = green, white; }
+new 1 actin { position_ends = -3.010 -10.293 1.228, -3.010 -10.293 16.228; end_state = green, white; }
+new 1 actin { position_ends = -8.202 6.859 4.885, -8.202 6.859 19.885; end_state = green, white; }
+new 1 actin { position_ends = 9.638 5.094 0.977, 9.638 5.094 15.977; end_state = green, white; }
+new 1 actin { position_ends = 7.358 -7.961 -5.813, 7.358 -7.961 9.187; end_state = green, white; }
+new 1 actin { position_ends = -9.946 -3.944 -2.861, -9.946 -3.944 12.139; end_state = green, white; }
+new 1 actin { position_ends = 10.673 0.237 -9.798, 10.673 0.237 5.202; end_state = green, white; }
+new 1 actin { position_ends = 3.395 10.377 -1.879, 3.395 10.377 13.121; end_state = green, white; }
+new 1 actin { position_ends = 8.728 6.436 0.557, 8.728 6.436 15.557; end_state = green, white; }
+new 1 actin { position_ends = -10.499 -1.308 -1.604, -10.499 -1.308 13.396; end_state = green, white; }
+new 1 actin { position_ends = -10.159 -3.269 -8.366, -10.159 -3.269 6.634; end_state = green, white; }
+new 1 actin { position_ends = 4.726 9.465 4.602, 4.726 9.465 19.602; end_state = green, white; }
+new 1 actin { position_ends = -7.476 -7.685 -9.176, -7.476 -7.685 5.824; end_state = green, white; }
+new 1 actin { position_ends = -8.159 -6.720 0.302, -8.159 -6.720 15.302; end_state = green, white; }
+new 1 actin { position_ends = 1.120 -10.679 -1.517, 1.120 -10.679 13.483; end_state = green, white; }
+new 1 actin { position_ends = 1.088 10.724 0.333, 1.088 10.724 15.333; end_state = green, white; }
+new 1 actin { position_ends = 10.217 3.555 -3.286, 10.217 3.555 11.714; end_state = green, white; }
+new 1 actin { position_ends = -8.006 -7.026 2.773, -8.006 -7.026 17.773; end_state = green, white; }
+new 1 actin { position_ends = -10.319 2.749 -5.206, -10.319 2.749 9.794; end_state = green, white; }
+new 1 actin { position_ends = -3.983 -10.023 -1.260, -3.983 -10.023 13.740; end_state = green, white; }
+new 1 actin { position_ends = 7.341 -7.665 -1.047, 7.341 -7.665 13.953; end_state = green, white; }
+new 1 actin { position_ends = -7.109 8.229 4.743, -7.109 8.229 19.743; end_state = green, white; }
+new 1 actin { position_ends = 9.809 4.381 -8.624, 9.809 4.381 6.376; end_state = green, white; }
+new 1 actin { position_ends = 10.141 -3.163 0.029, 10.141 -3.163 15.029; end_state = green, white; }
+new 1 actin { position_ends = -10.590 -1.214 1.590, -10.590 -1.214 16.590; end_state = green, white; }
+new 1 actin { position_ends = 7.267 7.972 -1.405, 7.267 7.972 13.595; end_state = green, white; }
+new 1 actin { position_ends = -7.735 -7.610 -4.714, -7.735 -7.610 10.286; end_state = green, white; }
+new 1 actin { position_ends = 1.375 -10.698 1.634, 1.375 -10.698 16.634; end_state = green, white; }
+new 1 actin { position_ends = -2.465 10.604 -6.755, -2.465 10.604 8.245; end_state = green, white; }
+new 1 actin { position_ends = 9.307 5.492 -8.462, 9.307 5.492 6.538; end_state = green, white; }
+new 1 actin { position_ends = -10.304 -3.520 0.525, -10.304 -3.520 15.525; end_state = green, white; }
+new 1 actin { position_ends = 3.559 10.205 -9.481, 3.559 10.205 5.519; end_state = green, white; }
+new 1 actin { position_ends = 9.055 5.801 -5.541, 9.055 5.801 9.459; end_state = green, white; }
+new 1 actin { position_ends = -9.109 -5.961 4.571, -9.109 -5.961 19.571; end_state = green, white; }
+new 1 actin { position_ends = -6.248 8.847 -8.199, -6.248 8.847 6.801; end_state = green, white; }
+new 1 actin { position_ends = -7.094 -7.869 -9.468, -7.094 -7.869 5.532; end_state = green, white; }
+new 1 actin { position_ends = -10.616 -0.689 -0.467, -10.616 -0.689 14.533; end_state = green, white; }
+new 1 actin { position_ends = -2.028 10.646 -4.150, -2.028 10.646 10.850; end_state = green, white; }
+new 1 actin { position_ends = -8.507 -6.784 3.808, -8.507 -6.784 18.808; end_state = green, white; }
+new 1 actin { position_ends = 8.619 6.219 -6.892, 8.619 6.219 8.108; end_state = green, white; }
+new 1 actin { position_ends = -7.682 -7.690 -7.574, -7.682 -7.690 7.426; end_state = green, white; }
+new 1 actin { position_ends = 5.278 9.224 1.710, 5.278 9.224 16.710; end_state = green, white; }
+new 1 actin { position_ends = 2.031 10.401 -7.410, 2.031 10.401 7.590; end_state = green, white; }
+new 1 actin { position_ends = -5.240 -9.584 -0.403, -5.240 -9.584 14.597; end_state = green, white; }
+new 1 actin { position_ends = -10.882 0.702 -5.766, -10.882 0.702 9.234; end_state = green, white; }
+new 1 actin { position_ends = 10.592 -1.982 -2.993, 10.592 -1.982 12.007; end_state = green, white; }
+new 1 actin { position_ends = -4.100 9.738 -2.537, -4.100 9.738 12.463; end_state = green, white; }
+new 1 actin { position_ends = 10.705 1.193 3.001, 10.705 1.193 18.001; end_state = green, white; }
+new 1 actin { position_ends = -9.665 4.233 -2.260, -9.665 4.233 12.740; end_state = green, white; }
+new 1 actin { position_ends = -0.737 -10.835 -3.229, -0.737 -10.835 11.771; end_state = green, white; }
+new 1 actin { position_ends = -8.420 -6.547 -6.445, -8.420 -6.547 8.555; end_state = green, white; }
+new 1 actin { position_ends = 5.131 9.589 -0.824, 5.131 9.589 14.176; end_state = green, white; }
+new 1 actin { position_ends = 6.299 -8.894 -5.930, 6.299 -8.894 9.070; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 12: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+
+% --- top actin supply pulse 13: +64 filaments ---
+new 1 actin { position_ends = 8.822 -5.887 3.567, 8.822 -5.887 18.567; end_state = green, white; }
+new 1 actin { position_ends = 6.562 8.625 0.783, 6.562 8.625 15.783; end_state = green, white; }
+new 1 actin { position_ends = 9.552 -4.850 2.960, 9.552 -4.850 17.960; end_state = green, white; }
+new 1 actin { position_ends = -10.468 -1.934 2.945, -10.468 -1.934 17.945; end_state = green, white; }
+new 1 actin { position_ends = -10.656 1.510 -4.078, -10.656 1.510 10.922; end_state = green, white; }
+new 1 actin { position_ends = -6.221 8.647 3.466, -6.221 8.647 18.466; end_state = green, white; }
+new 1 actin { position_ends = 6.275 8.610 4.425, 6.275 8.610 19.425; end_state = green, white; }
+new 1 actin { position_ends = 4.924 -9.514 3.452, 4.924 -9.514 18.452; end_state = green, white; }
+new 1 actin { position_ends = -7.617 -7.598 0.642, -7.617 -7.598 15.642; end_state = green, white; }
+new 1 actin { position_ends = 3.668 -9.939 -5.275, 3.668 -9.939 9.725; end_state = green, white; }
+new 1 actin { position_ends = -4.511 9.552 1.620, -4.511 9.552 16.620; end_state = green, white; }
+new 1 actin { position_ends = 5.195 9.374 4.861, 5.195 9.374 19.861; end_state = green, white; }
+new 1 actin { position_ends = -8.669 6.326 -2.118, -8.669 6.326 12.882; end_state = green, white; }
+new 1 actin { position_ends = 8.866 5.940 -9.068, 8.866 5.940 5.932; end_state = green, white; }
+new 1 actin { position_ends = -9.849 -4.127 -3.842, -9.849 -4.127 11.158; end_state = green, white; }
+new 1 actin { position_ends = 10.817 0.042 -9.593, 10.817 0.042 5.407; end_state = green, white; }
+new 1 actin { position_ends = -4.563 -9.939 3.743, -4.563 -9.939 18.743; end_state = green, white; }
+new 1 actin { position_ends = -10.750 1.133 -9.639, -10.750 1.133 5.361; end_state = green, white; }
+new 1 actin { position_ends = 10.834 0.799 3.719, 10.834 0.799 18.719; end_state = green, white; }
+new 1 actin { position_ends = -4.098 10.097 -3.990, -4.098 10.097 11.010; end_state = green, white; }
+new 1 actin { position_ends = 5.781 -9.092 -9.206, 5.781 -9.092 5.794; end_state = green, white; }
+new 1 actin { position_ends = -8.363 -6.651 -7.471, -8.363 -6.651 7.529; end_state = green, white; }
+new 1 actin { position_ends = 3.927 -9.904 -9.874, 3.927 -9.904 5.126; end_state = green, white; }
+new 1 actin { position_ends = 9.777 -4.312 -7.373, 9.777 -4.312 7.627; end_state = green, white; }
+new 1 actin { position_ends = 0.126 -10.690 -7.026, 0.126 -10.690 7.974; end_state = green, white; }
+new 1 actin { position_ends = 10.907 -0.330 -2.321, 10.907 -0.330 12.679; end_state = green, white; }
+new 1 actin { position_ends = -9.766 4.011 -4.733, -9.766 4.011 10.267; end_state = green, white; }
+new 1 actin { position_ends = 1.959 -10.391 -9.440, 1.959 -10.391 5.560; end_state = green, white; }
+new 1 actin { position_ends = -10.675 0.688 -4.956, -10.675 0.688 10.044; end_state = green, white; }
+new 1 actin { position_ends = -7.453 -7.586 -2.614, -7.453 -7.586 12.386; end_state = green, white; }
+new 1 actin { position_ends = 3.243 -10.302 -1.508, 3.243 -10.302 13.492; end_state = green, white; }
+new 1 actin { position_ends = -1.506 -10.502 -8.487, -1.506 -10.502 6.513; end_state = green, white; }
+new 1 actin { position_ends = -6.065 -8.936 1.558, -6.065 -8.936 16.558; end_state = green, white; }
+new 1 actin { position_ends = -0.352 10.609 -5.126, -0.352 10.609 9.874; end_state = green, white; }
+new 1 actin { position_ends = -9.602 4.787 -8.843, -9.602 4.787 6.157; end_state = green, white; }
+new 1 actin { position_ends = 8.061 -6.982 -7.926, 8.061 -6.982 7.074; end_state = green, white; }
+new 1 actin { position_ends = -9.560 -5.144 2.692, -9.560 -5.144 17.692; end_state = green, white; }
+new 1 actin { position_ends = 0.420 10.730 -7.899, 0.420 10.730 7.101; end_state = green, white; }
+new 1 actin { position_ends = 7.939 -7.044 3.396, 7.939 -7.044 18.396; end_state = green, white; }
+new 1 actin { position_ends = -8.119 6.894 -6.753, -8.119 6.894 8.247; end_state = green, white; }
+new 1 actin { position_ends = -7.957 -7.169 -8.100, -7.957 -7.169 6.900; end_state = green, white; }
+new 1 actin { position_ends = -5.600 9.174 -4.918, -5.600 9.174 10.082; end_state = green, white; }
+new 1 actin { position_ends = -9.834 -4.783 -1.064, -9.834 -4.783 13.936; end_state = green, white; }
+new 1 actin { position_ends = 9.553 -5.118 -7.035, 9.553 -5.118 7.965; end_state = green, white; }
+new 1 actin { position_ends = -4.684 9.857 -1.937, -4.684 9.857 13.063; end_state = green, white; }
+new 1 actin { position_ends = -10.510 2.345 -1.474, -10.510 2.345 13.526; end_state = green, white; }
+new 1 actin { position_ends = 7.398 7.598 2.576, 7.398 7.598 17.576; end_state = green, white; }
+new 1 actin { position_ends = 9.655 -4.935 2.310, 9.655 -4.935 17.310; end_state = green, white; }
+new 1 actin { position_ends = 9.680 -4.442 -2.900, 9.680 -4.442 12.100; end_state = green, white; }
+new 1 actin { position_ends = 0.166 10.909 -5.268, 0.166 10.909 9.732; end_state = green, white; }
+new 1 actin { position_ends = 9.809 -3.911 -8.756, 9.809 -3.911 6.244; end_state = green, white; }
+new 1 actin { position_ends = 9.050 -5.728 3.076, 9.050 -5.728 18.076; end_state = green, white; }
+new 1 actin { position_ends = 4.052 -9.899 -3.991, 4.052 -9.899 11.009; end_state = green, white; }
+new 1 actin { position_ends = 8.019 -7.048 -7.324, 8.019 -7.048 7.676; end_state = green, white; }
+new 1 actin { position_ends = -8.290 6.599 -3.236, -8.290 6.599 11.764; end_state = green, white; }
+new 1 actin { position_ends = -7.710 -7.769 -9.244, -7.710 -7.769 5.756; end_state = green, white; }
+new 1 actin { position_ends = -10.507 1.947 -1.547, -10.507 1.947 13.453; end_state = green, white; }
+new 1 actin { position_ends = 9.238 -5.689 -2.894, 9.238 -5.689 12.106; end_state = green, white; }
+new 1 actin { position_ends = 9.479 5.360 -1.224, 9.479 5.360 13.776; end_state = green, white; }
+new 1 actin { position_ends = -10.009 3.560 2.319, -10.009 3.560 17.319; end_state = green, white; }
+new 1 actin { position_ends = 5.845 -8.804 -4.887, 5.845 -8.804 10.113; end_state = green, white; }
+new 1 actin { position_ends = -8.815 6.193 -2.688, -8.815 6.193 12.312; end_state = green, white; }
+new 1 actin { position_ends = -0.465 10.601 2.894, -0.465 10.601 17.894; end_state = green, white; }
+new 1 actin { position_ends = -10.894 0.831 -3.857, -10.894 0.831 11.143; end_state = green, white; }
+new 256 crosslinker { position = inside; }
+
+% post-pulse 13: 60 s
+run 15000 system
+{
+    nb_frames = 20
+}
+

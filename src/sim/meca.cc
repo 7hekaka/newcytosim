@@ -201,8 +201,9 @@ void Meca::calculateForces(const real* X, real const* B, real* F) const
 void Meca::addAllRigidity(const real* X, real* Y) const
 {
     #pragma omp parallel for
-    for ( Mecable * mec : mecables )
+    for ( size_t m = 0; m < mecables.size(); ++m )
     {
+        Mecable * mec = mecables[m];
         const size_t inx = DIM * mec->matIndex();
         mec->addRigidity(X+inx, Y+inx);
     }
@@ -289,8 +290,9 @@ void Meca::readyMecables()
     zero_real(DIM*cnt, vBAS);
     
     #pragma omp parallel for
-    for ( Mecable * mec : mecables )
+    for ( size_t m = 0; m < mecables.size(); ++m )
     {
+        Mecable * mec = mecables[m];
         mec->putPoints(vPTS+DIM*mec->matIndex());
         mec->prepareMecable();
 #if ( DIM > 1 ) && !SEPARATE_RIGIDITY_TERMS
@@ -603,8 +605,9 @@ unsigned Meca::solve()
     {
         real local = INFINITY;
         #pragma omp for
-        for ( Mecable * mec : mecables )
+        for ( size_t m = 0; m < mecables.size(); ++m )
         {
+            Mecable * mec = mecables[m];
             const size_t inx = DIM * mec->matIndex();
             real n = brownian1(mec, vFOR+inx, alpha_, tau_, vRHS+inx);
             local = std::min(local, n);
@@ -872,8 +875,9 @@ void Meca::apply()
          */
 
         #pragma omp parallel for
-        for ( Mecable * mec : mecables )
+        for ( size_t m = 0; m < mecables.size(); ++m )
         {
+            Mecable * mec = mecables[m];
             const index_t off = DIM * mec->matIndex();
             const index_t len = DIM * mec->nbPoints();
 #ifndef __FAST_MATH__
@@ -897,4 +901,3 @@ void Meca::apply()
         //printf("superfluous call to Meca::apply()\n");
     }
 }
-

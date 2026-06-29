@@ -325,11 +325,11 @@ def save_metric_figure(lookup: dict, metric: dict) -> Path:
 def save_window_figure(lookup: dict) -> list[Path]:
     outs = []
     for group, family_order, slug, xlabel in [
-        ('total480', TOTAL480_ORDER, 'total480_window_mean_vz_abs', 'Cluster count (0 = no motors, total motors = 480)'),
-        ('mpc12', MPC12_ORDER, 'mpc12_window_mean_vz_abs', 'Cluster count (0 = no motors, 12 motors per cluster)'),
+        ('total480', TOTAL480_ORDER, 'total480_window_mean_vz_abs', 'Cluster count (0 = no motors; total motors = 480)'),
+        ('mpc12', MPC12_ORDER, 'mpc12_window_mean_vz_abs', 'Cluster count (0 = no motors; 12 motors per cluster)'),
     ]:
         plt.rcParams.update({'font.size': 14, 'axes.linewidth': 1.3, 'savefig.facecolor': 'white', 'figure.facecolor': 'white'})
-        fig, axes = plt.subplots(3, 3, figsize=(16.2, 12.6), sharey='row')
+        fig, axes = plt.subplots(3, 3, figsize=(15.2, 12.4), sharey='row')
         vals = []
         for row in lookup.values():
             for wslug, _, _ in WINDOWS:
@@ -349,23 +349,21 @@ def save_window_figure(lookup: dict) -> list[Path]:
                 metric = {'field': f'{wslug}_mean_vz_abs', 'ylabel': WINDOW_METRIC['ylabel'], 'clip_zero': True}
                 draw_count_family(ax, family_order, lookup, group, regime, metric)
                 ax.set_ylim(ylo, yhi)
+                ax.tick_params(labelleft=True)
                 if ridx == 0:
                     ax.set_title(f'{int(start)}-{int(stop if stop < TARGET_FINAL_MIN else round(TARGET_FINAL_MIN))} min', fontsize=16, pad=8)
                 if cidx == 0:
                     ax.text(0.03, 0.94, regime, transform=ax.transAxes, ha='left', va='top', fontsize=16, color='#444444')
-                if cidx > 0:
-                    ax.set_yticklabels([])
         for ridx in range(3):
             axes[ridx, 0].set_ylabel(WINDOW_METRIC['ylabel'], fontsize=18)
-        for cidx in range(3):
-            axes[2, cidx].set_xlabel(xlabel, fontsize=17)
+        fig.supxlabel(xlabel, fontsize=17, y=0.08)
         handles = []
         labels = []
         for _, label, color, marker, face in [CONTROL_SPEC] + MODEL_SPECS:
             handles.append(plt.Line2D([0], [0], color=color, lw=2.3 if label != 'No motors' else 0, marker=marker, markersize=8, markeredgewidth=1.8, markeredgecolor=color, markerfacecolor=face))
             labels.append(label)
         fig.legend(handles, labels, loc='lower center', ncol=3, frameon=False, bbox_to_anchor=(0.5, -0.01), fontsize=16)
-        fig.subplots_adjust(left=0.10, right=0.99, top=0.95, bottom=0.12, wspace=0.18, hspace=0.22)
+        fig.subplots_adjust(left=0.13, right=0.99, top=0.95, bottom=0.15, wspace=0.18, hspace=0.22)
         out = PLOTS / f'{slug}.png'
         fig.savefig(out, dpi=300, bbox_inches='tight')
         plt.close(fig)

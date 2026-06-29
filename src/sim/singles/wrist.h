@@ -19,6 +19,12 @@
  */
 class Wrist : public Single
 {
+private:
+    bool  slide_ = false;
+    real  Dsurf_ = 0.0;    // µm^2/s on sphere
+    Vector u_;             // unit vector on the sphere (solid-local)
+    unsigned refP_ = 0;    // reference point index for center/radius (your code already has base_)
+
 protected:
     
     Interpolation4 base_;
@@ -59,6 +65,7 @@ public:
     /// attach over a triad of Mecapoints starting at `ref`
     void rebase(Mecable const* mec, unsigned ref, Vector pos) { base_.set(mec, ref, pos); }
     
+    void enableSlide(real D) { slide_ = (D>0); Dsurf_ = D; }
     
     /// signature of the Solid underlying the Single
     ObjectSignature baseSignature() const { return base()->signature(); }

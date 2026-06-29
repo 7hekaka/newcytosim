@@ -1,0 +1,15 @@
+Representative run suggestions
+
+Chosen as the replicate closest to the condition mean dx, so these are good first movies to inspect.
+
+Run mapping:
+- 01_symmetric_dense_treadmill: r0001, r0002, r0003
+- 02_minus_x_cap_dense_treadmill: r0004, r0005, r0006
+- 03_plus_x_cap_dense_treadmill: r0007, r0008, r0009
+- 04_no_nucleator_control: r0010, r0011, r0012
+
+Suggested movies:
+- 01_symmetric_dense_treadmill: r0001 (dx=+0.007 um; path=/home/thekaka/project/cytosim/ast/nuclear_aster_treadmilling_long_pilot/job03/save/r0001)
+- 02_minus_x_cap_dense_treadmill: r0005 (dx=-0.141 um; path=/home/thekaka/project/cytosim/ast/nuclear_aster_treadmilling_long_pilot/job03/save/r0005)
+- 03_plus_x_cap_dense_treadmill: r0008 (dx=+0.219 um; path=/home/thekaka/project/cytosim/ast/nuclear_aster_treadmilling_long_pilot/job03/save/r0008)
+- 04_no_nucleator_control: r0012 (dx=+0.183 um; path=/home/thekaka/project/cytosim/ast/nuclear_aster_treadmilling_long_pilot/job03/save/r0012)

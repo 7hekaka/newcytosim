@@ -218,8 +218,9 @@ void Meca::precondition(const real* X, real* Y) const
         copy_real(dimension(), X, Y);
     
     #pragma omp parallel for
-    for ( Mecable const* mec : mecables )
+    for ( size_t m = 0; m < mecables.size(); ++m )
     {
+        Mecable const* mec = mecables[m];
         const index_t inx = DIM * mec->matIndex();
             applyPreconditionner(mec, Y+inx);
     }
@@ -1009,4 +1010,3 @@ void Meca::computePreconditionner()
     }
     free_real(tmp);
 }
-

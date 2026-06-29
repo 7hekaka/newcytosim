@@ -1,0 +1,11 @@
+case,n,dx_mean,dx_sem,dy_mean,dy_sem,dz_mean,dz_sem,net_displacement_mean,net_displacement_sem,x_velocity_mean,x_velocity_sem,actin_count_mean,actin_count_sem,actin_total_len_mean,actin_total_len_sem,actin_avg_len_mean,actin_avg_len_sem,actin_max_len_mean,actin_max_len_sem,plus_minus_x_delta_mean,plus_minus_x_delta_sem
+01_symmetric_aster_no_external,1,-0.0051,nan,0.0072,nan,0.0064,nan,0.0109,nan,-0.000255,nan,56.0,nan,168.0,nan,3.0,nan,3.0,nan,-0.022921428571428586,nan
+02_plus_x_cap_no_external,1,0.0528,nan,-0.0024,nan,-0.0028,nan,0.05292863119333429,nan,0.00264,nan,56.0,nan,168.0,nan,3.0,nan,3.0,nan,2.6428249999999993,nan
+03_plus_x_cap_fixed_binders,1,0.8811,nan,0.0456,nan,0.0091,nan,0.8823261188472208,nan,0.044055,nan,56.0,nan,168.0,nan,3.0,nan,3.0,nan,2.1765000000000008,nan
+04_plus_x_cap_fixed_plus_motors,1,-0.328,nan,-0.0054,nan,0.0006,nan,0.3280449969135332,nan,-0.0164,nan,56.0,nan,168.0,nan,3.0,nan,3.0,nan,2.106635714285714,nan
+05_symmetric_aster_fixed_plus_motors,1,-0.0867,nan,-0.008,nan,-0.0056,nan,0.08724820915067541,nan,-0.004335,nan,56.0,nan,168.0,nan,3.0,nan,3.0,nan,-0.17160535714285724,nan
+06_plus_x_cap_fixed_minus_motors,1,1.5965,nan,0.0109,nan,0.0349,nan,1.5969186172125367,nan,0.07982500000000001,nan,56.0,nan,168.0,nan,3.0,nan,3.0,nan,1.9478107142857148,nan
+07_symmetric_aster_fixed_minus_motors,1,1.3737,nan,0.0168,nan,-0.0455,nan,1.3745559937667144,nan,0.068685,nan,56.0,nan,168.0,nan,3.0,nan,3.0,nan,-0.7728803571428566,nan
+08_push_filaments_unanchored,1,-0.0049,nan,0.0173,nan,0.0035,nan,0.018318023910891698,nan,-0.000245,nan,48.0,nan,144.0,nan,3.0,nan,3.0,nan,0.7341333333333335,nan
+09_push_filaments_fixed_binders,1,-0.0098,nan,-0.012,nan,-0.0099,nan,0.01838613608129778,nan,-0.00049,nan,48.0,nan,144.0,nan,3.0,nan,3.0,nan,0.1893979166666665,nan
+10_push_filaments_fixed_plus_motors,1,0.0233,nan,-0.0076,nan,-0.0041,nan,0.024848742422907445,nan,0.001165,nan,48.0,nan,144.0,nan,3.0,nan,3.0,nan,0.6492250000000002,nan

@@ -97,7 +97,7 @@ def draw_group_snapshot(group, group_label, snapshot_slug, snapshot_label, panel
             if panel is not None and density is not None:
                 im = ax.imshow(density, origin='lower', aspect='auto', extent=[0.0, panel.smax, panel.zmin, panel.zmax], cmap=HEATMAP_CMAP, vmin=0.0, vmax=vmax, interpolation='nearest')
                 ax.set_xlim(0.0, panel.smax)
-                ax.set_ylim(panel.zmin, panel.zmax)
+                ax.set_ylim(panel.zmax, panel.zmin)
             if i == 0:
                 title = '0' if case == 'c0_m0' else f'{force_value:g}'
                 ax.set_title(title, fontsize=15, pad=8)
@@ -123,7 +123,7 @@ def draw_group_regime_timeline(group, group_label, regime, panel_lu, dens_lu, vm
             if panel is not None and density is not None:
                 im = ax.imshow(density, origin='lower', aspect='auto', extent=[0.0, panel.smax, panel.zmin, panel.zmax], cmap=HEATMAP_CMAP, vmin=0.0, vmax=vmax, interpolation='nearest')
                 ax.set_xlim(0.0, panel.smax)
-                ax.set_ylim(panel.zmin, panel.zmax)
+                ax.set_ylim(panel.zmax, panel.zmin)
             if i == 0:
                 title = snapshot_label
                 if panel is not None:

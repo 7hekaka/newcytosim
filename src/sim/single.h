@@ -58,6 +58,10 @@ private:
     /// stiffness of the interaction
     real linkStiffness() const { return 0; }
 
+    int    c_id_      = -1;      // cached from prop at construction
+    bool   c_off_init_ = false;
+    Vector c_off_T_;             // local offset in tangent plane at the cluster center
+
 protected:
     
     /// specialization of HandMonitor

@@ -1,0 +1,9 @@
+scenario,condition,frame,time_min,n_replicates,total_len,total_len_sd,total_len_sem,total_len_n,off_len,off_len_sd,off_len_sem,off_len_n,avg_len,avg_len_sd,avg_len_sem,avg_len_n,min_len,min_len_sd,min_len_sem,min_len_n,max_len,max_len_sd,max_len_sem,max_len_n
+large_long,nomotor_xlink,0,0.0,5,480.0,0.0,0.0,5,0.0,0.0,0.0,5,5.0,0.0,0.0,5,5.0,0.0,0.0,5,5.0,0.0,0.0,5
+large_long,rotatable_xlink,0,0.0,5,480.0,0.0,0.0,5,0.0,0.0,0.0,5,5.0,0.0,0.0,5,5.0,0.0,0.0,5,5.0,0.0,0.0,5
+small_long,nomotor_xlink,0,0.0,5,30.0,0.0,0.0,5,0.0,0.0,0.0,5,2.5,0.0,0.0,5,2.5,0.0,0.0,5,2.5,0.0,0.0,5
+small_long,nomotor_xlink,20,1.0,1,138.2,0.0,0.0,1,5.3,0.0,0.0,1,9.211,0.0,0.0,1,0.211,0.0,0.0,1,11.7,0.0,0.0,1
+small_long,nomotor_xlink,40,2.0,1,177.9,0.0,0.0,1,16.2,0.0,0.0,1,8.894,0.0,0.0,1,0.185,0.0,0.0,1,14.06,0.0,0.0,1
+small_long,nomotor_xlink,80,4.0,1,194.8,0.0,0.0,1,29.1,0.0,0.0,1,7.214,0.0,0.0,1,0.182,0.0,0.0,1,14.485,0.0,0.0,1
+small_long,rotatable_xlink,0,0.0,5,30.0,0.0,0.0,5,0.0,0.0,0.0,5,2.5,0.0,0.0,5,2.5,0.0,0.0,5,2.5,0.0,0.0,5
+small_long,rotatable_xlink,20,1.0,1,135.2,0.0,0.0,1,38.5,0.0,0.0,1,6.144,0.0,0.0,1,0.233,0.0,0.0,1,11.961,0.0,0.0,1

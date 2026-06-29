@@ -1,9 +1,10 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Run this inside an allocated compute node, for example:
+# Run this inside an allocated Bergamo compute node, for example:
 #   salloc --account=ACF-UTK0049 --partition=condo-sabel1 --qos=condo \
-#       --nodes=1 --ntasks=1 --cpus-per-task=8 --time=02:00:00
+#       --nodes=1 --ntasks=1 --cpus-per-task=8 --time=03:00:00 \
+#       --nodelist=ber1528
 #   ./python/run/compile_cytosim_cluster.sh
 
 ROOT="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
@@ -22,14 +23,8 @@ CYTOSIM_NATIVE_ARCH="${CYTOSIM_NATIVE_ARCH:-OFF}"
 CYTOSIM_ARCH_FLAGS="${CYTOSIM_ARCH_FLAGS:-}"
 CYTOSIM_ENABLE_OPENMP="${CYTOSIM_ENABLE_OPENMP:-ON}"
 CHEW_MODE="${CHEW_MODE:-2}"
-MODULES="${MODULES:-gcc netlib-lapack openblas}"
-CMAKE_MODULES="${CMAKE_MODULES:-cmake/3.30.5-gcc}"
-CMAKE_EXE="${CMAKE_EXE:-${CMAKE:-}}"
-PRIVATE_CMAKE="${PRIVATE_CMAKE:-$HOME/.local/opt/cmake-3.30.5-linux-x86_64/bin/cmake}"
-LEGACY_PRIVATE_CMAKE="${LEGACY_PRIVATE_CMAKE:-/nfs/home/kacheamp/.local/opt/cmake-3.30.5-linux-x86_64/bin/cmake}"
 OPENBLAS_ROOT="${OPENBLAS_ROOT:-$HOME/OpenBLAS}"
-LOCAL_LIB_DIR="${LOCAL_LIB_DIR:-$HOME/lib}"
-SETUP_OPENBLAS_SHIMS="${SETUP_OPENBLAS_SHIMS:-ON}"
+USER_CMAKE="${USER_CMAKE:-$HOME/.local/opt/cmake-3.30.5-linux-x86_64/bin/cmake}"
 
 exec > >(tee "$LOG") 2>&1
 
@@ -56,11 +51,6 @@ echo "native_arch: $CYTOSIM_NATIVE_ARCH"
 echo "arch_flags: ${CYTOSIM_ARCH_FLAGS:-<none>}"
 echo "openmp: $CYTOSIM_ENABLE_OPENMP"
 echo "chew_mode: $CHEW_MODE"
-echo "requested_modules: ${MODULES:-<none>}"
-echo "private_cmake: $PRIVATE_CMAKE"
-echo "legacy_private_cmake: $LEGACY_PRIVATE_CMAKE"
-echo "openblas_root: $OPENBLAS_ROOT"
-echo "local_lib_dir: $LOCAL_LIB_DIR"
 echo
 
 if [[ "$(hostname)" == login* && "${ALLOW_LOGIN_COMPILE:-0}" != "1" ]]; then
@@ -85,92 +75,18 @@ grep -m1 '^flags' /proc/cpuinfo || true
 echo
 
 echo "=== Modules ==="
-if ! command -v module >/dev/null 2>&1 && [[ -r /etc/profile.d/modules.sh ]]; then
-    set +u
-    # shellcheck disable=SC1091
-    source /etc/profile.d/modules.sh || true
-    set -u
-fi
 if command -v module >/dev/null 2>&1; then
+    MODULES="${MODULES:-gcc netlib-lapack openblas}"
     if [[ -n "$MODULES" ]]; then
         for mod in $MODULES; do
             echo "module load $mod"
-            if ! module load "$mod"; then
-                echo "WARNING: failed to load module '$mod'; continuing so local libraries can still be used"
-            fi
+            module load "$mod" || echo "warning: could not load module $mod"
         done
     fi
     module list || true
 else
     echo "module command not available"
 fi
-echo
-
-echo "=== BLAS/LAPACK setup ==="
-prepend_path()
-{
-    local var_name="$1"
-    local dir="$2"
-    [[ -d "$dir" ]] || return 0
-    local current="${!var_name:-}"
-    case ":$current:" in
-        *":$dir:"*) ;;
-        *) export "$var_name=$dir${current:+:$current}" ;;
-    esac
-}
-
-find_openblas()
-{
-    local candidate
-    for candidate in \
-        "$OPENBLAS_ROOT/libopenblas.a" \
-        "$OPENBLAS_ROOT/libopenblas.so" \
-        "$OPENBLAS_ROOT/lib/libopenblas.a" \
-        "$OPENBLAS_ROOT/lib/libopenblas.so"
-    do
-        if [[ -e "$candidate" ]]; then
-            printf '%s\n' "$candidate"
-            return 0
-        fi
-    done
-    return 1
-}
-
-openblas_lib="$(find_openblas || true)"
-if [[ "$SETUP_OPENBLAS_SHIMS" != "OFF" && -n "$openblas_lib" ]]; then
-    mkdir -p "$LOCAL_LIB_DIR"
-    case "$openblas_lib" in
-        *.a)
-            ln -sfn "$openblas_lib" "$LOCAL_LIB_DIR/libblas.a"
-            ln -sfn "$openblas_lib" "$LOCAL_LIB_DIR/liblapack.a"
-            ;;
-        *.so)
-            ln -sfn "$openblas_lib" "$LOCAL_LIB_DIR/libblas.so"
-            ln -sfn "$openblas_lib" "$LOCAL_LIB_DIR/liblapack.so"
-            ;;
-        *)
-            ln -sfn "$openblas_lib" "$LOCAL_LIB_DIR/libblas"
-            ln -sfn "$openblas_lib" "$LOCAL_LIB_DIR/liblapack"
-            ;;
-    esac
-    echo "openblas_lib: $openblas_lib"
-else
-    echo "openblas_lib: <not found under $OPENBLAS_ROOT>"
-fi
-
-prepend_path LD_LIBRARY_PATH "$LOCAL_LIB_DIR"
-prepend_path LD_LIBRARY_PATH "$OPENBLAS_ROOT"
-prepend_path LD_LIBRARY_PATH "$OPENBLAS_ROOT/lib"
-prepend_path LIBRARY_PATH "$LOCAL_LIB_DIR"
-prepend_path LIBRARY_PATH "$OPENBLAS_ROOT"
-prepend_path LIBRARY_PATH "$OPENBLAS_ROOT/lib"
-prepend_path CMAKE_LIBRARY_PATH "$LOCAL_LIB_DIR"
-prepend_path CMAKE_LIBRARY_PATH "$OPENBLAS_ROOT"
-prepend_path CMAKE_LIBRARY_PATH "$OPENBLAS_ROOT/lib"
-ls -l "$LOCAL_LIB_DIR"/libblas* "$LOCAL_LIB_DIR"/liblapack* 2>/dev/null || true
-echo "LD_LIBRARY_PATH=${LD_LIBRARY_PATH:-<unset>}"
-echo "LIBRARY_PATH=${LIBRARY_PATH:-<unset>}"
-echo "CMAKE_LIBRARY_PATH=${CMAKE_LIBRARY_PATH:-<unset>}"
 echo
 
 echo "=== Enable requested chewer mode ==="
@@ -187,38 +103,57 @@ PY
 grep -n "NEW_FIBER_END_CHEW" src/sim/fiber_prop.h
 echo
 
+echo "=== BLAS/LAPACK paths ==="
+mkdir -p "$HOME/lib"
+BLAS_CMAKE_ARGS=()
+if [[ -f "$OPENBLAS_ROOT/libopenblas.a" ]]; then
+    OPENBLAS_LIB="$OPENBLAS_ROOT/libopenblas.a"
+elif [[ -f "$OPENBLAS_ROOT/lib/libopenblas.a" ]]; then
+    OPENBLAS_LIB="$OPENBLAS_ROOT/lib/libopenblas.a"
+elif [[ -f "$OPENBLAS_ROOT/libopenblas.so" ]]; then
+    OPENBLAS_LIB="$OPENBLAS_ROOT/libopenblas.so"
+elif [[ -f "$OPENBLAS_ROOT/lib/libopenblas.so" ]]; then
+    OPENBLAS_LIB="$OPENBLAS_ROOT/lib/libopenblas.so"
+else
+    OPENBLAS_LIB=""
+fi
+
+if [[ -n "$OPENBLAS_LIB" ]]; then
+    echo "OpenBLAS: $OPENBLAS_LIB"
+    ln -sfn "$OPENBLAS_LIB" "$HOME/lib/libblas.${OPENBLAS_LIB##*.}"
+    ln -sfn "$OPENBLAS_LIB" "$HOME/lib/liblapack.${OPENBLAS_LIB##*.}"
+    BLAS_CMAKE_ARGS+=("-DBLAS_LIB:FILEPATH=$OPENBLAS_LIB" "-DLAPACK_LIB:FILEPATH=$OPENBLAS_LIB")
+else
+    echo "OpenBLAS not found under $OPENBLAS_ROOT; CMake will search system/module libraries"
+fi
+export LD_LIBRARY_PATH="$OPENBLAS_ROOT:$OPENBLAS_ROOT/lib:$HOME/lib:${LD_LIBRARY_PATH:-}"
+echo "LD_LIBRARY_PATH=$LD_LIBRARY_PATH"
+echo
+
 echo "=== Toolchain ==="
-if [[ -z "$CMAKE_EXE" ]]; then
-    for candidate in "$PRIVATE_CMAKE" "$LEGACY_PRIVATE_CMAKE"; do
-        if [[ -x "$candidate" ]]; then
-            CMAKE_EXE="$candidate"
-            break
-        fi
-    done
+if [[ -z "${CC:-}" ]]; then
+    if CC_BIN="$(command -v gcc 2>/dev/null)"; then
+        export CC="$CC_BIN"
+    fi
 fi
-
-if [[ -z "$CMAKE_EXE" && -n "$CMAKE_MODULES" && "$(command -v module || true)" ]]; then
-    for mod in $CMAKE_MODULES; do
-        echo "fallback module load $mod"
-        if module load "$mod" && command -v cmake >/dev/null 2>&1; then
-            CMAKE_EXE="$(command -v cmake)"
-            break
-        fi
-    done
+if [[ -z "${CXX:-}" ]]; then
+    if CXX_BIN="$(command -v g++ 2>/dev/null)"; then
+        export CXX="$CXX_BIN"
+    fi
 fi
-
-if [[ -z "$CMAKE_EXE" && "$(command -v cmake || true)" ]]; then
-    CMAKE_EXE="$(command -v cmake)"
+if [[ -n "${CMAKE:-}" && -x "${CMAKE:-}" ]]; then
+    CMAKE_BIN="$CMAKE"
+elif [[ -x "$USER_CMAKE" ]]; then
+    CMAKE_BIN="$USER_CMAKE"
+else
+    CMAKE_BIN="$(command -v cmake)"
 fi
-
-if [[ -z "$CMAKE_EXE" || ! -x "$CMAKE_EXE" ]]; then
-    echo "ERROR: no usable CMake found."
-    echo "Set CMAKE_EXE=/path/to/cmake or PRIVATE_CMAKE=/path/to/cmake and run again."
-    exit 2
-fi
-
-echo "cmake_exe: $CMAKE_EXE"
-"$CMAKE_EXE" --version || true
+echo "CMAKE_BIN=$CMAKE_BIN"
+"$CMAKE_BIN" --version || true
+echo "CC=${CC:-<unset>}"
+if [[ -n "${CC:-}" ]]; then "$CC" --version || true; fi
+echo "CXX=${CXX:-<unset>}"
+if [[ -n "${CXX:-}" ]]; then "$CXX" --version || true; fi
 command -v g++ || true
 g++ --version || true
 command -v make || true
@@ -235,25 +170,28 @@ cmake_args=(
     -S "$ROOT"
     -B "$BUILD_DIR"
     -DCMAKE_BUILD_TYPE=Release
+    "-DCMAKE_C_COMPILER=${CC:-cc}"
+    "-DCMAKE_CXX_COMPILER=${CXX:-c++}"
     -DMAKE_SIM=ON
     -DMAKE_PLAY="$MAKE_PLAY"
     -DMAKE_TOOLS="$MAKE_TOOLS"
     -DMAKE_TESTS="$MAKE_TESTS"
     -DCYTOSIM_NATIVE_ARCH="$CYTOSIM_NATIVE_ARCH"
     -DCYTOSIM_ENABLE_OPENMP="$CYTOSIM_ENABLE_OPENMP"
+    "${BLAS_CMAKE_ARGS[@]}"
 )
 if [[ -n "$CYTOSIM_ARCH_FLAGS" ]]; then
     cmake_args+=("-DCYTOSIM_ARCH_FLAGS=$CYTOSIM_ARCH_FLAGS")
 fi
-printf ' %q' "$CMAKE_EXE" "${cmake_args[@]}"
+printf ' %q' "$CMAKE_BIN" "${cmake_args[@]}"
 echo
-"$CMAKE_EXE" "${cmake_args[@]}"
+"$CMAKE_BIN" "${cmake_args[@]}"
 echo
 
 echo "=== Build ==="
 for target in $TARGETS; do
     echo "--- target: $target ---"
-    "$CMAKE_EXE" --build "$BUILD_DIR" --target "$target" --parallel "$JOBS" --verbose
+    "$CMAKE_BIN" --build "$BUILD_DIR" --target "$target" --parallel "$JOBS" --verbose
 done
 echo
 
@@ -261,11 +199,31 @@ echo "=== Binary sanity check ==="
 if [[ -x "$BUILD_DIR/bin/sim" ]]; then
     file "$BUILD_DIR/bin/sim" || true
     ldd "$BUILD_DIR/bin/sim" || true
+    ldd "$BUILD_DIR/bin/sim" | grep -Ei 'gomp|omp|blas|lapack|openblas|gfortran|stdc\\+\\+' || true
     timeout 20s "$BUILD_DIR/bin/sim" help >/tmp/cytosim_help_${STAMP}.txt
     head -20 /tmp/cytosim_help_${STAMP}.txt
     rm -f /tmp/cytosim_help_${STAMP}.txt
 else
     echo "No sim binary found at $BUILD_DIR/bin/sim"
+fi
+
+echo
+echo "=== Optional minus-chew sanity run ==="
+SANITY_CONF="$ROOT/turnover_mini_minus_chew/validation/minus_end_chew/config.cym"
+if [[ -x "$BUILD_DIR/bin/sim" && -x "$BUILD_DIR/bin/report" && -f "$SANITY_CONF" ]]; then
+    SANITY_DIR="$BUILD_DIR/sanity_minus_chew_${STAMP}"
+    mkdir -p "$SANITY_DIR"
+    cp "$SANITY_CONF" "$SANITY_DIR/config.cym"
+    (
+        cd "$SANITY_DIR"
+        export OMP_NUM_THREADS="${OMP_NUM_THREADS:-${SLURM_CPUS_PER_TASK:-1}}"
+        export OPENBLAS_NUM_THREADS=1
+        "$BUILD_DIR/bin/sim" config.cym
+        "$BUILD_DIR/bin/report" fiber:length frame=0,30 > fiber_length_check.txt
+        cat fiber_length_check.txt
+    )
+else
+    echo "skipping sanity run; missing sim/report or $SANITY_CONF"
 fi
 
 echo

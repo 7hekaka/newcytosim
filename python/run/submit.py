@@ -48,12 +48,15 @@ F. Nedelec
 submit  = 'sbatch'
 queue   = 'icelake'
 account = ''         # Project name
+qos = ''             # Quality of service
+nodelist = ''
 
 runtime = '12:00:00' # 12 hours
 memory  = 4048       # in MB
 ncpu    = 1          # nb of threads per job
 
 import sys, os, shutil, subprocess
+nodelist = os.environ.get('SBATCH_NODELIST', '')
 
 # output for error messages:
 out  = sys.stderr
@@ -119,8 +122,12 @@ def sub_script(exe):
     res.append(f'--cpus-per-task={ncpu}')
     if account:
         res.append(f'--account={account}')
+    if qos:
+        res.append(f'--qos={qos}')
     res.append(f'--job-name={jdir}')
     res.append(f'--partition={queue}')
+    if nodelist:
+        res.append(f'--nodelist={nodelist}')
     res.append(f'--time={runtime}')
     res.append(f'--mem={memory}')
     # define signals sent if time is exceeded:
@@ -142,7 +149,11 @@ def array_script(jobcnt):
     res.append(f'#SBATCH --cpus-per-task={ncpu}')
     if account:
         res.append(f'#SBATCH --account={account}')
+    if qos:
+        res.append(f'#SBATCH --qos={qos}')
     res.append(f'#SBATCH --partition={queue}')
+    if nodelist:
+        res.append(f'#SBATCH --nodelist={nodelist}')
     res.append(f'#SBATCH --time={runtime}')
     res.append(f'#SBATCH --mem={memory}')
     # define signals sent if time is exceeded:
@@ -163,7 +174,7 @@ def array_script(jobcnt):
 
 def main(args):
     """submit jobs, depending on the arguments provided"""
-    global submit, memory, runtime, queue, jdir, ncpu
+    global submit, memory, runtime, queue, account, qos, jdir, ncpu, nodelist
     
     #find submit command:
     proc = subprocess.Popen(['which', submit], stdout=subprocess.PIPE)
@@ -232,6 +243,10 @@ def main(args):
                 queue = val
             elif key == 'account':
                 account = val
+            elif key == 'qos':
+                qos = val
+            elif key == 'node' or key == 'nodes' or key == 'nodelist':
+                nodelist = val
             else:
                 out.write("Error: I do not understand argument `%s'\n" % arg)
                 sys.exit()
@@ -268,4 +283,3 @@ if __name__ == "__main__":
         print(__doc__)
     else:
         main(sys.argv[1:])
-

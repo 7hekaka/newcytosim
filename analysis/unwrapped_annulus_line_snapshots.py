@@ -218,7 +218,7 @@ def draw_panel(ax, panel: SnapshotPanel | None) -> None:
         for s, z in frame_segments(panel.frame, panel.seam, panel.smax, r_mid):
             ax.plot(s, z, color='black', lw=0.65, alpha=0.45)
         ax.set_xlim(0.0, panel.smax)
-        ax.set_ylim(panel.zmin, panel.zmax)
+        ax.set_ylim(panel.zmax, panel.zmin)
     style(ax)
 
 

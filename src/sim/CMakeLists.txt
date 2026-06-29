@@ -25,6 +25,7 @@ set(SOURCES_SIM
 set(SOURCES_SPACES
     space_annulus.cc
     space_rough_annulus.cc
+    space_shell.cc
     space_square.cc
     space_sphere.cc
     space_dice.cc
